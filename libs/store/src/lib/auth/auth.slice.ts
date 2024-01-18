@@ -29,24 +29,14 @@ export const initialAuthState: AuthState = {
 };
 
 function normalizeSession(session: Session): ISession {
-  return {
-    created: session.created,
-    token: session.token,
-    refreshToken: '',
-    createdAt: Date.now(),
-    refreshExpiresAt: Date.now(),
-    expiresAt: Date.now(),
-    username: session.username || '',
-    userId: session.user_id || '',
-    vars: session.vars,
-  };
+  return JSON.parse(JSON.stringify(session));
 }
 
 export const authenticateGoogle = createAsyncThunk(
   'auth/authenticateGoogle',
   async (token: string, thunkAPI) => {
-    const { client } = getMezonCtx(thunkAPI);
-    const session = await client?.authenticateGoogle(token);
+    const  mezon  = getMezonCtx(thunkAPI);
+    const session = await mezon.authenticateGoogle(token);
     if (!session) {
       return thunkAPI.rejectWithValue('Invalid session');
     }
@@ -62,8 +52,8 @@ export type AuthenticateEmailPayload = {
 export const authenticateEmail = createAsyncThunk(
   'auth/authenticateEmail',
   async ({ username, password }: AuthenticateEmailPayload, thunkAPI) => {
-    const { client } = getMezonCtx(thunkAPI);
-    const session = await client?.authenticateEmail(username, password);
+    const mezon  = getMezonCtx(thunkAPI);
+    const session = await mezon?.authenticateEmail(username, password);
     if (!session) {
       return thunkAPI.rejectWithValue('Invalid session');
     }
@@ -145,4 +135,10 @@ export const getAuthState = (rootState: {
 export const selectAllAuth = createSelector(
   getAuthState,
   (state: AuthState) => state
+);
+
+
+export const selectIsLogin = createSelector(
+  getAuthState,
+  (state: AuthState) => state.isLogin
 );

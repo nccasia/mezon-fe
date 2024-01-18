@@ -2,8 +2,21 @@ import { LoginForm } from '@mezon/components';
 import { QRSection } from 'libs/components/src/lib/components/LoginForm/QR/index';
 import { TitleSection } from 'libs/components/src/lib/components/LoginForm/Title/index';
 import GoogleButtonLogin from 'libs/components/src/lib/components/LoginForm/GoogleButton';
+import { useSelector } from 'react-redux';
+import { selectIsLogin } from '@mezon/store';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const isLogin =  useSelector(selectIsLogin)
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (isLogin) {
+      navigate('/chat');
+    }
+  }, [isLogin, navigate]);
+
   return (
     <div
         className=" w-screen h-screen flex items-center justify-center"

@@ -14,7 +14,7 @@ type Props = {
 export function MezonStoreProvider({ children, store, loading, persistor }: Props) {
   return (
     <Provider store={store}>
-      <PersistGate loading = {loading} persistor={persistor}>{children}</PersistGate>
+      <PersistGate loading={loading} persistor={persistor}>{children}</PersistGate>
     </Provider>
   );
 }
