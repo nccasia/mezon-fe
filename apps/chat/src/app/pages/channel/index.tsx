@@ -17,7 +17,6 @@ export default function Server() {
   return (
     <>
       <div className="hidden flex-col w-60 bg-bgSurface md:flex">
-        {/* <ServerHeader name={currentClan?.name} type='channel' /> */}
         <ChannelList />
         <FooterProfile name="nhan.nguyen" status="Online" />
       </div>
