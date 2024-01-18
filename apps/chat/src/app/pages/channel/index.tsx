@@ -7,8 +7,6 @@ import {
 import ChannelMessages from './ChanneMessages';
 import { useChat } from '@mezon/core';
 import { ChannelMessageBox } from './ChannelMessageBox';
-// import { LogOutButton } from 'libs/ui/src/lib/LogOutButton/index';
-
 export default function Server() {
   const { currentChanel, currentClan } = useChat();
 
