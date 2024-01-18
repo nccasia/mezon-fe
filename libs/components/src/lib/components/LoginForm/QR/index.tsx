@@ -1,5 +1,5 @@
-import mezonQRCode from '../../../../../../../src/assets/QR-mezon.png';
-import mezonLogo from '../../../../../../../src/assets/mezon-logo.png';
+import mezonQRCode from 'apps/chat/src/assets/SVG/QR-mezon.png';
+import mezonLogo from 'apps/chat/src/assets/SVG/mezon-logo.png';
 
 export const QRSection: React.FC = () => {
   return (
@@ -11,11 +11,7 @@ export const QRSection: React.FC = () => {
           alt="Mezon Logo"
         />
         <div className="absolute flex items-center justify-center">
-          <img
-            src={mezonLogo}
-            className="w-12 h-12"
-            alt="QR Code"
-          />
+          <img src={mezonLogo} className="w-12 h-12" alt="QR Code" />
         </div>
       </div>
       <div className="flex flex-col justify-start items-center w-[210px] h-fit p-0 gap-y-1">

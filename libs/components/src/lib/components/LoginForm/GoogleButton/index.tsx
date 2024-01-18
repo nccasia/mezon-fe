@@ -1,8 +1,7 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import React from 'react';
 import { useChat } from '@mezon/core';
-import googleIcon from '../../../../../../../src/assets/gg-icon.png';
-
+import googleIcon from 'apps/chat/src/assets/SVG/google-icon.png';
 
 const GoogleButtonLogin: React.FC = () => {
   const { loginByGoogle } = useChat();

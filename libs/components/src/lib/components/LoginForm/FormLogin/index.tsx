@@ -3,10 +3,9 @@ import { Resolver, useForm } from 'react-hook-form';
 import { AlertTitleTextWarning } from '../../../../../../ui/src/lib/Alert/index';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import line from '../../../../../../../src/assets/Vector 1.svg';
-import eyeOpen from '../../../../../../../src/assets/Live area open.svg';
-import eyeClose from '../../../../../../../src/assets/Live area close.svg';
-
+import line from 'apps/chat/src/assets/SVG/behind-line.svg';
+import eyeOpen from 'apps/chat/src/assets/SVG/eye-open.svg';
+import eyeClose from 'apps/chat/src/assets/SVG/eye-close.svg';
 
 export type LoginFormPayload = {
   userEmail: string;
@@ -26,7 +25,7 @@ export const validationSchema = Yup.object().shape({
     .required('Password is required')
     .matches(
       /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
-      'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number'
+      'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number',
     ),
 });
 
@@ -37,7 +36,9 @@ function LoginForm(props: LoginFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormPayload>({
-    resolver: yupResolver(validationSchema) as unknown as Resolver<LoginFormPayload>,
+    resolver: yupResolver(
+      validationSchema,
+    ) as unknown as Resolver<LoginFormPayload>,
 
     defaultValues: {
       password: '',
@@ -53,7 +54,7 @@ function LoginForm(props: LoginFormProps) {
       }
       return false;
     },
-    [onSubmit]
+    [onSubmit],
   );
 
   const handleFormSubmit = useCallback(
@@ -61,7 +62,7 @@ function LoginForm(props: LoginFormProps) {
       e.preventDefault();
       handleSubmit(submitForm)(e);
     },
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const [showPassword, setShowPassword] = useState(false);
