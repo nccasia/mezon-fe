@@ -1,3 +1,4 @@
+import InfoCollectionForm from 'libs/components/src/lib/components/CreateChannel'
 import { ChannelMessage } from './ChannelMessage'
 import { useChat } from '@mezon/core'
 
@@ -6,6 +7,7 @@ export default function ChannelMessages() {
 
     return (
         <>
+            {/* <InfoCollectionForm/> */}
             {messages.map((message, i) => (
                 <ChannelMessage key={i} message={message} />
             ))}
