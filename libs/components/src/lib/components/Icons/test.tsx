@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react'
 
-import * as Icons from './index_1'
+import * as Icons from '.'
 
 describe('<Icons />', () => {
   const iconsIndex = Object.keys(Icons)

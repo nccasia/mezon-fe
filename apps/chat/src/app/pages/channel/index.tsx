@@ -13,28 +13,21 @@ export default function Server() {
   const { currentChanel, currentClan, userProfile } = useChat();
 
   if (!currentClan || !currentChanel) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
   return (
     <>
       <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
-        <ServerHeader
-          name={currentClan?.clan_name}
-          type="channel"
-          bannerImage={currentClan.banner}
-        />
+        <ServerHeader name={currentClan?.clan_name} type='channel' bannerImage={currentClan.banner} />
         <ChannelList />
-        <FooterProfile
-          name={userProfile?.user?.username || ''}
-          status={userProfile?.user?.online}
-          avatar={userProfile?.user?.avatar_url || ''}
-        />
+        <FooterProfile name={userProfile?.user?.username || ''} status={userProfile?.user?.online} avatar={userProfile?.user?.avatar_url || ''} />
       </div>
-      <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
+      <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
         <ChannelTopbar channel={currentChanel} />
         <div className="flex h-screen">
           <div className="flex flex-col flex-1">
-            <div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
+            <div
+              className="flex-1 overflow-y-auto">
               <ChannelMessages />
             </div>
             <div className="flex-shrink-0 bg-bgSecondary">
@@ -46,6 +39,7 @@ export default function Server() {
           </div>
         </div>
       </div>
+
     </>
-  );
+  )
 }

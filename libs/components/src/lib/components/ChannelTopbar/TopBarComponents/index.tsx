@@ -4,23 +4,23 @@ import * as Icons from '../../Icons';
 import { useState, useRef, useEffect } from 'react';
 
 import {
+  CategoryNameProps,
   ChannelTypeEnum,
   channelStatusEnum,
   ThreadNameProps,
   IconProps,
-  ChannelProps,
 } from 'libs/utils/src/lib/typings/index';
 
-export const ChannelLable: React.FC<ChannelProps> = ({
-  status,
-  type,
+export const ChannelLable: React.FC<CategoryNameProps> = ({
+  channelStatus,
+  ChannelType,
   name,
 }) => {
   return (
     <>
       <div className="flex flex-row items-center">
         <div className="w-5 h-5 relative flex text-zinc-400 text-lg font-['Manrope']">
-          {type === ChannelTypeEnum.VOICE ? (
+          {ChannelType === ChannelTypeEnum.VOICE ? (
             <Icons.Speaker />
           ) : (
             <div>
@@ -44,7 +44,7 @@ export const ThreadLable: React.FC<ThreadNameProps> = ({ name }) => {
     <>
       <div className="items-center flex flex-row gap-1">
         <Icons.ArrowToThread />
-        <Icons.ThreadNotClick />
+        <Icons.ThreadNotClick/>
         <p className="text-white mb-0.5 font-thin font-['Manrope']"> {name}</p>
       </div>
     </>

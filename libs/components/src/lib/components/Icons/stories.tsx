@@ -1,5 +1,5 @@
 import { Story, Meta } from '@storybook/react'
-import * as Icons from './index_1'
+import * as Icons from '.'
 
 export default {
   title: 'Icons',

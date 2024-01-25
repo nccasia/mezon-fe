@@ -5,15 +5,15 @@
   "scripts": {
     "ssh:fix": "dos2unix ./ssh/id_gh_ncc",
     "sync": "npm run sync:mezon-js",
-    "sync:mezon-js": "npm run preinstall && npm install file:vendors/mezon-js/packages/nakama-js",
+    "sync:mezon-js": "npm run preinstall && npm install file:vendors/mezon-js/packages/mezon-js",
     "dev:chat": "nx run chat:serve",
     "preinstall": "sh ./scripts/preinstall.sh",
     "build:chat": "nx run chat:build"
   },
   "private": true,
   "dependencies": {
-    "@heroiclabs/nakama-js": "file:vendors/mezon-js/packages/nakama-js",
     "@hookform/resolvers": "^3.3.4",
+    "@mezon/mezon-js": "file:vendors/mezon-js/packages/mezon-js",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "2.0.1",
     "@swc/helpers": "~0.5.3",

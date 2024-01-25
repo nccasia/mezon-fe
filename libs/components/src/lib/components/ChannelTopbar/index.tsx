@@ -10,8 +10,8 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
     <div className="flex h-[72px] min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
       <div className="justify-start items-center gap-1 flex">
         <ChannelLable
-          type={1}
-          // channelStatus=""
+          ChannelType="voice"
+          channelStatus="lock"
           name={channel?.channel_lable}
         />
         <ThreadLable name={channel?.channel_lable} />

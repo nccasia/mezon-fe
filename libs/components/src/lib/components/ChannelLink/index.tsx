@@ -54,7 +54,7 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
         {state === 'inactiveUnread' && (
           <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>
         )}
-        <Speaker />
+        <Speaker className="mr-1.5 w-5 h-[28px] text-gray-400" />
         <p className="ml-2 text-[#AEAEAE] w-full h-[28px] hover:text-white">
           {channel?.channel_lable}
         </p>

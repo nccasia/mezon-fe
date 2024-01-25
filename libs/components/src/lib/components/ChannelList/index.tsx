@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { useChat } from '@mezon/core';
+import * as Icons from '../Icons';
 import ChannelLink from '../ChannelLink';
 import { IChannel, ICategoryChannel } from '@mezon/utils';
 import { Events, BrowseChannel } from './ChannelListComponents';
-import {
-  channelsActions,
-  useAppDispatch,
-  openCreateNewModalChannel,
-} from '@mezon/store';
-import * as Icons from '../Icons';
-import { CreateNewChannelModal } from 'libs/components/src/lib/components/CreateChannelModal/index';
 
 export type ChannelListProps = { className?: string };
 
@@ -27,18 +21,8 @@ function ChannelList() {
   }
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  const dispatch = useAppDispatch();
-
-  const openModalCreateNewChannel = (paramCategory: string) => {
-    console.log('paramCategory', paramCategory);
-    dispatch(channelsActions.openCreateNewModalChannel());
-    dispatch(channelsActions.getCurrentCategoryId(paramCategory));
-  };
-
   return (
     <>
-      {<CreateNewChannelModal />}
-
       <div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
         <Events />
         <BrowseChannel />
@@ -49,22 +33,17 @@ function ChannelList() {
         {categorizedChannels.map((category: ICategoryChannel) => (
           <div key={category.id}>
             {category.category_name && (
-              <div className="flex flex-row px-2">
-                <button
-                  onClick={() => {
-                    toggleCategory(category.id);
-                    setIsOpen(!isOpen);
-                  }}
-                  className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
-                >
-                  {isOpen ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+              <button
+                onClick={() => {
+                  toggleCategory(category.id);
+                  setIsOpen(!isOpen);
+                }}
+                className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
+              >
+                {isOpen ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 
-                  {category.category_name}
-                </button>
-                <button onClick={() => openModalCreateNewChannel(category.id)}>
-                  <Icons.Plus />
-                </button>
-              </div>
+                {category.category_name}
+              </button>
             )}
             {isOpen && (
               <div className="mt-[5px] space-y-0.5 font-['Manrope'] text-[#AEAEAE]">
