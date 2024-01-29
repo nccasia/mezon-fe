@@ -19,6 +19,7 @@ import {
 } from '@mezon/mezon-js/dist/api.gen';
 import { messagesActions } from '../messages/messages.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
+import { useNavigate } from 'react-router-dom';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -40,6 +41,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   currentChannelId?: string | null;
   isOpenCreateNewChannel?: boolean;
   currentCategory: ICategory | null;
+  newChannelCreated: ApiCreateChannelDescRequest | null | undefined;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -96,11 +98,13 @@ export const createNewChannel = createAsyncThunk(
   'channels/createNewChannel',
   async (body: ApiCreateChannelDescRequest, thunkAPI) => {
     try {
+      const navigate = useNavigate();
       const mezon = await ensureSession(getMezonCtx(thunkAPI));
       const response = await mezon.client.createChannelDesc(
         mezon.session,
         body,
       );
+      // thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
       if (response) {
         thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
       } else {
@@ -151,6 +155,7 @@ export const initialChannelsState: ChannelsState =
     error: null,
     isOpenCreateNewChannel: false,
     currentCategory: null,
+    newChannelCreated: null,
   });
 
 export const channelsSlice = createSlice({
@@ -201,10 +206,20 @@ export const channelsSlice = createSlice({
       .addCase(createNewChannel.pending, (state: ChannelsState) => {
         state.loadingStatus = 'loading';
       })
-      .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
-        state.loadingStatus = 'loaded';
-        state.isOpenCreateNewChannel = false;
-      })
+      .addCase(
+        createNewChannel.fulfilled,
+        (
+          state: ChannelsState,
+          // action: PayloadAction<ApiCreateChannelDescRequest | undefined | null>,
+        ) => {
+          state.loadingStatus = 'loaded';
+          state.isOpenCreateNewChannel = false;
+          // setTimeout(() => {
+          //   state.newChannelCreated = action.payload;
+          // }, 1000);
+
+        },
+      )
       .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
         state.loadingStatus = 'error';
         state.error = action.error.message;

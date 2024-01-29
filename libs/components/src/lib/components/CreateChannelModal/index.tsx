@@ -15,7 +15,10 @@ import { ChannelTypeComponent } from './ChannelType';
 import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { ChannelTypeEnum, LoadingStatus } from 'libs/utils/src/lib/typings/index';
+import {
+  ChannelTypeEnum,
+  LoadingStatus,
+} from 'libs/utils/src/lib/typings/index';
 
 export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +33,6 @@ export const CreateNewChannelModal = () => {
   const isLoading = useSelector(
     (state: RootState) => state.channels.loadingStatus,
   );
-
 
   useEffect(() => {
     if (isLoading === 'loaded') {
@@ -90,6 +92,7 @@ export const CreateNewChannelModal = () => {
     setChannelType(-1);
     setIsPrivate(0);
   };
+
   return (
     <>
       {isOpenModal && (

@@ -1299,7 +1299,7 @@ export const Announcement: React.FC<IconProps> = ({
 };
 
 export const Private: React.FC<IconProps> = ({
-  defaultFill = '#AEAEAE',
+  defaultFill = '#FFFFFF',
   defaultSize = 'w-5 h-5',
 }) => {
   return (
@@ -1315,7 +1315,7 @@ export const Private: React.FC<IconProps> = ({
           fillRule="evenodd"
           clipRule="evenodd"
           d="M5 6V5C5 2.23858 7.23858 0 10 0C12.7614 0 15 2.23858 15 5V6H16C17.1046 6 18 6.89543 18 8V18C18 19.1046 17.1046 20 16 20H4C2.89543 20 2 19.1046 2 18V8C2 6.89543 2.89543 6 4 6H5ZM7 5C7 3.34315 8.34315 2 10 2C11.6569 2 13 3.34315 13 5V6H7V5ZM10 10.75C10.6904 10.75 11.25 11.3096 11.25 12V14C11.25 14.6904 10.6904 15.25 10 15.25C9.30964 15.25 8.75 14.6904 8.75 14V12C8.75 11.3096 9.30964 10.75 10 10.75Z"
-          fill="#AEAEAE"
+          fill="#CCCCCC"
         />
       </g>
       <defs>
