@@ -67,6 +67,10 @@ function getChannelsRootState(
   return thunkAPI.getState() as ChannelsRootState;
 }
 
+
+
+
+
 export const joinChanel = createAsyncThunk(
   'channels/joinChanel',
   async (channelId: string, thunkAPI) => {
@@ -92,6 +96,60 @@ export const joinChanel = createAsyncThunk(
     }
   },
 );
+
+
+// Direct Message
+
+export const createNewChannelDirectMessage = createAsyncThunk(
+  'channels/createNewChannelDirectMessage',
+  async (body: ApiCreateChannelDescRequest, thunkAPI) => {
+    try {
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const response = await mezon.client.createChannelDesc(
+        mezon.session,
+        body,
+      );
+      if (response) {
+        return response;
+      } else {
+        return thunkAPI.rejectWithValue([]);
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue([]);
+    }
+  },
+);
+
+export const joinChannelDirectMessage = createAsyncThunk(
+  'channels/joinChannelDirectMessage',
+  async (channelId: string, thunkAPI) => {
+    console.log("joinChannelDirectMessage", channelId)
+    try {
+      // thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+      // thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+      // thunkAPI.dispatch(
+      //   channelMembersActions.fetchChannelMembers({ channelId }),
+      // );
+
+      const chanel = await waitUntil(() =>
+        selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
+      );
+      if (!chanel || !chanel.channel_lable) {
+        return thunkAPI.rejectWithValue([]);
+      }
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      await mezon.joinChatChannel(channelId, "private5");
+      return chanel;
+    } catch (error) {
+      console.log(error);
+      return thunkAPI.rejectWithValue([]);
+    }
+  },
+);
+
+
+
+
 
 export const createNewChannel = createAsyncThunk(
   'channels/createNewChannel',
@@ -242,6 +300,7 @@ export const channelsActions = {
   fetchChannels,
   joinChanel,
   createNewChannel,
+  joinChannelDirectMessage
 };
 
 /*

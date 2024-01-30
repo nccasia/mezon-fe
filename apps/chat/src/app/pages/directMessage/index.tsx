@@ -7,7 +7,7 @@ import Setting from "../setting"
 export default function Direct() {
     const { userProfile } = useChat();
     const [openSetting, setOpenSetting] = useState(false)
-    const currentDirectMess = null //get form store
+    const currentDirectMess = true //get form store
     const handleOpenCreate = () => {
         setOpenSetting(true)
       }

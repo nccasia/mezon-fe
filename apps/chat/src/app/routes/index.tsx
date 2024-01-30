@@ -104,6 +104,7 @@ export const routes = createBrowserRouter([
                   },
                   {
                     path: 'direct',
+                    loader: channelLoader,
                     element: <Direct />,
                   },
                 ],
@@ -115,11 +116,13 @@ export const routes = createBrowserRouter([
       {
         path: 'invite',
         loader: authLoader,
-        children: [{
-          path: ':inviteId',
-          // TODO: add loader
-          element: <InvitePage />,
-        }]
+        children: [
+          {
+            path: ':inviteId',
+            // TODO: add loader
+            element: <InvitePage />,
+          },
+        ],
       },
       // fallback route, renders when no other route is matched
       {
