@@ -1,4 +1,4 @@
-import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus } from "@mezon/utils";
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -6,18 +6,18 @@ import {
   createSlice,
   EntityState,
   PayloadAction,
-} from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+} from "@reduxjs/toolkit";
+import { ensureSession, getMezonCtx } from "../helpers";
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
-} from '@mezon/mezon-js/dist/api.gen';
-import { messagesActions } from '../messages/messages.slice';
-import { channelMembersActions } from '../channelmembers/channel.members';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { fetchCategories } from '../categories/categories.slice';
+} from "@mezon/mezon-js/dist/api.gen";
+import { messagesActions } from "../messages/messages.slice";
+import { channelMembersActions } from "../channelmembers/channel.members";
+import { GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
+import { fetchCategories } from "../categories/categories.slice";
 
-export const CHANNELS_FEATURE_KEY = 'channels';
+export const CHANNELS_FEATURE_KEY = "channels";
 
 /*
  * Update these interfaces according to your requirements.
@@ -27,7 +27,7 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-  return { ...channelRes, id: channelRes.channel_id || '' };
+  return { ...channelRes, id: channelRes.channel_id || "" };
 };
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
@@ -68,7 +68,7 @@ function getChannelsRootState(
 }
 
 export const joinChanel = createAsyncThunk(
-  'channels/joinChanel',
+  "channels/joinChanel",
   async (channelId: string, thunkAPI) => {
     try {
       thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
@@ -84,8 +84,62 @@ export const joinChanel = createAsyncThunk(
         return thunkAPI.rejectWithValue([]);
       }
       const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
+      await mezon.joinChatChannel(channelId, chanel?.channel_lable || "");
       return chanel;
+    } catch (error) {
+      console.log(error);
+      return thunkAPI.rejectWithValue([]);
+    }
+  },
+);
+// Direct Message
+
+export const createNewChannelDirectMessage = createAsyncThunk(
+  "channels/createNewChannelDirectMessage",
+  async (body: ApiCreateChannelDescRequest, thunkAPI) => {
+    try {
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const response = await mezon.client.createChannelDesc(
+        mezon.session,
+        body,
+      );
+      if (response) {
+        return response;
+      } else {
+        return thunkAPI.rejectWithValue([]);
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue([]);
+    }
+  },
+);
+
+export const joinChannelDirectMessage = createAsyncThunk(
+  "channels/joinChannelDirectMessage",
+  async (channelId: string, thunkAPI) => {
+    console.log("joinChannelDirectMessage-slice", channelId);
+    try {
+      console.log("s1");
+      thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+      thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+      thunkAPI.dispatch(
+        channelMembersActions.fetchChannelMembers({ channelId }),
+      );
+      // const chanel = await waitUntil(() =>
+        
+      //   selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
+      // );
+
+      // console.log("channel", chanel);
+      // if (!chanel || !chanel.channel_lable) {
+      //   return thunkAPI.rejectWithValue([]);
+      // }
+
+      // console.log("channel", chanel);
+
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const resonse = await mezon.joinChatChannel(channelId, "Room2");
+      return resonse;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue([]);
@@ -94,7 +148,7 @@ export const joinChanel = createAsyncThunk(
 );
 
 export const createNewChannel = createAsyncThunk(
-  'channels/createNewChannel',
+  "channels/createNewChannel",
   async (body: ApiCreateChannelDescRequest, thunkAPI) => {
     try {
       const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -123,14 +177,14 @@ type fetchChannelsArgs = {
 };
 
 export const fetchChannels = createAsyncThunk(
-  'channels/fetchChannels',
+  "channels/fetchChannels",
   async ({ clanId }: fetchChannelsArgs, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelDescs(
       mezon.session,
       100,
       1,
-      '',
+      "",
       clanId,
     );
 
@@ -146,8 +200,8 @@ export const fetchChannels = createAsyncThunk(
 
 export const initialChannelsState: ChannelsState =
   channelsAdapter.getInitialState({
-    loadingStatus: 'not loaded',
-    socketStatus: 'not loaded',
+    loadingStatus: "not loaded",
+    socketStatus: "not loaded",
     error: null,
     isOpenCreateNewChannel: false,
     currentCategory: null,
@@ -172,41 +226,41 @@ export const channelsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchChannels.pending, (state: ChannelsState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(
         fetchChannels.fulfilled,
         (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
           channelsAdapter.setAll(state, action.payload);
-          state.loadingStatus = 'loaded';
+          state.loadingStatus = "loaded";
         },
       )
       .addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
 
     builder
       .addCase(joinChanel.rejected, (state: ChannelsState, action) => {
-        state.socketStatus = 'error';
+        state.socketStatus = "error";
         state.error = action.error.message;
       })
       .addCase(joinChanel.pending, (state: ChannelsState) => {
-        state.socketStatus = 'loading';
+        state.socketStatus = "loading";
       })
       .addCase(joinChanel.fulfilled, (state: ChannelsState) => {
-        state.socketStatus = 'loaded';
+        state.socketStatus = "loaded";
       });
     builder
       .addCase(createNewChannel.pending, (state: ChannelsState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
-        state.loadingStatus = 'loaded';
+        state.loadingStatus = "loaded";
         state.isOpenCreateNewChannel = false;
       })
       .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
   },
@@ -242,6 +296,7 @@ export const channelsActions = {
   fetchChannels,
   joinChanel,
   createNewChannel,
+  joinChannelDirectMessage,
 };
 
 /*

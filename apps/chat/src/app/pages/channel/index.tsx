@@ -60,7 +60,7 @@ export default function Server() {
               {currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
             </div> 
             <div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
-              <ChannelMessageBox />
+              <ChannelMessageBox typeChatDirectMessage={false}/>
             </div>
           </div>
           <div className="w-[268px] bg-bgSurface  lg:flex hidden">

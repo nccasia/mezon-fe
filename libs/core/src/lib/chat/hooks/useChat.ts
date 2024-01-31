@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { useChannels } from './useChannels';
-import { useChannelMembers } from './useChannelMembers';
-import { useMessages } from './useMessages';
-import { useThreads } from './useThreads';
-import { useSelector } from 'react-redux';
+import React, { useMemo } from "react";
+import { useChannels } from "./useChannels";
+import { useChannelMembers } from "./useChannelMembers";
+import { useMessages } from "./useMessages";
+import { useThreads } from "./useThreads";
+import { useSelector } from "react-redux";
 import {
   selectChannelsEntities,
   selectCurrentChannel,
@@ -18,14 +18,14 @@ import {
   selectAllClans,
   selectAllCategories,
   selectAllAccount,
-} from '@mezon/store';
-import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
-import { useMezon } from '@mezon/transport';
-import { checkMessageSendingAction } from '@mezon/store';
+} from "@mezon/store";
+import { ICategoryChannel, IChannel, IMessage } from "@mezon/utils";
+import { useMezon } from "@mezon/transport";
+import { checkMessageSendingAction } from "@mezon/store";
 import {
   ApiInviteUserRes,
   ApiLinkInviteUser,
-} from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+} from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 
 // @deprecated
 // TODO: refactor this hook into useChatChannel
@@ -93,11 +93,15 @@ export function useChat() {
     },
     [changeCurrentClan, dispatch],
   );
-  
+
   const updateUser = React.useCallback(
-    async (name: string, logoUrl: string, displayName:string) => {
+    async (name: string, logoUrl: string, displayName: string) => {
       const action = await dispatch(
-        clansActions.updateUser({ user_name: name, avatar_url: logoUrl, display_name: displayName}),
+        clansActions.updateUser({
+          user_name: name,
+          avatar_url: logoUrl,
+          display_name: displayName,
+        }),
       );
       const payload = action.payload as ClansEntity;
       return payload;
@@ -142,6 +146,52 @@ export function useChat() {
     [dispatch],
   );
 
+  const sendDirectMessage = React.useCallback(
+    async (message: IMessage) => {
+      const clanDM = "093b8667-1ce3-4982-9140-790dfebcf3c9";
+      ("vo-send-dm");
+      // TODO: send message to server using nakama client
+      const session = sessionRef.current;
+      const client = clientRef.current;
+      const socket = socketRef.current;
+      const channel = channelRef.current;
+
+      if (!client || !session || !socket || !channel || !clanDM) {
+        console.log(client, session, socket, channel, clanDM);
+        throw new Error("Client is not initialized");
+      }
+
+      const payload = {
+        ...message,
+        id: Math.random().toString(),
+        date: new Date().toLocaleString(),
+        user: {
+          name: userProfile?.user?.display_name || "",
+          username: userProfile?.user?.username || "",
+          id: userProfile?.user?.id || "idUser",
+          avatarSm: userProfile?.user?.avatar_url || "",
+        },
+      };
+      if (!payload.channel_id) {
+        payload.channel_id = currentChannelId || "";
+      }
+      // dispatch(messagesActions.add(payload));
+      const ack = await socket.writeChatMessage(clanDM, channel.id, payload);
+      ack && dispatch(checkMessageSendingAction());
+    },
+    [
+      channelRef,
+      clientRef,
+      currentChannelId,
+      // currentClanId,
+      dispatch,
+      sessionRef,
+      socketRef,
+      userProfile?.user?.avatar_url,
+      userProfile?.user?.username,
+    ],
+  );
+
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
       // TODO: send message to server using nakama client
@@ -152,7 +202,7 @@ export function useChat() {
 
       if (!client || !session || !socket || !channel || !currentClanId) {
         console.log(client, session, socket, channel, currentClanId);
-        throw new Error('Client is not initialized');
+        throw new Error("Client is not initialized");
       }
 
       const payload = {
@@ -160,14 +210,14 @@ export function useChat() {
         id: Math.random().toString(),
         date: new Date().toLocaleString(),
         user: {
-          name: userProfile?.user?.display_name || '',
-          username: userProfile?.user?.username || '',
-          id: userProfile?.user?.id || 'idUser',
-          avatarSm: userProfile?.user?.avatar_url || '',
+          name: userProfile?.user?.display_name || "",
+          username: userProfile?.user?.username || "",
+          id: userProfile?.user?.id || "idUser",
+          avatarSm: userProfile?.user?.avatar_url || "",
         },
       };
       if (!payload.channel_id) {
-        payload.channel_id = currentChannelId || '';
+        payload.channel_id = currentChannelId || "";
       }
       // dispatch(messagesActions.add(payload));
       const ack = await socket.writeChatMessage(
@@ -177,7 +227,19 @@ export function useChat() {
       );
       ack && dispatch(checkMessageSendingAction());
     },
-    [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
+    [
+      channelRef,
+      clientRef,
+      currentChannelId,
+      currentClanId,
+      dispatch,
+      sessionRef,
+      socketRef,
+      userProfile?.user?.avatar_url,
+      userProfile?.user?.display_name,
+      userProfile?.user?.id,
+      userProfile?.user?.username,
+    ],
   );
 
   return useMemo(
@@ -200,7 +262,8 @@ export function useChat() {
       createLinkInviteUser,
       inviteUser,
       currentClanId,
-      getLinkInvite
+      getLinkInvite,
+      sendDirectMessage,
     }),
     [
       client,
@@ -221,7 +284,8 @@ export function useChat() {
       createLinkInviteUser,
       inviteUser,
       currentClanId,
-      getLinkInvite
+      getLinkInvite,
+      sendDirectMessage,
     ],
   );
 }
