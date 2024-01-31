@@ -58,7 +58,6 @@ export default function Server() {
               ref={messagesContainerRef}
             >
               {currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
-              
             </div> 
             <div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
               <ChannelMessageBox typeChatDirectMessage={false}/>

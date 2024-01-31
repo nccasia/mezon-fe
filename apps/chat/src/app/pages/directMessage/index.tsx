@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { userInfo } from "os";
 
 export default function Direct() {
+  const { currentChanel, currentClan} = useChat();
   const { userProfile } = useChat();
   const [openSetting, setOpenSetting] = useState(false);
   const currentDirectMess = true; //get form store
@@ -36,7 +37,7 @@ export default function Direct() {
     console.log("started");
     const bodyCreateDm: ApiCreateChannelDescRequest = {
       clan_id: DmCategoryExam.CLAN_DM,
-      type: ChannelTypeEnum.CHANNEL_TEXT,
+      type: 1,
       channel_lable: DmCategoryExam.CATEGORY_DM,
       channel_private: 1,
       category_id: DmCategoryExam.CATEGORY_DM,
@@ -55,6 +56,8 @@ export default function Direct() {
       channelsActions.joinChanelDM(channelId as string),
     );
     console.log("joined", joined);
+
+    
 
     // if (joined) {
     //   const channelPath = toChannelPage(
@@ -89,7 +92,10 @@ export default function Direct() {
         {currentDirectMess ? (
           <>
             <div className="overflow-y-scroll flex-1">
-              <ChannelMessages.Skeleton />
+              {/* <ChannelMessages.Skeleton /> */}
+              {/* <ChannelMessages channelId={channelId}> */}
+              {currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
+
             </div>
             <div className="flex-shrink-0 bg-bgSecondary">
               <ChannelMessageBox typeChatDirectMessage={true} />
