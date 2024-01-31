@@ -23,7 +23,7 @@ import { mainLoader, shouldRevalidateMain } from "../loaders/mainLoader";
 import { serverLoader, shouldRevalidateServer } from "../loaders/serverLoader";
 import {
   channelLoader,
-  directMessageLoader,
+  // directMessageLoader,
   shouldRevalidateChannel,
 } from "../loaders/channelLoader";
 import ClansRoutes from "./ClanRoutes";
@@ -105,14 +105,8 @@ export const routes = createBrowserRouter([
                   },
                   {
                     path: "direct",
+                    // loader: directMessageLoader,
                     element: <Direct />,
-                    children: [
-                      {
-                        path: ":channelId",
-                        loader: directMessageLoader,
-                        element: <ChannelIndex />,
-                      },
-                    ],
                   },
                 ],
               },

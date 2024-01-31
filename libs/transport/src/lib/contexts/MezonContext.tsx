@@ -147,20 +147,16 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
 
   const joinChatChannel = React.useCallback(
     async (channelId: string, channelName: string) => {
-      console.log("ch",channelId);
-        console.log("chN",channelName)
       const socket = socketRef.current;
 
       if (!socket) {
         throw new Error("Socket is not initialized");
       }
-      console.log("2");
 
       if (channelRef.current) {
         await socket.leaveChat(channelRef.current.id);
         channelRef.current = null;
       }
-      console.log("3")
       const join = await socket.joinChat(
         channelId,
         channelName,
@@ -168,8 +164,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
         true,
         false,
       );
+      console.log("mzcontex", join)
       channelRef.current = join;
-      console.log("joined", join);
       return join;
     },
     [socketRef],

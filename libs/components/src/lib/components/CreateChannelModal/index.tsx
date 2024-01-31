@@ -31,7 +31,7 @@ export const CreateNewChannelModal = () => {
   const isLoading = useSelector(
     (state: RootState) => state.channels.loadingStatus,
   );
-
+  console.log("cate", currentCategory?.category_id), 
   useEffect(() => {
     if (isLoading === 'loaded') {
       dispatch(channelsActions.openCreateNewModalChannel(false));
@@ -61,6 +61,7 @@ export const CreateNewChannelModal = () => {
       channel_private: isPrivate,
       category_id: currentCategory?.category_id,
     };
+    console.log(currentCategory?.category_id,"ctt")
     const newChannelCreatedId = await dispatch(createNewChannel(body));
     const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
     const channelID = payload.channel_id;
@@ -100,6 +101,8 @@ export const CreateNewChannelModal = () => {
     setChannelType(-1);
     setIsPrivate(0);
   };
+
+
   return (
     <>
       {isOpenModal && (
@@ -143,6 +146,8 @@ export const CreateNewChannelModal = () => {
                         type={ChannelTypeEnum.CHANNEL_VOICE}
                         onChange={onChangeChannelType}
                         error={isErrorType}
+                        disable={true}
+
                       />
                       <ChannelTypeComponent
                         disable={true}

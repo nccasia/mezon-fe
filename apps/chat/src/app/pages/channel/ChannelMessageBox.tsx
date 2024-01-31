@@ -13,11 +13,11 @@ export function ChannelMessageBox({ typeChatDirectMessage }: typeChatProps) {
   const sessionUser = useSelector((state: RootState) => state.auth.session);
   const handleSend = useCallback(
     (mess: IMessagePayload) => {
+      console.log("message-payload", mess)
       if (sessionUser) {
         const messageToSend: IMessage = {
           ...mess,
         };
-        console.log(typeChatDirectMessage, "type");
         if (typeChatDirectMessage) {
           sendDirectMessage(messageToSend);
         } else {

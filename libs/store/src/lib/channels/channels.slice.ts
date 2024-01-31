@@ -1,4 +1,9 @@
-import { ICategory, IChannel, LoadingStatus } from "@mezon/utils";
+import {
+  DmCategoryExam,
+  ICategory,
+  IChannel,
+  LoadingStatus,
+} from "@mezon/utils";
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -92,60 +97,87 @@ export const joinChanel = createAsyncThunk(
     }
   },
 );
-// Direct Message
 
-export const createNewChannelDirectMessage = createAsyncThunk(
-  "channels/createNewChannelDirectMessage",
-  async (body: ApiCreateChannelDescRequest, thunkAPI) => {
-    try {
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      const response = await mezon.client.createChannelDesc(
-        mezon.session,
-        body,
-      );
-      if (response) {
-        return response;
-      } else {
-        return thunkAPI.rejectWithValue([]);
-      }
-    } catch (error) {
-      return thunkAPI.rejectWithValue([]);
-    }
-  },
-);
-
-export const joinChannelDirectMessage = createAsyncThunk(
-  "channels/joinChannelDirectMessage",
+export const joinChanelDM = createAsyncThunk(
+  "channels/joinChanelDM",
   async (channelId: string, thunkAPI) => {
-    console.log("joinChannelDirectMessage-slice", channelId);
     try {
-      console.log("s1");
       thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
       thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
       thunkAPI.dispatch(
         channelMembersActions.fetchChannelMembers({ channelId }),
       );
-      // const chanel = await waitUntil(() =>
-        
-      //   selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
-      // );
 
-      // console.log("channel", chanel);
+      const chanel = await waitUntil(() =>
+        selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
+      );
       // if (!chanel || !chanel.channel_lable) {
       //   return thunkAPI.rejectWithValue([]);
       // }
-
-      // console.log("channel", chanel);
-
       const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      const resonse = await mezon.joinChatChannel(channelId, "Room2");
-      return resonse;
+      await mezon.joinChatChannel(channelId, DmCategoryExam.CATEGORY_DM);
+      return;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue([]);
     }
   },
 );
+
+// Direct Message
+
+// export const createNewChannelDirectMessage = createAsyncThunk(
+//   "channels/createNewChannelDirectMessage",
+//   async (body: ApiCreateChannelDescRequest, thunkAPI) => {
+//     try {
+//       const mezon = await ensureSession(getMezonCtx(thunkAPI));
+//       const response = await mezon.client.createChannelDesc(
+//         mezon.session,
+//         body,
+//       );
+//       if (response) {
+//         return response;
+//       } else {
+//         return thunkAPI.rejectWithValue([]);
+//       }
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue([]);
+//     }
+//   },
+// );
+
+// export const joinChannelDirectMessage = createAsyncThunk(
+//   "channels/joinChannelDirectMessage",
+//   async (channelId: string, thunkAPI) => {
+//     console.log("joinChannelDirectMessage-slice", channelId);
+//     try {
+//       console.log("s1");
+//       thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+//       thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+//       thunkAPI.dispatch(
+//         channelMembersActions.fetchChannelMembers({ channelId }),
+//       );
+//       // const chanel = await waitUntil(() =>
+
+//       //   selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
+//       // );
+
+//       // console.log("channel", chanel);
+//       // if (!chanel || !chanel.channel_lable) {
+//       //   return thunkAPI.rejectWithValue([]);
+//       // }
+
+//       // console.log("channel", chanel);
+
+//       const mezon = await ensureSession(getMezonCtx(thunkAPI));
+//       const resonse = await mezon.joinChatChannel(channelId, "Room2");
+//       return resonse;
+//     } catch (error) {
+//       console.log(error);
+//       return thunkAPI.rejectWithValue([]);
+//     }
+//   },
+// );
 
 export const createNewChannel = createAsyncThunk(
   "channels/createNewChannel",
@@ -296,7 +328,7 @@ export const channelsActions = {
   fetchChannels,
   joinChanel,
   createNewChannel,
-  joinChannelDirectMessage,
+  joinChanelDM,
 };
 
 /*

@@ -19,7 +19,12 @@ import {
   selectAllCategories,
   selectAllAccount,
 } from "@mezon/store";
-import { ICategoryChannel, IChannel, IMessage } from "@mezon/utils";
+import {
+  DmCategoryExam,
+  ICategoryChannel,
+  IChannel,
+  IMessage,
+} from "@mezon/utils";
 import { useMezon } from "@mezon/transport";
 import { checkMessageSendingAction } from "@mezon/store";
 import {
@@ -43,10 +48,12 @@ export function useChat() {
   const currentClan = useSelector(selectCurrentClan);
   const currentChanel = useSelector(selectCurrentChannel);
   const currentChannelId = useSelector(selectCurrentChannelId);
-  const currentClanId = useSelector(selectCurrentClanId);
+  const currentClanId = DmCategoryExam.CATEGORY_DM
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
-  const { members } = useChannelMembers({ channelId: currentChannelId });
+  const { members } = useChannelMembers({
+    channelId: DmCategoryExam.CHANNEL_TEST,
+  });
   const { userProfile } = useSelector(selectAllAccount);
 
   const client = clientRef.current;
@@ -148,8 +155,9 @@ export function useChat() {
 
   const sendDirectMessage = React.useCallback(
     async (message: IMessage) => {
-      const clanDM = "093b8667-1ce3-4982-9140-790dfebcf3c9";
-      ("vo-send-dm");
+      console.log("message", message)
+      const clanDM = DmCategoryExam.CLAN_DM;
+      // ("vo-send-dm");
       // TODO: send message to server using nakama client
       const session = sessionRef.current;
       const client = clientRef.current;
