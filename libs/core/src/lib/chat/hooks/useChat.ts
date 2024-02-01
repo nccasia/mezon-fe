@@ -138,6 +138,7 @@ export function useChat() {
             const client = clientRef.current;
             const socket = socketRef.current;
             const channel = channelRef.current;
+            const currentClanId = "093b8667-1ce3-4982-9140-790dfebcf3c9";
 
             if (!client || !session || !socket || !channel || !currentClanId) {
                 console.log(client, session, socket, channel, currentClanId);
@@ -160,7 +161,7 @@ export function useChat() {
             }
             // dispatch(messagesActions.add(payload));
             console.log("currenClan", currentClanId);
-            const ack = await socket.writeChatMessage(currentClanId, channel.id, payload);
+            const ack = await socket.writeChatMessage("", channel.id, payload);
 
             ack && dispatch(checkMessageSendingAction());
         },

@@ -68,7 +68,7 @@ export const joinChanel = createAsyncThunk("channels/joinChanel", async (channel
         // }
         // console.log("getChannel", chanel);
         const mezon = await ensureSession(getMezonCtx(thunkAPI));
-        await mezon.joinChatChannel(channelId, "", 2);
+        await mezon.joinChatChannel(channelId, "", 3);
         return;
     } catch (error) {
         console.log(error);

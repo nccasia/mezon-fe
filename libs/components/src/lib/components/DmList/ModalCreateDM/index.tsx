@@ -54,7 +54,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 
     const join = () => {
         console.log("joined");
-        dispatch(joinChanel("64ec3a99-84a8-4d63-a711-f925bdb13f0a"));
+        dispatch(joinChanel("d83d8bb7-3b67-46aa-9833-644497848041"));
     };
 
     const [searchTerm, setSearchTerm] = useState<string>("");
