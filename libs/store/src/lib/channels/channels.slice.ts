@@ -1,215 +1,178 @@
-import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
-import {
-  ApiChannelDescription,
-  ApiCreateChannelDescRequest,
-} from '@mezon/mezon-js/dist/api.gen';
-import { messagesActions } from '../messages/messages.slice';
-import { channelMembersActions } from '../channelmembers/channel.members';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { fetchCategories } from '../categories/categories.slice';
+import { ICategory, IChannel, LoadingStatus } from "@mezon/utils";
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
+import { ensureSession, getMezonCtx } from "../helpers";
+import { ApiChannelDescription, ApiCreateChannelDescRequest } from "@mezon/mezon-js/dist/api.gen";
+import { messagesActions } from "../messages/messages.slice";
+import { channelMembersActions } from "../channelmembers/channel.members";
+import { GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
+import { fetchCategories } from "../categories/categories.slice";
 
-export const CHANNELS_FEATURE_KEY = 'channels';
+export const CHANNELS_FEATURE_KEY = "channels";
 
 /*
  * Update these interfaces according to your requirements.
  */
 export interface ChannelsEntity extends IChannel {
-  id: string; // Primary ID
+    id: string; // Primary ID
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-  return { ...channelRes, id: channelRes.channel_id || '' };
+    return { ...channelRes, id: channelRes.channel_id || "" };
 };
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
-  loadingStatus: LoadingStatus;
-  socketStatus: LoadingStatus;
-  error?: string | null;
-  currentChannelId?: string | null;
-  isOpenCreateNewChannel?: boolean;
-  currentCategory: ICategory | null;
-  // newChannelCreatedId: string | undefined;
+    loadingStatus: LoadingStatus;
+    socketStatus: LoadingStatus;
+    error?: string | null;
+    currentChannelId?: string | null;
+    isOpenCreateNewChannel?: boolean;
+    currentCategory: ICategory | null;
+    // newChannelCreatedId: string | undefined;
 }
 
 export interface ChannelsRootState {
-  [CHANNELS_FEATURE_KEY]: ChannelsState;
+    [CHANNELS_FEATURE_KEY]: ChannelsState;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-function waitUntil<T>(
-  condition: () => T | undefined,
-  ms: number = 100,
-): Promise<T> {
-  return new Promise((resolve) => {
-    const interval = setInterval(() => {
-      const result = condition();
-      if (result !== undefined) {
-        clearInterval(interval);
-        resolve(result);
-      }
-    }, ms);
-  });
+function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise<T> {
+    return new Promise((resolve) => {
+        const interval = setInterval(() => {
+            const result = condition();
+            if (result !== undefined) {
+                clearInterval(interval);
+                resolve(result);
+            }
+        }, ms);
+    });
 }
 
-function getChannelsRootState(
-  thunkAPI: GetThunkAPI<unknown>,
-): ChannelsRootState {
-  return thunkAPI.getState() as ChannelsRootState;
+function getChannelsRootState(thunkAPI: GetThunkAPI<unknown>): ChannelsRootState {
+    return thunkAPI.getState() as ChannelsRootState;
 }
 
-export const joinChanel = createAsyncThunk(
-  'channels/joinChanel',
-  async (channelId: string, thunkAPI) => {
+export const joinChanel = createAsyncThunk("channels/joinChanel", async (channelId: string, thunkAPI) => {
     try {
-      thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-      thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-      thunkAPI.dispatch(
-        channelMembersActions.fetchChannelMembers({ channelId }),
-      );
+        console.log("channelID-joined", channelId);
+        thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+        thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+        thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
+        // thunkAPI.dispatch(fetchChannels({ clanId: "00000000-0000-0000-0000-000000000000" }));
+        // thunkAPI.dispatch(fetchCategories({ clanId: "00000000-0000-0000-0000-000000000000" }));
 
-      const chanel = await waitUntil(() =>
-        selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
-      );
-      if (!chanel || !chanel.channel_lable) {
-        return thunkAPI.rejectWithValue([]);
-      }
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
-      return chanel;
+        // const chanel = await waitUntil(() => selectChannelById(channelId)(getChannelsRootState(thunkAPI)));
+        // console.log("chanel", chanel);
+        // if (!chanel || !chanel.channel_lable) {
+        //     return thunkAPI.rejectWithValue([]);
+        // }
+        // console.log("getChannel", chanel);
+        const mezon = await ensureSession(getMezonCtx(thunkAPI));
+        await mezon.joinChatChannel(channelId, "", 3);
+        return;
     } catch (error) {
-      console.log(error);
-      return thunkAPI.rejectWithValue([]);
+        console.log(error);
+        return thunkAPI.rejectWithValue([]);
     }
-  },
-);
+});
 
-export const createNewChannel = createAsyncThunk(
-  'channels/createNewChannel',
-  async (body: ApiCreateChannelDescRequest, thunkAPI) => {
+export const createNewChannel = createAsyncThunk("channels/createNewChannel", async (body: ApiCreateChannelDescRequest, thunkAPI) => {
     try {
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      const response = await mezon.client.createChannelDesc(
-        mezon.session,
-        body,
-      );
-      if (response) {
-        thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
-        thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-        return response;
-      } else {
-        return thunkAPI.rejectWithValue([]);
-      }
+        const mezon = await ensureSession(getMezonCtx(thunkAPI));
+        const response = await mezon.client.createChannelDesc(mezon.session, body);
+        if (response) {
+            thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
+            thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+            return response;
+        } else {
+            return thunkAPI.rejectWithValue([]);
+        }
     } catch (error) {
-      return thunkAPI.rejectWithValue([]);
+        return thunkAPI.rejectWithValue([]);
     }
-  },
-);
+});
 
 type fetchChannelsArgs = {
-  clanId: string;
-  cursor?: string;
-  limit?: number;
-  forward?: number;
+    clanId: string;
+    cursor?: string;
+    limit?: number;
+    forward?: number;
 };
 
-export const fetchChannels = createAsyncThunk(
-  'channels/fetchChannels',
-  async ({ clanId }: fetchChannelsArgs, thunkAPI) => {
+export const fetchChannels = createAsyncThunk("channels/fetchChannels", async ({ clanId }: fetchChannelsArgs, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelDescs(
-      mezon.session,
-      100,
-      1,
-      '',
-      clanId,
-    );
+    const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, "", clanId);
 
     if (!response.channeldesc) {
-      return thunkAPI.rejectWithValue([]);
+        return thunkAPI.rejectWithValue([]);
     }
-
     const channels = response.channeldesc.map(mapChannelToEntity);
 
     return channels;
-  },
-);
+});
 
-export const initialChannelsState: ChannelsState =
-  channelsAdapter.getInitialState({
-    loadingStatus: 'not loaded',
-    socketStatus: 'not loaded',
+export const initialChannelsState: ChannelsState = channelsAdapter.getInitialState({
+    loadingStatus: "not loaded",
+    socketStatus: "not loaded",
     error: null,
     isOpenCreateNewChannel: false,
     currentCategory: null,
-  });
+});
 
 export const channelsSlice = createSlice({
-  name: CHANNELS_FEATURE_KEY,
-  initialState: initialChannelsState,
-  reducers: {
-    add: channelsAdapter.addOne,
-    remove: channelsAdapter.removeOne,
-    setCurrentChannelId: (state, action: PayloadAction<string>) => {
-      state.currentChannelId = action.payload;
-    },
-    openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
-      state.isOpenCreateNewChannel = action.payload;
-    },
-    getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
-      state.currentCategory = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchChannels.pending, (state: ChannelsState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(
-        fetchChannels.fulfilled,
-        (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
-          channelsAdapter.setAll(state, action.payload);
-          state.loadingStatus = 'loaded';
+    name: CHANNELS_FEATURE_KEY,
+    initialState: initialChannelsState,
+    reducers: {
+        add: channelsAdapter.addOne,
+        remove: channelsAdapter.removeOne,
+        setCurrentChannelId: (state, action: PayloadAction<string>) => {
+            state.currentChannelId = action.payload;
         },
-      )
-      .addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
+        openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
+            state.isOpenCreateNewChannel = action.payload;
+        },
+        getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
+            state.currentCategory = action.payload;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchChannels.pending, (state: ChannelsState) => {
+                state.loadingStatus = "loading";
+            })
+            .addCase(fetchChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
+                channelsAdapter.setAll(state, action.payload);
+                state.loadingStatus = "loaded";
+            })
+            .addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
+                state.loadingStatus = "error";
+                state.error = action.error.message;
+            });
 
-    builder
-      .addCase(joinChanel.rejected, (state: ChannelsState, action) => {
-        state.socketStatus = 'error';
-        state.error = action.error.message;
-      })
-      .addCase(joinChanel.pending, (state: ChannelsState) => {
-        state.socketStatus = 'loading';
-      })
-      .addCase(joinChanel.fulfilled, (state: ChannelsState) => {
-        state.socketStatus = 'loaded';
-      });
-    builder
-      .addCase(createNewChannel.pending, (state: ChannelsState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
-        state.loadingStatus = 'loaded';
-        state.isOpenCreateNewChannel = false;
-      })
-      .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
-  },
+        builder
+            .addCase(joinChanel.rejected, (state: ChannelsState, action) => {
+                state.socketStatus = "error";
+                state.error = action.error.message;
+            })
+            .addCase(joinChanel.pending, (state: ChannelsState) => {
+                state.socketStatus = "loading";
+            })
+            .addCase(joinChanel.fulfilled, (state: ChannelsState) => {
+                state.socketStatus = "loaded";
+            });
+        builder
+            .addCase(createNewChannel.pending, (state: ChannelsState) => {
+                state.loadingStatus = "loading";
+            })
+            .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
+                state.loadingStatus = "loaded";
+                state.isOpenCreateNewChannel = false;
+            })
+            .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
+                state.loadingStatus = "error";
+                state.error = action.error.message;
+            });
+    },
 });
 
 /*
@@ -238,10 +201,10 @@ export const channelsReducer = channelsSlice.reducer;
 export const { openCreateNewModalChannel } = channelsSlice.actions;
 
 export const channelsActions = {
-  ...channelsSlice.actions,
-  fetchChannels,
-  joinChanel,
-  createNewChannel,
+    ...channelsSlice.actions,
+    fetchChannels,
+    joinChanel,
+    createNewChannel,
 };
 
 /*
@@ -260,37 +223,24 @@ export const channelsActions = {
  */
 const { selectAll, selectEntities } = channelsAdapter.getSelectors();
 
-export const getChannelsState = (rootState: {
-  [CHANNELS_FEATURE_KEY]: ChannelsState;
-}): ChannelsState => rootState[CHANNELS_FEATURE_KEY];
+export const getChannelsState = (rootState: { [CHANNELS_FEATURE_KEY]: ChannelsState }): ChannelsState => rootState[CHANNELS_FEATURE_KEY];
 
 export const selectAllChannels = createSelector(getChannelsState, selectAll);
 
-export const selectChannelsEntities = createSelector(
-  getChannelsState,
-  selectEntities,
+export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
+
+export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id]);
+
+export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
+
+export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
+    clanId ? clansEntities[clanId] : null,
 );
 
-export const selectChannelById = (id: string) =>
-  createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id]);
-
-export const selectCurrentChannelId = createSelector(
-  getChannelsState,
-  (state) => state.currentChannelId,
-);
-
-export const selectCurrentChannel = createSelector(
-  selectChannelsEntities,
-  selectCurrentChannelId,
-  (clansEntities, clanId) => (clanId ? clansEntities[clanId] : null),
-);
+// export const selectCurrentChannelDmGroup = (chId: string) => createSelector(selectEntities, (channelEntities) => channelEntities[chId]);
 
 export const selectChannelsByClanId = (clainId: string) =>
-  createSelector(selectAllChannels, (channels) =>
-    channels.filter((ch) => ch.clan_id == clainId),
-  );
+    createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
 export const selectDefaultChannelIdByClanId = (clainId: string) =>
-  createSelector(selectChannelsByClanId(clainId), (channels) =>
-    channels.length > 0 ? channels[0].id : null,
-  );
+    createSelector(selectChannelsByClanId(clainId), (channels) => (channels.length > 0 ? channels[0].id : null));
