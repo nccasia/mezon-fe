@@ -133,7 +133,6 @@ export function useChat() {
 
     const sendMessage = React.useCallback(
         async (message: IMessage) => {
-            console.log("mess", message);
             // TODO: send message to server using nakama client
             const session = sessionRef.current;
             const client = clientRef.current;
@@ -160,7 +159,9 @@ export function useChat() {
                 payload.channel_id = currentChannelId || "";
             }
             // dispatch(messagesActions.add(payload));
+            console.log("currenClan", currentClanId);
             const ack = await socket.writeChatMessage(currentClanId, channel.id, payload);
+
             ack && dispatch(checkMessageSendingAction());
         },
         [

@@ -10,7 +10,6 @@ export type MessageWithUserProps = {
 };
 
 function MessageWithUser({ message }: MessageWithUserProps) {
-    console.log("mess-get", message);
     const isSending = useSelector((state: RootState) => state.messages.isSending);
     const content = useMemo(() => {
         if (typeof message.content === "string") {

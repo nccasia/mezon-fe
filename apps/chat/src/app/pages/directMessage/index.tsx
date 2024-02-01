@@ -9,13 +9,12 @@ import { RootState } from "@mezon/store";
 import { useParams } from "react-router-dom";
 export default function Direct() {
     const { currentChanel, userProfile } = useChat();
-    console.log("crrr", currentChanel);
     const [openSetting, setOpenSetting] = useState(false);
     const currentDirectMess = true; //get form store
     const handleOpenCreate = () => {
         setOpenSetting(true);
     };
-    const dmGroupId = "21ea6d0d-7f22-4882-8466-90aa882aa180";
+    const dmGroupId = "64ec3a99-84a8-4d63-a711-f925bdb13f0a";
 
     return (
         <>

@@ -32,12 +32,9 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
     const [isCheck, setIsCheck] = useState<boolean>(false);
     const length: number = selectedFriends.length;
     const { members } = useChannelMembers({ channelId: "7bbf0581-fbbf-4b72-9560-e50c6593fda3" });
-
-    console.log("memberlist", members[0].users);
-
     const handleCreateDM = async () => {
-        console.log("Selected Friends:", selectedFriends);
-        console.log("started");
+        // console.log("Selected Friends:", selectedFriends);
+        // console.log("started");
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
             type: length > 1 ? 3 : 2,
             channel_private: 1,
@@ -57,7 +54,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 
     const join = () => {
         console.log("joined");
-        dispatch(joinChanel("21ea6d0d-7f22-4882-8466-90aa882aa180"));
+        dispatch(joinChanel("64ec3a99-84a8-4d63-a711-f925bdb13f0a"));
     };
 
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -67,7 +64,11 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
     //     "e7766349-0e0b-40c2-ad02-603a74d23735",
     // ]);
 
-    const [friends, setFriends] = useState<string[]>(["842b743e-7dc5-479c-aba8-1f174dd4e621", "4f0ab1da-d153-4965-841d-b8d0123b645d"]);
+    const [friends, setFriends] = useState<string[]>([
+        "842b743e-7dc5-479c-aba8-1f174dd4e621",
+        "4f0ab1da-d153-4965-841d-b8d0123b645d", // 
+        "e7766349-0e0b-40c2-ad02-603a74d23735", // phongmm
+    ]);
 
     const filteredFriends = friends.filter((friend) => friend.toLowerCase().includes(searchTerm.toLowerCase()));
 

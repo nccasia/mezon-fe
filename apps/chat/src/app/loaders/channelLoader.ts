@@ -8,12 +8,11 @@ export const channelLoader: LoaderFunction = async ({ params }) => {
     if (!channelId) {
         throw new Error("Channel ID null");
     }
-    store.dispatch(channelsActions.joinChanel(channelId));
+    // store.dispatch(channelsActions.joinChanel(channelId));
     return null;
 };
 
 export const dmGroupMessaage: LoaderFunction = async ({ params }) => {
-    console.log("dmID", params);
     const { dmGroupId } = params;
     const store = await getStoreAsync();
     if (!dmGroupId) {
