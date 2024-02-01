@@ -55,6 +55,11 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
         setSelectedFriends([]);
     };
 
+    const join = () => {
+        console.log("joined");
+        dispatch(joinChanel("21ea6d0d-7f22-4882-8466-90aa882aa180"));
+    };
+
     const [searchTerm, setSearchTerm] = useState<string>("");
     // const [friends, setFriends] = useState<string[]>([
     //     "4f0ab1da-d153-4965-841d-b8d0123b645d",
@@ -62,17 +67,14 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
     //     "e7766349-0e0b-40c2-ad02-603a74d23735",
     // ]);
 
-
-    const [friends, setFriends] = useState<string[]>([
-        "842b743e-7dc5-479c-aba8-1f174dd4e621",
-        "4f0ab1da-d153-4965-841d-b8d0123b645d",
-    ]);
+    const [friends, setFriends] = useState<string[]>(["842b743e-7dc5-479c-aba8-1f174dd4e621", "4f0ab1da-d153-4965-841d-b8d0123b645d"]);
 
     const filteredFriends = friends.filter((friend) => friend.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
         <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold font-['Manrope']">
             <div className="flex flex-row items-center w-full gap-4 h-fit">
+                <button onClick={join}>Join</button>
                 <Modal title="Create DM" showModal={isOpen} onClose={onClose}>
                     <div>
                         <p className="pb-3">Select Friends</p>
