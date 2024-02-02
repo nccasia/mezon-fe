@@ -11,7 +11,6 @@ import {
   ApiClanDesc,
   ApiInviteUserRes,
   ApiLinkInviteUser,
-  ApiUpdateAccountRequest,
 } from "@mezon/mezon-js/dist/api.gen";
 import { ensureClient, ensureSession, getMezonCtx } from "../helpers";
 import { categoriesActions } from "../categories/categories.slice";

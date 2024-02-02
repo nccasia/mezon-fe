@@ -34,7 +34,7 @@ export default function InvitePage() {
   };
 
   const handleCancelJoin = () => {
-    navigate(`/guess/login`);
+    navigate(`/chat/direct`);
     setOpenModal(false);
   };
 
@@ -58,7 +58,7 @@ export default function InvitePage() {
       <div></div>
       <Modal show={openModal} onClose={() => setOpenModal(false)} size={'md'}>
         {/* <Modal.Header></Modal.Header> */}
-        <Modal.Body className="bg-gray-700">
+        <Modal.Body className="bg-bgDisable rounded-tl-[5px] rounded-tr-[5px]">
           <div className="flex flex-col justify-center items-center pb-24">
             <div className="w-[70px] h-[70px] bg-bgDisable rounded-lg flex justify-center items-center text-contentSecondary text-[25px] bg-zinc-900 ">
               {clanName.charAt(0).toUpperCase()}
@@ -71,7 +71,7 @@ export default function InvitePage() {
           </div>
         </Modal.Body>
         {/* <Modal.Footer> */}
-        <div className="flex justify-center flex-row items-center gap-4 pb-8 bg-gray-700">
+        <div className="flex justify-center flex-row items-center gap-4 pb-8 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
           <Button color="gray" onClick={handleCancelJoin}>
             No, Thanks
           </Button>

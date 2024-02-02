@@ -68,7 +68,7 @@ export const updateUserClanProfile = createAsyncThunk(
     const body: ApiUpdateClanProfileRequest = {
       clan_id: clanId,
       nick_name: username || "",
-      avartar: avatarUrl || "",
+      avartar : avatarUrl || "",
     };
     const response = await mezon.client.updateUserProfileByClan(
       mezon.session,

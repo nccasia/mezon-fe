@@ -149,7 +149,7 @@ function ChannelList() {
         ))}
       </div>
       <Modal
-        title="Invite"
+        title="Invite friend"
         onClose={() => {
           setOpenInvite(false);
         }}

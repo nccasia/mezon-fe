@@ -3,13 +3,16 @@ import { useSelector } from 'react-redux';
 import {
   authActions,
   accountActions,
-  useAppDispatch, selectAllAccount
+  useAppDispatch,
+  selectAllAccount
 } from '@mezon/store';
 
 export function useAuth() {
   const {userProfile} = useSelector(selectAllAccount)
 
   const dispatch = useAppDispatch();
+
+  const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
 
   const fetchUserProfile = React.useCallback(
     async () => {
@@ -44,10 +47,11 @@ export function useAuth() {
   return useMemo(
     () => ({
       userProfile,
+      userId,
       loginEmail,
       loginByGoogle,
       fetchUserProfile
     }),
-    [userProfile, loginEmail, loginByGoogle, fetchUserProfile],
+    [userProfile, userId, loginEmail, loginByGoogle, fetchUserProfile],
   );
 }

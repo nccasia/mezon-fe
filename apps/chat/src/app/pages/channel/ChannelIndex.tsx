@@ -39,7 +39,7 @@ export function ChannelIndex() {
                             <ChannelMessages.Skeleton />
                         </div>
                         <div className="flex-shrink-0 bg-bgSecondary">
-                            <ChannelMessageBox />
+                            <ChannelMessageBox.Skeleton />
                         </div>
                     </div>
                     <div className="w-[268px] bg-bgSurface md:flex">

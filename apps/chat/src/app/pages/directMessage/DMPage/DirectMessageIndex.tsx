@@ -18,23 +18,21 @@ export function DirectMessageIndex() {
     }, [defaultChannelId, navigate])
 
     return (
-        <>
-            <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-                <ChannelTopbar channel={null} />
-                <div className="flex h-screen">
-                    <div className="flex flex-col flex-1">
-                        <div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
-                            <ChannelMessages.Skeleton />
-                        </div>
-                        <div className="flex-shrink-0 bg-bgSecondary">
-                            <ChannelMessageBox />
-                        </div>
+        <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
+            <ChannelTopbar channel={null} />
+            <div className="flex h-screen">
+                <div className="flex flex-col flex-1">
+                    <div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
+                        <ChannelMessages.Skeleton />
                     </div>
-                    <div className="w-[268px] bg-bgSurface md:flex">
-                        <MemberList />
+                    <div className="flex-shrink-0 bg-bgSecondary">
+                        <ChannelMessageBox.Skeleton />
                     </div>
                 </div>
+                <div className="w-[268px] bg-bgSurface md:flex">
+                    <MemberList />
+                </div>
             </div>
-        </>
+        </div>
     )
 }

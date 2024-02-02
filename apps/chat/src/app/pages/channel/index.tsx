@@ -1,12 +1,18 @@
-import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader, MemberList } from "@mezon/components";
-import ChannelMessages from "./ChanneMessages";
-import { useChat, useChatChannel } from "@mezon/core";
-import { ChannelMessageBox } from "./ChannelMessageBox";
-import { LogOutButton } from "libs/ui/src/lib/LogOutButton/index";
-import Setting from "../setting";
-import { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@mezon/store";
+import {
+  ChannelList,
+  ChannelTopbar,
+  FooterProfile,
+  ServerHeader,
+  MemberList,
+} from '@mezon/components';
+import ChannelMessages from './ChanneMessages';
+import { useChat, useChatChannel } from '@mezon/core';
+import { ChannelMessageBox } from './ChannelMessageBox';
+import Setting from '../setting';
+import { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@mezon/store';
+import { ChannelTyping } from './ChannelTyping';
 
 export default function Server() {
     // TODO: move selector to store
@@ -43,7 +49,8 @@ export default function Server() {
                             {currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
                         </div>
                         <div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
-                            <ChannelMessageBox />
+                        {currentChanel && <ChannelTyping  channelId={currentChanel?.id} />}
+                        {currentChanel ? <ChannelMessageBox channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
                         </div>
                     </div>
                     <div className="w-[268px] bg-bgSurface  lg:flex hidden">

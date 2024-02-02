@@ -40,9 +40,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   // newChannelCreatedId: string | undefined;
 }
 
-export interface ChannelsRootState {
-  [CHANNELS_FEATURE_KEY]: ChannelsState;
-}
+
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
@@ -59,6 +57,10 @@ function waitUntil<T>(
       }
     }, ms);
   });
+}
+
+export interface ChannelsRootState {
+  [CHANNELS_FEATURE_KEY]: ChannelsState;
 }
 
 function getChannelsRootState(

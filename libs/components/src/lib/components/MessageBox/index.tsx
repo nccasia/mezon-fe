@@ -1,18 +1,15 @@
 import { IMessage } from '@mezon/utils';
 import {
-  useCallback,
-  FocusEvent,
-  useState,
+  useCallback, useState,
   ChangeEvent,
-  FormEvent,
-  useEffect,
+  FormEvent
 } from 'react';
 import * as Icons from '../Icons';
-import TypingIndicator from '../TypingIndicator';
-import { checkMessageSendingAction } from '@mezon/store';
-import { useDispatch } from 'react-redux';
+
+
 export type MessageBoxProps = {
   onSend: (mes: IMessagePayload) => void;
+  onTyping?: () => void;
 };
 
 export type IMessagePayload = IMessage & {
@@ -22,7 +19,7 @@ export type IMessagePayload = IMessage & {
 function MessageBox(props: MessageBoxProps) {
   // const dispatch = useDispatch();
   const [content, setContent] = useState('');
-  const { onSend } = props;
+  const { onSend, onTyping } = props;
 
   const handleSend = useCallback(() => {
     if (!content.trim()) {
@@ -100,48 +97,85 @@ function MessageBox(props: MessageBoxProps) {
     },
     [handleSend],
   );
-  return (
-    <>
-      <div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
-        <form
-          onSubmit={handleSubmitted}
-          className="self-stretch p-2 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
-        >
-          <div
-            className={`flex flex-row h-full  ${rowNumber > 1 ? 'items-end' : 'items-center'}`}
-          >
-            <div className="flex flex-row  justify-end h-fit">
-              <Icons.AddCircle />
-            </div>
-          </div>
 
-          <div
-            className="grow self-stretch justify-start items-center gap-2 flex"
-            onSubmit={handleSubmitted}
-          >
-            <textarea
-              placeholder="Write your thoughts here..."
-              className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-hidden w-full resize-none"
-              id="message"
-              onBlur={handleInputChanged}
-              onChange={handleInputChanged}
-              onKeyDown={handleKeyDown}
-              value={content}
-              autoComplete="off"
-              rows={rowNumber}
-            />
+  const handleTyping = useCallback(() => {
+    if (typeof onTyping === 'function') {
+      onTyping();
+    }
+  }, [onTyping]);
+
+  return (
+    <div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
+      <form
+        onSubmit={handleSubmitted}
+        className="self-stretch p-2 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
+      >
+        <div
+          className={`flex flex-row h-full  ${rowNumber > 1 ? 'items-end' : 'items-center'}`}
+        >
+          <div className="flex flex-row  justify-end h-fit">
+            <Icons.AddCircle />
           </div>
-          <div
-            className={`flex flex-row h-full  ${rowNumber > 1 ? 'items-end' : 'items-center'}`}
-          >
-            <div className="flex flex-row gap-1">
-              <Icons.Gif />
-              <Icons.Help />
-            </div>
+        </div>
+
+        <div
+          className="grow self-stretch justify-start items-center gap-2 flex"
+          onSubmit={handleSubmitted}
+        >
+          <textarea
+            placeholder="Write your thoughts here..."
+            className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-hidden w-full resize-none"
+            id="message"
+            onInput={handleTyping}
+            onBlur={handleInputChanged}
+            onChange={handleInputChanged}
+            onKeyDown={handleKeyDown}
+            value={content}
+            autoComplete="off"
+            rows={rowNumber}
+          />
+        </div>
+        <div
+          className={`flex flex-row h-full  ${rowNumber > 1 ? 'items-end' : 'items-center'}`}
+        >
+          <div className="flex flex-row gap-1">
+            <Icons.Gif />
+            <Icons.Help />
           </div>
-        </form>
-      </div>
-    </>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+MessageBox.Skeleton = () => {
+  return (
+    <div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
+      <form
+        className="self-stretch p-2 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
+      >
+        <div className="flex flex-row h-full items-center">
+          <div className="flex flex-row  justify-end h-fit">
+            <Icons.AddCircle />
+          </div>
+        </div>
+
+        <div
+          className="grow self-stretch justify-start items-center gap-2 flex"
+        >
+          <textarea
+            placeholder="Write your thoughts here..."
+            className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-hidden w-full resize-none"
+            id="message"
+            rows={1}
+          />
+        </div>
+        <div className="flex flex-row h-full items-center gap-1">
+          <Icons.Gif />
+          <Icons.Help />
+        </div>
+      </form>
+    </div>
   );
 }
 

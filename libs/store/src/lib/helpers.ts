@@ -40,6 +40,7 @@ export async function ensureChannel(mezon: MezonContextValue, id: string): Promi
 export async function ensureSocket(mezon: MezonContextValue): Promise<MezonValueContext> {
     return new Promise((resolve, reject) => {
         const interval = setInterval(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if(mezon.socketRef.current && (mezon.socketRef.current as any).adapter && (mezon.socketRef.current as any).adapter.isOpen())  {
                 clearInterval(interval);
                 resolve(ensureClient(mezon));
@@ -72,4 +73,8 @@ export function isMezonThunk(thunkAPI: GetThunkAPI<AsyncThunkConfig>): thunkAPI 
         return false;
     }
     return  typeof thunkAPI?.extra?.mezon !== 'undefined';
+}
+
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

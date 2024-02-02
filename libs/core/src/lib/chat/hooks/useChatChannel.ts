@@ -10,6 +10,9 @@ import {
   selectAllAccount,
   selectUnreadMessageIdByChannelId,
   selectLastMessageIdByChannelId,
+  messagesActions,
+  selectTypingUserIds,
+  selectChannelMemberByUserIds,
 } from "@mezon/store";
 import { IMessage } from "@mezon/utils";
 import { useMezon } from "@mezon/transport";
@@ -28,6 +31,9 @@ export function useChatChannel(channelId: string) {
   const { userProfile } = useSelector(selectAllAccount);
   const { messages } = useMessages({ channelId });
   const { members } = useChannelMembers({ channelId });
+  const typingUsersIds = useSelector(selectTypingUserIds)
+  const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []))
+  
   const unreadMessageId = useSelector(
     selectUnreadMessageIdByChannelId(channelId),
   );
@@ -62,6 +68,11 @@ export function useChatChannel(channelId: string) {
     [dispatch],
   );
 
+
+  const sendMessageTyping = React.useCallback(
+    async () => {
+      dispatch(messagesActions.sendTypingUser({ channelId }));
+    }, [channelId, dispatch]);
 
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
@@ -121,9 +132,11 @@ export function useChatChannel(channelId: string) {
       members,
       unreadMessageId,
       lastMessageId,
+      typingUsers,
       sendMessage,
       createLinkInviteUser,
       inviteUser,
+      sendMessageTyping,
     }),
     [
       client,
@@ -132,9 +145,11 @@ export function useChatChannel(channelId: string) {
       members,
       unreadMessageId,
       lastMessageId,
+      typingUsers,
       sendMessage,
       createLinkInviteUser,
       inviteUser,
+      sendMessageTyping,
     ],
   );
 }

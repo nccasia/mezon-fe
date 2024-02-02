@@ -59,7 +59,7 @@ interface ModalProps {
   handleLogOut: () => void;
 }
 
-const LogoutModal: React.FC<ModalProps> = ({
+export const LogoutModal: React.FC<ModalProps> = ({
   isOpen,
   handleLogOut,
   onClose,
@@ -69,7 +69,7 @@ const LogoutModal: React.FC<ModalProps> = ({
       {isOpen && (
         <div className="fixed  inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50"></div>
-          <div className="relative z-10 dark:bg-gray-900  bg-white p-6 rounded-lg text-center">
+          <div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-lg text-center">
             <h2 className="text-xl font-semibold mb-4">Confirm Log Out</h2>
             <p className="text-white-600 mb-6">
               Are you sure you want to log out?

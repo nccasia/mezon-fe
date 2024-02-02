@@ -15,11 +15,11 @@ const Modal = (props: ModalProps) => {
             {showModal ? (
                 <>
                     <div
-                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none "
+                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
                     >
                         <div className="relative w-auto my-6 mx-auto max-w-3xl ">
-                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-[#0B0B0B] outline-none focus:outline-none">
-                                <div className="flex items-center justify-between p-3 border-b border-solid border-borderDefault rounded-t">
+                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-bgDisable outline-none focus:outline-none">
+                                <div className="flex items-center justify-between p-3  border-solid border-borderDefault rounded-t">
                                     <h3 className="text-[22px] font-semibold">
                                         {title}
                                     </h3>
@@ -32,9 +32,14 @@ const Modal = (props: ModalProps) => {
                                         </span>
                                     </button>
                                 </div>
+                                <div className="border-b border-solid border-borderDefault rounded-t pl-[20px] pb-[10px]">
+                                    Send a channel invite link to a friend
+                                </div>
                                 {/*body*/}
                                 <div className="relative px-6 py-4 flex-auto">
-                                    {children}
+                                    <div className="bg-black p-[10px] rounded-[5px]">
+                                        {children}
+                                    </div>
                                 </div>
                                 {/*footer*/}
                                 {confirmButton && (

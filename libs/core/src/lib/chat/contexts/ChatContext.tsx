@@ -1,8 +1,9 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
-import { ChannelMessage, ChannelPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { channelMembersActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 type ChatContextProviderProps = {
   children: React.ReactNode
@@ -17,6 +18,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 
   const { socketRef } = useMezon();
+  const { userId } = useAuth();
   const { initWorker, unInitWorker } = useSeenMessagePool();
   const dispatch = useAppDispatch();
 
@@ -26,15 +28,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
   const onchannelpresence = useCallback((channelPresence: ChannelPresenceEvent) => {
     dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
-  }, []);
+  }, [dispatch]);
+
   const ondisconnect = useCallback(() => {
     // TODO: handle disconnect
   }, []);
+
+  const onmessagetyping = useCallback((event: MessageTypingEvent) => {
+    if(event.sender_id === userId) {
+      return;
+    }
+
+    dispatch(messagesActions.updateTypingUsers({
+      channelId: event.channel_id,
+      userId: event.sender_id,
+      isTyping: true
+    }));
+
+  }, [dispatch, userId]);
 
 
   const value = React.useMemo<ChatContextValue>(() => ({
 
   }), []);
+  
 
 
   useEffect(() => {
@@ -49,12 +66,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
     socket.ondisconnect = ondisconnect;
 
+    socket.onmessagetyping = onmessagetyping;
+
     return () => {
       socket.onchannelmessage = () => { };
       socket.onchannelpresence = () => { };
       socket.ondisconnect = () => { };
     }
-  }, [onchannelmessage, onchannelpresence, ondisconnect, socketRef])
+  }, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, socketRef])
 
   useEffect(() => {
     initWorker();
