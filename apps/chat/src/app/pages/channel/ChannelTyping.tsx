@@ -7,7 +7,7 @@ type ChannelTypingProps = {
 
 export function ChannelTyping({ channelId }: ChannelTypingProps) {
     const { typingUsers } = useChatChannel(channelId)
-    
+
     const typingLabel = useMemo(() => {
         if(typingUsers.length === 1) {
             return `${typingUsers[0].user?.username} is typing...`
@@ -18,5 +18,5 @@ export function ChannelTyping({ channelId }: ChannelTypingProps) {
         return ''
     }, [typingUsers])
 
-    return <div>{typingLabel}</div>
+    return <div className="pl-[66px] text-xs text-gray-400">{typingLabel}</div>
 }

@@ -34,11 +34,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     // TODO: handle disconnect
   }, []);
 
-  const onmessagetyping = useCallback((event: MessageTypingEvent) => {
+  const onmessagetyping = useCallback((e: MessageTypingEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const event = (e as any).message_typing_event;
     if(event.sender_id === userId) {
       return;
     }
-
+    
     dispatch(messagesActions.updateTypingUsers({
       channelId: event.channel_id,
       userId: event.sender_id,

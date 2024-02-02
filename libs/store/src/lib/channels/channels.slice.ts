@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
@@ -85,7 +85,7 @@ export const joinChanel = createAsyncThunk(
       if (!chanel || !chanel.channel_lable) {
         return thunkAPI.rejectWithValue([]);
       }
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const mezon = await ensureSocket(getMezonCtx(thunkAPI));
       await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
       return chanel;
     } catch (error) {

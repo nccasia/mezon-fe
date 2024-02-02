@@ -192,8 +192,10 @@ export const selectMembersByChannelId = (channelId?: string | null) => createSel
 );
 
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[]) => createSelector(
-  selectMembersByChannelId(channelId),
-  (members) => {
+  selectChannelMembesEntities,
+  (entities) => {
+    const members = Object.values(entities);
+    console.log('members', members, userIds, channelId)
     return members.filter((member) => member?.user?.id && userIds.includes(member?.user?.id))
   }
 )

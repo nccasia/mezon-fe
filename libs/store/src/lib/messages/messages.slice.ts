@@ -65,7 +65,7 @@ function getMessagesRootState(
   return thunkAPI.getState() as MessagesRootState;
 }
 
-const TYPING_TIMEOUT = 10000;
+const TYPING_TIMEOUT = 3000;
 
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
@@ -138,7 +138,7 @@ export const updateTypingUsers = createAsyncThunk(
     // set user typing to true
     thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
     // after 30 seconds recalculate typing users
-    await sleep(30500);
+    await sleep(TYPING_TIMEOUT + 100);
     thunkAPI.dispatch(messagesActions.recheckTypingUsers());
   },
 );
@@ -190,6 +190,11 @@ export const messagesSlice = createSlice({
           ...state.unreadMessagesEntries,
           [action.payload.channel_id]: action.payload.id,
         };
+        const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || "");
+
+        if (state?.typingUsers && state?.typingUsers[typingUserKey]) {
+          delete state.typingUsers[typingUserKey];
+        }
       }
     },
     markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
