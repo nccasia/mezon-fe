@@ -47,32 +47,3 @@ ChannelMessageBox.Skeleton = () => {
     );
 }
 
-// ===========
-// TODO: move to separate file
-interface DirectIdProps {
-    directParamId: string;
-}
-export function DirectMessageBox({ directParamId }: DirectIdProps) {
-    const { sendDirectMessage } = useChatDirect(directParamId);
-    // TODO: move selector to store
-    const sessionUser = useSelector((state: RootState) => state.auth.session);
-    const handleSend = useCallback(
-        (mess: IMessagePayload) => {
-            if (sessionUser) {
-                const messageToSend: IMessage = {
-                    ...mess,
-                };
-                sendDirectMessage(messageToSend);
-            } else {
-                console.error("Session is not available");
-            }
-        },
-        [sendDirectMessage, sessionUser],
-    );
-
-    return (
-        <div>
-            <MessageBox onSend={handleSend} />
-        </div>
-    );
-}

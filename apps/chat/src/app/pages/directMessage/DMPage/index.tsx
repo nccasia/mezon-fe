@@ -1,10 +1,9 @@
-import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from "@mezon/components";
+import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader, DirectMessageBox } from "@mezon/components";
 import { useAppNavigation, useAppParams, useChatChannel } from "@mezon/core";
 import { RootState, selectDefaultChannelIdByClanId } from "@mezon/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
 import ChannelMessages from "../../channel/ChanneMessages";
-import { ChannelMessageBox, DirectMessageBox } from "../../channel/ChannelMessageBox";
 
 export function DirectMessage() {
     const isSending = useSelector((state: RootState) => state.messages.isSending);
