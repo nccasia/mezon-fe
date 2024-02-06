@@ -6,6 +6,7 @@ import {
 import { getMezonCtx } from '../helpers';
 import { Session } from '@mezon/mezon-js';
 import { LoadingStatus } from '@mezon/utils';
+import { toast } from 'react-toastify';
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
@@ -127,6 +128,7 @@ export const authSlice = createSlice({
                 (state: AuthState, action) => {
                     state.loadingStatus = 'error';
                     state.error = action.error.message;
+                    toast.error(action.error.message)
                 },
             );
 
@@ -145,6 +147,8 @@ export const authSlice = createSlice({
             .addCase(authenticateEmail.rejected, (state: AuthState, action) => {
                 state.loadingStatus = 'error';
                 state.error = action.error.message;
+                toast.error(action.error.message)
+
             });
 
         builder
