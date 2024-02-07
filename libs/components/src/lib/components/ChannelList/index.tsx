@@ -98,7 +98,7 @@ function ChannelList() {
       </div>
       <hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
 
-      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide ">
+      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide text-[15px]">
         {categorizedChannels.map((category: ICategoryChannel) => (
           <div key={category.id}>
             {category.category_name && (
@@ -128,7 +128,7 @@ function ChannelList() {
               </div>
             )}
             {!categoriesState[category.id] && (
-              <div className="mt-[5px] space-y-0.5 font-['Manrope'] text-[#AEAEAE]">
+              <div className="mt-[5px] space-y-0.5 font-['Manrope'] text-[#AEAEAE] text-[15px]">
                 {category?.channels
                   ?.filter((channel: IChannel) => {
                     const categoryIsOpen = !categoriesState[category.id];

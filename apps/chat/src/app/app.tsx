@@ -60,7 +60,7 @@ function AppWrapper() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <MezonContextProvider nakama={nakama} connect={true}>
         <App />
-        {/* <ToastContainer
+        <ToastContainer
           position='top-right'
           autoClose={2200}
           hideProgressBar={false}
@@ -71,7 +71,7 @@ function AppWrapper() {
           draggable
           pauseOnHover
           theme='light'
-        /> */}
+        />
       </MezonContextProvider>
     </GoogleOAuthProvider>
   );

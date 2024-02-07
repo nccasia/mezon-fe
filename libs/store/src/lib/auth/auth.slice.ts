@@ -147,6 +147,7 @@ export const authSlice = createSlice({
             .addCase(authenticateEmail.rejected, (state: AuthState, action) => {
                 state.loadingStatus = 'error';
                 state.error = action.error.message;
+                console.log("FFGGFG", state.error)
                 toast.error(action.error.message)
 
             });

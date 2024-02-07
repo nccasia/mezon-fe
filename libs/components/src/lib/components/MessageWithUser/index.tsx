@@ -59,7 +59,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
                             </div>
                         </div>
                         <div className="w-full justify-start items-center inline-flex">
-                            <div className="flex flex-col gap-1 text-xs text-white font-['Manrope'] whitespace-pre-wrap">
+                            <div className="flex flex-col gap-1 text-xs text-white font-['Manrope'] whitespace-pre-wrap text-[15px]">
                                 {renderMultilineContent()}
                             </div>
                         </div>
