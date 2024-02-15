@@ -75,6 +75,7 @@ export const fetchChannelMembers = createAsyncThunk(
   async ({ channelId }: fetchChannelMembersPayload, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelUsers(mezon.session, channelId, 1, 100, "")
+    console.log("res-user-stt",  response)
     if (!response.channel_users) {
       return thunkAPI.rejectWithValue([])
     }

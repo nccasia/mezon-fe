@@ -34,7 +34,7 @@ function MemberProfile({
                 )}
                 {!isHideStatus ? (
                     <span
-                        className={`absolute bottom-[-0px] right-[-1px] inline-flex items-center justify-center gap-1 p-1 text-sm text-white border-[4px] border-bgSurface rounded-full ${status ? 'bg-colorNeutral' : 'bg-colorSuccess'}`}
+                        className={`absolute bottom-[-0px] right-[-1px] inline-flex items-center justify-center gap-1 p-1 text-sm text-white border-[4px] border-bgSurface rounded-full ${!status ? 'bg-colorNeutral' : 'bg-colorSuccess'}`}
                     >
                         <span className="sr-only"> </span>
                     </span>
@@ -53,7 +53,7 @@ function MemberProfile({
                 </p>
 
                 <span className={`text-[11px] text-${textColor}`}>  
-                    {status ? 'Offline' : 'Online'}
+                    {!status ? 'Offline' : 'Online'}
                 </span>
             </div>
         </div>

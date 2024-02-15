@@ -82,7 +82,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 return session;
             }
 
-            const session2 = await socketRef.current.connect(session, false);
+            const session2 = await socketRef.current.connect(session, true);
             sessionRef.current = session2;
 
             return session;
@@ -102,7 +102,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 return session;
             }
 
-            const session2 = await socketRef.current.connect(session, false);
+            const session2 = await socketRef.current.connect(session, true);
             sessionRef.current = session2;
 
             return session;
@@ -147,7 +147,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 return newSession;
             }
 
-            const session2 = await socketRef.current.connect(newSession, false);
+            const session2 = await socketRef.current.connect(newSession, true);
             sessionRef.current = session2;
 
             return newSession;
