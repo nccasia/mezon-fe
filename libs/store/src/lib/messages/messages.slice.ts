@@ -240,7 +240,7 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
-				messagesAdapter.setAll(state, action.payload);
+				messagesAdapter.setMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {

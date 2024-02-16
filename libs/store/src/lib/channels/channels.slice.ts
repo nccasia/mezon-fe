@@ -187,7 +187,7 @@ export const channelsSlice = createSlice({
                     state: ChannelsState,
                     action: PayloadAction<ChannelsEntity[]>,
                 ) => {
-                    channelsAdapter.setAll(state, action.payload);
+                    channelsAdapter.setMany(state, action.payload);
                     state.loadingStatus = 'loaded';
                 },
             )
