@@ -16,6 +16,7 @@ import { messagesActions } from '../messages/messages.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { fetchCategories } from '../categories/categories.slice';
+import { toast } from 'react-toastify';
 
 
 export const CHANNELS_FEATURE_KEY = 'channels';
@@ -220,6 +221,7 @@ export const channelsSlice = createSlice({
                 (state: ChannelsState, action) => {
                     state.loadingStatus = 'error';
                     state.error = action.error.message;
+                    toast.error(state.error)
                 },
             );
     },

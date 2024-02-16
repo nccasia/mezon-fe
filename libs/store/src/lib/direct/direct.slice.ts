@@ -8,6 +8,7 @@ import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'vendors/mezo
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { string } from 'yup';
 import { friendsActions } from '../friends/friend.slice';
+import { toast } from 'react-toastify';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -118,6 +119,7 @@ export const directSlice = createSlice({
 			.addCase(fetchDirectMessage.rejected, (state: DirectState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+				toast.error(state.error)
 			});
 	},
 });
