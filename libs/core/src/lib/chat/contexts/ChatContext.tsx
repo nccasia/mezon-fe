@@ -32,11 +32,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   }, [dispatch]);
 
   const onstatuspresence = useCallback((statusPresence: StatusPresenceEvent) => {
-    console.log('AAAAAAAAA: ', statusPresence)
-  }, []);
+    dispatch(channelMembersActions.updateStatusUser(statusPresence))
+  }, [dispatch]);
 
   const onnotification = useCallback((notification: Notification) => {
-    // console.log('SSSSSSSS: ', notification)
     if (notification.code === -2 || notification.code === -3) {
       dispatch(friendsActions.fetchListFriends());
       toast.info(notification.subject)

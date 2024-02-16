@@ -61,12 +61,6 @@ export function useChat() {
         return results as ICategoryChannel[];
     }, [channels, categories]);
 
-    const changeCurrentChannel = React.useCallback(
-        async (channelId: string) => {
-            await dispatch(channelsActions.joinChanel(channelId));
-        },
-        [dispatch],
-    );
     const changeCurrentClan = React.useCallback(
         async (clanId: string) => {
             await dispatch(clansActions.changeCurrentClan({ clanId }));
@@ -230,7 +224,6 @@ export function useChat() {
             updateUserClanProfile,
             sendMessage,
             changeCurrentClan,
-            changeCurrentChannel,
             createClans,
             updateUser,
             createLinkInviteUser,
@@ -251,7 +244,6 @@ export function useChat() {
             userProfile,
             sendMessage,
             changeCurrentClan,
-            changeCurrentChannel,
             userClansProfile,
             getUserClanProfile,
             updateUserClanProfile,

@@ -8,7 +8,9 @@ export const channelLoader: LoaderFunction = async ({params}) => {
   if(!channelId) {
    throw new Error('Channel ID null')
   }
-  store.dispatch(channelsActions.joinChanel(channelId));
+  // const channel = selectChannelById(channelId)(store.getState())
+  // const fetchMembers = !channel || !!channel?.channel_private
+  store.dispatch(channelsActions.joinChanel({channelId, noFetchMembers: false }));
   return null;
 }
 

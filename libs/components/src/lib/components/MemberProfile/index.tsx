@@ -2,7 +2,8 @@ export type MemberProfileProps = {
     avatar: string;
     name: string;
     status?: boolean;
-    isHideStatus: boolean;
+    isHideStatus?: boolean;
+    isHideIconStatus?: boolean;
     numberCharacterCollapse?: number;
     textColor?: string
 };
@@ -12,8 +13,9 @@ function MemberProfile({
     name,
     status,
     isHideStatus,
+    isHideIconStatus,
     numberCharacterCollapse = 6,
-    textColor ="contentSecondary"
+    textColor = "contentSecondary"
 }: MemberProfileProps) {
     return (
         <div className="relative gap-[5px] flex items-center ">
@@ -32,9 +34,9 @@ function MemberProfile({
                         {name.charAt(0).toUpperCase()}
                     </div>
                 )}
-                {!isHideStatus ? (
+                {!isHideIconStatus ? (
                     <span
-                        className={`absolute bottom-[-0px] right-[-1px] inline-flex items-center justify-center gap-1 p-1 text-sm text-white border-[4px] border-bgSurface rounded-full ${!status ? 'bg-colorNeutral' : 'bg-colorSuccess'}`}
+                        className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[5px] text-sm text-white border-[3px] border-bgSurface rounded-full ${!status ? 'bg-colorNeutral' : 'bg-colorSuccess'}`}
                     >
                         <span className="sr-only"> </span>
                     </span>
@@ -51,10 +53,11 @@ function MemberProfile({
                         ? `${name.substring(0, numberCharacterCollapse)}...`
                         : name}
                 </p>
-
-                <span className={`text-[11px] text-${textColor}`}>  
-                    {!status ? 'Offline' : 'Online'}
-                </span>
+                {!isHideStatus && (
+                    <span className={`text-[11px] text-${textColor}`}>
+                        {!status ? 'Offline' : 'Online'}
+                    </span>
+                )}
             </div>
         </div>
     );

@@ -12,23 +12,47 @@ function MemberList() {
 				{members.map((role: any) => (
 					<div key={role.id}>
 						{role.title && (
-							<p className="font-['Manrope'] mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+							<p className="mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 								{role.title}
 							</p>
 						)}
 						{
-							<div className="flex flex-col gap-4 font-['Manrope']">
-								{role?.users.map((user: ChannelMembersEntity) => (
+							<div className="flex flex-col gap-4">
+								{role?.users.filter((obj: ChannelMembersEntity) => obj.user?.online).map((user: ChannelMembersEntity) => (
 									<MemberProfile
 										numberCharacterCollapse={30}
 										avatar={user?.user?.avatar_url ?? ''}
 										name={user?.user?.username ?? ''}
 										status={user.user?.online}
-										isHideStatus={false}
+										isHideStatus={true}
+										isHideIconStatus={false}
 										key={user.id}
 										textColor="[#AEAEAE]"
 									/>
 								))}
+							</div>
+						}
+						{
+							<div>
+								<p className="mt-7 mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+									Offline
+								</p>
+								<div className="flex flex-col gap-4">
+									{role?.users.filter((obj: ChannelMembersEntity) => !obj.user?.online).map((user: ChannelMembersEntity) => (
+										<div className='opacity-60'>
+											<MemberProfile
+												numberCharacterCollapse={30}
+												avatar={user?.user?.avatar_url ?? ''}
+												name={user?.user?.username ?? ''}
+												status={user.user?.online}
+												isHideStatus={true}
+												isHideIconStatus={true}
+												key={user.id}
+												textColor="[#AEAEAE]"
+											/>
+										</div>
+									))}
+								</div>
 							</div>
 						}
 					</div>

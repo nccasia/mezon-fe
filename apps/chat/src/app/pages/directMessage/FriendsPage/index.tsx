@@ -87,7 +87,7 @@ export default function FriendsPage() {
     const filterStatus = (listFriends: FriendsEntity[]) => {
         switch (currentTabStatus) {
             case "online":
-                return listFriends.filter((item) => item.state === 0);
+                return listFriends.filter((item) => item.state === 0 && item.user?.online);
             case "all":
                 return listFriends.filter((item) => item.state === 0);
             case "pending":
@@ -137,30 +137,30 @@ export default function FriendsPage() {
         obj.user?.username?.includes(textSearch),
     );
 
-	const { toDmGroupPageFromFriendPage } = useAppNavigation();
-	const navigate = useNavigate();
+    const { toDmGroupPageFromFriendPage } = useAppNavigation();
+    const navigate = useNavigate();
 
-    const directMessageWithUser = async (userId:string) => {
-		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: ChannelTypeEnum.DM_CHAT,
-			channel_private: 1,
-			user_ids: [userId],
-		};
+    const directMessageWithUser = async (userId: string) => {
+        const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
+            type: ChannelTypeEnum.DM_CHAT,
+            channel_private: 1,
+            user_ids: [userId],
+        };
         const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
-		const resPayload = response.payload as ApiCreateChannelDescRequest;
+        const resPayload = response.payload as ApiCreateChannelDescRequest;
 
-		if (resPayload.channel_id) {
-			await dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: resPayload.channel_id,
-					channelName: resPayload.channel_lable,
-					type: Number(resPayload.type),
-				}),
-			);
-			const directChat = toDmGroupPageFromFriendPage(resPayload.channel_id, Number(resPayload.type));
-			navigate(directChat);
-		}
-	};
+        if (resPayload.channel_id) {
+            await dispatch(
+                directActions.joinDirectMessage({
+                    directMessageId: resPayload.channel_id,
+                    channelName: resPayload.channel_lable,
+                    type: Number(resPayload.type),
+                }),
+            );
+            const directChat = toDmGroupPageFromFriendPage(resPayload.channel_id, Number(resPayload.type));
+            navigate(directChat);
+        }
+    };
     const quantityPendingRequest = friends.filter((obj) =>
         obj.state === 2
     ).length || 0
@@ -177,14 +177,14 @@ export default function FriendsPage() {
                         {tabData.map((tab, index) => (
                             <div className="relative">
                                 <button
-                                    className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? "bg-[#151C2B]" : ""}`}
+                                    className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? "bg-[#151C2B]" : ""} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? "pr-[30px]" : ""}`}
                                     tabIndex={index}
                                     onClick={() => handleChangeTab(tab.value)}
                                 >
                                     {tab.title}
                                 </button>
                                 {tab.value === 'pending' && quantityPendingRequest !== 0 && (
-                                    <div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center top-6 right-[-2px]">
+                                    <div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center top-3 right-[5px]">
                                         {quantityPendingRequest}
                                     </div>
                                 )}

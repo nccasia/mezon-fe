@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { authActions } from '@mezon/store';
+import { authActions, useAppDispatch } from '@mezon/store';
 
 export function LogOutButton() {
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch()
   const handleOpenModal = () => {
     setOpenModal(true);
   };

@@ -83,6 +83,13 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 	return normalizeSession(session);
 });
 
+export const logOut = createAsyncThunk('auth/logOut', async (_, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+	 await mezon?.logOutMezon()
+	 thunkAPI.dispatch(authActions.setLogout())
+});
+
+
 export const authSlice = createSlice({
 	name: AUTH_FEATURE_KEY,
 	initialState: initialAuthState,
@@ -91,7 +98,7 @@ export const authSlice = createSlice({
 			state.session = action.payload;
 			state.isLogin = true;
 		},
-		logOut(state) {
+		setLogout(state) {
 			state.session = null;
 			state.isLogin = false;
 			state.loadingStatus = 'not loaded';
@@ -158,6 +165,7 @@ export const authActions = {
 	authenticateGoogle,
 	authenticateEmail,
 	refreshSession,
+	logOut
 };
 
 export const getAuthState = (rootState: { [AUTH_FEATURE_KEY]: AuthState }): AuthState => rootState[AUTH_FEATURE_KEY];

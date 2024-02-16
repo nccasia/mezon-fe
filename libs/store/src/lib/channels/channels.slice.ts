@@ -69,16 +69,22 @@ function getChannelsRootState(
     return thunkAPI.getState() as ChannelsRootState;
 }
 
+type fetchChannelMembersPayload = {
+	channelId: string;
+	noFetchMembers?: boolean;
+}
+
 export const joinChanel = createAsyncThunk(
     'channels/joinChanel',
-    async (channelId: string, thunkAPI) => {
+    async ({channelId, noFetchMembers}: fetchChannelMembersPayload, thunkAPI) => {
         try {
             thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
             thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-             thunkAPI.dispatch(
-                channelMembersActions.fetchChannelMembers({ channelId }),
-            );
-
+            if(!noFetchMembers) {
+                thunkAPI.dispatch(
+                    channelMembersActions.fetchChannelMembers({ channelId }),
+                );
+            }
             const chanel = await waitUntil(() =>
                 selectChannelById(channelId)(getChannelsRootState(thunkAPI)),
             );

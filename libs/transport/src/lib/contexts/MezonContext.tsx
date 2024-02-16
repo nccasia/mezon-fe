@@ -27,6 +27,7 @@ export type MezonContextValue = {
     authenticateEmail: (email: string, password: string) => Promise<Session>;
     authenticateDevice: (username: string) => Promise<Session>;
     authenticateGoogle: (token: string) => Promise<Session>;
+    logOutMezon: () => Promise<void>;
     refreshSession: (session: Sessionlike) => Promise<Session>;
     joinChatChannel: (channelId: string, type: string) => Promise<Channel>;
     joinChatDirectMessage: (
@@ -108,6 +109,18 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
             return session;
         },
         [clientRef, socketRef],
+    );
+
+    const logOutMezon = useCallback(
+        async () => {
+            if (socketRef.current) {
+                await socketRef.current.disconnect(true);
+            }
+            socketRef.current = null
+            sessionRef.current = null;
+
+        },
+        [socketRef],
     );
 
     const authenticateDevice = useCallback(
@@ -245,7 +258,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
             joinChatChannel,
             joinChatDirectMessage,
             createSocket,
-            addStatusFollow
+            addStatusFollow,
+            logOutMezon
         }),
         [
             clientRef,
@@ -260,7 +274,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
             joinChatChannel,
             joinChatDirectMessage,
             createSocket,
-            addStatusFollow
+            addStatusFollow,
+            logOutMezon
         ],
     );
 

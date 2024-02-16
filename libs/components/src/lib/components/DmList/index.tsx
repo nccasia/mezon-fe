@@ -91,7 +91,8 @@ function DirectMessageList() {
 								avatar={directMessage?.user?.avatar ?? ''}
 								name={directMessage?.channel_lable ?? ''}
 								status={false}
-								isHideStatus={false}
+								isHideStatus={true}
+								isHideIconStatus={false}
 								key={directMessage.channel_id}
 							/>
 						</button>

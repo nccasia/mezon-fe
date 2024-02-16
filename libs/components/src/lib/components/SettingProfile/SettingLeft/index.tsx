@@ -1,7 +1,6 @@
-import { authActions } from "@mezon/store";
+import { authActions, useAppDispatch } from "@mezon/store";
 import { LogOutButton, LogoutModal } from "libs/ui/src/lib/LogOutButton";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 const SettingItem = ({
   onItemClick,
 }: {
@@ -13,8 +12,8 @@ const SettingItem = ({
   const handleButtonClick = (buttonName: string) => {
     setSelectedButton(buttonName);
   };
-  const [openModal, setOpenModal] = useState<boolean>(false );
-  const dispatch = useDispatch();
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
   const handleOpenModal = () => {
     setOpenModal(true);
   };
