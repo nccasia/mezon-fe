@@ -1,5 +1,5 @@
 import { DirectMessageBox, DmTopbar, MemberListGroupChat } from '@mezon/components';
-import { useAppNavigation, useAppParams, useChatChannel } from '@mezon/core';
+import { useAppNavigation, useAppParams, useDirectMessages } from '@mezon/core';
 import { RootState, selectDefaultChannelIdByClanId } from '@mezon/store';
 import { ChannelTypeEnum } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
@@ -7,20 +7,23 @@ import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChanneMessages';
 
 export function DirectMessage() {
+	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 
 	const { serverId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
 	const { navigate } = useAppNavigation();
 
+	const { messages } = useDirectMessages({ channelId: directId ?? '' });
+
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
 		if (defaultChannelId) {
 			navigate(`./${defaultChannelId}`);
 		}
 	}, [defaultChannelId, navigate]);
-	const { messages } = useChatChannel(directId ?? '');
 
-	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (messagesContainerRef.current) {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;

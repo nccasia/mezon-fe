@@ -1,5 +1,5 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
-import { useAppNavigation, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useFriends } from '@mezon/core';
 import { selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useState } from 'react';
@@ -22,9 +22,7 @@ function MyApp() {
 		setOpenCreateClans(true);
 	};
 
-	// TODO: move to useFriendRequest hook
-	const { friends } = useChatDirect(undefined);
-	const quantityPendingRequest = friends.filter((obj) => obj.state === 2).length || 0;
+	const { quantityPendingRequest } = useFriends();
 
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden">

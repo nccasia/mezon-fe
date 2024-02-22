@@ -23,8 +23,8 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		}
 
 		if (typeof message.content === 'object') {
-			if (typeof message.content.text === 'string') {
-				return message.content.text;
+			if (typeof (message.content as unknown as any).text === 'string') {
+				return (message.content as unknown as any).text;
 			}
 		}
 	}, [message]);
@@ -67,50 +67,46 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	return (
 		<div
-				className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
-			>
-				<div className="justify-start gap-4 inline-flex w-full relative">
-					{isCombine ? (
-						<div className="w-[38px] h-[0] mr-[5px]"></div>
-					) : (
-						<div>
-							{message.user?.avatarSm ? (
-								<img
-									className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
-									src={message.user?.avatarSm || ''}
-									alt={message.user?.username || ''}
-								/>
-							) : (
-								<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-									{message.user?.username.charAt(0).toUpperCase()}
-								</div>
-							)}
-						</div>
-					)}
-					<div className="flex-col w-full flex justify-center items-start relative gap-1">
-						{!isCombine && (
-							<div className="flex-row items-center w-full gap-4 flex">
-								<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">
-									{message.user?.username}
-								</div>
-								<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{message?.date}</div>
+			className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+		>
+			<div className="justify-start gap-4 inline-flex w-full relative">
+				{isCombine ? (
+					<div className="w-[38px] h-[0] mr-[5px]"></div>
+				) : (
+					<div>
+						{message.user?.avatarSm ? (
+							<img
+								className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
+								src={message.user?.avatarSm || ''}
+								alt={message.user?.username || ''}
+							/>
+						) : (
+							<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+								{message.user?.username.charAt(0).toUpperCase()}
 							</div>
 						)}
-						<div className="justify-start items-center inline-flex">
-							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px]">
-								{renderMultilineContent()}
-							</div>
+					</div>
+				)}
+				<div className="flex-col w-full flex justify-center items-start relative gap-1">
+					{!isCombine && (
+						<div className="flex-row items-center w-full gap-4 flex">
+							<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">{message.user?.username}</div>
+							<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{message?.date}</div>
+						</div>
+					)}
+					<div className="justify-start items-center inline-flex">
+						<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
+							{renderMultilineContent()}
 						</div>
 					</div>
 				</div>
-				{message && (
-					<div
-						className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
-					>
-						<Icons.Sent />
-					</div>
-				)}
 			</div>
+			{message && (
+				<div className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}>
+					<Icons.Sent />
+				</div>
+			)}
+		</div>
 	);
 }
 

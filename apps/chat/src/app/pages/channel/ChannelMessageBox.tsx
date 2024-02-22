@@ -1,6 +1,6 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { MessageBox } from '@mezon/components';
-import { useChatChannel } from '@mezon/core';
+import { useChatChannel, useChatSending, useChatTypings } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
@@ -11,7 +11,8 @@ type ChannelMessageBoxProps = {
 };
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
-	const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
+	const { sendMessage } = useChatSending({ channelId });
+	const { sendMessageTyping } = useChatTypings({ channelId });
 
 	const handleSend = useCallback(
 		(mess: IMessageSendPayload) => {

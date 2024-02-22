@@ -1,4 +1,4 @@
-import { useAppNavigation, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useFriends } from '@mezon/core';
 import { IFriend, directActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ChannelTypeEnum } from '@mezon/utils';
@@ -15,7 +15,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const dispatch = useAppDispatch();
 	const { toDmGroupPage } = useAppNavigation();
 	const navigate = useNavigate();
-	const { friends } = useChatDirect(undefined);
+	const { friends } = useFriends();
 	const [length, setLength] = useState<number>(selectedFriends.length);
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +55,9 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	};
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
+	// TODO: move to custom hook
 	const filteredFriends = friends.filter((friend: IFriend) => friend.user?.username?.toLowerCase().includes(searchTerm.toLowerCase()));
+
 	useEffect(() => {
 		setLength(selectedFriends.length);
 	}, [selectedFriends]);
@@ -69,17 +71,19 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 		<div className="overflow-y-scroll  flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold font-['Manrope']">
 			<div className="flex flex-row items-center w-full gap-4 h-fit ">
 				<Modal title="Create DM" showModal={isOpen} onClose={resetAndCloseModal}>
-					<div className="bg-[#323232] w-full h-full">
+					<div className="bg-transparent w-full h-full">
 						<p className="pb-3">Select Friends</p>
 						<input
 							className="bg-black border font-thin text-white text-sm rounded-lg border-[#1E1E1E] focus:border-blue-500 focus:outline-none
-                        block ps-10 p-2.5 w-[500px] dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        block ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-full"
 							placeholder="Search user"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
+							style={{ paddingLeft: '16px' }}
 						/>
+						<p className="text-sm font-medium my-[8px]">Add individual members by starting with @, or type a role name</p>
 						<ul
-							className="h-[400px] px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+							className="h-[400px] pb-3 text-sm text-gray-700 dark:text-gray-200 max-h-[250px] overflow-y-scroll"
 							aria-labelledby="dropdownSearchButton"
 						>
 							{filteredFriends.map((friend, index) => (
@@ -89,7 +93,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 											id={`checkbox-item-${index}`}
 											type="checkbox"
 											value={friend.id}
-											className="w-4 h-4 border border-white cursor-pointer text-blue-600 bg-gray-100  rounded placeholder:text-gray-300  dark:bg-gray-600 dark:border-gray-500"
+											className="peer relative appearance-none w-5 h-5 border rounded-sm focus:outline-none checked:bg-gray-300"
 											onChange={handleCheckboxChange}
 										/>
 										<label

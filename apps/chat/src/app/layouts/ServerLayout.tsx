@@ -1,9 +1,9 @@
+import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans } from '@mezon/core';
+import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ServerLoaderData } from '../loaders/serverLoader';
 import Setting from '../pages/setting';
-import { useState } from 'react';
-import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader } from '@mezon/components';
 
 const ServerLayout = () => {
 	const { serverId } = useLoaderData() as ServerLoaderData;
@@ -30,7 +30,7 @@ const ServerLayout = () => {
 				<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 					<ChannelTopbar channel={undefined} />
 					<div className="flex h-heightWithoutTopBar flex-row">
-						<Outlet/>
+						<Outlet />
 					</div>
 				</div>
 				<Setting

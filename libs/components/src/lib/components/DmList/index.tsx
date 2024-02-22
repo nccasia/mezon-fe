@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useDirect } from '@mezon/core';
 import { RootState, directActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
@@ -14,10 +14,8 @@ export type CategoriesState = Record<string, boolean>;
 
 function DirectMessageList() {
 	const currentDmGroupId = useSelector((state: RootState) => state.direct.currentDirectMessageId);
-	const { directId } = useAppParams();
 	const pathname = useLocation().pathname;
-	const data = useChatDirect(directId);
-	const dmGroupChatList = data.listDM;
+	const { listDM: dmGroupChatList } = useDirect();
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {

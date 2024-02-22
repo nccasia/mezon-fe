@@ -1,24 +1,12 @@
 import { IconChat, IconEditThreeDot, IconFriends, MemberProfile, Search } from '@mezon/components';
-import { useAppNavigation, useChatDirect } from '@mezon/core';
-import {
-	FriendsEntity,
-	RootState,
-	directActions,
-	friendsActions,
-	requestAddFriendParam,
-	sendRequestAddFriend,
-	sendRequestBlockFriend,
-	sendRequestDeleteFriend,
-	useAppDispatch,
-} from '@mezon/store';
+import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
+import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
-import { ChannelTypeEnum } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { Friend } from 'vendors/mezon-js/packages/mezon-js/dist';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 const tabData = [
 	{ title: 'All', value: 'all' },
@@ -29,7 +17,8 @@ const tabData = [
 
 export default function FriendsPage() {
 	const dispatch = useAppDispatch();
-	const { friends } = useChatDirect(undefined);
+	const { createDirectMessageWithUser } = useDirect();
+	const { friends, quantityPendingRequest, addFriend, acceptFriend, blockFriend, deleteFriend, unBlockFriend } = useFriends();
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
@@ -72,7 +61,7 @@ export default function FriendsPage() {
 		});
 	};
 	const handleAddFriend = async () => {
-		await dispatch(sendRequestAddFriend(requestAddFriend));
+		await addFriend(requestAddFriend);
 		resetField();
 	};
 
@@ -92,35 +81,19 @@ export default function FriendsPage() {
 	};
 
 	const handleAcceptFriend = (userName: string, id: string) => {
-		const body = {
-			usernames: [userName],
-			ids: [id],
-		};
-		dispatch(sendRequestAddFriend(body));
+		acceptFriend(userName, id);
 	};
 
 	const handleDeleteFriend = (userName: string, id: string) => {
-		const body = {
-			usernames: [userName],
-			ids: [id],
-		};
-		dispatch(sendRequestDeleteFriend(body));
+		deleteFriend(userName, id);
 	};
 
 	const handleBlockFriend = (userName: string, id: string) => {
-		const body = {
-			usernames: [userName],
-			ids: [id],
-		};
-		dispatch(sendRequestBlockFriend(body));
+		blockFriend(userName, id);
 	};
 
 	const handleUnBlockFriend = (userName: string, id: string) => {
-		const body = {
-			usernames: [userName],
-			ids: [id],
-		};
-		dispatch(sendRequestDeleteFriend(body));
+		unBlockFriend(userName, id);
 	};
 
 	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
@@ -128,28 +101,14 @@ export default function FriendsPage() {
 	const { toDmGroupPageFromFriendPage } = useAppNavigation();
 	const navigate = useNavigate();
 
+	// TODO: move to useDirect hook
 	const directMessageWithUser = async (userId: string) => {
-		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: ChannelTypeEnum.DM_CHAT,
-			channel_private: 1,
-			user_ids: [userId],
-		};
-		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
-		const resPayload = response.payload as ApiCreateChannelDescRequest;
-
-		if (resPayload.channel_id) {
-			await dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: resPayload.channel_id,
-					channelName: resPayload.channel_lable,
-					type: Number(resPayload.type),
-				}),
-			);
-			const directChat = toDmGroupPageFromFriendPage(resPayload.channel_id, Number(resPayload.type));
+		const response = await createDirectMessageWithUser(userId);
+		if (response.channel_id) {
+			const directChat = toDmGroupPageFromFriendPage(response.channel_id, Number(response.type));
 			navigate(directChat);
 		}
 	};
-	const quantityPendingRequest = friends.filter((obj) => obj.state === 2).length || 0;
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
@@ -328,7 +287,7 @@ export default function FriendsPage() {
 								/>
 								<Button
 									label={'Send Friend Request'}
-									className="absolute top-5 right-3 text-[14px] py-[5px]"
+									className="absolute top-3 right-2 text-[14px] py-[5px]"
 									disable={!requestAddFriend.usernames?.length}
 									onClick={handleAddFriend}
 									aria-placeholder="SSSSS "

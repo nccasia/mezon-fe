@@ -93,7 +93,7 @@ export const CreateNewChannelModal = () => {
 		<>
 			{isOpenModal && (
 				<>
-					<div className="w-[100vw] h-[100vh] overflow-hidden absolute top-0 left-0 z-50 bg-black flex flex-row justify-center items-center">
+					<div className="w-[100vw] h-[100vh] overflow-hidden absolute top-0 left-[-70px] z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
 						{}
 						<div className="z-60 w-full md:w-[684px] h-full md:h-[630px] bg-[#151515] rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
 							<div className="self-stretch md:h-96 flex-col justify-start items-start flex">

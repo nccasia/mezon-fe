@@ -46,7 +46,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			confirmButton={handleCreateClan}
 			disableButtonConfirm={!nameClan ? true : false}
 		>
-			<div className="flex items-center flex-col justify-center max-w-lg ">
+			<div className="flex items-center flex-col justify-center ">
 				<span className="text-contentPrimary text-[24px] pb-2 font-[500]">Customize Your Server</span>
 				<p className="text-contentTertiary  text-center">
 					Give your new clan a personality with a name and an icon. You can always change it later.

@@ -1,4 +1,4 @@
-import { useChatChannel } from '@mezon/core';
+import { useChatMessages } from '@mezon/core';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -6,7 +6,7 @@ type ChannelMessagesProps = {
 	channelId: string;
 };
 export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatChannel(channelId);
+	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const fetchData = () => {
 		//call api
 		loadMoreMessage();
