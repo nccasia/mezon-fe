@@ -5,7 +5,6 @@
 
 .mentionSuggestions {
 	border-radius: 2px;
-	cursor: pointer;
 	padding-top: 8px;
 	padding-bottom: 8px;
 	display: flex;
@@ -18,7 +17,6 @@
 	position: relative;
 	color: black;
 	width: 300px;
-	border: 1px solid red;
 }
 
 .mentionSuggestionsEntryFocused {
@@ -36,8 +34,8 @@
 .mentionSuggestionsEntryAvatar {
 	display: inline;
 	margin-left: auto;
-	width: 60px;
-	height: 60px;
+	width: 50px;
+	height: 50px;
 	border-radius: 50%;
 	padding: 5px;
 }

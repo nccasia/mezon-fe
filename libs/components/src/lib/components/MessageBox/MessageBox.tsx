@@ -1,36 +1,12 @@
-import { MentionData } from '@draft-js-plugins/mention';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import * as Icons from '../Icons';
-
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { IMessageSendPayload } from '@mezon/utils';
+import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import { EditorState, convertToRaw } from 'draft-js';
-import 'draft-js/dist/Draft.css';
-import React, { MouseEvent, ReactElement, useMemo } from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MessageBoxProps } from '.';
+import * as Icons from '../Icons';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
-export interface EntryComponentProps {
-	className?: string;
-	onMouseDown(event: MouseEvent): void;
-	onMouseUp(event: MouseEvent): void;
-	onMouseEnter(event: MouseEvent): void;
-	role: string;
-	id: string;
-	'aria-selected'?: boolean | 'false' | 'true';
-	theme?: MentionPluginTheme;
-	mention: MentionData;
-	isFocused: boolean;
-	searchValue?: string;
-}
-
-export type MessageBoxProps = {
-	onSend: (mes: IMessageSendPayload) => void;
-	onTyping?: () => void;
-	memberList?: MentionData[];
-};
-
-function MessageBox(props: MessageBoxProps): ReactElement {
+export function MessageBox(props: MessageBoxProps): ReactElement {
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
 			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
@@ -44,7 +20,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
 			theme: mentionsStyles,
-			mentionPrefix: '@',
+			// mentionPrefix: '@',
 			supportWhitespace: true,
 		});
 		const { MentionSuggestions } = mentionPlugin;
@@ -89,19 +65,29 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setContent('');
 	}, [content, onSend, userMentioned]);
 
-	const checkSelectionCursor = () => {
-		if (content.length === 1 && content.includes('@')) {
+	// const checkSelectionCursor = () => {
+	// 	if (content === '@') {
+	// 		const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+	// 		setEditorState(updatedEditorState);
+	// 	} else setEditorState(editorState);
+	// 	if (content.length === 0) {
+	// 		setShowPlaceHolder(true);
+	// 	} else setShowPlaceHolder(false);
+	// };
+	const checkSelectionCursor = useCallback(() => {
+		if (content === '@') {
 			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
 			setEditorState(updatedEditorState);
 		} else setEditorState(editorState);
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 		} else setShowPlaceHolder(false);
-	};
+	}, [content]);
 
 	useEffect(() => {
+		console.log('dfdfdfdf');
 		checkSelectionCursor();
-	}, [refresh]);
+	}, [refresh, content]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -162,7 +148,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		</div>
 	);
 }
-
 MessageBox.Skeleton = () => {
 	return (
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
@@ -187,5 +172,3 @@ MessageBox.Skeleton = () => {
 		</div>
 	);
 };
-
-export default MessageBox;
