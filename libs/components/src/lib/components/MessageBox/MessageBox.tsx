@@ -20,7 +20,7 @@ export function MessageBox(props: MessageBoxProps): ReactElement {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
 			theme: mentionsStyles,
-			// mentionPrefix: '@',
+			mentionPrefix: '@',
 			supportWhitespace: true,
 		});
 		const { MentionSuggestions } = mentionPlugin;
@@ -55,7 +55,6 @@ export function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const [content, setContent] = useState('');
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-	const [refresh, setRefresh] = useState(false);
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
@@ -65,29 +64,19 @@ export function MessageBox(props: MessageBoxProps): ReactElement {
 		setContent('');
 	}, [content, onSend, userMentioned]);
 
-	// const checkSelectionCursor = () => {
-	// 	if (content === '@') {
-	// 		const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-	// 		setEditorState(updatedEditorState);
-	// 	} else setEditorState(editorState);
-	// 	if (content.length === 0) {
-	// 		setShowPlaceHolder(true);
-	// 	} else setShowPlaceHolder(false);
-	// };
-	const checkSelectionCursor = useCallback(() => {
-		if (content === '@') {
+	const checkSelectionCursor = () => {
+		if (content.length === 1) {
 			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
 			setEditorState(updatedEditorState);
 		} else setEditorState(editorState);
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 		} else setShowPlaceHolder(false);
-	}, [content]);
+	};
 
 	useEffect(() => {
-		console.log('dfdfdfdf');
 		checkSelectionCursor();
-	}, [refresh, content]);
+	}, [content]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -103,7 +92,6 @@ export function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
-
 	return (
 		<div className="flex w-full items-center relative">
 			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
@@ -127,8 +115,9 @@ export function MessageBox(props: MessageBoxProps): ReactElement {
 							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
 						/>
-						{showPlaceHolder && <p className="absolute duration-300 text-gray-300">Write your thoughs here...</p>}
+						{showPlaceHolder && <p className="absolute text-gray-300">Write your thoughs here...</p>}
 					</div>
+
 					<div className="absolute w-[90%] box-border bottom-[100%] bg-black rounded-md ">
 						<MentionSuggestions
 							open={open}
