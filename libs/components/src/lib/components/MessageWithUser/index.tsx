@@ -1,4 +1,12 @@
-import { IMessageWithUser, TIME_COMBINE } from '@mezon/utils';
+import {
+	IMessageWithUser,
+	TIME_COMBINE,
+	checkSameDay,
+	convertDateString,
+	convertTimeHour,
+	convertTimeString,
+	getTimeDifferenceInSeconds,
+} from '@mezon/utils';
 import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -9,29 +17,18 @@ export type MessageWithUserProps = {
 };
 
 function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
-	const timeDiff = useMemo(() => {
-		if (!preMessage || !message) return 0;
-
-		const dateCreatePreMess = new Date(preMessage?.date as string);
-		const dateCreateCurrentMess = new Date(message?.date as string);
-		return Math.abs(dateCreateCurrentMess.getTime() - dateCreatePreMess.getTime()) / 1000;
-	}, [message, preMessage]);
-
 	const content = useMemo(() => {
-		if (typeof message.content === 'string') {
-			return message.content;
-		}
-
-		if (typeof message.content === 'object') {
-			if (typeof (message.content as unknown as any).text === 'string') {
-				return (message.content as unknown as any).text;
-			}
-		}
+		return message.content['text'];
 	}, [message]);
 
 	const isCombine = useMemo(() => {
-		return timeDiff < TIME_COMBINE && preMessage?.user?.id === message?.user?.id;
-	}, [timeDiff, message, preMessage]);
+		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
+		return (
+			timeDiff < TIME_COMBINE &&
+			preMessage?.user?.id === message?.user?.id &&
+			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
+		);
+	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
 		const lines = content?.split('\n');
@@ -66,47 +63,65 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	};
 
 	return (
-		<div
-			className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
-		>
-			<div className="justify-start gap-4 inline-flex w-full relative">
-				{isCombine ? (
-					<div className="w-[38px] h-[0] mr-[5px]"></div>
-				) : (
-					<div>
-						{message.user?.avatarSm ? (
-							<img
-								className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
-								src={message.user?.avatarSm || ''}
-								alt={message.user?.username || ''}
-							/>
-						) : (
-							<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-								{message.user?.username.charAt(0).toUpperCase()}
-							</div>
-						)}
-					</div>
-				)}
-				<div className="flex-col w-full flex justify-center items-start relative gap-1">
-					{!isCombine && (
-						<div className="flex-row items-center w-full gap-4 flex">
-							<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">{message.user?.username}</div>
-							<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{message?.date}</div>
-						</div>
-					)}
-					<div className="justify-start items-center inline-flex">
-						<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
-							{renderMultilineContent()}
-						</div>
-					</div>
-				</div>
-			</div>
-			{message && (
-				<div className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}>
-					<Icons.Sent />
+		<>
+			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
+				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
+					<div className="w-full border-b-[1px] border-borderFocus text-center"></div>
+					<span className="text-center px-3 whitespace-nowrap">{convertDateString(message?.create_time as string)}</span>
+					<div className="w-full border-b-[1px] border-borderFocus text-center"></div>
 				</div>
 			)}
-		</div>
+
+			<div
+				className={`flex py-0.5 h-15 group hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+			>
+				<div className="justify-start gap-4 inline-flex w-full relative">
+					{isCombine ? (
+						<div className="w-[38px] flex items-center justify-center">
+							<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block">
+								{convertTimeHour(message?.create_time as string)}
+							</div>
+						</div>
+					) : (
+						<div>
+							{message.user?.avatarSm ? (
+								<img
+									className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
+									src={message.user?.avatarSm || ''}
+									alt={message.user?.username || ''}
+								/>
+							) : (
+								<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+									{message.user?.username.charAt(0).toUpperCase()}
+								</div>
+							)}
+						</div>
+					)}
+					<div className="flex-col w-full flex justify-center items-start relative gap-1">
+						{!isCombine && (
+							<div className="flex-row items-center w-full gap-4 flex">
+								<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">
+									{message.user?.username}
+								</div>
+								<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{convertTimeString(message?.create_time as string)}</div>
+							</div>
+						)}
+						<div className="justify-start items-center inline-flex w-full">
+							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
+								{renderMultilineContent()}
+							</div>
+						</div>
+					</div>
+				</div>
+				{message && (
+					<div
+						className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
+					>
+						<Icons.Sent />
+					</div>
+				)}
+			</div>
+		</>
 	);
 }
 

@@ -90,7 +90,7 @@ export type IMessageMeta = {
 
 export type IMessage = ChannelMessage & {
 	id: string;
-	content?: {
+	content: {
 		text?: string | undefined;
 		mentioned?: string[] | undefined;
 	};
