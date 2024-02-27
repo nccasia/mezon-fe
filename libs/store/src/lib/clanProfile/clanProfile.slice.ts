@@ -25,7 +25,6 @@ export const userClanProfileAdapter = createEntityAdapter<UserClanProfileEntity>
 type fetchUserClanProfilePayload = {
 	clanId: string;
 };
-
 export const fetchUserClanProfile = createAsyncThunk('userclanProfile/userClanProfile', async ({ clanId }: fetchUserClanProfilePayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.getUserProfileOnClan(mezon.session, clanId);
@@ -41,7 +40,6 @@ type updateLinkUserClanProfile = {
 	avatarUrl: string;
 	clanId: string;
 };
-
 export const updateUserClanProfile = createAsyncThunk(
 	'userclanProfile/updateUserClanProfile',
 	async ({ clanId, username, avatarUrl }: updateLinkUserClanProfile, thunkAPI) => {

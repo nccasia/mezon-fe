@@ -8,13 +8,11 @@ import createImagePlugin from '@draft-js-plugins/image';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
-import editorStyles from './editorStyles.module.css';
-import { useMezon } from '@mezon/transport';
-
-import { ApiUploadFileRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useSelector } from 'react-redux';
+import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
@@ -45,8 +43,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin, imagePlugin];
-
-	const { clientRef, sessionRef } = useMezon();
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -83,29 +79,23 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setOpen(_open);
 	}, []);
 
-	const onPastedFiles = useCallback((files: Blob[]) => {		
+	const onPastedFiles = useCallback((files: Blob[]) => {
+		const file = new File(files, "upload.png", { type: "image/png" });
 		const now = Date.now();
-		const filename = now + ".png";
-		const file = new File(files, filename, { type: "image/png" });
-		const fullfilename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
-
-		file.arrayBuffer().then((buf) => {
-			const session = sessionRef.current;
-			const client = clientRef.current;
-			if (!client || !session) {
-				console.log(client, session);
-				throw new Error('Client is not initialized');
-			}
-
-			const body: ApiUploadFileRequest = {
-				filename: fullfilename,
-				filetype: 'image/png',
-				size: file.size,
-				stream: Buffer.from(buf).toString('base64'),
-			};
-
-			client.uploadFile(session, body).then(res => {
-				const url = 'https://cdn.mezon.vn/' + fullfilename;
+		const bucket = "mezon";
+		const filename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + (now + file.type).replace('image/', '.');
+		const metaData = {
+			'Content-Type': 'image/png',
+			'Content-Language': file.size,
+		  };
+		file.arrayBuffer().then((buf) => {			
+			// upload to minio
+			uploadImageToMinIO(bucket, filename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+				if (err) {
+					console.log("err", err);
+					return 'not-handled';
+				}
+				const url = 'https://cdn.mezon.vn/' + filename;
 				const contentState = editorState.getCurrentContent();
 				const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
 					src: url,
@@ -120,14 +110,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 				setContent(url);
 				return 'handled';
-			}).catch(err => {
-				return 'not-handled';
 			});
 		});
 
 		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 		return 'not-handled';
-	}, [clientRef, currentChannelId, currentClanId, editorState, sessionRef]);
+	}, [currentChannelId, currentClanId, editorState]);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
