@@ -3,7 +3,6 @@ import {
 	IMessageWithUser
 } from '@mezon/utils';
 import Skeleton from 'react-loading-skeleton';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import MessageAvatar from './MessageAvatar';
 import { useMessageParser } from './useMessageParser';
 import MessageHead from './MessageHead';
@@ -15,9 +14,6 @@ import MessageStatus from './MessageStatus';
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
-	mentions?: Array<ApiMessageMention>;
-	attachments?: Array<ApiMessageAttachment>;
-	references?: Array<ApiMessageRef>;
 	user?: IChannelMember | null;
 };
 
