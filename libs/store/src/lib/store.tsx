@@ -20,10 +20,10 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
-
 import { directReducer } from './direct/direct.slice';
 import { friendsReducer } from './friends/friend.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
+import { notificationReducer } from './notification/notify.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -62,6 +62,7 @@ const reducer = {
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	isshow: IsShowReducer,
+	notification: notificationReducer
 };
 
 let storeInstance = configureStore({

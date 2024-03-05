@@ -17,3 +17,4 @@ export * from './lib/store';
 export * from './lib/threads/threads.slice';
 export * from './lib/users/users.slice';
 export * from './lib/clanMembers/clan.members';
+export * from './lib/notification/notify.slice';

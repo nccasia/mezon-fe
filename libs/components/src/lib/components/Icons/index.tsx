@@ -11,6 +11,22 @@ export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<circle cx="6" cy="6" r="6" fill="#16A34A" />
+		</svg>
+	);
+}
+
+export function OfflineStatus(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" stroke-width="3" />
+		</svg>
+	);
+}
+
 export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>

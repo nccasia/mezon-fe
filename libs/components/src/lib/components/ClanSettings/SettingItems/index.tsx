@@ -1,4 +1,4 @@
-import {  useClans, useRoles } from '@mezon/core';
+import { useClans } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
@@ -7,8 +7,8 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
-    const { currentClan } = useClans();
-	
+	const { currentClan } = useClans();
+
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const handleLogOut = () => {
@@ -19,9 +19,9 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 		setSelectedButton('');
 	};
 	return (
-		<div className="hidden overflow-y-auto w-1/4 bg-black md:block pt-96 pl-[142px] pr-[16px] pb-[96px] scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow">
 			<div className="w-170px ">
-				<p className="text-blue-500 ">{currentClan?.clan_name}</p>
+				<p className="text-[#84ADFF] font-bold text-sm tracking-wider ">{currentClan?.clan_name}</p>
 				{/* <button
 					className={`pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px] ${selectedButton === 'Account' ? 'bg-blue-400' : ''}`}
 					onClick={() => {
@@ -33,7 +33,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button> */}
 				{/* <br /> */}
 				<button
-					className={`pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px] ${selectedButton === 'Roles' ? 'bg-blue-400' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Roles' ? 'bg-blue-400 text-white' : ''}`}
 					onClick={() => {
 						handleButtonClick('Roles');
 						onItemClick && onItemClick('Roles');
@@ -43,9 +43,8 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button>
 				<br />
 				<button
-					className={`pt-1 pl-1 text-white ${selectedButton === 'LogOut' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
-					onClick={() => {
-					}}
+					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-blue-400' : ''} w-[170px] text-left rounded-[5px]`}
+					onClick={() => {}}
 				>
 					Delete server
 				</button>

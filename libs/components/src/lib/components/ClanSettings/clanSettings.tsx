@@ -1,7 +1,7 @@
 import { ExitSetting } from '@mezon/components';
-import  ServerSettingItems  from './SettingItems'
-import  ServerSettingMainRoles  from './SettingMainRoles'
 import { useEffect, useState } from 'react';
+import ServerSettingItems from './SettingItems';
+import ServerSettingMainRoles from './SettingMainRoles';
 import ServerSettingRoleManagement from './SettingRoleManagement';
 
 export type ModalSettingProps = {
@@ -17,9 +17,9 @@ const ClanSetting = (props: ModalSettingProps) => {
 	};
 	const [openEdit, setOpenEdit] = useState<boolean>(false);
 	const closeSettingEdit = () => {
-		setOpenEdit(false)
+		setOpenEdit(false);
 	};
-	
+
 	useEffect(() => {
 		if (!open) {
 			setOpenEdit(false);
@@ -27,9 +27,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 	}, [open]);
 
 	const openSettingEdit = () => {
-		setOpenEdit(true)
+		setOpenEdit(true);
 	};
-
 
 	return (
 		<div>
@@ -38,13 +37,13 @@ const ClanSetting = (props: ModalSettingProps) => {
 					<div className="flex text-gray- w-screen">
 						<ServerSettingItems onItemClick={handleSettingItemClick} />
 
-						{!openEdit?(
-							<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
-								{currentSetting === 'Roles' && <ServerSettingMainRoles handleOpen={openSettingEdit}/>}
+						{!openEdit ? (
+							<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
+								{currentSetting === 'Roles' && <ServerSettingMainRoles handleOpen={openSettingEdit} />}
 								{/* {currentSetting === 'Account' && <SettingAccount />} */}
 							</div>
-							):null}
-							<ServerSettingRoleManagement flagOption ={openEdit} handleClose={closeSettingEdit} />
+						) : null}
+						<ServerSettingRoleManagement flagOption={openEdit} handleClose={closeSettingEdit} />
 						<ExitSetting onClose={onClose} />
 					</div>
 				</div>

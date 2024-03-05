@@ -114,9 +114,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const contentState = editorState.getCurrentContent();
 			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
 				src: urlFile,
-				height: '20px',
-				width: 'auto',
-				onRemove: (key: string) => handleRemove(key),
+				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 			const newEditorState = EditorState.set(editorState, {
@@ -158,7 +156,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
-	const handleRemove = (keyToRemove: string) => {
+	const handleRemove = () => {
 		const currentContentState = editorState.getCurrentContent();
 		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
 		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');

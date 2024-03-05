@@ -3,6 +3,7 @@ import { IChannel } from '@mezon/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import { ChannelLable, SearchMessage } from './TopBarComponents';
+import NotificationList from '../NotificationList';
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
 };
@@ -26,7 +27,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 					</div>
 					<SearchMessage />
 					<div className="justify-start items-start gap-4 flex">
-						<InboxButton />
+						<NotificationList />
 						<HelpButton />
 					</div>
 				</div>

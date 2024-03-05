@@ -2,7 +2,6 @@ import { ChannelMessage } from '@mezon/mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
-	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiMessageMention,
@@ -13,6 +12,10 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
+
+import {
+	ApiChannelDescription,
+} from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
 

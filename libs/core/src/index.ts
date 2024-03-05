@@ -20,6 +20,7 @@ export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
 export * from './lib/chat/hooks/useDirectMessages';
 export * from './lib/chat/hooks/useFriends';
+export * from './lib/chat/hooks/useNotify';
 export * from './lib/chat/hooks/useInvite';
 export * from './lib/chat/hooks/useThreads';
 export * from './lib/core';

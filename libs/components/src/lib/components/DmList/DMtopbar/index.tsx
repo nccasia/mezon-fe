@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
+import NotificationList from '../../NotificationList';
+import { useMemberStatus } from '@mezon/core';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;
@@ -11,6 +13,7 @@ export type ChannelTopbarProps = {
 
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
+	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '')
 
 	return (
 		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
@@ -20,7 +23,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						numberCharacterCollapse={22}
 						avatar={Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1 ? '' : (currentDmGroup?.channel_avatar ?? '')}
 						name={''}
-						status={false}
+						status={userStatus}
 						isHideStatus={true}
 						isHideIconStatus={false}
 						key={currentDmGroup.channel_id}
@@ -54,7 +57,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						<SearchMessage />
 						<div className="justify-start items-start gap-4 flex">
 							<button>
-								<Icons.Inbox />
+								<NotificationList />
 							</button>
 							<button>
 								<Icons.Help />

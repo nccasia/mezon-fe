@@ -1,19 +1,16 @@
-import { useAppNavigation, useDirect } from '@mezon/core';
-import { RootState, directActions, useAppDispatch } from '@mezon/store';
+import { useDirect } from '@mezon/core';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as Icons from '../Icons';
 import { IconFriends } from '../Icons';
-import MemberProfile from '../MemberProfile';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
+import DMListItem from './DMListItem';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function DirectMessageList() {
-	const currentDmGroupId = useSelector((state: RootState) => state.direct.currentDirectMessageId);
 	const pathname = useLocation().pathname;
 	const { listDM: dmGroupChatList } = useDirect();
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
@@ -30,9 +27,6 @@ function DirectMessageList() {
 	const onClickOpenModal = () => {
 		setIsOpen(!isOpen);
 	};
-
-	const dispatch = useAppDispatch();
-	const { toDmGroupPage } = useAppNavigation();
 	const navigate = useNavigate();
 
 	const joinToChatAndNavigate = async (DMid: string, type: number) => {
@@ -48,7 +42,7 @@ function DirectMessageList() {
 			navigate(toDmGroupPage(DMid, type));
 		}
 	};
-
+	
 	return (
 		<>
 			<div className="absolute">
@@ -78,21 +72,7 @@ function DirectMessageList() {
 			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any) => (
-						<button
-							key={directMessage.channel_id}
-							className={`group text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] hover:bg-bgSecondary py-2 w-full focus:bg-bgTertiary ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'bg-[#1E1E1E] text-white' : ''}`}
-							onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
-						>
-							<MemberProfile
-								numberCharacterCollapse={22}
-								avatar={Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar.length !== 1 ? '' : (directMessage?.channel_avatar ?? '')}
-								name={directMessage?.channel_lable ?? ''}
-								status={false}
-								isHideStatus={true}
-								isHideIconStatus={false}
-								key={directMessage.channel_id}
-							/>
-						</button>
+						<DMListItem directMessage={directMessage} />
 					))}
 				</div>
 			</div>

@@ -37,7 +37,7 @@ export function DirectMessage() {
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full ">
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
-						{<ChannelMessages channelId={directId ?? ''} channelName={currentDmGroup.channel_lable} type='direct' />}
+						{<ChannelMessages channelId={directId ?? ''} channelName={currentDmGroup.channel_lable} type='direct' avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : ''} />}
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
 						<DirectMessageBox directParamId={directId ?? ''} />
