@@ -33,7 +33,11 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
     
-    const [searchResults, setSearchResults] = useState<any[]>(membersNotInRoles);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    
+    useEffect(() => {
+        setSearchResults(membersNotInRoles)
+    },[clickRole])
     
     const handleUserToggle = (permissionId: string) => {
         setSelectedUsers(prevPermissions => {

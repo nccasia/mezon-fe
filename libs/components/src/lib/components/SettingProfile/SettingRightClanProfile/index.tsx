@@ -13,7 +13,7 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	const handleClanChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedClanId(event.target.value);
 	};
-	// console.log("currentClan: ", currentClan)
+
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">

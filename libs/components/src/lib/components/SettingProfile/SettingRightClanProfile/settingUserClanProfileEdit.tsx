@@ -18,8 +18,7 @@ const SettingRightClanEdit = ({
 	clanId: string;
 }) => {
 	const { userProfile } = useAuth();
-	// console.log("clanId: ", clanId)
-
+	
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId || '', userProfile?.user?.id || ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 

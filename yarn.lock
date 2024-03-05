@@ -1746,7 +1746,7 @@
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
 
-"@mezon/mezon-js-protobuf@file:../mezon-js-protobuf", "@mezon/mezon-js-protobuf@file:vendors/mezon-js/packages/mezon-js-protobuf":
+"@mezon/mezon-js-protobuf@file:vendors/mezon-js/packages/mezon-js-protobuf":
   version "1.4.0"
   resolved "file:vendors/mezon-js/packages/mezon-js-protobuf"
   dependencies:

@@ -155,9 +155,9 @@ export const CreateNewChannelModal = () => {
 								</div>
 							</div>
 						</div>
+						{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
+						{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
 					</div>
-					{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
-					{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
 				</>
 			)}
 		</>

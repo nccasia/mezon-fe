@@ -5,7 +5,7 @@ import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
 
-const ServerLayout = () => {
+const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
@@ -44,4 +44,4 @@ const ServerLayout = () => {
 	);
 };
 
-export default ServerLayout;
+export default ClanLayout;

@@ -18,7 +18,7 @@ export const CreateChannelButton: React.FC<CreateChannelProps> = ({ onClickCance
 			<button
 				disabled={isLoading !== 'loaded' ? true : false}
 				onClick={onClickCreate}
-				className="Text text-white disabled:cursor-not-allowed text-xs font-['Manrope'] leading-normal relative h-10 w-30 justify-center px-3 py-3 bg-blue-600 hover:bg-blue-500 flex flex-row items-center gap-1 font-semibold rounded-lg"
+				className="Text text-white disabled:cursor-not-allowed text-xs font-['Manrope'] leading-normal relative h-10 w-30 justify-center px-3 py-3 bg-blue-600 hover:bg-blue-500 flex flex-row items-center gap-1 font-semibold rounded"
 			>
 				{isLoading !== 'loaded' && <Loading classProps="w-5 h-5 ml-2" />}
 				{isLoading !== 'loaded' ? <span>Creating</span> : <span>Create Channel</span>}

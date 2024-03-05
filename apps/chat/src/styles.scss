@@ -183,25 +183,11 @@ input:-webkit-autofill:active {
 					&:first-child {
 						margin-top: 0;
 					}
-					&::before {
-						content: 'x';
-						position: absolute;
-						right: 0;
-						top: 0;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						width: 32px;
-						height: 32px;
-						background-color: #373b40;
-						border-radius: 4px;
-						cursor: pointer;
-					}
 					&::after {
 						content: '';
 						position: absolute;
 						bottom: -17px;
-						left: -47px;
+						left: -50px;
 						height: 2px;
 						min-width: 500%;
 						background-color: #1e1e1e;

@@ -166,7 +166,6 @@ export const RolesClanSlice = createSlice({
 		remove: RolesClanAdapter.removeOne,
 		setCurrentRoleId: (state, action: PayloadAction<string>) => {
 			state.currentRoleId = action.payload;
-			console.log("state.currentRoleId: ", state.currentRoleId);
 		},
 	},
 	extraReducers: (builder) => {

@@ -3,6 +3,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
+import MemberProfile from '../../MemberProfile';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;
@@ -15,7 +16,15 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
-					<Icons.Hashtag />
+					<MemberProfile
+						numberCharacterCollapse={22}
+						avatar={currentDmGroup?.channel_avatar ?? ''}
+						name={''}
+						status={false}
+						isHideStatus={true}
+						isHideIconStatus={false}
+						key={currentDmGroup.channel_id}
+					/>
 					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup.channel_lable}</h2>
 				</div>
 

@@ -121,7 +121,7 @@ We have sevaral layout components to handle layout based on the route:
 -   `/` - `AppLayout`: The layout for the application
 -   `/chat` -[logged in]- `MainLayout`: The layout for the main page
 -   `Main`: The main page to render the global components
--   `/chat/server/:id` - `ServerLayout`: The layout for the server page
+-   `/chat/server/:id` - `ClanLayout`: The layout for the server page
 -   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
 -   routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
 -   We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)

@@ -95,7 +95,7 @@ export const followUserStatus = createAsyncThunk('channelMembers/followUserStatu
 		const onlineStatus = response.presences.map(item => {
 			return {userId: item.user_id, status: true}
 		})
-		
+		mezon.sessionRef.current?.user_id
 		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus))
 		if(mezon.sessionRef.current?.user_id) {
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({userId: mezon.sessionRef.current?.user_id, status: true}))
@@ -159,7 +159,7 @@ export const channelMembers = createSlice({
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
 		setManyStatusUser : (state, action: PayloadAction<StatusUserArgs[]>) => {
-		for (const i of action.payload){
+		for (let i of action.payload){
 			state.onlineStatusUser[i.userId] = i.status;
 		}
 	},
@@ -259,6 +259,18 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
+export const selectMembersMap = (channelId?: string | null) =>
+	createSelector(selectChannelMembesEntities, (entities) => {
+		const retval = new Map<string, ChannelMemberAvatar>();
+		const members = Object.values(entities);
+		
+		members.filter((member) => member && member.user !== null && member.user?.id && member.channelId === channelId).map(member => {
+			const key = member.user?.id as string;
+			retval.set(key, { name: member.user?.username || '', avatar: member.user?.avatar_url || ''});
+		})
+
+		return retval;
+	});
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser)
 
 export const selectMemberOnlineStatusById = (userId:string) => createSelector(selectMemberStatus,(status) => {
@@ -271,10 +283,9 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 		return members.filter((member) => userIds && member?.user?.id && member.channelId === channelId && userIds.includes(member?.user?.id));
 	});
 
-// Notice: memberId might be not userId
-export const selectMemberById = (memberId: string) =>
+export const selectMemberById = (userId: string) =>
 	createSelector(getChannelMembersState, (state) => {
-		return selectById(state, memberId);
+		return selectById(state, userId);
 	});
 
 export const selectMemberByUserId = (userId: string) => 

@@ -60,10 +60,10 @@ export default function InvitePage() {
 				</Modal.Body>
 				{/* <Modal.Footer> */}
 				<div className="flex justify-center flex-row items-center gap-4 pb-8 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
-					<Button color="gray" className="outline-none font-semibold" onClick={handleCancelJoin}>
+					<Button color="gray" className="outline-none font-semibold rounded" onClick={handleCancelJoin}>
 						No, Thanks
 					</Button>
-					<Button color="blue" onClick={handleJoinChannel} className="font-semibold">
+					<Button color="blue" onClick={handleJoinChannel} className="font-semibold rounded">
 						Join Mezon
 					</Button>
 				</div>

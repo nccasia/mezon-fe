@@ -12,7 +12,6 @@ export * from './lib/chat/hooks/useChatChannel';
 export * from './lib/chat/hooks/useChatMessage';
 export * from './lib/chat/hooks/useChatMessages';
 export * from './lib/chat/hooks/useChatParams';
-export * from './lib/chat/hooks/useChatUser';
 export * from './lib/chat/hooks/useChatSending';
 export * from './lib/chat/hooks/useChatTypings';
 export * from './lib/chat/hooks/useClanProfileSetting';

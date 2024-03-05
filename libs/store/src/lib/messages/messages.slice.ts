@@ -108,13 +108,11 @@ export const fetchMessages = createAsyncThunk(
 
 		const nextCursor = response.cacheable_cursor || '';
 		let hasMore = currentHasMore
-		
-		// console.log('AAAAAAAAAAA: ', response.messages.length)
+
 		if(currentCursor === cursor) {
 			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE ) ;
 		}
 		
-		// console.log('HAS MORE: ', response.messages)
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { cursor: nextCursor, hasMore } }));
 
 		if (response.last_seen_message_id) {
