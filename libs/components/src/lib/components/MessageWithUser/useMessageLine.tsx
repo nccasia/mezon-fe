@@ -20,11 +20,13 @@ export function useMessageLine(line: string): IMessageLine {
 
     const mentions = useMemo(() => {
         let lastIndex = 0;
-        return matches.map((match, i) => {
+        let nonMatchText = line;
+        
+        let mentions = matches.map((match, i) => {
           const startIndex = line.indexOf(match, lastIndex);
-          const endIndex = startIndex + match.length;
-          const nonMatchText = line.substring(lastIndex, startIndex);
+          const endIndex = startIndex + match.length;          
           const matchedText = line.substring(startIndex, endIndex);
+          nonMatchText = line.substring(lastIndex, startIndex);
           lastIndex = endIndex;
     
           return {
@@ -34,6 +36,17 @@ export function useMessageLine(line: string): IMessageLine {
             endIndex
           };
         });
+        if (mentions.length === 0) { // not match mention
+          return [{
+            nonMatchText:nonMatchText,
+            matchedText:'',
+            startIndex:0,
+            endIndex:0
+          }];
+        }
+
+        return mentions;
+
       }, [line, matches]);
 
     return {

@@ -59,7 +59,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = (e as any).message_typing_event;
+			const event = (e as any);
 			if (event.sender_id === userId) {
 				return;
 			}

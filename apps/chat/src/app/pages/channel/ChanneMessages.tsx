@@ -3,8 +3,6 @@ import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 import { ChatWelcome } from '@mezon/components';
-import { useSelector } from 'react-redux';
-import { selectDmGroupCurrentId } from '@mezon/store';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -16,7 +14,7 @@ export default function ChannelMessages({ channelId, channelName, type }: Channe
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
-
+	
 	const fetchData = () => {
 		loadMoreMessage();
 	};

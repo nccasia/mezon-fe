@@ -41,7 +41,7 @@ function MyApp() {
 				</NavLink>
 				<div className="py-2 border-t-2 border-t-borderDefault" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
-					<NavLink to={`/chat/servers/${currentClan.id}`}>
+					<NavLink to={`/chat/clans/${currentClan.id}`}>
 						<NavLinkComponent active={!pathName.includes('direct')}>
 							{currentClan?.logo ? (
 								<Image
