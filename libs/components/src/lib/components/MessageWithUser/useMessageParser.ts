@@ -6,9 +6,9 @@ export type IParsedMessage = {
     content: string;
     messageTime: string;
     messageHour: string;
-    references: any;
-    attachments?: ApiMessageAttachment[] | null;
-    mentions?: ApiMessageMention[] | null;
+    references?: any;
+    attachments?: any;
+    mentions?: any;
     lines: string[]
     isSameDay: boolean;
     isCombine: boolean;
@@ -24,11 +24,11 @@ export function useMessageParser( message: IMessageWithUser, preMessage?: IMessa
 	}, [message.references]);
 
     const mentions = useMemo(() => {
-		return message.mentions || null;
+		return message.mentions as any;
 	}, [message])
 
 	const content = useMemo(() => {
-		return message.content;
+		return message.content as any;
 	}, [message]);
 
     const lines =   useMemo(() => {

@@ -21,11 +21,11 @@ export function useAppNavigation() {
 	}, []);
 
 	const toChannelPage = useCallback((channelId: string, clanId: string) => {
-		return `/chat/servers/${clanId}/channels/${channelId}`;
+		return `/chat/clans/${clanId}/channels/${channelId}`;
 	}, []);
 
 	const toClanPage = useCallback((clanId: string) => {
-		return `/chat/servers/${clanId}/channels`;
+		return `/chat/clans/${clanId}/channels`;
 	}, []);
 
 	const toDmGroupPage = useCallback((directId: string, type: number) => {

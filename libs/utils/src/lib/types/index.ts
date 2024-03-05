@@ -5,6 +5,7 @@ import {
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiMessageMention,
 	ApiPermission,
 	ApiRole,
 	ApiUser,

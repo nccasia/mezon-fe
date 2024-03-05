@@ -78,7 +78,7 @@ export const routes = createBrowserRouter([
 								element: <Main />,
 								children: [
 									{
-										path: 'servers',
+										path: 'clans',
 										element: <ClansRoutes />,
 										children: [
 											{

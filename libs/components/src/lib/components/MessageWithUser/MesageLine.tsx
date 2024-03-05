@@ -25,7 +25,7 @@ const LineWithMention = ({ mention }: ILinePartWithMention) => {
 // TODO: refactor component for message lines
 const MessageLine = ({ line }: MessageLineProps) => {
     const { mentions } = useMessageLine(line);
-
+    console.log("mentions", mentions);
     return (
         <div>{mentions.map((mention, i) => {
             return (

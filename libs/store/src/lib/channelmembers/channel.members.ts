@@ -277,8 +277,8 @@ export const selectMemberById = (memberId: string) =>
 		return selectById(state, memberId);
 	});
 
-export const selectMemberByUserId = (userId: string) => createSelector(
-	selectAll,
+export const selectMemberByUserId = (userId: string) => 
+	createSelector(selectAllChannelMembers,	
 	(entities) => {
 		return entities.find(ent => ent?.user?.id === userId) || null;
 	}
