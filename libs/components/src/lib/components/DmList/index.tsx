@@ -28,20 +28,6 @@ function DirectMessageList() {
 		setIsOpen(!isOpen);
 	};
 	const navigate = useNavigate();
-
-	const joinToChatAndNavigate = async (DMid: string, type: number) => {
-		const result = await dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: DMid,
-				channelName: '',
-				type: type,
-			}),
-		);
-		await dispatch(directActions.selectDmGroupCurrentId(DMid));
-		if (result) {
-			navigate(toDmGroupPage(DMid, type));
-		}
-	};
 	
 	return (
 		<>
