@@ -18,7 +18,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				<div className="flex flex-row gap-1 items-center">
 					<MemberProfile
 						numberCharacterCollapse={22}
-						avatar={currentDmGroup?.channel_avatar ?? ''}
+						avatar={currentDmGroup?.channel_avatar?.length !== 1 ? '' : (currentDmGroup?.channel_avatar ?? '')}
 						name={''}
 						status={false}
 						isHideStatus={true}

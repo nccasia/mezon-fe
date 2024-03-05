@@ -1,3 +1,7 @@
+import { useAppParams, useDirect } from "@mezon/core";
+import { selectMembersByChannelId } from "@mezon/store";
+import { useSelector } from "react-redux";
+
 export type ModalProps = {
 	children: React.ReactNode;
 	showModal: boolean;
@@ -26,6 +30,8 @@ const Modal = (props: ModalProps) => {
 		borderBottomTitle,
 		classSubTitleBox,
 	} = props;
+	const { listDM: dmGroupChatList } = useDirect();
+	
 	return (
 		// TODO: using modal component
 		// eslint-disable-next-line react/jsx-no-useless-fragment
@@ -45,6 +51,18 @@ const Modal = (props: ModalProps) => {
 									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
 										<span className="text-3xl leading-3">×</span>
 									</button>
+								</div>
+								<div className="py-[10px] px-[20px]">
+									<input type="text" className="w-full h-9 border border-solid border-black bg-black rounded-[5px] px-[10px]" placeholder="Search for friends" />
+									<div>
+										{/* //list channel_lable */}
+										{/* {dmGroupChatList.map((directMessage: any) => (
+											<div key={directMessage.channel_id} className="flex items-center my-[10px]">
+												<input type="checkbox" id={directMessage.channel_id} name="channel_lable" className="mr-[5px]" />
+												<label htmlFor={directMessage.channel_id} className="text-white">{directMessage.channel_lable}</label>
+											</div>
+										))} */}
+									</div>
 								</div>
 
 								{/*body*/}

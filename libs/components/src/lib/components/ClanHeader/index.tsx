@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ClanSetting from '../ClanSettings/clanSettings';
+import { handleCopyToClipboard } from '../ChannelList';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -36,38 +37,38 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			}
 		});
 	};
-	const unsecuredCopyToClipboard = (text: string) => {
-		const textArea = document.createElement('textarea');
-		textArea.value = text;
-		document.body.appendChild(textArea);
-		textArea.focus();
-		textArea.select();
-		try {
-			document.execCommand('copy');
-		} catch (err) {
-			console.error('Unable to copy to clipboard', err);
-		}
-		document.body.removeChild(textArea);
-	};
-	const handleCopyToClipboard = (content: string) => {
-		if (window.isSecureContext && navigator.clipboard) {
-			navigator.clipboard.writeText(content);
-		} else {
-			unsecuredCopyToClipboard(content);
-		}
+	// const unsecuredCopyToClipboard = (text: string) => {
+	// 	const textArea = document.createElement('textarea');
+	// 	textArea.value = text;
+	// 	document.body.appendChild(textArea);
+	// 	textArea.focus();
+	// 	textArea.select();
+	// 	try {
+	// 		document.execCommand('copy');
+	// 	} catch (err) {
+	// 		console.error('Unable to copy to clipboard', err);
+	// 	}
+	// 	document.body.removeChild(textArea);
+	// };
+	// const handleCopyToClipboard = (content: string) => {
+	// 	if (window.isSecureContext && navigator.clipboard) {
+	// 		navigator.clipboard.writeText(content);
+	// 	} else {
+	// 		unsecuredCopyToClipboard(content);
+	// 	}
 
-		// send DM to user
-		const userId = '2640ec35-9de3-44c1-8481-07615e66d240';
-		createDirectMessageWithUser(userId).then(res => {
-			if (res.channel_id) {
-				console.log("channel id", res.channel_id, res.type);
-				const directChat = toDmGroupPageFromFriendPage(res.channel_id, Number(res.type));
-            	navigate(directChat);
-			}
-		}).catch(err => {
-			console.log("error", err);
-		});
-	};
+	// 	// send DM to user
+	// 	const userId = '2640ec35-9de3-44c1-8481-07615e66d240';
+	// 	createDirectMessageWithUser(userId).then(res => {
+	// 		if (res.channel_id) {
+	// 			console.log("channel id", res.channel_id, res.type);
+	// 			const directChat = toDmGroupPageFromFriendPage(res.channel_id, Number(res.type));
+    //         	navigate(directChat);
+	// 		}
+	// 	}).catch(err => {
+	// 		console.log("error", err);
+	// 	});
+	// };
 	const onClose = () => {
 		setOpenCreateCate(false);
 		setOpenInvite(false);

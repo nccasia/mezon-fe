@@ -12,6 +12,31 @@ import { BrowseChannel, Events } from './ChannelListComponents';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
+export const handleCopyToClipboard = (content: string) => {
+	// Send DM to user
+	
+
+	if (window.isSecureContext && navigator.clipboard) {
+		navigator.clipboard.writeText(content);
+	} else {
+		unsecuredCopyToClipboard(content);
+	}
+};
+
+export const unsecuredCopyToClipboard = (text: string) => {
+	const textArea = document.createElement('textarea');
+	textArea.value = text;
+	document.body.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+	try {
+		document.execCommand('copy');
+	} catch (err) {
+		console.error('Unable to copy to clipboard', err);
+	}
+	document.body.removeChild(textArea);
+};
+
 function ChannelList() {
 	const { categorizedChannels } = useCategory();
 	const [hasManageChannelPermission, {isClanCreator}] = useClanRestriction([EPermission.manageChannel]);
@@ -57,32 +82,7 @@ function ChannelList() {
 				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
 			}
 		});
-	};
-
-	const unsecuredCopyToClipboard = (text: string) => {
-		const textArea = document.createElement('textarea');
-		textArea.value = text;
-		document.body.appendChild(textArea);
-		textArea.focus();
-		textArea.select();
-		try {
-			document.execCommand('copy');
-		} catch (err) {
-			console.error('Unable to copy to clipboard', err);
-		}
-		document.body.removeChild(textArea);
-	};
-
-	const handleCopyToClipboard = (content: string) => {
-		// Send DM to user
-		
-
-		if (window.isSecureContext && navigator.clipboard) {
-			navigator.clipboard.writeText(content);
-		} else {
-			unsecuredCopyToClipboard(content);
-		}
-	};
+	};	
 
 	return (
 		<>
