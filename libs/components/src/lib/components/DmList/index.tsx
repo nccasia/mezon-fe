@@ -85,7 +85,7 @@ function DirectMessageList() {
 						>
 							<MemberProfile
 								numberCharacterCollapse={22}
-								avatar={directMessage?.channel_avatar.length !== 1 ? '' : (directMessage?.channel_avatar ?? '')}
+								avatar={Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar.length !== 1 ? '' : (directMessage?.channel_avatar ?? '')}
 								name={directMessage?.channel_lable ?? ''}
 								status={false}
 								isHideStatus={true}
