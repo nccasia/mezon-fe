@@ -58,7 +58,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					) : (
 						<div
 							id="preview_img"
-							className="h-[81px] w-[81px] flex justify-center items-center flex-col bg-bgSecondary border-white relative border-[1px] border-dashed rounded-full cursor-pointer"
+							className="h-[81px] w-[81px] flex justify-center items-center flex-col bg-bgSecondary border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
 						>
 							<div className="absolute right-0 top-[-3px] left-[54px]">
 								<Icons.AddIcon />

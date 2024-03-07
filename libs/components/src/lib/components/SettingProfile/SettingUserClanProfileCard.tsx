@@ -22,7 +22,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 					<img
 						src={profiles.urlImage}
 						alt=""
-						className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px] border-[6px] border-solid border-black"
+						className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px] border-[6px] border-solid border-black object-cover"
 					/>
 				)}
 			</div>

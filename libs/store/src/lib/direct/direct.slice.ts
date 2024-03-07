@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, IChannel, LoadingStatus } from '@mezon/utils';
+import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -29,12 +29,12 @@ export const mapDmGroupToEntity = (channelRes: ApiChannelDescription) => {
 	return { ...channelRes, id: channelRes.channel_id || '' };
 };
 
-export const createNewDirectMessage = createAsyncThunk('channels/createNewChannel', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
+export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMessage', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ clanId: '', channelType: ChannelTypeEnum.DM_CHAT | ChannelTypeEnum.GROUP_CHAT }));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({}));
 			thunkAPI.dispatch(directActions.selectDmGroupCurrentId(response.channel_id ?? ''));
 			return response;
 		} else {
@@ -46,17 +46,17 @@ export const createNewDirectMessage = createAsyncThunk('channels/createNewChanne
 });
 
 type fetchDmGroupArgs = {
-	clanId: string;
 	cursor?: string;
 	limit?: number;
 	forward?: number;
 	channelType?: number;
 };
 
-export const fetchDirectMessage = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType }: fetchDmGroupArgs, thunkAPI) => {
+export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2 }: fetchDmGroupArgs, thunkAPI) => {
 	thunkAPI.dispatch(friendsActions.fetchListFriends());
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', clanId, channelType);
+	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', '', channelType);
+	
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -71,7 +71,7 @@ interface JoinDirectMessagePayload {
 }
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
-	'directMessage/joinDirectMessage',
+	'direct/joinDirectMessage',
 	async ({ directMessageId, channelName, type }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.selectDmGroupCurrentId(directMessageId));
@@ -135,5 +135,7 @@ export const selectDirectMessageEntities = createSelector(getDirectState, select
 
 export const selectAllDirectMessages = createSelector(getDirectState, selectAll);
 export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => state.currentDirectMessageId);
+
+export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 
 export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);

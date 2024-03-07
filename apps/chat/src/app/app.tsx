@@ -4,7 +4,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MezonUiProvider } from '@mezon/ui';
 import { useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,7 +22,6 @@ const mezon: CreateMezonClientOptions = {
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
-const theme = 'dark';
 
 export function App() {
 	const mezon = useMezon();
@@ -35,9 +33,7 @@ export function App() {
 	}
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<MezonUiProvider themeName={theme}>
-				<RouterProvider router={routes} />
-			</MezonUiProvider>
+			<RouterProvider router={routes} />
 		</MezonStoreProvider>
 	);
 }

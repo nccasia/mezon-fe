@@ -2,7 +2,6 @@ import { ClanUserListClanUser } from '@mezon/mezon-js/dist/api.gen';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { RootState } from '../store';
 export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 
 /*
@@ -84,3 +83,10 @@ export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersC
 	rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllUsesClan = createSelector(getUsersClanState, selectAll);
+
+export const selectMemberClanByUserId = (userId: string) => 
+	createSelector(selectAllUsesClan,	
+	(entities) => {
+		return entities.find(ent => ent?.user?.id === userId) || null;
+	}
+)

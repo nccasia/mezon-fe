@@ -1,4 +1,4 @@
-import {useAppDispatch } from '@mezon/store';
+import {RootState, useAppDispatch } from '@mezon/store';
 import { notificationActions, selectAllNotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 export function useNotification() {
 	const dispatch = useAppDispatch();
 	const notification = useSelector(selectAllNotification);
+	const notifyMention  = useSelector((state: RootState) => state.notification.notificationMentions);
 
 	const deleteNotify = useCallback(
 		(id: string) => {
@@ -17,9 +18,10 @@ export function useNotification() {
 
 	return useMemo(
 		() => ({
+			notifyMention,
 			notification,
 			deleteNotify
 		}),
-		[notification, deleteNotify],
+		[notification, deleteNotify, notifyMention],
 	);
 }

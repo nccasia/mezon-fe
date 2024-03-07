@@ -6,20 +6,24 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
+import { useModal } from 'react-modal-hook';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
-	const [openCreateClan, setOpenCreateClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
 
+	const [openCreateClanModal, closeCreateClanModal] = useModal(() => (
+		<ModalCreateClan
+			open={true}
+			onClose={closeCreateClanModal}
+		/>
+	));
+
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
-	};
-	const handleOpenCreate = () => {
-		setOpenCreateClans(true);
 	};
 
 	const { quantityPendingRequest } = useFriends();
@@ -72,26 +76,23 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" />
+					{/* <Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" /> */}
+					<div className="size-12 bg-[#1E1E1E] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl hover:bg-slate-800 transition-all duration-200 ">
+						<p className="text-2xl font-bold text-[#155EEF]">+</p>
+					</div>
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
 						<ModalListClans
 							options={clans}
 							showModal={openListClans}
 							idSelectedClan={currentClan?.clan_id}
 							onChangeClan={handleChangeClan}
-							createClan={handleOpenCreate}
+							createClan={openCreateClanModal}
 							onClose={() => setOpenListClans(false)}
 						/>
 					</div>
 				</div>
 			</div>
 			<MainContent />
-			<ModalCreateClan
-				open={openCreateClan}
-				onClose={() => {
-					setOpenCreateClans(false);
-				}}
-			/>
 		</div>
 	);
 }

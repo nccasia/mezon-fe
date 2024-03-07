@@ -22,6 +22,7 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	reactions?: Array<ApiMessageReaction>;
 	reactionOutsideProps?: ReactedOutsideOptional;
+	isMessNotifyMention?: boolean;
 };
 
 type SenderInfoOptionals = {
@@ -43,7 +44,7 @@ type EmojiItemOptionals = {
 	emoji: string;
 };
 
-function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
 	const { messageTime } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -89,7 +90,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					],
 
 					channelId: message.channel_id,
-					messageId: message.message_id,
+					messageId: message.id,
 				});
 			}
 		});
@@ -213,16 +214,16 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			setIsReply(false);
 		}
 
-		if (message.message_id === messageRef.message_id && isOpenReply) {
+		if (message.id === messageRef?.id && isOpenReply) {
 			setIsMessRef(true);
-		} else if (message.message_id !== messageRef.message_id || !isOpenReply) {
+		} else if (message.id !== messageRef?.id || !isOpenReply) {
 			setIsMessRef(false);
 		}
-	}, [messageIdRef, getMessageRef, getSenderMessage, messageRef, isOpenReply, message.message_id]);
+	}, [messageIdRef, getMessageRef, getSenderMessage, messageRef, isOpenReply, message.id]);
 
 	return (
 		<>
-			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
+			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
 				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageTime}</span>
@@ -252,15 +253,15 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					<div className="flex-col w-full flex justify-center items-start relative gap-1">
 						<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 						<div className="justify-start items-center inline-flex w-full">
-							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap w-widthMessageTextChat">
+							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat break-all">
 								<MessageContent message={message} user={user} isCombine={isCombine} />
 							</div>
 						</div>
-						<div className="flex justify-start flex-row w-full gap-2">
+						<div className="flex justify-start flex-row w-full gap-2 flex-wrap">
 							{emojiDataIncSocket &&
 								emojiDataIncSocket.map((emoji: EmojiDataOptionals) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
-									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.message_id;
+									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
 									const uniqueKey = uuidv4();
 									return (
 										<div key={uniqueKey}>
@@ -283,7 +284,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						</div>
 					</div>
 				</div>
-				{message && (
+				{message && !isMessNotifyMention && (
 					<div
 						className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
 					>

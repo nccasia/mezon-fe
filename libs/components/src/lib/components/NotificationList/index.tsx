@@ -1,10 +1,11 @@
 import { useNotification } from '@mezon/core';
 import NotificationItem from './NotificationItem';
-import { Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
 import * as Icons from '../Icons';
 import { Dropdown } from 'flowbite-react';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useState } from 'react';
+import NotifyMentionItem from './NotifyMentionItem';
+import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 export type MemberListProps = { className?: string };
 
 const tabDataNotify = [
@@ -13,20 +14,8 @@ const tabDataNotify = [
 ];
 
 function NotificationList() {
-    const { notification } = useNotification();
+    const { notification, notifyMention } = useNotification();
     const [currentTabNotify, setCurrentTabNotify] = useState('individual')
-
-    const filterStatusNotify = () => {
-        switch (currentTabNotify) {
-            case 'individual':
-                return notification.filter((item: INotification) => item.code === -2 || item.code === -3);
-            case 'mention':
-                return notification.filter((item: INotification) => item.code === -9);
-            default:
-                return notification;
-        }
-    };
-
     const handleChangeTab = (valueTab: string) => {
         setCurrentTabNotify(valueTab)
     };
@@ -43,7 +32,7 @@ function NotificationList() {
                 </div>
             )}
         >
-            <div className='py-2 px-3 bg-bgPrimary w-[500px]'>
+            <div className='py-2 px-3 bg-bgPrimary w-[600px]'>
                 <div className='flex flex-row gap-2 items-center font-bold text-[16px]'>
                     <InboxButton />
                     <div>InBox </div>
@@ -62,11 +51,18 @@ function NotificationList() {
                     ))}
                 </div>
             </div>
-            <div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[800px] max-h-[700px] overflow-auto">
-                {filterStatusNotify().map((notify: INotification) => (
+            {currentTabNotify === 'individual' && (<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[800px] max-h-[700px] overflow-auto">
+                {notification.map((notify: INotification) => (
                     <NotificationItem notify={notify} key={notify.id} />
                 ))}
             </div>
+            )}
+            {currentTabNotify === 'mention' && (<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
+                {notifyMention.map((notify: ChannelMessage) => (
+                    <NotifyMentionItem notify={notify} key={notify.id} />
+                ))}
+            </div>
+            )}
         </Dropdown>
     );
 }
@@ -75,8 +71,8 @@ export default NotificationList;
 
 function InboxButton() {
     return (
-        <button>
+        <div>
             <Icons.Inbox />
-        </button>
+        </div>
     );
 }

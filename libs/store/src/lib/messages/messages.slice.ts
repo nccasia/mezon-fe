@@ -1,4 +1,4 @@
-import { ChannelMessageTS } from '@mezon/mezon-js/dist';
+import { ChannelMessage } from '@mezon/mezon-js/dist';
 import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -13,14 +13,14 @@ export const MESSAGES_FEATURE_KEY = 'messages';
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity = (channelMess: ChannelMessageTS, lastSeenId?: string): IMessageWithUser => {
+export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
 	const creationTime = new Date(channelMess.create_time || '');
 	const creationTimeMs = creationTime.getTime();
 	return {
 		...channelMess,
 		creationTime,
 		creationTimeMs,
-		id: channelMess.message_id || '',
+		id: channelMess.id || '',
 		date: new Date().toLocaleString(),
 		user: {
 			name: channelMess.username || '',
@@ -28,7 +28,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessageTS, lastSee
 			id: channelMess.sender_id || 'idUser',
 			avatarSm: channelMess.avatar || '',
 		},
-		lastSeen: lastSeenId === channelMess.message_id,
+		lastSeen: lastSeenId === channelMess.id,
 	};
 };
 

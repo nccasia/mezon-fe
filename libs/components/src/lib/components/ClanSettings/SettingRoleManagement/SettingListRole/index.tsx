@@ -32,18 +32,17 @@ const SettingListRole = (props: closeEditRole) => {
 	};
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	return (
-		<div className="w-1/3 pr-[10px]">
-			<div className="flex justify-between font-semibold">
-				<div className="cursor-pointer" onClick={() => props.handleClose()}>
+		<div className="w-1/3 pr-3 flex flex-col">
+			<div className="font-semibold mb-4">
+				<div className="cursor-pointer tracking-wide" onClick={() => props.handleClose()}>
 					BACK
 				</div>
 			</div>
-			<br />
-			<div className="overflow-auto h-full">
+			<div className="overflow-y-scroll flex flex-col gap-y-2">
 				{clickedRole === 'New Role' ? (
-					<div className="mb-2">
+					<div>
 						<button
-							className={`block w-full py-1 px-4 rounded ${
+							className={`block w-full py-2 px-4 rounded ${
 								clickedRole === 'New Role' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
 							} text-white font-bold`}
 						>
@@ -52,12 +51,12 @@ const SettingListRole = (props: closeEditRole) => {
 					</div>
 				) : (
 					activeRoles.map((role) => (
-						<div key={role.id} className="mb-2">
+						<div key={role.id}>
 							<button
 								onClick={() => handleRoleClick(role.id)}
-								className={`block w-full py-1 px-4 rounded ${
+								className={`w-full py-2 px-4 rounded ${
 									clickedRole === role.id ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-								} text-white font-bold`}
+								} text-white font-bold truncate`}
 							>
 								{role.title}
 							</button>

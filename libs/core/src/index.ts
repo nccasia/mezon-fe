@@ -26,3 +26,4 @@ export * from './lib/chat/hooks/useInvite';
 export * from './lib/chat/hooks/useThreads';
 export * from './lib/core';
 export * from './lib/policy';
+export * from './lib/chat/hooks/useSendInviteMessage';

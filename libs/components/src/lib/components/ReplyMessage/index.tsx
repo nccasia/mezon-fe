@@ -6,11 +6,11 @@ import * as Icons from '../Icons/index';
 
 function ReplyMessage() {
 	const { messageRef, isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
-	const getSenderMessage = useSelector(selectMemberByUserId(messageRef?.sender_id));
+	const getSenderMessage = useSelector(selectMemberByUserId(messageRef?.sender_id ?? ''));
 
 	const handleRemoveReply = () => {
 		setIsOpenReply(false);
-		setMessageRef({});
+		setMessageRef(undefined);
 	};
 
 	return (

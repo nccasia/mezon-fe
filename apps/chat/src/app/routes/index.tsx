@@ -1,21 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom';
+import loadable from '@loadable/component';
+
 
 // Layouts
 import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
 import ClanLayout from '../layouts/ClanLayout';
-
-// Pages
-import ChannellayOut from '../pages/channel';
-
-import DirectMain from '../pages/directMessage';
-import InvitePage from '../pages/invite';
-import Login from '../pages/login';
-import Main from '../pages/main';
-import ErrorRoutes from './ErrorRoutes';
-import InitialRoutes from './InititalRoutes';
-import ProtectedRoutes from './ProtectedRoutes';
 
 // Loaders
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
@@ -26,15 +17,33 @@ import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 import { clanLoader, shouldRevalidateServer } from '../loaders/clanLoader';
 import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
+
+
+import ChannelsRoutes from './ChannelsRoutes';
+import ClansRoutes from './ClanRoutes';
+import DMRoutes from './DMRoutes';
+import { loginLoader } from '../loaders/loginLoader';
+
+
+// Pages
+
+import ErrorRoutes from './ErrorRoutes';
+import InitialRoutes from './InititalRoutes';
+import ProtectedRoutes from './ProtectedRoutes';
+
 import { ChannelIndex } from '../pages/channel/ChannelIndex';
 import { ClanIndex } from '../pages/clan/ClanIndex';
 import { DirectMessage } from '../pages/directMessage/DMPage';
 import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
 import FriendsPage from '../pages/directMessage/FriendsPage';
-import ChannelsRoutes from './ChannelsRoutes';
-import ClansRoutes from './ClanRoutes';
-import DMRoutes from './DMRoutes';
-import { loginLoader } from '../loaders/loginLoader';
+
+const Login = loadable(() => import('../pages/login'));
+const Main = loadable(() => import('../pages/main'));
+const DirectMain = loadable(() => import('../pages/directMessage'));
+const InvitePage = loadable(() => import('../pages/invite'));
+const ChannelMain = loadable(() => import('../pages/channel'));
+
+
 
 // Components
 export const routes = createBrowserRouter([
@@ -103,7 +112,7 @@ export const routes = createBrowserRouter([
 																path: ':channelId',
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
-																element: <ChannellayOut />,
+																element: <ChannelMain />,
 															},
 														],
 													},

@@ -24,7 +24,7 @@ export const AlertTitleTextWarning: React.FC<AlertProps> = ({ description, onCli
 				<div
 					id="toast-danger flex"
 					className="flex items-center justify-between z-50 w-full md:w-[684px] p-2 mb-4 text-gray-200 bg-gray-900 
-          rounded-lg shadow dark:text-white dark:bg-gray-800 absolute bottom-0 xl:bottom-8 2xl:bottom-[25rem] transform font-[Manrope]"
+          rounded-lg shadow dark:text-white dark:bg-gray-800 absolute bottom-0 xl:bottom-8 transform font-[Manrope]"
 					role="alert"
 				>
 					<div className="flex items-center justify-center">

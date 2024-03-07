@@ -49,7 +49,7 @@ export function ChannelMessage(props: MessageProps) {
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
 			setEmojiPicker(emoji.native);
-			setReactionOutside({ emoji: emoji.native, messageId: mess.message_id });
+			setReactionOutside({ emoji: emoji.native, messageId: mess.id });
 			setIsOpenReactEmoji(false);
 		};
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;

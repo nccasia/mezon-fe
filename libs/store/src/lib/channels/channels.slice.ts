@@ -232,7 +232,7 @@ export const selectAllChannels = createSelector(getChannelsState, selectAll);
 
 export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
 
-export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id]);
+export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id] || null);
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 

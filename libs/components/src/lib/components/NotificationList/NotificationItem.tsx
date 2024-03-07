@@ -2,26 +2,27 @@ import { convertTimeString } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import MemberProfile from '../MemberProfile';
 import { useNotification } from '@mezon/core';
+import { useSelector } from 'react-redux';
+import { selectMemberClanByUserId } from '@mezon/store';
 export type NotifyProps = {
     notify: INotification;
 };
 
 function NotificationItem({ notify }: NotifyProps) {
     const { deleteNotify } = useNotification();
+    const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 
     return (
         <div className='flex flex-row justify-between hover:bg-bgSurface py-3 px-3 w-full'>
             <div className="flex items-center gap-2">
-                {(notify.code === -2 || notify.code === -3) && (
-                    <MemberProfile
-                        isHideUserName={true}
-                        avatar={''}
-                        name={notify?.contentNotify.username ?? ''}
-                        isHideStatus={true}
-                        isHideIconStatus={true}
-                        textColor='#fff'
-                    />
-                )}
+                <MemberProfile
+                    isHideUserName={true}
+                    avatar={user?.user?.avatar_url || ''}
+                    name={notify?.contentNotify?.username ?? ''}
+                    isHideStatus={true}
+                    isHideIconStatus={true}
+                    textColor='#fff'
+                />
                 <div className="flex flex-col gap-1">
                     <span>{notify?.subject}</span>
                     <span className="text-zinc-400 text-[11px]">{convertTimeString(notify.create_time as string)}</span>

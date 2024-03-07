@@ -1,6 +1,6 @@
 import { Session } from "vendors/mezon-js/packages/mezon-js/dist";
 import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
-import { Client } from "vendors/mezon-js/packages/mezon-js/dist/client";
+import { Client } from "@mezon/mezon-js";
 
 const isValidUrl = (urlString: string) => {
 	let url;
