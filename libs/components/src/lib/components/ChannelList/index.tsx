@@ -1,6 +1,6 @@
 import { UserRestrictionZone, useCategory, useClanRestriction, useInvite } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { Modal } from '@mezon/ui';
+import { ListMemberInvite, Modal } from '@mezon/ui';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,8 +12,31 @@ import { BrowseChannel, Events } from './ChannelListComponents';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
+export const unsecuredCopyToClipboard = (text: string) => {
+	const textArea = document.createElement('textarea');
+	textArea.value = text;
+	document.body.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+	try {
+		document.execCommand('copy');
+	} catch (err) {
+		console.error('Unable to copy to clipboard', err);
+	}
+	document.body.removeChild(textArea);
+};
+
+export const handleCopyToClipboard = (content: string) => {
+	if (window.isSecureContext && navigator.clipboard) {
+		navigator.clipboard.writeText(content);
+	} else {
+		unsecuredCopyToClipboard(content);
+	}
+};
+
 function ChannelList() {
 	const { categorizedChannels } = useCategory();
+	const [selecteChannelID, setSelecteChannelID] = useState('');
 	const [hasManageChannelPermission, {isClanCreator}] = useClanRestriction([EPermission.manageChannel]);
 	const currentChanel = useSelector(selectCurrentChannel);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
@@ -52,6 +75,7 @@ function ChannelList() {
 
 	const handleOpenInvite = (currentServerId: string, currentChannelId: string) => {
 		setOpenInvite(true);
+		setSelecteChannelID(currentChannelId);
 		createLinkInviteUser(currentServerId ?? '', currentChannelId ?? '', 10).then((res) => {
 			if (res && res.invite_link) {
 				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
@@ -59,30 +83,6 @@ function ChannelList() {
 		});
 	};
 
-	const unsecuredCopyToClipboard = (text: string) => {
-		const textArea = document.createElement('textarea');
-		textArea.value = text;
-		document.body.appendChild(textArea);
-		textArea.focus();
-		textArea.select();
-		try {
-			document.execCommand('copy');
-		} catch (err) {
-			console.error('Unable to copy to clipboard', err);
-		}
-		document.body.removeChild(textArea);
-	};
-
-	const handleCopyToClipboard = (content: string) => {
-		// Send DM to user
-		
-
-		if (window.isSecureContext && navigator.clipboard) {
-			navigator.clipboard.writeText(content);
-		} else {
-			unsecuredCopyToClipboard(content);
-		}
-	};
 
 	return (
 		<>
@@ -158,9 +158,12 @@ function ChannelList() {
 				subTitleBox="Send invite link to a friend"
 				borderBottomTitle="border-b "
 			>
-				<p className="px-[6px]">
-					<span>{urlInvite}</span>
-				</p>
+				<div>
+					<ListMemberInvite url={urlInvite} channelID={selecteChannelID} />
+					<p className='pt-[10px]'>
+						<span>{urlInvite}</span>
+					</p>
+				</div>
 			</Modal>
 		</>
 	);

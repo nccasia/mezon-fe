@@ -1,10 +1,16 @@
 import { Outlet } from 'react-router-dom';
+import { MezonUiProvider } from '@mezon/ui';
+
+const theme = 'dark';
 
 const AppLayout = () => {
 	return (
-		<div id="app-layout">
-			<Outlet />
-		</div>
+		<MezonUiProvider themeName={theme}>
+			<div id="app-layout">
+				<Outlet />
+			</div>
+		</MezonUiProvider>
+
 	);
 };
 

@@ -63,7 +63,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					/>
 				</div>
 				<button
-					className="bg-blue-600 rounded-[3px] py-[8px] px-[10px] text-nowrap"
+					className="bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[8px] px-[10px] text-nowrap"
 					onClick={() => {
 						dispatch(setSelectedRoleId('New Role'));
 						dispatch(setNameRoleNew('New Role'));
@@ -78,7 +78,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 			<br />
 			<div className="overflow-y-scroll relative w-full">
 				<table className="w-full divide-y divide-gray-200">
-					<thead className="bg-bgSecondary sticky top-0">
+					<thead className="bg-borderDefault sticky top-0">
 						<tr className="h-11">
 							<th scope="col" className="  text-sm font-bold text-gray-200 uppercase tracking-wider w-1/2 text-center">
 								Roles - {RolesClan.length}

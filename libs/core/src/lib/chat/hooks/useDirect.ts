@@ -1,11 +1,16 @@
-import { directActions, selectAllDirectMessages, useAppDispatch } from '@mezon/store';
+import { directActions, selectAllDirectMessages, selectIsLoadDMData, useAppDispatch } from '@mezon/store';
 import { ChannelTypeEnum } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
-export function useDirect() {
+type UseDirectParams = {
+	autoFetch: boolean, 
+}
+
+export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : false}) {
 	const listDM = useSelector(selectAllDirectMessages);
+	const isLoadDM = useSelector(selectIsLoadDMData);
 	const dispatch = useAppDispatch();
 
 	const createDirectMessageWithUser = useCallback(
@@ -32,12 +37,26 @@ export function useDirect() {
 		},
 		[dispatch],
 	);
+	const refechDMList = useCallback(
+		() => {
+			dispatch(directActions.fetchDirectMessage({}))
+		},
+		[dispatch],
+	);
+
+	useEffect(() => {
+		if (isLoadDM || !autoFetch){
+			return
+		} 
+		refechDMList()
+	}, [isLoadDM, refechDMList, autoFetch]);
 
 	return useMemo(
 		() => ({
 			listDM,
 			createDirectMessageWithUser,
+			refechDMList,
 		}),
-		[listDM, createDirectMessageWithUser],
+		[listDM, createDirectMessageWithUser, refechDMList],
 	);
 }

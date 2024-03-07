@@ -1,6 +1,6 @@
-import { useAppNavigation, useAuth, useClans, useDirect, useInvite } from '@mezon/core';
+import { useAuth, useClans, useInvite } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { InputField, Modal as ModalInvite } from '@mezon/ui';
+import { InputField, ListMemberInvite, Modal as ModalInvite } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ClanSetting from '../ClanSettings/clanSettings';
+import { handleCopyToClipboard } from '../ChannelList';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -25,8 +26,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const { currentClan } = useClans();
 	const { createLinkInviteUser } = useInvite();
 	const [urlInvite, setUrlInvite] = useState('');
-	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
-	const { createDirectMessageWithUser } = useDirect();
 
 	const handleOpenInvite = () => {
 		setOpenInvite(true);
@@ -34,38 +33,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			if (res && res.invite_link) {
 				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
 			}
-		});
-	};
-	const unsecuredCopyToClipboard = (text: string) => {
-		const textArea = document.createElement('textarea');
-		textArea.value = text;
-		document.body.appendChild(textArea);
-		textArea.focus();
-		textArea.select();
-		try {
-			document.execCommand('copy');
-		} catch (err) {
-			console.error('Unable to copy to clipboard', err);
-		}
-		document.body.removeChild(textArea);
-	};
-	const handleCopyToClipboard = (content: string) => {
-		if (window.isSecureContext && navigator.clipboard) {
-			navigator.clipboard.writeText(content);
-		} else {
-			unsecuredCopyToClipboard(content);
-		}
-
-		// send DM to user
-		const userId = '2640ec35-9de3-44c1-8481-07615e66d240';
-		createDirectMessageWithUser(userId).then(res => {
-			if (res.channel_id) {
-				console.log("channel id", res.channel_id, res.type);
-				const directChat = toDmGroupPageFromFriendPage(res.channel_id, Number(res.type));
-            	navigate(directChat);
-			}
-		}).catch(err => {
-			console.log("error", err);
 		});
 	};
 	const onClose = () => {
@@ -166,9 +133,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				classSubTitleBox="ml-[-5px]"
 				borderBottomTitle="border-b "
 			>
-				<p>
-					<span>{urlInvite}</span>
-				</p>
+				<div>
+					<ListMemberInvite url={urlInvite} />
+					<p className='pt-[10px]'>
+						<span>{urlInvite}</span>
+					</p>
+				</div>
 			</ModalInvite>
 			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary" size="lg">
 				<div className="bg-[#313338] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">

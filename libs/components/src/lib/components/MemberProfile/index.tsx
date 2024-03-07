@@ -1,4 +1,4 @@
-import { OfflineStatus, OnlineStatus } from "../Icons";
+import { OfflineStatus, OnlineStatus } from '../Icons';
 
 export type MemberProfileProps = {
 	avatar: string;
@@ -8,7 +8,7 @@ export type MemberProfileProps = {
 	isHideIconStatus?: boolean;
 	numberCharacterCollapse?: number;
 	textColor?: string;
-	isHideUserName?: boolean
+	isHideUserName?: boolean;
 };
 
 function MemberProfile({
@@ -19,7 +19,7 @@ function MemberProfile({
 	isHideIconStatus,
 	numberCharacterCollapse = 6,
 	textColor = 'contentSecondary',
-	isHideUserName
+	isHideUserName,
 }: MemberProfileProps) {
 	return (
 		<div className="relative gap-[5px] flex items-center cursor-pointer">
@@ -27,23 +27,9 @@ function MemberProfile({
 				{avatar ? (
 					<div>
 						{!avatar.includes(',') ? (
-							<img
-								src={avatar}
-								style={{
-									width: '38px',
-									height: '38px',
-									borderRadius: '50%',
-								}}
-							/>
+							<img src={avatar} className="w-[38px] h-[38px] rounded-full object-cover" />
 						) : (
-							<img
-								src={`/assets/images/avatar-group.png`}
-								style={{
-									width: '38px',
-									height: '38px',
-									borderRadius: '50%',
-								}}
-							/>
+							<img src={`/assets/images/avatar-group.png`} className="w-[38px] h-[38px] rounded-full object-cover" />
 						)}
 					</div>
 				) : (
@@ -62,9 +48,11 @@ function MemberProfile({
 				)}
 			</a>
 			<div className="flex flex-col items-start">
-				{!isHideUserName && (<p className="text-[15px]" title={name && name.length > numberCharacterCollapse ? name : undefined}>
-					{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
-				</p>)}
+				{!isHideUserName && (
+					<p className="text-[15px]" title={name && name.length > numberCharacterCollapse ? name : undefined}>
+						{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
+					</p>
+				)}
 				{!isHideStatus && <span className={`text-[11px] text-${textColor}`}>{!status ? 'Offline' : 'Online'}</span>}
 			</div>
 		</div>
