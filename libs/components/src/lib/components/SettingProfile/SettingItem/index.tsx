@@ -23,7 +23,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 			<div className="w-170px ">
 				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
-					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 ${selectedButton === 'Account' ? 'bg-blue-400 text-white' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 transition-all duration-300 hover:bg-bgButtonHover ${selectedButton === 'Account' ? 'bg-blue-400 text-white' : ''}`}
 					onClick={() => {
 						handleButtonClick('Account');
 						onItemClick && onItemClick('Account');

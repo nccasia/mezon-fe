@@ -47,7 +47,9 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 						</div>
 					</div>
 					<div className="w-full items-center">
-						<button className="w-full h-[50px] bg-[#1E1E1E] rounded-lg font-medium tracking-wide">Example button</button>
+						<button className="w-full h-[50px] bg-[#1E1E1E] rounded-lg font-medium tracking-wide transition-all duration-300 hover:bg-bgButtonHover">
+							Example button
+						</button>
 					</div>
 				</div>
 			</div>

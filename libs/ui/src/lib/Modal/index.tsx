@@ -42,8 +42,11 @@ const Modal = (props: ModalProps) => {
 										<h3 className="text-[22px] font-semibold">{title}</h3>
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
-									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-										<span className="text-3xl leading-3">×</span>
+									<button
+										className="flex items-center justify-center opacity-50 transition-all transform duration-300 hover:scale-105 hover:opacity-100"
+										onClick={onClose}
+									>
+										<span className="text-3xl leading-3 text-contentPrimary">×</span>
 									</button>
 								</div>
 
@@ -55,7 +58,7 @@ const Modal = (props: ModalProps) => {
 								{confirmButton && (
 									<div className="flex items-center p-[20px] pb-[32px] border-t border-solid border-borderDefault rounded-b justify-between">
 										<button
-											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-[16px] leading-6 rounded-lg"
+											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 hover:bg-bgButtonHover text-[16px] leading-6 rounded-lg"
 											onClick={onClose}
 										>
 											Back

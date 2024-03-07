@@ -1,5 +1,5 @@
 import { IconFriends, Search } from '@mezon/components';
-import { useDirect, useFriends } from '@mezon/core';
+import { useFriends } from '@mezon/core';
 import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useState } from 'react';
@@ -78,9 +78,7 @@ export default function FriendsPage() {
 		}
 	};
 
-
 	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
-
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
@@ -108,7 +106,7 @@ export default function FriendsPage() {
 					))}
 				</div>
 				<button
-					className={`px-3 py-[6px] rounded-[4px]  ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
+					className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 hover:bg-blue-500 ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
 					onClick={handleOpenRequestFriend}
 					style={{ whiteSpace: 'nowrap' }}
 				>
@@ -145,7 +143,7 @@ export default function FriendsPage() {
 								<InputField
 									onChange={(e) => handleChange('username', e.target.value)}
 									type="text"
-									className="bg-bgSurface mb-2 mt-1"
+									className="bg-bgSurface mb-2 mt-1 py-3"
 									value={requestAddFriend.usernames}
 									placeholder="Usernames"
 								/>

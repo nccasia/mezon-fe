@@ -18,7 +18,7 @@ const SettingRightClanEdit = ({
 	clanId: string;
 }) => {
 	const { userProfile } = useAuth();
-	
+
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId || '', userProfile?.user?.id || ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
@@ -136,7 +136,7 @@ const SettingRightClanEdit = ({
 						<div className="flex">
 							<label>
 								<div
-									className="w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer transition-all duration-300 hover:bg-blue-500"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -144,7 +144,7 @@ const SettingRightClanEdit = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap transition-all duration-300 hover:bg-slate-800"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar

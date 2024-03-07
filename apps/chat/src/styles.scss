@@ -154,50 +154,46 @@ input:-webkit-autofill:active {
 
 // css editor
 #editor {
-	.DraftEditor-editorContainer {
-		.public-DraftEditor-content {
+	.public-DraftEditor-content {
+		div {
 			div {
-				div {
-					display: none;
-					&:last-child {
-						display: block;
-						order: 2;
-						clear: both;
-					}
+				&:has(span span) {
+					order: 2;
 				}
-				figure {
-					position: relative;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					order: 1;
-					width: 208px;
-					height: 208px;
-					padding: 8px;
-					margin-top: 10px;
-					margin-bottom: 25px;
-					margin-right: 20px;
-					background-color: #2b2d31;
+				clear: both;
+			}
+			figure {
+				// order: 1;
+				position: relative;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 208px;
+				height: 208px;
+				padding: 8px;
+				margin-top: 10px;
+				margin-bottom: 25px;
+				margin-right: 20px;
+				background-color: #2b2d31;
+				border-radius: 4px;
+				float: left;
+				&:first-child {
+					margin-top: 0;
+				}
+				&::after {
+					content: '';
+					position: absolute;
+					bottom: -17px;
+					left: -50px;
+					height: 2px;
+					min-width: 500%;
+					background-color: #1e1e1e;
+				}
+				img {
+					object-fit: cover;
+					max-width: 100%;
+					max-height: 174px;
 					border-radius: 4px;
-					float: left;
-					&:first-child {
-						margin-top: 0;
-					}
-					&::after {
-						content: '';
-						position: absolute;
-						bottom: -17px;
-						left: -50px;
-						height: 2px;
-						min-width: 500%;
-						background-color: #1e1e1e;
-					}
-					img {
-						object-fit: cover;
-						max-width: 100%;
-						max-height: 174px;
-						border-radius: 4px;
-					}
 				}
 			}
 		}

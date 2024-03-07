@@ -443,6 +443,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	};
 
+	// const ImageDecorator = new CompositeDecorator([
+	// 	{
+	// 		strategy: (contentBlock, callback, contentState) => {
+	// 			contentBlock.findEntityRanges((character) => {
+	// 				const entityKey = character.getEntity();
+	// 				return entityKey !== null && contentState.getEntity(entityKey).getType() === 'IMAGE';
+	// 			}, callback);
+	// 		},
+	// 		component: (props) => {
+	// 			const { contentState, entityKey } = props;
+	// 			const { src } = contentState.getEntity(entityKey).getData();
+	// 			return (
+	// 				<div style={{ display: 'inline-block' }} className="test">
+	// 					<img src={src} alt="Pasted" />
+	// 				</div>
+	// 			);
+	// 		},
+	// 	},
+	// ]);
+
+	useEffect(() => {
+		if (isOpenReply) {
+			editorRef.current!.focus();
+		}
+	}, [isOpenReply]);
 
 	useEffect(() => {
 		if (isOpenReply) {
@@ -512,6 +537,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						plugins={plugins}
 						ref={editorRef}
 						handlePastedFiles={onPastedFiles}
+						// decorators={[ImageDecorator]}
 					/>
 					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
 				</div>

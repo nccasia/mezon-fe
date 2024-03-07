@@ -48,8 +48,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			classNameBox="h-full"
 		>
 			<div className="flex items-center flex-col justify-center ">
-				<span className="text-contentPrimary text-[24px] pb-4 font-[700] leading-8">Customize Your Server</span>
-				<p className="text-contentTertiary  text-center text-[20px] leading-6 font-[400]">
+				<span className="text-contentPrimary text-2xl pb-4 font-[700] leading-8 tracking-wider">Customize Your Server</span>
+				<p className="text-contentTertiary  text-center text-xl leading-6 font-[400]">
 					Give your new clan a personality with a name and an icon. You can always change it later.
 				</p>
 				<label className="block mt-8 mb-4">
@@ -64,17 +64,17 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 								<Icons.AddIcon />
 							</div>
 							<Icons.UploadImage />
-							<span className="text-[14px]">Upload</span>
+							<span className="text-[14px] text-contentPrimary font-bold text-sm tracking-wide">UPLOAD</span>
 						</div>
 					)}
 					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 				</label>
 				<div className="w-full">
-					<span className="font-[700] text-[16px] leading-6">CLAN NAME</span>
+					<span className="font-[700] text-[16px] leading-6 text-contentPrimary">CLAN NAME</span>
 					<InputField
 						onChange={(e) => setNameClan(e.target.value)}
 						type="text"
-						className="bg-bgSurface mb-2 mt-4"
+						className="bg-bgSurface mb-2 mt-4 py-3"
 						placeholder={`${userProfile?.user?.username}'s clan`}
 					/>
 					<span className="text-[14px] text-contentTertiary">

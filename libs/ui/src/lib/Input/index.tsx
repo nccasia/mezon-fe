@@ -17,7 +17,7 @@ const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, r
 			</div>
 			<input
 				type={type}
-				className={`bg-bgPrimary font-[400] py-[12px] px-[14px] rounded w-full text-white outline-none ${className}`}
+				className={`bg-bgPrimary font-[400] px-[14px] rounded w-full text-white outline-none ${className}`}
 				{...rest}
 				maxLength={maxLength}
 				multiple

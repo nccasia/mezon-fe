@@ -66,10 +66,15 @@ const SettingRightUser = ({
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
 				<h1 className="text-2xl font-bold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-bold text-xl border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] text-xl ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
-					Clan Profiles
-				</button>
+				<div className="flex gap-x-4">
+					<button className="pt-1 pb-2 font-bold text-xl border-b-2 border-[#155EEF] tracking-wider">User Profile</button>
+					<button
+						className="pt-1 text-[#AEAEAE] text-xl  font-bold pb-[10px] tracking-wider transition-all duration-300 hover:bg-bgButtonHover"
+						onClick={handleClanProfileButtonClick}
+					>
+						Clan Profiles
+					</button>
+				</div>
 			</div>
 			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
 				<div className="w-1/2 text-[#CCCCCC]">
@@ -90,7 +95,7 @@ const SettingRightUser = ({
 						<div className="flex">
 							<label>
 								<div
-									className="text-white w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="text-white w-[130px] bg-contentBrand transition-all duration-300 transform hover:bg-blue-500 rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -98,7 +103,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="text-white bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap transition-all duration-300 hover:bg-slate-800"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar

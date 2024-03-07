@@ -11,7 +11,10 @@ export const CreateChannelButton: React.FC<CreateChannelProps> = ({ onClickCance
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	return (
 		<div className="Frame394 relative border-t border-solid border-borderDefault self-stretch mb-0 bg-[#151515] pt-3 justify-end items-center gap-4 inline-flex">
-			<button onClick={onClickCancel} className="Text text-white hover:underline text-xs font-['Manrope'] leading-normal font-semibold">
+			<button
+				onClick={onClickCancel}
+				className="Text text-white text-xs font-['Manrope'] leading-normal font-semibold h-full transition-all duration-300 rounded hover:bg-bgButtonHover"
+			>
 				Cancel
 			</button>
 

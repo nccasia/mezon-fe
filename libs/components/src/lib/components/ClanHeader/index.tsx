@@ -1,14 +1,13 @@
 import { useAuth, useClans } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { InputField} from '@mezon/ui';
+import { InputField } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
-import * as Icons from '../Icons';
 import ClanSetting from '../ClanSettings/clanSettings';
-import { useModal } from 'react-modal-hook';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 
 export type ClanHeaderProps = {
@@ -25,9 +24,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
 
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} open={true} channelID=''/>
-	));
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} channelID="" />);
 	const onClose = () => {
 		setOpenCreateCate(false);
 	};
@@ -83,7 +80,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
 								}}
 								onClick={() => {
-									openInviteClanModal()
+									openInviteClanModal();
 									// handleOpenInvite()
 								}}
 							>
@@ -99,7 +96,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										setOpenServerSettings(true);
 									}}
 								>
-									Server Settings
+									Clan Settings
 								</Dropdown.Item>
 							)}
 						</Dropdown>
