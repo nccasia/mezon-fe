@@ -2,7 +2,7 @@ import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,7 +22,7 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	reactions?: Array<ApiMessageReaction>;
 	reactionOutsideProps?: ReactedOutsideOptional;
-	isMessNotifyMention?: boolean
+	isMessNotifyMention?: boolean;
 };
 
 type SenderInfoOptionals = {
@@ -61,6 +61,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
+
 	const processData = (dataEmoji: any) => {
 		const result: EmojiDataOptionals[] = [];
 		dataEmoji.forEach((item: EmojiItemOptionals) => {
@@ -180,7 +181,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						{
 							id: messageDataReactedFromSocket?.userId ?? '',
 							count: 1,
-							emojiIdList: [],
+							emojiIdList: ['00000000-0000-0000-0000-000000000000'],
 						},
 					],
 					channelId: messageDataReactedFromSocket?.channelId ?? '',
@@ -247,7 +248,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						</div>
 					</div>
 				)}
-				<div className="justify-start gap-4 inline-flex w-full relative">
+				<div className="justify-start gap-4 inline-flex w-full relative border">
 					<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 					<div className="flex-col w-full flex justify-center items-start relative gap-1">
 						<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
@@ -263,21 +264,21 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
 									const uniqueKey = uuidv4();
 									return (
-										<div key={uniqueKey}>
+										<Fragment key={uniqueKey}>
 											{checkID && (
 												<div
-													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+													className={` relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
 													onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '')}
 												>
 													<span>{emoji.emoji}</span>
 													<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
-														<p className="text-[13px]">
+														<p className="text-[13px] relative">
 															{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}
 														</p>
 													</span>
 												</div>
 											)}
-										</div>
+										</Fragment>
 									);
 								})}
 						</div>

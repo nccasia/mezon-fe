@@ -9,7 +9,6 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
@@ -365,8 +364,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 		const results =
 			emojiResults.map((emoji: any) => {
-				const uniqueKey = uuidv4();
-				return <div key={uniqueKey}>{emoji.skins[0]}</div>;
+				return emoji.skins[0];
 			}) || [];
 		if (results) {
 			setShowPlaceHolder(false);

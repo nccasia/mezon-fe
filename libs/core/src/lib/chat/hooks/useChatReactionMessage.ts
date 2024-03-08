@@ -18,7 +18,6 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			const client = clientRef.current;
 			const socket = socketRef.current;
 			const channel = channelRef.current;
-
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
