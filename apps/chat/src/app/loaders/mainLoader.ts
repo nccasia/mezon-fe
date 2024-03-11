@@ -4,7 +4,6 @@ export const mainLoader = async () => {
 	const store = await getStoreAsync();
 	store.dispatch(clansActions.fetchClans());
 	store.dispatch(notificationActions.fetchListNotification());
-	store.dispatch(notificationActions.fetchNotifyMention());
 	return null;
 };
 

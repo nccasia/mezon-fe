@@ -182,9 +182,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
 
-	useEffect(() => {
+	useEffect(() => {		
 		if (messageRef) {
-			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, message_sender_id: messageRef.sender_id }]);
+			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, 
+				message_sender_id: messageRef.sender_id, 
+				has_attachment: messageRef.attachments?.length as number > 0,
+				content: JSON.stringify(messageRef.content)
+			}]);
 		}
 	}, [messageRef]);
 

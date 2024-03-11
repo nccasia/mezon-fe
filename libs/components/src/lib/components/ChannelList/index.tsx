@@ -6,7 +6,6 @@ import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
-
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 

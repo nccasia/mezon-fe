@@ -51,7 +51,7 @@ export function ChannelMessage(props: MessageProps) {
 		setIsOpenEmojiReacted(true);
 		setMessageRef(mess);
 		setReactionOutside({
-			// emoji: emojiSelected,
+			emoji: emojiSelected,
 			messageId: messageRef?.id ?? '',
 		});
 	};
@@ -68,7 +68,7 @@ export function ChannelMessage(props: MessageProps) {
 			<div
 				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
 			>
-				<button
+				<div
 					className="h-full p-1 group"
 					onClick={(event) => {
 						event.stopPropagation();
@@ -80,9 +80,9 @@ export function ChannelMessage(props: MessageProps) {
 						classNameParentDiv="absolute z-50"
 						classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
 					/>
-				</button>
+				</div>
 
-				<button onClick={handleClickReply} className="rotate-180 absolute left-8">
+				<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1.5">
 					<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
