@@ -12,7 +12,7 @@ import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
-	emoji: string;
+	// emoji: string;
 	messageId: string;
 };
 
@@ -196,19 +196,22 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		}
 	}, [messageDataReactedFromSocket]);
 
+	const { messageRef, isOpenReply, emojiSelected } = useContext(ChatContext);
+	console.log(emojiSelected);
 	useEffect(() => {
-		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
-			return;
-		}
-	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
+		setTimeout(() => {
+			if (reactionOutsideProps?.messageId !== '' && emojiSelected !== '' && userId) {
+				handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId ?? '', emojiSelected, userId, message.sender_id);
+				return;
+			}
+		}, 0);
+	}, [reactionOutsideProps?.messageId, emojiSelected]);
 
 	const [isReply, setIsReply] = useState<boolean>(true);
 	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
 	const getMessageRef = useSelector(selectMessageByMessageId(messageIdRef));
 	const getSenderMessage = useSelector(selectMemberByUserId(getMessageRef?.sender_id));
 	const [isMessRef, setIsMessRef] = useState<boolean>(false);
-	const { messageRef, isOpenReply } = useContext(ChatContext);
 
 	useEffect(() => {
 		if (messageIdRef && getMessageRef && getSenderMessage) {
@@ -247,8 +250,13 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span  className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
-									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]"> {getMessageRef?.content.t}</span>
+									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">
+										@{getSenderMessage.user?.username}{' '}
+									</span>
+									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]">
+										{' '}
+										{getMessageRef?.content.t}
+									</span>
 								</p>
 							</div>
 						</div>
