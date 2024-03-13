@@ -44,14 +44,6 @@ function MemberProfile({
 				)}
 			</a>
 			<div className="flex flex-col items-start">
-				{!isHideUserName && (
-					<p
-						className={`text-[15px] ${classParent == '' ? '' : 'relative top-[-7px]'} z-[1] bg-bgSurface nameMemberProfile`}
-						title={name && name.length > numberCharacterCollapse ? name : undefined}
-					>
-						{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
-					</p>
-				)}
 				<div className="absolute top-6 group-hover:-translate-y-4 transition-all duration-300 flex flex-col items-start">
 					{!isHideStatus && (
 						<>
@@ -60,6 +52,14 @@ function MemberProfile({
 						</>
 					)}
 				</div>
+				{!isHideUserName && (
+					<p
+						className={`text-[15px] ${classParent == 'bg-transparent' ? '' : 'relative top-[-7px] bg-bgSurface'} nameMemberProfile`}
+						title={name && name.length > numberCharacterCollapse ? name : undefined}
+					>
+						{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
+					</p>
+				)}
 			</div>
 		</div>
 	);
