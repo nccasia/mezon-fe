@@ -49,6 +49,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					isHideIconStatus={friend.state !== 0 ? true : false}
 					key={friend.user?.id}
 					numberCharacterCollapse={100}
+					classParent="friendList"
 				/>
 			</div>
 			<div>

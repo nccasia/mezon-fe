@@ -48,7 +48,7 @@ export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMe
 	}, [channelId, clanId]);
 
 	return (
-		<div>
+		<div className="mx-4 relative">
 			<ReplyMessage />
 			<MessageBox
 				isOpenEmojiPropOutside={controlEmoji}

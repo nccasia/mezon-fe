@@ -203,6 +203,7 @@ input:-webkit-autofill:active {
 // css inBox dropdrow nocation
 #inBox [data-testid='flowbite-dropdown'] {
 	min-width: 480px !important;
+	left: -30px !important;
 	ul {
 		padding-bottom: 0;
 	}
@@ -219,5 +220,39 @@ input:-webkit-autofill:active {
 		path {
 			fill: red;
 		}
+	}
+	&.bgHover {
+		svg:hover {
+			background-color: #3b3b3b;
+		}
+	}
+}
+
+// css memberProfile
+.memberProfile:hover {
+	background-color: #3b3b3b;
+	.nameMemberProfile {
+		background-color: #3b3b3b;
+	}
+}
+
+// css friendList
+.friendList {
+	.nameMemberProfile {
+		background-color: transparent;
+	}
+}
+
+// css replyMessage
+.replyMessage {
+	svg {
+		min-width: 32px;
+	}
+}
+
+// css InfiniteScroll
+#scrollLoading {
+	.infinite-scroll-component {
+		margin-bottom: 20px;
 	}
 }

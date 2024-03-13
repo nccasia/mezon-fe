@@ -98,7 +98,7 @@ const SettingRightUser = ({
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-white w-[130px] bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="text-white bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px]"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -106,7 +106,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap"
+								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px]"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -123,12 +123,12 @@ const SettingRightUser = ({
 				// <div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform ">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p>Carefull - you have unsaved changes!</p>
+						<p className="text-[15px]">Carefull - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
 							// className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]"
-							className="bg-gray-600 rounded-[4px] p-[8px]"
+							className="text-[15px] bg-gray-600 rounded-[4px] p-[8px]"
 							onClick={() => {
 								handleClose();
 							}}
@@ -138,7 +138,7 @@ const SettingRightUser = ({
 
 						<button
 							// className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
-							className="bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
+							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
 								handleUpdateUser(), handlSaveClose();
 							}}

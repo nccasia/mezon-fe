@@ -13,7 +13,6 @@
 
 .editor :global(.public-DraftEditor-content) {
 	height: 10px;
-
 }
 
 .mention {
@@ -36,11 +35,11 @@
 	transform: scaleY(0);
 	border: #033a6d;
 	color: white;
-	width: 75%;
 	position: relative;
-	margin-bottom: calc(var(--editor-height));
+	margin-bottom: 15px;
 	font-size: 15px;
-	max-width: 75%;
+	min-width: 100%;
+	left: -16px !important;
 }
 
 .mentionSuggestionsEntryFocused {
@@ -61,4 +60,8 @@
 	height: 50px;
 	border-radius: 50%;
 	padding: 5px;
+}
+
+img {
+	object-fit: cover;
 }

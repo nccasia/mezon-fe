@@ -246,23 +246,23 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto p-1`}>
+				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto py-2 px-3`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
-						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
+						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 							<Icons.ReplyCorner />
 							<div className="flex flex-row gap-1 mb-2">
 								<div className="w-5 h-5">
 									<img
-										className="rounded-full"
+										className="rounded-full min-w-5 max-h-5 object-cover"
 										src={getSenderMessage.user?.avatar_url}
 										alt={getSenderMessage.user?.avatar_url}
 									></img>
 								</div>
-								<p className="gap-1">
+								<p className="gap-1 flex">
 									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">
 										@{getSenderMessage.user?.username}{' '}
 									</span>
-									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]">
+									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all">
 										{' '}
 										{getMessageRef?.content.t}
 									</span>
@@ -275,7 +275,10 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 							<div className="justify-start items-center inline-flex w-full">
-								<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text break-all">
+								<div
+									className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
+									style={{ wordBreak: 'break-word' }}
+								>
 									<MessageContent message={message} user={user} isCombine={isCombine} />
 								</div>
 							</div>

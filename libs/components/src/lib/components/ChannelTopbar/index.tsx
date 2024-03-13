@@ -10,7 +10,7 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
-		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader relative">
+		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLable type={Number(channel?.type)} name={channel?.channel_lable} isPrivate={channel?.channel_private} />
 			</div>
@@ -18,15 +18,18 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			{/* Desktop buttons */}
 			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
-					<div className="justify-start items-center gap-[15px] flex iconHover">
-						<ThreadButton />
-						<MuteButton />
-						<PinButton />
-						<ChannelListButton />
-						<ThreeDotButton />
+					<div className="flex pr-[70px]">
+						<div className="justify-start items-center gap-[15px] flex iconHover">
+							<ThreadButton />
+							<MuteButton />
+							<PinButton />
+							<ChannelListButton />
+							<ThreeDotButton />
+						</div>
+						<SearchMessage />
 					</div>
-					<SearchMessage />
-					<div className="justify-start items-start gap-4 flex iconHover" id="inBox">
+
+					<div className="justify-start items-start gap-4 iconHover absolute right-3 flex" id="inBox">
 						<NotificationList />
 						<HelpButton />
 					</div>

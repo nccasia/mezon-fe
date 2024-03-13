@@ -3,10 +3,10 @@ import { useAppNavigation, useFriends } from '@mezon/core';
 import { selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
-import { useModal } from 'react-modal-hook';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -15,12 +15,7 @@ function MyApp() {
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
 
-	const [openCreateClanModal, closeCreateClanModal] = useModal(() => (
-		<ModalCreateClan
-			open={true}
-			onClose={closeCreateClanModal}
-		/>
-	));
+	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
@@ -29,7 +24,7 @@ function MyApp() {
 	const { quantityPendingRequest } = useFriends();
 
 	return (
-		<div className="flex h-screen text-gray-100 overflow-hidden">
+		<div className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div className="overflow-visible py-4 px-3 space-y-2 bg-bgPrimary scrollbar-hide">
 				<NavLink to="/chat/direct/friends">
 					<NavLinkComponent active={pathName.includes('direct')}>

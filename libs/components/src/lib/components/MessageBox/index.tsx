@@ -499,7 +499,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 
 	return (
-		<div className="flex flex-inline w-[96%] items-end gap-2 box-content mt-2 mb-4 mx-auto pr-2 bg-black relative overflow-x-hidden iconHover rounded-lg">
+		<div
+			className="flex flex-inline w-full items-end gap-2 box-content mb-4 bg-black relative  overflow-x-hidden iconHover rounded-lg"
+			style={{ overflow: 'visible' }}
+		>
 			{showEmojiSuggestion && (
 				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
 					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
@@ -563,11 +566,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					/>
 					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
 				</div>
-
-				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
+			<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 
-			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3 iconHover">
+			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3 iconHover mr-2">
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>

@@ -18,6 +18,7 @@ module.exports = {
 	bgTertiary: '#1E1E1E',
 	bgDisable: '#323232',
 	bgSurface: '#0B0B0B',
+	bgHoverMember: '#3b3b3b',
 
 	/* border */
 	borderDefault: '#1E1E1E',

@@ -16,7 +16,7 @@ function ReplyMessage() {
 	return (
 		<>
 			{isOpenReply && (
-				<div className="flex flex-row items-center justify-between w-[97%] mx-auto my-2  bg-[#2B2D31] p-2 rounded-md text-[14px]">
+				<div className="flex flex-row items-center justify-between w-full my-2  bg-[#2B2D31] p-2 rounded-md text-[14px]">
 					<div className="">
 						Replying to <span className=" text-green-500 font-semibold">{getSenderMessage?.user?.username}</span>
 					</div>
