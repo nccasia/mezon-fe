@@ -1,11 +1,8 @@
 import { EmojiPicker, Icons, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
-import {  ReactedOutsideOptional,  } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -39,29 +36,7 @@ export function ChannelMessage(props: MessageProps) {
 		return preMessage;
 	}, [preMessage]);
 
-	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } =
-		useContext(ChatContext);
-	const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
-	const [emojiPicker, setEmojiPicker] = useState<string>('');
-	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
-	function EmojiReaction() {
-		const handleEmojiSelect = (emoji: any) => {
-			setEmojiPicker(emoji.native);
-			//TODO: check if already react this emoji
-			setReactionOutside({ id: '', emoji: emoji.native, messageId: mess.id });
-			setIsOpenReactEmoji(false);
-		};
-		return (
-			<Picker
-				data={data}
-				onEmojiSelect={handleEmojiSelect}
-				theme="dark"
-				onClickOutside={() => {
-					setIsOpenReactEmoji(false);
-				}}
-			/>
-		);
-	}
+	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef } = useContext(ChatContext);
 
 	const handleClickReply = () => {
@@ -78,10 +53,8 @@ export function ChannelMessage(props: MessageProps) {
 		event.stopPropagation();
 	};
 
-
-
 	return (
-		<div className="relative group hover:bg-gray-950/[.07]" >
+		<div className="relative group hover:bg-gray-950/[.07]">
 			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
 
