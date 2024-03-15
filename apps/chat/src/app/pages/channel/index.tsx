@@ -20,7 +20,7 @@ export default function ChannelLayout() {
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div  className="flex flex-col flex-1 w-full h-full">
 					<div
-						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden z-0 max-h-heightMessageViewChat h-heightMessageViewChat"
 						ref={messagesContainerRef}
 					>
 						{currentChanel ? (

@@ -44,6 +44,7 @@ export type ChatContextValue = {
 
 	widthEmojiBar: number;
 	setWidthEmojiBar: React.Dispatch<React.SetStateAction<number>>;
+	
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -58,6 +59,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom] = React.useState<boolean>(false);
 	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
 	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
+	const [isHoverSender, setIsHoverSender] = React.useState<boolean>(false);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({

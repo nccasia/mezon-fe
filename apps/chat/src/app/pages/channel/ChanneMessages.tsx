@@ -34,6 +34,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 
 	return (
 		<div
+			className="z-0 border border-blue-500 overflow-x-hidden"
 			id="scrollLoading"
 			ref={containerRef}
 			style={{
@@ -42,6 +43,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 				display: 'flex',
 				flexDirection: 'column-reverse',
 				overflowX: 'hidden',
+				zIndex: 0,
 			}}
 		>
 			<InfiniteScroll
