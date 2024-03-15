@@ -52,6 +52,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			mentionTrigger: '@',
 		}),
 	);
+	const { setEmojiSelectedMess } = useContext(ChatContext);
 
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
@@ -59,6 +60,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	//clear Editor after navigate channel
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
+		setEmojiSelectedMess('');
 	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
@@ -214,7 +216,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const handleSend = useCallback(() => {
 		setIsOpenEmojiChatBoxSuggestion(false);
-		console.log(content);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
@@ -223,12 +224,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent('');
 			setAttachmentData([]);
 			setMentionData([]);
+			setEmojiSelectedMess('');
 			setEditorState(() => EditorState.createEmpty());
 			setIsOpenReply(false);
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
 			setAttachmentData([]);
+			setMentionData([]);
+			setEmojiSelectedMess('');
 			setClearEditor(true);
 			setSelectedItemIndex(0);
 			liRefs?.current[selectedItemIndex]?.focus();
@@ -283,17 +287,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setIsOpenEmojiChatBoxSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length === 1) {
+		if ((content.length === 1 && emojiSelectedMess) || content.length === 1) {
 			moveSelectionToEnd();
 		}
 	}, [clearEditor, content, showEmojiSuggestion, emojiSelectedMess]);
 
-	useEffect(() => {
-		if (emojiSelectedMess) {
-			// onFocusEditorState();
-			moveSelectionToEnd();
-		}
-	}, [emojiSelectedMess]);
+	// useEffect(() => {
+	// 	if (emojiSelectedMess) {
+	// 		onFocusEditorState();
+	// 		moveSelectionToEnd();
+	// 	}
+	// }, [emojiSelectedMess]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -312,12 +316,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			return newEditorState;
 		});
-		// onFocusEditorState();
 	}
 
 	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
 		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
+
 		setMessageRef(undefined);
 		event.stopPropagation();
 	};
@@ -325,9 +329,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	useEffect(() => {
 		if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
 			setShowPlaceHolder(false);
-			if (emojiSelectedMess) {
-				handleEmojiClick(emojiSelectedMess);
-			}
+			handleEmojiClick(emojiSelectedMess);
 		}
 	}, [emojiSelectedMess]);
 
@@ -482,7 +484,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (isOpenReply) {
 			editorRef.current!.focus();
 		}
-	}, [isOpenReply]);
+	}, [isOpenReply, !isOpenEmojiMessBox]);
 
 	const editorElement = document.getElementById('editor');
 	useEffect(() => {
