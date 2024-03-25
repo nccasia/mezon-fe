@@ -136,11 +136,12 @@ export type IUser = {
 };
 
 export type IVoice = {
-	clanId: string;
-	clanName: string;
+	clan_id: string;
+	clan_name: string;
 	participant: string;
-	roomName: string;
-	lastScreenshot: string;
+	voice_channel_id: string;
+	voice_channel_label: string;
+	last_screenshot: string;
 };
 
 export interface CategoryNameProps {

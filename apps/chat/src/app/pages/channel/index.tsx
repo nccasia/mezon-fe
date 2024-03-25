@@ -22,7 +22,13 @@ export default function ChannelLayout() {
 		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {
 			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={ChannelStreamMode.STREAM_MODE_CHANNEL}/>
 		} else if (currentChannel && currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			return <ChannelVoice jwt={sessionRef.current?.token || ''} channelLabel={currentChannel.channel_label || ''} clanId={currentClan?.id || ""} clanName={currentClan?.clan_name || ""} userName={userProfile?.user?.username || "unknown"} />
+			return <ChannelVoice jwt={sessionRef.current?.token || ''} 
+						channelId={currentChannel.channel_id || '' }
+						channelLabel={currentChannel.channel_label || ''} 
+						clanId={currentClan?.id || ""} 
+						clanName={currentClan?.clan_name || ""} 
+						userName={userProfile?.user?.username || "unknown"} 
+					/>
 		} else {
 			return <ChannelMessages.Skeleton />
 		}

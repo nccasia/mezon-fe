@@ -17,15 +17,16 @@ type VoiceContextProviderProps = {
 
 export type VoiceContextValue = {
 	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
-	voiceRoomRef: React.MutableRefObject<JitsiConference | null>;
-	currentVoiceRoomName: string;
+	voiceChannelRef: React.MutableRefObject<JitsiConference | null>;
+	voiceChannelName: string;
 	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLMediaElement | undefined>>;
-	setCurrentVoiceRoomName: React.Dispatch<React.SetStateAction<string>>;
+	setVoiceChannelName: React.Dispatch<React.SetStateAction<string>>;
 	setUserDisplayName: React.Dispatch<React.SetStateAction<string>>;
+	setVoiceChannelId: React.Dispatch<React.SetStateAction<string>>;
 	setClanId: React.Dispatch<React.SetStateAction<string>>;
 	setClanName: React.Dispatch<React.SetStateAction<string>>;
 	changeAudioOutput: (selected: any) => void;
-	createLocalTrack: () => void;	
+	createLocalTrack: () => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
 	voiceDisconnect: () => void;
 };
@@ -34,11 +35,12 @@ const VoiceContext = React.createContext<VoiceContextValue>({} as VoiceContextVa
 
 const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children }) => {
 	const voiceConnRef = React.useRef<JitsiConnection | null>(null);
-	const voiceRoomRef = React.useRef<JitsiConference | null>(null);
+	const voiceChannelRef = React.useRef<JitsiConference | null>(null);
 	const localTracksRef = React.useRef<JitsiLocalTrack[]>([]);
 	const remoteTracksRef = React.useRef<Map<string, JitsiRemoteTrack[]>>(new Map());
 	const [isJoinedConf, setIsJoinedConf] = React.useState<boolean>(false);	
-	const [currentVoiceRoomName, setCurrentVoiceRoomName] = React.useState<string>("");
+	const [voiceChannelName, setVoiceChannelName] = React.useState<string>("");
+	const [voiceChannelId, setVoiceChannelId] = React.useState<string>("");
 	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
 	const [clanId, setClanId] = React.useState<string>("");
 	const [clanName, setClanName] = React.useState<string>("");
@@ -93,9 +95,9 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				}
 			}
 
-			if (isJoinedConf && voiceRoomRef.current) {
-				if(voiceRoomRef.current.getLocalAudioTrack() == null || localtrack.getType() === 'video') {
-					voiceRoomRef.current.addTrack(localtrack);
+			if (isJoinedConf && voiceChannelRef.current) {
+				if(voiceChannelRef.current.getLocalAudioTrack() == null || localtrack.getType() === 'video') {
+					voiceChannelRef.current.addTrack(localtrack);
 				}				
 			}
 		}
@@ -161,39 +163,41 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [remoteTracksRef, targetTrackNode]);
 	
 	const onConferenceJoined = useCallback(() => {
-		console.log("onConferenceJoined clan info", clanId, clanName);
+		console.log("onConferenceJoined clan info", clanId, clanName, voiceChannelId, voiceChannelName);
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
-			voiceRoomRef.current?.addTrack(localTrack);
+			voiceChannelRef.current?.addTrack(localTrack);
 		});
 
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				clanId, // channel_id
-				clanName, // channel_label,
-				"", // id
+				voiceChannelRef.current?.myUserId() || '',
+				clanId,
+				clanName,
+				voiceChannelId,
+				voiceChannelName,
 				userDisplayName,
-				currentVoiceRoomName,
 				"",
 			)
 		}
-	}, [clanId, clanName, socketRef, userDisplayName, currentVoiceRoomName]);
+	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelName]);
 	
 	const onUserJoined = useCallback((id: string, user: JitsiParticipant) => {
 		console.log('user join', id, user);
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				clanId, //channel_id,
-				clanName, //channel_label,
 				user.getJid(),
-				user.getDisplayName(),		
-				currentVoiceRoomName,
+				clanId,
+				clanName,
+				voiceChannelId,				
+				voiceChannelName,
+				user.getDisplayName(),
 				"",
 			)
 		}	
-	}, [clanId, clanName, currentVoiceRoomName, socketRef]);
+	}, [clanId, clanName, voiceChannelName, voiceChannelId, socketRef]);
 
 	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
 		console.log('user left', id);
@@ -212,7 +216,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, []);
 
 	const onPhoneNumberChanged = useCallback(() => {
-		console.log(`${voiceRoomRef.current?.getPhoneNumber()} - ${voiceRoomRef.current?.getPhonePin()}`);
+		console.log(`${voiceChannelRef.current?.getPhoneNumber()} - ${voiceChannelRef.current?.getPhonePin()}`);
 	}, []);
 
 	const onTrackAudioLevelChanged = useCallback((audioLevel: number) => {
@@ -251,7 +255,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [onLocalTracks]);
 
 	const createVoiceRoom = useCallback(async () => {
-		console.log("room name", currentVoiceRoomName);
+		console.log("room name", voiceChannelName);
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
@@ -263,30 +267,30 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			}
 		};
 
-		console.log("room name", currentVoiceRoomName);
-		if (voiceRoomRef.current?.getName() === currentVoiceRoomName) {
+		console.log("room name", voiceChannelName);
+		if (voiceChannelRef.current?.getName() === voiceChannelName) {
 			console.log("already created");
 			return null;
 		}
 		
-		console.log("room name", currentVoiceRoomName);
-		voiceRoomRef.current = voiceConnRef.current.initJitsiConference(currentVoiceRoomName, confOptions);	
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
-		voiceRoomRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
-		voiceRoomRef.current.join("password");
-		voiceRoomRef.current.setReceiverVideoConstraint(720); // max 720
+		console.log("room name", voiceChannelName);
+		voiceChannelRef.current = voiceConnRef.current.initJitsiConference(voiceChannelName, confOptions);	
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
+		voiceChannelRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
+		voiceChannelRef.current.join("password");
+		voiceChannelRef.current.setReceiverVideoConstraint(720); // max 720
 
-		voiceRoomRef.current.setDisplayName(userDisplayName);
+		voiceChannelRef.current.setDisplayName(userDisplayName);
 
-		return voiceRoomRef.current;
-	}, [currentVoiceRoomName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
+		return voiceChannelRef.current;
+	}, [voiceChannelName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
 	
 	const onConnectionSuccess = useCallback(() => {
 		console.log("onConnectionSuccess");
@@ -294,7 +298,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [createVoiceRoom]);
 
 	const createVoiceConnection = useCallback(async (roomName: string, jwt: string) => {
-		if (!currentVoiceRoomName) {
+		if (!voiceChannelName) {
 			return null; // init when the channel is set
 		}
 
@@ -338,7 +342,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 
 		return connection;
-	}, [currentVoiceRoomName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack])
+	}, [voiceChannelName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack])
 
 	/**
 	 * This function is called when we disconnect.
@@ -370,10 +374,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const value = React.useMemo<VoiceContextValue>(
 		() => ({
 			voiceConnRef,
-			voiceRoomRef,
-			currentVoiceRoomName,
+			voiceChannelRef,
+			voiceChannelName,
 			setTargetTrackNode,
-			setCurrentVoiceRoomName,
+			setVoiceChannelName,
+			setVoiceChannelId,
 			setUserDisplayName,
 			setClanId,
 			setClanName,
@@ -382,7 +387,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			changeAudioOutput,
 			createLocalTrack,
 		}),
-		[currentVoiceRoomName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
+		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;
