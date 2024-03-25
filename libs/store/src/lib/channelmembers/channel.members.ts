@@ -3,7 +3,7 @@ import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ChannelPresenceEvent, StatusPresenceEvent } from '@mezon/mezon-js';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from '@mezon/mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
@@ -52,7 +52,7 @@ function getChannelMemberRootState(thunkAPI: GetThunkAPI<unknown>): ChannelMembe
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
 const fetchChannelMembersCached = memoize(
-	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelUsers(mezon.session, channelId, 1, 100, ''),
+	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelUsers(mezon.session, channelId, ChannelType.CHANNEL_TYPE_TEXT, 1, 100, ''),
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
