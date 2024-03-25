@@ -436,7 +436,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 							<Icons.ReplyCorner />
-							<div className="flex flex-row gap-1 mb-2">
+							<div className="flex flex-row gap-1 mb-2 pr-12">
 								<div className="w-5 h-5">
 									<img
 										className="rounded-full min-w-5 max-h-5 object-cover"

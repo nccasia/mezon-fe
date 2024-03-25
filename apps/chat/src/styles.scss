@@ -156,7 +156,7 @@ input:-webkit-autofill:active {
 #editor {
 	.public-DraftEditor-content {
 		div {
-			display: flex;
+			display: block;
 			div {
 				clear: both;
 				order: 2;

@@ -1,12 +1,12 @@
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import IntegrationsChannel from './Component/IntegrationsChannel';
+import InvitesChannel from './Component/InvitesChannel';
+import { DeleteModal } from './Component/Modal/deleteChannelModal';
+import OverviewChannel from './Component/OverviewChannel';
+import PermissionsChannel from './Component/PermissionsChannel';
 import ChannelSettingItem from './channelSettingItem';
-import { DeleteModal } from './deleteChannelModal';
 import ExitSetting from './exitSetting';
-import IntegrationsChannel from './integrationsChannel';
-import InvitesChannel from './invitesChannel';
-import OverviewChannel from './overviewChannel';
-import PermissionsChannel from './permissionsChannel';
 
 export type ModalSettingProps = {
 	open: boolean;

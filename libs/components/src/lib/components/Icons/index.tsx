@@ -1262,3 +1262,28 @@ export const LockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 		</svg>
 	);
 };
+
+export const RoleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="23" height="20" fill="none" viewBox="0 0 24 24" className={`${defaultSize}`}>
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M3.47 5.18c.27-.4.64-.74 1.1-.96l6.09-3.05a3 3 0 0 1 2.68 0l6.1 3.05A2.83 2.83 0 0 1 21 6.75v3.5a14.17 14.17 0 0 1-8.42 12.5c-.37.16-.79.16-1.16 0A14.18 14.18 0 0 1 3 9.77V6.75c0-.57.17-1.11.47-1.57Zm2.95 10.3A12.18 12.18 0 0 0 12 20.82a12.18 12.18 0 0 0 5.58-5.32A9.49 9.49 0 0 0 12.47 14h-.94c-1.88 0-3.63.55-5.11 1.49ZM12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+			></path>
+		</svg>
+	);
+};
+
+export const EscIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={`${defaultSize}`}>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm4.7-15.7a1 1 0 0 0-1.4 0L12 10.58l-3.3-3.3a1 1 0 0 0-1.4 1.42L10.58 12l-3.3 3.3a1 1 0 1 0 1.42 1.4L12 13.42l3.3 3.3a1 1 0 0 0 1.4-1.42L13.42 12l3.3-3.3a1 1 0 0 0 0-1.4Z"
+			></path>
+		</svg>
+	);
+};

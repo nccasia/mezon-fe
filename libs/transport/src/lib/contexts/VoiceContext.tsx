@@ -200,8 +200,19 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [clanId, clanName, voiceChannelName, voiceChannelId, socketRef]);
 
 	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
-		console.log('user left', id);
-	}, []);
+		console.log('user left', id, user);
+		remoteTracksRef.current.set(id, []);
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceLeaved(
+				user.getJid(),
+				clanId,
+				clanName,
+				voiceChannelId,				
+				voiceChannelName,
+				user.getDisplayName(),
+			)
+		}	
+	}, [clanId, clanName, socketRef, voiceChannelId, voiceChannelName]);
 
 	const onTrackMuteChanged = useCallback((track: JitsiTrack) => {
 		console.log('onTrackMuteChanged');

@@ -1,7 +1,7 @@
 import { InputField, TextArea } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
-import ModalAskChangeChannel from './modalAskChangeChannel';
+import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
