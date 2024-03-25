@@ -24,10 +24,23 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	dataVoiceSocket?: DataVoiceSocketOptinals;
-	dataVoiceSocketList?: DataVoiceSocketOptinals[];
+	// dataVoiceSocketList?: DataVoiceSocketOptinals[];
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
+
+export const pushMemberToVoiceChannelData = createAsyncThunk(
+	'voice/pushMemberToVoiceChannelData',
+	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: DataVoiceSocketOptinals, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(voiceActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
+			console.log('getData-OKE2', { clanId, clanName, id, participant, userId, roomName, lastScreenshot });
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
 
 /**
  * Export an effect using createAsyncThunk from
@@ -67,28 +80,27 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 		roomName: 'f',
 		lastScreenshot: 'g',
 	},
-	dataVoiceSocketList: [],
+	// dataVoiceSocketList: [],
 });
 
 export const voiceSlice = createSlice({
 	name: VOICE_FEATURE_KEY,
 	initialState: initialVoiceState,
 	reducers: {
+		// ...
 		add: voiceAdapter.addOne,
 		remove: voiceAdapter.removeOne,
-		// ...
-
 		setDataSocketToStore: (state, action: PayloadAction<DataVoiceSocketOptinals>) => {
 			console.log('act', action);
-			state.dataVoiceSocket = {
-				clanId: action?.payload?.clanId,
-				clanName: action?.payload?.clanName,
-				id: action?.payload?.id,
-				participant: action?.payload?.participant,
-				userId: action?.payload?.userId,
-				roomName: action?.payload?.roomName,
-				lastScreenshot: action?.payload?.lastScreenshot,
-			};
+			// state.dataVoiceSocket = {
+			// 	clanId: action.payload?.clanId || state?.dataVoiceSocket?.clanId,
+			// 	clanName: action.payload?.clanName || state?.dataVoiceSocket?.clanName,
+			// 	id: action.payload?.id || state?.dataVoiceSocket?.id,
+			// 	participant: action.payload?.participant || state?.dataVoiceSocket?.participant,
+			// 	userId: action.payload?.userId || state?.dataVoiceSocket?.userId,
+			// 	roomName: action.payload?.roomName || state?.dataVoiceSocket?.roomName,
+			// 	lastScreenshot: action.payload?.lastScreenshot || state?.dataVoiceSocket?.lastScreenshot,
+			// };
 			console.log(state.dataVoiceSocket);
 		},
 	},
@@ -133,23 +145,9 @@ export const voiceReducer = voiceSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 
-// export const pushMemberToVoiceChannelData = createAsyncThunk(
-// 	'voices/pushMemberToVoiceChannelData',
-
-// 	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: any, thunkAPI) => {
-// 		console.log('getData-OKE2', { clanId, clanName, id, lastScreenshot, participant, roomName, userId });
-
-// 		try {
-// 			await thunkAPI.dispatch(voiceActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
-// 		} catch (e) {
-// 			console.log(e);
-// 			return thunkAPI.rejectWithValue([]);
-// 		}
-// 	},
-// );
-
-export const voiceActions = { ...voiceSlice.actions, fetchVoice };
 export const { setDataSocketToStore } = voiceSlice.actions;
+
+export const voiceActions = { ...voiceSlice.actions, fetchVoice, pushMemberToVoiceChannelData };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

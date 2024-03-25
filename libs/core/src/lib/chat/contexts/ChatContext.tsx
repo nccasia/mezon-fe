@@ -142,19 +142,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
 			const voiceEventJoined = voice as any;
-			console.log('voiceEventJoined', voiceEventJoined);
-			dispatch(
-				voiceActions.setDataSocketToStore({
-					clanId: voiceEventJoined.clan_id,
-					clanName: voiceEventJoined.clan_name,
-					id: voiceEventJoined.id,
-					participant: voiceEventJoined.participant,
-					userId: voiceEventJoined.user_id,
-					roomName: voiceEventJoined.roomName,
-					lastScreenshot: voiceEventJoined.lastScreenshot,
-				}),
-			);
-
+			if (voiceEventJoined) {
+				dispatch(
+					voiceActions.pushMemberToVoiceChannelData({
+						clanId: voiceEventJoined.clan_id,
+						clanName: voiceEventJoined.clan_name,
+						id: voiceEventJoined.id,
+						participant: voiceEventJoined.participant,
+						userId: voiceEventJoined.user_id,
+						roomName: voiceEventJoined.voice_channel_id,
+						lastScreenshot: voiceEventJoined.voice_channel_label,
+					}),
+				);
+			}
 		},
 		[dispatch],
 	);
@@ -163,7 +163,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(voice: VoiceJoinedEvent) => {
 			const voiceEventLeaved = voice as any;
 			console.log('onvoiceleaved', voiceEventLeaved);
-			dispatch(voiceActions.remove(voiceEventLeaved.id));
+			// dispatch(voiceActions.remove(voiceEventLeaved.id));
 		},
 		[dispatch],
 	);

@@ -47,23 +47,26 @@ type fetchChannelMembersPayload = {
 	noFetchMembers?: boolean;
 };
 
-export const joinChannel = createAsyncThunk('channels/joinChannel', async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
-	try {
-		thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-		thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-		if (!noFetchMembers) {
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId }));
+export const joinChannel = createAsyncThunk(
+	'channels/joinChannel',
+	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
+		try {
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+			if (!noFetchMembers) {
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId }));
+			}
+			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			// thunkAPI.dispatch(channelsActions.setChannelSeenLastSeenMessageId({ channelId, channelLastSeenMesageId: channel.last_message_id || '' }));
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			await mezon.joinChatChannel(channelId);
+			return channel;
+		} catch (error) {
+			console.log(error);
+			return thunkAPI.rejectWithValue([]);
 		}
-		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
-		// thunkAPI.dispatch(channelsActions.setChannelSeenLastSeenMessageId({ channelId, channelLastSeenMesageId: channel.last_message_id || '' }));
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId);
-		return channel;
-	} catch (error) {
-		console.log(error);
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+	},
+);
 
 export const createNewChannel = createAsyncThunk('channels/createNewChannel', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
 	try {

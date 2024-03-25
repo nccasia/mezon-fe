@@ -1,10 +1,7 @@
-import { selectNewestUserJoinedVoice } from '@mezon/store';
-import { useSelector } from 'react-redux';
-
 function UserListVoiceChannel() {
-	const a = useSelector(selectNewestUserJoinedVoice);
-	console.log(a)
-	
+	// const a = useSelector(selectNewestUserJoinedVoice);
+	// console.log(a)
+
 	const data = {
 		userAvt: 'https://fastly.picsum.photos/id/684/200/300.jpg?hmac=nn1tmB9fSTQO4MaL20HOedMOv4HNILJxIjPvOPhuxbE',
 		userName: 'Phong-K',
