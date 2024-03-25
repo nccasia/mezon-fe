@@ -42,16 +42,17 @@ function getChannelsRootState(thunkAPI: GetThunkAPI<unknown>): ChannelsRootState
 }
 
 type fetchChannelMembersPayload = {
+	clanId: string;
 	channelId: string;
 	noFetchMembers?: boolean;
 };
 
-export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
+export const joinChannel = createAsyncThunk('channels/joinChannel', async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 	try {
 		thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 		thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 		if (!noFetchMembers) {
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
+			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId }));
 		}
 		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 		// thunkAPI.dispatch(channelsActions.setChannelSeenLastSeenMessageId({ channelId, channelLastSeenMesageId: channel.last_message_id || '' }));
@@ -166,14 +167,14 @@ export const channelsSlice = createSlice({
 			});
 
 		builder
-			.addCase(joinChanel.rejected, (state: ChannelsState, action) => {
+			.addCase(joinChannel.rejected, (state: ChannelsState, action) => {
 				state.socketStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addCase(joinChanel.pending, (state: ChannelsState) => {
+			.addCase(joinChannel.pending, (state: ChannelsState) => {
 				state.socketStatus = 'loading';
 			})
-			.addCase(joinChanel.fulfilled, (state: ChannelsState) => {
+			.addCase(joinChannel.fulfilled, (state: ChannelsState) => {
 				state.socketStatus = 'loaded';
 			});
 		builder
@@ -219,7 +220,7 @@ export const { openCreateNewModalChannel } = channelsSlice.actions;
 export const channelsActions = {
 	...channelsSlice.actions,
 	fetchChannels,
-	joinChanel,
+	joinChannel,
 	createNewChannel,
 };
 

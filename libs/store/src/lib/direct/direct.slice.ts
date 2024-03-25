@@ -76,7 +76,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.selectDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId: directMessageId }));
+			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId }));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			await mezon.joinChatDirectMessage(directMessageId, channelName, type);
 			return;

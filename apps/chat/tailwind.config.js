@@ -22,6 +22,14 @@ module.exports = {
 
   theme: {
     extend: {
+      typography: {
+        sm: {
+          css: {
+            color: '#ccc',
+            fontSize: '15px',
+          },
+        },
+      },
       spacing: {
         px: '1px',
         0: '0',

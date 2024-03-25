@@ -52,7 +52,7 @@ function getChannelMemberRootState(thunkAPI: GetThunkAPI<unknown>): ChannelMembe
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
 const fetchChannelMembersCached = memoize(
-	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelUsers(mezon.session, channelId, ChannelType.CHANNEL_TYPE_TEXT , 1, 100, ''),
+	(mezon: MezonValueContext, clanId: string, channelId: string) => mezon.client.listChannelUsers(mezon.session, clanId, channelId, ChannelType.CHANNEL_TYPE_TEXT, 1, 100, ''),
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
@@ -61,20 +61,21 @@ const fetchChannelMembersCached = memoize(
 );
 
 type fetchChannelMembersPayload = {
+	clanId: string;
 	channelId: string;
 	noCache?: boolean;
 };
 
 export const fetchChannelMembers = createAsyncThunk(
 	'channelMembers/fetchChannelMembers',
-	async ({ channelId, noCache }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: fetchChannelMembersPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
-			fetchChannelMembersCached.clear(mezon, channelId);
+			fetchChannelMembersCached.clear(mezon, clanId, channelId);
 		}
 
-		const response = await fetchChannelMembersCached(mezon, channelId);
+		const response = await fetchChannelMembersCached(mezon, clanId, channelId);
 		if (!response.channel_users) {
 			return thunkAPI.rejectWithValue([]);
 		}
@@ -117,7 +118,7 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 			const channelId = channelPresence.channel_id;
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
 			if (!user) {
-				thunkAPI.dispatch(fetchChannelMembers({ channelId }));
+				thunkAPI.dispatch(fetchChannelMembers({ clanId: '', channelId: channelId }));
 			}
 		}
 	},
