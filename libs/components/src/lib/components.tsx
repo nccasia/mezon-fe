@@ -24,7 +24,9 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
 export { default as SettingAccount } from './components/SettingAccount';
+export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+export { default as UserVoiceDashboard } from './components/UserVoiceDashboard';
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

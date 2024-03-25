@@ -141,14 +141,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
-			dispatch(voiceActions.add(voice));
-		}, [dispatch]
+			const voiceEventJoined = voice as any;
+			console.log('voiceEventJoined', voiceEventJoined);
+			dispatch(
+				voiceActions.pushMemberToVoiceChannelData({
+					clanId: voiceEventJoined.clan_id,
+					clanName: voiceEventJoined.clan_name,
+					id: voiceEventJoined.id,
+					lastScreenshot: voiceEventJoined.lastScreenshot,
+					participant: voiceEventJoined.participant,
+					roomName: voiceEventJoined.roomName,
+					userId: voiceEventJoined.user_id,
+				}),
+			);
+		},
+		[dispatch],
 	);
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceJoinedEvent) => {
-			dispatch(voiceActions.remove(voice.id));
-		}, [dispatch]
+			const voiceEventLeaved = voice as any;
+			console.log('onvoiceleaved', voiceEventLeaved);
+			dispatch(voiceActions.remove(voiceEventLeaved.id));
+		},
+		[dispatch],
 	);
 
 	const onchannelmessage = useCallback(
@@ -270,13 +286,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onstatuspresence = onstatuspresence;
 
 		return () => {
+			socket.onvoicejoined = () => {};
+			socket.onvoiceleaved = () => {};
 			socket.onchannelmessage = () => {};
 			socket.onchannelpresence = () => {};
 			socket.onnotification = () => {};
 			socket.onstatuspresence = () => {};
 			socket.ondisconnect = () => {};
 		};
-	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef]);
+	}, [
+		onvoicejoined,
+		onvoiceleaved,
+		onchannelmessage,
+		onchannelpresence,
+		ondisconnect,
+		onmessagetyping,
+		onmessagereaction,
+		onnotification,
+		onstatuspresence,
+		socketRef,
+	]);
 
 	useEffect(() => {
 		initWorker();

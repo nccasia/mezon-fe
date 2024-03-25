@@ -2,6 +2,7 @@ import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import * as InfoUser from '@mezon/ui';
 import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -375,7 +376,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		} else {
 			setClassName('ml-10');
 		}
-	}, [ widthEmojiBar, widthMessageWithUser]);
+	}, [widthEmojiBar, widthMessageWithUser]);
 
 	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
 	const [isEmojiHover, setEmojiHover] = useState<any>();
@@ -385,18 +386,6 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		setEmojiHover(emojiParam);
 		setIsHideSmileButton(false);
 	};
-
-	type Props = {
-		id: string;
-	};
-	function AvatarComponent({ id }: Props) {
-		const user = useSelector(selectMemberByUserId(id));
-		return <img src={user?.user?.avatar_url} className="w-8 h-8 rounded-full border border-gray-500 " alt={user?.user?.avatar_url} />;
-	}
-	function NameComponent({ id }: Props) {
-		const user = useSelector(selectMemberByUserId(id));
-		return <p className="text-xs text-white">{user?.user?.username}</p>;
-	}
 
 	const removeEmojiSender = async (
 		id: string,
@@ -599,8 +588,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																							key={item.id}
 																							className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative "
 																						>
-																							<AvatarComponent id={item.id} />
-																							<NameComponent id={item.id} />
+																							<InfoUser.AvatarComponent id={item.id} />
+																							<InfoUser.NameComponent id={item.id} />
 																							<p className="text-xs absolute right-8">{item.count}</p>
 																							{item.id === userId && (
 																								<button

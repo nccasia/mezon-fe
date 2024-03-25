@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
+import UserListVoiceChannel from '../UserListVoiceChannel';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -40,8 +41,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
 
+	console.log(channel.channel_label)
+
 	return (
-		<div className="relative group">
+		<div className="relative group  ">
 			<Link to={channelPath}>
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
@@ -65,6 +68,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</p>
 				</span>
 			</Link>
+
+			{channel.type === ChannelType.CHANNEL_TYPE_VOICE && <UserListVoiceChannel />}
+
 			<AddPerson
 				className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block right-8' : 'hidden right-3'} cursor-pointer`}
 				onClick={handleCreateLinkInvite}
