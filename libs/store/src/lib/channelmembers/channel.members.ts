@@ -52,7 +52,7 @@ function getChannelMemberRootState(thunkAPI: GetThunkAPI<unknown>): ChannelMembe
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
 const fetchChannelMembersCached = memoize(
-	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelUsers(mezon.session, channelId, ChannelType.CHANNEL_TYPE_TEXT, 1, 100, ''),
+	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelUsers(mezon.session, channelId, ChannelType.CHANNEL_TYPE_TEXT , 1, 100, ''),
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
