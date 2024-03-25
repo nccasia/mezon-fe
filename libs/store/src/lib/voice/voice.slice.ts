@@ -1,6 +1,5 @@
 import { IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { VoiceJoinedEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 
 export const VOICE_FEATURE_KEY = 'voice';
 
@@ -11,11 +10,21 @@ export interface VoiceEntity extends IVoice {
 	id: string; // Primary ID
 }
 
+export type DataVoiceSocketOptinals = {
+	clanId?: string;
+	clanName?: string;
+	id?: string;
+	participant?: string;
+	userId?: string;
+	roomName?: string;
+	lastScreenshot?: string;
+};
+
 export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	dataVoiceSocket: VoiceJoinedEvent | {};
-	dataVoiceSocketList: VoiceJoinedEvent[] | [{}];
+	dataVoiceSocket?: DataVoiceSocketOptinals;
+	dataVoiceSocketList?: DataVoiceSocketOptinals[];
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -50,13 +59,13 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	dataVoiceSocket: {
-		clanId: '',
-		clanName: '',
-		id: '',
-		lastScreenshot: '',
-		participant: '',
-		roomName: '',
-		userId: 0,
+		clanId: 'a',
+		clanName: 'b',
+		id: 'c',
+		participant: 'd',
+		userId: 'e',
+		roomName: 'f',
+		lastScreenshot: 'g',
 	},
 	dataVoiceSocketList: [],
 });
@@ -68,18 +77,22 @@ export const voiceSlice = createSlice({
 		add: voiceAdapter.addOne,
 		remove: voiceAdapter.removeOne,
 		// ...
-		setDataSocketToStore: (state: VoiceState, action: PayloadAction<VoiceJoinedEvent>) => {
+
+		setDataSocketToStore: (state, action: PayloadAction<DataVoiceSocketOptinals>) => {
+			console.log('act', action);
 			state.dataVoiceSocket = {
-				clanId: action.payload.clanId,
-				clanName: action.payload.clanName,
-				id: action.payload.id,
-				lastScreenshot: action.payload.lastScreenshot,
-				participant: action.payload.participant,
-				roomName: action.payload.roomName,
+				clanId: action?.payload?.clanId,
+				clanName: action?.payload?.clanName,
+				id: action?.payload?.id,
+				participant: action?.payload?.participant,
+				userId: action?.payload?.userId,
+				roomName: action?.payload?.roomName,
+				lastScreenshot: action?.payload?.lastScreenshot,
 			};
-			console.log('state.dataVoiceSocket ', state.dataVoiceSocket);
+			console.log(state.dataVoiceSocket);
 		},
 	},
+
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchVoice.pending, (state: VoiceState) => {
@@ -120,21 +133,24 @@ export const voiceReducer = voiceSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 
-export const pushMemberToVoiceChannelData = createAsyncThunk(
-	'voices/pushMemberToVoiceChannelData',
+// export const pushMemberToVoiceChannelData = createAsyncThunk(
+// 	'voices/pushMemberToVoiceChannelData',
 
-	async ({ clanId, clanName, id, lastScreenshot, participant, roomName, userId }: VoiceJoinedEvent, thunkAPI) => {
-		try {
-			console.log('getData-OKE', { clanId, clanName, id, lastScreenshot, participant, roomName });
-			await thunkAPI.dispatch(voiceActions.setDataSocketToStore({ clanId, clanName, id, lastScreenshot, participant, roomName, userId }));
-		} catch (e) {
-			console.log(e);
-			return thunkAPI.rejectWithValue([]);
-		}
-	},
-);
+// 	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: any, thunkAPI) => {
+// 		console.log('getData-OKE2', { clanId, clanName, id, lastScreenshot, participant, roomName, userId });
 
-export const voiceActions = { ...voiceSlice.actions, fetchVoice, pushMemberToVoiceChannelData };
+// 		try {
+// 			await thunkAPI.dispatch(voiceActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
+// 		} catch (e) {
+// 			console.log(e);
+// 			return thunkAPI.rejectWithValue([]);
+// 		}
+// 	},
+// );
+
+export const voiceActions = { ...voiceSlice.actions, fetchVoice };
+export const { setDataSocketToStore } = voiceSlice.actions;
+
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
  *
@@ -156,3 +172,5 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
+
+export const selectNewestUserJoinedVoice = createSelector(getVoiceState, (state) => state.dataVoiceSocket);

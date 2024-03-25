@@ -144,16 +144,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const voiceEventJoined = voice as any;
 			console.log('voiceEventJoined', voiceEventJoined);
 			dispatch(
-				voiceActions.pushMemberToVoiceChannelData({
+				voiceActions.setDataSocketToStore({
 					clanId: voiceEventJoined.clan_id,
 					clanName: voiceEventJoined.clan_name,
 					id: voiceEventJoined.id,
-					lastScreenshot: voiceEventJoined.lastScreenshot,
 					participant: voiceEventJoined.participant,
-					roomName: voiceEventJoined.roomName,
 					userId: voiceEventJoined.user_id,
+					roomName: voiceEventJoined.roomName,
+					lastScreenshot: voiceEventJoined.lastScreenshot,
 				}),
 			);
+
 		},
 		[dispatch],
 	);

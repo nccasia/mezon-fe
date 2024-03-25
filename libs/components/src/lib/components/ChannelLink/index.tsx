@@ -41,7 +41,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
 
-	console.log(channel.channel_label)
+	console.log(channel.channel_label);
+	// const currentTabStatus = useSelector((state: RootState) => state.voice.selectVoiceUserNewest);
+
+	// const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
 
 	return (
 		<div className="relative group  ">

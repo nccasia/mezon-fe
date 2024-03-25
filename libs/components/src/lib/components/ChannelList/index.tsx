@@ -41,8 +41,6 @@ function ChannelList() {
 		}, {} as CategoriesState),
 	);
 
-	// console.log('categorize', categorizedChannels);
-
 	const handleToggleCategory = (category: ICategoryChannel, setToTrue?: boolean) => {
 		if (setToTrue) {
 			setCategoriesState((prevState) => ({
@@ -62,6 +60,9 @@ function ChannelList() {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
+
+	
+	
 
 	return (
 		<>
