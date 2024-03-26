@@ -144,7 +144,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const voiceEventJoined = voice as any;
 			if (voiceEventJoined) {
 				dispatch(
-					voiceActions.pushMemberToVoiceChannelData({
+					messagesActions.pushMemberToVoiceChannelData({
 						clanId: voiceEventJoined.clan_id,
 						clanName: voiceEventJoined.clan_name,
 						id: voiceEventJoined.id,

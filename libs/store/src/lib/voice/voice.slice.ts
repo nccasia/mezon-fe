@@ -10,7 +10,7 @@ export interface VoiceEntity extends IVoice {
 	id: string; // Primary ID
 }
 
-export type DataVoiceSocketOptinals = {
+export type DataVoiceSocketOptinals2 = {
 	clanId?: string;
 	clanName?: string;
 	id?: string;
@@ -23,15 +23,15 @@ export type DataVoiceSocketOptinals = {
 export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	dataVoiceSocket?: DataVoiceSocketOptinals;
-	// dataVoiceSocketList?: DataVoiceSocketOptinals[];
+	dataVoiceSocket?: DataVoiceSocketOptinals2;
+	// dataVoiceSocketList?: DataVoiceSocketOptinals2[];
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
 
-export const pushMemberToVoiceChannelData = createAsyncThunk(
-	'voice/pushMemberToVoiceChannelData',
-	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: DataVoiceSocketOptinals, thunkAPI) => {
+export const pushMemberToVoiceChannelData2 = createAsyncThunk(
+	'voice/pushMemberToVoiceChannelData2',
+	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: DataVoiceSocketOptinals2, thunkAPI) => {
 		try {
 			await thunkAPI.dispatch(voiceActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
 			console.log('getData-OKE2', { clanId, clanName, id, participant, userId, roomName, lastScreenshot });
@@ -90,7 +90,7 @@ export const voiceSlice = createSlice({
 		// ...
 		add: voiceAdapter.addOne,
 		remove: voiceAdapter.removeOne,
-		setDataSocketToStore: (state, action: PayloadAction<DataVoiceSocketOptinals>) => {
+		setDataSocketToStore: (state, action: PayloadAction<DataVoiceSocketOptinals2>) => {
 			console.log('act', action);
 			// state.dataVoiceSocket = {
 			// 	clanId: action.payload?.clanId || state?.dataVoiceSocket?.clanId,
@@ -147,7 +147,7 @@ export const voiceReducer = voiceSlice.reducer;
 
 export const { setDataSocketToStore } = voiceSlice.actions;
 
-export const voiceActions = { ...voiceSlice.actions, fetchVoice, pushMemberToVoiceChannelData };
+export const voiceActions = { ...voiceSlice.actions, fetchVoice, pushMemberToVoiceChannelData2 };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -171,4 +171,4 @@ export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
 
-export const selectNewestUserJoinedVoice = createSelector(getVoiceState, (state) => state.dataVoiceSocket);
+export const selectNewestUserJoinedVoice2 = createSelector(getVoiceState, (state) => state.dataVoiceSocket);

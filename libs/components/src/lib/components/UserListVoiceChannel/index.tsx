@@ -1,22 +1,31 @@
-function UserListVoiceChannel() {
-	// const a = useSelector(selectNewestUserJoinedVoice);
-	// console.log(a)
+import { selectNewestUserJoinedVoice } from '@mezon/store';
+import { AvatarComponent, NameComponent } from '@mezon/ui';
+import { Fragment } from 'react';
+import { useSelector } from 'react-redux';
 
-	const data = {
-		userAvt: 'https://fastly.picsum.photos/id/684/200/300.jpg?hmac=nn1tmB9fSTQO4MaL20HOedMOv4HNILJxIjPvOPhuxbE',
-		userName: 'Phong-K',
-	};
+function UserListVoiceChannel() {
+	const voiceChannelUser = useSelector(selectNewestUserJoinedVoice);
+	console.log('voiceChannelUser', voiceChannelUser);
 
 	return (
 		<>
-			<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-2 cursor-pointer rounded-sm">
-				<div className="">
-					<img className="w-5 h-5 rounded-full" src={data.userAvt} alt={data.userAvt}></img>
-				</div>
-				<div>
-					<p>{data.userName}</p>
-				</div>
-			</div>
+			{voiceChannelUser?.map((item) => {
+				return (
+					<Fragment key={item.id}>
+						<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
+							<div className="w-5 h-5 rounded-full scale-75">
+								{/* <img className="w-5 h-5 rounded-full" src={data.userAvt} alt={data.userAvt}></img> */}
+								<div className="w-8 h-8 mt-[-0.3rem]">
+									<AvatarComponent id={item.userId ?? ''} />
+								</div>
+							</div>
+							<div>
+								<NameComponent id={item.userId ?? ''} />
+							</div>
+						</div>
+					</Fragment>
+				);
+			})}
 		</>
 	);
 }

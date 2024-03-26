@@ -47,7 +47,15 @@ export type FetchMessageParam = {
 	lastLoadMessageId: string;
 	hasMore?: boolean;
 };
-
+export type DataVoiceSocketOptinals = {
+	clanId?: string;
+	clanName?: string;
+	id?: string;
+	participant?: string;
+	userId?: string;
+	roomName?: string;
+	lastScreenshot?: string;
+};
 export interface MessagesState extends EntityState<MessagesEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -56,6 +64,8 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
 	reactionMessageData?: UpdateReactionMessageArgs;
+	dataVoiceSocket?: DataVoiceSocketOptinals;
+	dataVoiceSocketList?: DataVoiceSocketOptinals[];
 }
 
 export interface MessagesRootState {
@@ -89,6 +99,19 @@ type fetchMessageChannelPayload = {
 	messageId?: string;
 	direction?: number;
 };
+
+export const pushMemberToVoiceChannelData = createAsyncThunk(
+	'voice/pushMemberToVoiceChannelData',
+	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: DataVoiceSocketOptinals, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(messagesActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
+			console.log('getData-OKE2', { clanId, clanName, id, participant, userId, roomName, lastScreenshot });
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
@@ -274,6 +297,16 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	typingUsers: {},
 	paramEntries: {},
 	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
+	dataVoiceSocket: {
+		clanId: '',
+		clanName: '',
+		id: '',
+		participant: '',
+		userId: '',
+		roomName: '',
+		lastScreenshot: '',
+	},
+	dataVoiceSocketList:[]
 });
 
 export type SetCursorChannelArgs = {
@@ -287,6 +320,20 @@ export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
 	initialState: initialMessagesState,
 	reducers: {
+		setDataSocketToStore: (state, action: PayloadAction<DataVoiceSocketOptinals>) => {
+			console.log('act', action);
+			state.dataVoiceSocket = {
+				clanId: action.payload?.clanId,
+				clanName: action.payload?.clanName,
+				id: action.payload?.id,
+				participant: action.payload?.participant,
+				userId: action.payload?.userId,
+				roomName: action.payload?.roomName,
+				lastScreenshot: action.payload?.lastScreenshot,
+			};
+			state.dataVoiceSocketList?.push(state.dataVoiceSocket)
+			console.log(state.dataVoiceSocket);
+		},
 		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
@@ -408,6 +455,7 @@ export const messagesActions = {
 	loadMoreMessage,
 	updateReactionMessage,
 	jumpToMessage,
+	pushMemberToVoiceChannelData,
 };
 
 /*
@@ -506,3 +554,5 @@ export const selectMessageReacted = createSelector(getMessagesState, (state) => 
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
+
+export const selectNewestUserJoinedVoice = createSelector(getMessagesState, (state) => state.dataVoiceSocketList);
