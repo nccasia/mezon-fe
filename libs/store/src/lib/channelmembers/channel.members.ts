@@ -218,6 +218,7 @@ export const channelMembersActions = {
 	fetchChannelMembersPresence,
 	followUserStatus,
 	updateStatusUser,
+	fetchChannelMembersCached
 };
 
 /*

@@ -50,7 +50,6 @@ export const CreateNewChannelModal = () => {
 			channel_private: isPrivate,
 			category_id: currentCategory?.category_id,
 		};
-		console.log("body", body)
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;

@@ -1,12 +1,15 @@
 import { useAppNavigation, useAuth, useClans } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
+import { selectNewestUserJoinedVoice } from '@mezon/store';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import UserListVoiceChannel from '../UserListVoiceChannel';
+
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -26,6 +29,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
+	const voiceChannelUser = useSelector(selectNewestUserJoinedVoice);
 
 	const classes = {
 		active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
@@ -41,14 +45,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
 
-	console.log(channel.channel_label);
-	// const currentTabStatus = useSelector((state: RootState) => state.voice.selectVoiceUserNewest);
-
-	// const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
-
 	return (
-		<div className="relative group  ">
+		<div className="relative group border">
 			<Link to={channelPath}>
+				{' '}
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
@@ -71,8 +71,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</p>
 				</span>
 			</Link>
+			{channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+				<UserListVoiceChannel channelType={channel.type ?? undefined} channelID={channel.channel_id ?? ''} />
+			)}
 
-			{channel.type === ChannelType.CHANNEL_TYPE_VOICE && <UserListVoiceChannel />}
+			{/* { <UserListVoiceChannel />} */}
 
 			<AddPerson
 				className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block right-8' : 'hidden right-3'} cursor-pointer`}

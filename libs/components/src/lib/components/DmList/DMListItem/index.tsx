@@ -29,7 +29,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
     };
 
     const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '')
-
+    
     return (
         <button
             key={directMessage.channel_id}

@@ -51,10 +51,11 @@ export type DataVoiceSocketOptinals = {
 	clanId?: string;
 	clanName?: string;
 	id?: string;
+	lastScreenshot?: string;
 	participant?: string;
 	userId?: string;
-	roomName?: string;
-	lastScreenshot?: string;
+	voiceChannelId?: string;
+	voiceChannelLable?: string;
 };
 export interface MessagesState extends EntityState<MessagesEntity, string> {
 	loadingStatus: LoadingStatus;
@@ -102,10 +103,20 @@ type fetchMessageChannelPayload = {
 
 export const pushMemberToVoiceChannelData = createAsyncThunk(
 	'voice/pushMemberToVoiceChannelData',
-	async ({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }: DataVoiceSocketOptinals, thunkAPI) => {
+	async ({ clanId, clanName, id, lastScreenshot, participant, userId, voiceChannelId, voiceChannelLable }: DataVoiceSocketOptinals, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(messagesActions.setDataSocketToStore({ clanId, clanName, id, participant, userId, roomName, lastScreenshot }));
-			console.log('getData-OKE2', { clanId, clanName, id, participant, userId, roomName, lastScreenshot });
+			await thunkAPI.dispatch(
+				messagesActions.setDataSocketToStore({
+					clanId,
+					clanName,
+					id,
+					lastScreenshot,
+					participant,
+					userId,
+					voiceChannelId,
+					voiceChannelLable,
+				}),
+			);
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -306,7 +317,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 		roomName: '',
 		lastScreenshot: '',
 	},
-	dataVoiceSocketList:[]
+	dataVoiceSocketList: [],
 });
 
 export type SetCursorChannelArgs = {
@@ -315,6 +326,26 @@ export type SetCursorChannelArgs = {
 };
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
+
+function removeDuplicatesByUserIdAndVoiceChannelId(arr: any[]) {
+	const visitedEntries = new Set<string>();
+	let i = 0;
+
+	while (i < arr.length) {
+		const entry = arr[i];
+		if (entry.userId !== undefined && entry.voiceChannelId !== undefined) {
+			const key = entry.userId + entry.voiceChannelId;
+			if (!visitedEntries.has(key)) {
+				visitedEntries.add(key);
+				i++;
+			} else {
+				arr.splice(i, 1);
+			}
+		} else {
+			arr.splice(i, 1);
+		}
+	}
+}
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
@@ -326,13 +357,15 @@ export const messagesSlice = createSlice({
 				clanId: action.payload?.clanId,
 				clanName: action.payload?.clanName,
 				id: action.payload?.id,
+				lastScreenshot: action.payload.lastScreenshot,
 				participant: action.payload?.participant,
 				userId: action.payload?.userId,
-				roomName: action.payload?.roomName,
-				lastScreenshot: action.payload?.lastScreenshot,
+				voiceChannelId: action.payload?.voiceChannelId,
+				voiceChannelLable: action.payload?.voiceChannelLable,
 			};
-			state.dataVoiceSocketList?.push(state.dataVoiceSocket)
-			console.log(state.dataVoiceSocket);
+
+			state.dataVoiceSocketList?.push(state.dataVoiceSocket);
+			removeDuplicatesByUserIdAndVoiceChannelId(state.dataVoiceSocketList ?? []);
 		},
 		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
 			state.paramEntries[action.payload.channelId] = action.payload.param;

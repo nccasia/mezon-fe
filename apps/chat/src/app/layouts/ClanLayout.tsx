@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, FooterProfile, ClanHeader } from '@mezon/components';
+import { ChannelList, ChannelTopbar, FooterProfile, ClanHeader, UserVoiceDashboard } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans } from '@mezon/core';
 import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
@@ -20,6 +20,8 @@ const ClanLayout = () => {
 				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList />
+					<UserVoiceDashboard />
+
 					<FooterProfile
 						name={userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}

@@ -260,10 +260,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setSelectedItemIndex(0);
 			liRefs?.current[selectedItemIndex]?.focus();
 			setEditorState(() => EditorState.createEmpty());
-			dispatch(
-				channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
-			);
-			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
+			if (messages.length > 0) {
+				dispatch(
+					channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
+				);
+				dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
+			}
 		}
 	}, [content, onSend, mentionData, attachmentData]);
 

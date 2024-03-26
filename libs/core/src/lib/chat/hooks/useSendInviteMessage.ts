@@ -3,6 +3,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
+import { ChannelStreamMode } from '@mezon/mezon-js';
 
 
 export function useSendInviteMessage() {
@@ -24,7 +25,7 @@ export function useSendInviteMessage() {
 				throw new Error('Client is not initialized');
 			}
 			
-			await socket.writeChatMessage('DM', channel_id, '', 4, content, [], [], []);
+			await socket.writeChatMessage('DM', channel_id, '', ChannelStreamMode.STREAM_MODE_DM, content, [], [], []);
 		},
 		[sessionRef, clientRef, socketRef],
 	);

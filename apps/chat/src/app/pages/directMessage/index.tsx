@@ -1,4 +1,4 @@
-import { DirectMessageList, FooterProfile, ClanHeader } from '@mezon/components';
+import { ClanHeader, DirectMessageList, FooterProfile, UserVoiceDashboard } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import { useState } from 'react';
 import Setting from '../setting';
@@ -16,6 +16,7 @@ export default function Direct() {
 			<div className=" flex-col w-[272px] bg-bgSurface relative">
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
+
 				<FooterProfile
 					name={userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}

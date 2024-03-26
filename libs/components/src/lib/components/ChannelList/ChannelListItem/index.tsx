@@ -32,7 +32,6 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 
 		return false;
 	};
-
 	return (
 		<ChannelLink
 			clanId={channel?.clan_id}

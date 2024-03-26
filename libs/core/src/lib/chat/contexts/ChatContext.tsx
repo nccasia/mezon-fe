@@ -148,10 +148,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						clanId: voiceEventJoined.clan_id,
 						clanName: voiceEventJoined.clan_name,
 						id: voiceEventJoined.id,
+						lastScreenshot:voiceEventJoined.last_screenshot,
 						participant: voiceEventJoined.participant,
 						userId: voiceEventJoined.user_id,
-						roomName: voiceEventJoined.voice_channel_id,
-						lastScreenshot: voiceEventJoined.voice_channel_label,
+						voiceChannelId: voiceEventJoined.voice_channel_id,
+						voiceChannelLable: voiceEventJoined.voice_channel_label,
 					}),
 				);
 			}
