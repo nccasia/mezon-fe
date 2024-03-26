@@ -1,7 +1,7 @@
 import { ChatContext, useClans } from '@mezon/core';
 import { DataVoiceSocketOptinals, selectCurrentChannelId, selectNewestUserJoinedVoice } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { Fragment, useContext, useEffect } from 'react';
+import { Fragment, useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 export type UserListVoiceChannelProps = {
@@ -12,8 +12,6 @@ export type UserListVoiceChannelProps = {
 function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { currentClan } = useClans();
-
-	console.log('channelID', channelID);
 
 	const voiceChannelUser = useSelector(selectNewestUserJoinedVoice);
 

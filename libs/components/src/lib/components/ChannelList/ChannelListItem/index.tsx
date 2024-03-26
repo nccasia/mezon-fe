@@ -1,5 +1,13 @@
-import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
+import {
+	selectArrayUnreadChannel,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectEntitiesChannel,
+	selectMemberStatus,
+	selectMembersByChannelId,
+} from '@mezon/store';
 import { IChannel } from '@mezon/utils';
+import { useMemo } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelLink from '../../ChannelLink';
@@ -18,6 +26,38 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	const handleOpenInvite = () => {
 		openInviteChannelModal();
 	};
+
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const rawMembers = useSelector(selectMembersByChannelId(currentChannelId));
+	const onlineStatus = useSelector(selectMemberStatus);
+
+	const onlineMembers = useMemo(() => {
+		if (!rawMembers) return [];
+		return rawMembers.filter((user) => user.user?.online === true);
+	}, [onlineStatus, rawMembers]);
+
+	console.log(onlineMembers);
+	// const { voiceChannelMemberList, setVoiceChannelMemberList } = useContext(ChatContext);
+	// const convertMemberToVoiceData = () => {
+	// 	const newArray: any = [];
+	// 	for (const item of onlineMembers) {
+	// 		const newItem: any = {
+	// 			clanId: '',
+	// 			clanName: '',
+	// 			id: '',
+	// 			lastScreenshot: '',
+	// 			participant: item.user?.username,
+	// 			userId: item.user?.id,
+	// 			voiceChannelId: item.channelId,
+	// 			voiceChannelLabel: '',
+	// 		};
+	// 		newArray.push(newItem);
+	// 	}
+	// 	setVoiceChannelMemberList(newArray);
+	// };
+	// useEffect(() => {
+	// 	convertMemberToVoiceData();
+	// }, [currentChanel?.channel_id]);
 
 	const isUnReadChannel = (channelId: string) => {
 		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
