@@ -71,11 +71,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</p>
 				</span>
 			</Link>
+
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 				<UserListVoiceChannel channelType={channel.type ?? undefined} channelID={channel.channel_id ?? ''} />
 			)}
-
-			{/* { <UserListVoiceChannel />} */}
 
 			<AddPerson
 				className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block right-8' : 'hidden right-3'} cursor-pointer`}

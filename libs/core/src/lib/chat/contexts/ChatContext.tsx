@@ -7,7 +7,14 @@ import {
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
 } from '@mezon/mezon-js';
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	DataVoiceSocketOptinals,
+	channelMembersActions,
+	friendsActions,
+	mapMessageChannelToEntity,
+	messagesActions,
+	useAppDispatch,
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageWithUser, TabNamePopup } from '@mezon/utils';
 import React, { useCallback, useEffect } from 'react';
@@ -56,6 +63,15 @@ export type ChatContextValue = {
 
 	valueInput: string;
 	setValueInput: React.Dispatch<React.SetStateAction<string>>;
+
+	userJoinedVoiceChannel: DataVoiceSocketOptinals;
+	setUserJoinedVoiceChannel: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals>>;
+
+	userJoinedVoiceChannelList: DataVoiceSocketOptinals[];
+	setUserJoinedVoiceChannelList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[]>>;
+
+	voiceChannelMemberList: DataVoiceSocketOptinals[];
+	setVoiceChannelMemberList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[]>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -74,6 +90,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [activeTab, setActiveTab] = React.useState<string>(TabNamePopup.NONE);
 	const [heightEditor, setHeightEditor] = React.useState<number>(50);
 	const [valueInput, setValueInput] = React.useState<string>('');
+	const [userJoinedVoiceChannel, setUserJoinedVoiceChannel] = React.useState<DataVoiceSocketOptinals>({});
+	const [userJoinedVoiceChannelList, setUserJoinedVoiceChannelList] = React.useState<DataVoiceSocketOptinals[]>([]);
+	const [voiceChannelMemberList, setVoiceChannelMemberList] = React.useState<DataVoiceSocketOptinals[]>([]);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -103,6 +122,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setHeightEditor,
 			valueInput,
 			setValueInput,
+			userJoinedVoiceChannel,
+			setUserJoinedVoiceChannel,
+			userJoinedVoiceChannelList,
+			setUserJoinedVoiceChannelList,
+			voiceChannelMemberList,
+			setVoiceChannelMemberList,
 		}),
 		[
 			messageRef,
@@ -131,6 +156,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setHeightEditor,
 			valueInput,
 			setValueInput,
+			userJoinedVoiceChannel,
+			setUserJoinedVoiceChannel,
+			userJoinedVoiceChannelList,
+			setUserJoinedVoiceChannelList,
+			voiceChannelMemberList,
+			setVoiceChannelMemberList,
 		],
 	);
 
@@ -143,12 +174,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(voice: VoiceJoinedEvent) => {
 			const voiceEventJoined = voice as any;
 			if (voiceEventJoined) {
+				setUserJoinedVoiceChannel({
+					clanId: voiceEventJoined.clan_id,
+					clanName: voiceEventJoined.clan_name,
+					id: voiceEventJoined.id,
+					lastScreenshot: voiceEventJoined.last_screenshot,
+					participant: voiceEventJoined.participant,
+					userId: voiceEventJoined.user_id,
+					voiceChannelId: voiceEventJoined.voice_channel_id,
+					voiceChannelLable: voiceEventJoined.voice_channel_label,
+				});
+				if (userJoinedVoiceChannel) {
+					userJoinedVoiceChannelList.push(userJoinedVoiceChannel);
+				}
 				dispatch(
 					messagesActions.pushMemberToVoiceChannelData({
 						clanId: voiceEventJoined.clan_id,
 						clanName: voiceEventJoined.clan_name,
 						id: voiceEventJoined.id,
-						lastScreenshot:voiceEventJoined.last_screenshot,
+						lastScreenshot: voiceEventJoined.last_screenshot,
 						participant: voiceEventJoined.participant,
 						userId: voiceEventJoined.user_id,
 						voiceChannelId: voiceEventJoined.voice_channel_id,
