@@ -134,8 +134,8 @@ export const channelsSlice = createSlice({
 			const channels = action.payload;
 			state.arrayUnreadChannel = channels.map((item) => ({
 				channelId: item.channel_id ?? '',
-				channelLastMessageId: item.last_message_id ?? '',
-				channelLastSeenMesageId: item.last_seen_message_id ?? '',
+				channelLastMessageId: item.last_sent_message?.id ?? '',
+				channelLastSeenMesageId: item.last_seen_message?.id ?? '',
 			}));
 		},
 		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastMessageId: string }>) => {

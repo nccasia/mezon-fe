@@ -140,7 +140,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
-		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 
 		let hasMore = currentHasMore;
 		if (currentLastLoadMessageId === messageId) {
@@ -149,14 +149,14 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
-		if (response.last_seen_message_id) {
+		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
 				messagesActions.setChannelLastMessage({
 					channelId,
-					messageId: response.last_seen_message_id,
+					messageId: response.last_seen_message?.id,
 				}),
 			);
-			const lastMessage = messages.find((message) => message.id === response.last_seen_message_id);
+			const lastMessage = messages.find((message) => message.id === response.last_seen_message?.id);
 
 			if (lastMessage) {
 				seenMessagePool.updateKnownSeenMessage({
@@ -225,10 +225,8 @@ export const updateLastSeenMessage = createAsyncThunk(
 	async ({ channelId, channelLabel, messageId }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			// thunkAPI.dispatch(
-			//   messagesActions.setChannelLastMessage({ channelId, messageId }),
-			// );
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId);
+			const now = Math.floor(Date.now() / 1000);
+			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
