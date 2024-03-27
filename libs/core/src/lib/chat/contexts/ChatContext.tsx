@@ -71,7 +71,10 @@ export type ChatContextValue = {
 	setUserJoinedVoiceChannelList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[]>>;
 
 	voiceChannelMemberList: DataVoiceSocketOptinals[];
-	setVoiceChannelMemberList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[]>>;
+	setVoiceChannelMemberList: React.Dispatch<React.SetStateAction<any>>;
+
+	voiceChannelMemberListConverted: DataVoiceSocketOptinals[];
+	setVoiceChannelMemberListConverted: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[]>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -92,7 +95,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [valueInput, setValueInput] = React.useState<string>('');
 	const [userJoinedVoiceChannel, setUserJoinedVoiceChannel] = React.useState<DataVoiceSocketOptinals>({});
 	const [userJoinedVoiceChannelList, setUserJoinedVoiceChannelList] = React.useState<DataVoiceSocketOptinals[]>([]);
-	const [voiceChannelMemberList, setVoiceChannelMemberList] = React.useState<DataVoiceSocketOptinals[]>([]);
+	const [voiceChannelMemberList, setVoiceChannelMemberList] = React.useState<any>([]);
+	const [voiceChannelMemberListConverted, setVoiceChannelMemberListConverted] = React.useState<DataVoiceSocketOptinals[]>([]);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -128,6 +132,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setUserJoinedVoiceChannelList,
 			voiceChannelMemberList,
 			setVoiceChannelMemberList,
+			voiceChannelMemberListConverted,
+			setVoiceChannelMemberListConverted,
 		}),
 		[
 			messageRef,
@@ -162,6 +168,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setUserJoinedVoiceChannelList,
 			voiceChannelMemberList,
 			setVoiceChannelMemberList,
+			voiceChannelMemberListConverted,
+			setVoiceChannelMemberListConverted,
 		],
 	);
 

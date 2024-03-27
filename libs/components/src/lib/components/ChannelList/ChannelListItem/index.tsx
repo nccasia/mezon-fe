@@ -1,5 +1,14 @@
-import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
+import { ChatContext } from '@mezon/core';
+import {
+	selectArrayUnreadChannel,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectEntitiesChannel,
+	selectMemberStatus,
+	selectMembersByChannelId,
+} from '@mezon/store';
 import { IChannel } from '@mezon/utils';
+import { useContext, useEffect, useMemo } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelLink from '../../ChannelLink';
@@ -19,6 +28,20 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		openInviteChannelModal();
 	};
 
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const rawMembers = useSelector(selectMembersByChannelId(currentChannelId));
+	const onlineStatus = useSelector(selectMemberStatus);
+
+	const onlineMembers = useMemo(() => {
+		if (!rawMembers) return [];
+		return rawMembers.filter((user) => user.user?.online === true);
+	}, [onlineStatus, rawMembers]);
+	const { voiceChannelMemberList, setVoiceChannelMemberList } = useContext(ChatContext);
+
+	useEffect(() => {
+		setVoiceChannelMemberList(onlineMembers);
+	}, []);
+
 	const isUnReadChannel = (channelId: string) => {
 		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
 		const checkTypeChannel = entitiesChannel[channelId];
@@ -34,6 +57,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	};
 	return (
 		<ChannelLink
+			userList={onlineMembers}
 			clanId={channel?.clan_id}
 			channel={channel}
 			active={currentChanel?.id === channel.id}

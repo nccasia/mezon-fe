@@ -1,6 +1,6 @@
 import { useAppNavigation, useAuth, useClans } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
-import { selectNewestUserJoinedVoice } from '@mezon/store';
+import { selectMembersByChannelId, selectNewestUserJoinedVoice } from '@mezon/store';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,10 +17,14 @@ export type ChannelLinkProps = {
 	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
 	isUnReadChannel?: boolean;
+	userList: any;
 };
 
-function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel }: ChannelLinkProps) {
+function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, userList }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
+	const rawMembers = useSelector(selectMembersByChannelId(channel.channel_id));
+
+	console.log(rawMembers);
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();

@@ -1,7 +1,7 @@
 import { ChatContext, useClans } from '@mezon/core';
 import { DataVoiceSocketOptinals, selectCurrentChannelId, selectMembersByChannelId, selectNewestUserJoinedVoice } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { Fragment, useContext, useEffect } from 'react';
+import { Fragment, useContext, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export type UserListVoiceChannelProps = {
@@ -22,10 +22,36 @@ function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelPr
 	const { userJoinedVoiceChannel, setUserJoinedVoiceChannel } = useContext(ChatContext);
 	const { userJoinedVoiceChannelList, setUserJoinedVoiceChannelList } = useContext(ChatContext);
 	const { voiceChannelMemberList, setVoiceChannelMemberList } = useContext(ChatContext);
+	const { voiceChannelMemberListConverted, setVoiceChannelMemberListConverted } = useContext(ChatContext);
 
-	console.log('userJoinedVoiceChannel', userJoinedVoiceChannel);
-	console.log('userJoinedVoiceChannelList', userJoinedVoiceChannelList);
-	console.log('voiceChannelMemberList', voiceChannelMemberList);
+	console.log('onlineMembers', onlineMembers);
+	// console.log('userJoinedVoiceChannelList', userJoinedVoiceChannelList);
+	// console.log('voiceChannelMemberList', voiceChannelMemberList);
+	// console.log('voiceChannelMemberListConverted', voiceChannelMemberListConverted);
+
+	const convertMemberToVoiceData = () => {
+		const newArray: any = [];
+		for (const item of onlineMembers) {
+			const newItem: any = {
+				clanId: '',
+				clanName: '',
+				id: '',
+				lastScreenshot: '',
+				participant: item.user?.username,
+				userId: item.user?.id,
+				voiceChannelId: item.channelId,
+				voiceChannelLabel: '',
+			};
+			newArray.push(newItem);
+		}
+		setVoiceChannelMemberListConverted(newArray);
+	};
+
+	useEffect(() => {
+		convertMemberToVoiceData();
+	}, [channelID]);
+
+	console.log(voiceChannelMemberListConverted);
 
 	function removeDuplicatesByUserIdAndVoiceChannelId(arr: any[]) {
 		const visitedEntries = new Set<string>();
@@ -64,8 +90,7 @@ function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelPr
 
 	return (
 		<>
-			{voiceChannelMemberList?.map((item: DataVoiceSocketOptinals, index: number) => {
-				// if (item.voiceChannelId === channelID) {
+			{voiceChannelMemberListConverted?.map((item: DataVoiceSocketOptinals, index: number) => {
 				return (
 					<Fragment key={index}>
 						<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
@@ -81,7 +106,6 @@ function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelPr
 						</div>
 					</Fragment>
 				);
-				// }
 			})}
 		</>
 	);
