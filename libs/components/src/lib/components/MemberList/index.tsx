@@ -1,6 +1,5 @@
-import { ChatContext } from '@mezon/core';
 import { ChannelMembersEntity, selectCurrentChannelId, selectMemberStatus, selectMembersByChannelId } from '@mezon/store';
-import { useContext, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
@@ -15,28 +14,6 @@ function MemberList() {
 		if (!rawMembers) return [];
 		return rawMembers.filter((user) => user.user?.online === true);
 	}, [onlineStatus, rawMembers]);
-
-	const { voiceChannelMemberList, setVoiceChannelMemberList } = useContext(ChatContext);
-	useEffect(() => {
-		const convertMemberToVoiceData = () => {
-			const newArray: any = [];
-			for (const item of onlineMembers) {
-				const newItem: any = {
-					clanId: '',
-					clanName: '',
-					id: '',
-					lastScreenshot: '',
-					participant: item.user?.username,
-					userId: item.user?.id,
-					voiceChannelId: item.channelId,
-					voiceChannelLabel: '',
-				};
-				newArray.push(newItem);
-			}
-			setVoiceChannelMemberList(newArray);
-		};
-		convertMemberToVoiceData()
-	}, [onlineMembers]);
 
 	const offlineMembers = useMemo(() => {
 		if (!rawMembers) return [];
