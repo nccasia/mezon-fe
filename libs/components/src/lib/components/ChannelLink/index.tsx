@@ -15,9 +15,19 @@ export type ChannelLinkProps = {
 	isPrivate?: number;
 	isUnReadChannel?: boolean;
 	numberNotication?: number;
+	voiceChannelData: any;
 };
 
-function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication }: ChannelLinkProps) {
+function ChannelLink({
+	clanId,
+	channel,
+	active,
+	isPrivate,
+	createInviteLink,
+	isUnReadChannel,
+	numberNotication,
+	voiceChannelData,
+}: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
@@ -68,7 +78,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						</p>
 					</span>
 				</Link>
-				<UserListVoiceChannel channelID={channel.id} />
+				{channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					<UserListVoiceChannel voiceChannelData={voiceChannelData} channelID={channel.id} />
+				)}
 
 				<AddPerson
 					className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block right-8' : 'hidden right-3'} cursor-pointer`}

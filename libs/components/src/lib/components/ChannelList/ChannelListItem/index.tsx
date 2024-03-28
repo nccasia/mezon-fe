@@ -7,6 +7,7 @@ import ChannelLink from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
 type ChannelListItemProp = {
 	channel: IChannel;
+	voiceChannelData:any
 };
 const ChannelListItem = (props: ChannelListItemProp) => {
 	const currentChanel = useSelector(selectCurrentChannel);
@@ -46,6 +47,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	return (
 		<Fragment>
 			<ChannelLink
+				voiceChannelData = {props.voiceChannelData}
 				clanId={channel?.clan_id}
 				channel={channel}
 				active={currentChanel?.id === channel.id}

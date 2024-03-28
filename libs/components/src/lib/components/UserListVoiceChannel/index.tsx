@@ -1,16 +1,14 @@
 import { ChatContext } from '@mezon/core';
-import { RootState } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { DataVoiceSocketOptinals } from '@mezon/utils';
-import { Fragment, useContext, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useEffect } from 'react';
 
 export type UserListVoiceChannelProps = {
 	channelID: string;
+	voiceChannelData: any;
 };
 
-function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
-	const voiceChannelMember = useSelector((state: RootState) => state.channelMembers.voiceChannelMember);
+function UserListVoiceChannel({ channelID, voiceChannelData }: UserListVoiceChannelProps) {
 	const { dataVoiceChannelMember, setDataVoiceChannelMember } = useContext(ChatContext);
 	const { userJoinedVoiceChannelList, setUserJoinedVoiceChannelList } = useContext(ChatContext);
 	const { userJoinedVoiceChannel, setUserJoinedVoiceChannel } = useContext(ChatContext);
@@ -28,7 +26,7 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 		});
 		return result;
 	}
-	const filterVoiceMember = filterDuplicateIds(voiceChannelMember);
+	const filterVoiceMember = filterDuplicateIds(voiceChannelData);
 	const convertMemberToVoiceData = () => {
 		const newArray: any = [];
 		for (const item of filterVoiceMember) {
@@ -72,8 +70,13 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 		setDataVoiceChannelMember(voiceMemberConverted);
 	}, []);
 
+	const filterByChannelId = (arr:DataVoiceSocketOptinals[], channelId:string) => {
+		return arr.filter(item => item.voiceChannelId === channelId);
+	};
+	
+
+
 	useEffect(() => {
-		setDataVoiceChannelMember(voiceMemberConverted);
 		let arrCombine: DataVoiceSocketOptinals[] = [];
 		if (!voiceMemberConverted && userJoinedVoiceChannelList) {
 			arrCombine = [...userJoinedVoiceChannelList];
@@ -83,28 +86,36 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 			arrCombine = [...voiceMemberConverted, ...userJoinedVoiceChannelList];
 		}
 		removeDuplicatesByUserIdAndVoiceChannelId(arrCombine);
-		console.log(arrCombine);
-		setDataVoiceChannelMember(arrCombine);
-	}, [userJoinedVoiceChannel]);
+		console.log("-----")
+		console.log("arrCombine",arrCombine);
+		console.log("v",channelID)
+		const filter = filterByChannelId(arrCombine, channelID)
+		console.log("filter",filter);
 
+		setDataVoiceChannelMember(filter);
+	}, [userJoinedVoiceChannel, userJoinedVoiceChannelList]);
 	return (
 		<>
 			{dataVoiceChannelMember?.map((item: any, index: number) => {
+				console.log(dataVoiceChannelMember)
 				if (item.voiceChannelId === channelID) {
+					console.log(item);
+					console.log(item.voiceChannelId);
+
 					return (
-						<Fragment key={index}>
-							<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
-								<div className="w-5 h-5 rounded-full scale-75">
-									<div className="w-8 h-8 mt-[-0.3rem]">
-										<AvatarComponent id={item.userId ?? ''} />
-									</div>
-								</div>
-								<div>
-									<NameComponent id={item.userId ?? ''} />
+						<div key={index} className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
+							<div className="w-5 h-5 rounded-full scale-75">
+								<div className="w-8 h-8 mt-[-0.3rem]">
+									<AvatarComponent id={item.userId} />
 								</div>
 							</div>
-						</Fragment>
+							<div>
+								<NameComponent id={item.userId} />
+							</div>
+						</div>
 					);
+				} else {
+					return <p>FFFFF</p>;
 				}
 			})}
 		</>
@@ -112,3 +123,4 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 }
 
 export default UserListVoiceChannel;
+

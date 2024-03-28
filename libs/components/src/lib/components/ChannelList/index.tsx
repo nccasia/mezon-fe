@@ -1,11 +1,12 @@
 import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
-import { channelsActions, useAppDispatch } from '@mezon/store';
+import { RootState, channelsActions, useAppDispatch } from '@mezon/store';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
+import { useSelector } from 'react-redux';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -40,6 +41,7 @@ function ChannelList() {
 			return acc;
 		}, {} as CategoriesState),
 	);
+	const voiceChannelMember = useSelector((state: RootState) => state.channelMembers.voiceChannelMember);
 
 	// console.log('categorize', categorizedChannels);
 
@@ -105,7 +107,7 @@ function ChannelList() {
 										return categoryIsOpen || channel?.unread;
 									})
 									.map((channel: IChannel, index: number) => {
-										return <ChannelListItem key={index} channel={channel} />;
+										return <ChannelListItem voiceChannelData={voiceChannelMember} key={index} channel={channel} />;
 									})}
 							</div>
 						)}
