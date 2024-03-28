@@ -1,7 +1,7 @@
-import { ChatContext } from '@mezon/core';
+import { ChatContext, useAppParams } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 // import EmojiPicker from '../EmojiPicker';
 import { EmojiClickData } from 'emoji-picker-react';
@@ -9,10 +9,21 @@ import EmojiPickerComp from '../EmojiPicker';
 import GiphyComp from './gifs/gifs';
 import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
-
+import { ChannelStreamMode } from '@mezon/mezon-js';
 const GifStickerEmojiPopup = () => {
 	const { activeTab, setActiveTab } = useContext(ChatContext);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const { type } = useAppParams();
+	const [ mod, setMod] = useState(0);
+	useEffect(()=>{
+		if (type === "2") {
+			setMod(ChannelStreamMode.STREAM_MODE_GROUP)
+		} else if (type === "3"){
+			setMod(ChannelStreamMode.STREAM_MODE_DM)
+		} else {
+			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL)
+		}
+	},[type])
 	const handleTabClick = (tab: string) => {
 		setActiveTab(tab);
 	};
@@ -47,12 +58,12 @@ const GifStickerEmojiPopup = () => {
 			<div className="w-full h-fit">
 				{activeTab === TabNamePopup.GIFS && (
 					<div>
-						<GiphyComp channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+						<GiphyComp channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 					</div>
 				)}
 
 				{activeTab === TabNamePopup.STICKERS && (
-					<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+					<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 				)}
 
 				{activeTab === TabNamePopup.EMOJI && <EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
