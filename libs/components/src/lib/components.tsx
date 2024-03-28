@@ -25,6 +25,7 @@ export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserMentionList } from './components/UserMentionList';
+export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

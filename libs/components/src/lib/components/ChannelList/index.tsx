@@ -64,7 +64,7 @@ function ChannelList() {
 	};
 
 	return (
-		<div className="overflow-y-scroll h-[88%] scrollbar-thin " id='channelList'>
+		<div className="overflow-y-scroll h-[88%] scrollbar-thin " id="channelList">
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />

@@ -7,4 +7,6 @@ export * from './lib/MezonUiProvider';
 export { default as Modal } from './lib/Modal';
 export { default as Select } from './lib/Select';
 export { default as TextArea } from './lib/TextArea';
+export * from './lib/GetInforUserFromId/index';
+
 export * from './lib/useMezonUi';

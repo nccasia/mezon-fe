@@ -1,8 +1,10 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { ChatContext, getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { TabNamePopup } from '@mezon/utils';
+import { channelsActions, selectArrayNotification, useAppDispatch } from '@mezon/store';
+import { NotificationContent, TabNamePopup } from '@mezon/utils';
 import { useContext, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -16,8 +18,11 @@ type ChannelMessagesProps = {
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
+	const dispatch = useAppDispatch();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { heightEditor } = useContext(ChatContext);
+	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
+	const arrayNotication = useSelector(selectArrayNotification);
 
 	const fetchData = () => {
 		loadMoreMessage();
@@ -40,20 +45,28 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	const {
-		activeTab,
-		setActiveTab,
-		setIsOpenEmojiMessBox,
-		setIsOpenEmojiReacted,
-		setIsOpenEmojiReactedBottom,
-		setValueInput,
-	} = useContext(ChatContext);
+	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom, setValueInput } =
+		useContext(ChatContext);
 
 	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
 
 	useEffect(() => {
 		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
 	}, [heightEditor]);
+
+	const handleScroll = (e: any) => {
+		setPosition(e.target.scrollTop);
+	};
+
+	useEffect(() => {
+		const notificationLength = arrayNotication.length;
+		const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
+		const timestamp = notification.update_time?.seconds || '';
+		const channelId = notification.channel_id;
+		if (position && position >= 0) {
+			dispatch(channelsActions.setTimestamp({ channelId, timestamp: String(timestamp) }));
+		}
+	}, [position]);
 
 	return (
 		<div
@@ -88,6 +101,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				endMessage={<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
+				onScroll={handleScroll}
 			>
 				{messages.map((message, i) => (
 					<ChannelMessage

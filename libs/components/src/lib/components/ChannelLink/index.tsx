@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
+import UserListVoiceChannel from '../UserListVoiceChannel';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -66,14 +67,48 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</p>
 				</span>
 			</Link>
-			<AddPerson
-				className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block right-8' : 'hidden right-3'} cursor-pointer`}
-				onClick={handleCreateLinkInvite}
-			/>
-			<SettingProfile
-				className={`absolute ml-auto w-4 h-4  top-[6px] right-3 ${active ? 'text-white' : 'text-[#0B0B0B]'} ${currentClan?.creator_id === userProfile?.user?.id ? 'block group-hover:block group-hover:text-white' : 'hidden'} cursor-pointer`}
-				onClick={handleOpenCreate}
-			/>
+
+			{currentClan?.creator_id === userProfile?.user?.id ? (
+				numberNotication !== 0 ? (
+					<>
+						<AddPerson
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block text-white ${active ? '' : ''}`}
+							onClick={handleCreateLinkInvite}
+						/>
+						<SettingProfile
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block text-white ${active ? '' : ''}`}
+							onClick={handleOpenCreate}
+						/>
+						<div
+							className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red600 rounded-full text-xs text-center top-2`}
+						>
+							{numberNotication}
+						</div>
+					</>
+				) : (
+					<>
+						<AddPerson
+							className={`tesst absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} block right-8 cursor-pointer`}
+							onClick={handleCreateLinkInvite}
+						/>
+						<SettingProfile
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 ${active ? 'text-white' : 'text-[#0B0B0B]'} block group-hover:block group-hover:text-white cursor-pointer`}
+							onClick={handleOpenCreate}
+						/>
+					</>
+				)
+			) : (
+				<>
+					<AddPerson
+						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} hidden right-3 cursor-pointer`}
+						onClick={handleCreateLinkInvite}
+					/>
+					{numberNotication !== 0 && (
+						<div className="absolute ml-auto w-4 h-4  top-[2px] text-white  right-3 group-hover:hidden">{numberNotication}</div>
+					)}
+				</>
+			)}
+
 			<SettingChannel
 				open={openSetting}
 				onClose={() => {
@@ -81,7 +116,6 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				}}
 				channel={channel}
 			/>
-			{/* <p>{numberNotication}</p> */}
 		</div>
 	);
 }

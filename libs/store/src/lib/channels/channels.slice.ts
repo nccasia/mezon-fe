@@ -1,3 +1,4 @@
+import { ChannelType } from '@mezon/mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory, IChannel, LoadingStatus, UnreadChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
@@ -6,7 +7,6 @@ import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
-import { ChannelType } from '@mezon/mezon-js';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -48,23 +48,25 @@ type fetchChannelMembersPayload = {
 	noFetchMembers?: boolean;
 };
 
-export const joinChannel = createAsyncThunk('channels/joinChannel', async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
-	try {
-		thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-		thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-		if (!noFetchMembers) {
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId: clanId, channelId: channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+export const joinChannel = createAsyncThunk(
+	'channels/joinChannel',
+	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
+		try {
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+			if (!noFetchMembers) {
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+			}
+			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			await mezon.joinChatChannel(channelId);
+			return channel;
+		} catch (error) {
+			console.log(error);
+			return thunkAPI.rejectWithValue([]);
 		}
-		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
-		// thunkAPI.dispatch(channelsActions.setChannelSeenLastSeenMessageId({ channelId, channelLastSeenMesageId: channel.last_message_id || '' }));
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId);
-		return channel;
-	} catch (error) {
-		console.log(error);
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+	},
+);
 
 export const createNewChannel = createAsyncThunk('channels/createNewChannel', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
 	try {
@@ -132,15 +134,16 @@ export const channelsSlice = createSlice({
 			const channels = action.payload;
 			state.arrayUnreadChannel = channels.map((item) => ({
 				channelId: item.channel_id ?? '',
-				channelLastMessageId: item.last_sent_message?.id ?? '',
+				channelLastSentMessageId: item.last_sent_message?.id ?? '',
 				channelLastSeenMesageId: item.last_seen_message?.id ?? '',
+				timestamp: item.last_seen_message?.timestamp ?? '',
 			}));
 		},
-		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastMessageId: string }>) => {
-			const { channelId, channelLastMessageId } = action.payload;
+		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSentMessageId: string }>) => {
+			const { channelId, channelLastSentMessageId } = action.payload;
 			state.arrayUnreadChannel.forEach((item) => {
 				if (item.channelId === channelId) {
-					item.channelLastMessageId = channelLastMessageId;
+					item.channelLastSentMessageId = channelLastSentMessageId;
 				}
 			});
 		},
@@ -149,6 +152,14 @@ export const channelsSlice = createSlice({
 			state.arrayUnreadChannel.forEach((item) => {
 				if (item.channelId === channelId) {
 					item.channelLastSeenMesageId = channelLastSeenMesageId;
+				}
+			});
+		},
+		setTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: string }>) => {
+			const { channelId, timestamp } = action.payload;
+			state.arrayUnreadChannel.forEach((item) => {
+				if (item.channelId === channelId) {
+					item.timestamp = timestamp;
 				}
 			});
 		},

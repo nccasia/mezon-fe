@@ -15,7 +15,6 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
-
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -50,7 +49,7 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}
 				currentClanId={clanId}
-			/>			
+			/>
 		</div>
 	);
 }

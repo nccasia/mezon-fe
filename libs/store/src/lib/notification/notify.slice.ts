@@ -1,6 +1,7 @@
-import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { Notification } from '@mezon/mezon-js';
+import { ContentNotificationChannel, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiNotification } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 
@@ -13,25 +14,29 @@ export interface NotificationEntity extends INotification {
 }
 
 export const mapNotificationToEntity = (notifyRes: Notification): INotification => {
-	return { ...notifyRes, id: notifyRes.id || '', content: {...notifyRes.content, create_time: notifyRes.create_time} || null};
+	return { ...notifyRes, id: notifyRes.id || '', content: { ...notifyRes.content, create_time: notifyRes.create_time } || null };
 };
+
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	arrayNotification: ContentNotificationChannel[];
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
 export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listNotifications(mezon.session,50);
+	const response = await mezon.client.listNotifications(mezon.session, 50);
 	if (!response.notifications) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	return response.notifications.map(mapNotificationToEntity);
+	const notifications = response.notifications.map(mapNotificationToEntity);
+	thunkAPI.dispatch(notificationActions.setArrayNotification(notifications));
+	return notifications;
 });
 
-export const deleteNotify = createAsyncThunk('notification/deleteNotify', async (ids:string[], thunkAPI) => {
+export const deleteNotify = createAsyncThunk('notification/deleteNotify', async (ids: string[], thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.deleteNotifications(mezon.session, ids);
 	if (!response) {
@@ -45,6 +50,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	loadingStatus: 'not loaded',
 	notificationMentions: [],
 	error: null,
+	arrayNotification: [],
 });
 
 export const notificationSlice = createSlice({
@@ -53,6 +59,14 @@ export const notificationSlice = createSlice({
 	reducers: {
 		add: notificationAdapter.addOne,
 		remove: notificationAdapter.removeOne,
+		setArrayNotification: (state, action: PayloadAction<ApiNotification[]>) => {
+			const notifications = action.payload;
+			state.arrayNotification = notifications
+				.filter((item) => item.code === -9)
+				.map((item) => ({
+					content: item.content,
+				}));
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -80,5 +94,9 @@ export const notificationActions = {
 
 const { selectAll } = notificationAdapter.getSelectors();
 
-export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]:NotificationState }): NotificationState => rootState[NOTIFICATION_FEATURE_KEY];
+export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: NotificationState }): NotificationState =>
+	rootState[NOTIFICATION_FEATURE_KEY];
+
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
+
+export const selectArrayNotification = createSelector(getNotificationState, (state) => state.arrayNotification);

@@ -3,9 +3,9 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import { ChatContext, useChatMessages } from '@mezon/core';
-import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectArrayNotification, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { EmojiPlaces, IMessageSendPayload, TabNamePopup } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
 import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
@@ -34,6 +34,7 @@ init({ data });
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
+	const arrayNotication = useSelector(selectArrayNotification);
 	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
 
 	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
@@ -251,7 +252,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					channelLastSeenMesageId: messages[0].id ? messages[0].id : '',
 				}),
 			);
-			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
+			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
@@ -264,7 +265,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				dispatch(
 					channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
 				);
-				dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
+				dispatch(
+					channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }),
+				);
+				const notificationLength = arrayNotication.length;
+				const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
+				const timestamp = notification.update_time?.seconds || '';
+				dispatch(channelsActions.setTimestamp({ channelId: currentChanel?.id || '', timestamp: String(timestamp) }));
 			}
 		}
 	}, [content, onSend, mentionData, attachmentData]);
@@ -341,7 +348,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	useEffect(() => {
 		setHeightEditor(editorHeight ?? 50);
 	}, [editorHeight]);
-
 
 	function handleEmojiClick(clickedEmoji: string) {
 		setEditorState((prevEditorState) => {

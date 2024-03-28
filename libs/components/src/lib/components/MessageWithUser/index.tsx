@@ -467,7 +467,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 							</div>
 						</div>
 					)}
-					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible" ref={divMessageWithUser}>
+					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
