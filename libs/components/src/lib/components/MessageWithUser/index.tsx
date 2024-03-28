@@ -1,4 +1,4 @@
-import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
+import { ChatContext, useAppParams, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
@@ -299,7 +299,17 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const getSenderMessage = useSelector(selectMemberByUserId(getMessageRef?.sender_id));
 	const [isMessRef, setIsMessRef] = useState<boolean>(false);
 	const { messageRef, isOpenReply } = useContext(ChatContext);
-
+	const { type } = useAppParams();
+	const [ mod, setMod] = useState(0);
+	useEffect(()=>{
+		if (type === "2") {
+			setMod(ChannelStreamMode.STREAM_MODE_GROUP)
+		} else if (type === "3"){
+			setMod(ChannelStreamMode.STREAM_MODE_DM)
+		} else {
+			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL)
+		}
+	},[type])
 	useEffect(() => {
 		if (messageIdRef && getMessageRef && getSenderMessage) {
 			setIsReply(true);
@@ -320,7 +330,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		if (messageRef?.id === message.id && emojiSelectedReacted)
 			handleReactMessage(
 				'',
-				ChannelStreamMode.STREAM_MODE_CHANNEL,
+				mod,
 				currentChannelId ?? '',
 				messageRef?.id ?? '',
 				emojiSelectedReacted ?? '',
@@ -407,7 +417,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		countRemoved: number,
 	) => {
 		setIsHideSmileButton(true);
-		await reactionMessageAction('', ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessageAction('', mod, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 	function removeSenderBySenderId(emojiData: EmojiDataOptionals, senderId: string) {
 		if (emojiData.senders) {
@@ -511,7 +521,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															onClick={() =>
 																handleReactMessage(
 																	emoji.id,
-																	ChannelStreamMode.STREAM_MODE_CHANNEL,
+																	mod,
 																	currentChannelId ?? '',
 																	message.id,
 																	emoji.emoji,
