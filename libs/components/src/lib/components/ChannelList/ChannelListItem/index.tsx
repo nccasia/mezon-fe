@@ -1,9 +1,12 @@
-import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel, selectMessageByMessageId } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
+import { selectArrayNotification, selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
+import { IChannel, NotificationContent } from '@mezon/utils';
+import { Fragment } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { ChannelType } from 'vendors/mezon-js/packages/mezon-js/dist';
 import ChannelLink from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
+import UserListVoiceChannel from '../../UserListVoiceChannel';
 type ChannelListItemProp = {
 	channel: IChannel;
 };
@@ -11,6 +14,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	const currentChanel = useSelector(selectCurrentChannel);
 	const arrayUnreadChannel = useSelector(selectArrayUnreadChannel);
 	const entitiesChannel = useSelector(selectEntitiesChannel);
+	const arrayNotication = useSelector(selectArrayNotification);
 	const { channel } = props;
 
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
@@ -20,16 +24,13 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		openInviteChannelModal();
 	};
 
-	// console.log('messageLast', messageLast);
-	// console.log('messageLastSeen', messageLastSeen);
-
 	const isUnReadChannel = (channelId: string) => {
 		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
 		const checkTypeChannel = entitiesChannel[channelId];
 		if (checkTypeChannel && checkTypeChannel.type === 4) {
 			return true;
 		} else {
-			if (channel && channel.channelLastMessageId === channel.channelLastSeenMesageId) {
+			if (channel && channel.channelLastSentMessageId === channel.channelLastSeenMesageId) {
 				return true;
 			}
 		}
@@ -37,25 +38,36 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		return false;
 	};
 
-	const useNotication = (channelId: string) => {
+	const isNotication = (channelId: string) => {
+		let count = 0;
 		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
-		const messageLast = useSelector(selectMessageByMessageId(channel?.channelLastMessageId || ''));
-		// console.log('mess', messageLast);
-		// console.log('channel', channel?.channelId);
-		return 2;
+		arrayNotication.map((item) => {
+			const nocation = item.content as NotificationContent;
+			if (nocation.channel_id === channelId) {
+				const timestamp = nocation.update_time?.seconds;
+				if (!!timestamp && timestamp > Number(channel?.timestamp)) {
+					count++;
+				}
+			}
+		});
+
+		return count;
 	};
 
 	return (
-		<ChannelLink
-			clanId={channel?.clan_id}
-			channel={channel}
-			active={currentChanel?.id === channel.id}
-			key={channel.id}
-			createInviteLink={handleOpenInvite}
-			isPrivate={channel.channel_private}
-			isUnReadChannel={isUnReadChannel(channel.id)}
-			numberNotication={useNotication(channel.id)}
-		/>
+		<Fragment>
+			<ChannelLink
+				clanId={channel?.clan_id}
+				channel={channel}
+				active={currentChanel?.id === channel.id}
+				key={channel.id}
+				createInviteLink={handleOpenInvite}
+				isPrivate={channel.channel_private}
+				isUnReadChannel={isUnReadChannel(channel.id)}
+				numberNotication={isNotication(channel.id)}
+			/>
+			<UserListVoiceChannel channelID={channel.channel_id ?? ""}  />
+		</Fragment>
 	);
 };
 

@@ -21,21 +21,43 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
         voice.setUserDisplayName(userName);
         voice.setClanId(clanId);
         voice.setClanName(clanName);
-        const targetNode = document.querySelector("#meet");
-        voice.setTargetTrackNode(targetNode as HTMLMediaElement);
+        const targetNode = document.getElementById("meet");
+        voice.setTargetTrackNode(targetNode as HTMLElement);
+
+        const canvasTrack = document.getElementById("canvas");		
+		if (canvasTrack !== undefined) {
+			voice.setScreenCanvasElement(canvasTrack as HTMLCanvasElement);
+            voice.setScreenCanvasCtx((canvasTrack as HTMLCanvasElement).getContext("2d") as CanvasRenderingContext2D);
+		}
+		
+        const videoShareElem = document.getElementById("screenvideo");
+        videoShareElem!.style.display = "none";
+        voice.setScreenVideoElement(videoShareElem as HTMLVideoElement);
         voice.createVoiceConnection(voiceChannelName.toLowerCase(), jwt);
     }, [voice]);
 
     const startScreenShare = useCallback(() => {
         voice.createScreenShare();
     }, [voice]);
+
+    const stopScreenShare = useCallback(() => {
+        voice.stopScreenShare();
+    }, [voice]);
+
+    const leaveVoiceChannel = useCallback(() => {
+        voice.voiceDisconnect();
+    }, [voice]);
     
     return (
         <div className="space-y-2 px-4 mb-4 mt-[250px]" >
+            <div><button  type="button" onClick={startScreenShare}>SCREEN SHARE</button></div>
+            <div><button  type="button" onClick={stopScreenShare}>STOP SHARE</button></div>
+            <div><button  type="button" onClick={leaveVoiceChannel}>LEAVE VOICE CHANNEL</button></div>
             <div id="meet">
+                <canvas id="canvas"></canvas>
                 <div className="localTrack"></div>
-                <div className="remoteTrack"></div>
-                <div><button onClick={startScreenShare}/></div>
+                <div className="remoteTrack"></div> 
+                <video id="screenvideo" autoPlay width={460} height={640}/>
             </div>            
         </div>
     ); 

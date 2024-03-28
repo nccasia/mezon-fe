@@ -1,6 +1,7 @@
 import { ChatContext } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
+import { SuggestionMode } from 'emoji-picker-react';
 
 import { useContext } from 'react';
 
@@ -42,18 +43,9 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 	};
 	return (
 		<>
-			{/* <Picker
-				data={data}
-				onEmojiSelect={handleEmojiSelect}
-				theme="dark"
-				onClickOutside={() => {
-					setIsOpenEmojiMessBox(false);
-					setIsOpenEmojiReacted(false);
-					setIsOpenEmojiReactedBottom(false);
-				}}
-			/> */}
+
 			<div onClick={(event) => event.stopPropagation()} className="z-20">
-				<EmojiPicker onEmojiClick={handleEmojiSelect} width={500} theme={Theme.DARK} height={458} emojiStyle={EmojiStyle.NATIVE} />
+				<EmojiPicker suggestedEmojisMode={SuggestionMode.FREQUENT} onEmojiClick={handleEmojiSelect} width={500} theme={Theme.DARK} height={458} emojiStyle={EmojiStyle.NATIVE} />
 			</div>
 		</>
 	);

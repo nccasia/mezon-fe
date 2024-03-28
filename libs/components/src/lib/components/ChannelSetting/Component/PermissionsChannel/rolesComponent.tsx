@@ -11,7 +11,7 @@ const RolesComponent = ({ tick }: RolesComponentProps) => {
 
 	return (
 		<>
-			{tick === activeRoles.length > 0 ? <p className="uppercase font-bold text-xs pb-4">Roles</p> : ''}
+			<p className="uppercase font-bold text-xs pb-4">Roles</p>
 			<div>
 				{activeRoles.map((role, index) => (
 					<div className={`flex justify-between py-2 ${tick ? 'hover:bg-[#43444B] px-[6px]' : ''} rounded`} key={role.id}>

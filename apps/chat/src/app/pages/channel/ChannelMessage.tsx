@@ -46,27 +46,7 @@ export function ChannelMessage(props: MessageProps) {
 	}, [preMessage]);
 
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } = useContext(ChatContext);
-	const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
-	const [emojiPicker, setEmojiPicker] = useState<string>('');
-	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
-	function EmojiReaction() {
-		const handleEmojiSelect = (emoji: any) => {
-			setEmojiPicker(emoji.native);
-			//TODO: check if already react this emoji
-			setReactionOutside({ id: '', emoji: emoji.native, messageId: mess.id });
-			setIsOpenReactEmoji(false);
-		};
-		return (
-			<Picker
-				data={data}
-				onEmojiSelect={handleEmojiSelect}
-				theme="dark"
-				onClickOutside={() => {
-					setIsOpenReactEmoji(false);
-				}}
-			/>
-		);
-	}
+
 	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, setIsOpenEdit, isOpenEdit } = useContext(ChatContext);
 
 	const handleClickReply = () => {
