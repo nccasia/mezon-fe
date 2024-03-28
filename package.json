@@ -44,6 +44,7 @@
 		"flowbite": "^2.2.1",
 		"flowbite-react": "^0.7.2",
 		"fs": "^0.0.1-security",
+		"js-base64": "^3.7.7",
 		"localforage": "^1.10.0",
 		"markdown-to-jsx": "^7.4.5",
 		"match-sorter": "^6.3.3",

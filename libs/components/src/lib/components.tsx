@@ -9,6 +9,7 @@ export { default as DirectMessageList } from './components/DmList';
 export { default as DmTopbar } from './components/DmList/DMtopbar/index';
 export { default as MemberListGroupChat } from './components/DmList/MemberListGroupChat/index';
 export { default as DirectMessageBox } from './components/DmList/MessageBoxDM/index';
+export { default as EmojiList } from './components/EmojiComponentCustom';
 export { default as EmojiPickerComp } from './components/EmojiPicker/index';
 export { default as FooterProfile } from './components/FooterProfile';
 export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis';
@@ -24,8 +25,8 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
 export { default as SettingAccount } from './components/SettingAccount';
-export { default as UserMentionList } from './components/UserMentionList';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
+export { default as UserMentionList } from './components/UserMentionList';
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

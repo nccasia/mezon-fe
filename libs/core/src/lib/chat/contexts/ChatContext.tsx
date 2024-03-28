@@ -63,6 +63,9 @@ export type ChatContextValue = {
 
 	userJoinedVoiceChannelList: DataVoiceSocketOptinals[] | undefined;
 	setUserJoinedVoiceChannelList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[] | undefined>>;
+
+	emoijiSelectedFromSuggestion: string;
+	setEmojiSelectedFromSuggstion: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -84,6 +87,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const [userJoinedVoiceChannel, setUserJoinedVoiceChannel] = React.useState<DataVoiceSocketOptinals | undefined>();
 	const [userJoinedVoiceChannelList, setUserJoinedVoiceChannelList] = React.useState<DataVoiceSocketOptinals[] | undefined>([]);
+
+	const [emoijiSelectedFromSuggestion, setEmojiSelectedFromSuggstion] = React.useState<string>('');
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -117,6 +122,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setUserJoinedVoiceChannelList,
 			userJoinedVoiceChannel,
 			setUserJoinedVoiceChannel,
+
+			emoijiSelectedFromSuggestion,
+			setEmojiSelectedFromSuggstion,
 		}),
 		[
 			messageRef,
@@ -149,6 +157,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setUserJoinedVoiceChannelList,
 			userJoinedVoiceChannel,
 			setUserJoinedVoiceChannel,
+
+			emoijiSelectedFromSuggestion,
+			setEmojiSelectedFromSuggstion,
 		],
 	);
 
@@ -188,7 +199,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
-			console.log("onvoiceleaved", voice);
+			console.log('onvoiceleaved', voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
