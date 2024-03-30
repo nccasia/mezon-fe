@@ -1,5 +1,7 @@
-import { IVoice, LoadingStatus } from '@mezon/utils';
+import { IChannelMember, IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelType } from '@mezon/mezon-js';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const VOICE_FEATURE_KEY = 'voice';
 
@@ -12,40 +14,49 @@ export interface VoiceEntity extends IVoice {
 
 export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
-	error?: string | null;
+	error?: string | null;	
+	voiceChannelMember: IChannelMember[];
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchUsers())
- * }, [dispatch]);
- * ```
- */
-export const fetchVoice = createAsyncThunk<VoiceEntity[]>('voice/fetchStatus', async (_, thunkAPI) => {
-	/**
-	 * Replace this with your custom fetch call.
-	 * For example, `return myApi.getUserss()`;
-	 * Right now we just return an empty array.
-	 */
-	return Promise.resolve([]);
-});
+type fetchVoiceChannelMembersPayload = {
+	clanId: string;
+	channelId: string;
+	channelType: ChannelType;
+};
+
+export const fetchVoiceChannelMembers = createAsyncThunk('voice/fetchVoiceChannelMembers',
+	async ({ clanId, channelId, channelType }: fetchVoiceChannelMembersPayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		const response = await mezon.client.listChannelVoiceUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
+		if (!response.voice_channel_users) {
+			return thunkAPI.rejectWithValue([]);
+		}
+
+		const members = response.voice_channel_users.map((channelRes) => {			
+			return {
+				user_id: channelRes.user_id || '',
+				clan_id: clanId,			
+				voice_channel_id: channelRes.channel_id || '',
+				clan_name: "",
+				participant: "",
+				voice_channel_label: "",
+				last_screenshot: "",
+				id: channelRes.jid || ""
+			};
+		});
+
+		thunkAPI.dispatch(voiceActions.addMany(members));
+		return response.voice_channel_users;
+	},
+);
 
 export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null,	
+	voiceChannelMember: [],
 });
 
 export const voiceSlice = createSlice({
@@ -53,19 +64,21 @@ export const voiceSlice = createSlice({
 	initialState: initialVoiceState,
 	reducers: {
 		add: voiceAdapter.addOne,
+		addMany: voiceAdapter.addMany,
 		remove: voiceAdapter.removeOne,
 		// ...
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchVoice.pending, (state: VoiceState) => {
+			.addCase(fetchVoiceChannelMembers.pending, (state: VoiceState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchVoice.fulfilled, (state: VoiceState, action: PayloadAction<VoiceEntity[]>) => {
-				voiceAdapter.setAll(state, action.payload);
+			.addCase(fetchVoiceChannelMembers.fulfilled, (state: VoiceState, action: PayloadAction<any>) => {
+				voiceAdapter.addMany(state, action.payload);
+				//state.voiceChannelMember = action.payload;
 				state.loadingStatus = 'loaded';
 			})
-			.addCase(fetchVoice.rejected, (state: VoiceState, action) => {
+			.addCase(fetchVoiceChannelMembers.rejected, (state: VoiceState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -95,7 +108,10 @@ export const voiceReducer = voiceSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const voiceActions = voiceSlice.actions;
+export const voiceActions = {
+	...voiceSlice.actions,
+	fetchVoiceChannelMembers,
+}
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -118,3 +134,9 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
+
+export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
+	createSelector(selectVoiceEntities, (entities) => {
+		const voiceMembers = Object.values(entities);
+		return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
+	});

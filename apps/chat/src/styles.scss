@@ -54,6 +54,45 @@ body {
 	font-family: 'Manrope';
 }
 
+//button voice control pannel
+.button {
+	line-height: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	position: relative;
+	color: #e1e1e1;
+}
+
+// btn icon voice control pannel
+.button-icon {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	border: none;
+	border-radius: 3px;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 16px;
+	padding: 6px 16px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+
+.actionButtons {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+	grid-gap: 8px;
+	padding-top: 4px;
+	justify-content: space-between;
+}
+
 /* unread message style*/
 .divider_b9338f {
 	z-index: 1;
@@ -281,47 +320,47 @@ input:-webkit-autofill:active {
 }
 
 .prose ol li {
-  margin-bottom: 0;
-  padding-top: 10px;
-  padding-bottom: 5px;
+	margin-bottom: 0;
+	padding-top: 10px;
+	padding-bottom: 5px;
 }
 
 .prose ol li ol {
-  margin-bottom: 0;
-  margin-top: 0;
+	margin-bottom: 0;
+	margin-top: 0;
 }
 
 .prose ul li {
-  position: relative;
-  margin-top: 5px;
-  padding-top: 10px;
-  padding-bottom: 5px;
+	position: relative;
+	margin-top: 5px;
+	padding-top: 10px;
+	padding-bottom: 5px;
 }
 
-.prose ul li ul{
-  margin-bottom: 0;
-  margin-top: -10px;
+.prose ul li ul {
+	margin-bottom: 0;
+	margin-top: -10px;
 }
 
 .pre {
-  position: relative;
+	position: relative;
 }
 
 .pre .copy-icon {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 5;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	z-index: 5;
 }
 
 .olProps {
-  line-height: 20px;
+	line-height: 20px;
 }
 
 .olProps li {
-  line-height: 10px;
+	line-height: 10px;
 }
 
 .liProps {
-  line-height: 10px;
+	line-height: 10px;
 }

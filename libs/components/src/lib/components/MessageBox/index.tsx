@@ -3,10 +3,10 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import { ChatContext, useChatMessages } from '@mezon/core';
-import { channelsActions, selectArrayNotification, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectArrayNotification, selectCurrentChannel, selectEmojiSuggestion, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { EmojiPlaces, IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
-import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
+import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const currentChanel = useSelector(selectCurrentChannel);
 	const arrayNotication = useSelector(selectArrayNotification);
 	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
-
+	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
@@ -259,8 +259,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent('');
 			setAttachmentData([]);
 			setClearEditor(true);
-			// setSelectedItemIndex(0);
-			// liRefs?.current[selectedItemIndex]?.focus();
 			setEditorState(() => EditorState.createEmpty());
 			if (messages.length > 0) {
 				dispatch(
@@ -316,9 +314,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(updatedEditorState);
 	};
 
-	const [selectionToEnd, setSelectionToEnd] = useState(false);
-	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive, isOpenEmojiMessBox, setMessageRef } =
-		useContext(ChatContext);
+	const { setEmojiPlaceActive, emojiSelectedMess, setMessageRef } = useContext(ChatContext);
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
@@ -359,6 +355,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	// 		return newEditorState;
 	// 	});
 	// }
+
 	const { activeTab, setActiveTab } = useContext(ChatContext);
 
 	const handleOpenGifs = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -379,124 +376,39 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		event.stopPropagation();
 	};
 
-	// useEffect(() => {
-	// 	if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
-	// 		setShowPlaceHolder(false);
-	// 		if (emojiSelectedMess) {
-	// 			handleEmojiClick(emojiSelectedMess);
-	// 		}
-	// 	}
-	// }, [emojiSelectedMess]);
-
-	// const [emojiResult, setEmojiResult] = useState<string[]>([]);
-
-	const LENGTH_EMOJI_SEARCH_SYNTAX = 3;
-	const { emoijiSelectedFromSuggestion } = useContext(ChatContext);
-	console.log('emoijiSelectedFromSuggestion', emoijiSelectedFromSuggestion);
 	function clickEmojiSuggestion() {
-		// setSelectedItemIndex(index);
-		// handleEmojiClick(emoji);
-		setEditorState((prevEditorState) => {
-			const currentContentState = prevEditorState.getCurrentContent();
-			const raw = convertToRaw(currentContentState);
-			const messageRaw = raw.blocks;
-			const emojiPicker = messageRaw[0].text.toString();
-			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
-			const blockMap = editorState.getCurrentContent().getBlockMap();
-			const selectionsToReplace: SelectionState[] = [];
-			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
-				const text = contentBlock?.getText() || '';
-				let matchArr, start, end;
-				while ((matchArr = regex.exec(text)) !== null) {
-					start = matchArr.index;
-					end = start + matchArr[0].length;
-					callback(start, end);
-				}
-			};
-			blockMap.forEach((contentBlock) => {
-				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
-					const blockKey = contentBlock?.getKey();
-					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
-						anchorOffset: start,
-						focusOffset: end,
-					});
-					selectionsToReplace.push(blockSelection);
-				});
-			});
-			let contentState = editorState.getCurrentContent();
-			selectionsToReplace.forEach((selectionState: SelectionState) => {
-				contentState = Modifier.replaceText(contentState, selectionState, emoijiSelectedFromSuggestion ?? '�️');
-			});
-			onFocusEditorState();
-			// moveSelectionToEnd();
-
-			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
-			return newEditorState;
-		});
+		if (!emojiPicked) {
+			return;
+		}
+		const currentContentState = editorState.getCurrentContent();
+		const selectionState = editorState.getSelection();
+		const contentText = currentContentState.getPlainText();
+		const syntaxEmoji = findSyntaxEmoji(contentText);
+		if (!syntaxEmoji) {
+			return;
+		}
+		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
+		const newContentState = ContentState.createFromText(updatedContentText);
+		const newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
+		const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
+		setEditorState(updatedEditorState);
 	}
+
+	function findSyntaxEmoji(contentText: string): string | null {
+		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+
+		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
+		if (emojiArray.length > 0) {
+			return emojiArray[0];
+		}
+		return null;
+	}
+
+	const [valueSearchEmoji, setValueSearchEmoji] = useState<string>();
 
 	useEffect(() => {
 		clickEmojiSuggestion();
-	}, [emoijiSelectedFromSuggestion]);
-
-	// const [syntax, setSyntax] = useState<string>('');
-	// const regexDetect = /:[^\s]{2,}/;
-	const [valueSearchEmoji, setValueSearchEmoji] = useState<string>();
-	// const handleDetectEmoji = async (value: string) => {
-	// 	setValueSearchEmoji(value);
-	// };
-
-	// const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
-	// 	switch (e.key) {
-	// 		case 'ArrowUp':
-	// 			e.preventDefault();
-	// 			setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
-	// 			liRefs?.current[selectedItemIndex]?.focus();
-	// 			setClicked(!clicked);
-	// 			break;
-	// 		case 'ArrowDown':
-	// 			e.preventDefault();
-	// 			setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
-	// 			liRefs?.current[selectedItemIndex]?.focus();
-	// 			setClicked(!clicked);
-	// 			break;
-	// 		case 'Enter':
-	// 			clickEmojiSuggestion(native as string, selectedItemIndex);
-	// 			setTimeout(() => {
-	// 				editorRef.current!.focus();
-	// 			}, 0);
-
-	// 			break;
-	// 		case 'Escape':
-	// 			setIsOpenEmojiChatBoxSuggestion(false);
-	// 			setEmojiResult([]);
-	// 			break;
-	// 		case 'Backscape':
-	// 			setIsOpenEmojiChatBoxSuggestion(false);
-	// 			setTimeout(() => {
-	// 				editorRef.current!.focus();
-	// 			}, 0);
-	// 			moveSelectionToEnd();
-	// 			break;
-	// 		default:
-	// 			editorRef.current!.focus();
-	// 			setSelectionToEnd(!selectionToEnd);
-	// 			break;
-	// 	}
-	// };
-
-	// const [selectedItemIndex, setSelectedItemIndex] = useState(0);
-	// const liRefs = useRef<(HTMLLIElement | null)[]>([]);
-	// const ulRef = useRef<HTMLUListElement | null>(null);
-	// const [clicked, setClicked] = useState<boolean>(false);
-	// useEffect(() => {
-	// 	if (liRefs.current[selectedItemIndex]) {
-	// 		liRefs?.current[selectedItemIndex]?.focus();
-	// 	}
-
-	// 	emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
-	// }, [showEmojiSuggestion, emojiResult, syntax]);
+	}, [emojiPicked]);
 
 	useEffect(() => {
 		setValueSearchEmoji(content);
@@ -538,37 +450,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		<div className="relative">
 			<EmojiList valueInput={valueSearchEmoji ?? ''} />
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
-				{/* {showEmojiSuggestion && (
-					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
-						<p className=" text-center p-2">Emoji Matching: {syntax}</p>
-						<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
-							<ul
-								ref={ulRef}
-								className="w-full flex flex-col"
-								onKeyDown={(e) => {
-									if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-										e.preventDefault();
-									}
-								}}
-							>
-								{emojiResult?.map((emoji: any, index: number) => (
-									<li
-										ref={(el) => (liRefs.current[index] = el)}
-										key={emoji.shortcodes}
-										onKeyDown={(e) => handleKeyPress(e, emoji.native)}
-										onClick={() => clickEmojiSuggestion(emoji.native, index)}
-										className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
-											selectedItemIndex === index ? 'selected-item' : ''
-										}`}
-										tabIndex={0}
-									>
-										{emoji.native} {emoji.shortcodes}
-									</li>
-								))}
-							</ul>
-						</div>
-					</div>
-				)} */}
 				<label>
 					<input
 						id="preview_img"

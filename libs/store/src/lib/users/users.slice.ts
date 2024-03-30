@@ -111,6 +111,7 @@ export const usersActions = usersSlice.actions;
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
+
 const { selectAll, selectEntities } = usersAdapter.getSelectors();
 
 export const getUsersState = (rootState: { [USERS_FEATURE_KEY]: UsersState }): UsersState => rootState[USERS_FEATURE_KEY];

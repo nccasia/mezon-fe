@@ -1,24 +1,6 @@
-import { ChatContext } from '@mezon/core';
-import emojisData from 'apps/chat/src/assets/dataEmoji/metaDataEmojis.json';
-import { useContext, useEffect, useState } from 'react';
-
-// Xác định kiểu cho dữ liệu emoji
-
-interface Emoji {
-	id: string;
-	name: string;
-	emoticons: string[];
-	keywords: string[];
-	skins: Skin[];
-	version: number;
-	search: string;
-}
-
-interface Skin {
-	unified: string;
-	native: string;
-	shortcodes: string;
-}
+import { useEmojis } from '@mezon/core';
+import { IEmoji } from '@mezon/utils';
+import { useEffect, useState } from 'react';
 
 type EmojiSuggestionList = {
 	valueInput: string;
@@ -26,52 +8,62 @@ type EmojiSuggestionList = {
 };
 
 function EmojiList({ valueInput = '' }: EmojiSuggestionList) {
-	const [selectedEmoji, setSelectedEmoji] = useState<Emoji | null>(null);
-	const [suggestions, setSuggestions] = useState<Emoji[]>([]);
-	const regexDetectEmoji = /:[^\s]{2,}/;
+	const { emojis, setEmojiSuggestion } = useEmojis();
+	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
-	const { emoijiSelectedFromSuggestion, setEmojiSelectedFromSuggstion } = useContext(ChatContext);
 
-	const pickEmoji = (emoji: Emoji) => {
-		setSelectedEmoji(emoji);
-		setEmojiSelectedFromSuggstion(emoji.skins[0].native);
+	const pickEmoji = (emoji: IEmoji) => {
+		setEmojiSuggestion(emoji.skins[0].native);
 	};
 
 	const searchEmojiByShortcode = (shortcode: string) => {
-		const matchedEmojis: Emoji[] = [];
-		for (const emoji of Object.values(emojisData.emojis)) {
-			const emojiWithShortcodes = emoji as Emoji;
-			if (emojiWithShortcodes.skins[0]?.shortcodes?.includes(shortcode)) {
-				matchedEmojis.push(emojiWithShortcodes);
+		const matchedEmojis: IEmoji[] = [];
+		if (emojis) {
+			for (const [key, emoji] of Object.entries(emojis)) {
+				console.log(emoji.skins[0]?.shortcodes);
+				console.log(`:${shortcode}:`);
+				console.log('shortcode', emoji.skins[0]?.shortcodes === ':' + shortcode + ':');
+				if (emoji.skins[0]?.shortcodes?.includes(shortcode)) {
+					matchedEmojis.push(emoji);
+					if (emoji.skins[0]?.shortcodes === ':' + shortcode + ':') {
+						setEmojiSuggestion(emoji.skins[0].native);
+					}
+				}
 			}
 		}
 		return matchedEmojis;
 	};
 
+	function handleSearchSyntaxEmoji(text: string) {
+		const regexSyntaxEmoji = /:([^\s:]+)/g;
+		const matches = text.match(regexSyntaxEmoji);
+		if (matches) {
+			return matches.map((match) => match.slice(1));
+		}
+		return [];
+	}
+
 	useEffect(() => {
-		const matches = regexDetectEmoji.exec(valueInput)?.[0];
-		const emojiPickerActive = matches?.startsWith(':');
-		const lastEmojiIdx = emojiPickerActive ? valueInput.lastIndexOf(':') : null;
-		const emojiSearch = emojiPickerActive ? valueInput.slice(Number(lastEmojiIdx)) : null;
-		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
+		const detectedEmoji = handleSearchSyntaxEmoji(valueInput);
+		const emojiSearchWithOutPrefix = detectedEmoji[0];
 		setInputCorrect(emojiSearchWithOutPrefix ?? '');
 	}, [valueInput]);
 
 	useEffect(() => {
 		const emojiSuggestions = searchEmojiByShortcode(inputCorrect);
-		setSuggestions(emojiSuggestions);
+		setSuggestions(emojiSuggestions ?? []);
 	}, [inputCorrect]);
 
 	return (
 		<>
 			{inputCorrect && suggestions.length > 0 && (
-				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full">
+				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full duration-100">
 					<div className="mb-2 font-manrope text-xs font-semibold text-[#B1B5BC]">
 						<p>Emoji Matching: {inputCorrect}</p>
 					</div>
 					<div className="w-full max-h-[20rem] h-fit overflow-y-scroll bg-[#2B2D31] hide-scrollbar">
 						<ul>
-							{suggestions.map((emoji: Emoji) => (
+							{suggestions.map((emoji: IEmoji) => (
 								<li
 									key={emoji.id}
 									className="cursor-pointer hover:bg-[#35373C] hover:rounded-sm flex justify-start items-center"

@@ -22,6 +22,15 @@ export interface ChannelMemberAvatar {
 	name: string;
 }
 
+export interface ChannelMembersState extends EntityState<ChannelMembersEntity, string> {
+	loadingStatus: LoadingStatus;
+	error?: string | null;
+	currentChannelId?: string | null;
+	followingUserIds?: string[];
+	onlineStatusUser: Record<string, boolean>;
+	toFollowUserIds: string[];
+}
+
 // TODO: remove channelId from the parameter
 export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
 	const id = channelRes.id ? channelRes.id : `${channelId}${channelRes.user?.id}`;
@@ -31,16 +40,6 @@ export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser,
 export const mapUserIdToEntity = (userId: string, username: string) => {
 	return { username: username, id: userId };
 };
-
-export interface ChannelMembersState extends EntityState<ChannelMembersEntity, string> {
-	loadingStatus: LoadingStatus;
-	error?: string | null;
-	currentChannelId?: string | null;
-	followingUserIds?: string[];
-	onlineStatusUser: Record<string, boolean>;
-	toFollowUserIds: string[];
-	voiceChannelMember: IChannelMember[];
-}
 
 export interface ChannelMemberRootState {
 	[CHANNEL_MEMBERS_FEATURE_KEY]: ChannelMembersState;
@@ -88,40 +87,6 @@ export const fetchChannelMembers = createAsyncThunk(
 		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
 		thunkAPI.dispatch(channelMembersActions.followUserStatus());
 		return members;
-	},
-);
-
-const fetchVoiceChannelMembersCached = memoize(
-	(mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) =>
-		mezon.client.listChannelVoiceUsers(mezon.session, clanId, channelId, channelType, 1, 100, ''),
-	{
-		promise: true,
-		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
-		normalizer: (args) => args[1],
-	},
-);
-
-type fetchVoiceChannelMembersPayload = {
-	clanId: string;
-	channelId: string;
-	noCache?: boolean;
-	channelType: ChannelType;
-};
-
-export const fetchVoiceChannelMembers = createAsyncThunk(
-	'channelMembers/fetchVoiceChannelMembers',
-	async ({ clanId, channelId, noCache, channelType }: fetchVoiceChannelMembersPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-		if (noCache) {
-			fetchVoiceChannelMembersCached.clear(mezon, clanId, channelId, channelType);
-		}
-
-		const response = await fetchVoiceChannelMembersCached(mezon, clanId, channelId, channelType);
-		if (!response.channel_users) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response.channel_users;
 	},
 );
 
@@ -182,7 +147,6 @@ export const initialChannelMembersState: ChannelMembersState = channelMembersAda
 	error: null,
 	onlineStatusUser: {},
 	toFollowUserIds: [],
-	voiceChannelMember: [],
 });
 
 export type StatusUserArgs = {
@@ -225,20 +189,7 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});
-		builder
-			.addCase(fetchVoiceChannelMembers.pending, (state: ChannelMembersState) => {
-				state.loadingStatus = 'loading';
-			})
-			.addCase(fetchVoiceChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<any>) => {
-				// channelMembersAdapter.addMany(state, action.payload);
-				state.voiceChannelMember = action.payload;
-				state.loadingStatus = 'loaded';
-			})
-			.addCase(fetchVoiceChannelMembers.rejected, (state: ChannelMembersState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
+			});		
 	},
 });
 
@@ -268,7 +219,6 @@ export const channelMembersActions = {
 	fetchChannelMembersPresence,
 	followUserStatus,
 	updateStatusUser,
-	fetchVoiceChannelMembers,
 };
 
 /*
@@ -309,13 +259,6 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
 		const members = Object.values(entities);
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
-	});
-
-export const selectVoiceChannelMembersByChannelId = (channelId?: string | null) =>
-	createSelector(selectChannelMembesEntities, (entities) => {
-		const voiceMembers = Object.values(entities);
-		console.log('voiceMembers-2', voiceMembers);
-		return voiceMembers.filter((member) => member && member.user !== null && member.id === channelId);
 	});
 
 export const selectMembersMap = (channelId?: string | null) =>

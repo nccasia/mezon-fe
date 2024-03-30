@@ -64,7 +64,7 @@ function ChannelList() {
 	};
 
 	return (
-		<div onContextMenu={(event) => event.preventDefault()} className="overflow-y-scroll h-[88%] scrollbar-thin " id="channelList">
+		<div onContextMenu={(event) => event.preventDefault()} className="overflow-y-scroll h-[76%] scrollbar-thin " id="channelList">
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />

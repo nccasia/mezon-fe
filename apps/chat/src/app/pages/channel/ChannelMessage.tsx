@@ -1,6 +1,4 @@
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
-import { EmojiPickerComp, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
+import { EmojiPickerComp, Icons, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage, useChatSending } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';

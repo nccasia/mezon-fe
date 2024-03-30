@@ -192,7 +192,13 @@ export const updateLastSeenMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
+			await mezon.socketRef.current?.writeLastSeenMessage(
+				channelId,
+				channelLabel,
+				ChannelStreamMode.STREAM_MODE_CHANNEL,
+				messageId,
+				now.toString(),
+			);
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -486,6 +492,7 @@ export const selectTypingUserById = (userId: string) =>
 	});
 
 export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
+
 export const selectParamByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId];

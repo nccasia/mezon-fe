@@ -140,6 +140,7 @@ export type IUser = {
 };
 
 export type IVoice = {
+	user_id: string;
 	clan_id: string;
 	clan_name: string;
 	participant: string;
@@ -148,16 +149,22 @@ export type IVoice = {
 	last_screenshot: string;
 };
 
-export type DataVoiceSocketOptinals = {
-	clanId?: string | undefined;
-	clanName?: string | undefined;
-	id?: string | undefined;
-	lastScreenshot?: string | undefined;
-	participant?: string | undefined;
-	userId?: string | undefined;
-	voiceChannelId?: string | undefined;
-	voiceChannelLable?: string | undefined;
+export type IEmoji = {
+	id: string;
+	name: string;
+	keywords: string[];
+	skins: {
+		unified: string;
+		native: string;
+		shortcodes: string;
+	}[];
+	version: number;
+	search: string;
 };
+
+interface EmojiCollection {
+	[key: string]: IEmoji;
+}
 
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
