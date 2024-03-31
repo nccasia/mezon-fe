@@ -40,7 +40,7 @@
 		"draft-js": "^0.11.7",
 		"emoji-mart": "^5.5.2",
 		"emoji-picker-react": "^4.9.2",
-		"firebase": "^10.9.0",
+		"firebase": "^10.10.0",
 		"flowbite": "^2.2.1",
 		"flowbite-react": "^0.7.2",
 		"fs": "^0.0.1-security",

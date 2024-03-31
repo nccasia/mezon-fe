@@ -321,10 +321,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			// setIsOpenEmojiChatBoxSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length === 1) {
+		if (content.length >= 1) {
 			moveSelectionToEnd();
 		}
-	}, [clearEditor, content, emojiSelectedMess]);
+	}, [clearEditor, content, emojiSelectedMess,emojiPicked]);
 
 	useEffect(() => {
 		if (emojiSelectedMess) {
@@ -384,14 +384,22 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const selectionState = editorState.getSelection();
 		const contentText = currentContentState.getPlainText();
 		const syntaxEmoji = findSyntaxEmoji(contentText);
+		console.log("syntaxEmoji",syntaxEmoji)
 		if (!syntaxEmoji) {
 			return;
 		}
+
 		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
+		console.log("newContentState",updatedContentText)
+
 		const newContentState = ContentState.createFromText(updatedContentText);
-		const newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
+		console.log("updatedContentText-01",updatedContentText)
+
+		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
 		const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
+
 		setEditorState(updatedEditorState);
+
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
