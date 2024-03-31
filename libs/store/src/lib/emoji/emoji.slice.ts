@@ -13,6 +13,8 @@ export interface EmojisState extends EntityState<EmojisEntity, string> {
 		[key: string]: IEmoji | any;
 	};
 	emojiPicked: string;
+	isEmojiListShowed: boolean;
+	isFocusEditor: boolean;
 }
 
 export const fetchEmojis = createAsyncThunk<EmojisEntity[]>('emojis/fetchEmojiData', async (_, thunkAPI) => {
@@ -24,6 +26,8 @@ export const initialEmojisState: EmojisState = emojisAdapter.getInitialState({
 	error: null,
 	emojisData: emojisMetaData.emojis,
 	emojiPicked: '',
+	isEmojiListShowed: false,
+	isFocusEditor: false,
 });
 
 export const emojisSlice = createSlice({
@@ -34,6 +38,12 @@ export const emojisSlice = createSlice({
 		remove: emojisAdapter.removeOne,
 		setEmojiPicked: (state, action: PayloadAction<string>) => {
 			state.emojiPicked = action.payload;
+		},
+		setStatusEmojiList: (state, action: PayloadAction<boolean>) => {
+			state.isEmojiListShowed = action.payload;
+		},
+		setIsFocusEditor: (state, action: PayloadAction<boolean>) => {
+			state.isFocusEditor = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -60,3 +70,5 @@ export const selectAllEmojis = createSelector(getEmojisState, selectAll);
 export const selectEmojisEntities = createSelector(getEmojisState, selectEntities);
 export const selectEmojisData = createSelector(getEmojisState, (emojisState) => emojisState.emojisData);
 export const selectEmojiSuggestion = createSelector(getEmojisState, (emojisState) => emojisState.emojiPicked);
+export const getEmojiListStatus = createSelector(getEmojisState, (emojisState) => emojisState.isEmojiListShowed);
+export const getIsFocusEditor = createSelector(getEmojisState, (emojisState) => emojisState.isFocusEditor);
