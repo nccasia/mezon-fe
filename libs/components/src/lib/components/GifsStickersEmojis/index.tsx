@@ -1,30 +1,28 @@
+import { EmojiPickerPanel, GifsPanel, StickerPanel } from '@mezon/components';
 import { useAppParams } from '@mezon/core';
+import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import EmojiPickerComp from '../EmojiPicker';
-import GiphyComp from './gifs/GiphyComp';
-import { InputSearch } from './inputSearch';
-import ImageSquare from './stickers';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 
+import { InputSearch } from './inputSearch';
 
 const GifStickerEmojiPopup = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { type } = useAppParams();
-	const [ mod, setMod] = useState(0);
-	const [activeTab, setActiveTab] = useState<string>("");
+	const [mod, setMod] = useState(0);
+	const [activeTab, setActiveTab] = useState<string>('');
 
-	useEffect(()=>{
+	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
-			setMod(ChannelStreamMode.STREAM_MODE_GROUP)
+			setMod(ChannelStreamMode.STREAM_MODE_GROUP);
 		} else if (Number(type) === ChannelType.CHANNEL_TYPE_DM) {
-			setMod(ChannelStreamMode.STREAM_MODE_DM)
+			setMod(ChannelStreamMode.STREAM_MODE_DM);
 		} else {
-			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL)
+			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL);
 		}
-	},[type])
+	}, [type]);
 
 	const handleTabClick = (tab: string) => {
 		setActiveTab(tab);
@@ -59,15 +57,20 @@ const GifStickerEmojiPopup = () => {
 			<div className="w-full h-fit">
 				{activeTab === TabNamePopup.GIFS && (
 					<div>
-						<GiphyComp activeTab={TabNamePopup.EMOJI} channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
+						<GifsPanel
+							activeTab={TabNamePopup.EMOJI}
+							channelId={currentChannel?.id || ''}
+							channelLabel={currentChannel?.channel_label || ''}
+							mode={mod}
+						/>
 					</div>
 				)}
 
 				{activeTab === TabNamePopup.STICKERS && (
-					<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
+					<StickerPanel channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 				)}
 
-				{activeTab === TabNamePopup.EMOJI && <EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
+				{activeTab === TabNamePopup.EMOJI && <EmojiPickerPanel emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
 			</div>
 		</div>
 	);

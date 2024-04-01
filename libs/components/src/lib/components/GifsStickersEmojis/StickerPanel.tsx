@@ -26,7 +26,7 @@ type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
+function StickerPanel({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
 
 	const handleSend = useCallback(
@@ -108,4 +108,4 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 	);
 }
 
-export default ImageSquare;
+export default StickerPanel;

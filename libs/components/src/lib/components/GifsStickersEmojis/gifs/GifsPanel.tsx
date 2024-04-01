@@ -15,7 +15,7 @@ type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
+function GifsPanel({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const [data, setData] = useState([]);
 	// const [search, setSearch] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
@@ -145,4 +145,4 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	);
 }
 
-export default GiphyComp;
+export default GifsPanel;

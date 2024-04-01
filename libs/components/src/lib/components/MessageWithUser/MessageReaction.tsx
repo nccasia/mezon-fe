@@ -1,11 +1,11 @@
-import { useAuth, useChatReactionMessage } from "@mezon/core";
-import { EmojiPlaces, IMessageWithUser } from "@mezon/utils";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useAuth, useChatReactionMessage } from '@mezon/core';
+import { emojiActions, referencesActions, selectEmojiReactedBottomState, selectReference, useAppDispatch } from '@mezon/store';
+import { AvatarComponent, NameComponent } from '@mezon/ui';
+import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import EmojiPicker from '../EmojiSuggestion';
 import * as Icons from '../Icons/index';
-import { emojiActions, referencesActions, selectEmojiReactedBottomState, selectReference, useAppDispatch } from "@mezon/store";
-import { useSelector } from "react-redux";
-import EmojiPicker from '../EmojiPicker';
-import { AvatarComponent, NameComponent } from "@mezon/ui";
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -46,7 +46,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 
 	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
 	const refMessage = useSelector(selectReference);
-	
+
 	const { messageDataReactedFromSocket, reactionMessageAction } = useChatReactionMessage({ currentChannelId });
 	const [isHideSmileButton, setIsHideSmileButton] = useState<boolean>(false);
 
@@ -79,7 +79,6 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		}
 		return emojiData;
 	};
-
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
 	//TODO: do not convert here, use the mapReactionToEntity
@@ -132,29 +131,47 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }),
 	);
 
-	const setEmojiSelectedReacted = useCallback((state: string) => {
-		dispatch(emojiActions.setEmojiSelectedReacted(state));
-	}, [dispatch]);
+	const setEmojiSelectedReacted = useCallback(
+		(state: string) => {
+			dispatch(emojiActions.setEmojiSelectedReacted(state));
+		},
+		[dispatch],
+	);
 
-	const setMessageRef = useCallback((state: any) => {
-		dispatch(referencesActions.setReference(state));
-	}, [dispatch]);
+	const setMessageRef = useCallback(
+		(state: any) => {
+			dispatch(referencesActions.setReference(state));
+		},
+		[dispatch],
+	);
 
-	const setIsOpenEmojiReacted = useCallback((state: boolean) => {
-		dispatch(emojiActions.setEmojiReactedState(state));
-	}, [dispatch]);
+	const setIsOpenEmojiReacted = useCallback(
+		(state: boolean) => {
+			dispatch(emojiActions.setEmojiReactedState(state));
+		},
+		[dispatch],
+	);
 
-	const setIsOpenEmojiMessBox = useCallback((state: boolean) => {
-		dispatch(emojiActions.setEmojiMessBoxState);
-	}, [dispatch]);
+	const setIsOpenEmojiMessBox = useCallback(
+		(state: boolean) => {
+			dispatch(emojiActions.setEmojiMessBoxState);
+		},
+		[dispatch],
+	);
 
-	const setEmojiPlaceActive = useCallback((state: EmojiPlaces) => {
-		dispatch(emojiActions.setEmojiPlaceActive(state));
-	}, [dispatch]);
+	const setEmojiPlaceActive = useCallback(
+		(state: EmojiPlaces) => {
+			dispatch(emojiActions.setEmojiPlaceActive(state));
+		},
+		[dispatch],
+	);
 
-	const setIsOpenEmojiReactedBottom = useCallback((state: boolean) => {
-		dispatch(emojiActions.setEmojiMessBoxState);
-	}, [dispatch]);
+	const setIsOpenEmojiReactedBottom = useCallback(
+		(state: boolean) => {
+			dispatch(emojiActions.setEmojiMessBoxState);
+		},
+		[dispatch],
+	);
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }));
 	const handleReactMessage = async (
@@ -297,50 +314,51 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 
 	return (
 		<div>
-			{emojiDataIncSocket && emojiDataIncSocket.filter((obj) => obj.messageId === message.id)
-				?.map((emoji: EmojiDataOptionals, index) => {
-					const isRightMargin = calculateDistance(index, 288);
-					const totalSenderCount = emoji.senders.reduce((sum, sender) => sum + sender.count, 0);
-					const shouldHideEmoji = Math.abs(totalSenderCount) === 0;
-					const userSender = emoji.senders.find((sender) => sender.id === userId);
-					const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
-					if (shouldHideEmoji) {
-						return null;
-					}
-					return (
-						<Fragment key={index}>
-							{checkID && (
-								<div
-									ref={(element) => (childRef.current[index] = element)}
-									className={` justify-center items-center relative 
+			{emojiDataIncSocket &&
+				emojiDataIncSocket
+					.filter((obj) => obj.messageId === message.id)
+					?.map((emoji: EmojiDataOptionals, index) => {
+						const isRightMargin = calculateDistance(index, 288);
+						const totalSenderCount = emoji.senders.reduce((sum, sender) => sum + sender.count, 0);
+						const shouldHideEmoji = Math.abs(totalSenderCount) === 0;
+						const userSender = emoji.senders.find((sender) => sender.id === userId);
+						const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
+						if (shouldHideEmoji) {
+							return null;
+						}
+						return (
+							<Fragment key={index}>
+								{checkID && (
+									<div
+										ref={(element) => (childRef.current[index] = element)}
+										className={` justify-center items-center relative 
 									${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
-									onClick={() =>
-										handleReactMessage(
-											emoji.id,
-											mode,
-											currentChannelId ?? '',
-											message.id,
-											emoji.emoji,
-											1,
-											userId ?? '',
-											message.sender_id,
-										)
-									}
-									onMouseEnter={() => {
-										return getEmojiHover(emoji);
-									}}
-									onMouseLeave={() => {
-										setIsHoverSender(false);
-									}}
-								>
-									<span className=" relative left-[-10px] ">{emoji.emoji}</span>
-									<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
-										<p>{calculateTotalCount(emoji.senders)}</p>
-									</div>
+										onClick={() =>
+											handleReactMessage(
+												emoji.id,
+												mode,
+												currentChannelId ?? '',
+												message.id,
+												emoji.emoji,
+												1,
+												userId ?? '',
+												message.sender_id,
+											)
+										}
+										onMouseEnter={() => {
+											return getEmojiHover(emoji);
+										}}
+										onMouseLeave={() => {
+											setIsHoverSender(false);
+										}}
+									>
+										<span className=" relative left-[-10px] ">{emoji.emoji}</span>
+										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
+											<p>{calculateTotalCount(emoji.senders)}</p>
+										</div>
 
-									{!isHideSmileButton &&
-										emojiDataIncSocket.indexOf(emoji) === emojiDataIncSocket.length - 1 && (
+										{!isHideSmileButton && emojiDataIncSocket.indexOf(emoji) === emojiDataIncSocket.length - 1 && (
 											<div onMouseEnter={() => setIsHovered(true)} className="absolute w-4 h-4">
 												<div className="bg-transparent w-8 flex flex-row items-center rounded-md cursor-pointer"></div>
 												<div
@@ -352,9 +370,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 													<Icons.Smile
 														defaultSize="w-4 h-4"
 														defaultFill={
-															isOpenEmojiReactedBottom && message.id === refMessage?.id
-																? '#FFFFFF'
-																: '#AEAEAE'
+															isOpenEmojiReactedBottom && message.id === refMessage?.id ? '#FFFFFF' : '#AEAEAE'
 														}
 													/>
 												</div>
@@ -363,18 +379,13 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 													<div
 														className={`scale-75 transform ${calculateDistance(emojiDataIncSocket.length - 1, 373) ? 'ml-[-10rem]' : 'ml-10'} bottom-24 origin-left fixed z-50`}
 													>
-														<EmojiPicker
-															messageEmoji={message}
-															emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM}
-														/>
+														<EmojiPicker messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
 													</div>
 												)}
 											</div>
 										)}
 
-									{isHoverSender &&
-										emoji.emoji === isEmojiHover.emoji &&
-										emoji.messageId === message.id && (
+										{isHoverSender && emoji.emoji === isEmojiHover.emoji && emoji.messageId === message.id && (
 											<div
 												onMouseLeave={() => {
 													setIsHoverSender(false);
@@ -438,11 +449,11 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 												<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
 											</div>
 										)}
-								</div>
-							)}
-						</Fragment>
-					);
-				})}
+									</div>
+								)}
+							</Fragment>
+						);
+					})}
 		</div>
 	);
 };
