@@ -13,7 +13,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
+import { IMessageSendPayload, NotificationContent } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -442,7 +442,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						</div>
 					</div>
 					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
-					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
+					<GifStickerEmojiButtons />
 				</div>
 			</div>
 		</div>

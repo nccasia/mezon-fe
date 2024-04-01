@@ -1,6 +1,6 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { channelsActions, emojiActions, selectActiceGifsStickerEmojiTab, selectArrayNotification, useAppDispatch } from '@mezon/store';
+import { channelsActions, emojiActions,  selectArrayNotification, useAppDispatch } from '@mezon/store';
 import { NotificationContent, TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -21,7 +21,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
-	const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
+	// const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
 
 	const dispatch = useAppDispatch();
 	const arrayNotication = useSelector(selectArrayNotification);
@@ -73,7 +73,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		<div
 			onClick={(e) => {
 				e.stopPropagation();
-				dispatch(emojiActions.setActiveGifsStickerEmojiTab(TabNamePopup.NONE));
+				// dispatch(emojiActions.setActiveGifsStickerEmojiTab(TabNamePopup.NONE));
 			}}
 			className=" relative"
 			id="scrollLoading"
@@ -112,7 +112,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					/>
 				))}
 			</InfiniteScroll>
-			{activeGifsStickerEmojiTab !== TabNamePopup.NONE && (
+			{/* {activeGifsStickerEmojiTab !== TabNamePopup.NONE && ( */}
 				<div
 					className={popupClass}
 					onClick={(e) => {
@@ -121,7 +121,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				>
 					<GifStickerEmojiPopup />
 				</div>
-			)}
+			{/* )} */}
 		</div>
 	);
 }

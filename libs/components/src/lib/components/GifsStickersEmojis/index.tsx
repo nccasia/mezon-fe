@@ -1,9 +1,9 @@
 import { EmojiPickerPanel, GifsPanel, StickerPanel } from '@mezon/components';
-import { useAppParams } from '@mezon/core';
+import { EmojiContext, useAppParams } from '@mezon/core';
 import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
-import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { TabNamePopup } from '@mezon/utils';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { InputSearch } from './inputSearch';
@@ -12,7 +12,10 @@ const GifStickerEmojiPopup = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
-	const [activeTab, setActiveTab] = useState<string>('');
+
+	const {activeTab,setActiveTab} = useContext(EmojiContext)
+
+	console.log(activeTab)
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -51,7 +54,7 @@ const GifStickerEmojiPopup = () => {
 						Emoji
 					</button>
 				</div>
-				{activeTab !== TabNamePopup.EMOJI && <InputSearch />}
+				{activeTab !== TabNamePopup.NONE && <InputSearch />}
 			</div>
 
 			<div className="w-full h-fit">
@@ -70,7 +73,8 @@ const GifStickerEmojiPopup = () => {
 					<StickerPanel channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 				)}
 
-				{activeTab === TabNamePopup.EMOJI && <EmojiPickerPanel emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
+				{/* {activeTab === TabNamePopup.EMOJI && <EmojiPickerPanel emojiAction={EmojiPlaces.EMOJI_EDITOR} />} */}
+				{activeTab === TabNamePopup.EMOJI && <EmojiPickerPanel />}
 			</div>
 		</div>
 	);

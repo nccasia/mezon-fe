@@ -1,5 +1,5 @@
 import { MessageReactionEvent } from '@mezon/mezon-js';
-import { EmojiPlaces, IEmoji, TabNamePopup } from '@mezon/utils';
+import { EmojiPlaces, IEmoji } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -31,7 +31,7 @@ export type UpdateReactionMessageArgs = {
 export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	activeGifsStickerEmojiTab: TabNamePopup;
+	// activeGifsStickerEmojiTab: TabNamePopup;
 	emojiPlaceActive: EmojiPlaces;
 	emojiReactedBottomState: boolean;
 	emojiMessBoxState: boolean;
@@ -41,7 +41,6 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
 	reactionMessageData: UpdateReactionMessageArgs;
-
 
 	emojiPicked: string;
 	isEmojiListShowed: boolean;
@@ -77,7 +76,7 @@ export const updateReactionMessage = createAsyncThunk(
 export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	activeGifsStickerEmojiTab: TabNamePopup.NONE,
+	// activeGifsStickerEmojiTab: TabNamePopup.NONE,
 	emojiPlaceActive: EmojiPlaces.EMOJI_REACTION,
 	emojiReactedBottomState: false,
 	emojiMessBoxState: false,
@@ -101,9 +100,9 @@ export const emojiSlice = createSlice({
 		add: emojiAdapter.addOne,
 		remove: emojiAdapter.removeOne,
 
-		setActiveGifsStickerEmojiTab(state, action) {
-			state.activeGifsStickerEmojiTab = action.payload;
-		},
+		// setActiveGifsStickerEmojiTab(state, action) {
+		// 	state.activeGifsStickerEmojiTab = action.payload;
+		// },
 		setEmojiPlaceActive(state, action) {
 			state.emojiPlaceActive = action.payload;
 		},
@@ -193,7 +192,7 @@ export const selectEmojiReactedBottomState = createSelector(getEmojiState, (stat
 
 export const selectEmojiReactedState = createSelector(getEmojiState, (state: EmojiState) => state.emojiReactedState);
 
-export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (state: EmojiState) => state.activeGifsStickerEmojiTab);
+// export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (state: EmojiState) => state.activeGifsStickerEmojiTab);
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 

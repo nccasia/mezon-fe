@@ -4,7 +4,7 @@ import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import EmojiPicker from '../EmojiSuggestion';
+import { EmojiPickerPanel } from '@mezon/components';
 import * as Icons from '../Icons/index';
 
 type MessageReactionProps = {
@@ -375,13 +375,13 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 													/>
 												</div>
 
-												{isOpenEmojiReactedBottom && message.id === refMessage?.id && (
+												{/* {isOpenEmojiReactedBottom && message.id === refMessage?.id && (
 													<div
 														className={`scale-75 transform ${calculateDistance(emojiDataIncSocket.length - 1, 373) ? 'ml-[-10rem]' : 'ml-10'} bottom-24 origin-left fixed z-50`}
 													>
-														<EmojiPicker messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+														<EmojiPickerPanel messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
 													</div>
-												)}
+												)} */}
 											</div>
 										)}
 

@@ -4,6 +4,7 @@ export * from './lib/app/hooks/useAppParams';
 export * from './lib/auth/hooks/useAuth';
 export * from './lib/auth/hooks/useMemberStatus';
 export * from './lib/chat/contexts/ChatContext';
+export * from './lib/chat/contexts/EmojiContext';
 export * from './lib/chat/hooks/useAccount';
 export * from './lib/chat/hooks/useCategory';
 export * from './lib/chat/hooks/useChannelMembers';

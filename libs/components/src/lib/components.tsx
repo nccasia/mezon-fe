@@ -13,7 +13,7 @@ export { default as EmojiListSuggestion } from './components/EmojiSuggestion/Emo
 export { default as FooterProfile } from './components/FooterProfile';
 export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis';
 export { default as StickerPanel } from './components/GifsStickersEmojis/StickerPanel';
-export { default as EmojiPickerPanel } from './components/GifsStickersEmojis/emojiPanel';
+export { default as EmojiPickerPanel } from './components/GifsStickersEmojis/EmojiPanel';
 export { default as GifsPanel } from './components/GifsStickersEmojis/gifs/GifsPanel';
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
@@ -29,6 +29,8 @@ export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
+export { default as UserMentionList } from './components/UserMentionList';
+
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

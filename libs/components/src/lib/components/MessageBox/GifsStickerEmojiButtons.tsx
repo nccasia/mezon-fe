@@ -1,24 +1,23 @@
-import { Icons } from "@mezon/components";
-import { TabNamePopup } from "@mezon/utils";
-import { useCallback } from "react";
+import { Icons } from '@mezon/components';
+import { EmojiContext } from '@mezon/core';
+import { TabNamePopup } from '@mezon/utils';
+import { useCallback, useContext } from 'react';
 
-export type GifStickerEmojiButtonsProps = {
-	activeTab: TabNamePopup;
-}
 
-function GifStickerEmojiButtons({ activeTab} : GifStickerEmojiButtonsProps) {
-	const handleOpenGifs = useCallback(() => {
-
-	}, []);
+function GifStickerEmojiButtons() {
+	const { activeTab, setActiveTab } = useContext(EmojiContext);
+	const handleOpenGifs = () => {
+		setActiveTab(TabNamePopup.GIFS);
+	};
 
 	const handleOpenStickers = useCallback(() => {
-
+		setActiveTab(TabNamePopup.STICKERS);
 	}, []);
 
 	const handleOpenEmoji = useCallback(() => {
-
+		setActiveTab(TabNamePopup.EMOJI);
 	}, []);
-	
+
 	return (
 		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
 			<div onClick={handleOpenGifs} className="cursor-pointer">

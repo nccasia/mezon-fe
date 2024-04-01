@@ -1,4 +1,5 @@
-import { ChatContextProvider } from '@mezon/core';
+import { ChatContextProvider, EmojiContextProvider } from '@mezon/core';
+
 import { MezonSuspense } from '@mezon/transport';
 import { Outlet } from 'react-router-dom';
 
@@ -14,7 +15,9 @@ const MainLayoutWrapper = () => {
 	return (
 		<MezonSuspense>
 			<ChatContextProvider>
-				<MainLayout />
+				<EmojiContextProvider>
+					<MainLayout />
+				</EmojiContextProvider>
 			</ChatContextProvider>
 		</MezonSuspense>
 	);

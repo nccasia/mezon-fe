@@ -1,4 +1,4 @@
-import { EmojiPickerComp, MessageWithUser, UnreadMessageBreak, ChannelMessageOpt } from '@mezon/components';
+import { EmojiPickerPanel, MessageWithUser, UnreadMessageBreak, ChannelMessageOpt } from '@mezon/components';
 import { useChatMessage, useChatSending } from '@mezon/core';
 import { emojiActions, referencesActions, selectEmojiOpenEditState, selectEmojiReactedBottomState, selectEmojiReactedState, selectMemberByUserId, selectMessageReplyState, selectReference, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
@@ -96,13 +96,13 @@ export function ChannelMessage(props: MessageProps) {
 			>
 				<ChannelMessageOpt message={mess} />
 
-				{mess.id === refMessage?.id && (
+				{/* {mess.id === refMessage?.id && (
 					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerPanel messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
-				)}
+				)} */}
 			</div>
 			{ emojiReactedState && mess.id === refMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
