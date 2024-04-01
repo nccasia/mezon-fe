@@ -28,6 +28,7 @@ export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserMentionList } from './components/UserMentionList';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as EmojiListSuggestion } from './components/EmojiPicker/EmojiSuggestion';
+export { default as EmojiPickerPanel } from './components/EmojiPicker/EmojiPickerPanel';
 
 
 export * as Icons from './components/Icons';

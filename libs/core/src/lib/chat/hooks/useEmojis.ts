@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 
 export function useEmojis() {
 	const emojis = useSelector(selectAllEmoji)[1];
+	const categoryEmoji = useSelector(selectAllEmoji)[0]
 	const isEmojiListShowed = useSelector(getEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const isFocusEditor = useSelector(getIsFocusEditor);
@@ -49,6 +50,7 @@ export function useEmojis() {
 
 	return {
 		emojis,
+		categoryEmoji,
 		emojiPicked,
 		setEmojiSuggestion,
 		setIsEmojiListShowed,
@@ -57,5 +59,6 @@ export function useEmojis() {
 		isFocusEditor,
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
+
 	};
 }
