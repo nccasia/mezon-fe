@@ -190,6 +190,12 @@ export type IUserAccount = ApiAccount;
 
 export type IPermission = ApiPermission;
 
+export interface IMentionData {
+	id: string;
+	avatar: string;
+	name: string;
+}
+
 export enum ChannelStatusEnum {
 	isPrivate = 1,
 }

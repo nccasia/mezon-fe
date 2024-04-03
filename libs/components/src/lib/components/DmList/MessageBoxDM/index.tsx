@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 import {MessageBox, UserMentionList} from '@mezon/components';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useThrottledCallback } from 'use-debounce';
-import { MentionData } from '@draft-js-plugins/mention';
 
 interface DirectIdProps {
 	directParamId: string;

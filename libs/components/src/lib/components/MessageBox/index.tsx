@@ -1,6 +1,3 @@
-import Editor from '@draft-js-plugins/editor';
-import createImagePlugin from '@draft-js-plugins/image';
-import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import { EmojiListSuggestion } from '@mezon/components';
 import { useChatMessages, useEmojis } from '@mezon/core';
 import {
@@ -13,17 +10,14 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
-import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { IMentionData, IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
-import ImageComponent from './ImageComponet';
-import MentionSuggestionWrapper from './MentionSuggestionWrapper';
-import editorStyles from './editorStyles.module.css';
+import { Mention, MentionItem, MentionsInput, MentionsInputClass, SuggestionDataItem } from 'react-mentions';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -33,7 +27,7 @@ export type MessageBoxProps = {
 		references?: Array<ApiMessageRef>,
 	) => void;
 	onTyping?: () => void;
-	listMentions?: MentionData[] | undefined;
+	listMentions?: IMentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
 	currentChannelId?: string;
 	currentClanId?: string;
@@ -47,73 +41,54 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
 
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
-	const [editorState, setEditorState] = useState(EditorState.createEmpty());
-
+	
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 
-	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
-	const mentionPlugin = useRef(
-		createMentionPlugin({
-			entityMutability: 'IMMUTABLE',
-			theme: editorStyles,
-			mentionPrefix: '@',
-			supportWhitespace: true,
-			mentionTrigger: '@',
-		}),
-	);
-
-	const plugins = [mentionPlugin.current, imagePlugin];
-	//clear Editor after navigate channel
-	useEffect(() => {
-		setEditorState(EditorState.createEmpty());
-	}, [currentChannelId, currentClanId]);
+	const suggestionMentionData = useMemo(() => {
+		return listMentions?.map(item => {
+			return {id: item.id, display: item.name};
+		})
+	}, []) as SuggestionDataItem[];
 
 	const onChange = useCallback(
-		(editorState: EditorState) => {
+		(event: { target: { value: string } },
+			newValue: string,
+			newPlainTextValue: string,
+			mentions: MentionItem[]) => {
 			if (typeof onTyping === 'function') {
 				onTyping();
 			}
 			setClearEditor(false);
-			setEditorState(editorState);
-			const contentState = editorState.getCurrentContent();
-			const raw = convertToRaw(contentState);
-			// get message
-			const messageRaw = raw.blocks;
-			const messageContent = Object.values(messageRaw)
-				.filter((item) => item.text.trim() !== '')
-				.map((item) => item.text);
-			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+			const messageContent = newValue;
 
-			onConvertToFiles(messageBreakline);
+			handleConvertToFiles(messageContent);
 
-			handleUrlInput(messageBreakline)
+			handleUrlInput(messageContent)
 				.then((attachment) => {
 					handleFinishUpload(attachment);
 				})
 				.catch(() => {
-					setContent(content + messageBreakline);
+					setContent(content + messageContent);
 				});
 
-			const mentionedUsers = [];
-			for (const key in raw.entityMap) {
-				const ent = raw.entityMap[key];
-				if (ent.type === 'mention') {
+			const mentionedUsers: any = [];
+			mentions.map(item => {
 					mentionedUsers.push({
-						user_id: ent.data.mention.id,
-						username: ent.data.mention.name,
+						user_id: item.id,
+						username: item.display,
 					});
 				}
-			}
+			);
 			setMentionData(mentionedUsers);
 		},
 		[attachmentData],
 	);
 
-	const onConvertToFiles = useCallback(
+	const handleConvertToFiles = useCallback(
 		(content: string) => {
 			if (content.length > 2000) {
 				const fileContent = new Blob([content], { type: 'text/plain' });
@@ -155,30 +130,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				urlFile = '/assets/images/video.png';
 			}
 
-			const contentState = editorState.getCurrentContent();
-			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-				src: urlFile,
-				height: '20px',
-				width: 'auto',
-				onRemove: () => handleEditorRemove(),
-			});
-			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-
-			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
-			const newEditorStateWithImage = EditorState.forceSelection(
-				newEditorState,
-				newEditorState.getSelection().merge({
-					anchorOffset: 0,
-					focusOffset: 0,
-				}),
-			);
-			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
-			setEditorState(newStateWithImage);
+			setContent(urlFile || '')
 
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		},
-		[attachmentData, content, editorState],
+		[attachmentData, content],
 	);
 
 	const onPastedFiles = useCallback(
@@ -205,14 +162,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			return 'not-handled';
 		},
-		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
+		[attachmentData, clientRef, content, currentChannelId, currentClanId, sessionRef],
 	);
 
 	const handleEditorRemove = () => {
-		const currentContentState = editorState.getCurrentContent();
-		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
-		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');
-		setEditorState(newEditorState);
+		
 	};
 
 	const refMessage = useSelector(selectReference);
@@ -227,7 +181,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent('');
 			setAttachmentData([]);
 			setMentionData([]);
-			setEditorState(() => EditorState.createEmpty());
 			dispatch(referencesActions.setReference(null));
 			dispatch(
 				channelsActions.setChannelLastSeenMessageId({
@@ -241,7 +194,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent('');
 			setAttachmentData([]);
 			setClearEditor(true);
-			setEditorState(() => EditorState.createEmpty());
 			if (messages.length > 0) {
 				dispatch(
 					channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
@@ -272,29 +224,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		return 'not-handled';
 	}
 
-	const editorRef = useRef<Editor | null>(null);
+	const editorRef = useRef<MentionsInputClass | null>(null);
 
 	const onFocusEditorState = () => {
 		setTimeout(() => {
-			editorRef.current!.focus();
+			//editorRef.current!.focus();
 		}, 0);
 	};
 
 	const moveSelectionToEnd = useCallback(() => {
-		setTimeout(() => {
-			editorRef.current!.focus();
-		}, 0);
-		const editorContent = editorState.getCurrentContent();
-		const editorSelection = editorState.getSelection();
-		const updatedSelection = editorSelection.merge({
-			anchorKey: editorContent.getLastBlock().getKey(),
-			anchorOffset: editorContent.getLastBlock().getText().length,
-			focusKey: editorContent.getLastBlock().getKey(),
-			focusOffset: editorContent.getLastBlock().getText().length,
-		});
-		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
-		setEditorState(updatedEditorState);
-	}, [editorState]);
+		
+	}, []);
 
 	const emojiSelectedMess = useSelector(selectEmojiSelectedMess);
 
@@ -310,7 +250,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
-		editorElement[2].classList.add('break-all');
+		//editorElement[2].classList.add('break-all');
 	}, []);
 
 	// please no delete
@@ -329,7 +269,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				firstChildHasBr.style.display = 'none';
 			}
 		}
-	}, [editorState]);
+	}, [editorElement]);
 
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const {
@@ -343,15 +283,37 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setIsFocusEditorStatus,
 	} = useEmojis();
 
+	const findSyntaxEmoji = useCallback((contentText: string): string | null => {
+		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
+		if (emojiArray.length > 0) {
+			return emojiArray[0];
+		}
+		return null;
+	}, []);
+
+	const clickEmojiSuggestion = useCallback(() => {
+		if (!emojiPicked) {
+			return;
+		}
+
+		const syntaxEmoji = findSyntaxEmoji(content);
+		if (!syntaxEmoji) {
+			return;
+		}
+
+		onFocusEditorState();
+	}, [content, emojiPicked, findSyntaxEmoji]);
+
 	useEffect(() => {
 		clickEmojiSuggestion();
-	}, [emojiPicked]);
+	}, [clickEmojiSuggestion, emojiPicked]);
 
 	useEffect(() => {
 		if (content) {
 			setTextToSearchEmojiSuggesion(content);
 		}
-	}, [content]);
+	}, [content, setTextToSearchEmojiSuggesion]);
 
 	useEffect(() => {
 		if (isEmojiListShowed) {
@@ -366,43 +328,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEmojiSuggestion('');
 		setTextToSearchEmojiSuggesion('');
 		setIsFocusEditorStatus(false);
-		setEditorState(() => EditorState.createEmpty());
 	};
 
 	useEffect(() => {
 		if (isFocusEditor) {
 			onFocusEditorState();
 		}
-	}, [isFocusEditor]);
-
-	function clickEmojiSuggestion() {
-		if (!emojiPicked) {
-			return;
-		}
-		const currentContentState = editorState.getCurrentContent();
-		const selectionState = editorState.getSelection();
-		const contentText = currentContentState.getPlainText();
-		const syntaxEmoji = findSyntaxEmoji(contentText);
-		if (!syntaxEmoji) {
-			return;
-		}
-
-		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
-		const newContentState = ContentState.createFromText(updatedContentText);
-		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
-		const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
-		setEditorState(updatedEditorState);
-		onFocusEditorState();
-	}
-
-	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-		if (emojiArray.length > 0) {
-			return emojiArray[0];
-		}
-		return null;
-	}
+	}, [isFocusEditor]);	
 
 	return (
 		<div className="relative">
@@ -418,7 +350,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<div
 					className={`w-full bg-black gap-3 flex items-center`}
 					onClick={() => {
-						editorRef.current!.focus();
+						//editorRef.current!.focus();
 					}}
 				>
 					<div className={`w-[96%] bg-black gap-3 relative`} onClick={onFocusEditorState}>
@@ -427,21 +359,21 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}
 							style={{ wordBreak: 'break-word' }}
 						>
-							<Editor
-								keyBindingFn={keyBindingFn}
-								handleKeyCommand={handleKeyCommand}
-								editorState={clearEditor ? EditorState.createEmpty() : editorState}
+							<MentionsInput
+								value={content}
 								onChange={onChange}
-								plugins={plugins}
-								ref={editorRef}
-								handlePastedFiles={onPastedFiles}
-							/>
+								//onPaste={onPastedFiles}
+								//keyBindingFn={keyBindingFn}
+								//handleKeyCommand={handleKeyCommand}								
+								//inputRef={editorRef}
+							>
+								<Mention trigger="@" data={suggestionMentionData} />
+							</MentionsInput>							
 							{showPlaceHolder && (
 								<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
 							)}
 						</div>
 					</div>
-					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
 					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
 				</div>
 			</div>
