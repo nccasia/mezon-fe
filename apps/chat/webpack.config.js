@@ -17,7 +17,11 @@ module.exports = composePlugins(
   (config) => {
     // Update the webpack config as needed here.
     // e.g. `config.plugins.push(new MyPlugin())`
+    config.plugins = config.plugins || [];
     config.plugins.push(new NodePolyfillPlugin());
+
+    // Add the following to the webpack config to fix the error:
+    config.resolve = config.resolve || {};
     config.resolve.fallback = { "fs": false };
     config.loader = {
       test: /plugin\.css$/,
