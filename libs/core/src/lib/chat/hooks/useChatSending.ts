@@ -33,16 +33,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				throw new Error('Client is not initialized');
 			}
 
-			const wait = await socket.writeChatMessage(
-				currentClanId,
-				channel.id,
-				channel.chanel_label,
-				mode,
-				content,
-				mentions,
-				attachments,
-				references,
-			);
+			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
 
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));

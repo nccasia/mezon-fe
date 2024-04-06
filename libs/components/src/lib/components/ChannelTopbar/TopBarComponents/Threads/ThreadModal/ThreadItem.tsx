@@ -5,7 +5,7 @@ import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import MessageLine from '../../../../MessageWithUser/MesageLine';
+import MessageLine from '../../../../MessageWithUser/MessageLine';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
 
 type ThreadItemProps = {
