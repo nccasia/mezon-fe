@@ -121,6 +121,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setTextToSearchEmojiSuggesion,
 		setKeyCodeFromKeyBoardState,
 		pressAnyButtonState,
+		emotionconsData
 	} = useEmojiSuggestion();
 
 	const editorRef = useRef<HTMLInputElement | null>(null);

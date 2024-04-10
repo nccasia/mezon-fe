@@ -80,8 +80,7 @@ export const emojiSuggestionSlice = createSlice({
 			})
 			.addCase(fetchEmoji.fulfilled, (state: EmojiSuggestionState, action: PayloadAction<EmojiSuggestionEntity[]>) => {
 				emojiSuggestionAdapter.setAll(state, action.payload);
-				console.log(action.payload);
-				state.emotionconsData = action.payload as Record<string, string>;
+				state.emotionconsData = action.payload as any;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
@@ -116,3 +115,5 @@ export const selectKeyCodeFromKeyBoardState = createSelector(getEmojiSuggestionS
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
 
 export const selectPressAnyButtonState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.pressAnyButtonState);
+
+export const selectEmotionconsData = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emotionconsData);

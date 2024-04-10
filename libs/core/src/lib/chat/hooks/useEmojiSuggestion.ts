@@ -3,6 +3,7 @@ import {
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
 	selectEmojiSuggestion,
+	selectEmotionconsData,
 	selectKeyCodeFromKeyBoardState,
 	selectPressAnyButtonState,
 	selectTextToSearchEmojiSuggestion,
@@ -18,6 +19,7 @@ export function useEmojiSuggestion() {
 	const keyCodeFromKeyBoard = useSelector(selectKeyCodeFromKeyBoardState);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
 	const pressAnyButtonState = useSelector(selectPressAnyButtonState);
+	const emotionconsData = useSelector(selectEmotionconsData).emoticons;
 
 	const dispatch = useAppDispatch();
 
@@ -69,6 +71,7 @@ export function useEmojiSuggestion() {
 			setTextToSearchEmojiSuggesion,
 			setKeyboardPressAnyButtonStatus,
 			pressAnyButtonState,
+			emotionconsData
 		}),
 		[
 			emojis,
@@ -82,6 +85,7 @@ export function useEmojiSuggestion() {
 			setTextToSearchEmojiSuggesion,
 			setKeyboardPressAnyButtonStatus,
 			pressAnyButtonState,
+			emotionconsData
 		],
 	);
 }

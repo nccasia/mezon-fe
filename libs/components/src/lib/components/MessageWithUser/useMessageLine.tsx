@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 // TODO: refactor this to sender function
 const mentionRegex = /(?<=(\s|^))@\S+(?=\s|$)/g
+const emoticonRegex = /(\:\w+\:|\<[\/\\]?3|[\(\)\\\|\*\$][\-\^]?[\:\;\=]|[\:\;\=B8][\-\^]?[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)/;
 
 export type ILineMention = {
     nonMatchText:  string;
@@ -16,6 +17,7 @@ export type IMessageLine = {
 }
 
 export function useMessageLine(line: string): IMessageLine {
+    console.log("line", line)
     const matches = useMemo(() => line.match(mentionRegex) || [], [line]);
 
     const mentions = useMemo(() => {
