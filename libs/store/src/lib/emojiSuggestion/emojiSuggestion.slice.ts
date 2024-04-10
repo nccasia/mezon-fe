@@ -5,6 +5,7 @@ export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
 export interface EmojiSuggestionEntity extends IEmoji {
 	id: string;
+	emoticons: Record<string, string>;
 }
 
 export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity, string> {
@@ -15,6 +16,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
 	pressAnyButtonState: boolean;
+	emotionconsData: Record<string, string>;
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
@@ -43,6 +45,7 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
 	pressAnyButtonState: false,
+	emotionconsData: {},
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -77,6 +80,8 @@ export const emojiSuggestionSlice = createSlice({
 			})
 			.addCase(fetchEmoji.fulfilled, (state: EmojiSuggestionState, action: PayloadAction<EmojiSuggestionEntity[]>) => {
 				emojiSuggestionAdapter.setAll(state, action.payload);
+				console.log(action.payload);
+				state.emotionconsData = action.payload as Record<string, string>;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
