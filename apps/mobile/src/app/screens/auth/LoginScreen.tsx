@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Formik } from 'formik';
 import * as Yup from 'yup';

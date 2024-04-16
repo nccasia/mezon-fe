@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+          "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,15 +27,8 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+              "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "285548761692-evbblcupqf590p2jqissbdqucfcev6sv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "chat.mezon.vn"
-              }
             }
           ]
         }
@@ -50,7 +43,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+          "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -63,15 +56,8 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+              "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "285548761692-evbblcupqf590p2jqissbdqucfcev6sv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "chat.mezon.vn"
-              }
             }
           ]
         }

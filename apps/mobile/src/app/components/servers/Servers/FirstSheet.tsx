@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { PanGestureHandler } from 'react-native-gesture-handler'
+// import { PanGestureHandler } from 'react-native-gesture-handler'
 import { darkColor } from '../../../constants/Colors'
 import ServerNavbar from '../firstSheets/ServerNavbar'
 import ServerDetail from '../firstSheets/ServerDetail'

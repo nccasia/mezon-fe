@@ -18,7 +18,7 @@ const App = () => {
 			<Stack.Navigator screenOptions={{ headerShown: false }}>
 				{isAppLoading ? (
 					<Stack.Screen name="Splash" component={SplashScreen} />
-				) : isUser ? (
+				) : !isUser ? (
 					<>
 						<Stack.Screen name="Login" component={LoginScreen} />
 						<Stack.Screen name="Register" component={RegisterScreen} /></>
