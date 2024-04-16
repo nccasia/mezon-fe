@@ -4,7 +4,6 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import FirstSheet from '../../components/servers/Servers/FirstSheet';
 import SecondSheet from '../../components/servers/Servers/SecondSheet';
 import ThirdSheet from '../../components/servers/Servers/ThirdSheet';
-import BottomTab from '../../components/servers/Servers/BottomTab';
 
 const ServersScreen = () => {
     // const signOutWithGoogle = async () => {
@@ -21,7 +20,6 @@ const ServersScreen = () => {
             <FirstSheet />
             <SecondSheet />
             <ThirdSheet />
-            <BottomTab />
         </View>
     )
 }

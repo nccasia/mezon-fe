@@ -1,8 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+
 import { darkColor } from '../../../constants/Colors'
 
-const serverDetail = () => {
+
+
+
+import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+
+const ServerDetail = () => {
     return (
         <View style={styles.serverDetailsContainer}>
             <Text style={{ color: 'white' }}>ServerDetails</Text>
@@ -10,7 +15,7 @@ const serverDetail = () => {
     )
 }
 
-export default serverDetail
+export default ServerDetail
 
 const styles = StyleSheet.create({
     serverDetailsContainer: {

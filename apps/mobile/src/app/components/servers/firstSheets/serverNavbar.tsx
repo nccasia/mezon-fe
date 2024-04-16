@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Feather from 'react-native-vector-icons/Feather'
 import { darkColor } from '../../../constants/Colors';
-const serverNavbar = () => {
+const ServerNavbar = () => {
     return (
         <View style={styles.serverNavbarContainer}>
             <View style={styles.commonIconStyle}>
@@ -29,7 +29,7 @@ const serverNavbar = () => {
     );
 }
 
-export default serverNavbar
+export default ServerNavbar
 
 const styles = StyleSheet.create({
     serverNavbarContainer: {
@@ -48,3 +48,4 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
 })
+
