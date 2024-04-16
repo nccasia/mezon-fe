@@ -1,44 +1,38 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Images from 'apps/mobile/src/assets/Images'
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
-// import auth from '@react-native-firebase/auth';
-
+import auth from '@react-native-firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
-import { useEffect } from 'react';
 const GoogleLogin = () => {
-    useEffect(() => {
-        GoogleSignin.configure({
-            webClientId: '285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com',
-            iosClientId: "285548761692-evbblcupqf590p2jqissbdqucfcev6sv.apps.googleusercontent.com",
-            offlineAccess: true,
-            forceCodeForRefreshToken: true,
-        });
-    }, [])
+
+    GoogleSignin.configure({
+        webClientId: "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com"
+    });
+
     const navigation = useNavigation()
-    const signInWithGoogle = async () => {
+    async function onGoogleButtonPress() {
         try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            console.log(userInfo);
+            // Check if your device supports Google Play
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            // Get the users ID token
+            const { idToken } = await GoogleSignin.signIn();
+
+            // Create a Google credential with the token
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+            // Sign-in the user with the credential
+            auth().signInWithCredential(googleCredential);
             navigation.navigate('Servers')
         } catch (error) {
-            console.log('Message', error.message);
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                console.log('User cancelled the login flow');
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                console.log('Sign in is in progress already');
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                console.log('Play services not available or outdated');
-            } else {
-                console.log('Some other error happened');
-            }
+            console.log(error);
+
         }
-    };
+
+    }
     return (
         <Pressable style={styles.googleButton}
-            onPress={signInWithGoogle}
+            onPress={onGoogleButtonPress}
         >
             <View style={styles.socialButtonsContainer}>
                 <View style={styles.signinButtonLogoContainer}>

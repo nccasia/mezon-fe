@@ -21,16 +21,6 @@ const LoginScreen = () => {
     // const isLoading = useSelector(state => state.auth.loading);
 
     const navigation = useNavigation()
-    // const handleLogin = (values) => {
-    //     try {
-    //         dispatch(loginRequest(values));
-    //         navigation.navigate('Home')
-    //     } catch (error) {
-    //         Alert.alert('Email or password not correct')
-    //     }
-
-
-    // };
     return (
         <View style={styles.container}>
             {/* header */}

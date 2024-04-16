@@ -24,7 +24,7 @@ const App = () => {
 						<Stack.Screen name="Register" component={RegisterScreen} /></>
 				) : (
 					<>
-						<Stack.Screen name="Servers" component={BottomNavigator} />
+						<Stack.Screen name="Servers" component={BottomNavigator} options={{ gestureEnabled: false }} />
 					</>
 				)}
 

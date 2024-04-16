@@ -1,4 +1,4 @@
-export const darkColorlightColor = {
+export const darkColor = {
     Border_Defalt: '#1E1E1E',
     Border_Selector: '#155EEF',
     Border_Invert: '#FFFFFF',

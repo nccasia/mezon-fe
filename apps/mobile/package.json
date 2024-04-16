@@ -3,6 +3,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"dependencies": {
+		"@react-native-firebase/app": "^19.2.2",
+		"@react-native-firebase/auth": "^19.2.2",
 		"@react-native-google-signin/google-signin": "^11.0.1",
 		"@react-native/metro-config": "*",
 		"@react-navigation/bottom-tabs": "^6.5.20",

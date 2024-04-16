@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "285548761692",
+    "project_id": "mezon-772fa",
+    "storage_bucket": "mezon-772fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285548761692:android:77d1245e9ae9f5cf4e0c99",
+        "android_client_info": {
+          "package_name": "com.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUDD4tD2X6h7TkzaO7rknWdZiVrEgIaeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "285548761692-evbblcupqf590p2jqissbdqucfcev6sv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chat.mezon.vn"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285548761692:android:fb428de8e388d1124e0c99",
+        "android_client_info": {
+          "package_name": "com.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUDD4tD2X6h7TkzaO7rknWdZiVrEgIaeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285548761692-qciqfftsn1cv0kp31s6c9j6j1j1kluk1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "285548761692-evbblcupqf590p2jqissbdqucfcev6sv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chat.mezon.vn"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
