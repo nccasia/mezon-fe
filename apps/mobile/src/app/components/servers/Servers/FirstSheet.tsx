@@ -2,11 +2,14 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import { darkColor } from '../../../constants/Colors'
-import ServerNavbar from '../firstSheets/serverNavbar'
-import ServerDetail from '../firstSheets/serverDetail'
+import ServerNavbar from '../firstSheets/ServerNavbar'
+import ServerDetail from '../firstSheets/ServerDetail'
 const FirstSheet = () => {
     return (
         <View style={styles.firstSheetContainer}>
+
+            {/* <ServerNavbar />
+            <ServerDetail /> */}
             <ServerNavbar />
             <ServerDetail />
         </View>

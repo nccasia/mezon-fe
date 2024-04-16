@@ -6,19 +6,19 @@ const ServerNavbar = () => {
     return (
         <View style={styles.serverNavbarContainer}>
             <View style={styles.commonIconStyle}>
-                <Feather name="message-circle" size="18" fill="white" />
+                <Feather name="message-circle" size={18} />
             </View>
 
             {/* here will be the list of servers */}
 
             <View style={styles.commonIconStyle}>
                 <Text style={{
-                    // color: colors.textColor 
+                    color: darkColor.Content_Subtle
                 }}>1st</Text>
             </View>
             <View style={styles.commonIconStyle}>
                 <Text style={{
-                    // color: colors.textColor
+                    color: darkColor.Content_Subtle
                 }}>2nd</Text>
             </View>
 
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
         height: 40,
         width: 40,
         borderRadius: 20,
-        backgroundColor: darkColor.Backgound_BrandLight,
         marginBottom: 10
     },
 })
