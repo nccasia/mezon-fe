@@ -76,7 +76,7 @@ const MessagesScreen = () => {
                 </View>
 
             </ScrollView>
-            <View style={{ position: 'absolute', bottom: 100, right: 10, width: 60, height: 60, backgroundColor: darkColor.Foundation_Possitive, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ position: 'absolute', bottom: 120, right: 10, width: 60, height: 60, backgroundColor: darkColor.Foundation_Possitive, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
                 <Feather name="message-circle" size={30} />
             </View>
         </View >

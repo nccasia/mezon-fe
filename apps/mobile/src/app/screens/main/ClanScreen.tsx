@@ -10,7 +10,6 @@ const ClanScreen = () => {
     return (
 
         <SafeAreaView style={styles.secondSheetContainer}>
-            {/* you can seperate this in its own component */}
 
             {/* body */}
             <ScrollView style={styles.scrollViewContainer} nestedScrollEnabled={true}>
@@ -188,7 +187,7 @@ const ClanScreen = () => {
                     </View>
                 </View>
             </ScrollView>
-            <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 60, backgroundColor: darkColor.Background_Secondary, alignItems: 'center', flexDirection: 'row', gap: 12, paddingRight: 16 }}>
+            <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 60, backgroundColor: darkColor.Background_Secondary, alignItems: 'center', flexDirection: 'row', gap: 12, paddingRight: 10, paddingLeft: 10 }}>
                 <Pressable style={{ backgroundColor: darkColor.Backgound_Disabled, width: 42, height: 42, justifyContent: 'center', alignItems: 'center', borderRadius: 50 }}>
                     <Feather name="plus" size={30} style={{ color: darkColor.Content_Secondary }} />
                 </Pressable>

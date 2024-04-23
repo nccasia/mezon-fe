@@ -8,8 +8,6 @@ const GoogleLogin = () => {
 
     GoogleSignin.configure({
         webClientId: "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
-        offlineAccess: true,
-        forceCodeForRefreshToken: true,
     });
 
     const navigation = useNavigation()
@@ -27,8 +25,9 @@ const GoogleLogin = () => {
             auth().signInWithCredential(googleCredential);
             navigation.navigate('Servers')
         } catch (error) {
-            console.log(error);
-            navigation.navigate('Servers')
+
+            console.log(JSON.stringify(error));
+
         }
 
     }

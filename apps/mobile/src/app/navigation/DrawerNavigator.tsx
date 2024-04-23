@@ -7,68 +7,64 @@ import Feather from 'react-native-vector-icons/Feather'
 import ServersScreen from '../screens/main/ClanScreen';
 import { darkColor } from '../constants/Colors';
 import CustomDrawerContent from '../components/ClanScreen/CustomDrawerContent';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = ({ navigation }) => {
     return (
         <>
-            <Drawer.Navigator initialRouteName="Servers"
-                drawerContent={props => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    headerStyle: {
-                        backgroundColor: darkColor.Backgound_Primary,
-                    },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: {
-                        fontWeight: 'bold',
-                    },
+            <BottomSheetModalProvider>
 
-                    drawerStyle: {
-                        backgroundColor: '#c6cbef',
-                        width: "90%",
-                        height: HEIGHT,
+                <Drawer.Navigator initialRouteName="Servers"
+                    drawerContent={props => <CustomDrawerContent {...props} />}
+                    screenOptions={{
+                        headerStyle: {
+                            backgroundColor: darkColor.Backgound_Primary,
+                        },
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
 
-                    },
-                    headerRight: () => (
-                        <View
-                            style={{
-                                width: '100%',
-                                height: 50,
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                flexDirection: 'row'
-                            }}
-                        >
-                            <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <Feather size={20} name="chevron-right" style={{ color: '#FFFFFF' }} />
-                            </View>
-                            <View style={{ flexDirection: 'row', marginRight: 10 }}>
-                                <View style={{ borderRadius: 100, backgroundColor: '#323232', width: 35, height: 35, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Feather size={20} name="search" style={{ color: '#FFFFFF' }} />
+                        drawerStyle: {
+                            backgroundColor: '#c6cbef',
+                            width: "90%",
+                            height: HEIGHT,
+
+                        },
+                        headerRight: () => (
+                            <View
+                                style={{
+                                    width: '100%',
+                                    height: 50,
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexDirection: 'row'
+                                }}
+                            >
+                                <View style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <Feather size={20} name="chevron-right" style={{ color: '#FFFFFF' }} />
                                 </View>
+                                <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                                    <View style={{ borderRadius: 100, backgroundColor: '#323232', width: 35, height: 35, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Feather size={20} name="search" style={{ color: '#FFFFFF' }} />
+                                    </View>
 
+                                </View>
                             </View>
-                        </View>
-                    ),
-                }}>
+                        ),
+                    }}>
 
-                <Drawer.Screen name="Servers"
-                    // options={{
-                    //     drawerIcon: ({ focused, size }) => (
-                    //         <Feather
-                    //             name="arrow-left"
-                    //             size={size}
-                    //             color={focused ? '#f4511e' : '#333'}
-                    //         />
-                    //     ),
-                    // }} 
-                    component={ServersScreen} />
-                <Drawer.Screen name="Messages" component={MessagesScreen} />
+                    <Drawer.Screen name="Servers"
+
+                        component={ServersScreen} />
+                    <Drawer.Screen name="Messages" component={MessagesScreen} />
 
 
-            </Drawer.Navigator>
-
+                </Drawer.Navigator>
+            </BottomSheetModalProvider>
         </>
+
     );
 }
 

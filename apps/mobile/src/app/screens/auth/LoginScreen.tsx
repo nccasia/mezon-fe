@@ -16,7 +16,7 @@ const LoginSchema = Yup.object().shape({
         "Must contain minimum 8 characters, at least one uppercase letter"
     ),
 });
-const LoginScreen = () => {
+const LoginScreen = ({ isUser }) => {
     // const dispatch = useDispatch();
     // const isLoading = useSelector(state => state.auth.loading);
 
