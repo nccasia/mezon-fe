@@ -96,7 +96,6 @@ export function ChannelMessage(props: MessageProps) {
 	};
 
 	useEscapeKey(handleCancelEdit);
-
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser

@@ -25,33 +25,33 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 
-	useEffect(() => {
-		if (idMessageReplied) {
-			setMessageIdToJump(idMessageReplied);
-			setTimeToJump(0);
-			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
-			setPositionToJump('start');
-		}
-	}, [getJumpToMessageId, idMessageReplied]);
+	// useEffect(() => {
+	// 	if (idMessageReplied) {
+	// 		setMessageIdToJump(idMessageReplied);
+	// 		setTimeToJump(0);
+	// 		setPositionToJump('center');
+	// 	} else {
+	// 		setMessageIdToJump(getJumpToMessageId());
+	// 		setTimeToJump(1000);
+	// 		setPositionToJump('start');
+	// 	}
+	// }, [getJumpToMessageId, idMessageReplied]);
 
-	const { jumpToMessage } = useJumpToMessage();
+	// const { jumpToMessage } = useJumpToMessage();
 
-	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		if (messageid) {
-			timeoutId = setTimeout(() => {
-				jumpToMessage(messageid, positionToJump);
-			}, timeToJump);
-		}
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-		};
-	}, [messageid, jumpToMessage]);
+	// useEffect(() => {
+	// 	let timeoutId: NodeJS.Timeout | null = null;
+	// 	if (messageid) {
+	// 		timeoutId = setTimeout(() => {
+	// 			jumpToMessage(messageid, positionToJump);
+	// 		}, timeToJump);
+	// 	}
+	// 	return () => {
+	// 		if (timeoutId) {
+	// 			clearTimeout(timeoutId);
+	// 		}
+	// 	};
+	// }, [messageid, jumpToMessage]);
 
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
