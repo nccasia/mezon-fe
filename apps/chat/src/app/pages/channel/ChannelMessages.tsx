@@ -81,8 +81,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
-				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
-
 				{messages.map((message, i) => (
 					<ChannelMessage
 						mode={mode}
