@@ -79,7 +79,6 @@ export function useChatReaction() {
 
 	const updateEmojiReactionData = (data: any[]) => {
 		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
-
 		data &&
 			data.forEach((item) => {
 				const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
@@ -119,15 +118,7 @@ export function useChatReaction() {
 		return Object.values(dataItemReaction);
 	};
 
-	// useEffect(() => {
-	// 	dispatch(reactionActions.setDataReactionFromServe(reactionData));
-	// }, []);
-
-	const dataReactionConvert = updateEmojiReactionData(dataReactionServerAndSocket);
-	const dataReactionCombine = [...dataReactionConvert, ...reactionData];
-	
-	console.log(dataReactionCombine);
-	console.log(reactionData);
+	const dataReactionCombine = updateEmojiReactionData([...dataReactionServerAndSocket, ...reactionData]);
 
 	const setDataReactionFromServe = useCallback(
 		(state: EmojiDataOptionals[]) => {
