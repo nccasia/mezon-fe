@@ -1,10 +1,9 @@
-import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
-import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -107,40 +106,41 @@ export const fetchMessages = createAsyncThunk(
 		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
-		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
-			if (!message.reactions) return [];
-			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
-			message.reactions.forEach((reaction) => {
-				const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
 
-				if (!emojiDataItems[key]) {
-					emojiDataItems[key] = {
-						id: reaction.id,
-						emoji: reaction.emoji,
-						senders: [
-							{
-								sender_id: reaction.sender_id,
-								count: reaction.count,
-								emojiIdList: [],
-								sender_name: '',
-								avatar: '',
-							},
-						],
-						channel_id: message.channel_id,
-						message_id: message.id,
-					};
-				} else {
-					const existingItem = emojiDataItems[key];
+		// const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
+		// 	if (!message.reactions) return [];
+		// 	const emojiDataItems: Record<string, EmojiDataOptionals> = {};
+		// 	message.reactions.forEach((reaction) => {
+		// 		const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
 
-					if (existingItem.senders.length > 0) {
-						existingItem.senders[0].count = reaction.count;
-					}
-				}
-			});
-			return Object.values(emojiDataItems);
-		});
+		// 		if (!emojiDataItems[key]) {
+		// 			emojiDataItems[key] = {
+		// 				id: reaction.id,
+		// 				emoji: reaction.emoji,
+		// 				senders: [
+		// 					{
+		// 						sender_id: reaction.sender_id,
+		// 						count: reaction.count,
+		// 						emojiIdList: [],
+		// 						sender_name: '',
+		// 						avatar: '',
+		// 					},
+		// 				],
+		// 				channel_id: message.channel_id,
+		// 				message_id: message.id,
+		// 			};
+		// 		} else {
+		// 			const existingItem = emojiDataItems[key];
 
-		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
+		// 			if (existingItem.senders.length > 0) {
+		// 				existingItem.senders[0].count = reaction.count;
+		// 			}
+		// 		}
+		// 	});
+		// 	return Object.values(emojiDataItems);
+		// });
+
+		// thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
 		hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
@@ -447,7 +447,8 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;	}
+		return +a.creationTimeMs - +b.creationTimeMs;
+	}
 	return 0;
 }
 

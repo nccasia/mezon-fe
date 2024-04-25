@@ -1,5 +1,6 @@
 import {
 	reactionActions,
+	selectAllMessages,
 	selectDataReactionCombine,
 	selectReactionBottomState,
 	selectReactionPlaceActive,
@@ -25,7 +26,7 @@ export function useChatReaction() {
 	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
-
+	const messages = useSelector(selectAllMessages);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
 
@@ -42,6 +43,39 @@ export function useChatReaction() {
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
+
+	const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
+		if (!message.reactions) return [];
+		const emojiDataItems: Record<string, EmojiDataOptionals> = {};
+		message.reactions.forEach((reaction) => {
+			const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+
+			if (!emojiDataItems[key]) {
+				emojiDataItems[key] = {
+					id: reaction.id,
+					emoji: reaction.emoji,
+					senders: [
+						{
+							sender_id: reaction.sender_id,
+							count: reaction.count,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						},
+					],
+					channel_id: message.channel_id,
+					message_id: message.id,
+				};
+			} else {
+				const existingItem = emojiDataItems[key];
+
+				if (existingItem.senders.length > 0) {
+					existingItem.senders[0].count = reaction.count;
+				}
+			}
+		});
+		return Object.values(emojiDataItems);
+	});
 
 	const updateEmojiReactionData = (data: any[]) => {
 		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
@@ -85,7 +119,15 @@ export function useChatReaction() {
 		return Object.values(dataItemReaction);
 	};
 
-	const dataReactionCombine = updateEmojiReactionData(dataReactionServerAndSocket);
+	// useEffect(() => {
+	// 	dispatch(reactionActions.setDataReactionFromServe(reactionData));
+	// }, []);
+
+	const dataReactionConvert = updateEmojiReactionData(dataReactionServerAndSocket);
+	const dataReactionCombine = [...dataReactionConvert, ...reactionData];
+	
+	console.log(dataReactionCombine);
+	console.log(reactionData);
 
 	const setDataReactionFromServe = useCallback(
 		(state: EmojiDataOptionals[]) => {
@@ -137,6 +179,7 @@ export function useChatReaction() {
 			setReactionBottomState,
 			setUserReactionPanelState,
 			userReactionPanelState,
+			reactionData,
 		}),
 		[
 			reactionActions,
@@ -151,6 +194,7 @@ export function useChatReaction() {
 			dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
+			reactionData,
 		],
 	);
 }
