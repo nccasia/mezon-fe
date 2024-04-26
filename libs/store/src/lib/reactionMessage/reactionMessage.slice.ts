@@ -101,19 +101,20 @@ export const reactionSlice = createSlice({
 				channel_id: action.payload.channel_id ?? '',
 				message_id: action.payload.message_id ?? '',
 			};
-			if (!action.payload.action) {
-				state.reactionDataServerAndSocket.push(state.reactionDataSocket);
-			} else if (action.payload.action) {
-				const { action, ...newStateReaction } = state.reactionDataSocket;
-				const removedReactionData = state.reactionDataServerAndSocket.filter(
-					(item) =>
-						item.emoji !== newStateReaction.emoji ||
-						item.channel_id !== newStateReaction.channel_id ||
-						item.message_id !== newStateReaction.message_id ||
-						item.senders[0].sender_id !== newStateReaction.senders[0].sender_id,
-				);
-				state.reactionDataServerAndSocket = removedReactionData;
-			}
+			
+			// if (!action.payload.action) {
+			// 	state.reactionDataServerAndSocket.push(state.reactionDataSocket);
+			// } else if (action.payload.action) {
+			// 	const { action, ...newStateReaction } = state.reactionDataSocket;
+			// 	const removedReactionData = state.reactionDataServerAndSocket.filter(
+			// 		(item) =>
+			// 			item.emoji !== newStateReaction.emoji ||
+			// 			item.channel_id !== newStateReaction.channel_id ||
+			// 			item.message_id !== newStateReaction.message_id ||
+			// 			item.senders[0].sender_id !== newStateReaction.senders[0].sender_id,
+			// 	);
+			// 	state.reactionDataServerAndSocket = removedReactionData;
+			// }
 		},
 
 		setDataReactionFromServe(state, action) {

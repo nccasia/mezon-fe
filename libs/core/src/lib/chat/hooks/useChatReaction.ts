@@ -2,6 +2,7 @@ import {
 	reactionActions,
 	selectAllMessages,
 	selectDataReactionCombine,
+	selectMessageReacted,
 	selectReactionBottomState,
 	selectReactionPlaceActive,
 	selectReactionRightState,
@@ -9,7 +10,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiDataOptionals, EmojiPlaces } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useClans } from './useClans';
@@ -29,6 +30,7 @@ export function useChatReaction() {
 	const messages = useSelector(selectAllMessages);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
+	const dataSocketAction = useSelector(selectMessageReacted);
 
 	const reactionMessageDispatch = useCallback(
 		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
@@ -118,7 +120,31 @@ export function useChatReaction() {
 		return Object.values(dataItemReaction);
 	};
 
-	const dataReactionCombine = updateEmojiReactionData([...dataReactionServerAndSocket, ...reactionData]);
+	// const dataReactionCombine = updateEmojiReactionData([...reactionData]);
+
+	const [dataReactionCombine, setDataCombine] = useState<EmojiDataOptionals[]>(updateEmojiReactionData(reactionData));
+
+	useEffect(() => {
+		if (dataSocketAction.action === undefined || dataSocketAction.action === false) {
+			const { action, ...newStateReaction } = dataSocketAction;
+			reactionData.push(newStateReaction);
+			setDataCombine(updateEmojiReactionData(reactionData));
+		} else if (dataSocketAction.action) {
+			const { action, ...newStateReaction } = dataSocketAction;
+			console.log(dataReactionCombine);
+
+			const removedReactionData = dataReactionCombine.filter(
+				(item) =>
+					item.emoji !== newStateReaction.emoji ||
+					item.channel_id !== newStateReaction.channel_id ||
+					item.message_id !== newStateReaction.message_id ||
+					item.senders[0].sender_id !== newStateReaction.senders[0].sender_id,
+			);
+			setDataCombine(removedReactionData);
+		}
+	}, [dataSocketAction]);
+
+	// const dataReactionSocket = updateEmojiReactionData([...dataReactionServerAndSocket]);
 
 	const setDataReactionFromServe = useCallback(
 		(state: EmojiDataOptionals[]) => {
@@ -171,6 +197,7 @@ export function useChatReaction() {
 			setUserReactionPanelState,
 			userReactionPanelState,
 			reactionData,
+			// dataReactionSocket,
 		}),
 		[
 			reactionActions,
@@ -186,6 +213,7 @@ export function useChatReaction() {
 			setReactionRightState,
 			setReactionBottomState,
 			reactionData,
+			// dataReactionSocket,
 		],
 	);
 }
