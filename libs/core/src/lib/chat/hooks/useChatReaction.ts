@@ -1,9 +1,10 @@
 import {
 	reactionActions,
 	selectAllMessages,
-	selectDataReactionCombine,
 	selectMessageReacted,
 	selectReactionBottomState,
+	selectReactionDataFetch,
+	selectReactionDataSocket,
 	selectReactionPlaceActive,
 	selectReactionRightState,
 	selectUserReactionPanelState,
@@ -24,9 +25,11 @@ export function useChatReaction() {
 	const dispatch = useDispatch();
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
-	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
+	const reactionDataSocket = useSelector(selectReactionDataSocket);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
+	const reactionDataFetch = useSelector(selectReactionDataFetch);
+
 	const messages = useSelector(selectAllMessages);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -190,8 +193,7 @@ export function useChatReaction() {
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			reactionDataSocket,
 			setReactionRightState,
 			setReactionBottomState,
 			setUserReactionPanelState,
@@ -208,8 +210,7 @@ export function useChatReaction() {
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			reactionDataSocket,
 			setReactionRightState,
 			setReactionBottomState,
 			reactionData,

@@ -16,7 +16,6 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		userId,
 		reactionMessageDispatch,
 		reactionBottomState,
-		dataReactionCombine,
 		setReactionRightState,
 		setReactionBottomState,
 		setUserReactionPanelState,
@@ -142,6 +141,8 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	useEffect(() => {
 		checkPosEmojiReactionPanel();
 	}, [reactionBottomState]);
+
+
 
 	return (
 		<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
