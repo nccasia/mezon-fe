@@ -22,6 +22,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		userReactionPanelState,
 		reactionPlaceActive,
 		// dataReactionSocket,
+		dataReactionCombine
 	} = useChatReaction();
 
 	const { referenceMessage, setReferenceMessage, setOpenReplyMessageState } = useReference();

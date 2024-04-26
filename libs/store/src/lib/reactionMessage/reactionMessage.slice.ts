@@ -69,6 +69,47 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	dataReationFetch: [],
 });
 
+const updateEmojiReactionData = (data: any[]) => {
+	const dataItemReaction: Record<string, EmojiDataOptionals> = {};
+	data &&
+		data.forEach((item) => {
+			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
+			if (!dataItemReaction[key]) {
+				dataItemReaction[key] = {
+					id: item.id,
+					emoji: item.emoji,
+					senders: [
+						{
+							sender_id: item.senders[0]?.sender_id ?? '',
+							count: item.senders[0]?.count ?? 0,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						},
+					],
+					channel_id: item.channel_id,
+					message_id: item.message_id,
+				};
+			} else {
+				const existingItem = dataItemReaction[key];
+				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
+
+				if (senderIndex !== -1) {
+					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
+				} else {
+					existingItem.senders.push({
+						sender_id: item.senders[0]?.sender_id ?? '',
+						count: item.senders[0]?.count ?? 0,
+						emojiIdList: [],
+						sender_name: '',
+						avatar: '',
+					});
+				}
+			}
+		});
+	return Object.values(dataItemReaction);
+};
+
 export const reactionSlice = createSlice({
 	name: REACTION_FEATURE_KEY,
 	initialState: initialReactionState,
@@ -107,25 +148,18 @@ export const reactionSlice = createSlice({
 				channel_id: action.payload.channel_id ?? '',
 				message_id: action.payload.message_id ?? '',
 			};
-			
-			// if (!action.payload.action) {
-			// 	state.reactionDataServerAndSocket.push(state.reactionDataSocket);
-			// } else if (action.payload.action) {
-			// 	const { action, ...newStateReaction } = state.reactionDataSocket;
-			// 	const removedReactionData = state.reactionDataServerAndSocket.filter(
-			// 		(item) =>
-			// 			item.emoji !== newStateReaction.emoji ||
-			// 			item.channel_id !== newStateReaction.channel_id ||
-			// 			item.message_id !== newStateReaction.message_id ||
-			// 			item.senders[0].sender_id !== newStateReaction.senders[0].sender_id,
-			// 	);
-			// 	state.reactionDataServerAndSocket = removedReactionData;
-			// }
+
+			if (!action.payload.action) {
+				const { action, ...newStateReaction } = state.reactionDataSocket;
+				state.reactionDataServerAndSocket.push(newStateReaction);
+			} else if (action.payload.action) {
+				state.reactionDataServerAndSocket = [state.reactionDataSocket];
+			}
 		},
 
-		setDataReactionFromServe(state, action) {
-			state.reactionDataServerAndSocket = action.payload;
-		},
+		// setDataReactionFromServe(state, action) {
+		// 	state.reactionDataServerAndSocket = action.payload;
+		// },
 		setUserReactionPanelState(state, action) {
 			state.userReactionPanelState = action.payload;
 		},
@@ -160,4 +194,3 @@ export const selectReactionDataSocket = createSelector(getReactionState, (state:
 export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
 
 export const selectReactionDataFetch = createSelector(getReactionState, (state: ReactionState) => state.dataReationFetch);
-

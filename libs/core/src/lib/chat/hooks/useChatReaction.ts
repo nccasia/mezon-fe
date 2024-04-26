@@ -123,38 +123,66 @@ export function useChatReaction() {
 		return Object.values(dataItemReaction);
 	};
 
-	// const dataReactionCombine = updateEmojiReactionData([...reactionData]);
+	const converReactionDataSocket = updateEmojiReactionData(reactionDataSocket);
+	const combineReaction = [...converReactionDataSocket, ...reactionData];
 
-	const [dataReactionCombine, setDataCombine] = useState<EmojiDataOptionals[]>(updateEmojiReactionData(reactionData));
+	const convertCombine = updateEmojiReactionData(combineReaction);
+	const [convertCombineCloned, setConvertCombineClone] = useState([...convertCombine]);
+	const [dataReactionCombine, setDataCombine] = useState<EmojiDataOptionals[]>(convertCombine);
+
+	// console.log('---');
+	// console.log('reactionDataSocket', reactionDataSocket); // fetch
+	// console.log('converReactionDataSocket', converReactionDataSocket); // conver each emoji
+	// console.log('combineReaction', combineReaction);
+	// console.log('convertCombine', convertCombine);
+
+	// const removeReaction = (socketAction: EmojiDataOptionals, dataReaction: EmojiDataOptionals[]) => {
+	// 	const { action, ...newStateReaction } = socketAction;
+	// 	console.log('new-Remove', newStateReaction);
+	// 	console.log('I', dataReactionCombine);
+
+	// 	return dataReaction.filter((item) => {
+	// 		// Nếu id khớp, kiểm tra xem sender_id của userRemove có tồn tại trong senders của phần tử không
+	// 		const senderIds = item.senders.map((sender) => sender.sender_id);
+	// 		const userSenderId = socketAction.senders[0].sender_id;
+	// 		if (!senderIds.includes(userSenderId)) {
+	// 			return true; // Giữ phần tử nếu không tồn tại sender_id của userRemove trong senders của phần tử
+	// 		}
+
+	// 		return false; // Loại bỏ phần tử nếu id và sender_id đều khớp
+	// 	});
+	// };
+
+	function removeReaction(socketAction: EmojiDataOptionals, dataReaction: EmojiDataOptionals[]) {
+		const newDataReaction = [];
+		for (const item of dataReaction) {
+			if (item.emoji === socketAction.emoji) {
+				item.senders = item.senders.filter((sender) => sender.sender_id !== socketAction.senders[0].sender_id);
+				if (item.senders.length > 0) {
+					newDataReaction.push(item);
+				}
+			} else {
+				newDataReaction.push(item);
+			}
+		}
+		return newDataReaction;
+	}
 
 	useEffect(() => {
-		if (dataSocketAction.action === undefined || dataSocketAction.action === false) {
-			const { action, ...newStateReaction } = dataSocketAction;
-			reactionData.push(newStateReaction);
-			setDataCombine(updateEmojiReactionData(reactionData));
+		if (!dataSocketAction.action) {
+			setDataCombine(convertCombine);
 		} else if (dataSocketAction.action) {
-			const { action, ...newStateReaction } = dataSocketAction;
-			console.log(dataReactionCombine);
-
-			const removedReactionData = dataReactionCombine.filter(
-				(item) =>
-					item.emoji !== newStateReaction.emoji ||
-					item.channel_id !== newStateReaction.channel_id ||
-					item.message_id !== newStateReaction.message_id ||
-					item.senders[0].sender_id !== newStateReaction.senders[0].sender_id,
-			);
-			setDataCombine(removedReactionData);
+			const handleRemove = removeReaction(dataSocketAction, convertCombine);
+			setDataCombine(convertCombine);
 		}
-	}, [dataSocketAction]);
+	}, [dataSocketAction, reactionDataSocket, reactionActions]);
 
-	// const dataReactionSocket = updateEmojiReactionData([...dataReactionServerAndSocket]);
-
-	const setDataReactionFromServe = useCallback(
-		(state: EmojiDataOptionals[]) => {
-			dispatch(reactionActions.setDataReactionFromServe(state));
-		},
-		[dispatch],
-	);
+	// const setDataReactionFromServe = useCallback(
+	// 	(state: EmojiDataOptionals[]) => {
+	// 		dispatch(reactionActions.setDataReactionFromServe(state));
+	// 	},
+	// 	[dispatch],
+	// );
 
 	const setReactionPlaceActive = useCallback(
 		(state: EmojiPlaces) => {
@@ -187,7 +215,7 @@ export function useChatReaction() {
 		() => ({
 			reactionActions,
 			userId,
-			setDataReactionFromServe,
+			// setDataReactionFromServe,
 			reactionMessageDispatch,
 			setReactionPlaceActive,
 			reactionPlaceActive,
@@ -200,11 +228,12 @@ export function useChatReaction() {
 			userReactionPanelState,
 			reactionData,
 			// dataReactionSocket,
+			dataReactionCombine,
 		}),
 		[
 			reactionActions,
 			userId,
-			setDataReactionFromServe,
+			// setDataReactionFromServe,
 			reactionMessageDispatch,
 			setReactionPlaceActive,
 			reactionPlaceActive,
@@ -215,6 +244,7 @@ export function useChatReaction() {
 			setReactionBottomState,
 			reactionData,
 			// dataReactionSocket,
+			dataReactionCombine,
 		],
 	);
 }
