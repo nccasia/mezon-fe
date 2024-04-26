@@ -14,6 +14,8 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
+	const InfiniteScrollRef = useRef<HTMLDivElement>(null);
+
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
@@ -50,9 +52,33 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
+	// const handleScroll = (e: any) => {
+	// 	setPosition(e.target.scrollTop);
+	// };
+
+	const [isTopReached, setIsTopReached] = useState(false);
+	const [scrollPosition, setScrollPosition] = useState(0);
+
 	const handleScroll = (e: any) => {
-		setPosition(e.target.scrollTop);
+		const scrollTop = e.target.scrollTop;
+		const containerHeight = e.target.scrollHeight;
+		const clientHeight = e.target.clientHeight;
+		const topThreshold = 50; // Adjust this threshold as needed
+
+		setScrollPosition(scrollTop);
+
+		if (scrollTop < topThreshold) {
+			setIsTopReached(true);
+		} else {
+			setIsTopReached(false);
+		}
 	};
+
+	// useEffect(() => {
+	//   if (isTopReached) {
+	// 	loadMoreMessage(); // Load older messages when at the top
+	//   }
+	// }, [isTopReached, loadMoreMessage]);
 
 	return (
 		<div
@@ -70,24 +96,28 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
+				style={{
+					display: 'flex',
+					flexDirection: isTopReached ? 'column-reverse' : 'column',
+					overflowX: 'hidden',
+				}}
 				inverse={true}
 				hasMore={hasMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
+				endMessage={<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
-				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
 				{messages.map((message, i) => (
 					<ChannelMessage
 						mode={mode}
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
-						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
 						channelId={channelId}
 						channelLabel={channelLabel || ''}
 					/>

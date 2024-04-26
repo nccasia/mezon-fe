@@ -447,7 +447,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;
+		return +b.creationTimeMs - +a.creationTimeMs;
 	}
 	return 0;
 }
@@ -462,12 +462,12 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 
 export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.filter((message) => message.sender_id === senderId).pop();
+		return messages.filter((message) => message.sender_id === senderId).shift();
 	});
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.pop();
+		return messages.shift();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
