@@ -1,6 +1,7 @@
-import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { ChannelMembersEntity, selectMemberByUserId, selectMemberStatus, selectMembersByChannelId } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export type useChannelMembersOptions = {
 	channelId?: string | null;
@@ -8,6 +9,22 @@ export type useChannelMembersOptions = {
 
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
 	const rawMembers = useSelector(selectMembersByChannelId(channelId));
+	const onlineStatus = useSelector(selectMemberStatus);
+	const { userId } = useAuth();
+	const userProfile = useSelector(selectMemberByUserId(userId as string));
+
+	const onlineMembers = useMemo(() => {
+		const listMembers = rawMembers.filter((member) => member.user?.online === true && onlineStatus[member.user.id ?? ''] === true);
+		if (userProfile) {
+			listMembers.push(userProfile);
+		}
+		return listMembers;
+	}, [onlineStatus, rawMembers, userProfile]);
+
+	const offlineMembers = useMemo(() => {
+		const listMembers = rawMembers.filter((member) => !onlineMembers.includes(member) && member.user?.id !== userId);
+		return listMembers;
+	}, [onlineMembers, rawMembers, userId]);
 
 	const members = useMemo(() => {
 		if (!rawMembers) {
@@ -35,5 +52,7 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 	return {
 		members,
 		rawMembers,
+		onlineMembers,
+		offlineMembers,
 	};
 }

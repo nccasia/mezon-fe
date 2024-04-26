@@ -50,7 +50,7 @@ const ThreadBox = () => {
 			value?: ThreadValue,
 		) => {
 			if (sessionUser) {
-				if (value) {
+				if (value?.nameThread) {
 					await createThread(value);
 				}
 				await sendMessageThread(content, mentions, attachments, references);

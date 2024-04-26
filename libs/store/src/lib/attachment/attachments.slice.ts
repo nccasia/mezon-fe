@@ -1,7 +1,8 @@
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import memoize from 'memoizee';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const ATTACHMENT_FEATURE_KEY = 'attachments';
 
@@ -35,6 +36,18 @@ type fetchChannelAttachmentsPayload = {
 	channelId: string;
 };
 
+const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
+const fetchChannelAttachmentsCached = memoize(
+	(mezon: MezonValueContext, clanId: string, channelId: string) => mezon.client.listChannelAttachments(mezon.session, clanId, channelId, ''),
+	{
+		promise: true,
+		maxAge: CHANNEL_ATTACHMENTS_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[2];
+		},
+	},
+);
+
 export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachment, channelId?: string, clanId?: string) => {
 	return { ...attachmentRes, id: attachmentRes.id || '', channelId, clanId };
 };
@@ -43,7 +56,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 	'attachment/fetchChannelAttachments',
 	async ({ clanId, channelId }: fetchChannelAttachmentsPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listChannelAttachments(mezon.session, channelId, clanId, '');
+		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 		if (!response.attachments) {
 			return thunkAPI.rejectWithValue([]);
 		}

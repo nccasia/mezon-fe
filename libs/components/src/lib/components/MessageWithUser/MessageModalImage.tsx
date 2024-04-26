@@ -1,3 +1,4 @@
+import { useEscapeKey } from '@mezon/core';
 import { selectAttachmentPhoto } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -48,6 +49,8 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 		setUrlImg(url);
 	};
 
+	useEscapeKey(closeModal);
+
 	return (
 		<div>
 			{open ? (
@@ -59,7 +62,7 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 							className="md:max-h-[90vh] max-h-full object-contain rounded-[10px] cursor-default h-fit"
 							onDragStart={handleDrag}
 							onWheel={handleWheel}
-							style={{ transform: `scale(${scale})`, transition: 'transform 0.5s ease' }}
+							style={{ transform: `scale(${scale})`, transition: 'transform 0.3s ease' }}
 							onClick={() => console.log(attachments)}
 						/>
 					</div>

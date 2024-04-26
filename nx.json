@@ -89,5 +89,6 @@
 				"previewTargetName": "preview"
 			}
 		}
-	]
+	],
+	"defaultProject": "desktop"
 }

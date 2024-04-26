@@ -1,4 +1,3 @@
-import { useEscapeKey } from '@mezon/core';
 import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
@@ -17,8 +16,6 @@ function MessageImage({ attachmentData }: MessageImage) {
 	const closeModal = () => {
 		setOpenModal(false);
 	};
-
-	useEscapeKey(closeModal);
 
 	return (
 		<>

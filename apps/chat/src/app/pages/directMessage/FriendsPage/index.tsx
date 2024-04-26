@@ -84,47 +84,49 @@ export default function FriendsPage() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
-				<div className="flex flex-row gap-2">
-					{closeMenu ? (
-						statusMenu ? (
-							<></>
-						) : (
-							<div onClick={() => setStatusMenu(true)}>
-								<Icons.OpenMenu defaultSize="w-6 h-6" />
-							</div>
-						)
-					) : (
+			<div className="flex min-w-0 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
+				{closeMenu ? (
+					statusMenu ? (
 						<></>
-					)}
-					<Icons.IconFriends />
-					Friend
-				</div>
-				<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
-					{tabData.map((tab, index) => (
-						<div key={index} className="relative">
-							<button
-								className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-[#151C2B]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
-								tabIndex={index}
-								onClick={() => handleChangeTab(tab.value)}
-							>
-								{tab.title}
-							</button>
-							{tab.value === 'pending' && quantityPendingRequest !== 0 && (
-								<div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center top-3 right-[5px]">
-									{quantityPendingRequest}
-								</div>
-							)}
+					) : (
+						<div onClick={() => setStatusMenu(true)}>
+							<Icons.OpenMenu defaultSize="w-6 h-6" />
 						</div>
-					))}
+					)
+				) : (
+					<></>
+				)}
+				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenu && !statusMenu ? 'ml-7' : ''}`}>
+					<div className="flex flex-row gap-2 items-center">
+						<Icons.IconFriends />
+						Friend
+					</div>
+					<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
+						{tabData.map((tab, index) => (
+							<div key={index} className="relative">
+								<button
+									className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-[#151C2B]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
+									tabIndex={index}
+									onClick={() => handleChangeTab(tab.value)}
+								>
+									{tab.title}
+								</button>
+								{tab.value === 'pending' && quantityPendingRequest !== 0 && (
+									<div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center top-3 right-[5px]">
+										{quantityPendingRequest}
+									</div>
+								)}
+							</div>
+						))}
+					</div>
+					<button
+						className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 hover:bg-blue-500 ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
+						onClick={handleOpenRequestFriend}
+						style={{ whiteSpace: 'nowrap' }}
+					>
+						Add Friend
+					</button>
 				</div>
-				<button
-					className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 hover:bg-blue-500 ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
-					onClick={handleOpenRequestFriend}
-					style={{ whiteSpace: 'nowrap' }}
-				>
-					Add Friend
-				</button>
 			</div>
 			<div className="flex-1 flex w-full">
 				<div className="px-8 py-6 flex-1">
@@ -148,7 +150,7 @@ export default function FriendsPage() {
 						</div>
 					)}
 					{openModalAddFriend && (
-						<div className="w-full min-w-[500px] flex flex-col gap-3">
+						<div className="w-full flex flex-col gap-3">
 							<span className="font-[700]">ADD FRIEND</span>
 							<span className="font-[400] text-[14px] text-contentTertiary">You can add friends with their Mezon usernames</span>
 

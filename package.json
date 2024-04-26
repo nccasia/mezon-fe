@@ -17,7 +17,14 @@
 		"dev:android": "npx nx run-android mobile",
 		"dev:ios": "npx nx run-ios mobile",
 		"build:android": "npx nx build-android mobile",
-		"build:ios": "npx nx build-ios mobile"
+		"build:ios": "npx nx build-ios mobile",
+		"postinstall": "electron-builder install-app-deps",
+		"dev:desktop": "nx run desktop:serve",
+		"build:desktop:app": "nx run desktop:build",
+		"build:desktop:renderer": "nx build chat --prod --baseHref=./",
+		"build:desktop": "yarn build:desktop:app && yarn build:desktop:renderer",
+		"package:desktop": "nx run desktop:package",
+		"release:desktop": "yarn build:desktop && yarn package:desktop"
 	},
 	"private": true,
 	"dependencies": {
@@ -111,6 +118,7 @@
 		"babel-jest": "^29.7.0",
 		"babel-loader": "^8.2.3",
 		"css-loader": "^6.10.0",
+		"electron": "^28.2.3",
 		"eslint": "8.57.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-import": "2.29.1",
@@ -126,6 +134,7 @@
 		"node-polyfill-webpack-plugin": "^3.0.0",
 		"npm": "^10.5.0",
 		"nx": "18.2.2",
+		"nx-electron": "^18.0.1",
 		"postcss": "8.4.33",
 		"prettier": "^3.2.3",
 		"prettier-plugin-organize-imports": "^3.2.4",

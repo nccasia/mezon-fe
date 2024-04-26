@@ -1,8 +1,9 @@
 import {
 	reactionActions,
 	selectAllMessages,
-	selectDataReactionCombine,
 	selectReactionBottomState,
+	selectReactionDataFetch,
+	selectReactionDataSocket,
 	selectReactionPlaceActive,
 	selectReactionRightState,
 	selectUserReactionPanelState,
@@ -23,9 +24,11 @@ export function useChatReaction() {
 	const dispatch = useDispatch();
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
-	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
+	const reactionDataSocket = useSelector(selectReactionDataSocket);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
+	const reactionDataFetch = useSelector(selectReactionDataFetch);
+
 	const messages = useSelector(selectAllMessages);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -118,7 +121,9 @@ export function useChatReaction() {
 		return Object.values(dataItemReaction);
 	};
 
-	const dataReactionCombine = updateEmojiReactionData([...dataReactionServerAndSocket, ...reactionData]);
+	dispatch(reactionActions.setReactionDataFetch(reactionData));
+
+	const dataReactionCombine = updateEmojiReactionData([...reactionDataSocket, ...reactionDataFetch]);
 
 	const setDataReactionFromServe = useCallback(
 		(state: EmojiDataOptionals[]) => {
@@ -164,13 +169,12 @@ export function useChatReaction() {
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			reactionDataSocket,
 			setReactionRightState,
 			setReactionBottomState,
 			setUserReactionPanelState,
 			userReactionPanelState,
-			reactionData,
+			dataReactionCombine
 		}),
 		[
 			reactionActions,
@@ -181,11 +185,10 @@ export function useChatReaction() {
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			reactionDataSocket,
 			setReactionRightState,
 			setReactionBottomState,
-			reactionData,
+			dataReactionCombine
 		],
 	);
 }

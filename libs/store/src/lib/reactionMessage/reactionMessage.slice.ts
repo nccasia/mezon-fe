@@ -30,6 +30,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionDataSocket: EmojiDataOptionals;
 	reactionDataServerAndSocket: EmojiDataOptionals[];
 	userReactionPanelState: boolean;
+	dataReationFetch: EmojiDataOptionals[];
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -65,6 +66,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	},
 	reactionDataServerAndSocket: [],
 	userReactionPanelState: false,
+	dataReationFetch: [],
 });
 
 export const reactionSlice = createSlice({
@@ -73,6 +75,10 @@ export const reactionSlice = createSlice({
 	reducers: {
 		add: reactionAdapter.addOne,
 		remove: reactionAdapter.removeOne,
+
+		setReactionDataFetch(state, action) {
+			state.dataReationFetch = action.payload;
+		},
 
 		setReactionPlaceActive(state, action) {
 			state.reactionPlaceActive = action.payload;
@@ -148,6 +154,9 @@ export const selectReactionRightState = createSelector(getReactionState, (state:
 
 export const selectMessageReacted = createSelector(getReactionState, (state: ReactionState) => state.reactionDataSocket);
 
-export const selectDataReactionCombine = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
+export const selectReactionDataSocket = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
 
 export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
+
+export const selectReactionDataFetch = createSelector(getReactionState, (state: ReactionState) => state.dataReationFetch);
+
