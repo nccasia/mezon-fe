@@ -1,7 +1,7 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MentionDataProps, SubPanelName, MIN_THRESHOLD_CHARS } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, SubPanelName, MIN_THRESHOLD_CHARS, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import * as Icons from '../Icons';
@@ -14,6 +14,8 @@ export type MessageBoxProps = {
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
+		value?: ThreadValue,
+		anonymous?: boolean
 	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionDataProps[] | undefined;
@@ -137,6 +139,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							onTyping={props.onTyping}
 							currentChannelId={props.currentChannelId}
 							handleConvertToFile={onConvertToFiles}
+							currentClanId = {currentClanId}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

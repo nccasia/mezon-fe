@@ -3,6 +3,7 @@
 	"$schema": "../../node_modules/nx/schemas/project-schema.json",
 	"sourceRoot": "apps/chat/src",
 	"projectType": "application",
+	"tags": [],
 	"targets": {
 		"build": {
 			"executor": "@nx/webpack:webpack",
@@ -16,14 +17,26 @@
 				"main": "apps/chat/src/main.tsx",
 				"tsConfig": "apps/chat/tsconfig.app.json",
 				"assets": [
-					{ "glob": "**/*", "input": "apps/chat/src/assets/", "output": "./assets/" },
+					{
+						"glob": "**/*",
+						"input": "apps/chat/src/assets/",
+						"output": "./assets/"
+					},
 					{
 						"glob": "**/*",
 						"input": "libs/assets/src/assets/",
 						"output": "./assets/"
 					},
-					{ "glob": "apps/chat/src/assets/favicon.ico", "input": "./", "output": "./" },
-					{ "glob": "apps/chat/src/assets/firebase-messaging-sw.js", "input": "./", "output": "./" }
+					{
+						"glob": "apps/chat/src/assets/favicon.ico",
+						"input": "./",
+						"output": "./"
+					},
+					{
+						"glob": "apps/chat/src/assets/firebase-messaging-sw.js",
+						"input": "./",
+						"output": "./"
+					}
 				],
 				"styles": ["apps/chat/src/styles.scss"],
 				"scripts": [],
@@ -58,7 +71,8 @@
 			"defaultConfiguration": "development",
 			"options": {
 				"buildTarget": "chat:build",
-				"hmr": true
+				"hmr": true,
+				"proxyConfig": "apps/chat/proxy.conf.json"
 			},
 			"configurations": {
 				"development": {
@@ -81,6 +95,5 @@
 				"jestConfig": "apps/chat/jest.config.ts"
 			}
 		}
-	},
-	"tags": []
+	}
 }

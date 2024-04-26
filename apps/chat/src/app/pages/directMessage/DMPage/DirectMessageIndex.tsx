@@ -16,7 +16,7 @@ export default function DirectMessageIndex() {
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<DmTopbar.Skeleton />
-			<div className="flex h-heightWithoutTopBar flex-row ">
+			<div className="flex flex-row ">
 				<div className="flex flex-col flex-1">
 					<div className="overflow-y-auto bg-bgSecondary  max-h-heightMessageViewChat h-heightMessageViewChat">
 						<ChannelMessages.Skeleton />

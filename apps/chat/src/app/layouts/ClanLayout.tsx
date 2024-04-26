@@ -35,6 +35,7 @@ const ClanLayout = () => {
 						name={userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
+						userId={userProfile?.user?.id || ''}
 						openSetting={handleOpenCreate}
 						channelCurrent={currentChannel}
 					/>
@@ -43,7 +44,7 @@ const ClanLayout = () => {
 					className={`flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 				>
 					<ChannelTopbar channel={currentChannel} />
-					<div className="flex h-heightWithoutTopBar flex-row">
+					<div className="flex flex-row">
 						<Outlet />
 					</div>
 				</div>

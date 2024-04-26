@@ -7,6 +7,7 @@ import TextInputUser from '../../components/Auth/TextInput';
 import Button from '../../components/Auth/Button';
 import GoogleLogin from '../../components/Auth/GoogleLogin';
 import FooterAuth from '../../components/Auth/FooterAuth';
+import {APP_SCREEN} from "../../navigation/ScreenTypes";
 // import { useDispatch, useSelector } from 'react-redux';
 // import { loginRequest } from '../../redux/Actions/authActions/action';
 const LoginSchema = Yup.object().shape({
@@ -75,7 +76,7 @@ const LoginScreen = () => {
             </Formik>
             <FooterAuth
                 content={'Need an account?'}
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => navigation.navigate(APP_SCREEN.REGISTER)}
                 title={"Register"}
             />
         </View>

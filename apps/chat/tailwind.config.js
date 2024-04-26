@@ -46,12 +46,13 @@ module.exports = {
         widthMessageTextChat: `calc(100% - 40px)`,
         widthChannelTypeText: `calc(100% - 10px)`,
         widthSideBar: `calc(100vw - 72px)`,
+        widthHeader:`calc(100% - 344px)`,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
       },
       height: {
-        heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+        heightMessageViewChat: `calc(100vh - 72px)`,
         heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
         heightTopBar: topBarHeight,
@@ -111,6 +112,7 @@ module.exports = {
     },
     screens: {
       ssm: "430px",
+      sbm:"480px",
       sm: '640px',
       md: '768px',
       lg: '1024px',

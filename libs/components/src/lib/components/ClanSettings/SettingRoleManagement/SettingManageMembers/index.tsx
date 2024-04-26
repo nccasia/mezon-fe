@@ -38,7 +38,7 @@ const SettingManageMembers = () => {
 	}, [activeRole]);
 
 	const handleRemoveMember = async (userID: string) => {
-		const userIDArray = userID.split(','); 
+		const userIDArray = userID?.split(',');
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
 	return (

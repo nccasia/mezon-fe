@@ -248,6 +248,18 @@ input:-webkit-autofill:active {
 	}
 }
 
+.footer-profile .memberProfile {
+ padding: 2px 4px;
+}
+
+.footer-profile:hover .memberProfile {
+	background-color: #3b3b3b;
+
+	.nameMemberProfile {
+		background-color: #3b3b3b;
+	}
+}
+
 // css friendList
 .friendList {
 	.nameMemberProfile {
@@ -420,5 +432,5 @@ input:-webkit-autofill:active {
 
 // css editorReactMention
 #editorReactMention {
-	white-space: nowrap;
+	white-space: nowrap !important;
 }

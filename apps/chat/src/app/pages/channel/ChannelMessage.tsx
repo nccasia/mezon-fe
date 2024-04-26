@@ -67,6 +67,13 @@ export function ChannelMessage(props: MessageProps) {
 			handleCancelEdit();
 		}
 	};
+	const handelSave = () =>{
+		if (editMessage) {
+			handleSend(editMessage, message.id);
+			setNewMessage(editMessage);
+			handleCancelEdit();
+		}
+	} 
 
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -126,7 +133,7 @@ export function ChannelMessage(props: MessageProps) {
 					<textarea
 						onFocus={handleFocus}
 						ref={textareaRef}
-						defaultValue={editMessage}
+						defaultValue={mess.content.t}
 						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}
 						onChange={(e) => {
@@ -134,7 +141,16 @@ export function ChannelMessage(props: MessageProps) {
 						}}
 						rows={editMessage?.split('\n').length}
 					></textarea>
-					<p className="absolute -bottom-4 text-xs">escape to cancel • enter to save</p>
+					<div className='text-xs flex'>
+						<p className='pr-[3px]'>escape to</p>
+						<p className='pr-[3px] text-[#3297ff]'
+						 style={{ cursor: 'pointer' }}
+						onClick={handleCancelEdit}>cancel</p>
+						<p className='pr-[3px]'>• enter to</p>
+						<p className='text-[#3297ff]'
+						 style={{ cursor: 'pointer' }}
+						onClick={handelSave}>save</p>
+					</div>
 				</div>
 			)}
 		</div>

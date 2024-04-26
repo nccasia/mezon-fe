@@ -1,8 +1,8 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
+import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -21,8 +21,10 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
+			value?: ThreadValue,
+			anonymous?: boolean
 		) => {
-			sendMessage(content, mentions, attachments, references);
+				sendMessage(content, mentions, attachments, references, anonymous);
 		},
 		[sendMessage],
 	);

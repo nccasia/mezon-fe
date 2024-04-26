@@ -11,7 +11,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
-		<div className="flex flex-row items-center relative">
+		<div className={`flex flex-row items-center gap-x-5 relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
 			<div className="absolute flex text-zinc-400 text-lg pb-0">
 				{closeMenu ? (
 					statusMenu ? (
@@ -27,7 +27,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 						</>
 					) : (
 						<div onClick={() => setStatusMenu(true)}>
-							<Icons.OpenMenu defaultSize="w-6 h-6" />
+							<Icons.OpenMenu />
 						</div>
 					)
 				) : (
@@ -45,7 +45,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			</div>
 
 			<p
-				className={`mb-0.5 text-white mt-2 max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-8' : 'ml-7 '}`}
+				className={` text-white mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '}`}
 			>
 				{name}
 			</p>

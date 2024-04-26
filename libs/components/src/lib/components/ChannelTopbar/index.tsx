@@ -1,4 +1,4 @@
-import { useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useEscapeKey, useMenu, useOnClickOutside } from '@mezon/core';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -21,10 +21,11 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
+	const { closeMenu, statusMenu } = useMenu();
 
 	return (
 		<div
-			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
+			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader fixed z-[1] w-full sbm:w-widthHeader top-0 right-0 ${closeMenu && !statusMenu ? '' : 'left-[344px] right-auto'} ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -69,7 +70,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<InboxButton />
 								<HelpButton />
 							</div>
-							<div className="ssm:hidden">
+							<div className="ssm:hidden mr-5">
 								<ChannelListButton />
 							</div>
 						</div>
