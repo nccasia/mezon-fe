@@ -52,33 +52,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	// const handleScroll = (e: any) => {
-	// 	setPosition(e.target.scrollTop);
-	// };
-
-	const [isTopReached, setIsTopReached] = useState(false);
-	const [scrollPosition, setScrollPosition] = useState(0);
-
 	const handleScroll = (e: any) => {
-		const scrollTop = e.target.scrollTop;
-		const containerHeight = e.target.scrollHeight;
-		const clientHeight = e.target.clientHeight;
-		const topThreshold = 50; // Adjust this threshold as needed
-
-		setScrollPosition(scrollTop);
-
-		if (scrollTop < topThreshold) {
-			setIsTopReached(true);
-		} else {
-			setIsTopReached(false);
-		}
+		setPosition(e.target.scrollTop);
 	};
-
-	// useEffect(() => {
-	//   if (isTopReached) {
-	// 	loadMoreMessage(); // Load older messages when at the top
-	//   }
-	// }, [isTopReached, loadMoreMessage]);
 
 	return (
 		<div
@@ -98,7 +74,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				next={fetchData}
 				style={{
 					display: 'flex',
-					flexDirection: isTopReached ? 'column-reverse' : 'column',
+					flexDirection: 'column-reverse',
 					overflowX: 'hidden',
 				}}
 				inverse={true}
