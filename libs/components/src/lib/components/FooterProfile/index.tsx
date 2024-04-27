@@ -1,10 +1,19 @@
 import { useOnClickOutside } from '@mezon/core';
-import { ChannelsEntity, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	ChannelsEntity,
+	selectShowModalCustomStatus,
+	selectShowModalFooterProfile,
+	selectStatusCall,
+	useAppDispatch,
+	userClanProfileActions,
+	voiceActions,
+} from '@mezon/store';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
 import MemberProfile from '../MemberProfile';
+import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import VoiceControlPanel from '../VoiceControlPanel';
 import ModalFooterProfile from './ModalFooterProfile';
 
@@ -20,7 +29,8 @@ export type FooterProfileProps = {
 function FooterProfile({ name, status, avatar, userId, openSetting, channelCurrent }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
 	const showScreen = useSelector(selectStatusCall);
-	const [showModalFooterProfile, setShowModalFooterProfile] = useState<boolean>(false);
+	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
+	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,10 +43,18 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	}, [channelCurrent?.type]);
 
 	const handleClickFooterProfile = () => {
-		setShowModalFooterProfile(!showModalFooterProfile);
+		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));
 	};
 
-	useOnClickOutside(profileRef, () => setShowModalFooterProfile(false));
+	const handleCloseModalFooterProfile = () => {
+		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
+	};
+
+	const handleCloseModalCustomStatus = () => {
+		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
+	};
+
+	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
 	return (
 		<div>
@@ -67,6 +85,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 text-[#AEAEAE]" onClick={openSetting} />
 				</div>
 			</button>
+			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
 		</div>
 	);
 }

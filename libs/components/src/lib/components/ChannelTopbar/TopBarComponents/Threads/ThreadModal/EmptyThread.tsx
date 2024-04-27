@@ -16,7 +16,7 @@ const EmptyThread = ({ onClick }: EmptyThreadProps) => {
 			<Button
 				onClick={handleCreateThread}
 				size="sm"
-				className="mt-6 h-10 font-medium text-sm rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1]"
+				className="mt-6 h-10 font-medium text-sm rounded focus:ring-transparent bg-primaryButton hover:!bg-[#0040C1]"
 			>
 				Create Thread
 			</Button>

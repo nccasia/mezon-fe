@@ -1,7 +1,7 @@
-import { ApiClanProfile } from 'mezon-js/api.gen';
 import { IClanProfile, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateClanProfileRequest } from 'mezon-js';
+import { ApiClanProfile } from 'mezon-js/api.gen';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 export const USER_CLAN_PROFILE_FEATURE_KEY = 'userClanProfile';
 
@@ -18,6 +18,8 @@ export interface UserClanProfileState extends EntityState<UserClanProfileEntity,
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentUserClanProfileId?: string | null;
+	showModalFooterProfile: boolean;
+	showModalCustomStatus: boolean;
 }
 
 export const userClanProfileAdapter = createEntityAdapter<UserClanProfileEntity>();
@@ -64,6 +66,8 @@ export const updateUserClanProfile = createAsyncThunk(
 export const initialUserClanProfileState: UserClanProfileState = userClanProfileAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	showModalFooterProfile: false,
+	showModalCustomStatus: false,
 });
 
 export const userClanProfileSlice = createSlice({
@@ -74,6 +78,12 @@ export const userClanProfileSlice = createSlice({
 		remove: userClanProfileAdapter.removeOne,
 		changeUserClanProfile: (state, action: PayloadAction<string>) => {
 			state.currentUserClanProfileId = action.payload;
+		},
+		setShowModalFooterProfile: (state, action: PayloadAction<boolean>) => {
+			state.showModalFooterProfile = action.payload;
+		},
+		setShowModalCustomStatus: (state, action: PayloadAction<boolean>) => {
+			state.showModalCustomStatus = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -109,3 +119,7 @@ export const selectAllUserClanProfile = createSelector(getUserClanProfileState, 
 
 export const selectUserClanProfileByClanID = (clanId: string, userId: string) =>
 	createSelector(selectAllUserClanProfile, (profiles) => profiles.find((pr) => pr.clan_id === clanId && pr.user_id === userId));
+
+export const selectShowModalFooterProfile = createSelector(getUserClanProfileState, (state) => state.showModalFooterProfile);
+
+export const selectShowModalCustomStatus = createSelector(getUserClanProfileState, (state) => state.showModalCustomStatus);

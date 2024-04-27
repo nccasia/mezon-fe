@@ -429,3 +429,8 @@ input:-webkit-autofill:active {
 		display: none;
 	}
 }
+
+// css editorReactMention text box chat
+#editorReactMention {
+	max-width: calc(100% - 100px);
+}

@@ -43,7 +43,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						<Button
 							onClick={handleCreateThread}
 							size="sm"
-							className="h-6 rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1] items-center"
+							className="h-6 rounded focus:ring-transparent bg-primaryButton hover:!bg-primaryButton items-center"
 						>
 							Create
 						</Button>

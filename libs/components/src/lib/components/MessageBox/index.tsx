@@ -1,7 +1,7 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useReference } from '@mezon/core';
+import { useMenu, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MentionDataProps, SubPanelName, MIN_THRESHOLD_CHARS, ThreadValue } from '@mezon/utils';
+import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import * as Icons from '../Icons';
@@ -15,7 +15,7 @@ export type MessageBoxProps = {
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
-		anonymous?: boolean
+		anonymous?: boolean,
 	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionDataProps[] | undefined;
@@ -111,9 +111,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		},
 		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
 	);
+
+	const { closeMenu, statusMenu } = useMenu();
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex gap-2 mb-2 mt-2">
+			<div className="w-full max-h-full flex gap-2 mb-2 mt-2 overflow-x-scroll hide-scrollbar">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>
@@ -123,7 +125,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				})}
 			</div>
 
-			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
+			<div
+				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-black rounded-md relative overflow-x-hidden ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
+			>
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
 					currentChannelId={currentChannelId || ''}
@@ -139,7 +143,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							onTyping={props.onTyping}
 							currentChannelId={props.currentChannelId}
 							handleConvertToFile={onConvertToFiles}
-							currentClanId = {currentClanId}
+							currentClanId={currentClanId}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

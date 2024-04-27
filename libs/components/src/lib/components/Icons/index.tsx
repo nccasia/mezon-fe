@@ -172,7 +172,7 @@ export function AddIcon(props: React.HTMLAttributes<SVGElement>) {
 export function Check(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Check" viewBox="0 0 16 15.2" {...props}>
-			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" fill="currentColor" />
+			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" fill="#155EEF" />
 		</svg>
 	);
 }
@@ -2108,3 +2108,73 @@ export const BackToCategoriesGif: React.FC<IconProps> = ({ defaultFill = '#AEAEA
 		</svg>
 	);
 };
+
+export const SmilingFace: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="18" height="18" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<g clipPath="url(#clip0_2372_24105)">
+				<path
+					d="M12.5 2C7.00797 2 2.5 6.50742 2.5 12C2.5 17.4926 7.00797 22 12.5 22C17.992 22 22.5 17.4926 22.5 12C22.5 6.50742 17.992 2 12.5 2ZM8.98438 6.72656C9.95367 6.72656 10.7422 7.51508 10.7422 8.48438C10.7422 8.80824 10.4801 9.07031 10.1562 9.07031C9.83238 9.07031 9.57031 8.80824 9.57031 8.48438C9.57031 8.16109 9.30711 7.89844 8.98438 7.89844C8.66164 7.89844 8.39844 8.16109 8.39844 8.48438C8.39844 8.80824 8.13637 9.07031 7.8125 9.07031C7.48863 9.07031 7.22656 8.80824 7.22656 8.48438C7.22656 7.51508 8.01508 6.72656 8.98438 6.72656ZM12.5 17.2734C9.59207 17.2734 7.22656 14.9079 7.22656 12C7.22656 11.6761 7.48863 11.4141 7.8125 11.4141C8.13637 11.4141 8.39844 11.6761 8.39844 12C8.39844 14.2614 10.2386 16.1016 12.5 16.1016C14.7614 16.1016 16.6016 14.2614 16.6016 12C16.6016 11.6761 16.8636 11.4141 17.1875 11.4141C17.5114 11.4141 17.7734 11.6761 17.7734 12C17.7734 14.9079 15.4079 17.2734 12.5 17.2734ZM17.1875 9.07031C16.8636 9.07031 16.6016 8.80824 16.6016 8.48438C16.6016 8.16109 16.3384 7.89844 16.0156 7.89844C15.6929 7.89844 15.4297 8.16109 15.4297 8.48438C15.4297 8.80824 15.1676 9.07031 14.8438 9.07031C14.5199 9.07031 14.2578 8.80824 14.2578 8.48438C14.2578 7.51508 15.0463 6.72656 16.0156 6.72656C16.9849 6.72656 17.7734 7.51508 17.7734 8.48438C17.7734 8.80824 17.5114 9.07031 17.1875 9.07031Z"
+					fill="#B5BAC1"
+				/>
+			</g>
+			<defs>
+				<clipPath id="clip0_2372_24105">
+					<rect width="20" height="20" fill="white" transform="translate(2.5 2)" />
+				</clipPath>
+			</defs>
+		</svg>
+	);
+};
+
+export function DarkModeIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
+			<path
+				fillRule="evenodd"
+				d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z"
+				clipRule="evenodd"
+			/>
+		</svg>
+	);
+}
+
+export function MinusCircleIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<g clipPath="url(#clip0_403_3438)">
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM8.00005 10.75C7.30969 10.75 6.75005 11.3096 6.75005 12C6.75005 12.6904 7.30969 13.25 8.00005 13.25H16C16.6904 13.25 17.25 12.6904 17.25 12C17.25 11.3096 16.6904 10.75 16 10.75H8.00005Z"
+					fill="#F23F43"
+				/>
+			</g>
+			<defs>
+				<clipPath id="clip0_403_3438">
+					<rect width="20" height="20" fill="white" transform="translate(2 2)" />
+				</clipPath>
+			</defs>
+		</svg>
+	);
+}
+
+export function ConvertAccount(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<g clipPath="url(#clip0_403_2187)">
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M16.2929 2.29289C16.6834 1.90237 17.3166 1.90237 17.7071 2.29289L21.7071 6.29289C22.0976 6.68342 22.0976 7.31658 21.7071 7.70711L17.7071 11.7071C17.3166 12.0976 16.6834 12.0976 16.2929 11.7071C15.9024 11.3166 15.9024 10.6834 16.2929 10.2929L18.5858 8L5 8C4.44772 8 4 7.55228 4 7C4 6.44771 4.44772 6 5 6L18.5858 6L16.2929 3.70711C15.9024 3.31658 15.9024 2.68342 16.2929 2.29289ZM7.70711 12.2929C8.09763 12.6834 8.09763 13.3166 7.70711 13.7071L5.41421 16L19 16C19.5523 16 20 16.4477 20 17C20 17.5523 19.5523 18 19 18L5.41421 18L7.70711 20.2929C8.09763 20.6834 8.09763 21.3166 7.70711 21.7071C7.31658 22.0976 6.68342 22.0976 6.29289 21.7071L2.29289 17.7071C2.10536 17.5196 2 17.2652 2 17C2 16.7348 2.10536 16.4804 2.29289 16.2929L6.29289 12.2929C6.68342 11.9024 7.31658 11.9024 7.70711 12.2929Z"
+					fill="#B5BAC1"
+				/>
+			</g>
+			<defs>
+				<clipPath id="clip0_403_2187">
+					<rect width="20" height="20" fill="white" transform="translate(22 2) rotate(90)" />
+				</clipPath>
+			</defs>
+		</svg>
+	);
+}

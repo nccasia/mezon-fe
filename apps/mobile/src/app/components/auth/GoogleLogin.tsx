@@ -4,11 +4,12 @@ import Images from 'apps/mobile/src/assets/Images'
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 const GOOGLE_ANDROID_ID = '648946579638-qtugur5pktrkh30q0ampp76fnaekcmk7.apps.googleusercontent.com';
+const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
 
 const GoogleLogin = () => {
     useEffect(() => {
         GoogleSignin.configure({
-            webClientId: GOOGLE_ANDROID_ID,
+            webClientId: GOOGLE_WEB_ID,
             offlineAccess: true,
             forceCodeForRefreshToken: true,
         });

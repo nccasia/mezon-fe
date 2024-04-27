@@ -65,6 +65,9 @@ module.exports = {
       maxWidth: {
         '9/10': '90%',
         '2/5': "40%",
+        boxChatView:`calc(100vw - 589px)`,
+        wrappBoxChatView:`calc(100vw - 377px)`,
+        wrappBoxChatViewMobile:`calc(100vw - 31px)`,
       },
 
       maxHeight: {

@@ -10,8 +10,6 @@ const SettingRightProfile = () => {
 		setIsUserSettings(false);
 	};
 
-	useEffect(() => {}, [userProfile]);
-
 	const handleUserSettingsClick = () => {
 		setIsUserSettings(true);
 	};
@@ -24,6 +22,7 @@ const SettingRightProfile = () => {
 					name={userProfile?.user?.username || ''}
 					avatar={userProfile?.user?.avatar_url || ''}
 					nameDisplay={userProfile?.user?.display_name || ''}
+					aboutMe = {userProfile?.user?.about_me || ''}
 				/>
 			) : (
 				<SettingRightClan onUserProfileClick={handleUserSettingsClick} />

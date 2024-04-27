@@ -45,7 +45,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	);
 
 	return (
-		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
+		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 absolute right-0">
 			<div onClick={handleOpenGifs} className="cursor-pointer">
 				<Icons.Gif defaultFill={`${subPanelActive === SubPanelName.GIFS ? '#FFFFFF' : '#AEAEAE'}`} />
 			</div>

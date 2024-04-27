@@ -1,13 +1,13 @@
-import { ApiClanDesc } from 'mezon-js/api.gen';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelType } from 'mezon-js';
+import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
+import { usersClanActions } from '../clanMembers/clan.members';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
-import { ChannelType } from 'mezon-js';
-import { usersClanActions } from '../clanMembers/clan.members';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
@@ -47,7 +47,8 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(policiesActions.fetchPermission());
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
-	thunkAPI.dispatch(voiceActions.fetchVoiceChannelMembers({
+	thunkAPI.dispatch(
+		voiceActions.fetchVoiceChannelMembers({
 			clanId: clanId ?? '',
 			channelId: '',
 			channelType: ChannelType.CHANNEL_TYPE_VOICE,
@@ -101,9 +102,10 @@ type UpdateLinkUser = {
 	user_name: string;
 	avatar_url: string;
 	display_name: string;
+	about_me: string;
 };
 
-export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name }: UpdateLinkUser, thunkAPI) => {
+export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
 	try {
 		const mezon = ensureClient(getMezonCtx(thunkAPI));
 		const body = {
@@ -113,6 +115,7 @@ export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_nam
 			location: '',
 			timezone: '',
 			username: user_name,
+			about_me: about_me,
 		};
 		const response = await mezon.client.updateAccount(mezon.session, body);
 		if (!response) {

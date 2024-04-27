@@ -18,12 +18,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
-	const { sendInviteMessage } = useSendInviteMessage();
-	const { createDirectMessageWithUser } = useDirect();
-	const [content, setContent] = useState<string>('');
 	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
-	const mezon = useMezon();
-	const { userProfile } = useAuth();
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
@@ -57,7 +52,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	};
 	return (
 		<div className="flex flex-col">
-			<div className="font-bold tracking-wider text-xs">ROLES</div>
+			<div className="font-bold tracking-wider text-sm">ROLES</div>
 			<div className="mt-2">
 				{userRolesClan.map((role, index) => (
 					<span key={index} className="inline-block text-xs border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 mb-2">
