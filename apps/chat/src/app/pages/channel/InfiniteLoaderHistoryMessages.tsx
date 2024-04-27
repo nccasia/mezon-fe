@@ -1,15 +1,7 @@
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { ChannelMessage } from './ChannelMessage';
-import ChannelMessages from './ChannelMessages';
 
-export default function InfiniteLoaderHistoryMessages({
-	hasNextPage,
-	isNextPageLoading,
-	messages,
-	loadNextPage,
-}: any) {
-
+export default function InfiniteLoaderHistoryMessages({ hasNextPage, isNextPageLoading, messages, loadNextPage }: any) {
 	console.log('hasNextPage', hasNextPage);
 	console.log('isNextPageLoading', isNextPageLoading);
 	console.log('items', messages);
@@ -24,7 +16,7 @@ export default function InfiniteLoaderHistoryMessages({
 	// Render an item or a loading indicator.
 	const Item = ({ index, style }: any) => {
 		let content;
-    console.log(content);
+		console.log(content);
 		if (!isItemLoaded(index)) {
 			content = 'Loading...';
 		} else {
@@ -35,25 +27,12 @@ export default function InfiniteLoaderHistoryMessages({
 	};
 
 	return (
-    <InfiniteLoader
-    ref={listRef}
-    isItemLoaded={isItemLoaded}
-    itemCount={itemCount}
-    loadMoreItems={loadMoreItems}
-  >
-    {({ onItemsRendered, ref }) => (
-      <List
-        className="List"
-        height={150}
-        itemCount={itemCount}
-        itemSize={30}
-        onItemsRendered={onItemsRendered}
-        ref={ref}
-        width={300}
-      >
-        {Item}
-      </List>
-    )}
-  </InfiniteLoader>
+		<InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
+			{({ onItemsRendered, ref }) => (
+				<List className="List" height={150} itemCount={itemCount} itemSize={30} onItemsRendered={onItemsRendered} ref={ref} width={300}>
+					{Item}
+				</List>
+			)}
+		</InfiniteLoader>
 	);
 }

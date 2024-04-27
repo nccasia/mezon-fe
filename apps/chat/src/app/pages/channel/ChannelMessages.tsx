@@ -1,8 +1,7 @@
 import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
-import { IMessage } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
-import InfiniteLoaderHistoryMessages from './InfiniteLoaderHistoryMessages';
+import ScrollContainerMessage from './ScrollContainerMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -22,9 +21,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
 
-	const fetchData = () => {
-		loadMoreMessage();
-	};
+	// const fetchData = () => {
+	// 	loadMoreMessage();
+	// };
 
 	useEffect(() => {
 		if (idMessageReplied) {
@@ -61,20 +60,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	// 	setMessagesLoaded(messages);
 	// }, [messages]);
 
-	const [messagesLoaded, setMessagesLoaded] = useState<IMessage[]>([]);
-	const [hasNextPage, setHasNextPage] = useState(true);
-	const [isNextPageLoading, setIsNextPageLoading] = useState(false);
-	const [sortOrder, setSortOrder] = useState('asc');
-	const [items, setItems] = useState([]);
+	// const [messagesLoaded, setMessagesLoaded] = useState<IMessage[]>([]);
+	// const [hasNextPage, setHasNextPage] = useState(true);
+	// const [isNextPageLoading, setIsNextPageLoading] = useState(false);
+	// const [sortOrder, setSortOrder] = useState('asc');
+	// const [items, setItems] = useState([]);
 
-	const loadNextPage = (...args: any) => {
-		setIsNextPageLoading(true);
-		setTimeout(() => {
-			setMessagesLoaded(messages);
-			setHasNextPage(items.length < 50);
-			setIsNextPageLoading(false);
-		}, 2500);
-	};
+	// const loadNextPage = (...args: any) => {
+	// 	setIsNextPageLoading(true);
+	// 	setTimeout(() => {
+	// 		setMessagesLoaded(messages);
+	// 		setHasNextPage(items.length < 50);
+	// 		setIsNextPageLoading(false);
+	// 	}, 2500);
+	// };
 
 	return (
 		// <div
@@ -117,14 +116,28 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		// 	</InfiniteScroll>
 		// </div>
 
-		<div>
-			<InfiniteLoaderHistoryMessages
-				hasNextPage={hasNextPage}
-				isNextPageLoading={isNextPageLoading}
-				messages={messages}
-				loadNextPage={loadNextPage}
-			/>
-		</div>
+		// <div>
+		// 	<InfiniteLoaderHistoryMessages
+		// 		hasNextPage={hasNextPage}
+		// 		isNextPageLoading={isNextPageLoading}
+		// 		messages={messages}
+		// 		loadNextPage={loadNextPage}
+		// 	/>
+		// </div>
+
+		<ScrollContainerMessage mode={mode} channelLabel={channelLabel} channelId={channelId}>
+			{/* {messages.map((message, i) => (
+				<ChannelMessage
+					mode={mode}
+					key={message.id}
+					lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+					message={message}
+					preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+					channelId={channelId}
+					channelLabel={channelLabel || ''}
+				/>
+			))} */}
+		</ScrollContainerMessage>
 	);
 }
 
