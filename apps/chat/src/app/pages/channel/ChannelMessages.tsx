@@ -125,7 +125,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		// 	/>
 		// </div>
 
-		<ScrollContainerMessage mode={mode} channelLabel={channelLabel} channelId={channelId}>
+		<ScrollContainerMessage
+			mode={mode}
+			channelLabel={channelLabel}
+			channelId={channelId}
+			messages={messages}
+			lastMessageId={lastMessageId}
+			unreadMessageId={unreadMessageId}
+			hasMoreMessage={hasMoreMessage}
+		>
 			{/* {messages.map((message, i) => (
 				<ChannelMessage
 					mode={mode}

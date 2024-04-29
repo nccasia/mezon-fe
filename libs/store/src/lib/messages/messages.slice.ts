@@ -195,6 +195,7 @@ type JumpToMessageArgs = {
 	channelId: string;
 	messageId: string;
 };
+
 export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId }: JumpToMessageArgs, thunkAPI) => {
 	try {
 		await thunkAPI.dispatch(
