@@ -1,7 +1,9 @@
 import { useChatMessages } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { VariableSizeList as List } from 'react-window';
 import { ChannelMessage } from './ChannelMessage';
+import { useWindowResize } from './useResize';
 
 export const ScrollContainerMessage = ({
 	children,
@@ -67,25 +69,48 @@ export const ScrollContainerMessage = ({
 		}
 	};
 
-	return (
-		<div className="relative h-full">
-			<div className="relative h-full overflow-scroll border border-red-600 overflow-x-hidden" ref={outerDiv} onScroll={handleScroll}>
-				<div className="relative transition-all duration-300 border border-green-600" ref={innerDiv}>
-					{messageToMap &&
-						messageToMap.map((message, i) => (
-							<ChannelMessage
-								mode={mode}
-								key={message.id}
-								lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-								message={message}
-								preMessage={messages.length > 0 ? messages[i - 1] : undefined}
-								channelId={channelId}
-								channelLabel={channelLabel || ''}
-							/>
-						))}
-				</div>
+	const Row = ({ data, index, setSize, windowWidth }: any) => {
+		const rowRef = useRef<HTMLDivElement>(null); // Correct type for rowRef
+		useEffect(() => {
+			if (rowRef.current) {
+				setSize(index, rowRef.current.getBoundingClientRect().height);
+			}
+		}, [setSize, index, windowWidth]); // Ensure windowWidth is defined in your component
+		return (
+			<div ref={rowRef}>
+				{data[index] && (
+					<ChannelMessage
+						mode={mode}
+						key={data[index].id}
+						lastSeen={data[index].id === unreadMessageId && data[index].id !== lastMessageId}
+						message={data[index]}
+						preMessage={index > 0 ? data[index][index - 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
+					/>
+				)}
 			</div>
-		</div>
+		);
+	};
+
+	const listRef = useRef<List>(null); // Correct type for listRef
+	const sizeMap = useRef<{ [key: number]: number }>({}); // Correct type for sizeMap
+	const setSize = useCallback((index: any, size: any) => {
+		sizeMap.current = { ...sizeMap.current, [index]: size };
+		listRef?.current?.resetAfterIndex(index);
+	}, []);
+	console.log(setSize);
+	const getSize = (index: number) => sizeMap.current[index] || 50;
+	const [windowWidth] = useWindowResize();
+
+	return (
+		<List ref={listRef} height={600} width="100%" itemCount={messages.length} itemSize={getSize} itemData={messages}>
+			{({ data, index, style }) => (
+				<div style={style}>
+					<Row data={data} index={index} setSize={setSize} windowWidth={windowWidth} />
+				</div>
+			)}
+		</List>
 	);
 };
 
