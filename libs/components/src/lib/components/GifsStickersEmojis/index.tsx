@@ -39,7 +39,7 @@ const GifStickerEmojiPopup = () => {
 	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 
 	return (
-		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222]">
+		<div className="flex flex-col items-center w-full md:w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222] transform scale-100">
 			<div className=" w-full">
 				<div className="flex justify-start flex-row w-full mt-2 border-b border-blue-500 pb-2">
 					<button
@@ -64,7 +64,7 @@ const GifStickerEmojiPopup = () => {
 				{subPanelActive !== SubPanelName.EMOJI && <InputSearch />}
 			</div>
 
-			<div className="w-full h-fit">
+			<div className="w-full h-fit border">
 				{subPanelActive === SubPanelName.GIFS && (
 					<div>
 						<TenorGifCategories
