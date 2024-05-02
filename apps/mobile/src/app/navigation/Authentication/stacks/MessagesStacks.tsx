@@ -5,13 +5,13 @@ import {
 	TransitionSpecs,
 } from '@react-navigation/stack';
 
-import {APP_SCREEN} from "../../ScreenTypes";
+import { APP_SCREEN } from "../../ScreenTypes";
 import Notifications from "../../../screens/main/Notifications";
-
+import MessageID from "../../../screens/main/Messages/MessageID";
 // eslint-disable-next-line no-empty-pattern
-export const MessagesStacks = ({} : any) => {
+export const MessagesStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
-	
+
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -26,6 +26,14 @@ export const MessagesStacks = ({} : any) => {
 				cardStyle: { backgroundColor: 'white' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}>
+			<Stack.Screen
+				name={APP_SCREEN.MESSAGES.IDMESSAGE}
+				component={MessageID}
+
+				options={{
+					headerShown: false,
+				}}
+			/>
 			{/*Example*/}
 			<Stack.Screen
 				name={APP_SCREEN.NOTIFICATION.HOME}
@@ -35,6 +43,8 @@ export const MessagesStacks = ({} : any) => {
 					headerShown: false,
 				}}
 			/>
+
+
 		</Stack.Navigator>
 	);
 };

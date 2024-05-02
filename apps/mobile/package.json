@@ -14,6 +14,8 @@
 		"@testing-library/react-native": "*",
 		"formik": "^2.4.5",
 		"metro-config": "*",
+		"moment": "^2.30.1",
+		"react": "18.2.0",
 		"react-native": "*",
 		"react-native-dotenv": "^3.4.11",
 		"react-native-fast-image": "^8.6.3",

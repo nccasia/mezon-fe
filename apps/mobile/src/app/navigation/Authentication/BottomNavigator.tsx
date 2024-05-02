@@ -3,11 +3,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
-import MessagesScreen from '../../screens/main/MessagesScreen';
+import MessagesScreen from '../../screens/main/Messages/MessagesScreen';
 import Notifications from '../../screens/main/Notifications';
 import ProfileScreen from '../../screens/main/ProfileScreen';
 import { darkColor } from '../../constants/Colors';
-import {APP_SCREEN} from "../ScreenTypes";
+import { APP_SCREEN } from "../ScreenTypes";
 import DrawerNavigator from "./DrawerNavigator";
 import HomeScreen from "../../screens/home/HomeScreen";
 
@@ -18,15 +18,15 @@ const BottomNavigator = () => {
     return (
         <TabStack.Navigator
             screenOptions={{
-              tabBarHideOnKeyboard: true,
-              tabBarStyle: {
-                  height: 65,
-                  paddingBottom: 10,
-                  borderTopWidth: 0,
-                  elevation: 0,
-                  backgroundColor: darkColor.Backgound_Tertiary
-              },
-              tabBarActiveTintColor: "#FFFFFF"
+                tabBarHideOnKeyboard: true,
+                tabBarStyle: {
+                    height: 65,
+                    paddingBottom: 10,
+                    borderTopWidth: 0,
+                    elevation: 0,
+                    backgroundColor: darkColor.Backgound_Tertiary
+                },
+                tabBarActiveTintColor: "#FFFFFF"
             }}
             initialRouteName={APP_SCREEN.DRAWER_BAR}
         >
@@ -45,8 +45,8 @@ const BottomNavigator = () => {
                 name={APP_SCREEN.MESSAGES.HOME}
                 component={MessagesScreen}
                 options={{
-                  headerShown: false,
-                  title: 'Messages',
+                    headerShown: false,
+                    title: 'Messages',
                     tabBarIcon: ({ color }) => (
                         <Feather name="message-circle" color={color} size={28} />
                     ),

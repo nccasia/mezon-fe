@@ -1,0 +1,362 @@
+[
+    {
+        "id": "9a1b0bf5-6cac-4ea6-a0fb-bf139df9a2cf",
+        "from": "Aguilar",
+        "date": "Wed Sep 10 2008 01:23:35 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=aguilarduke@marketoid.com",
+        "msg": "Ullamco nostrud velit reprehenderit exercitation labore laboris consequat ex magna nostrud.",
+        "read": true,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "16d121b0-bad3-475a-a1d3-57060a25e3c2",
+        "from": "Baxter",
+        "date": "Wed May 20 1998 08:53:35 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=baxterduke@marketoid.com",
+        "msg": "Commodo tempor consequat elit in sit sint cillum magna laborum laborum veniam ea exercitation quis.",
+        "read": false,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "594d6cfc-5f69-4e63-ba2b-6eb318fc5d7d",
+        "from": "Bonnie",
+        "date": "Tue Dec 30 2003 17:58:09 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=bonnieduke@marketoid.com",
+        "msg": "Labore excepteur reprehenderit deserunt pariatur in cupidatat dolor Lorem nulla elit irure.",
+        "read": true,
+        "unreadCount": 1,
+        "online": true
+    },
+    {
+        "id": "d90b9cac-aca0-4b8f-9ac5-3b7c228e3657",
+        "from": "Myrna",
+        "date": "Fri Dec 24 2010 08:09:38 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=myrnaduke@marketoid.com",
+        "msg": "Proident cupidatat sint exercitation incididunt enim deserunt cillum irure.",
+        "read": true,
+        "unreadCount": 0,
+        "online": false
+    },
+    {
+        "id": "45ba88b0-3d9e-4ca7-a93a-45b7db9d7100",
+        "from": "Terra",
+        "date": "Mon Jun 04 1990 16:28:06 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=terraduke@marketoid.com",
+        "msg": "Deserunt mollit qui aute enim sit enim ullamco nostrud velit excepteur culpa in.",
+        "read": false,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "874933b3-b7ba-47e0-8bcd-40defa550c68",
+        "from": "Bessie",
+        "date": "Wed Jul 17 1985 00:01:43 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=bessieduke@marketoid.com",
+        "msg": "Duis et eu commodo nulla in anim elit.",
+        "read": true,
+        "unreadCount": 0,
+        "online": false
+    },
+    {
+        "id": "f09bb250-6e5b-4d98-a849-93e0fdc1a351",
+        "from": "Ella",
+        "date": "Fri Aug 05 2011 14:09:06 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=elladuke@marketoid.com",
+        "msg": "Commodo pariatur proident et dolor.",
+        "read": false,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "c4ae3078-4df8-4c0d-b55f-73e02622ee0f",
+        "from": "Cain",
+        "date": "Thu Mar 06 1997 05:05:53 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=cainduke@marketoid.com",
+        "msg": "Ex ea magna exercitation duis aliquip minim pariatur adipisicing.",
+        "read": false,
+        "unreadCount": 3,
+        "online": false
+    },
+    {
+        "id": "c6650dc2-2fa3-4415-9fb7-239ccc7983d0",
+        "from": "Herring",
+        "date": "Tue Sep 05 2017 21:57:55 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=herringduke@marketoid.com",
+        "msg": "Qui velit laborum dolore labore dolor est.",
+        "read": true,
+        "unreadCount": 1,
+        "online": false
+    },
+    {
+        "id": "a8c98568-690f-43aa-b188-0d13ff10dbde",
+        "from": "Jerri",
+        "date": "Wed Jul 07 2021 22:38:47 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=jerriduke@marketoid.com",
+        "msg": "Nisi irure nostrud tempor ex aute aute consectetur reprehenderit velit.",
+        "read": true,
+        "unreadCount": 2,
+        "online": false
+    },
+    {
+        "id": "9160e9d7-8e66-425f-99a0-dd323d464387",
+        "from": "Yvette",
+        "date": "Fri May 03 1996 17:50:23 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=yvetteduke@marketoid.com",
+        "msg": "Ea consectetur ex ullamco commodo reprehenderit dolore occaecat aute culpa commodo exercitation id.",
+        "read": false,
+        "unreadCount": 1,
+        "online": false
+    },
+    {
+        "id": "d8da9548-3691-47f1-940a-85f0dba6d470",
+        "from": "Cornelia",
+        "date": "Thu Feb 06 2003 18:59:28 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=corneliaduke@marketoid.com",
+        "msg": "Qui incididunt pariatur do esse pariatur reprehenderit nulla id deserunt magna consequat sint non.",
+        "read": false,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "349337b0-ada4-4ba1-9899-914913daacc6",
+        "from": "Mueller",
+        "date": "Wed May 20 1987 01:53:37 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=muellerduke@marketoid.com",
+        "msg": "Dolore proident laborum laborum consequat ea duis ut sunt sint ullamco qui tempor.",
+        "read": false,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "ddd8aef7-c1c1-4d76-aea1-89c9c43d7491",
+        "from": "Anita",
+        "date": "Tue Jun 14 2016 17:52:21 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=anitaduke@marketoid.com",
+        "msg": "Minim elit ex veniam eiusmod ut.",
+        "read": true,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "a257f2f2-400a-45d2-8f7f-2425535ebbb1",
+        "from": "Beverley",
+        "date": "Wed Sep 19 2012 18:31:41 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=beverleyduke@marketoid.com",
+        "msg": "In incididunt aliquip elit amet sit laboris est mollit cillum anim amet sit sunt ut.",
+        "read": true,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "66b9566e-03f7-4c9a-a315-0b1975b3fb6f",
+        "from": "Lindsay",
+        "date": "Tue Dec 24 2002 17:16:18 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=lindsayduke@marketoid.com",
+        "msg": "Mollit consectetur laboris aute adipisicing aute Lorem nostrud sunt.",
+        "read": false,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "89435cc6-9b61-4ed6-bdbe-4915b52ac6f9",
+        "from": "Lynnette",
+        "date": "Sat Aug 13 2011 20:52:38 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=lynnetteduke@marketoid.com",
+        "msg": "Ipsum cillum veniam non proident sit anim eu pariatur.",
+        "read": false,
+        "unreadCount": 1,
+        "online": true
+    },
+    {
+        "id": "fb9dac21-4429-4ca9-b39c-1c0a75961930",
+        "from": "Mckay",
+        "date": "Fri Dec 13 1996 11:54:16 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=mckayduke@marketoid.com",
+        "msg": "Dolor ex sit cupidatat laboris sint amet ad qui.",
+        "read": true,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "546830d2-c2b7-48f4-a3e6-d2560615eb5f",
+        "from": "Acosta",
+        "date": "Sat Jun 20 1987 05:46:38 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=acostaduke@marketoid.com",
+        "msg": "Aute irure adipisicing exercitation ipsum aliquip mollit magna eu velit magna magna.",
+        "read": true,
+        "unreadCount": 1,
+        "online": false
+    },
+    {
+        "id": "ec99722b-095b-4a44-b945-43b6660d8ede",
+        "from": "Jewel",
+        "date": "Sun Jun 12 1988 12:19:33 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=jewelduke@marketoid.com",
+        "msg": "Amet adipisicing duis tempor fugiat sit cillum nisi dolore occaecat pariatur eiusmod tempor.",
+        "read": false,
+        "unreadCount": 1,
+        "online": true
+    },
+    {
+        "id": "3d8a32e7-590d-4bcd-8600-624e09baac1b",
+        "from": "Parks",
+        "date": "Thu Oct 25 1984 17:37:01 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=parksduke@marketoid.com",
+        "msg": "Deserunt veniam veniam Lorem mollit sint adipisicing tempor proident.",
+        "read": true,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "8227764e-ea3a-4369-af0e-b692a2475f4e",
+        "from": "Elliott",
+        "date": "Sun Jul 28 1974 03:25:44 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=elliottduke@marketoid.com",
+        "msg": "Nisi eu labore quis in.",
+        "read": false,
+        "unreadCount": 1,
+        "online": true
+    },
+    {
+        "id": "f96fc7f8-c6f4-492c-9d9d-111aa4f2d213",
+        "from": "Shields",
+        "date": "Tue Feb 27 1979 03:23:55 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=shieldsduke@marketoid.com",
+        "msg": "Cillum mollit duis consequat magna minim officia id enim anim amet enim.",
+        "read": false,
+        "unreadCount": 1,
+        "online": true
+    },
+    {
+        "id": "a18e2182-fa22-4cea-b84a-e49cefe0bceb",
+        "from": "Felicia",
+        "date": "Wed Jan 23 1985 11:46:33 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=feliciaduke@marketoid.com",
+        "msg": "Do excepteur non Lorem reprehenderit aute.",
+        "read": false,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "fe65602a-d1e7-4d02-9275-07c43a69519c",
+        "from": "Ruiz",
+        "date": "Tue Dec 15 1987 00:04:48 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=ruizduke@marketoid.com",
+        "msg": "Amet ex anim ut aliqua culpa incididunt cillum.",
+        "read": false,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "50a2e86c-d31a-46a1-b3d3-9d3dff98cd82",
+        "from": "Laurel",
+        "date": "Fri Dec 22 2000 21:49:21 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=laurelduke@marketoid.com",
+        "msg": "Do irure irure consectetur ullamco officia pariatur excepteur.",
+        "read": true,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "59c41dca-f2c7-4ed4-9147-01f0f29ba005",
+        "from": "Brittany",
+        "date": "Sun Aug 28 2011 08:18:22 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=brittanyduke@marketoid.com",
+        "msg": "Culpa cupidatat sunt duis commodo ex aute voluptate ut.",
+        "read": true,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "e7f501e4-a7a1-4395-ab12-a2e6f9ca230c",
+        "from": "Lindsay",
+        "date": "Fri Mar 25 2016 15:16:00 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=lindsayduke@marketoid.com",
+        "msg": "Magna enim ad nulla nisi.",
+        "read": true,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "0078b06e-3848-47de-b080-de9506b94a60",
+        "from": "Fran",
+        "date": "Sat Jan 17 2015 13:09:00 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=franduke@marketoid.com",
+        "msg": "Occaecat ullamco fugiat velit consequat magna veniam do magna qui consequat pariatur ad do.",
+        "read": true,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "9dd2b21e-4483-44b1-9ee8-bb10fc82e389",
+        "from": "Deana",
+        "date": "Tue Aug 25 1970 19:38:04 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=deanaduke@marketoid.com",
+        "msg": "Laborum dolor proident nisi Lorem adipisicing aliqua et cupidatat.",
+        "read": false,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "b70d4d65-0c8b-4b22-ae51-77ebe7932e38",
+        "from": "Pena",
+        "date": "Thu Feb 15 1996 02:04:15 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=penaduke@marketoid.com",
+        "msg": "Aute deserunt irure nisi occaecat nostrud do ex dolor veniam exercitation.",
+        "read": true,
+        "unreadCount": 2,
+        "online": true
+    },
+    {
+        "id": "ae3e9195-312d-415e-b7c7-f80a938cc0af",
+        "from": "Lancaster",
+        "date": "Fri Dec 10 1982 02:19:46 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=lancasterduke@marketoid.com",
+        "msg": "Qui officia laborum culpa occaecat elit ullamco reprehenderit est nostrud incididunt esse sint ullamco.",
+        "read": true,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "88dc3545-1899-404f-aee3-58beb0bc33b1",
+        "from": "Cecilia",
+        "date": "Fri Jan 02 2009 15:07:21 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=ceciliaduke@marketoid.com",
+        "msg": "Qui pariatur ad cupidatat adipisicing occaecat sunt quis ut elit.",
+        "read": false,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "75463d91-03b1-4c39-b552-7e72e4407161",
+        "from": "Livingston",
+        "date": "Tue Jul 30 1996 09:02:02 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=livingstonduke@marketoid.com",
+        "msg": "Ut in occaecat eiusmod sit elit incididunt.",
+        "read": false,
+        "unreadCount": 3,
+        "online": true
+    },
+    {
+        "id": "47e33b3c-6224-476e-860e-78f20b035b8f",
+        "from": "Bryant",
+        "date": "Mon Jan 16 1995 05:22:06 GMT+0100 (Central European Standard Time)",
+        "img": "https://i.pravatar.cc/150?u=bryantduke@marketoid.com",
+        "msg": "Dolor Lorem dolor velit sit quis id in.",
+        "read": false,
+        "unreadCount": 0,
+        "online": true
+    },
+    {
+        "id": "ef88fc0d-50d0-4efb-bea9-489ce7babd57",
+        "from": "Sullivan",
+        "date": "Fri Sep 12 2008 00:49:05 GMT+0200 (Central European Summer Time)",
+        "img": "https://i.pravatar.cc/150?u=sullivanduke@marketoid.com",
+        "msg": "Do aliqua proident commodo qui cupidatat elit laborum proident reprehenderit sint proident aute amet adipisicing.",
+        "read": true,
+        "unreadCount": 3,
+        "online": true
+    }
+]

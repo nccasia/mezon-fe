@@ -1,5 +1,5 @@
 import React from 'react';
-import {CreateMezonClientOptions, MezonContextProvider} from "@mezon/transport";
+import { CreateMezonClientOptions, MezonContextProvider } from "@mezon/transport";
 import RootNavigation from "./RootNavigator";
 
 const mezon: CreateMezonClientOptions = {
@@ -11,9 +11,9 @@ const mezon: CreateMezonClientOptions = {
 
 const App = () => {
 	return (
-		<MezonContextProvider mezon={mezon} connect={true}>
-			<RootNavigation />
-		</MezonContextProvider>
+		// <MezonContextProvider mezon={mezon} connect={true}>
+		<RootNavigation />
+		// </MezonContextProvider>
 	);
 };
 

@@ -2,10 +2,10 @@ import { StyleSheet } from 'react-native'
 import React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HEIGHT } from '../../constants/config';
-import MessagesScreen from '../../screens/main/MessagesScreen';
+import MessagesScreen from '../../screens/main/Messages/MessagesScreen';
 import ClanScreen from '../../screens/main/ClanScreen';
 import { darkColor } from '../../constants/Colors';
-import {APP_SCREEN} from "../ScreenTypes";
+import { APP_SCREEN } from "../ScreenTypes";
 import DrawerClan from "../../screens/main/DrawerServices";
 const Drawer = createDrawerNavigator();
 
@@ -25,13 +25,13 @@ const DrawerNavigator = ({ navigation }) => {
                     width: "90%",
                 },
             }}>
-          <Drawer.Screen
-            name={APP_SCREEN.SERVERS.REDIRECT}
-            options={{
-              headerShown: false,
-            }}
-            component={ClanScreen}
-          />
+            <Drawer.Screen
+                name={APP_SCREEN.SERVERS.REDIRECT}
+                options={{
+                    headerShown: false,
+                }}
+                component={ClanScreen}
+            />
         </Drawer.Navigator>
     );
 }
