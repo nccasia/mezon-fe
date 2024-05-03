@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import ServerList from "./ServerList";
+import ClanList from "./ClanList";
 import ChannelList from "./ChannelList";
 import {styles} from "./styles";
 
@@ -8,7 +8,7 @@ const DrawerContent = React.memo((props: any) => {
 
     return (
         <View {...props.dProps} style={styles.containerDrawerContent}>
-            <ServerList />
+            <ClanList />
             <ChannelList navigation={props.dProps.navigation} />
         </View>
     )
