@@ -1006,63 +1006,22 @@ interface IconProps {
 	isWhite?: boolean;
 }
 
-export const ThreadIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
-
+export const ThreadIcon: React.FC<IconProps> = ({ isWhite }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
-			<g id="live area" clipPath="url(#clip0_2190_1641)">
-				<g id="Group">
-					<path
-						id="Vector"
-						d="M17.8721 9.58565L18.7007 8.75701C18.9298 8.52799 18.9298 8.15733 18.7007 7.92838L12.0716 1.29924C11.8426 1.07022 11.472 1.07022 11.243 1.29924L10.4143 2.12787C10.1853 2.3569 10.1853 2.72748 10.4143 2.9565L17.0435 9.58565C17.2724 9.81467 17.6431 9.81467 17.8721 9.58565Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_2"
-						d="M8.75698 18.7007L9.58562 17.8721C9.81464 17.6431 9.81464 17.2724 9.58562 17.0434L2.95647 10.4143C2.72753 10.1853 2.35687 10.1853 2.12784 10.4143L1.29921 11.243C1.07019 11.4719 1.07019 11.8426 1.29921 12.0716L7.92835 18.7007C8.15737 18.9298 8.52796 18.9298 8.75698 18.7007Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_3"
-						d="M9.16968 5.02902L9.99819 4.20051L15.7978 10.0001L14.9693 10.8286L9.16968 5.02902Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_4"
-						d="M7.51245 6.686L8.34097 5.85749L14.1405 11.6571L13.312 12.4856L7.51245 6.686Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_5"
-						d="M5.8551 8.3429L6.68362 7.51438L12.4832 13.314L11.6547 14.1425L5.8551 8.3429Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_6"
-						d="M4.19788 9.99985L5.02639 9.17133L10.826 14.9709L9.99746 15.7994L4.19788 9.99985Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_7"
-						d="M0.343237 19.6568C0.800855 20.1145 1.54285 20.1144 2.0005 19.6568L4.61386 17.0434L2.95656 15.3861L0.343276 17.9995C-0.11438 18.4571 -0.114458 19.1991 0.343237 19.6568Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						id="Vector_8"
-						d="M19.6567 0.343271C19.1991 -0.114424 18.4571 -0.114424 17.9994 0.343271L15.3861 2.95651L17.0434 4.61382L19.6567 2.0005C20.1144 1.5428 20.1144 0.800889 19.6567 0.343271Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-				</g>
-			</g>
-			<defs>
-				<clipPath id="clip0_2190_1641">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg
+			x="0"
+			y="0"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			viewBox="0 0 24 24"
+		>
+			<path
+				d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z"
+				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			></path>
 		</svg>
 	);
 };
@@ -1074,87 +1033,64 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 		setIsWhite(!isWhite);
 	};
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
-			<g id="Live area" clipPath="url(#clip0_2190_1826)">
-				<g id="Vector">
-					<path
-						d="M1.65071 0.240611C1.25783 -0.0967751 0.665134 -0.0793476 0.292893 0.292893C-0.0976311 0.683418 -0.0976311 1.31658 0.292893 1.70711L3.36097 4.77518C3.12684 5.47412 3 6.22225 3 7V10.5L1.29289 12.2071C1.10536 12.3946 1 12.649 1 12.9142V15C1 15.5523 1.44772 16 2 16H14.5858L18.2929 19.7071C18.6834 20.0976 19.3166 20.0976 19.7071 19.7071C20.079 19.3352 20.0967 18.7432 19.7603 18.3503C19.7406 18.3335 19.7215 18.3158 19.7029 18.2972L1.70304 0.297067C1.68474 0.278765 1.6673 0.259929 1.65071 0.240611Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M19 14.7658V12.9142C19 12.649 18.8946 12.3946 18.7071 12.2071L17 10.5V7C17 3.13401 13.866 1.49257e-08 10 1.49257e-08C8.38159 1.49257e-08 6.89146 0.54923 5.70583 1.47147L19 14.7658Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M10 20C8.32132 20 6.88416 18.9659 6.29077 17.5H13.7093C13.1159 18.9659 11.6787 20 10 20Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-				</g>
-			</g>
-			<defs>
-				<clipPath id="clip0_2190_1826">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg
+			onClick={handleClick}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="#B5BAC1"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="#B5BAC1"
+				d="M1.3 21.3a1 1 0 1 0 1.4 1.4l20-20a1 1 0 0 0-1.4-1.4l-20 20ZM3.13 16.13c.11.27.46.28.66.08L15.73 4.27a.47.47 0 0 0-.07-.74 6.97 6.97 0 0 0-1.35-.64.62.62 0 0 1-.38-.43 2 2 0 0 0-3.86 0 .62.62 0 0 1-.38.43A7 7 0 0 0 5 9.5v2.09a.5.5 0 0 1-.13.33l-1.1 1.22A3 3 0 0 0 3 15.15v.28c0 .24.04.48.13.7ZM18.64 9.36c.13-.13.36-.05.36.14v2.09c0 .12.05.24.13.33l1.1 1.22a3 3 0 0 1 .77 2.01v.28c0 .67-.34 1.29-.95 1.56-1.31.6-4 1.51-8.05 1.51-.46 0-.9-.01-1.33-.03a.48.48 0 0 1-.3-.83l8.27-8.28ZM9.18 19.84A.16.16 0 0 0 9 20a3 3 0 1 0 6 0c0-.1-.09-.17-.18-.16a24.84 24.84 0 0 1-5.64 0Z"
+			></path>
 		</svg>
 	);
 };
 
-export const PinRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
+export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
-			<g id="Live area" clipPath="url(#clip0_2190_1462)">
-				<path
-					id="Vector"
-					d="M8.70711 0.292893C9.09763 0.683417 9.09763 1.31658 8.70711 1.70711L8.20711 2.20711L10.2972 4.2972C10.4297 4.42973 10.5968 4.52235 10.7795 4.56449L16.7205 5.93551C16.9032 5.97765 17.0703 6.07027 17.2028 6.2028L19.2929 8.29289C19.6834 8.68342 19.6834 9.31658 19.2929 9.70711L15.2071 13.7929L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L13.7929 15.2071L9.70711 19.2929C9.31658 19.6834 8.68342 19.6834 8.29289 19.2929L6.2028 17.2028C6.07027 17.0703 5.97765 16.9032 5.93551 16.7205L4.56449 10.7795C4.52235 10.5968 4.42973 10.4297 4.2972 10.2972L2.20711 8.20711L1.70711 8.70711C1.31658 9.09763 0.683417 9.09763 0.292893 8.70711C-0.0976311 8.31658 -0.0976311 7.68342 0.292893 7.29289L7.29289 0.292893C7.68342 -0.0976311 8.31658 -0.0976311 8.70711 0.292893Z"
-					fill={isWhite ? '#FFFFFF' : defaultFill}
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_2190_1462">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				d="M19.38 11.38a3 3 0 0 0 4.24 0l.03-.03a.5.5 0 0 0 0-.7L13.35.35a.5.5 0 0 0-.7 0l-.03.03a3 3 0 0 0 0 4.24L13 5l-2.92 2.92-3.65-.34a2 2 0 0 0-1.6.58l-.62.63a1 1 0 0 0 0 1.42l9.58 9.58a1 1 0 0 0 1.42 0l.63-.63a2 2 0 0 0 .58-1.6l-.34-3.64L19 11l.38.38ZM9.07 17.07a.5.5 0 0 1-.08.77l-5.15 3.43a.5.5 0 0 1-.63-.06l-.42-.42a.5.5 0 0 1-.06-.63L6.16 15a.5.5 0 0 1 .77-.08l2.14 2.14Z"
+			></path>
 		</svg>
 	);
 };
 
 export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill = '#AEAEAE', isWhite = false }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
-			<g id="Live area">
-				<g id="Vector">
-					<path
-						d="M10 7C11.6569 7 13 5.65685 13 4C13 2.34315 11.6569 1 10 1C8.34315 1 7 2.34315 7 4C7 5.65685 8.34315 7 10 7Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M3.5 7C2.11929 7 1 5.88071 1 4.5C1 3.11929 2.11929 2 3.5 2C4.88071 2 6 3.11929 6 4.5C6 5.88071 4.88071 7 3.5 7Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M14 4.5C14 5.88071 15.1193 7 16.5 7C17.8807 7 19 5.88071 19 4.5C19 3.11929 17.8807 2 16.5 2C15.1193 2 14 3.11929 14 4.5Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M5 11C5 9.34315 6.34315 8 8 8H12C13.6569 8 15 9.34315 15 11V14.382C15 14.7607 14.786 15.107 14.4472 15.2764L13 16V19C13 19.5523 12.5523 20 12 20H8C7.44772 20 7 19.5523 7 19V16L5.55279 15.2764C5.214 15.107 5 14.7607 5 14.382V11Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M2 8C0.895431 8 0 8.89543 0 10V14.382C0 14.7607 0.214002 15.107 0.552786 15.2764L2 16V19C2 19.5523 2.44772 20 3 20H5.5V17L4.05279 16.2764C3.714 16.107 3.5 15.7607 3.5 15.382V10.6056C3.5 9.60249 4.0013 8.6658 4.8359 8.1094L5 8H2Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-					<path
-						d="M20 10C20 8.89543 19.1046 8 18 8H15L15.1641 8.1094C15.9987 8.6658 16.5 9.60249 16.5 10.6056V15.382C16.5 15.7607 16.286 16.107 15.9472 16.2764L14.5 17V20H17C17.5523 20 18 19.5523 18 19V16L19.4472 15.2764C19.786 15.107 20 14.7607 20 14.382V10Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
-					/>
-				</g>
-			</g>
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				d="M14.5 8a3 3 0 1 0-2.7-4.3c-.2.4.06.86.44 1.12a5 5 0 0 1 2.14 3.08c.01.06.06.1.12.1ZM18.44 17.27c.15.43.54.73 1 .73h1.06c.83 0 1.5-.67 1.5-1.5a7.5 7.5 0 0 0-6.5-7.43c-.55-.08-.99.38-1.1.92-.06.3-.15.6-.26.87-.23.58-.05 1.3.47 1.63a9.53 9.53 0 0 1 3.83 4.78ZM12.5 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2 20.5a7.5 7.5 0 0 1 15 0c0 .83-.67 1.5-1.5 1.5a.2.2 0 0 1-.2-.16c-.2-.96-.56-1.87-.88-2.54-.1-.23-.42-.15-.42.1v2.1a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2.1c0-.25-.31-.33-.42-.1-.32.67-.67 1.58-.88 2.54a.2.2 0 0 1-.2.16A1.5 1.5 0 0 1 2 20.5Z"
+			></path>
 		</svg>
 	);
 };
@@ -1194,16 +1130,24 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 		setIsWhite(!isWhite);
 	};
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} cursor-pointer`} onClick={handleClick}>
-			<g id="Live area">
-				<path
-					id="Vector"
-					fillRule="evenodd"
-					clipRule="evenodd"
-					d="M4.78077 1C3.86303 1 3.06307 1.62459 2.84048 2.51493L1.03529 9.73571C1.02268 9.78184 1.01329 9.8293 1.00738 9.87784C1.00135 9.92634 0.998949 9.97464 0.999992 10.0224L0.999992 17C0.999992 18.1046 1.89542 19 2.99999 19H17C18.1046 19 19 18.1046 19 17V10.0224C19.001 9.97462 18.9986 9.92631 18.9926 9.8778C18.9867 9.82928 18.9773 9.78183 18.9647 9.7357L17.1595 2.51493C16.9369 1.6246 16.137 1 15.2192 1H4.78077ZM5.99999 10H3.03077L4.78077 3L15.2192 3L16.9692 10H14C13.4477 10 13.0163 10.46 12.8356 10.9819C12.4289 12.1565 11.313 13 9.99999 13C8.68702 13 7.57104 12.1565 7.16436 10.9819C6.98368 10.46 6.55228 10 5.99999 10Z"
-					fill={isWhite ? '#FFFFFF' : defaultFill}
-				/>
-			</g>
+		<svg
+			onClick={handleClick}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fillRule="evenodd"
+				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
@@ -1215,21 +1159,25 @@ export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize
 		setIsWhite(!isWhite);
 	};
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
-			<g id="Live area" clipPath="url(#clip0_2201_1247)">
-				<path
-					id="Vector"
-					fillRule="evenodd"
-					clipRule="evenodd"
-					d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20ZM10.4519 6.87521C10.0404 6.76783 9.53982 6.87439 9.20711 7.2071C8.81658 7.59762 8.18342 7.59762 7.79289 7.2071C7.40237 6.81657 7.40237 6.18341 7.79289 5.79288C8.67181 4.91397 9.92126 4.66981 10.9568 4.93999C12.0217 5.2178 13 6.09936 13 7.49999C13 8.67244 12.2263 9.44116 11.7707 9.89375L11.7071 9.9571C11.1498 10.5144 11 10.729 11 11C11 11.5523 10.5523 12 10 12C9.44771 12 9 11.5523 9 11C9 9.82755 9.77373 9.05883 10.2293 8.60624L10.2929 8.54289C10.8502 7.98555 11 7.77094 11 7.49999C11 7.19919 10.8342 6.97493 10.4519 6.87521ZM8.75 14.75C8.75 14.0596 9.30964 13.5 10 13.5C10.6904 13.5 11.25 14.0596 11.25 14.75C11.25 15.4404 10.6904 16 10 16C9.30964 16 8.75 15.4404 8.75 14.75Z"
-					fill={isWhite ? '#FFFFFF' : defaultFill}
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_2201_1247">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg
+			onClick={handleClick}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			viewBox="0 0 24 24"
+		>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm-.28-16c-.98 0-1.81.47-2.27 1.14A1 1 0 1 1 7.8 7.01 4.73 4.73 0 0 1 11.72 5c2.5 0 4.65 1.88 4.65 4.38 0 2.1-1.54 3.77-3.52 4.24l.14 1a1 1 0 0 1-1.98.27l-.28-2a1 1 0 0 1 .99-1.14c1.54 0 2.65-1.14 2.65-2.38 0-1.23-1.1-2.37-2.65-2.37ZM13 17.88a1.13 1.13 0 1 1-2.25 0 1.13 1.13 0 0 1 2.25 0Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
@@ -1283,21 +1231,13 @@ export function Speaker({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }: Ic
 
 export function Search(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<g id="Live area" clipPath="url(#clip0_2190_1532)">
-				<path
-					id="Vector"
-					fillRule="evenodd"
-					clipRule="evenodd"
-					d="M11.0804 12.8481C10.0125 13.5751 8.72257 14 7.33335 14C3.65146 14 0.666687 11.0152 0.666687 7.33332C0.666687 3.65142 3.65146 0.666656 7.33335 0.666656C11.0153 0.666656 14 3.65142 14 7.33332C14 8.72254 13.5751 10.0125 12.8481 11.0803L16.9672 15.1994C17.4554 15.6876 17.4554 16.4791 16.9672 16.9672C16.4791 17.4554 15.6876 17.4554 15.1995 16.9672L11.0804 12.8481ZM11.5 7.33332C11.5 9.63451 9.63454 11.5 7.33335 11.5C5.03217 11.5 3.16669 9.63451 3.16669 7.33332C3.16669 5.03214 5.03217 3.16666 7.33335 3.16666C9.63454 3.16666 11.5 5.03214 11.5 7.33332Z"
-					fill="#535353"
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_2190_1532">
-					<rect width="16.6667" height="16.6667" fill="white" transform="translate(0.666687 0.666656)" />
-				</clipPath>
-			</defs>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#949BA4" viewBox="0 0 24 24">
+			<path
+				fill="#949BA4"
+				fillRule="evenodd"
+				d="M15.62 17.03a9 9 0 1 1 1.41-1.41l4.68 4.67a1 1 0 0 1-1.42 1.42l-4.67-4.68ZM17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 }

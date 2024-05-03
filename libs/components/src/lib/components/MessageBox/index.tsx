@@ -9,7 +9,7 @@ import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 
 export type MessageBoxProps = {
-	onSend: (
+	readonly onSend: (
 		content: IMessageSendPayload,
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
@@ -17,10 +17,10 @@ export type MessageBoxProps = {
 		value?: ThreadValue,
 		anonymous?: boolean,
 	) => void;
-	onTyping?: () => void;
-	listMentions?: MentionDataProps[] | undefined;
-	currentChannelId?: string;
-	currentClanId?: string;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[];
+	readonly currentChannelId?: string;
+	readonly currentClanId?: string;
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
@@ -50,7 +50,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				.catch((err) => {
 					return 'not-handled';
 				});
-			return;
 		}
 	}, []);
 
@@ -141,7 +140,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							listMentions={props.listMentions}
 							onSend={props.onSend}
 							onTyping={props.onTyping}
-							currentChannelId={props.currentChannelId}
+							currentChannelId={props.currentChannelId ?? ''}
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
 						/>

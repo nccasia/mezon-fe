@@ -13,18 +13,20 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	const { reactionActions, userId, reactionRightState, reactionBottomState } = useChatReaction();
 	const { openEditMessageState, openOptionMessageState } = useReference();
 
-	const handleClickReply = () => {
+	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
+		event.stopPropagation();
 	};
 
-	const handleClickEdit = () => {
+	const handleClickEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
+		event.stopPropagation();
 	};
 
 	const handleClickOption = (e: any) => {

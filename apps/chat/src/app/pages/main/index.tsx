@@ -32,7 +32,6 @@ function MyApp() {
 		dispatch(reactionActions.setReactionBottomState(false));
 		dispatch(referencesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
-		dispatch(referencesActions.setReferenceMessage(null));
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
 	};
 

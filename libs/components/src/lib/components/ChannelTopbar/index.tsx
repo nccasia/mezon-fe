@@ -10,6 +10,8 @@ import * as Icons from '../Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import { ChannelLabel, SearchMessage } from './TopBarComponents';
+import NotificationSetting from './TopBarComponents/NotificationSetting';
+import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
@@ -54,7 +56,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 					<div className="items-center h-full ml-auto flex">
 						<div className="justify-end items-center gap-2 flex">
 							<div className="hidden ssm:flex">
-								<div className="relative justify-start items-center gap-[15px] flex iconHover mr-2">
+								<div className="relative justify-start items-center gap-[15px] flex iconHover mr-4">
 									<ThreadButton />
 									<MuteButton />
 									<PinButton />
@@ -95,7 +97,7 @@ function ThreadButton() {
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
 				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.ThreadIcon />
+					<Icons.ThreadIcon isWhite={isShowThread} />
 				</button>
 			</Tooltip>
 			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}
@@ -104,18 +106,51 @@ function ThreadButton() {
 }
 
 function MuteButton() {
+	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowNotificationSetting = () => {
+		setIsShowNotificationSetting(!isShowNotificationSetting);
+	};
+
+	useOnClickOutside(threadRef, () => setIsShowNotificationSetting(false));
+	useEscapeKey(() => setIsShowNotificationSetting(false));
 	return (
-		<button>
-			<Icons.MuteBell />
-		</button>
+		<div className="relative leading-5 h-5" ref={threadRef}>
+			<Tooltip
+				className={`${isShowNotificationSetting && 'hidden'} w-[164px]`}
+				content="Notification Settings"
+				trigger="hover"
+				animation="duration-500"
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.MuteBell />
+				</button>
+			</Tooltip>
+			{isShowNotificationSetting && <NotificationSetting />}
+		</div>
 	);
 }
 
 function PinButton() {
+	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowPinMessage = () => {
+		setIsShowPinMessage(!isShowPinMessage);
+	};
+
+	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
+	useEscapeKey(() => setIsShowPinMessage(false));
 	return (
-		<button>
-			<Icons.PinRight />
-		</button>
+		<div className="relative leading-5 h-5" ref={threadRef}>
+			<Tooltip className={`${isShowPinMessage && 'hidden'} w-[142px]`} content="Pinned Messages" trigger="hover" animation="duration-500">
+				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.PinRight isWhite={isShowPinMessage} />
+				</button>
+			</Tooltip>
+			{isShowPinMessage && <PinnedMessages />}
+		</div>
 	);
 }
 

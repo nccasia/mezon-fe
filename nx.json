@@ -59,7 +59,6 @@
 			}
 		}
 	},
-	"nxCloudAccessToken": "OWZhOWI1NDQtMDZlMS00MWZiLWJiODItYTE1YWEwN2ExMzcxfHJlYWQtd3JpdGU=",
 	"plugins": [
 		{
 			"plugin": "@nx/react-native/plugin",
@@ -90,5 +89,14 @@
 			}
 		}
 	],
-	"defaultProject": "desktop"
+	"defaultProject": "desktop",
+	"neverConnectToCloud": true,
+	"tasksRunnerOptions": {
+		"default": {
+			"runner": "nx/tasks-runners/default",
+			"options": {
+				"cacheableOperations": ["build", "test"]
+			}
+		}
+	}
 }

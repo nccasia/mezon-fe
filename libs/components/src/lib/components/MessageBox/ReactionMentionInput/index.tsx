@@ -2,6 +2,7 @@ import {
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
+	useChatReaction,
 	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
@@ -23,7 +24,6 @@ import {
 	ChannelMembersEntity,
 	ILineMention,
 	IMessageSendPayload,
-	KEY_KEYBOARD,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	ThreadValue,
@@ -65,7 +65,7 @@ type EmojiData = {
 };
 
 export type MentionReactInputProps = {
-	onSend: (
+	readonly onSend: (
 		content: IMessageSendPayload,
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
@@ -73,14 +73,13 @@ export type MentionReactInputProps = {
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
 	) => void;
-	onTyping?: () => void;
-	onCreateThread?: (key: string) => void;
-	listMentions?: MentionDataProps[] | undefined;
-	isThread?: boolean;
-	handlePaste?: any;
-	currentChannelId?: string;
-	handleConvertToFile?: (valueContent: string) => void | undefined;
-	currentClanId?: string;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[] | undefined;
+	readonly isThread?: boolean;
+	readonly handlePaste?: any;
+	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
+	readonly currentClanId?: string;
+	readonly currentChannelId?: string;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -102,6 +101,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { emojis } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked } = useEmojiSuggestion();
+	const { reactionRightState } = useChatReaction();
 	const { valueTextInput } = useMessageValue(currentChannelId as string);
 
 	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
@@ -123,7 +123,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						ref_type: 0,
 						message_sender_id: referenceMessage.sender_id,
 						content: JSON.stringify(referenceMessage.content),
-						has_attachment: referenceMessage.attachments?.length > 0 ? true : false,
+						has_attachment: referenceMessage.attachments?.length > 0,
 					},
 				]),
 			);
@@ -131,8 +131,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [referenceMessage]);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { keyCode, ctrlKey, shiftKey } = event;
-		if (keyCode === KEY_KEYBOARD.ENTER && ctrlKey && shiftKey && valueTextInput !== '') {
+		const { key, ctrlKey, shiftKey } = event;
+		const isEnterKey = key === 'Enter';
+
+		if (isEnterKey && ctrlKey && shiftKey && valueTextInput !== '') {
 			event.preventDefault();
 			if (props.currentClanId) {
 				handleSend(true);
@@ -140,8 +142,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 
-		switch (keyCode) {
-			case KEY_KEYBOARD.ENTER: {
+		switch (key) {
+			case 'Enter': {
 				if (shiftKey) {
 					return;
 				} else {
@@ -223,7 +225,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const body = {
 			channelId: currentChannel?.channel_id as string,
 			channelType: currentChannel?.type,
-			userIds: userIds as string[],
+			userIds: userIds,
 		};
 		if (userIds.length > 0) {
 			await dispatch(channelUsersActions.addChannelUsers(body));
@@ -285,28 +287,27 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
+		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
 			return focusToElement(editorRef);
 		}
-	}, [referenceMessage, openReplyMessageState, openEditMessageState]);
+	}, [referenceMessage, openReplyMessageState, openEditMessageState, emojiPicked]);
 
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
 	};
 
 	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /(@|\#)\[(.*?)\]\((.*?)\)/g;
+		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 		const result = text.replace(regex, (match, symbol, p1, p2) => {
 			return symbol === '#' ? `#${p2}` : `@${p1}`;
 		});
 		return result;
 	};
-
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
-	const input = document.querySelector('#editorReactMention') as HTMLElement | null;
+	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
 		if (!emojiPicked || !input) {
 			return;

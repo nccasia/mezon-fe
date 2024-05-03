@@ -255,16 +255,20 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
 	const { userId } = useChatReaction();
 
-	const handleClickEdit = () => {
+	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(referencesActions.setReferenceMessage(message));
+		event.stopPropagation();
 	};
 
-	const handleClickReply = () => {
+	const handleClickReply = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(referencesActions.setReferenceMessage(message));
+		event.stopPropagation();
 	};
 
 	const handleClickCopy = () => {
