@@ -60,6 +60,8 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 							onDragStart={handleDrag}
 							onWheel={handleWheel}
 							style={{ transform: `scale(${scale})`, transition: 'transform 0.3s ease' }}
+							onClick={() => console.log(attachments)}
+							onKeyDown={() => console.log(attachments)}
 						/>
 					</div>
 					<button
@@ -95,6 +97,11 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 												className={`md:sieze-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
 												onDragStart={handleDrag}
 												onClick={() => handleClickImg(url)}
+												onKeyDown={(event) => {
+													if (event.key === 'Enter') {
+														handleClickImg(url);
+													}
+												}}
 											/>
 										</div>
 									);

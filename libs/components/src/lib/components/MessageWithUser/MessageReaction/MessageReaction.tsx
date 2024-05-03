@@ -11,7 +11,7 @@ type MessageReactionProps = {
 };
 
 // TODO: refactor component for message lines
-const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionProps) => {
+const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
 	const {
 		userId,
 		reactionMessageDispatch,
@@ -149,7 +149,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 					const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 					const checkID = emoji.message_id === message.id;
 					return (
-						<div key={index}>
+						<div key={emoji.message_id}>
 							{checkID && (
 								<div
 									ref={(element) => (childRef.current[index] = element)}
@@ -173,6 +173,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 									onMouseLeave={() => {
 										handleOnleaveEmoji();
 									}}
+									role='none'
 								>
 									<span className=" relative left-[-10px] ">{emoji.emoji}</span>
 									<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
