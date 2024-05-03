@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { Icons } from '../../components';
 
 export type MessageImage = {
-	content?: string;
-	attachmentData: ApiMessageAttachment;
+	readonly attachmentData: ApiMessageAttachment;
 };
 function formatFileSize(bytes: number) {
 	if (bytes >= 1000000) {

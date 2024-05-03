@@ -5,12 +5,11 @@ export function useMessageSender(user?: IChannelMember | null) {
     const avatarImg = useMemo(() => {
         return user?.user?.avatar_url || ''
     }, [user]);
-
     const hasAvatar = useMemo(() => {
-        return user?.user?.avatar_url ? true : false;
-    }, [user])
+        return !!user?.user?.avatar_url;
+    }, [user]);
 
-    const username =  useMemo(() => {
+    const username = useMemo(() => {
         return user?.user?.username || ''
     }, [user])
 

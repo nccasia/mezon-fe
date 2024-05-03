@@ -17,7 +17,6 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		reactionMessageDispatch,
 		reactionBottomState,
 		dataReactionCombine,
-		setReactionRightState,
 		setReactionBottomState,
 		setUserReactionPanelState,
 		userReactionPanelState,

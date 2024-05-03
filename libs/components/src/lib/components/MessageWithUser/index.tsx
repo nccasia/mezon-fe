@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -11,7 +11,6 @@ import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
 import { useChatMessages, useReference } from '@mezon/core';
-import React from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
 
@@ -32,12 +31,12 @@ export type MessageWithUserProps = {
 	isMention?: boolean;
 };
 
-function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId: currentChannelId ?? '' });
+	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);

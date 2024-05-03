@@ -45,7 +45,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 
 	useEscapeKey(onClose);
 
-	// TODO: using modal component
+	// TODO: using modal component\
 	if (!showModal) return null;
 
 	return (

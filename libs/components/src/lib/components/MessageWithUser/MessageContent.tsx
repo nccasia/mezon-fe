@@ -19,6 +19,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
+	console.log(videos);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -49,7 +50,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		return (
 			<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 				{videos.map((video, index) => (
-					<div key={index} className="w-fit gap-y-2">
+					<div key={video.url} className="w-fit gap-y-2">
 						<MessageVideo attachmentData={video} />
 					</div>
 				))}
@@ -63,7 +64,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 				{images.map((image, index) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 					return (
-						<div key={index} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
+						<div key={image.url} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
 							<MessageImage attachmentData={image} />
 						</div>
 					);
@@ -74,7 +75,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			return <MessageLinkFile key={index} attachmentData={document} />;
+			return <MessageLinkFile key={document.url} attachmentData={document} />;
 		});
 	};
 
