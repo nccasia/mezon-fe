@@ -107,15 +107,15 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
-				message={mess as IMessageWithUser}
-				preMessage={messPre as IMessageWithUser}
+				message={mess}
+				preMessage={messPre}
 				user={user}
 				mode={mode}
 				newMessage={newMessage}
 				child={
 					<PopupMessage
 						reactionRightState={reactionRightState}
-						mess={mess as IMessageWithUser}
+						mess={mess}
 						referenceMessage={referenceMessage}
 						reactionBottomState={reactionBottomState}
 						openEditMessageState={openEditMessageState}

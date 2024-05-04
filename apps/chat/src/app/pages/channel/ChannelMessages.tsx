@@ -1,8 +1,8 @@
-import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
-import { useEffect, useRef, useState } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { getJumpToMessageId, useJumpToMessage, useReference } from '@mezon/core';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
+import useKeepScrollPosition from './useKeepScrollPosition';
+import useMessages from './useMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -12,97 +12,130 @@ type ChannelMessagesProps = {
 	mode: number;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
+const ChannelMessages: React.FC<ChannelMessagesProps> = ({ channelId, channelLabel, type, avatarDM, mode }) => {
+	const [messageIdToJump, setMessageIdToJump] = useState(getJumpToMessageId()); // Sửa lại tên biến để tuân thủ quy ước
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
-	const fetchData = () => {
-		loadMoreMessage();
-	};
-	useEffect(() => {
-		if (idMessageReplied) {
-			setMessageIdToJump(idMessageReplied);
-			setTimeToJump(0);
-			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
-			setPositionToJump('start');
-		}
-	}, [getJumpToMessageId, idMessageReplied]);
+	// const {  unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+
+	// const fetchData = () => {
+	// 	loadMoreMessage();
+	// };
+
+	// useEffect(() => {
+	// 	fetchData();
+	// }, [channelId, fetchData]);
+
+	const { messages, setLastMessageRef } = useMessages();
+	const { containerRef } = useKeepScrollPosition(messages);
+	const firstMessageRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		if (messageid) {
-			timeoutId = setTimeout(() => {
-				jumpToMessage(messageid, positionToJump);
-			}, timeToJump);
+		console.log(firstMessageRef);
+		if (firstMessageRef.current && setLastMessageRef) {
+			setLastMessageRef(firstMessageRef.current);
 		}
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-		};
-	}, [messageid, jumpToMessage]);
-
-	const handleScroll = (e: any) => {
-		setPosition(e.target.scrollTop);
-	};
+	}, [setLastMessageRef, firstMessageRef]);
 
 	return (
-		<div
-			className="bg-[#26262B] relative"
-			id="scrollLoading"
-			ref={containerRef}
-			style={{
-				height: '100%',
-				overflowY: 'scroll',
-				display: 'flex',
-				flexDirection: 'column-reverse',
-				overflowX: 'hidden',
-			}}
-		>
-			<InfiniteScroll
-				dataLength={messages.length}
-				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
-				inverse={true}
-				hasMore={hasMoreMessage}
-				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
-				scrollableTarget="scrollLoading"
-				refreshFunction={fetchData}
-				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
-				pullDownToRefreshThreshold={50}
-				onScroll={handleScroll}
-			>
-				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
-				{messages.map((message, i) => (
-					<ChannelMessage
-						mode={mode}
-						key={message.id}
-						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-						message={message}
-						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel || ''}
-					/>
-				))}
-			</InfiniteScroll>
+		<div ref={containerRef}>
+			{messages.map((m: any, i: number) => {
+				return (
+					<div key={m.id}>
+						<div ref={i === 0 ? firstMessageRef : null}>
+							<ChannelMessage
+								mode={mode}
+								key={m.id}
+								// lastSeen={m.id === unreadMessageId && message.id !== lastMessageId}
+								message={m}
+								preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+								channelId={channelId}
+								channelLabel={channelLabel || ''}
+							/>
+						</div>
+					</div>
+				);
+			})}
 		</div>
 	);
-}
-
-ChannelMessages.Skeleton = () => {
-	return (
-		<>
-			<ChannelMessage.Skeleton />
-			<ChannelMessage.Skeleton />
-			<ChannelMessage.Skeleton />
-		</>
-	);
 };
+
+export default ChannelMessages;
+
+// <div
+// 	className="bg-[#26262B] relative border border-green-300"
+// 	// id="scrollLoading"
+// 	ref={(ref) => (i === 0 ? setLastMessageRef(ref) : null)} // style={{
+// 	// 	height: '100%',
+// 	// 	overflowY: 'scroll',
+// 	// 	display: 'flex',
+// 	// 	flexDirection: 'column-reverse',
+// 	// 	overflowX: 'hidden',
+// 	// }}
+// 	// onScroll={handleScroll} // Sửa lại sự kiện onScroll
+// >
+// 	{/* <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} /> */}
+// 	{messages.map((message, i) => (
+// 		<ChannelMessage
+// 			mode={mode}
+// 			key={message.id}
+// 			lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+// 			message={message}
+// 			preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+// 			channelId={channelId}
+// 			channelLabel={channelLabel || ''}
+// 		/>
+// 	))}
+// </div>;
+
+// const handleScroll = () => {
+// 	if (containerRef.current) {
+// 		setPosition(containerRef.current.scrollTop);
+// 	}
+// };
+
+// ChannelMessages.Skeleton = () => {
+// 	return (
+// 		<>
+// 			<ChannelMessage.Skeleton />
+// 			<ChannelMessage.Skeleton />
+// 			<ChannelMessage.Skeleton />
+// 		</>
+// 	);
+// };
+
+// const fetchData = () => {
+// 	loadMoreMessage();
+// };
+
+// const containerRef = useRef<HTMLDivElement>(null);
+// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+
+// useEffect(() => {
+// 	if (idMessageReplied) {
+// 		setMessageIdToJump(idMessageReplied);
+// 		setTimeToJump(0);
+// 		setPositionToJump('center');
+// 	} else {
+// 		setMessageIdToJump(getJumpToMessageId());
+// 		setTimeToJump(1000);
+// 		setPositionToJump('start');
+// 	}
+// }, [getJumpToMessageId, idMessageReplied]);
+
+// useEffect(() => {
+// 	let timeoutId: NodeJS.Timeout | null = null;
+// 	if (messageIdToJump) {
+// 		// Sửa lại điều kiện để kiểm tra messageIdToJump
+// 		timeoutId = setTimeout(() => {
+// 			jumpToMessage(messageIdToJump, positionToJump);
+// 		}, timeToJump);
+// 	}
+// 	return () => {
+// 		if (timeoutId) {
+// 			clearTimeout(timeoutId);
+// 		}
+// 	};
+// }, [messageIdToJump, jumpToMessage, positionToJump, timeToJump]);

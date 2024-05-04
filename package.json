@@ -52,6 +52,7 @@
 		"mezon-js-protobuf": "^1.4.11",
 		"minio": "^7.1.3",
 		"react": "18.2.0",
+		"react-activation": "^0.12.4",
 		"react-copy-to-clipboard": "^5.1.0",
 		"react-datepicker": "^6.9.0",
 		"react-dom": "18.2.0",
