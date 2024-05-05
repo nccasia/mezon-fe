@@ -112,12 +112,7 @@ export default function ChannelLayout() {
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
-						<div
-							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
-							ref={messagesContainerRef}
-						>
-							{renderChannelMedia()}
-						</div>
+						{renderChannelMedia()}
 						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 							<div className="flex-1 bg-[#1E1E1E]">
 								{!statusCall ? (

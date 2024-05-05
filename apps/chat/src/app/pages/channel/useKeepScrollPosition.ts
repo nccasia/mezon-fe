@@ -1,40 +1,22 @@
-import { IMessageWithUser } from '@mezon/utils';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 
-const useKeepScrollPosition = (deps: IMessageWithUser[]) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-
+const useKeepScrollPosition = (deps: any) => {
+	const containerRef = useRef(null);
 	const previousScrollPosition = useRef(0);
 
 	useMemo(() => {
-		if (containerRef.current) {
-			const container = containerRef.current;
-			previousScrollPosition.current = container.scrollHeight - container.scrollTop;
+		if (containerRef?.current) {
+			const container = containerRef?.current;
+			previousScrollPosition.current = container?.scrollHeight - container?.scrollTop;
 		}
-	}, [...deps]);
+	}, [deps]);
 
 	useLayoutEffect(() => {
-		const container = containerRef.current;
-
-		const handleScroll = () => {
-			console.log('sd');
-			if (container) {
-				previousScrollPosition.current = container.scrollHeight - container.scrollTop;
-			}
-		};
-
-		if (container) {
-			// Gắn sự kiện onscroll vào phần tử
-			container.addEventListener('scroll', handleScroll);
+		if (containerRef?.current) {
+			const container = containerRef?.current || {};
+			container.scrollTop = container?.scrollHeight - previousScrollPosition.current;
 		}
-
-		return () => {
-			if (container) {
-				// Gỡ bỏ sự kiện onscroll khi component bị unmount
-				container.removeEventListener('scroll', handleScroll);
-			}
-		};
-	}, [...deps]);
+	}, [deps]);
 
 	return {
 		containerRef,
