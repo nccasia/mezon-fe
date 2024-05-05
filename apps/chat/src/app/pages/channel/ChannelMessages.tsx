@@ -18,15 +18,7 @@ const ChannelMessages: React.FC<ChannelMessagesProps> = ({ channelId, channelLab
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
-	// const {  unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
-	// const fetchData = () => {
-	// 	loadMoreMessage();
-	// };
-
-	// useEffect(() => {
-	// 	fetchData();
-	// }, [channelId, fetchData]);
 
 	const { messages, setLastMessageRef } = useMessages();
 	const { containerRef } = useKeepScrollPosition(messages);
@@ -63,6 +55,16 @@ const ChannelMessages: React.FC<ChannelMessagesProps> = ({ channelId, channelLab
 };
 
 export default ChannelMessages;
+
+	// const {  unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+
+	// const fetchData = () => {
+	// 	loadMoreMessage();
+	// };
+
+	// useEffect(() => {
+	// 	fetchData();
+	// }, [channelId, fetchData]);
 
 // <div
 // 	className="bg-[#26262B] relative border border-green-300"

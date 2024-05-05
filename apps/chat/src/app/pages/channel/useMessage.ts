@@ -43,20 +43,9 @@ const useMessages = () => {
 
 	const [loaded, setLoaded] = useState<boolean>(false);
 
-	console.log(lastMessageRef);
-
 	useEffect(() => {
-		if (loaded) {
-			loadMoreMessage();
-			setLoaded(false);
-		}
-	}, [loaded]);
-
-	useEffect(() => {
-		console.log(isIntersecting);
 		if (isIntersecting) {
-			setLoaded(true);
-			setMessages(messagesLoaded);
+			setMessages(loadMoreMessage());
 		}
 	}, [isIntersecting]);
 
