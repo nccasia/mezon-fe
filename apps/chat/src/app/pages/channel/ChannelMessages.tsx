@@ -1,8 +1,7 @@
-import { getJumpToMessageId, useJumpToMessage, useReference } from '@mezon/core';
-import React, { useEffect, useRef, useState } from 'react';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
+import React, { useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 import useKeepScrollPosition from './useKeepScrollPosition';
-import useMessages from './useMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -18,25 +17,42 @@ const ChannelMessages: React.FC<ChannelMessagesProps> = ({ channelId, channelLab
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
+	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
-
-	const { messages, setLastMessageRef } = useMessages();
-	const { containerRef } = useKeepScrollPosition(messages);
+	// const { messages, setLastMessageRef } = useMessages();
 	const firstMessageRef = useRef<HTMLDivElement | null>(null);
+	const [lastMessageRef, setLastMessageRef] = useState<HTMLDivElement | null>(null);
+	// const isIntersecting = useOnScreen({ current: lastMessageRef });
 
-	useEffect(() => {
-		console.log(firstMessageRef);
-		if (firstMessageRef.current && setLastMessageRef) {
-			setLastMessageRef(firstMessageRef.current);
+	const { containerRef } = useKeepScrollPosition(messages);
+
+	// useEffect(() => {
+	// 	console.log(isIntersecting);
+	// 	if (isIntersecting) {
+	// 		loadMoreMessage();
+	// 	}
+	// }, [isIntersecting]);
+
+	// useEffect(() => {
+	// 	console.log(firstMessageRef);
+	// 	if (firstMessageRef.current && setLastMessageRef) {
+	// 		setLastMessageRef(firstMessageRef.current);
+	// 	}
+	// }, [setLastMessageRef, firstMessageRef]);
+
+	const handleScroll = (e: any) => {
+		console.log(e.target.scrollTop);
+		if (e.target.scrollTop === 0 && hasMoreMessage) {
+			loadMoreMessage();
 		}
-	}, [setLastMessageRef, firstMessageRef]);
+	};
 
 	return (
-		<div ref={containerRef}>
+		<div ref={containerRef} onScroll={handleScroll}>
 			{messages.map((m: any, i: number) => {
 				return (
 					<div key={m.id}>
-						<div ref={i === 0 ? firstMessageRef : null}>
+						<div>
 							<ChannelMessage
 								mode={mode}
 								key={m.id}
@@ -56,15 +72,15 @@ const ChannelMessages: React.FC<ChannelMessagesProps> = ({ channelId, channelLab
 
 export default ChannelMessages;
 
-	// const {  unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+// const {  unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
-	// const fetchData = () => {
-	// 	loadMoreMessage();
-	// };
+// const fetchData = () => {
+// 	loadMoreMessage();
+// };
 
-	// useEffect(() => {
-	// 	fetchData();
-	// }, [channelId, fetchData]);
+// useEffect(() => {
+// 	fetchData();
+// }, [channelId, fetchData]);
 
 // <div
 // 	className="bg-[#26262B] relative border border-green-300"
