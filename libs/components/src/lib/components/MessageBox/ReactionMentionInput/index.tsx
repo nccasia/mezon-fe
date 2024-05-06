@@ -160,7 +160,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if (valueTextInput && typeof valueTextInput === 'string' && !valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
+			if (
+				valueTextInput &&
+				typeof valueTextInput === 'string' &&
+				!valueTextInput.trim() &&
+				attachmentDataRef.length === 0 &&
+				mentionData.length === 0
+			) {
 				if (!nameThread.trim() && props.isThread && !currentThread) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
 					dispatch(threadsActions.setNameThreadError(threadError.name));
@@ -352,16 +358,37 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
+	// Tìm và thêm class 'emoji' cho các emoji trong nội dung
+	const inputElement = document.getElementById('editorReactMention');
+	useEffect(() => {
+		if (inputElement) {
+			inputElement.addEventListener('input', function (event) {
+				const inputValue = valueTextInput;
+				const emojiRegex = /[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
+				const emojiMatches = inputValue.match(emojiRegex);
+
+				if (emojiMatches) {
+					emojiMatches.forEach((emoji) => {
+						console.log(emoji);
+						const emojiSpan = document.createElement('span');
+						emojiSpan.className = 'emoji';
+						emojiSpan.textContent = emoji;
+						inputElement.appendChild(emojiSpan);
+					});
+				}
+			});
+		}
+	}, [inputElement]);
 	return (
 		<div className="relative">
 			{props.isThread && !currentThread && (
-				<div onClick={()=>console.log(referenceMessage)}>
+				<div onClick={() => console.log(referenceMessage)}>
 					<ThreadNameTextField
 						onChange={handleChangeNameThread}
 						onKeyDown={onKeyDown}
 						value={nameThread}
 						label="Thread Name"
-						placeholder={(openThreadMessageState && referenceMessage?.content.t!=='' )? referenceMessage?.content.t : 'Enter Thread Name'}
+						placeholder={openThreadMessageState && referenceMessage?.content.t !== '' ? referenceMessage?.content.t : 'Enter Thread Name'}
 						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
