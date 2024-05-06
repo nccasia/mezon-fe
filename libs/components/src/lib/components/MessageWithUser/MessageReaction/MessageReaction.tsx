@@ -86,7 +86,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			checkPositionSenderPanel(hoverEmoji);
 		}
 	}, [hoverEmoji, parentDiv]);
-	const PANEL_SENDER_WIDTH = 350;
+	const PANEL_SENDER_WIDTH = 300;
 	const EMOJI_REACTION_BOTTOM_PANEL = 376;
 
 	const [posToRight, setPosToRight] = useState<boolean>(false);
