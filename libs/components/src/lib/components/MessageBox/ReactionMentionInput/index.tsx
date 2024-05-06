@@ -343,8 +343,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	useEffect(() => {
-		if (currentChannelId) {
-			setContent(valueTextInput);
+		if (currentChannelId && valueTextInput) {
+			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
+			setContent(convertedHashtag);
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, valueTextInput]);
