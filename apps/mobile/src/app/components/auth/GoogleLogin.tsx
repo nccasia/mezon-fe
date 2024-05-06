@@ -33,7 +33,7 @@ const GoogleLogin = () => {
 				Alert.alert('Login Failed', 'Unable to login with Google');
 			}
 		} catch (error) {
-			console.log('error onGoogleButtonPress', error);
+			console.log('error onGoogleButtonPres', error);
 			Alert.alert('Login Failed', 'Unable to login with Google');
 		}
 	}
