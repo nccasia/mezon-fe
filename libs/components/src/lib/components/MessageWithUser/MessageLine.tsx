@@ -19,7 +19,7 @@ const LineWithLink = ({ link }: { link: string }) => {
 			if (res.expiry_time) {
 				if (new Date(res.expiry_time) < new Date()) {
 					openInviteChannelModal();
-				}else{
+				} else {
 					window.location.href = link;
 				}
 			}
@@ -35,10 +35,10 @@ const LineWithLink = ({ link }: { link: string }) => {
 };
 
 const isLink = (line: string) => {
-	if (line && line.includes(' ')) {
+	if (line?.includes(' ')) {
 		return false;
 	}
-	if ((line && line.startsWith('http://')) || (line && line.startsWith('https://'))) {
+	if ((line?.startsWith('http://')) || (line?.startsWith('https://'))) {
 		return true;
 	}
 	return false;
@@ -47,13 +47,17 @@ const isLink = (line: string) => {
 // TODO: refactor component for message lines
 const MessageLine = ({ line }: MessageLineProps) => {
 	const { mentions } = useMessageLine(line);
-	if (isLink(line)) {
-		return <LineWithLink link={line} />;
-	}
+
 	return (
-		<div>
-			<MarkdownFormatText mentions={mentions} />
-		</div>
+		<>
+			{isLink(line) ? (
+				<LineWithLink link={line} />
+			) : (
+				<div>
+					<MarkdownFormatText mentions={mentions} />
+				</div>
+			)}
+		</>
 	);
 };
 

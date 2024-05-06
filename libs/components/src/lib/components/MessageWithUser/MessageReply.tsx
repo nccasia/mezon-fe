@@ -9,9 +9,9 @@ type MessageReplyProps = {
 };
 
 // TODO: refactor component for message lines
-const MessageReply = ({ message }: MessageReplyProps) => {
-	const [messageRefId, setMessageId] = useState('');
-	const [senderId, setSenderId] = useState('');
+const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
+	const [messageRefId, setMessageId] = useState<string>('')
+	const [senderId, setSenderId] = useState<string>('')
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const dispatch = useDispatch();
@@ -45,9 +45,9 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 						<div className="w-5 h-5">
 							<img
 								className="rounded-full min-w-5 max-h-5 object-cover"
-								src={senderMessage?.user && senderMessage.user?.avatar_url}
-								alt={senderMessage?.user && senderMessage.user?.avatar_url}
-							></img>
+								src={senderMessage?.user?.avatar_url}
+								alt={senderMessage?.user?.avatar_url}
+							/>
 						</div>
 
 						<div className="gap-1 flex flex-row items-center">
@@ -69,7 +69,7 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 									onClick={(e) => getIdMessageToJump(messageRefId, e)}
 									className="text-[13px] hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
 								>
-									{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
+									{messageRefFetchFromServe?.content?.t}
 								</span>
 							)}
 						</div>

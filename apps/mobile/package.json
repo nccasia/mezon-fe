@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"dependencies": {
-		"@gorhom/bottom-sheet": "^4.6.1",
+		"gorhom/bottom-sheet": "^4.6.1",
 		"@react-native-google-signin/google-signin": "^11.0.1",
 		"@react-native/metro-config": "*",
 		"@react-navigation/bottom-tabs": "^6.5.20",
@@ -15,7 +15,6 @@
 		"@testing-library/react-native": "*",
 		"formik": "^2.4.5",
 		"metro-config": "*",
-		"moment": "^2.30.1",
 		"react-native": "*",
 		"react-native-dotenv": "^3.4.11",
 		"react-native-fast-image": "^8.6.3",

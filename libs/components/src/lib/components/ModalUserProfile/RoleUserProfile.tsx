@@ -64,7 +64,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 			<div className="font-bold tracking-wider text-sm">ROLES</div>
 			<div className="mt-2">
 				{userRolesClan.map((role, index) => (
-					<span key={index} className="inline-block text-xs border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 mb-2">
+					<span key={role.id} className="inline-block text-xs border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 mb-2">
 						<button
 							className="mr-2 px-1 border border-bgDisable rounded-full bg-bgDisable hover:bg-gray-400"
 							onClick={() => deleteRole(role.id)}

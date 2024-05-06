@@ -40,7 +40,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, pos }: UserReactionP
 				<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
 				{emojiShowPanel.senders.map((sender: SenderInfoOptionals, index: number) => {
 					return (
-						<Fragment key={index}>
+						<Fragment key={sender.sender_id}>
 							{sender.count && sender.count > 0 && (
 								<div key={sender.sender_id} className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative ">
 									<AvatarComponent id={sender.sender_id ?? ''} />

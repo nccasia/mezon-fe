@@ -53,7 +53,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 				>
-					{username ? username : 'Anonymous'}
+					{username ?? 'Anonymous'}
 				</div>
 				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -66,6 +66,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 						bottom: positionBottom ? '64px' : '',
 					}}
 					onMouseDown={handleDefault}
+					role="button"
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

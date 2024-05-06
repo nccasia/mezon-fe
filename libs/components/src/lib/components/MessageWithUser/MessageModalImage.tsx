@@ -35,13 +35,11 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 	const handleWheel = (event: any) => {
 		const deltaY = event.deltaY;
 		setScale((prevScale) => {
-			let newScale = prevScale;
 			if (deltaY > 0) {
-				newScale = Math.max(1, prevScale - 0.05);
+				return Math.max(1, prevScale - 0.05);
 			} else {
-				newScale = Math.min(5, prevScale + 0.05);
+				return Math.min(5, prevScale + 0.05);
 			}
-			return newScale;
 		});
 	};
 
@@ -92,7 +90,7 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 								{attachments.map((img, index) => {
 									const url = `https://cdn.mezon.vn/${img.clanId}/${img.channelId}/${img.filename}`;
 									return (
-										<div className={url === urlImg ? 'hidden' : ''} key={index}>
+										<div className={url === urlImg ? 'hidden' : ''} key={`${index + img.id}`}>
 											<img
 												src={url}
 												alt={url}

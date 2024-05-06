@@ -11,13 +11,12 @@ type MessageReactionProps = {
 };
 
 // TODO: refactor component for message lines
-const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionProps) => {
+const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
 	const {
 		userId,
 		reactionMessageDispatch,
 		reactionBottomState,
 		dataReactionCombine,
-		setReactionRightState,
 		setReactionBottomState,
 		setUserReactionPanelState,
 		userReactionPanelState,
