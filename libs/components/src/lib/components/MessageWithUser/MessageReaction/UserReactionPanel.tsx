@@ -2,7 +2,6 @@ import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction } from '@mezon/core';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
-import { Fragment } from 'react';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
@@ -28,8 +27,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 	return (
 		<>
 			{calculateTotalCount(emojiShowPanel.senders) > 0 && (
-				<button
-					onClick={(e) => e.stopPropagation()}
+				<div
 					className={`absolute z-50  bottom-7 w-[18rem]
 				bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
 				>
@@ -43,7 +41,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 
 					{emojiShowPanel.senders.map((sender: SenderInfoOptionals, index: number) => {
 						return (
-							<Fragment key={index}>
+							<div key={index}>
 								{sender.count && sender.count > 0 && (
 									<div key={sender.sender_id} className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative ">
 										<AvatarComponent id={sender.sender_id ?? ''} />
@@ -71,11 +69,11 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 										)}
 									</div>
 								)}
-							</Fragment>
+							</div>
 						);
 					})}
 					<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
-				</button>
+				</div>
 			)}
 		</>
 	);
