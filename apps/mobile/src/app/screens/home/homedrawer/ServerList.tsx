@@ -1,4 +1,4 @@
-import { selectAllClans } from '@mezon/store';
+import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,12 @@ import { ClanIcon } from './Reusables';
 
 const ServerList = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
+	const currentClan = useSelector(selectCurrentClan);
 
+	const handleChangeClan = async (clanId: string) => {
+		const store = await getStoreAsync();
+		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+	};
 	return (
 		<View style={{ height: '100%', paddingTop: 20, width: '22%', justifyContent: 'flex-start' }}>
 			<ClanIcon icon={<LogoMezon width={40} height={40} />} data={[]} />
@@ -17,7 +22,7 @@ const ServerList = React.memo((props: any) => {
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
 			</View>
 			{clans.map((server) => (
-				<ClanIcon data={server} />
+				<ClanIcon data={server} onPress={handleChangeClan} isActive={currentClan?.clan_id === server?.clan_id} />
 			))}
 			<ClanIcon icon={<PlusGreenIcon width={30} height={30} />} data={{}} />
 			<ClanIcon icon={<DiscoveryIcon width={30} height={30} />} data={{}} />

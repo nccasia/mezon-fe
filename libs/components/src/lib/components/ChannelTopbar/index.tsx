@@ -97,7 +97,7 @@ function ThreadButton() {
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
 				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.ThreadIcon isWhite={isShowThread} />
+					<Icons.ThreadIcon isWhite={isShowThread} defaultSize='size-6'/>
 				</button>
 			</Tooltip>
 			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}

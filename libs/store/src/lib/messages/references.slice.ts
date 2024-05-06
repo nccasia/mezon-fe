@@ -19,6 +19,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageToJump: string;
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
+	openThreadMessageState: boolean;
 	attachmentDataRef: ApiMessageAttachment[];
 	openOptionMessageState: boolean;
 	valueTextInput: Record<string, string>;
@@ -38,6 +39,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
+	openThreadMessageState: false,
 	attachmentDataRef: [],
 	openOptionMessageState: false,
 	valueTextInput: {},
@@ -55,7 +57,9 @@ export const referencesSlice = createSlice({
 		setDataReferences(state, action) {
 			state.dataReferences = action.payload;
 		},
-
+		setOpenThreadMessageState(state, action) {
+			state.openThreadMessageState = action.payload;
+		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
@@ -116,6 +120,8 @@ export const selectIdMessageReplied = createSelector(getReferencesState, (state:
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
+
+export const selectOpenThreadMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openThreadMessageState);
 
 export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
 

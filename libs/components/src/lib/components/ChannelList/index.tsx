@@ -76,7 +76,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 									onClick={() => {
 										handleToggleCategory(category);
 									}}
-									className="text-[#AEAEAE] flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
+									className="text-[#AEAEAE] flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-sm font-semibold"
 								>
 									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}

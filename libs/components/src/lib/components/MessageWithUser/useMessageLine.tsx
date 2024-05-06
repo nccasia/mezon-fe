@@ -2,9 +2,10 @@ import { IMessageLine } from '@mezon/utils';
 import { useMemo } from 'react';
 
 // TODO: refactor this to sender function
-const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
 
 export function useMessageLine(line: string): IMessageLine {
+	const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
+
 	const matches = useMemo(() => {
 		if (line) {
 			return line.match(mentionRegex) || [];
@@ -12,7 +13,7 @@ export function useMessageLine(line: string): IMessageLine {
 			return [];
 		}
 	}, [line]);
-	
+
 	const mentions = useMemo(() => {
 		let lastIndex = 0;
 		let nonMatchText = line;

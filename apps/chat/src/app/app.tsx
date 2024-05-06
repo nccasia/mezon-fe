@@ -41,7 +41,7 @@ function AppWrapper() {
 	useEffect(() => {
 		WebFont.load({
 			google: {
-				families: ['Noto Sans'],
+				families: ['gg sans'],
 			},
 		});
 	}, []);

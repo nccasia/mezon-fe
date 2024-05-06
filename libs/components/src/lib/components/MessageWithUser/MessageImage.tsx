@@ -4,8 +4,7 @@ import { useState } from 'react';
 import MessageModalImage from './MessageModalImage';
 
 export type MessageImage = {
-	content?: string;
-	attachmentData: ApiMessageAttachment;
+	readonly attachmentData: ApiMessageAttachment;
 };
 
 function MessageImage({ attachmentData }: MessageImage) {
@@ -16,23 +15,25 @@ function MessageImage({ attachmentData }: MessageImage) {
 	const closeModal = () => {
 		setOpenModal(false);
 	};
+	const handleClick = () => {
+		if (!isDimensionsValid && !checkImage) {
+			setOpenModal(true);
+		}
+	};
+	const imgStyle = {
+		width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
+		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
+	};
 
 	return (
 		<>
 			<div className="break-all">
 				<img
-					className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? `cursor-pointer` : `cursor-default`}`}
+					className={"max-w-[100%] max-h-[30vh] object-cover my-2 rounded " + (!isDimensionsValid && !checkImage ? "cursor-pointer" : "cursor-default")}
 					src={attachmentData.url?.toString()}
 					alt={attachmentData.url}
-					onClick={() => {
-						if (!isDimensionsValid && !checkImage) {
-							setOpenModal(true);
-						} else return;
-					}}
-					style={{
-						width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
-						height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
-					}}
+					onClick={handleClick}
+					style={imgStyle}
 				/>
 			</div>
 

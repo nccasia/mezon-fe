@@ -1,7 +1,9 @@
+import { RootState } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import Button from '../../components/Auth/Button';
 import FooterAuth from '../../components/Auth/FooterAuth';
@@ -17,6 +19,8 @@ const LoginSchema = Yup.object().shape({
 });
 const LoginScreen = () => {
 	const navigation = useNavigation();
+	const isLoading = useSelector((state: RootState) => state.auth.loadingStatus);
+
 	return (
 		<View style={styles.container}>
 			{/* header */}
@@ -61,7 +65,7 @@ const LoginScreen = () => {
 							isPass={true}
 						/>
 						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Login'} />
+						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Login'} loading={isLoading === 'loading'} />
 					</>
 				)}
 			</Formik>

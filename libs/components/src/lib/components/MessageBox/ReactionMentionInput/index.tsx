@@ -88,7 +88,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
@@ -160,7 +160,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
+			if (valueTextInput && typeof valueTextInput === 'string' && !valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 				if (!nameThread.trim() && props.isThread && !currentThread) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
 					dispatch(threadsActions.setNameThreadError(threadError.name));
@@ -355,16 +355,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	return (
 		<div className="relative">
 			{props.isThread && !currentThread && (
-				<div>
+				<div onClick={()=>console.log(referenceMessage)}>
 					<ThreadNameTextField
 						onChange={handleChangeNameThread}
 						onKeyDown={onKeyDown}
 						value={nameThread}
 						label="Thread Name"
-						placeholder="Enter Thread Name"
+						placeholder={(openThreadMessageState && referenceMessage?.content.t!=='' )? referenceMessage?.content.t : 'Enter Thread Name'}
 						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
 					/>
-					<PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />
+					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 				</div>
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}

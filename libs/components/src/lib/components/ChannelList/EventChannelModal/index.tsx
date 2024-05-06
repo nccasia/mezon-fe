@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import * as Icons from '../../Icons';
 import ModalCreate from './ModalCreate';
+import { useAuth, useClans } from '@mezon/core';
 
 export type EventModalProps = {
 	open: boolean;
@@ -9,6 +10,8 @@ export type EventModalProps = {
 
 const EventModal = (props: EventModalProps) => {
 	const { open, onClose } = props;
+	const { userProfile } = useAuth();
+	const { currentClan } = useClans();
 	const [openModal, setOpenModal] = useState(false);
 
 	return open ? (
@@ -23,10 +26,14 @@ const EventModal = (props: EventModalProps) => {
 										<Icons.EventIcon />
 										<h4>Events</h4>
 									</div>
-									<div className="w-[0.1px] h-4 bg-gray-400"></div>
-									<div className="bg-primary px-2 py-1 rounded-md" onClick={() => setOpenModal(true)}>
-										Create Event
-									</div>
+									{currentClan?.creator_id === userProfile?.user?.id &&
+										<>
+											<div className="w-[0.1px] h-4 bg-gray-400"></div>
+											<div className="bg-primary px-2 py-1 rounded-md" onClick={() => setOpenModal(true)}>
+												Create Event
+											</div>
+										</>
+									}
 								</div>
 								<span className="text-5xl leading-3 hover:text-white" onClick={onClose}>
 									×

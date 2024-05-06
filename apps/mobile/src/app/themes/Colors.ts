@@ -9,7 +9,7 @@ const colors = {
 	textGray: isDarkTheme ? '#c7c7c7' : '#c7c7c7',
 	titleReset: isDarkTheme ? 'rgba(148, 154, 164, 1)' : 'rgb(44,44,45)',
 	gray72: isDarkTheme ? '#727272' : '#727272',
-	gray70: isDarkTheme ? '#707070' : '#707070',
+	Tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	gray48: isDarkTheme ? '#484848' : '#484848',
 };
 

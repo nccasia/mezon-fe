@@ -1,12 +1,12 @@
 export default {
 	control: {
 		backgroundColor: '#000',
-		fontSize: 15,
+		fontSize: 16,
 	},
 
 	'&multiLine': {
 		control: {
-			fontFamily: 'Noto Sans, sans-serif',
+			fontFamily: 'gg sans, sans-serif',
 			minHeight: 35,
 			border: 'none',
 			outline: 'none',
@@ -19,7 +19,7 @@ export default {
 			padding: 9,
 			border: 'none',
 			outline: 'none',
-			whiteSpace: 'pre-wrap'
+			whiteSpace: 'pre-wrap',
 		},
 	},
 
@@ -39,7 +39,7 @@ export default {
 
 	suggestions: {
 		border: '1px solid #0B0B0B',
-		boxShadow:"1px 2px #000",
+		boxShadow: '1px 2px #000',
 		padding: '5px 0px 5px 2px',
 		width: '100%',
 		borderRadius: 12,
@@ -52,12 +52,11 @@ export default {
 			padding: '5px 8px 5px 10px',
 		},
 		item: {
-
 			padding: '5px 15px',
 			borderBottom: '1px solid rgba(0,0,0,0.15)',
 			'&focused': {
 				backgroundColor: '#41433A',
-				borderRadius: 6
+				borderRadius: 6,
 			},
 		},
 	},

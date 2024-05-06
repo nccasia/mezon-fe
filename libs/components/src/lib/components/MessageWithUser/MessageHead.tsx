@@ -49,11 +49,12 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all username"
+					className="text-base text-white font-medium tracking-wider cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
+					role='button'
 				>
-					{username ? username : 'Anonymous'}
+					{username ?? 'Anonymous'}
 				</div>
 				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -64,8 +65,10 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,
 						bottom: positionBottom ? '64px' : '',
+
 					}}
 					onMouseDown={handleDefault}
+					role="button"
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

@@ -1,11 +1,14 @@
-import { accountActions, authActions, useAppDispatch } from '@mezon/store-mobile';
+import { useAuth } from '@mezon/core';
+import { useAppDispatch } from '@mezon/store-mobile';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import Images from 'apps/mobile/src/assets/Images';
 import React, { useEffect } from 'react';
 import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 const GoogleLogin = () => {
 	const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
 	const dispatch = useAppDispatch();
+	const { loginByGoogle } = useAuth();
 
 	useEffect(() => {
 		GoogleSignin.configure({
@@ -18,13 +21,7 @@ const GoogleLogin = () => {
 		try {
 			await GoogleSignin.hasPlayServices();
 			const { idToken } = await GoogleSignin.signIn();
-			const action = await dispatch(authActions.authenticateGoogle(idToken));
-			const session = action.payload;
-			if (!!session) {
-				dispatch(accountActions.setAccount(session));
-			} else {
-				Alert.alert('Login Failed', 'Unable to login with Google');
-			}
+			await loginByGoogle(idToken);
 		} catch (error) {
 			console.log('error onGoogleButtonPress', error);
 			Alert.alert('Login Failed', 'Unable to login with Google');

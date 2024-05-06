@@ -49,7 +49,7 @@ const GifStickerEmojiPopup = () => {
 	}, [emojiRefParentDiv]);
 
 	return (
-		<div className="md:min-w-[500px] w-full h-fit min-h-[500px] rounded-lg bg-[#222222] ">
+		<div className="w-[370px] sbm:w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222] ">
 			<div className="w-full">
 				<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1">
 					<button

@@ -22,7 +22,7 @@ export const Events = () => {
 							<Icons.EventIcon />
 						</div>
 					</div>
-					<div className="w-[99px] text-zinc-400 text-sm font-medium">3 Events</div>
+					<div className="w-[99px] text-zinc-400 text-base font-medium">3 Events</div>
 				</div>
 				<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
 					<div className="text-white text-xs font-medium">1</div>

@@ -100,7 +100,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			</div>
 			<div className="flex justify-between mt-4 w-full">
 				<button
-					className={`py-2 text-[#84ADFF] font-bold ${currentModal === Tabs_Option.EVENT_INFO && 'hidden'}`}
+					className={`py-2 text-[#84ADFF] font-bold ${currentModal === Tabs_Option.LOCATION && 'hidden'}`}
 					onClick={() => handleBack(currentModal)}
 				>
 					Back

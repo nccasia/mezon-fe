@@ -6,7 +6,7 @@ type RoleUserProfileProps = {
 };
 
 const AboutUserProfile = ({ userID }: RoleUserProfileProps) => {
-	const userById = useSelector(selectMemberByUserId(userID || ''));
+	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	return (
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-xs ">ABOUT ME</div>
@@ -14,7 +14,6 @@ const AboutUserProfile = ({ userID }: RoleUserProfileProps) => {
 
 				{userById?.user?.about_me}
 			</div>
-			
 		</div>
 	);
 };

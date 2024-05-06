@@ -39,7 +39,7 @@ function NotificationList() {
 							return (
 								<div key={index}>
 									<button
-										className={`px-2 py-[4px] rounded-[4px] font-[600] ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary font-[700]' : ''}`}
+										className={`px-2 py-[4px] rounded-[4px] text-base font-medium ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary' : ''}`}
 										tabIndex={index}
 										onClick={() => handleChangeTab(tab.value)}
 									>

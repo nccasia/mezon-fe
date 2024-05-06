@@ -11,5 +11,5 @@ export function AvatarComponent({ id }: Props) {
 }
 export function NameComponent({ id }: Props) {
 	const user = useSelector(selectMemberByUserId(id));
-	return <p className="text-xs text-[#AEAEAE]">{user?.user?.username}</p>;
+	return <p className="text-sm font-medium text-[#AEAEAE]">{user?.user?.username}</p>;
 }

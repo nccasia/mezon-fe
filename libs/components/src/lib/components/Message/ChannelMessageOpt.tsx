@@ -1,8 +1,9 @@
 import { Icons } from '@mezon/components';
-import { useChatReaction, useReference } from '@mezon/core';
-import { referencesActions, useAppDispatch } from '@mezon/store';
+import { useChatReaction, useReference, useThreads } from '@mezon/core';
+import { referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { Ref, forwardRef } from 'react';
+import { Ref, forwardRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
@@ -10,8 +11,11 @@ type ChannelMessageOptProps = {
 
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
-	const { reactionActions, userId, reactionRightState, reactionBottomState } = useChatReaction();
-	const { openEditMessageState, openOptionMessageState } = useReference();
+	const { reactionActions, userId } = useChatReaction();
+	const { openOptionMessageState, setOpenThreadMessageState } = useReference();
+	const { setIsShowCreateThread } = useThreads();
+	const [thread, setThread] = useState(false);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
@@ -46,6 +50,13 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		event.stopPropagation();
 	};
 
+	const handleThread = () => {
+		setThread(!thread);
+		setIsShowCreateThread(true);
+		setOpenThreadMessageState(true);
+		dispatch(referencesActions.setReferenceMessage(message));
+	}
+
 	return (
 		<div ref={ref} className="iconHover flex justify-between  bg-[#232323] rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
@@ -60,7 +71,12 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
 					<Icons.Reply />
 				</button>
-			)}
+			)} 
+			{ Number(currentChannel?.parrent_id) === 0 && 
+				<button className="h-full p-1 cursor-pointer" onClick={handleThread}> 
+					<Icons.ThreadIcon isWhite={thread}/>
+				</button>
+			}
 			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
 				<Icons.ThreeDot />
 			</button>

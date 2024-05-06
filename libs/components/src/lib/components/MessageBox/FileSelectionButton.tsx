@@ -1,6 +1,6 @@
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import * as Icons from '../Icons';
-import { ApiMessageAttachment } from "mezon-js/api.gen";
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -40,7 +40,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 				className="block w-full hidden"
 				multiple
 			/>
-			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
+			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb cursor-pointer">
 				<Icons.AddCircle />
 			</div>
 		</label>

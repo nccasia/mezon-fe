@@ -6,6 +6,7 @@ import {
 	selectOpenEditMessageState,
 	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
+	selectOpenThreadMessageState,
 	selectReferenceMessage,
 	useAppDispatch,
 } from '@mezon/store';
@@ -21,6 +22,7 @@ export function useReference() {
 	const idMessageReplied = useSelector(selectIdMessageReplied);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const attachmentDataRef = useSelector(selectAttachmentData);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 
@@ -59,6 +61,13 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setOpenThreadMessageState = useCallback(
+		(status: boolean) => {
+			dispatch(referencesActions.setOpenThreadMessageState(status));
+		},
+		[dispatch],
+	);
+
 	const setAttachmentData = useCallback(
 		(attachent: ApiMessageAttachment | ApiMessageAttachment[]) => {
 			dispatch(referencesActions.setAttachmentData(attachent));
@@ -81,11 +90,13 @@ export function useReference() {
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
 			setOpenOptionMessageState,
+			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
 			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
+			openThreadMessageState,
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,
@@ -97,11 +108,13 @@ export function useReference() {
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
 			setOpenOptionMessageState,
+			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
 			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
+			openThreadMessageState,
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,

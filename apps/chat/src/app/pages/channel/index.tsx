@@ -138,7 +138,7 @@ export default function ChannelLayout() {
 							</div>
 						) : (
 							<div
-								className={`flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative ${isShow ? 'max-w-boxChatView' : 'max-w-full'}`}
+								className={`flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative max-w-full`}
 							>
 								{currentChannel && (
 									<ChannelTyping

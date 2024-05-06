@@ -1,5 +1,5 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { useChatSending, useGifsStickersEmoji, useMenu } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
@@ -14,6 +14,7 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
+	const { isShowMemberList } = useMenu();
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -38,7 +39,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 		<div className="mx-4 relative" role="button" aria-hidden>
 			{subPanelActive !== SubPanelName.NONE && (
 				<div
-					className="absolute right-0 bottom-[105%] z-10"
+					className={`fixed bottom-[66px] z-10 ${isShowMemberList ? 'right-64' : 'right-4'}`}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}

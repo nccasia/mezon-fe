@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useReference } from '@mezon/core';
-import { directActions, referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useMenu, useReference } from '@mezon/core';
+import { directActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -193,18 +193,16 @@ function PopupMessage({
 	isCombine,
 	deleteSendMessage,
 }: PopupMessageProps) {
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { reactionPlaceActive } = useChatReaction();
+	const { closeMenu, statusMenu } = useMenu();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
-	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
 		if (channelMessageDiv) {
 			const rect = channelMessageDiv.getBoundingClientRect();
-			if (rect.bottom < 500 && rect.top > 0) {
-				setPickerPosition({ top: rect.top - 50, left: rect.left });
-			} else {
-				setPickerPosition({ top: rect.top - 340, left: rect.left });
-			}
+			setPickerPosition({ top: rect.top, left: rect.left, bottom: rect.bottom });
 		}
 		return 0;
 	};
@@ -219,7 +217,7 @@ function PopupMessage({
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5 
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block bg-bgSecondary top-0 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -233,10 +231,10 @@ function PopupMessage({
 					{mess.id === referenceMessage?.id && reactionRightState && (
 						<div
 							id="emojiPicker"
-							className="fixed h-[0px]"
-							style={{ top: pickerPosition.top - 20, left: pickerPosition.left - 310, bottom: pickerPosition.top < 350 ? 0 : '' }}
+							className={`fixed size-[500px] ${closeMenu && !statusMenu && 'w-[370px]'}`}
+							style={{ top: pickerPosition.bottom > 200 ? '' : (pickerPosition.top - 50), bottom:pickerPosition.bottom > 200 ? 20 : '', left: (closeMenu && !statusMenu) ? '' : pickerPosition.left - 510, right: (closeMenu && !statusMenu) ? 0 : ''}}
 						>
-							<div className="scale-75 transform mb-0 z-10">
+							<div className="mb-0 z-10 h-full">
 								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>

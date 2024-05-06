@@ -35,13 +35,11 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 	const handleWheel = (event: any) => {
 		const deltaY = event.deltaY;
 		setScale((prevScale) => {
-			let newScale = prevScale;
 			if (deltaY > 0) {
-				newScale = Math.max(1, prevScale - 0.05);
+				return Math.max(1, prevScale - 0.05);
 			} else {
-				newScale = Math.min(5, prevScale + 0.05);
+				return Math.min(5, prevScale + 0.05);
 			}
-			return newScale;
 		});
 	};
 
@@ -92,13 +90,18 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 								{attachments.map((img, index) => {
 									const url = `https://cdn.mezon.vn/${img.clanId}/${img.channelId}/${img.filename}`;
 									return (
-										<div className={url === urlImg ? 'hidden' : ''} key={index}>
+										<div className={url === urlImg ? 'hidden' : ''} key={`${img.id}_${index}`}>
 											<img
 												src={url}
 												alt={url}
 												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
 												onDragStart={handleDrag}
 												onClick={() => handleClickImg(url)}
+												onKeyDown={(event) => {
+													if (event.key === 'Enter') {
+														handleClickImg(url);
+													}
+												}}
 											/>
 										</div>
 									);

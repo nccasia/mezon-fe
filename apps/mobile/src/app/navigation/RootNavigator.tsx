@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
-import { initStore, MezonStoreProvider, selectIsLogin } from "@mezon/store";
+import { initStore, MezonStoreProvider, selectIsLogin } from "@mezon/store-mobile";
 import { useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { useMezon } from "@mezon/transport";

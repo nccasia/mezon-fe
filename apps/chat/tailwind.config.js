@@ -46,7 +46,7 @@ module.exports = {
         widthMessageTextChat: `calc(100% - 40px)`,
         widthChannelTypeText: `calc(100% - 10px)`,
         widthSideBar: `calc(100vw - 72px)`,
-        widthHeader:`calc(100% - 344px)`,
+        widthHeader: `calc(100% - 344px)`,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
@@ -65,9 +65,9 @@ module.exports = {
       maxWidth: {
         '9/10': '90%',
         '2/5': "40%",
-        boxChatView:`calc(100vw - 589px)`,
-        wrappBoxChatView:`calc(100vw - 377px)`,
-        wrappBoxChatViewMobile:`calc(100vw - 31px)`,
+        boxChatView: `calc(100vw - 589px)`,
+        wrappBoxChatView: `calc(100vw - 377px)`,
+        wrappBoxChatViewMobile: `calc(100vw - 31px)`,
       },
 
       maxHeight: {
@@ -82,7 +82,7 @@ module.exports = {
       },
 
       fontFamily: {
-        notoSans: ['Noto Sans', 'sans-serif'],
+        ggSans: ['gg sans', 'sans-serif'],
       },
       screens: {
         'mobile-s': '320px',
@@ -117,7 +117,7 @@ module.exports = {
     },
     screens: {
       ssm: "430px",
-      sbm:"480px",
+      sbm: "480px",
       sm: '640px',
       md: '768px',
       lg: '1024px',

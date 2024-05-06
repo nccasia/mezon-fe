@@ -1,8 +1,7 @@
 import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { useMezonVoice } from '@mezon/voice';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
+import { useMezonVoice } from '@mezon/voice';
 import cls from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useRef, useState } from 'react';
@@ -116,9 +115,19 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		}
 	};
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} role="button" className="relative group">
+		<div
+			ref={panelRef}
+			onMouseDown={(event) => handleMouseClick(event)}
+			onClick={() => setIsShowCreateThread(false)}
+			role="button"
+			className="relative group"
+		>
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
-				<span className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`} onClick={() => handleVoiceChannel(channel.id)} role="button">
+				<span
+					className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`}
+					onClick={() => handleVoiceChannel(channel.id)}
+					role="button"
+				>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
 						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
@@ -132,7 +141,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</div>
 					<p
 						className={cls({
-							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
+							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-base font-medium focus:bg-[#36373D]': true,
 							'font-medium text-white': active || isUnReadChannel,
 						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
@@ -158,7 +167,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						</div>
 						<p
 							className={cls({
-								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
+								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-base focus:bg-[#36373D]': true,
 								'font-medium text-white': active || isUnReadChannel,
 							})}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}

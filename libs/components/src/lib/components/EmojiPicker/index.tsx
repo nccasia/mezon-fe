@@ -49,7 +49,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 
 	return (
 		<EmojiPicker
-			style={{ border: 'none', minWidth: '100%' }}
+			style={{ border: 'none', minWidth: '100%',minHeight: '100%', }}
 			suggestedEmojisMode={SuggestionMode.FREQUENT}
 			onEmojiClick={handleEmojiSelect}
 			theme={Theme.DARK}

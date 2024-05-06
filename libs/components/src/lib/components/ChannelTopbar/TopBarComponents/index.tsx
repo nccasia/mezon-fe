@@ -45,7 +45,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			</div>
 
 			<p
-				className={` text-white mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '}`}
+				className={` text-base font-semibold text-white mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '}`}
 			>
 				{name}
 			</p>

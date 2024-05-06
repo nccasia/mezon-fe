@@ -26,6 +26,7 @@ export const styles = StyleSheet.create({
 		color: '#FFF',
 		fontWeight: 'bold',
 		fontSize: 18,
+		textTransform: 'uppercase',
 	},
 	wrapperChatBox: {
 		minHeight: 80,
@@ -92,7 +93,7 @@ export const styles = StyleSheet.create({
 		textTransform: 'uppercase',
 		fontSize: 15,
 		fontWeight: 'bold',
-		color: Colors.gray72,
+		color: Colors.Tertiary,
 	},
 	channelListItem: {
 		width: '100%',
@@ -106,7 +107,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,
-		color: Colors.gray70,
+		color: Colors.Tertiary,
 	},
 	channelListItemTitleActive: {
 		color: Colors.black,
@@ -153,7 +154,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.gray70,
+		backgroundColor: Colors.Tertiary,
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
@@ -168,5 +169,29 @@ export const styles = StyleSheet.create({
 		borderBottomWidth: 0.5,
 		borderBottomColor: 'lightgray',
 		backgroundColor: Colors.titleReset,
-	}
+	},
+	lineActiveClan: {
+		backgroundColor: Colors.black,
+		width: 4,
+		height: '80%',
+		top: '10%',
+		left: 0,
+		borderTopRightRadius: 10,
+		borderBottomEndRadius: 10,
+		position: 'absolute',
+	},
+	clanIconActive: {
+		backgroundColor: Colors.black,
+	},
+	containerThreadList: {
+		paddingLeft: size.s_24,
+		paddingBottom: size.s_14,
+	},
+	titleThread: {
+		fontSize: size.s_14,
+		fontWeight: '600',
+		marginLeft: size.s_6,
+		color: Colors.Tertiary,
+		top: size.s_6,
+	},
 });

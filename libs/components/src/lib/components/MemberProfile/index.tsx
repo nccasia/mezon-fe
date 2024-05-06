@@ -94,7 +94,7 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-[15px] ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] bg-bgSurface'} nameMemberProfile`}
+							className={`text-base font-medium ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] bg-bgSurface'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
