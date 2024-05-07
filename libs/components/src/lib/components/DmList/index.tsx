@@ -65,7 +65,7 @@ function DirectMessageList() {
 				</div>
 			</div>
 			{isChange ? <ForwardMessageModal open={isChange} /> : null}
-			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
+			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any, index: number) => {
 						return <DMListItem key={index} directMessage={directMessage} />;

@@ -57,13 +57,13 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
 	return (
-		<div>
+		<>
 			{showScreen && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className="flex items-center justify-between border-t-2
 			 border-borderDefault px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
-			 shadow-sm transition absolute bottom-0 bg-bgSurface
+			 shadow-sm transition bg-bgSurface
 			 w-full group focus-visible:outline-none"
 			>
 				<div className="footer-profile" ref={profileRef} onClick={handleClickFooterProfile}>
@@ -86,7 +86,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 				</div>
 			</button>
 			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
-		</div>
+		</>
 	);
 }
 
