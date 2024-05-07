@@ -218,27 +218,27 @@ function PopupMessage({
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
 					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block bg-bgSecondary top-0 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
-				${
-					(reactionRightState && mess.id === referenceMessage?.id) ||
-					(reactionBottomState && mess.id === referenceMessage?.id) ||
-					(openEditMessageState && mess.id === referenceMessage?.id) ||
-					(openOptionMessageState && mess.id === referenceMessage?.id)
-						? ''
-						: 'hidden group-hover:block'
-				} `}
+				${(reactionRightState && mess.id === referenceMessage?.id) ||
+							(reactionBottomState && mess.id === referenceMessage?.id) ||
+							(openEditMessageState && mess.id === referenceMessage?.id) ||
+							(openOptionMessageState && mess.id === referenceMessage?.id)
+							? ''
+							: 'hidden group-hover:block'
+						} `}
 				>
-					<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-					{mess.id === referenceMessage?.id && reactionRightState && (
-						<div
-							id="emojiPicker"
-							className={`fixed size-[500px] ${closeMenu && !statusMenu && 'w-[370px]'}`}
-							style={{ top: pickerPosition.bottom > 200 ? '' : (pickerPosition.top - 50), bottom:pickerPosition.bottom > 200 ? 20 : '', left: (closeMenu && !statusMenu) ? '' : pickerPosition.left - 510, right: (closeMenu && !statusMenu) ? 0 : ''}}
-						>
-							<div className="mb-0 z-10 h-full">
-								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+					<div className='relative'>
+						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
+						{mess.id === referenceMessage?.id && reactionRightState && (
+							<div
+								id="emojiPicker"
+								className={`absolute right-[126px] size-[500px] ${closeMenu && !statusMenu && 'w-[370px]'}`}
+							>
+								<div className="mb-0 z-10 h-full">
+									<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+								</div>
 							</div>
-						</div>
-					)}
+						)}
+					</div>
 
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
 						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />

@@ -175,7 +175,7 @@ type LoadMoreMessArgs = {
 export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: LoadMoreMessArgs, thunkAPI) => {
 	try {
 		const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
-		await thunkAPI.dispatch(
+		return await thunkAPI.dispatch(
 			fetchMessages({
 				channelId: channelId,
 				noCache: false,

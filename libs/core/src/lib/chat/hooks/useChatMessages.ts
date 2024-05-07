@@ -31,7 +31,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 	const lastMessageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
 
 	const loadMoreMessage = React.useCallback(async () => {
-		dispatch(messagesActions.loadMoreMessage({ channelId }));
+		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
 	return useMemo(
