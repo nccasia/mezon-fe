@@ -6,6 +6,7 @@ import { RouterProvider } from 'react-router-dom';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { VoiceContextProvider } from '@mezon/core';
 import { StrictMode, useEffect, useMemo } from 'react';
+import { AliveScope } from 'react-activation';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
@@ -32,7 +33,9 @@ export function App() {
 	}
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<RouterProvider router={routes} />
+			{/* <AliveScope> */}
+				<RouterProvider router={routes} />
+			{/* </AliveScope> */}
 		</MezonStoreProvider>
 	);
 }
