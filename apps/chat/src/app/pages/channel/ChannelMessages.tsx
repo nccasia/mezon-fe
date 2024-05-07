@@ -24,6 +24,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const fetchData = () => {
 		loadMoreMessage();
 	};
+
+	useEffect(() => {
+		fetchData();
+	}, [channelId]);
+
+	const [messageToMap, setMessageToMap] = useState<any>([]);
+
+	useEffect(() => {
+		if (messages.length > 0) {
+			setMessageToMap(messages);
+		}
+	}, []);
+
+	console.log(messageToMap);
 	useEffect(() => {
 		if (idMessageReplied) {
 			setMessageIdToJump(idMessageReplied);
@@ -50,9 +64,40 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
+	// const handleScroll = (e: any) => {
+	// 	setPosition(e.target.scrollTop);
+	// 	sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+	// };
+
 	const handleScroll = (e: any) => {
-		setPosition(e.target.scrollTop);
+		const { scrollTop } = e.target;
+		setPosition(scrollTop);
+		const channelID = channelId;
+		const scrollPositions = JSON.parse(sessionStorage.getItem('scrollPositions') ?? '{}');
+		scrollPositions[channelID] = { scrollTop, messageToMap }; // Saving both scroll position and messages
+		sessionStorage.setItem('scrollPositions', JSON.stringify(scrollPositions));
 	};
+
+	useEffect(() => {
+		const channelID = channelId;
+		const scrollPositions = JSON.parse(sessionStorage.getItem('scrollPositions') ?? '{}');
+		const scrollData = scrollPositions[channelID];
+		console.log('scrollData', scrollData);
+		if (scrollData !== undefined) {
+			const { scrollTop, messageToMap } = scrollData;
+			console.log('savedMessages', messageToMap);
+			if (messageToMap !== undefined) {
+				setMessageToMap(messageToMap);
+				window.scrollTo(0, scrollTop);
+			} else {
+				setMessageToMap(messages);
+				window.scrollTo(0, 0);
+			}
+			// Do something with savedMessages here if needed
+			// delete scrollPositions[channelID];
+			sessionStorage.setItem('scrollPositions', JSON.stringify(scrollPositions));
+		}
+	}, [channelId]);
 
 	return (
 		<div
@@ -66,9 +111,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				flexDirection: 'column-reverse',
 				overflowX: 'hidden',
 			}}
+			onScroll={handleScroll}
 		>
 			<InfiniteScroll
-				dataLength={messages.length}
+				dataLength={messageToMap.length}
 				next={fetchData}
 				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
 				inverse={true}
@@ -81,13 +127,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				onScroll={handleScroll}
 			>
 				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
-				{messages.map((message, i) => (
+				{messageToMap?.map((message: any, i: number) => (
 					<ChannelMessage
 						mode={mode}
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
-						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+						preMessage={messageToMap.length > 0 ? messageToMap[i - 1] : undefined}
 						channelId={channelId}
 						channelLabel={channelLabel || ''}
 					/>
