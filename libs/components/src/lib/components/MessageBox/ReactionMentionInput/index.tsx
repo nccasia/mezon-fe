@@ -265,6 +265,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
+			console.log(mentions);
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
 					mentionedUsers.push({
@@ -273,6 +274,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					});
 				}
 			}
+			console.log(mentionedUsers);
 			setMentionData(mentionedUsers);
 		}
 		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {

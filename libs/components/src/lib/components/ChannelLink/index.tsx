@@ -113,6 +113,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
+		
 	};
 	return (
 		<div

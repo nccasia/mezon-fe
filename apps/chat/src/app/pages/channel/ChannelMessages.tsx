@@ -50,9 +50,26 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
+	// const handleScroll = (e: any) => {
+	// 	setPosition(e.target.scrollTop);
+	// };
+
 	const handleScroll = (e: any) => {
-		setPosition(e.target.scrollTop);
+		const { scrollTop } = e.target;
+		const scrollPositions = JSON.parse(sessionStorage.getItem('scrollPositions') || '{}');
+		scrollPositions[channelId] = { scrollTop }; // Lưu kích thước thanh cuộn cho kênh hiện tại
+		console.log(scrollPositions[channelId]);
+		sessionStorage.setItem(`scrollPositions_${channelId}`, JSON.stringify(scrollPositions));
 	};
+	
+	useEffect(() => {
+		const scrollPositions = JSON.parse(sessionStorage.getItem(`scrollPositions_${channelId}`) || '{}');
+		const savedScroll = scrollPositions[channelId];
+		if (savedScroll) {
+			const { scrollTop } = savedScroll;
+			window.scrollTo(0, scrollTop);
+		}
+	}, [channelId]);
 
 	return (
 		<div
@@ -66,8 +83,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				flexDirection: 'column-reverse',
 				overflowX: 'hidden',
 			}}
+			onScroll={handleScroll}
 		>
-			<InfiniteScroll
+			{/* <InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
 				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
@@ -78,8 +96,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				refreshFunction={fetchData}
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
-				onScroll={handleScroll}
-			>
+				// onScroll={handleScroll}
+			> */}
 				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
 				{messages.map((message, i) => (
 					<ChannelMessage
@@ -92,7 +110,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						channelLabel={channelLabel || ''}
 					/>
 				))}
-			</InfiniteScroll>
+			{/* </InfiniteScroll> */}
 		</div>
 	);
 }

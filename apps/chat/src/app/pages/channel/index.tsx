@@ -13,6 +13,7 @@ import { useMezon } from '@mezon/transport';
 import { useMezonVoice } from '@mezon/voice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
+import KeepAlive from 'react-activation';
 import { useSelector } from 'react-redux';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import ChannelMessages from './ChannelMessages';
@@ -106,18 +107,20 @@ export default function ChannelLayout() {
 		<>
 			{draggingState && <FileUploadByDnD />}
 			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0"
+				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0 border"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
-						<div
+						{/* <div
 							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}
-						</div>
+						</div> */}
+						{renderChannelMedia()}
+
 						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 							<div className="flex-1 bg-[#1E1E1E]">
 								{!statusCall ? (
@@ -137,9 +140,7 @@ export default function ChannelLayout() {
 								)}
 							</div>
 						) : (
-							<div
-								className={`flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative max-w-full`}
-							>
+							<div className={`flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative max-w-full`}>
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}

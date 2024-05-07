@@ -22,6 +22,7 @@ import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 
 // Pages
+import KeepAlive from 'react-activation';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import ThreadsMain from '../pages/thread';
 import ErrorRoutes from './ErrorRoutes';
@@ -108,7 +109,11 @@ export const routes = createBrowserRouter([
 																path: ':channelId',
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
-																element: <ChannelMain />,
+																element: (
+																	<KeepAlive>
+																		<ChannelMain />
+																	</KeepAlive>
+																),
 																children: [
 																	{
 																		path: 'threads',
