@@ -16,7 +16,7 @@ export default function Direct() {
 
 	return (
 		<>
-			<div className={`flex-col w-[272px] bg-bgSurface relative ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
+			<div className={`flex-col w-[272px] flex bg-bgSurface relative ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				<FooterProfile
