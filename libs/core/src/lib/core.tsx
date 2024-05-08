@@ -1,7 +1,7 @@
 import styles from './core.module.scss';
 
 /* eslint-disable-next-line */
-export interface CoreProps {}
+export interface CoreProps { }
 
 export function Core(props: CoreProps) {
 	return (
