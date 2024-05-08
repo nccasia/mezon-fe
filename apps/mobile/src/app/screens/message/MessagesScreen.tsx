@@ -1,16 +1,21 @@
 import moment from 'moment';
 import React, { useState } from 'react';
-import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { darkColor } from '../../constants/Colors';
-import { HEIGHT, WIDTH } from '../../constants/config';
+import { styles } from './styles';
+import { Colors } from '@mezon/mobile-ui';
+import { useFriends } from '@mezon/core';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { useNavigation } from "@react-navigation/native";
+
 const chats = [
 	{
 		id: '9a1b0bf5-6cac-4ea6-a0fb-bf139df9a2cf',
 		from: 'Aguilar',
 		date: 'Wed Sep 10 2008 01:23:35 GMT+0200 (Central European Summer Time)',
 		img: 'https://i.pravatar.cc/150?u=aguilarduke@marketoid.com',
-		msg: 'Ullamco nostrud velit reprehenderit exercitation labore laboris consequat ex magna nostrud.',
+		msg: 'OKE',
 		read: true,
 		unreadCount: 2,
 		online: true,
@@ -246,115 +251,77 @@ const chats = [
 	},
 ];
 const MessagesScreen = () => {
-	const [items, setItems] = useState(chats);
-	console.log(items);
+	// const data = useSelector
+	const [value, setValue] = React.useState<string>('');
 
+	const navigation = useNavigation();
+
+	const onDetail = ({ userData }) => {
+		// Example for navigation detail screen
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		navigation.push(APP_SCREEN.MESSAGES.STACK, {
+			screen: APP_SCREEN.MESSAGES.USER,
+			params: userData,
+		});
+	};
 	return (
-		<View style={{ backgroundColor: darkColor.Background_Secondary, width: WIDTH, height: HEIGHT }}>
+		<View style={styles.container}>
 			{/* header */}
-			<View style={{ height: 150, width: '100%', paddingBottom: 20 }}>
+			<View style={styles.headerContainer}>
 				{/* header */}
+				<Text style={styles.textHeader}>Messages</Text>
 				<View
-					style={{
-						width: '100%',
-						height: '60%',
-						flexDirection: 'row',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-						paddingLeft: 20,
-						paddingRight: 10,
-					}}
+					style={styles.containerAddFriend}
 				>
-					<Text style={{ fontSize: 18, fontWeight: 600 }}>Messages</Text>
-					<View
-						style={{
-							flexDirection: 'row',
-							alignItems: 'center',
-							justifyContent: 'center',
-							width: '38%',
-							backgroundColor: darkColor.Backgound_Tertiary,
-							borderRadius: 40,
-							gap: 5,
-							height: '60%',
-						}}
-					>
-						<Feather name="user-plus" size={20} />
-						<Text>Add Friends</Text>
-					</View>
-				</View>
-				{/* search */}
-				<View
-					style={{
-						height: '40%',
-						width: '95%',
-						backgroundColor: darkColor.Backgound_Primary,
-						paddingLeft: 20,
-						paddingRight: 10,
-						alignItems: 'center',
-						flexDirection: 'row',
-						borderRadius: 30,
-						marginLeft: 10,
-					}}
-				>
-					<Feather name="search" size={20} />
-					<TextInput placeholder="Search" />
+					<Feather name="user-plus" size={20} style={styles.iconFriends} />
+					<Text style={styles.textAddFriend}>Add Friends</Text>
 				</View>
 			</View>
 			<ScrollView>
+				{/* search */}
+				<View
+					style={styles.containerSearchInput}
+				>
+					<Feather name="search" size={20} style={styles.iconSearch} />
+					<TextInput placeholder="Search" style={styles.inputSearch} placeholderTextColor={Colors.gray72} value={value} onChangeText={setValue} />
+				</View>
 				{/* body */}
-				<View style={{ width: '100%', paddingTop: 20, paddingLeft: 20, paddingRight: 20, gap: 10 }}>
+				<View style={styles.body}>
 					<ScrollView
 						contentInsetAdjustmentBehavior="automatic"
-						contentContainerStyle={{ paddingBottom: 40, flex: 1, backgroundColor: darkColor.Background_Secondary }}
+						contentContainerStyle={styles.contentContainerStyle}
+						showsHorizontalScrollIndicator={false}
+						horizontal={true}
 					>
 						<FlatList
-							data={items}
-							scrollEnabled={false}
+							data={chats}
 							keyExtractor={(item) => item.id.toString()}
 							ItemSeparatorComponent={() => <View style={{}} />}
 							renderItem={({ item }) => (
-								<TouchableOpacity style={{ flexDirection: 'row', width: '100%', height: 60 }}>
-									<View style={{ width: 60, height: 60 }}>
-										<Image source={{ uri: item.img }} style={{ width: '90%', height: '90%', borderRadius: 50 }} />
+								<TouchableOpacity onPress={() => onDetail(item)} style={styles.ChatContainer}>
+									<View style={styles.imageChat}>
+										<Image source={{ uri: item.img }} style={styles.imageFriend} />
 										{item.online ? (
 											<View
-												style={{
-													position: 'absolute',
-													width: 16,
-													height: 16,
-													borderRadius: 10,
-													backgroundColor: 'green',
-													bottom: 4,
-													right: 6,
-													borderWidth: 2,
-													borderColor: darkColor.Background_Secondary,
-												}}
+												style={styles.dotOnline}
 											></View>
 										) : (
 											<View
-												style={{
-													position: 'absolute',
-													width: 16,
-													height: 16,
-													borderRadius: 10,
-													backgroundColor: 'red',
-													bottom: 4,
-													right: 6,
-													borderWidth: 2,
-													borderColor: darkColor.Background_Secondary,
-												}}
+												style={styles.dotOffline}
 											></View>
 										)}
 									</View>
 									<View style={{ flex: 1 }}>
-										<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-											<Text style={{ fontWeight: 800 }}>{item.from}</Text>
-
-											<Text>{moment(item.date, 'DD MM YYYY hh:mm:ss').format('DD/MM/YYYY HH:mm:ss')}</Text>
+										<View style={styles.headerChatList}>
+											<Text style={styles.textChatName}>{item.from}</Text>
+											<Text style={styles.textDay}>{moment().diff(moment(item.date), 'days')} d</Text>
 										</View>
-
-										<Text style={{ fontSize: 16, color: 'gray' }}>
-											{item.msg.length > 40 ? `${item.msg.substring(0, 40)}...` : item.msg}
+										<Text style={styles.textChatMessage}>
+											{item.from}:
+											<Text style={styles.textChatMessage}>
+												{item.msg.length > 25 ? `${item.msg.substring(0, 25)}...` : item.msg}
+											</Text>
 										</Text>
 									</View>
 								</TouchableOpacity>
@@ -383,5 +350,3 @@ const MessagesScreen = () => {
 };
 
 export default MessagesScreen;
-
-const styles = StyleSheet.create({});

@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
 		height: '100%',
 		width: '78%',
 		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
+		borderTopRightRadius: verticalScale(10),
 		overflow: 'hidden',
 	},
 	listHeader: {
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
 	titleHeaderChannel: {
 		color: '#FFF',
 		fontWeight: 'bold',
-		fontSize: 18,
+		fontSize: size.s_18,
 		textTransform: 'uppercase',
 	},
 	wrapperChatBox: {

@@ -7,7 +7,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
 import HomeScreen from '../../screens/home/HomeScreen';
-import MessagesScreen from '../../screens/main/MessagesScreen';
+import MessagesScreen from '../../screens/message/MessagesScreen';
 import Notifications from '../../screens/main/Notifications';
 import ProfileScreen from '../../screens/main/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
