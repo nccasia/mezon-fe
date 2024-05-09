@@ -88,5 +88,20 @@ export const styles = StyleSheet.create({
         color: 'gray',
         fontSize: 12,
         fontWeight: 'bold'
+    },
+    helloImage: { width: 80, height: 80, borderRadius: 50 },
+    textHelloBold: { fontWeight: 'bold', fontSize: 35, color: Colors.textGray },
+    textHello: { fontSize: 33, color: Colors.textGray },
+    ChatMessageContainer: { flexDirection: 'row', width: '100%', height: 60, gap: 10, alignItems: 'center' },
+    headerChatMessage: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    imageMessage: { width: 35, height: 35, borderRadius: 50 },
+    buttonContainer: {
+        flexDirection: 'row',
+        backgroundColor: Colors.primary,
+        shadowColor: Colors.black,
+        // shadowOffset: { height: -8 },
+        shadowOpacity: 0.05,
+        height: 60,
+        alignItems: 'center'
     }
 });

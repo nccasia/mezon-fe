@@ -305,11 +305,11 @@ const MessagesScreen = () => {
 										{item.online ? (
 											<View
 												style={styles.dotOnline}
-											></View>
+											/>
 										) : (
 											<View
 												style={styles.dotOffline}
-											></View>
+											/>
 										)}
 									</View>
 									<View style={{ flex: 1 }}>

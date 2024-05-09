@@ -17,15 +17,22 @@ export const MessagesStacks = ({ }: any) => {
 		return (
 			<View style={styles.header}>
 				<View style={styles.headerLeft}>
-					<Feather name="arrow-left" size={20} onPress={() => navigation.goBack()} />
-					<Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }} >{title}</Text>
+					<View style={{ alignItems: 'center', justifyContent: 'center' }}>
+						<Feather name="arrow-left" size={20} style={styles.icon} onPress={() => navigation.goBack()} />
+						<View style={styles.viewReadMessage} >
+							<Text style={styles.textRead}>1</Text>
+						</View>
+					</View>
+					<Text style={styles.nameUser} >{title}</Text>
+					<Feather name="chevron-right" size={20} style={styles.icon} />
+
 				</View>
 				<View style={styles.headerRight}>
 					<TouchableOpacity style={styles.backgroundIcon}>
-						<Feather name="phone-call" size={17} />
+						<Feather name="phone-call" size={17} style={styles.icon} />
 					</TouchableOpacity >
 					<TouchableOpacity style={styles.backgroundIcon}>
-						<Feather name="video" size={17} />
+						<Feather name="video" size={17} style={styles.icon} />
 					</TouchableOpacity>
 
 				</View>
