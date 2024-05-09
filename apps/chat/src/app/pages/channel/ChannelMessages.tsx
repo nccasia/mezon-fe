@@ -64,6 +64,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				}}
 			>
 				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+					const isLoaderRow = virtualRow.index > allRows.length - 1;
 					const message = allRows[virtualRow.index] as IMessageWithUser;
 					return (
 						<div
@@ -80,15 +81,23 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 							}}
 						>
 							<div style={{ width: '100%' }}>
-								<ChannelMessage
-									mode={mode}
-									key={message?.id}
-									lastSeen={message?.id === unreadMessageId && message?.id !== lastMessageId}
-									message={message}
-									preMessage={messages.length > 0 ? messages[virtualRow.index - 1] : undefined}
-									channelId={channelId}
-									channelLabel={channelLabel || ''}
-								/>
+								{isLoaderRow ? (
+									hasNextPage ? (
+										'Loading more...'
+									) : (
+										'Nothing more to load'
+									)
+								) : (
+									<ChannelMessage
+										mode={mode}
+										key={message?.id}
+										lastSeen={message?.id === unreadMessageId && message?.id !== lastMessageId}
+										message={message}
+										preMessage={messages.length > 0 ? messages[virtualRow.index - 1] : undefined}
+										channelId={channelId}
+										channelLabel={channelLabel || ''}
+									/>
+								)}
 							</div>
 						</div>
 					);
@@ -107,4 +116,3 @@ ChannelMessages.Skeleton = () => {
 		</>
 	);
 };
-
