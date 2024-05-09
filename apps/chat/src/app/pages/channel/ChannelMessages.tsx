@@ -1,8 +1,12 @@
-import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
-import { useEffect, useRef, useState } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { useChatMessages } from '@mezon/core';
+import { fetchMessages, useAppDispatch } from '@mezon/store';
+import { IMessageWithUser } from '@mezon/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useEffect, useRef } from 'react';
+import { QueryClient, useInfiniteQuery } from 'react-query';
 import { ChannelMessage } from './ChannelMessage';
+
+const queryClient = new QueryClient();
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -13,86 +17,83 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage, currentLastLoadMessage } = useChatMessages({ channelId });
+
+	const dispatch = useAppDispatch();
+	const fetchServerPage = () => {
+		return dispatch(fetchMessages({ channelId: channelId, noCache: false, messageId: currentLastLoadMessage, direction: 3 }));
+	};
+
+	const { status, data, error, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery(
+		'chatMessages',
+		() => fetchServerPage(),
+		{
+			getNextPageParam: (_lastGroup, groups) => {
+				return groups.length;
+			},
+		},
+	);
+
+	const allRows = data ? data.pages.flatMap((d) => d.payload) : [];
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
-	const [timeToJump, setTimeToJump] = useState(1000);
-	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
-	const { jumpToMessage } = useJumpToMessage();
-	const { idMessageReplied } = useReference();
-	const fetchData = () => {
-		loadMoreMessage();
-	};
+	const rowVirtualizer = useVirtualizer({
+		count: hasNextPage ? allRows.length + 1 : allRows.length,
+		getScrollElement: () => containerRef.current,
+		estimateSize: () => 100,
+		overscan: 5,
+	});
 	useEffect(() => {
-		if (idMessageReplied) {
-			setMessageIdToJump(idMessageReplied);
-			setTimeToJump(0);
-			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
-			setPositionToJump('start');
-		}
-	}, [getJumpToMessageId, idMessageReplied]);
+		const [lastItem] = [...rowVirtualizer.getVirtualItems()].reverse();
 
-	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		if (messageid) {
-			timeoutId = setTimeout(() => {
-				jumpToMessage(messageid, positionToJump);
-			}, timeToJump);
+		if (!lastItem) {
+			return;
 		}
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-		};
-	}, [messageid, jumpToMessage]);
 
-	const handleScroll = (e: any) => {
-		setPosition(e.target.scrollTop);
-	};
+		if (lastItem.index >= allRows.length - 1 && hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage, allRows.length, isFetchingNextPage, rowVirtualizer.getVirtualItems()]);
 
 	return (
-		<div
-			className="bg-[#26262B] relative"
-			id="scrollLoading"
-			ref={containerRef}
-			style={{
-				height: '100%',
-				overflowY: 'scroll',
-				display: 'flex',
-				flexDirection: 'column-reverse',
-				overflowX: 'hidden',
-			}}
-		>
-			<InfiniteScroll
-				dataLength={messages.length}
-				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
-				inverse={true}
-				hasMore={hasMoreMessage}
-				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
-				scrollableTarget="scrollLoading"
-				refreshFunction={fetchData}
-				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
-				pullDownToRefreshThreshold={50}
-				onScroll={handleScroll}
+		<div ref={containerRef} style={{ overflowY: 'auto', height: window.innerHeight, width: '100%' }}>
+			<div
+				style={{
+					height: `${rowVirtualizer.getTotalSize()}px`,
+					width: '100%',
+					position: 'relative',
+				}}
 			>
-				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
-				{messages.map((message, i) => (
-					<ChannelMessage
-						mode={mode}
-						key={message.id}
-						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-						message={message}
-						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel || ''}
-					/>
-				))}
-			</InfiniteScroll>
+				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+					const message = allRows[virtualRow.index] as IMessageWithUser;
+					return (
+						<div
+							key={virtualRow.key}
+							data-index={virtualRow.index}
+							ref={rowVirtualizer.measureElement}
+							style={{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								transform: `translateY(${virtualRow.start - rowVirtualizer.options.scrollMargin}px)`,
+								display: 'flex',
+							}}
+						>
+							<div style={{ width: '100%' }}>
+								<ChannelMessage
+									mode={mode}
+									key={message?.id}
+									lastSeen={message?.id === unreadMessageId && message?.id !== lastMessageId}
+									message={message}
+									preMessage={messages.length > 0 ? messages[virtualRow.index - 1] : undefined}
+									channelId={channelId}
+									channelLabel={channelLabel || ''}
+								/>
+							</div>
+						</div>
+					);
+				})}
+			</div>
 		</div>
 	);
 }
@@ -106,3 +107,4 @@ ChannelMessages.Skeleton = () => {
 		</>
 	);
 };
+

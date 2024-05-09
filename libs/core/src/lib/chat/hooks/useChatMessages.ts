@@ -1,6 +1,7 @@
 import {
 	messagesActions,
 	selectHasMoreMessageByChannelId,
+	selectLastLoadMessageIDByChannelId,
 	selectLastMessageIdByChannelId,
 	selectMessageByChannelId,
 	selectMessageByUserId,
@@ -29,7 +30,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const lastMessageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
-
+	const currentLastLoadMessage = useSelector(selectLastLoadMessageIDByChannelId(channelId))
 	const loadMoreMessage = React.useCallback(async () => {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
@@ -43,7 +44,8 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			hasMoreMessage,
 			lastMessageByUserId,
 			loadMoreMessage,
+			currentLastLoadMessage,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage, currentLastLoadMessage],
 	);
 }
