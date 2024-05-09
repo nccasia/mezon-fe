@@ -26,10 +26,10 @@ const NotificationSetting = () => {
 						<ItemNotificationSetting children="Until I turn it back on" />
 					</Dropdown>
 				</div>
-				<ItemNotificationSetting children="Use Category Default" type="radio" />
-				<ItemNotificationSetting children="All Messages" type="radio" />
-				<ItemNotificationSetting children="Only @mentions" type="radio" />
-				<ItemNotificationSetting children="Nothing" type="radio" />
+				<ItemNotificationSetting children="Use Category Default" type="radio" name="NotificationSetting" onClick={onchange}/>
+				<ItemNotificationSetting children="All Messages" type="radio" name="NotificationSetting" onClick={onchange}/>
+				<ItemNotificationSetting children="Only @mentions" type="radio" name="NotificationSetting" onClick={onchange}/>
+				<ItemNotificationSetting children="Nothing" type="radio" name="NotificationSetting" onClick={onchange}/>
 			</div>
 		</div>
 	);
