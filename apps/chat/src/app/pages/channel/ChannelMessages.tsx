@@ -1,5 +1,5 @@
 import { useChatMessages } from '@mezon/core';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 import { ChannelMessage } from './ChannelMessage';
@@ -17,12 +17,19 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const listRef = useRef<any>({});
 	const rowHeights = useRef<any>({});
+	const [scrollPosition, setScrollPosition] = useState<{ [key: string]: number }>({});
 
 	useEffect(() => {
 		// TODO: May find another solution instead of delay to get ref
 		setTimeout(() => {
 			if (messages.length > 0) {
-				listRef.current?.scrollToItem(messages.length - 1);
+				// retrieve the last scroll position of the channel
+				const lastPosition = scrollPosition[channelId];
+				if (lastPosition !== undefined) {
+					listRef.current?.scrollTo(lastPosition);
+				} else {
+					listRef.current?.scrollToItem(messages.length - 1);
+				}
 			}
 		}, 100);
 	}, [messages.length]);
@@ -65,6 +72,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}
 
 	const onScroll = ({ scrollOffset }: any) => {
+		setTimeout(() => {
+			setScrollPosition((prev) => ({
+				...prev,
+				[channelId]: scrollOffset,
+			}));
+		}, 500);
+
 		if (scrollOffset < 50 && hasMoreMessage && messages.length > 49) {
 			loadMoreMessage();
 		}
