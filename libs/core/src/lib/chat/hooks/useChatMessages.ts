@@ -5,6 +5,7 @@ import {
 	selectLastMessageIdByChannelId,
 	selectMessageByChannelId,
 	selectMessageByUserId,
+	selectMessagesIsLoading,
 	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
@@ -30,6 +31,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const messageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
+	const isLoading = useSelector(selectMessagesIsLoading);
 
 	const loadMoreMessage = React.useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
@@ -43,12 +45,13 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		() => ({
 			client,
 			messages,
+			isLoading,
 			unreadMessageId,
 			lastMessageId,
 			hasMoreMessage,
 			lastMessageByUserId,
 			loadMoreMessage,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, isLoading, loadMoreMessage],
 	);
 }

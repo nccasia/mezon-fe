@@ -1,7 +1,9 @@
 import { useChatMessages } from '@mezon/core';
 import { useVirtualizer } from '@mezon/virtual';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ChannelMessage } from './ChannelMessage';
+
+const INFINE_SCROLL_THRESHOLD_PX = 200;
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -12,27 +14,27 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const { messages, isLoading, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
 	const parentRef = useRef<any>();
 
 	const rowVirtualizer = useVirtualizer({
-		count: messages.length + 1, // Add 1 to account for loader row
+		count: hasMoreMessage ? messages.length + 1 : messages.length,
 		estimateSize: () => 100,
 		getScrollElement: () => parentRef.current,
-		overscan: 50,
 		reverse: true,
 	});
 
-	useEffect(() => {
-		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
-
-		if (!lastItem) return;
-
-		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
+	// called on scroll and possibly on mount to fetch more data as the user scrolls and reaches top of conversation
+	const handleOnScroll = useCallback(() => {
+		const { scrollHeight, scrollTop, clientHeight } = parentRef.current;
+		const scrollOffsetTop =  scrollHeight - clientHeight + scrollTop;
+		const shouldLoadMore = scrollOffsetTop < INFINE_SCROLL_THRESHOLD_PX;
+		if (shouldLoadMore && hasMoreMessage && !isLoading) {
 			loadMoreMessage();
 		}
-	}, [hasMoreMessage, loadMoreMessage, messages.length]);
+	}, [hasMoreMessage, isLoading, loadMoreMessage]);
+
 
 	return (
 		<div
@@ -46,6 +48,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			<div
 				ref={parentRef}
 				className="List"
+				onScroll={handleOnScroll}
 				style={{
 					display: 'flex',
 					flexDirection: 'column-reverse',
@@ -70,7 +73,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 						const isLoaderRow = virtualRow.index === messages.length;
 						const message = messages[virtualRow.index];
-						console.log('message', message);
 						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
 						const minHeight = hasAttachment ? '200px' : 'auto';
 						return (
@@ -102,7 +104,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 											mode={mode}
 											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 											message={message}
-											preMessage={messages[virtualRow.index - 1]}
+											// workaround for now, preMessage = messages[virtualRow.index + 1] because we are using reverse
+											preMessage={messages[virtualRow.index + 1] || null}
 											channelId={channelId}
 											channelLabel={channelLabel || ''}
 										/>

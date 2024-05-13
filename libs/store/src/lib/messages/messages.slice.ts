@@ -383,7 +383,7 @@ export const messagesSlice = createSlice({
 				state.error = action.error.message;
 			});
 
-		builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {});
+		// builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {});
 	},
 });
 
@@ -473,6 +473,8 @@ export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
 	});
 
 export const selectUnreadMessageEntries = createSelector(getMessagesState, (state) => state.unreadMessagesEntries);
+
+export const selectMessagesIsLoading = createSelector(getMessagesState, (state) => state.loadingStatus === 'loading');
 
 export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
 	createSelector(getMessagesState, selectUnreadMessageEntries, (state, lastMessagesEntries) => {
