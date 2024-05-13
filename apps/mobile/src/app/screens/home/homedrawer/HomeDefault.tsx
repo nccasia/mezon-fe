@@ -23,7 +23,7 @@ const HomeDefault = React.memo((props: any) => {
 					<ChannelMessages channelId={currentChannel.channel_id} type="CHANNEL" mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 				)}
 			</View>
-			<ChatBox channelTitle={currentChannel?.channel_label || ''} channelId={2} serverId={1} />
+			<ChatBox channelTitle={currentChannel?.channel_label || ''} channelId={3} serverId={1} />
 		</View>
 	);
 });
