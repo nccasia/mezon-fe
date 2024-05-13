@@ -1601,6 +1601,11 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setIsWhite] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setIsWhite(!isWhite);
+	};
 	return (
 		<svg
 			className={defaultSize}
@@ -1611,9 +1616,10 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			height="24"
 			fill={defaultFill}
 			viewBox="0 0 24 24"
+			onClick={handleClick}
 		>
 			<path
-				fill={defaultFill}
+				fill={isWhite? '#FFFFFF' : defaultFill}
 				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22ZM6.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-9.8 1.17a1 1 0 0 1 1.39.27 3.5 3.5 0 0 0 5.82 0 1 1 0 0 1 1.66 1.12 5.5 5.5 0 0 1-9.14 0 1 1 0 0 1 .27-1.4Z"
 				clipRule="evenodd"

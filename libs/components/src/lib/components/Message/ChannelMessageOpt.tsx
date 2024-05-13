@@ -47,6 +47,14 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
+		const element = event.target; 
+		const rect = (element as HTMLElement).getBoundingClientRect(); 
+		const distanceToBottom = window.innerHeight - rect.bottom; 
+		if(distanceToBottom > 550){
+			dispatch(reactionActions.setReactionTopState(true));
+		} else {
+			dispatch(reactionActions.setReactionTopState(false));
+		}
 		event.stopPropagation();
 	};
 
