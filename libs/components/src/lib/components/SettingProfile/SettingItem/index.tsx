@@ -76,7 +76,13 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<hr className="border-t border-solid border-borderDefault mt-4" />
 				<button className="pt-2 text-[#84ADFF] mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-4 ml-[-8px] hover:text-white">
+				<button
+					className={`p-2 text-[#AEAEAE]  pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Appearance' ? 'bg-[#232E3B] text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					onClick={() => {
+						handleButtonClick('Appearance');
+						onItemClick && onItemClick('Appearance');
+					}}
+				>
 					Appearance
 				</button>
 				<br />

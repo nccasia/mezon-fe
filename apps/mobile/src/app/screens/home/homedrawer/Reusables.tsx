@@ -2,15 +2,11 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-import { channelsActions, getStoreAsync, messagesActions, selectCurrentChannel, selectIsUnreadChannelById } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { selectCurrentChannel } from '@mezon/store-mobile';
+import { ICategoryChannel } from '@mezon/utils';
 import { useSelector } from 'react-redux';
-import HashSignWhiteIcon from '../../../../assets/svg/channelText-white.svg';
-import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
-import SpeakerIcon from '../../../../assets/svg/speaker.svg';
-import ThreadListChannel from './ThreadListChannel';
+import { ChannelListItem } from './ChannelListItem';
 import { styles } from './styles';
 
 export const ChannelListContext = React.createContext({} as any);
@@ -83,61 +79,18 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
 				{props.data.channels?.map((item: any, index: number) => {
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const isUnReadChannel = useSelector(selectIsUnreadChannelById(item?.id));
 					const isActive = currentChanel?.id === item.id;
 
 					return (
 						<ChannelListItem
 							data={item}
 							key={Math.floor(Math.random() * 9999999).toString() + index}
-							isUnRead={isUnReadChannel}
 							isActive={isActive}
 							currentChanel={currentChanel}
 						/>
 					);
 				})}
 			</View>
-		</View>
-	);
-});
-
-export const ChannelListItem = React.memo((props: { data: any; image?: string; isUnRead: boolean; isActive: boolean; currentChanel: IChannel }) => {
-	const useChannelListContentIn = React.useContext(ChannelListContext);
-
-	const handleRouteData = async (thread?: IChannel) => {
-		const store = await getStoreAsync();
-		useChannelListContentIn.navigation.closeDrawer();
-		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-	};
-
-	return (
-		<View>
-			<TouchableOpacity
-				activeOpacity={1}
-				onPress={() => handleRouteData()}
-				style={[styles.channelListItem, props.isActive && styles.channelListItemActive]}
-			>
-				{props.isUnRead && <View style={styles.dotIsNew} />}
-				{props.image != undefined ? (
-					<View style={{ width: 30, height: 30, borderRadius: 50, overflow: 'hidden' }}>
-						<FastImageRes uri={props.image} />
-					</View>
-				) : props.data.type == ChannelType.CHANNEL_TYPE_VOICE ? (
-					<SpeakerIcon width={20} height={20} fill={'#FFFFFF'} />
-				) : props.isUnRead ? (
-					<HashSignWhiteIcon width={18} height={18} />
-				) : (
-					<HashSignIcon width={18} height={18} />
-				)}
-				<Text style={[styles.channelListItemTitle, props.isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
-			</TouchableOpacity>
-			{!!props?.data?.threads?.length && (
-				<ThreadListChannel threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} />
-			)}
 		</View>
 	);
 });

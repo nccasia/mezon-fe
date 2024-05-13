@@ -60,7 +60,7 @@ export default function ChannelLayout() {
 		voice.voiceDisconnect();
 		voice.setVoiceOptions((prev) => ({
 			...prev,
-			voiceStart: true,
+			voiceStart: false,
 		}));
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));

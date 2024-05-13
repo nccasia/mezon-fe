@@ -40,3 +40,12 @@ export const getSnapToOffets = (imageWidth: number, padding: number, width: numb
 export const isImage = (url?: string) => {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)/.test(url);
 };
+
+export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
+export const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
+export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$))/g;
+
+export const validURL = (string: string) => {
+  const res = string.match(urlPattern);
+  return res !== null;
+};
