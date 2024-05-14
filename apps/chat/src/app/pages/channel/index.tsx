@@ -66,6 +66,7 @@ export default function ChannelLayout() {
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));
 	}, [voice]);
 
+
 	const renderChannelMedia = () => {
 		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {
 			return (
@@ -102,8 +103,8 @@ export default function ChannelLayout() {
 		}
 	};
 
-	useEffect(()=>{
-		if(isShowMemberList){
+	useEffect(() => {
+		if (isShowMemberList) {
 			setIsShowCreateThread(false);
 		}
 	}, [isShowMemberList]);
