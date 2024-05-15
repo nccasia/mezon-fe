@@ -362,4 +362,14 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		marginBottom: size.s_10,
 	},
+	containerBottomSheet: {
+		flex: 1,
+		padding: 24,
+		justifyContent: 'center',
+		backgroundColor: 'grey',
+	},
+	contentContainerBottomSheet: {
+		flex: 1,
+		alignItems: 'center',
+	},
 });

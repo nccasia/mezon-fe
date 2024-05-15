@@ -4,10 +4,12 @@ import { TouchableOpacity } from 'react-native';
 
 export type EmojiPickerOptions = {
 	mode?: number;
+	togglePopupEmoji?: () => void;
 };
 
 function EmojiPicker(props: EmojiPickerOptions) {
 	const onPicker = () => {
+		props?.togglePopupEmoji();
 		// TODO: add logic here
 		// 	Emoji, Gif, sticker
 	};

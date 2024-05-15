@@ -1,7 +1,7 @@
-import { Colors } from '@mezon/mobile-ui';
+import {Colors, Metrics} from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
-import React from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
@@ -11,11 +11,26 @@ import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import { styles } from './styles';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import BottomSheet, { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+
+import GifStickerEmojiPopup from "./components/GifStickerEmojiPopup";
 
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
-
+	const bottomSheetModalRef = useRef<any>(null);
+	const snapPoints = useMemo(() => [320, Metrics.screenHeight], []);
+	
+	const onOpenPopup = useCallback(() => {
+		bottomSheetModalRef?.current?.present?.();
+	}, []);
+	
+	const onClosePopup = useCallback(() => {
+		alert('onClosePopup')
+		bottomSheetModalRef.current?.snapToIndex(-1);
+		bottomSheetModalRef?.current?.close?.();
+	}, []);
+	
 	return (
 		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
@@ -32,7 +47,22 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						onShowEmoji={() => {
+							bottomSheetModalRef?.current?.present?.();
+						}}
 					/>
+					
+					<BottomSheet
+						ref={bottomSheetModalRef}
+						index={0}
+						snapPoints={snapPoints}
+						onChange={onOpenPopup}
+						onClose={onClosePopup}
+					>
+						<BottomSheetScrollView>
+							<GifStickerEmojiPopup />
+						</BottomSheetScrollView>
+					</BottomSheet>
 				</View>
 			)}
 		</View>
