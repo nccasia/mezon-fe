@@ -12,6 +12,7 @@ export const useEscapeKey = (handler: () => void) => {
 				dispatch(referencesActions.setReferenceMessage(null));
 				dispatch(referencesActions.setDataReferences(null));
 				dispatch(reactionActions.setMessageMatchWithRef(false));
+				dispatch(reactionActions.setReactionRightState(false));
 				handler();
 			}
 		};
