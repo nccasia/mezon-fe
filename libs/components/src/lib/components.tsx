@@ -13,7 +13,7 @@ export { default as DirectMessageList } from './components/DmList';
 export { default as DmTopbar } from './components/DmList/DMtopbar/index';
 export { default as MemberListGroupChat } from './components/DmList/MemberListGroupChat/index';
 export { default as DirectMessageBox } from './components/DmList/MessageBoxDM/index';
-export { default as EmojiPickerComp } from './components/EmojiPicker/index';
+export { default as EmojiCustomPanel } from './components/EmojiPicker/index';
 export { default as FooterProfile } from './components/FooterProfile';
 export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis';
 export { default as ListMemberInvite } from './components/ListMemberInvite';

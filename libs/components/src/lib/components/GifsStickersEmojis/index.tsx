@@ -2,18 +2,17 @@ import { useAppParams, useChatReaction, useEscapeKey, useGifs, useGifsStickersEm
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import EmojiPickerComp from '../EmojiPicker';
-import TenorGifCategories from './gifs/TenorGifCategories';
+
 import { InputSearch } from './inputSearch';
-import ImageSquare from './stickers';
 
 export type GifStickerEmojiPopupOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
 };
+const EmojiPanel = React.lazy(() => import('../EmojiPicker'));
 
 const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmojiPopupOptions) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -88,7 +87,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 			</div>
 
 			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>
-				{subPanelActive === SubPanelName.GIFS && (
+				{/* {subPanelActive === SubPanelName.GIFS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<TenorGifCategories
 							activeTab={SubPanelName.EMOJI}
@@ -97,26 +96,32 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 							mode={mod}
 						/>
 					</div>
-				)}
+				)} */}
 
-				{subPanelActive === SubPanelName.STICKERS && (
+				{/* {subPanelActive === SubPanelName.STICKERS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<ImageSquare channelId={currentChannel?.id ?? ''} channelLabel={currentChannel?.channel_label ?? ''} mode={mod} />
 					</div>
-				)}
+				)} */}
 				{subPanelActive === SubPanelName.EMOJI && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+						<Suspense fallback={<div className="flex justify-center items-center text-xs w-full">Loading...</div>}>
+							<EmojiPanel emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+						</Suspense>
 					</div>
 				)}
 				{emojiAction === EmojiPlaces.EMOJI_REACTION && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_REACTION} mode={mode} messageEmoji={messageEmoji} />
+						<Suspense fallback={<div className="flex justify-center items-center text-xs w-full">Loading...</div>}>
+							<EmojiPanel emojiAction={EmojiPlaces.EMOJI_REACTION} mode={mode} messageEmoji={messageEmoji} />
+						</Suspense>
 					</div>
 				)}
 				{emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} mode={mode} messageEmoji={messageEmoji} />
+						<Suspense fallback={<div className="flex justify-center items-center text-xs w-full">Loading...</div>}>
+							<EmojiPanel emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} mode={mode} messageEmoji={messageEmoji} />
+						</Suspense>
 					</div>
 				)}
 			</div>
