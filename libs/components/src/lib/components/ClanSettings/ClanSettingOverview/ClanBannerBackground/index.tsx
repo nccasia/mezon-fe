@@ -60,7 +60,7 @@ const ClanBannerBackground = () => {
 				<label>
 					<div
 						style={{ backgroundImage: `url(${urlImage})` }}
-						className={`bg-contain w-[320px] h-[180px] bg-buttonProfile rounded relative cursor-pointer`}
+						className={`bg-cover bg-no-repeat w-[320px] h-[180px] bg-buttonProfile rounded relative cursor-pointer`}
 					>
 						<div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-[#A7A8AC] flex items-center justify-center">
 							<Icons.ImageUploadIcon />
