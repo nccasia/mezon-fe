@@ -220,19 +220,19 @@ type DisplayByCategoriesProps = {
 	readonly onEmojiHover: (item: IEmoji) => void;
 	readonly emojisData: IEmoji[];
 };
-
 function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
 	const { emojis } = useEmojiSuggestion();
-	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
-		return emojis
+	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string, limit: number) => {
+		const filteredEmojis = emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
 				category: emoji.category.replace(/ *\([^)]*\) */g, ''),
 			}));
-	};
-	const emojisByCategoryName = getEmojisByCategories(emojis, categoryName ?? '');
 
+		return filteredEmojis.slice(0, limit);
+	};
+	const emojisByCategoryName = categoryName ? getEmojisByCategories(emojis, categoryName, 100) : [];
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 
 	return (
