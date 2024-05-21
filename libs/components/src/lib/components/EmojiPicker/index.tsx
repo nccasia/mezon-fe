@@ -1,7 +1,7 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { EmojiPlaces, IEmoji, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icons } from '../../components';
 
 export type EmojiCustomPanelOptions = {
@@ -15,9 +15,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { emojis, categoriesEmoji } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-	const dataCategories = categoriesEmoji(emojis);
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
-	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
+	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>([]);
+	const [loadedCategories, setLoadedCategories] = useState<string[]>(['Smileys & Emotion']); // Khởi tạo chỉ với category 'smile'
 	const { reactionPlaceActive } = useChatReaction();
 
 	const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -52,6 +52,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		<Icons.Bowl defaultSize="w-7 h-7" />,
 		<Icons.Ribbon defaultSize="w-7 h-7" />,
 	];
+	const dataCategories = categoriesEmoji(emojis);
 	const categoriesWithIcons = dataCategories
 		.map((category, index) => ({ name: category, icon: categoryIcons[index] }))
 		.filter((category) => category.name !== '' && category.name !== 'Component');
@@ -110,7 +111,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSelectedCategory(categoryName);
 			const categoryDiv = categoryRefs.current[categoryName];
 			if (categoryDiv && containerRef.current) {
-				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' }); // Thay đổi behavior thành smooth để cuộn mượt hơn
+				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' });
 			}
 		}
 	};
@@ -154,6 +155,30 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}
 	}, []);
 
+	useEffect(() => {
+		const handleScroll = () => {
+			if (containerRef.current) {
+				const container = containerRef.current;
+				const scrollTop = container.scrollTop;
+				const scrollHeight = container.scrollHeight;
+				const clientHeight = container.clientHeight;
+
+				if (scrollTop + clientHeight >= scrollHeight - 5) {
+					const nextCategory = categoriesWithIcons.find(category => !loadedCategories.includes(category.name));
+					if (nextCategory) {
+						setLoadedCategories(prev => [...prev, nextCategory.name]);
+					}
+				}
+			}
+		};
+
+		const container = containerRef.current;
+		if (container) {
+			container.addEventListener('scroll', handleScroll);
+			return () => container.removeEventListener('scroll', handleScroll);
+		}
+	}, [loadedCategories, categoriesWithIcons]);
+
 	return (
 		<div className={`flex max-h-full flex-row w-full md:w-[500px] ${props.isReaction && 'border border-black rounded overflow-hidden'}`}>
 			<div
@@ -181,7 +206,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			{valueInputToCheckHandleSearch !== '' && emojisSearch ? (
 				<div className=" h-[400px]  w-full">
 					<div className="h-[352px]">
-						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
 					</div>
 					<EmojiHover emojiHoverNative={emojiHoverNative} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
@@ -192,14 +216,14 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						ref={containerRef}
 						className="w-full  max-h-[352px]  overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
 					>
-						{categoriesWithIcons.map((item, index) => {
+						{loadedCategories.map((category, index) => {
 							return (
-								<div className="w-full" key={item.name} ref={(el) => (categoryRefs.current[item.name] = el)}>
+								<div className="w-full" key={category} ref={(el) => (categoryRefs.current[category] = el)}>
 									<DisplayByCategories
 										emojisData={emojis}
 										onEmojiSelect={handleEmojiSelect}
 										onEmojiHover={handleOnHover}
-										categoryName={item.name}
+										categoryName={category}
 									/>
 								</div>
 							);
@@ -232,7 +256,6 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 			}));
 	};
 	const emojisByCategoryName = getEmojisByCategories(emojis, categoryName ?? '');
-
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 
 	return (
@@ -255,17 +278,30 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 
+	const handleEmojiSelect = useCallback(
+		(emoji: any) => {
+			onEmojiSelect(emoji);
+		},
+		[onEmojiSelect],
+	);
+
+	const handleEmojiHover = useCallback(
+		(item: any) => {
+			onEmojiHover(item);
+		},
+		[onEmojiHover],
+	);
+
 	return (
 		<div
 			className={`grid grid-cols-9 ml-1 gap-1  ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
-			{' '}
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
 					className="text-3xl emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
-					onClick={() => onEmojiSelect(item.emoji)}
-					onMouseEnter={() => onEmojiHover(item)}
+					onClick={() => handleEmojiSelect(item.emoji)}
+					onMouseEnter={() => handleEmojiHover(item)}
 				>
 					{item.emoji}
 				</button>

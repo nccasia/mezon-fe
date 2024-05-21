@@ -5,7 +5,9 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import TenorGifCategories from './gifs/TenorGifCategories';
 import { InputSearch } from './inputSearch';
+import ImageSquare from './stickers';
 
 export type GifStickerEmojiPopupOptions = {
 	messageEmoji?: IMessageWithUser;
@@ -87,7 +89,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 			</div>
 
 			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>
-				{/* {subPanelActive === SubPanelName.GIFS && (
+				{subPanelActive === SubPanelName.GIFS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<TenorGifCategories
 							activeTab={SubPanelName.EMOJI}
@@ -96,13 +98,13 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 							mode={mod}
 						/>
 					</div>
-				)} */}
+				)}
 
-				{/* {subPanelActive === SubPanelName.STICKERS && (
+				{subPanelActive === SubPanelName.STICKERS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<ImageSquare channelId={currentChannel?.id ?? ''} channelLabel={currentChannel?.channel_label ?? ''} mode={mod} />
 					</div>
-				)} */}
+				)}
 				{subPanelActive === SubPanelName.EMOJI && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
 						<Suspense fallback={<div className="flex justify-center items-center text-xs w-full">Loading...</div>}>
