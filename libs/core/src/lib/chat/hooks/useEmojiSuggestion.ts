@@ -11,7 +11,18 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useEmojiSuggestion() {
-	const emojis = useSelector(selectAllEmojiSuggestion);
+	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
+
+	function filterEmojiData(emojis: IEmoji[]) {
+		return emojis.map(({ emoji, shortname, category }) => ({
+			emoji,
+			shortname,
+			category,
+		}));
+	}
+
+	const emojis = filterEmojiData(emojisMetaData);
+
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);

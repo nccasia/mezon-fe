@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
+import { getJumpToMessageId, useApp, useChatMessages, useChatReaction, useJumpToMessage, useMessages, useReference } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
@@ -55,7 +55,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	function reverseArray(array: IMessageWithUser[]) {
 		return array.slice().reverse();
 	}
-
+	const { reactionBottomState } = useChatReaction();
+	const { messageMatchWithRefStatus, positionOfSmileButton } = useChatReaction();
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5

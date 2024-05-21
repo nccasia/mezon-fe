@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { Ref, forwardRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -44,19 +44,19 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	const handleClickReact = (event: any) => {
 		event.stopPropagation();
-		// setIdReferenceMessage(message.id);
-		// dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
-		// dispatch(referencesActions.setOpenReplyMessageState(false));
-		// dispatch(reactionActions.setReactionBottomState(false));
-		// setSubPanelActive(SubPanelName.NONE);
+		setIdReferenceMessage(message.id);
+		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(reactionActions.setReactionBottomState(false));
+		setSubPanelActive(SubPanelName.NONE);
 		setReactionRightState(true);
-		// const rect = (event.target as HTMLElement).getBoundingClientRect();
-		// const distanceToBottom = window.innerHeight - rect.bottom;
-		// if (distanceToBottom > 550) {
-		// 	dispatch(reactionActions.setReactionTopState(true));
-		// } else {
-		// 	dispatch(reactionActions.setReactionTopState(false));
-		// }
+		const rect = (event.target as HTMLElement).getBoundingClientRect();
+		const distanceToBottom = window.innerHeight - rect.bottom;
+		if (distanceToBottom > 550) {
+			dispatch(reactionActions.setReactionTopState(true));
+		} else {
+			dispatch(reactionActions.setReactionTopState(false));
+		}
 	};
 
 	const handleThread = () => {
@@ -68,7 +68,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	return (
 		<div ref={ref} className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-			<button onClick={handleClickReact} className="h-full p-1 cursor-pointer">
+			<button onClick={handleClickReact} className="h-full p-1 cursor-pointer z-10">
 				<Icons.Smile defaultSize="w-5 h-5" />
 			</button>
 

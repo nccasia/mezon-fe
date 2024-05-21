@@ -2,6 +2,7 @@ import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useChatReaction, useMenu, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import EmojiCustomPanel from 'libs/components/src/lib/components/EmojiPicker';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
@@ -12,9 +13,6 @@ const ChannelLayout = () => {
 	const { reactionRightState } = useChatReaction();
 	const { referenceMessage } = useReference();
 	const { reactionBottomState } = useChatReaction();
-
-	console.log(reactionRightState);
-
 	const { closeMenu, statusMenu } = useMenu();
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
@@ -48,12 +46,11 @@ const ChannelLayout = () => {
 					className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 				>
 					<div className="mb-0 z-10 h-full">
-						{/* <GifStickerEmojiPopup
-							// messageEmoji={referenceMessage as IMessageWithUser}
+						<GifStickerEmojiPopup
+							messageEmoji={referenceMessage as IMessageWithUser}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							emojiAction={EmojiPlaces.EMOJI_REACTION}
-						/> */}
-						<div>EMOJJI</div>
+						/>
 					</div>
 				</div>
 			)}

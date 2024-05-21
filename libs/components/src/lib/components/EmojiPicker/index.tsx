@@ -21,13 +21,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { reactionPlaceActive } = useChatReaction();
 
 	const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
-		return emojis.filter(
-			(emoji) =>
-				emoji.name.includes(searchTerm) ||
-				emoji.shortname.includes(searchTerm) ||
-				emoji.unicode.includes(searchTerm) ||
-				emoji.html.includes(searchTerm),
-		);
+		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
 	};
 
 	useEffect(() => {
@@ -74,6 +68,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
+		
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
@@ -110,7 +105,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSelectedCategory(categoryName);
 			const categoryDiv = categoryRefs.current[categoryName];
 			if (categoryDiv && containerRef.current) {
-				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' }); // Thay đổi behavior thành smooth để cuộn mượt hơn
+				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' });
 			}
 		}
 	};
@@ -222,6 +217,7 @@ type DisplayByCategoriesProps = {
 };
 function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
 	const { emojis } = useEmojiSuggestion();
+
 	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string, limit: number) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
@@ -232,8 +228,9 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 
 		return filteredEmojis.slice(0, limit);
 	};
-	const emojisByCategoryName = categoryName ? getEmojisByCategories(emojis, categoryName, 100) : [];
+	const emojisByCategoryName = categoryName ? getEmojisByCategories(emojis, categoryName, 70) : [];
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
+	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 
 	return (
 		<div>
@@ -247,6 +244,7 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 					<Icons.ArrowRight />
 				</span>
 			</button>
+
 			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} />}
 		</div>
 	);
