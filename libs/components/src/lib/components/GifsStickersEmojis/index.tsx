@@ -61,7 +61,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 			onClick={(e) => e.stopPropagation()}
 			className={`w-[370px] sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
 		>
-			<div className="w-full">
+			{/* <div className="w-full">
 				{emojiAction !== EmojiPlaces.EMOJI_REACTION && emojiAction !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 					<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1">
 						<button
@@ -85,7 +85,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 					</div>
 				)}
 				<InputSearch />
-			</div>
+			</div> */}
 
 			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>
 				{subPanelActive === SubPanelName.GIFS && (

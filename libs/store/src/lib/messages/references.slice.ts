@@ -20,6 +20,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
 	attachmentDataRef: ApiMessageAttachment[];
+	idMessageRef: string;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -37,6 +38,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	openEditMessageState: false,
 	openReplyMessageState: false,
 	attachmentDataRef: [],
+	idMessageRef: '',
 });
 
 export const referencesSlice = createSlice({
@@ -67,6 +69,9 @@ export const referencesSlice = createSlice({
 			} else {
 				state.attachmentDataRef.push(action.payload);
 			}
+		},
+		setIdReferenceMessage(state, action) {
+			state.idMessageRef = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -108,3 +113,5 @@ export const selectOpenEditMessageState = createSelector(getReferencesState, (st
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
 
 export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
+
+export const selectIdMessageRef = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRef);

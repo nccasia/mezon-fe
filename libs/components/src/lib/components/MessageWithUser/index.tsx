@@ -35,7 +35,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
+	const { referenceMessage, openReplyMessageState, idMessageReplied, setIdReferenceMessage } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 
 	const isCombine = useMemo(() => {

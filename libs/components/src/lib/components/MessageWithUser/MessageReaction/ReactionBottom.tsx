@@ -5,11 +5,10 @@ import { useCallback, useState } from 'react';
 
 type ReactionBottomProps = {
 	message: IMessageWithUser;
-	moveToTop: boolean;
 	smileButtonRef: React.RefObject<HTMLDivElement>;
 };
 
-const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomProps) => {
+const ReactionBottom = ({ message, smileButtonRef }: ReactionBottomProps) => {
 	const {
 		setReactionRightState,
 		setReactionPlaceActive,
@@ -19,17 +18,18 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 		setMessageMatchWithRef,
 		setPositionOfSmileButton,
 	} = useChatReaction();
-	const { setReferenceMessage, referenceMessage } = useReference();
+	const { setReferenceMessage, idMessageRef, setIdReferenceMessage } = useReference();
 	const [highlightColor, setHighLightColor] = useState('#AEAEAE');
 
-	const checkMessageMatched = useCallback((msg: IMessageWithUser) => msg.id === referenceMessage?.id, [referenceMessage]);
+	const checkMessageMatched = useCallback((msg: IMessageWithUser) => msg.id === idMessageRef, [idMessageRef]);
 
 	const handleClickOpenEmojiBottom = useCallback(
 		(event: React.MouseEvent<HTMLDivElement>) => {
 			setMessageMatchWithRef(true);
 			checkMessageMatched(message);
 			setReactionRightState(false);
-			setReferenceMessage(message);
+			// setReferenceMessage(message);
+			setIdReferenceMessage(message.id);
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
 			setReactionBottomState(false);
 			event.stopPropagation();
@@ -78,7 +78,7 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 
 	return (
 		<>
-			{message.id === referenceMessage?.id && (
+			{message.id === idMessageRef && (
 				<div
 					onMouseEnter={handleHoverSmileButton}
 					onClick={handleClickOpenEmojiBottom}

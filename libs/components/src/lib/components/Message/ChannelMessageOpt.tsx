@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { Ref, forwardRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -11,8 +11,8 @@ type ChannelMessageOptProps = {
 
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
-	const { reactionActions, userId } = useChatReaction();
-	const { openOptionMessageState, setOpenThreadMessageState } = useReference();
+	const { reactionActions, userId, setReactionRightState } = useChatReaction();
+	const { openOptionMessageState, setOpenThreadMessageState, idMessageRef, setIdReferenceMessage } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -22,7 +22,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setIdReferenceMessage(message.id));
 		event.stopPropagation();
 	};
 
@@ -30,7 +30,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setIdReferenceMessage(message.id));
 		event.stopPropagation();
 	};
 
@@ -39,24 +39,24 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(!openOptionMessageState));
-		dispatch(referencesActions.setReferenceMessage(message));
+		// dispatch(referencesActions.setReferenceMessage(message));
 	};
 
 	const handleClickReact = (event: any) => {
 		event.stopPropagation();
-		dispatch(reactionActions.setReactionRightState(true));
-		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
-		dispatch(referencesActions.setOpenReplyMessageState(false));
-		dispatch(reactionActions.setReactionBottomState(false));
-		setSubPanelActive(SubPanelName.NONE);
-		const rect = (event.target as HTMLElement).getBoundingClientRect();
-		const distanceToBottom = window.innerHeight - rect.bottom;
-		if (distanceToBottom > 550) {
-			dispatch(reactionActions.setReactionTopState(true));
-		} else {
-			dispatch(reactionActions.setReactionTopState(false));
-		}
+		// setIdReferenceMessage(message.id);
+		// dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
+		// dispatch(referencesActions.setOpenReplyMessageState(false));
+		// dispatch(reactionActions.setReactionBottomState(false));
+		// setSubPanelActive(SubPanelName.NONE);
+		setReactionRightState(true);
+		// const rect = (event.target as HTMLElement).getBoundingClientRect();
+		// const distanceToBottom = window.innerHeight - rect.bottom;
+		// if (distanceToBottom > 550) {
+		// 	dispatch(reactionActions.setReactionTopState(true));
+		// } else {
+		// 	dispatch(reactionActions.setReactionTopState(false));
+		// }
 	};
 
 	const handleThread = () => {
@@ -68,9 +68,9 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	return (
 		<div ref={ref} className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
+			<button onClick={handleClickReact} className="h-full p-1 cursor-pointer">
 				<Icons.Smile defaultSize="w-5 h-5" />
-			</div>
+			</button>
 
 			{userId === message.sender_id ? (
 				<button onClick={handleClickEdit} className="h-full p-1 cursor-pointer">

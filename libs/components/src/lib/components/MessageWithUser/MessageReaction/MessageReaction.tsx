@@ -24,7 +24,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		reactionBottomStateResponsive,
 	} = useChatReaction();
 
-	const { referenceMessage, setReferenceMessage, setOpenReplyMessageState } = useReference();
+	const { setReferenceMessage, setOpenReplyMessageState, idMessageRef, setIdReferenceMessage } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 
 	async function reactOnExistEmoji(
@@ -40,7 +40,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	}
 
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
-		if (message.id === referenceMessage?.id) {
+		if (message.id === idMessageRef) {
 			return true;
 		} else {
 			return false;
@@ -66,7 +66,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		setHoverEmoji(emojiParam);
 		setReactionBottomState(true);
 		setUserReactionPanelState(true);
-		setReferenceMessage(message);
+		// setReferenceMessage(message);
+		setIdReferenceMessage(message.id);
 		setOpenReplyMessageState(false); //to hide Replymessage Component
 		setEmojiShowUserReaction(emojiParam);
 		setShowSenderPanelIn1s(true);
@@ -87,7 +88,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [hoverEmoji, parentDiv]);
 	const PANEL_SENDER_WIDTH = 300;
-	const EMOJI_REACTION_BOTTOM_PANEL = 376;
 
 	const [posToRight, setPosToRight] = useState<boolean>(false);
 	const [moveToTop, setMoveToTop] = useState<boolean>(false);
@@ -126,26 +126,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			return false;
 		}
 	};
-
-	const checkPosEmojiReactionPanel = () => {
-		if (!parentDiv.current) return;
-		const parentRect = parentDiv.current.getBoundingClientRect();
-		const smileButton = smileButtonRef.current;
-
-		if (!smileButton) return;
-		const childRect = smileButton.getBoundingClientRect();
-		const distanceToRight = parentRect.right - childRect.right;
-
-		if (distanceToRight < EMOJI_REACTION_BOTTOM_PANEL) {
-			setMoveToTop(true);
-		} else {
-			setMoveToTop(false);
-		}
-	};
-
-	useEffect(() => {
-		checkPosEmojiReactionPanel();
-	}, [reactionBottomState]);
 
 	// work in mobile
 	useEffect(() => {
@@ -217,7 +197,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 										</div>
 
 										{checkMessageToMatchMessageRef(message) && reactionBottomState && lastPositionEmoji(emoji, message) && (
-											<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
+											<ReactionBottom smileButtonRef={smileButtonRef} message={message} />
 										)}
 
 										{checkMessageToMatchMessageRef(message) &&
