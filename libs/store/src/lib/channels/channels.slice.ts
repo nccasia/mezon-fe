@@ -1,7 +1,7 @@
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { ChannelCreatedEvent, ChannelDeletedEvent, ChannelType } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { appActions } from '../app/app.slice';
 import { attachmentActions } from '../attachment/attachments.slice';
@@ -93,7 +93,6 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			await mezon.joinChatThread(response.channel_id as string);
 			if (response.parrent_id !== '0') {
@@ -115,7 +114,19 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId }));
+			return response;
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
+export const updateChannel = createAsyncThunk('channels/updateChannel', async (body: ApiUpdateChannelDescRequest,thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
+		if (response) {
+			return response;
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
@@ -153,8 +164,7 @@ export const fetchChannelsCached = memoize(
 
 export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType = 1 }: fetchChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
-
+	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', clanId, channelType);
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -218,6 +228,9 @@ export const channelsSlice = createSlice({
 		deleteChannelSocket: (state, action: PayloadAction<ChannelDeletedEvent>) => {
 			const payload = action.payload;
 			channelsAdapter.removeOne(state, payload.channel_id);
+		},
+		updateChannelSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
+			const payload = action.payload;
 		},
 		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
 			state.valueTextInput[action.payload.channelId] = action.payload.value;
@@ -306,6 +319,7 @@ export const channelsActions = {
 	joinChannel,
 	createNewChannel,
 	deleteChannel,
+	updateChannel,
 };
 
 /*
@@ -351,6 +365,8 @@ export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels
 );
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);
+
+export const selectChannelSecond = createSelector(selectAllChannels, (channels) => channels[1]);
 
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));

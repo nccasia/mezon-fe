@@ -2,6 +2,8 @@ import { InputField, TextArea } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
+import { channelsActions, useAppDispatch } from '@mezon/store';
+import { ApiUpdateChannelDescRequest } from 'mezon-js';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
@@ -9,6 +11,7 @@ export type OverviewChannelProps = {
 
 const OverviewChannel = (props: OverviewChannelProps) => {
 	const { channel } = props;
+	const dispatch = useAppDispatch();
 	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label);
 	const [topicInit, setTopicInit] = useState('');
 
@@ -30,9 +33,15 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setChannelLabel(channelLabelInit);
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		setChannelLabelInit(channelLabel);
 		setTopicInit(topic);
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: channel.channel_id || '',
+			channel_lable: channelLabel || '',
+			category_id: channel.category_id || '',
+		}
+		await dispatch(channelsActions.updateChannel(updateChannel));
 	};
 
 	useEffect(() => {

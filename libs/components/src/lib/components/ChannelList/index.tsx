@@ -61,7 +61,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		>
 			{<CreateNewChannelModal />}
 			{currentClan?.banner && (
-				<div className="h-[136px]">{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full" />}</div>
+				<div className="h-[136px]">{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}</div>
 			)}
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events />

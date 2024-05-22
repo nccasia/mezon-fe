@@ -26,7 +26,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 			{open ? (
 				<div className="  flex fixed inset-0  w-screen z-10">
 					<div className="flex text-gray- w-screen relative">
-						<ChannelSettingItem onItemClick={handleSettingItemClick} channel={channel} />
+						<ChannelSettingItem onItemClick={handleSettingItemClick} channel={channel} onCloseModal={onClose}/>
 						{currentSetting === 'Overview' && <OverviewChannel channel={channel} />}
 						{currentSetting === 'Permissions' && <PermissionsChannel channel={channel} />}
 						{currentSetting === 'Invites' && <InvitesChannel />}

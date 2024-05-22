@@ -18,6 +18,7 @@ import {
 	ChannelDeletedEvent,
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
+	ChannelUpdatedEvent,
 	MessageReactionEvent,
 	MessageTypingEvent,
 	Notification,
@@ -162,6 +163,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const onchannelupdated = useCallback(
+		(channelUpdated: ChannelUpdatedEvent) => {
+			if (channelUpdated) {
+				dispatch(channelsActions.updateChannelSocket(channelUpdated));
+			}
+		},
+		[dispatch],
+	);
+
 	useEffect(() => {
 		const socket = socketRef.current;
 		if (!socket) {
@@ -192,6 +202,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onchanneldeleted = onchanneldeleted;
 
+		socket.onchannelupdated = onchannelupdated;
+
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelmessage = () => {};
@@ -218,6 +230,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,
+		onchannelupdated,
 	]);
 
 	useEffect(() => {

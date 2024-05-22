@@ -7,10 +7,11 @@ import { DeleteModal } from './Component/Modal/deleteChannelModal';
 export type ChannelSettingItemProps = {
 	onItemClick: (settingName: string) => void;
 	channel: IChannel;
+	onCloseModal: () => void;
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, channel } = props;
+	const { onItemClick, onCloseModal, channel } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
@@ -87,6 +88,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 			</div>
 			{showModal && (
 				<DeleteModal
+					onCloseModal = {onCloseModal}
 					onClose={() => setShowModal(false)}
 					channelLable={channel?.channel_label || ''}
 					channelId={channel.channel_id as string}
