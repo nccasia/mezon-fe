@@ -24,7 +24,7 @@ let emojiCache: IEmoji[] = [];
 
 export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
 	try {
-		const cachedData = sessionStorage.getItem('emojiCache');
+		const cachedData = localStorage.getItem('emojiCache');
 		if (cachedData) {
 			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
 			return cachedEmojis;
@@ -35,7 +35,7 @@ export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, t
 		}
 		const data = await response.json();
 		emojiCache = data.emojis;
-		sessionStorage.setItem('emojiCache', JSON.stringify(emojiCache));
+		localStorage.setItem('emojiCache', JSON.stringify(emojiCache));
 		return emojiCache;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
@@ -107,4 +107,3 @@ export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (em
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
-

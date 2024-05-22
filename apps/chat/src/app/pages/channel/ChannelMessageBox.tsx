@@ -1,8 +1,10 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useGifsStickersEmoji, useMenu } from '@mezon/core';
-import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
+import { selectReactionRightState } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -35,9 +37,21 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 	const { subPanelActive } = useGifsStickersEmoji();
+	const reactionRightState = useSelector(selectReactionRightState);
+
 	return (
 		<div className="mx-4 relative" role="button" aria-hidden>
-			{subPanelActive !== SubPanelName.NONE && (
+			{/* {subPanelActive !== SubPanelName.NONE && (
+				<div
+					className={`fixed bottom-[66px] z-10 ${isShowMemberList ? 'right-64' : 'right-4'}`}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)} */}
+			{subPanelActive === SubPanelName.EMOJI && (
 				<div
 					className={`fixed bottom-[66px] z-10 ${isShowMemberList ? 'right-64' : 'right-4'}`}
 					onClick={(e) => {

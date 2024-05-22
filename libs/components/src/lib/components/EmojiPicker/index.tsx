@@ -13,6 +13,18 @@ export type EmojiCustomPanelOptions = {
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { emojis, categoriesEmoji } = useEmojiSuggestion();
+	const {
+		smileysEmotionEmojis,
+		peopleBodyEmojis,
+		activitiesEmojis,
+		symbolsEmojis,
+		objectsEmojis,
+		animalNatureEmojis,
+		travelPlacesEmojis,
+		foodDrinkEmojis,
+		flagsEmojis,
+	} = useEmojiSuggestion();
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
@@ -21,13 +33,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { reactionPlaceActive } = useChatReaction();
 
 	const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
-		return emojis.filter(
-			(emoji) =>
-				emoji.name.includes(searchTerm) ||
-				emoji.shortname.includes(searchTerm) ||
-				emoji.unicode.includes(searchTerm) ||
-				emoji.html.includes(searchTerm),
-		);
+		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
 	};
 
 	useEffect(() => {
@@ -164,9 +170,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				const clientHeight = container.clientHeight;
 
 				if (scrollTop + clientHeight >= scrollHeight - 5) {
-					const nextCategory = categoriesWithIcons.find(category => !loadedCategories.includes(category.name));
+					const nextCategory = categoriesWithIcons.find((category) => !loadedCategories.includes(category.name));
 					if (nextCategory) {
-						setLoadedCategories(prev => [...prev, nextCategory.name]);
+						setLoadedCategories((prev) => [...prev, nextCategory.name]);
 					}
 				}
 			}
@@ -216,18 +222,60 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						ref={containerRef}
 						className="w-full  max-h-[352px]  overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
 					>
-						{loadedCategories.map((category, index) => {
-							return (
-								<div className="w-full" key={category} ref={(el) => (categoryRefs.current[category] = el)}>
-									<DisplayByCategories
-										emojisData={emojis}
-										onEmojiSelect={handleEmojiSelect}
-										onEmojiHover={handleOnHover}
-										categoryName={category}
-									/>
-								</div>
-							);
-						})}
+						<DisplayByCategories
+							emojisData={smileysEmotionEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Smileys & Emotion'}
+						/>
+						<DisplayByCategories
+							emojisData={peopleBodyEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'People & Body'}
+						/>
+						{/* <DisplayByCategories
+							emojisData={activitiesEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Activities'}
+						/> */}
+						{/* <DisplayByCategories
+							emojisData={symbolsEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Symbols'}
+						/> */}
+						{/* <DisplayByCategories
+							emojisData={objectsEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Objects'}
+						/> */}
+						{/* <DisplayByCategories
+							emojisData={animalNatureEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Animals & Nature'}
+						/> */}
+						{/* <DisplayByCategories
+							emojisData={travelPlacesEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Travel & Places'}
+						/> */}
+						{/* <DisplayByCategories
+							emojisData={foodDrinkEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Food & Drink'}
+						/>
+						<DisplayByCategories
+							emojisData={flagsEmojis}
+							onEmojiSelect={handleEmojiSelect}
+							onEmojiHover={handleOnHover}
+							categoryName={'Flags'}
+						/> */}
 					</div>
 					<EmojiHover emojiHoverNative={emojiHoverNative} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
 				</div>
@@ -245,17 +293,17 @@ type DisplayByCategoriesProps = {
 	readonly emojisData: IEmoji[];
 };
 
-function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
-	const { emojis } = useEmojiSuggestion();
-	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
-		return emojis
-			.filter((emoji) => emoji.category.includes(categoryParam))
-			.map((emoji) => ({
-				...emoji,
-				category: emoji.category.replace(/ *\([^)]*\) */g, ''),
-			}));
-	};
-	const emojisByCategoryName = getEmojisByCategories(emojis, categoryName ?? '');
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+	// const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
+	// 	return emojis
+	// 		.filter((emoji) => emoji.category.includes(categoryParam))
+	// 		.map((emoji) => ({
+	// 			...emoji,
+	// 			category: emoji.category.replace(/ *\([^)]*\) */g, ''),
+	// 		}));
+	// };
+	// const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
+
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 
 	return (
@@ -270,7 +318,7 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} />}
+			{emojisPanel && <EmojisPanel emojisData={emojisData} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} />}
 		</div>
 	);
 }

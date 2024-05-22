@@ -32,7 +32,7 @@ const ChannelLayout = () => {
 	} else {
 		topPosition = `${positionOfSmileButton.top - 100}px`;
 	}
-
+	console.log("Re-render");
 	return (
 		<div
 			className={`flex flex-col flex-1 shrink min-w-0 dark:bg-bgSecondary bg-bgLightModeSecond h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
@@ -40,20 +40,20 @@ const ChannelLayout = () => {
 			<div className="flex h-heightWithoutTopBar flex-row">
 				<Outlet />
 			</div>
-			{reactionRightState && (
+			{/* {reactionRightState && (
 				<div
-					id="emojiPicker"
+					// id="emojiPicker"
 					className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 				>
 					<div className="mb-0 z-10 h-full">
 						<GifStickerEmojiPopup
-							messageEmoji={referenceMessage as IMessageWithUser}
+							// messageEmoji={referenceMessage as IMessageWithUser}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							emojiAction={EmojiPlaces.EMOJI_REACTION}
 						/>
 					</div>
 				</div>
-			)}
+			)} */}
 			{reactionBottomState && messageMatchWithRefStatus && (
 				<div
 					className="fixed"

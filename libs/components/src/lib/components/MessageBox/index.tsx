@@ -150,6 +150,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
+					
 				</div>
 			</div>
 		</div>
