@@ -70,17 +70,17 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			return <Loading />;
 		}
 		return (
-				<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
-					<FeaturedGifs
-						onClickToTrending={() => ontrendingClickingStatus()}
-						channelId={channelId}
-						channelLabel={channelLabel}
-						mode={mode}
-					/>
+			<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
+				<FeaturedGifs
+					onClickToTrending={() => ontrendingClickingStatus()}
+					channelId={channelId}
+					channelLabel={channelLabel}
+					mode={mode}
+				/>
 
-					{Array.isArray(dataGifCategories) &&
-						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index+item	.name} />)}
-				</div>
+				{Array.isArray(dataGifCategories) &&
+					dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index + item.name} />)}
+			</div>
 		);
 	};
 
@@ -106,7 +106,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			</div>
 		);
 	};
-	
+
 	return (
 		<>{categoriesStatus || (valueInputToCheckHandleSearch === '' && trendingClickingStatus === false) ? renderGifCategories() : renderGifs()}</>
 	);

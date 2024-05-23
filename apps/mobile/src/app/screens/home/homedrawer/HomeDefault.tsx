@@ -33,6 +33,10 @@ const HomeDefault = React.memo((props: any) => {
 		}
 	};
 
+	function handleSelected() {
+		onShowKeyboardBottomSheet(false, 0, "text");
+	}
+
 	useAnimatedKeyboard();
 
 	return (
@@ -47,24 +51,25 @@ const HomeDefault = React.memo((props: any) => {
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
+
 					<ChatBox
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
+
 					<View style={{ height: keyboardHeight }} />
-					{keyboardHeight !== 0 && keyboardType !== 'text' && (
-						<BottomKeyboardPicker height={keyboardHeight} ref={bottomKeyboardRef}>
-							{keyboardType === 'emoji' ? (
-								<EmojiPicker />
-							) : keyboardType === 'attachment' ? (
-								<AttachmentPicker />
-							) : (
-								<View />
-							)}
-						</BottomKeyboardPicker>
-					)}
+
+					<BottomKeyboardPicker height={keyboardHeight} ref={bottomKeyboardRef}>
+						{keyboardType === 'emoji' ? (
+							<EmojiPicker onDone={handleSelected} />
+						) : keyboardType === 'attachment' ? (
+							<AttachmentPicker />
+						) : (
+							<View />
+						)}
+					</BottomKeyboardPicker>
 				</View>
 			)}
 		</View>
@@ -75,7 +80,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 	const navigateMenuThreadDetail = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 	};
-	
+
 	return (
 		<View style={styles.homeDefaultHeader}>
 			<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
@@ -90,8 +95,9 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 						<BarsIcon width={20} height={20} color={Colors.white} />
 					</TouchableOpacity>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						{!!channelTitle && <HashSignIcon width={18} height={18}/>}
-						<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+						{!!channelTitle && <HashSignIcon width={18} height={18} />}
+						<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}
+						</Text>
 					</View>
 				</View>
 			</TouchableOpacity>

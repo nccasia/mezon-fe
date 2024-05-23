@@ -1,4 +1,4 @@
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import React, { Ref, forwardRef } from 'react';
 import { Colors } from '@mezon/mobile-ui';
@@ -15,9 +15,12 @@ export default forwardRef(function BottomKeyboardPicker(
 	ref: Ref<BottomSheetMethods>) {
 
 	return (
-		<BottomSheet ref={ref} snapPoints={[height === 0 ? 1 : height, '100%']} animateOnMount
+		<BottomSheet
+			ref={ref}
+			animateOnMount index={-1}
+			snapPoints={[height === 0 ? 1 : height, '100%']}
 			backgroundStyle={{ backgroundColor: Colors.bgPrimary }}>
-			<BottomSheetView>{children}</BottomSheetView>
+			<BottomSheetScrollView>{children}</BottomSheetScrollView>
 		</BottomSheet>
 	);
 });
