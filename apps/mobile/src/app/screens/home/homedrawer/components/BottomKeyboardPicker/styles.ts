@@ -6,13 +6,6 @@ const styles = StyleSheet.create({
         padding: 24,
         backgroundColor: 'grey',
     },
-    contentContainer: {
-        flex: 1,
-        alignItems: 'center',
-        position: "absolute",
-        top: 0,
-        left: 0,
-    },
 });
 
 

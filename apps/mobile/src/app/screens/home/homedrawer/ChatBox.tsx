@@ -3,7 +3,7 @@ import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobil
 import { Colors } from '@mezon/mobile-ui';
 import { IMessageWithUser } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import {DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform} from 'react-native';
+import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform, KeyboardEvent } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { IModeKeyboardPicker } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
@@ -84,8 +84,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				message_sender_id: currentSelectedReplyMessage.user.id,
 				content: JSON.stringify(currentSelectedReplyMessage.content),
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
-			}]: undefined;
-	
+			}] : undefined;
+
 			sendMessage({ t: text }, [], [], reference, false);
 			removeAction(EMessageActionType.Reply);
 		}
@@ -117,14 +117,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		})
 	}, [messageActionListNeedToResolve])
 
-	
+
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
-		  return 1;
+			return 1;
 		}
 		if (a.type !== EMessageActionType.EditMessage && b.type === EMessageActionType.EditMessage) {
-		  return -1;
+			return -1;
 		}
 		return 0;
 	}
@@ -132,18 +132,19 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const pushMessageActionIntoStack = useCallback((messagePayload: IMessageActionNeedToResolve) => {
 		const isExistingAction = messageActionListNeedToResolve.some(it => it.type === messagePayload.type);
 		if (isExistingAction) {
-			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), {...messagePayload}].sort(sortMessageActionList);
+			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), { ...messagePayload }].sort(sortMessageActionList);
 			setMessageActionListNeedToResolve(newStack);
 		} else {
 			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
 		}
 	}, [messageActionListNeedToResolve])
-	
+
 	function keyboardWillShow(event: KeyboardEvent) {
 		if (keyboardHeight !== event.endCoordinates.height) {
 			setKeyboardHeight(event.endCoordinates.height);
 		}
 	}
+
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
@@ -184,7 +185,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			props.onShowKeyboardBottomSheet(true, keyboardHeight, mode);
 		} else {
 			inputRef && inputRef.current && inputRef.current.focus();
-			props.onShowKeyboardBottomSheet(false, 0);
+			props.onShowKeyboardBottomSheet(false, keyboardHeight);
 		}
 	}
 
@@ -195,7 +196,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}
 
 	function handleInputBlur() {
-		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
+		if (modeKeyBoardBottomSheet === 'text')
+			props.onShowKeyboardBottomSheet(false, 0);
 	}
 
 	return (
@@ -210,7 +212,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							{t('chatBox.replyingTo')} {senderMessage?.user?.username}
 						</Text>
 					</View>
-				): null}
+				) : null}
 				{currentSelectedEditMessage ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.EditMessage)}>
@@ -218,9 +220,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>{t('chatBox.editingMessage')}</Text>
 					</View>
-				): null}
+				) : null}
 			</View>
-			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
+			<View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10 }}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
@@ -257,9 +259,13 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
 					/>
+
 					<View style={styles.iconEmoji}>
-						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
+						<EmojiSwitcher
+							onChange={handleKeyboardBottomSheetMode}
+							mode={modeKeyBoardBottomSheet} />
 					</View>
+
 				</View>
 
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>

@@ -15,6 +15,7 @@ import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
+import { useAnimatedKeyboard } from 'react-native-reanimated';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -33,6 +34,8 @@ const HomeDefault = React.memo((props: any) => {
 			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
 		}
 	};
+
+	useAnimatedKeyboard();
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -53,10 +56,11 @@ const HomeDefault = React.memo((props: any) => {
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
 					<View
-						style={{
-							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: Colors.secondary,
-						}}
+						// style={{
+						// 	height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+						// 	backgroundColor: Colors.secondary,
+						// }}
+						style={{ height: heightKeyboardShow }}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>

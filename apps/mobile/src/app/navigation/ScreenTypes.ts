@@ -1,3 +1,5 @@
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 export const APP_SCREEN = {
   UN_AUTHORIZE: 'UN_AUTHORIZE',
   LOGIN: 'LOGIN',
@@ -39,3 +41,9 @@ export const APP_SCREEN = {
     CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY'
   }
 }
+
+type ParamList = {
+  Profile: undefined
+}
+
+export type ScreenProps<T extends keyof ParamList> = NativeStackScreenProps<ParamList, T>;

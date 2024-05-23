@@ -1,16 +1,18 @@
-import { ChatContextProvider } from '@mezon/core';
-import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, notificationActions } from '@mezon/store-mobile';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
+import { ChatContextProvider } from '@mezon/core';
+import {
+	appActions, clansActions, getStoreAsync,
+	selectAllClans, selectCurrentClan, notificationActions,
+	gifsActions
+} from '@mezon/store-mobile';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { SafeAreaView, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import BarsLogo from '../../../assets/svg/bars.svg';
-import SearchLogo from '../../../assets/svg/discoverySearch.svg';
 import HashSignIcon from '../../../assets/svg/loading.svg';
-import UsersLogo from '../../../assets/svg/users.svg';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 import { styles } from './styles';
+import { BarsIcon, DiscoverySearchIcon, UserIcon } from '@mezon/mobile-components';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,10 +49,11 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 					headerLeft(vals) {
 						return (
 							<View style={styles.drawerHeaderLeft} {...vals} onTouchEnd={() => navigation.openDrawer()}>
-								<BarsLogo width={20} height={20} />
+								<BarsIcon width={20} height={20} />
 							</View>
 						);
 					},
+
 					headerTitle(props) {
 						return (
 							<View style={styles.drawerHeaderTitle}>
@@ -59,11 +62,12 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 							</View>
 						);
 					},
+
 					headerRight(props) {
 						return (
 							<View style={styles.drawerHeaderRight}>
-								<SearchLogo width={22} height={22} />
-								<UsersLogo width={22} height={22} />
+								<DiscoverySearchIcon width={22} height={22} />
+								<UserIcon width={22} height={22} />
 							</View>
 						);
 					},
@@ -89,11 +93,16 @@ const HomeScreen = React.memo((props: any) => {
 
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
-    store.dispatch(notificationActions.fetchListNotification());
+
+		store.dispatch(notificationActions.fetchListNotification());
 		store.dispatch(clansActions.fetchClans());
+		store.dispatch(gifsActions.fetchGifCategories());
+		store.dispatch(gifsActions.fetchGifCategoryFeatured());
+
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}
+		
 		return null;
 	};
 

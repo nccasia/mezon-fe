@@ -79,7 +79,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 					/>
 
 					{Array.isArray(dataGifCategories) &&
-						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index+item.name} />)}
+						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index+item	.name} />)}
 				</div>
 		);
 	};
@@ -106,6 +106,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			</div>
 		);
 	};
+	
 	return (
 		<>{categoriesStatus || (valueInputToCheckHandleSearch === '' && trendingClickingStatus === false) ? renderGifCategories() : renderGifs()}</>
 	);
