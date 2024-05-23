@@ -25,7 +25,7 @@ export default function GiftItem({ loading, data, onPress }: GifItemProps) {
         return <Text>loading...</Text>
     }
 
-   
+
 
     function handlePressGif(url: string) {
         onPress && onPress(url);
@@ -38,6 +38,7 @@ export default function GiftItem({ loading, data, onPress }: GifItemProps) {
                     <TouchableOpacity
                         style={styles.content}
                         onPress={() => handlePressGif(item.media_formats.gif.url)}
+                        key={index.toString()}
                     >
                         <FastImage
                             source={{ uri: item.media_formats.gif.url }}

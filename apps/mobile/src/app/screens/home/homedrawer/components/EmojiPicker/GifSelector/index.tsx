@@ -1,23 +1,16 @@
-import { useChatSending, useGifs } from "@mezon/core";
+import { useGifs } from "@mezon/core";
 import { useState } from "react";
 import { useEffect } from "react";
 import { GifCategoriesEntity, fetchGifsDataSearch } from "@mezon/store-mobile";
 import GifCategory from "./GifCategory";
 import GiftItem from "./GifItem";
-import { useCallback } from "react";
-import { IMessageSendPayload } from "@mezon/utils";
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from "mezon-js/api.gen";
 
-type ChannelMessageBoxProps = {
-    channelId: string;
-    channelLabel: string;
-    mode: number;
-    onDone: () => void
+type GifSelectorProps = {
+    onSelected: (url: string) => void
 };
 
-export default function GifSelector({ channelId, channelLabel, mode, onDone }: ChannelMessageBoxProps) {
+export default function GifSelector({ onSelected }: GifSelectorProps) {
     const [gifData, setGifData] = useState<any>();
-    const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
 
     const {
         dataGifCategories,
@@ -45,21 +38,9 @@ export default function GifSelector({ channelId, channelLabel, mode, onDone }: C
         }
     }, [dataGifsSearch, trendingClickingStatus, valueInputToCheckHandleSearch]);
 
-    const handleSend = useCallback(
-        (
-            content: IMessageSendPayload,
-            mentions?: Array<ApiMessageMention>,
-            attachments?: Array<ApiMessageAttachment>,
-            references?: Array<ApiMessageRef>,
-        ) => {
-            sendMessage(content, mentions, attachments, references);
-        },
-        [sendMessage],
-    );
 
     function handleGifPress(url: string) {
-        handleSend({ t: '' }, [], [{ url }], []);
-        onDone && onDone();
+        onSelected && onSelected(url);
     }
 
     return (
