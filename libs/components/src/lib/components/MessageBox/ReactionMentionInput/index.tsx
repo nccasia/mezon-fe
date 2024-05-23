@@ -166,15 +166,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if ((!valueTextInput && attachmentDataRef.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef.length === 0)) {
+			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
 				return;
 			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
 				!(valueTextInput || '').trim() &&
-				attachmentDataRef.length === 0 &&
-				mentionData.length === 0
+				attachmentDataRef?.length === 0 &&
+				mentionData?.length === 0
 			) {
 				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
@@ -192,7 +192,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
+			if (referenceMessage !== null && dataReferences?.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,
@@ -462,7 +462,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
 					)}
 					style={mentionStyle}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					markup="#[__display__](__id__)"
@@ -476,7 +476,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					renderSuggestion={(suggestion) => (
 						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
 					)}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					trigger=":"
@@ -484,7 +484,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					regex={neverMatchingRegex}
 					data={queryEmojis}
 					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 			</MentionsInput>
 		</div>
