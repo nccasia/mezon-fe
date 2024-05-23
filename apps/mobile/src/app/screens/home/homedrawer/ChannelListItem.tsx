@@ -1,12 +1,10 @@
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
+import { HashSignIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
 import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import HashSignWhiteIcon from '../../../../assets/svg/channelText-white.svg';
-import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import SpeakerIcon from '../../../../assets/svg/speaker.svg';
 import { ChannelListContext, FastImageRes } from './Reusables';
 import ThreadListChannel from './ThreadListChannel';
@@ -46,7 +44,7 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 				) : props.data.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 					<SpeakerIcon width={20} height={20} fill={'#FFFFFF'} />
 				) : isUnRead ? (
-					<HashSignWhiteIcon width={18} height={18} />
+					<HashSignIcon width={18} height={18} />
 				) : (
 					<HashSignIcon width={18} height={18} />
 				)}

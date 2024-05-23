@@ -18,6 +18,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 	const dispatch = useDispatch();
+	
 	return (
 		<Drawer.Navigator
 			screenOptions={{
@@ -102,7 +103,7 @@ const HomeScreen = React.memo((props: any) => {
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}
-		
+
 		return null;
 	};
 

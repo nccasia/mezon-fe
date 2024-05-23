@@ -1,10 +1,9 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
-
 import { FastImageRes } from './Reusables';
 import { styles } from './styles';
+import { HashSignIcon } from '@mezon/mobile-components';
 
 const WelcomeMessage = React.memo((props: { channelTitle: string; uri?: string }) => {
 	return (

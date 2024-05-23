@@ -1,15 +1,15 @@
 import { HashSignIcon, SmilingFaceIcon } from '@mezon/mobile-components';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
-import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
+import { IKeyboardType } from '../../BottomKeyboardPicker';
 
 export type IProps = {
-	mode: IModeKeyboardPicker;
-	onChange: (mode: IModeKeyboardPicker) => void;
+	mode: IKeyboardType;
+	onChange: (mode: IKeyboardType) => void;
 };
 
 function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
-	const [mode, setMode] = useState<IModeKeyboardPicker>(_mode);
+	const [mode, setMode] = useState<IKeyboardType>(_mode);
 
 	const onPickerPress = () => {
 		if (mode === 'text') {

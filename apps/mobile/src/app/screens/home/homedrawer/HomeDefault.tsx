@@ -1,18 +1,16 @@
+import React, { useRef, useState } from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { SearchIcon } from '@mezon/mobile-components';
+import { BarsIcon, HashSignIcon, SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useRef, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import BarsLogo from '../../../../assets/svg/bars-white.svg';
-import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import AttachmentPicker from './components/AttachmentPicker';
-import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
+import BottomKeyboardPicker, { IKeyboardType } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
 import { useAnimatedKeyboard } from 'react-native-reanimated';
@@ -20,18 +18,18 @@ import { useAnimatedKeyboard } from 'react-native-reanimated';
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
-	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-	const bottomPickerRef = useRef<BottomSheet>(null);
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+	const [keyboardType, setKeyboardType] = useState<IKeyboardType>('text');
+	const bottomKeyboardRef = useRef<BottomSheet>(null);
 
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
+	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IKeyboardType) => {
+		setKeyboardHeight(height);
 		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.collapse();
+			setKeyboardType(type);
+			bottomKeyboardRef && bottomKeyboardRef.current && bottomKeyboardRef.current.collapse();
 		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
+			setKeyboardType('text');
+			bottomKeyboardRef && bottomKeyboardRef.current && bottomKeyboardRef.current.close();
 		}
 	};
 
@@ -55,18 +53,12 @@ const HomeDefault = React.memo((props: any) => {
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
-					<View
-						// style={{
-						// 	height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-						// 	backgroundColor: Colors.secondary,
-						// }}
-						style={{ height: heightKeyboardShow }}
-					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
-							{typeKeyboardBottomSheet === 'emoji' ? (
+					<View style={{ height: keyboardHeight }} />
+					{keyboardHeight !== 0 && keyboardType !== 'text' && (
+						<BottomKeyboardPicker height={keyboardHeight} ref={bottomKeyboardRef}>
+							{keyboardType === 'emoji' ? (
 								<EmojiPicker />
-							) : typeKeyboardBottomSheet === 'attachment' ? (
+							) : keyboardType === 'attachment' ? (
 								<AttachmentPicker />
 							) : (
 								<View />
@@ -83,6 +75,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 	const navigateMenuThreadDetail = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 	};
+	
 	return (
 		<View style={styles.homeDefaultHeader}>
 			<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
@@ -94,10 +87,10 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 							navigation.openDrawer();
 						}}
 					>
-						<BarsLogo width={20} height={20} />
+						<BarsIcon width={20} height={20} color={Colors.white} />
 					</TouchableOpacity>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						{!!channelTitle && <HashSignIcon width={18} height={18} />}
+						{!!channelTitle && <HashSignIcon width={18} height={18}/>}
 						<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
 					</View>
 				</View>

@@ -5,7 +5,7 @@ import { IMessageWithUser } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform, KeyboardEvent } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
-import { IModeKeyboardPicker } from './components';
+import { IKeyboardType } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
@@ -28,7 +28,7 @@ interface IChatBoxProps {
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
-	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IKeyboardType>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
@@ -179,7 +179,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		}
 	};
 
-	function handleKeyboardBottomSheetMode(mode: IModeKeyboardPicker) {
+	function handleKeyboardBottomSheetMode(mode: IKeyboardType) {
 		setModeKeyBoardBottomSheet(mode);
 		if (mode === 'emoji' || mode === 'attachment') {
 			props.onShowKeyboardBottomSheet(true, keyboardHeight, mode);

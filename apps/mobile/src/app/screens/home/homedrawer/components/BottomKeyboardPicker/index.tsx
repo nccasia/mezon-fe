@@ -1,10 +1,9 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import React, { Ref, forwardRef } from 'react';
-import styles from './styles';
 import { Colors } from '@mezon/mobile-ui';
 
-export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
+export type IKeyboardType = 'text' | 'emoji' | 'attachment';
 
 interface IProps {
 	height: number;
