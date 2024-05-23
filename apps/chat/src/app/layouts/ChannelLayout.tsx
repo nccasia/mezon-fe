@@ -1,7 +1,7 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
-import { useApp, useChatReaction, useMenu, useReference, useThreads } from '@mezon/core';
+import { useApp, useChatReaction, useGifsStickersEmoji, useMenu, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
@@ -10,8 +10,10 @@ const ChannelLayout = () => {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionTopState = useSelector(selectReactionTopState);
-	const { referenceMessage } = useReference();
+	const { idMessageRefReaction } = useReference();
 	const { reactionBottomState } = useChatReaction();
+
+	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 
 	const { closeMenu, statusMenu } = useMenu();
 	const { isShowCreateThread } = useThreads();
@@ -40,21 +42,21 @@ const ChannelLayout = () => {
 			<div className="flex h-heightWithoutTopBar flex-row">
 				<Outlet />
 			</div>
-			{reactionRightState && (
+			{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
 				<div
 					id="emojiPicker"
 					className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 				>
 					<div className="mb-0 z-10 h-full">
 						<GifStickerEmojiPopup
-							messageEmoji={referenceMessage as IMessageWithUser}
+							messageEmojiId={idMessageRefReaction}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							emojiAction={EmojiPlaces.EMOJI_REACTION}
 						/>
 					</div>
 				</div>
 			)}
-			{reactionBottomState && messageMatchWithRefStatus && (
+			{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 				<div
 					className="fixed"
 					style={{
@@ -68,7 +70,7 @@ const ChannelLayout = () => {
 				>
 					<div className="mb-0 z-10 h-full">
 						<GifStickerEmojiPopup
-							messageEmoji={referenceMessage as IMessageWithUser}
+							messageEmojiId={idMessageRefReaction}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							emojiAction={EmojiPlaces.EMOJI_REACTION}
 						/>

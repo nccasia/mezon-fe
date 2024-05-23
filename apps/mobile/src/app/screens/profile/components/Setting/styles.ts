@@ -7,14 +7,22 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: size.s_10,
+        paddingHorizontal: size.s_16,
+        marginBottom: size.s_10,
+        borderRadius: size.s_10,
         gap: size.s_10
     },
     logoutText: {
+        fontWeight: '600',
         color: Colors.textRed,
         fontSize: size.label
     },
+    title: {
+        color: Colors.tertiary,
+        fontSize: size.label
+    },
     settingContainer: {
-        paddingHorizontal: size.s_20
+        padding: size.s_20
     },
     logoutIconWrapper: {
         height: 20,

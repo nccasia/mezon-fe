@@ -6,9 +6,10 @@ type SuggestItemProps = {
 	symbol?: string;
 	name: string;
 	subText?: string;
+  isDisplayDefaultAvatar?: boolean;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => {
+const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar }: SuggestItemProps) => {
 	return (
 		<View style={s.wrapperItem}>
 			<View style={s.containerItem}>
@@ -17,7 +18,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => 
                 uri: avatarUrl,
               }}
             /> :
-           !name.startsWith('here') && <View style={s.avatarMessageBoxDefault}>
+           !name.startsWith('here') && isDisplayDefaultAvatar && <View style={s.avatarMessageBoxDefault}>
            <Text style={s.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
             </View>
             }

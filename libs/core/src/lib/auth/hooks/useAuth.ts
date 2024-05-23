@@ -15,10 +15,13 @@ export function useAuth() {
 	}, [dispatch]);
 
 	const loginEmail = useCallback(
-		async (username: string, password: string) => {
+		async (username: string, password: string, isMobile = false) => {
 			const action = await dispatch(authActions.authenticateEmail({ username, password }));
 			const session = action.payload;
 			dispatch(accountActions.setAccount(session));
+			if (isMobile) {
+				return session;
+			}
 		},
 		[dispatch],
 	);

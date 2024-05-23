@@ -4,7 +4,7 @@ import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useSelector } from 'react-redux';
 import {View, Text, TouchableOpacity, Image} from 'react-native';
 import { styles as s } from './NotificationIndividualItem.styles';
-import { useMessageSender } from '../../../../hooks/useMessageSender';
+import { useMessageSender } from '../../../hooks/useMessageSender';
 export type NotifyProps = {
 	readonly notify: INotification;
 };

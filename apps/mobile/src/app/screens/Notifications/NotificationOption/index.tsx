@@ -5,7 +5,7 @@ import { styles as s } from './NotificationOption.styles'
 import { EActionDataNotify } from '../types'
 import { MuteIcon, SettingIcon, } from "@mezon/mobile-components";
 import { useTranslation } from 'react-i18next'
-import MezonToggleButton from '../../../../temp-ui/MezonRadioButton'
+import MezonToggleButton from '../../../temp-ui/MezonRadioButton'
 
 
 const NotificationOption = ({onChange}) => {

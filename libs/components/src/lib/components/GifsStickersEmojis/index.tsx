@@ -1,6 +1,6 @@
-import { useAppParams, useChatReaction, useEscapeKey, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useEscapeKey, useGifsStickersEmoji, useOnClickOutside } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,20 +10,18 @@ import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
 
 export type GifStickerEmojiPopupOptions = {
-	messageEmoji?: IMessageWithUser;
+	messageEmojiId?: string;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
 };
 
-const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmojiPopupOptions) => {
+const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerEmojiPopupOptions) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
-
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
-	const { setReactionPlaceActive } = useChatReaction();
-	const { setShowCategories } = useGifs();
 	const { setValueInputSearch } = useGifsStickersEmoji();
+	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -35,17 +33,11 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 		}
 	}, [type]);
 	const handleTabClick = (tab: SubPanelName) => {
-		setShowCategories(true);
 		setValueInputSearch('');
-		if (tab === SubPanelName.EMOJI) {
-			setReactionPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-		}
-
 		setSubPanelActive(tab);
 	};
 
 	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
-
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
 	const [emojiDivWidth, setEmojiDivWidth] = useState<number | undefined>();
 
@@ -55,11 +47,15 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 			setEmojiDivWidth(width);
 		}
 	}, [emojiRefParentDiv]);
-
+	useOnClickOutside(panelRef, (event) => {
+		event.stopPropagation();
+		setSubPanelActive(SubPanelName.NONE);
+	});
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
 			className={`w-[370px] sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
+			ref={panelRef}
 		>
 			<div className="w-full">
 				{emojiAction !== EmojiPlaces.EMOJI_REACTION && emojiAction !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
@@ -106,17 +102,17 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 				)}
 				{subPanelActive === SubPanelName.EMOJI && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+						<EmojiPickerComp />
 					</div>
 				)}
 				{emojiAction === EmojiPlaces.EMOJI_REACTION && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_REACTION} mode={mode} messageEmoji={messageEmoji} />
+						<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} />
 					</div>
 				)}
 				{emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} mode={mode} messageEmoji={messageEmoji} />
+						<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} />
 					</div>
 				)}
 			</div>

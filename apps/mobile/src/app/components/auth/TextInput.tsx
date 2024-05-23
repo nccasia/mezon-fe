@@ -74,11 +74,11 @@ const styles = StyleSheet.create({
 	inputText: {
 		fontSize: size.s_16,
 		color: '#FFFFFF',
+		width: '90%',
 	},
 	errorText: {
 		fontSize: 15,
 		marginTop: 10,
-		marginBottom: 20,
 		marginHorizontal: 20,
 		color: 'red',
 	},

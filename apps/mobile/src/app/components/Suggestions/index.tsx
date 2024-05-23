@@ -33,7 +33,7 @@ const Suggestions: FC<MentionSuggestionsProps> = ({
             style={{maxHeight: 200}}
             data={suggestions?.filter(item => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
             renderItem={({item}) => <Pressable onPress={()=> handleSuggestionPress(item)}>
-            <SuggestItem name={item.display ?? ''} avatarUrl={(item).avatarUrl} subText="" />
+            <SuggestItem isDisplayDefaultAvatar={true} name={item.display ?? ''} avatarUrl={(item).avatarUrl} subText="" />
             </Pressable>
           }
             keyExtractor={(_, index) => index.toString()}
@@ -80,7 +80,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({
             style={{maxHeight: 200}}
             data={listChannelsMention?.filter(item => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
             renderItem={({item}) => <Pressable onPress={()=> handleSuggestionPress(item)}>
-            <SuggestItem name={item.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText} />
+            <SuggestItem isDisplayDefaultAvatar={false} name={item.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText} />
             </Pressable>
           }
             keyExtractor={(_, index) => index.toString()}

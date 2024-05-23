@@ -1,6 +1,6 @@
 import { Colors } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-import { HEIGHT, WIDTH } from '../../../constants/config';
+import { HEIGHT, WIDTH } from '../../constants/config';
 export const styles = StyleSheet.create({
 notifications :{
   width: WIDTH,

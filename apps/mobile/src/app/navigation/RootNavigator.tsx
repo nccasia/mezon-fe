@@ -1,6 +1,6 @@
 import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
-import { MezonSuspense, useMezon } from '@mezon/transport';
-import { DefaultTheme, NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { useMezon } from '@mezon/transport';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,9 +11,9 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { preloadedState } from '../../../../chat/src/app/mock/state';
-import { darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
+import { Colors, darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
+import { SafeAreaView } from 'react-native';
 import { createLocalNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
@@ -22,13 +22,18 @@ const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const [isDarkMode] = useState(true); //TODO: move to custom hook
 	useEffect(() => {
-		authLoader();
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			createLocalNotification(remoteMessage?.notification?.title, remoteMessage?.notification?.body, remoteMessage?.data);
 		});
 
 		return unsubscribe;
 	}, []);
+
+	useEffect(() => {
+		if (isLoggedIn) {
+			authLoader();
+		}
+	}, [isLoggedIn]);
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
@@ -54,8 +59,8 @@ const NavigationMain = () => {
 	const lightTheme = {
 		...DefaultTheme,
 		colors: {
-		  ...DefaultTheme.colors,
-		  ...lightThemeColor
+			...DefaultTheme.colors,
+			...lightThemeColor,
 		},
 	};
 
@@ -64,32 +69,34 @@ const NavigationMain = () => {
 		...DarkTheme,
 		colors: {
 			...DarkTheme.colors,
-			...darkThemeColor
-		}
-	}
+			...darkThemeColor,
+		},
+	};
 
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
-			<RootStack.Navigator screenOptions={{ headerShown: false }}>
-				{isLoggedIn ? (
-					<RootStack.Group
-						screenOptions={{
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-					</RootStack.Group>
-				) : (
-					<RootStack.Group
-						screenOptions={{
-							animationTypeForReplace: 'pop',
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-					</RootStack.Group>
-				)}
-			</RootStack.Navigator>
+			<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+				<RootStack.Navigator screenOptions={{ headerShown: false }}>
+					{isLoggedIn ? (
+						<RootStack.Group
+							screenOptions={{
+								gestureEnabled: false,
+							}}
+						>
+							<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
+						</RootStack.Group>
+					) : (
+						<RootStack.Group
+							screenOptions={{
+								animationTypeForReplace: 'pop',
+								gestureEnabled: false,
+							}}
+						>
+							<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
+						</RootStack.Group>
+					)}
+				</RootStack.Navigator>
+			</SafeAreaView>
 		</NavigationContainer>
 	);
 };

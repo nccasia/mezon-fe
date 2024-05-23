@@ -14,17 +14,17 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   notifyHeaderTitle: {
-    color: Colors.titleSteelGray,
+    color: Colors.textGray,
     fontSize: size.label,
     fontWeight: '400',
     marginBottom: 5
   },
   notifyDuration: {
-    color: Colors.titleSteelGray,
+    color: Colors.textGray,
   },
   boxImage: {
-    width: 60,
-    height: 60,
+    width: size.s_40,
+    height: size.s_40,
     borderRadius: 50,
     marginBottom: 10
   },

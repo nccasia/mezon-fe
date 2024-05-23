@@ -272,16 +272,18 @@ export enum SubPanelName {
 	GIFS = 'GIFS',
 	STICKERS = 'STICKER',
 	EMOJI = 'EMOJI',
+	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
 export type IEmoji = {
 	category: string;
 	emoji: string;
-	html: string;
-	name: string;
-	order: number;
+	html?: string;
+	name?: string;
+	order?: number;
 	shortname: string;
-	unicode: string;
+	unicode?: string;
 };
 
 export type IEmoticons = {
@@ -352,7 +354,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
-  name?: string;
+	name?: string;
 };
 
 export type MentionsInputChangeEvent = {

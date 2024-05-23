@@ -1,24 +1,15 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useApp, useAppNavigation, useFriends, useMenu } from '@mezon/core';
-import {
-	gifsStickerEmojiActions,
-	messagesActions,
-	reactionActions,
-	referencesActions,
-	selectAllClans,
-	selectCurrentChannel,
-	selectCurrentClan,
-} from '@mezon/store';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
-import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -36,16 +27,6 @@ function MyApp() {
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const handleClickOutside = () => {
-		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(reactionActions.setReactionBottomState(false));
-		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
-		dispatch(reactionActions.setReactionBottomStateResponsive(false));
-		dispatch(reactionActions.setMessageMatchWithRef(false));
-	};
 
 	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
@@ -118,7 +99,7 @@ function MyApp() {
 	};
 
 	return (
-		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
+		<div className="flex h-screen text-gray-100 overflow-hidden relative">
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}

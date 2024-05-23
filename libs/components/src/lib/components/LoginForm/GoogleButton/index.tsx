@@ -7,7 +7,7 @@ const GoogleButtonLogin: React.FC = () => {
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
-		redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
+		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
 		},

@@ -2,6 +2,8 @@ import {
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
+	selectIdMessageRefReaction,
+	selectIdMessageRefReply,
 	selectIdMessageReplied,
 	selectOpenEditMessageState,
 	selectOpenOptionMessageState,
@@ -26,6 +28,8 @@ export function useReference() {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const attachmentDataRef = useSelector(selectAttachmentData);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 
 	const setReferenceMessage = useCallback(
 		(message: IMessageWithUser | null) => {
@@ -76,6 +80,20 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setIdReferenceMessageReply = useCallback(
+		(idMessageRefReply: string) => {
+			dispatch(referencesActions.setIdReferenceMessageReply(idMessageRefReply));
+		},
+		[dispatch],
+	);
+
+	const setIdReferenceMessageReaction = useCallback(
+		(idMessageRefReaction: string) => {
+			dispatch(referencesActions.setIdReferenceMessageReaction(idMessageRefReaction));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			setReferenceMessage,
@@ -93,6 +111,10 @@ export function useReference() {
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,
+			idMessageRefReply,
+			setIdReferenceMessageReply,
+			idMessageRefReaction,
+			setIdReferenceMessageReaction,
 		}),
 		[
 			setReferenceMessage,
@@ -110,6 +132,10 @@ export function useReference() {
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,
+			idMessageRefReply,
+			setIdReferenceMessageReply,
+			idMessageRefReaction,
+			setIdReferenceMessageReaction,
 		],
 	);
 }

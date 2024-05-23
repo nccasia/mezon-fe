@@ -1,17 +1,19 @@
-import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
-import { EmojiPlaces, IEmoji, IMessageWithUser, SubPanelName } from '@mezon/utils';
+import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { selectMessageByMessageId } from '@mezon/store';
+import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Icons } from '../../components';
 
 export type EmojiCustomPanelOptions = {
-	messageEmoji?: IMessageWithUser;
-	emojiAction?: EmojiPlaces;
+	messageEmojiId?: string | undefined;
 	mode?: number;
 	isReaction?: boolean;
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
+	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
 	const { emojis, categoriesEmoji } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -21,13 +23,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { reactionPlaceActive } = useChatReaction();
 
 	const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
-		return emojis.filter(
-			(emoji) =>
-				emoji.name.includes(searchTerm) ||
-				emoji.shortname.includes(searchTerm) ||
-				emoji.unicode.includes(searchTerm) ||
-				emoji.html.includes(searchTerm),
-		);
+		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
 	};
 
 	useEffect(() => {
@@ -57,16 +53,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		.filter((category) => category.name !== '' && category.name !== 'Component');
 	[categoriesWithIcons[0], categoriesWithIcons[1]] = [categoriesWithIcons[1], categoriesWithIcons[0]];
 
-	const {
-		reactionMessageDispatch,
-		setReactionRightState,
-		setReactionBottomState,
-		setReactionPlaceActive,
-		setUserReactionPanelState,
-		setReactionBottomStateResponsive,
-		setMessageMatchWithRef,
-	} = useChatReaction();
-	const { setReferenceMessage } = useReference();
+	const { reactionMessageDispatch, setReactionPlaceActive } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [emojiHoverNative, setEmojiHoverNative] = useState<string>('');
@@ -74,24 +61,18 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
-		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
+		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-				props.messageEmoji?.id ?? '',
+				props.messageEmojiId ?? '',
 				emojiPicked,
 				1,
-				props.messageEmoji?.sender_id ?? '',
+				messageEmoji?.sender_id ?? '',
 				false,
 			);
-			setReactionRightState(false);
-			setReactionBottomState(false);
-			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
-			setReferenceMessage(null);
-			setUserReactionPanelState(false);
-			setReactionBottomStateResponsive(false);
-			setMessageMatchWithRef(false);
-		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+			setSubPanelActive(SubPanelName.NONE);
+		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setEmojiSuggestion(emojiPicked);
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 			setSubPanelActive(SubPanelName.NONE);
@@ -110,7 +91,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSelectedCategory(categoryName);
 			const categoryDiv = categoryRefs.current[categoryName];
 			if (categoryDiv && containerRef.current) {
-				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' }); // Thay đổi behavior thành smooth để cuộn mượt hơn
+				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' });
 			}
 		}
 	};
@@ -221,17 +202,20 @@ type DisplayByCategoriesProps = {
 	readonly emojisData: IEmoji[];
 };
 
-function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
-	const { emojis } = useEmojiSuggestion();
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
 	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
-		return emojis
+		const filteredEmojis = emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
 				category: emoji.category.replace(/ *\([^)]*\) */g, ''),
 			}));
+
+		const first50Emojis = filteredEmojis.slice(0, 72);
+
+		return first50Emojis;
 	};
-	const emojisByCategoryName = getEmojisByCategories(emojis, categoryName ?? '');
+	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 

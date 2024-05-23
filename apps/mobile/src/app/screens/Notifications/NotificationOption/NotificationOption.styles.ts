@@ -1,6 +1,6 @@
 import { Colors, horizontalScale, size, verticalScale } from "@mezon/mobile-ui"
-import { HEIGHT, WIDTH } from '../../../../constants/config';
 import { StyleSheet } from "react-native"
+import { HEIGHT, WIDTH } from "../../../constants/config"
 
 export const styles = StyleSheet.create({
   wrapperOption:{
