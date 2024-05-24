@@ -91,7 +91,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View style={{
 				width: widthMedia,
-				marginBottom: size.s_10,
+				marginVertical: size.s_10,
 			}}>
 				{videos.map((video, index) => {
 					return (
@@ -260,7 +260,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}
 
 	return (
-		<View style={styles.messageWrapper}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
@@ -283,7 +283,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				</View>
 			): null}
 				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-        {!isCombine &&
+        {!isCombine ?
 				<Pressable
 					onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)}
 					style={styles.wrapperAvatar}
@@ -296,9 +296,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 							</View>
 						))}
-				</Pressable>
+				</Pressable> : <View style={styles.wrapperAvatarCombine} />
 					}
-				<Pressable style={[styles.rowMessageBox, isCombine && styles.rowMessageBoxCombine]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
+				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
 					{!isCombine && (
 						<View style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>

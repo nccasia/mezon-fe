@@ -309,6 +309,7 @@ export const styles = StyleSheet.create({
 	},
 	messageWrapper: {
 		flexDirection: 'column',
+		marginTop: size.s_10,
 	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
@@ -330,10 +331,10 @@ export const styles = StyleSheet.create({
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
-		width: '100%',
+		width: '90%',
 	},
   rowMessageBoxCombine: {
-    marginLeft: size.s_50,
+    marginLeft: verticalScale(44),
   },
 	messageBoxTop: {
 		flexDirection: 'row',
@@ -355,7 +356,6 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
   contentMessageCombine: {
-    paddingLeft: size.s_10,
     marginBottom: -5,
   },
 	contentMessageLink: {
@@ -386,7 +386,7 @@ export const styles = StyleSheet.create({
 	},
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
-		marginBottom: size.s_10,
+		marginVertical: size.s_10,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -467,5 +467,9 @@ export const styles = StyleSheet.create({
     width: size.s_40,
     height: size.s_40,
     borderRadius: size.s_40,
-    overflow: 'hidden' }
+    overflow: 'hidden'
+  },
+	wrapperAvatarCombine: {
+		width: size.s_40,
+	}
 });

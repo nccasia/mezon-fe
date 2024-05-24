@@ -178,9 +178,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		}
 		inputRef?.current?.clear?.();
 		setText('');
-		[EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
+    [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+	  }, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -248,7 +247,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			showKeyboard.remove();
 			resetInput();
 		};
-	}, [pushMessageActionIntoStack]);
+	}, []);
 
 	useEffect(() => {
 		const listChannelsMention: ChannelsMention[] = listChannels.map((item) => {
