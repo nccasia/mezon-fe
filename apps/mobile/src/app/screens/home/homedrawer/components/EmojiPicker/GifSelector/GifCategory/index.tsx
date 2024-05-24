@@ -4,8 +4,6 @@ import FastImage from 'react-native-fast-image';
 import styles from "./styles";
 import { useGifs } from "@mezon/core";
 
-
-
 interface GifCategoryProps {
     loading?: boolean;
     data: GifCategoriesEntity[];
@@ -29,7 +27,7 @@ export default function GifCategory({ loading, data }: GifCategoryProps) {
                     onPress={() => handlePressCategory(item.searchterm)}
                     style={styles.content}
                     key={index.toString()}>
-                    <FastImage source={{ uri: item.image }} style={{ height: 100, width: 200 }} />
+                    <FastImage source={{ uri: item.image }} style={{ height: "100%", width: "100%" }} />
                     <View style={styles.textWrapper}>
                         <Text style={styles.textTitle}>{item.name}</Text>
                     </View>

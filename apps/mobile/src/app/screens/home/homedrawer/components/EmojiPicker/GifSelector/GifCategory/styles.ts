@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
     content: {
         position: "relative",
         height: 100,
-        width: 170,
+        flex: 1,
+        flexBasis: 170,
         borderRadius: 10,
         overflow: "hidden"
     },

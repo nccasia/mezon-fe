@@ -1,7 +1,7 @@
 import { Colors, Fonts } from '@mezon/mobile-ui';
 import React from 'react';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import GifSelector from './GifSelector';
 import { useEffect } from 'react';
 import { ChannelStreamMode } from 'mezon-js';
@@ -70,7 +70,8 @@ function EmojiPicker({ onDone }: IProps) {
 	}
 
 	return (
-		<View style={styles.container}>
+		<View style={styles.container}
+		>
 			<View style={styles.tabContainer}>
 				<TextTab selected title='Emoji' />
 				<TextTab title='GIFs' />

@@ -3,9 +3,6 @@ import { Text, TouchableOpacity, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { useEffect } from "react";
-import { useCallback } from "react";
-import { IMessageSendPayload } from "@mezon/utils";
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from "mezon-js/api.gen";
 
 interface GifItemProps {
     loading?: boolean;
@@ -15,17 +12,12 @@ interface GifItemProps {
 
 export default function GiftItem({ loading, data, onPress }: GifItemProps) {
     useEffect(() => {
-        // console.log(data);
-        // console.log("aaa");
-        // console.log(data && Array.isArray(data), data && Array.isArray(data) && data.length);
-        // data && Array.isArray(data) && data.forEach((item) => console.log(item.media_formats.gif.url))
+        data && Array.isArray(data) && data.forEach((item) => console.log(item.media_formats.gif.url))
     }, [data])
 
     if (loading) {
         return <Text>loading...</Text>
     }
-
-
 
     function handlePressGif(url: string) {
         onPress && onPress(url);

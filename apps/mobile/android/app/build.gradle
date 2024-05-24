@@ -119,6 +119,9 @@ dependencies {
     implementation("com.facebook.react:flipper-integration")
     implementation 'com.facebook.fresco:animated-gif:2.5.0'
 
+    // Provide the Android support library (you might already have this or a similar dependency)
+    implementation 'com.android.support:support-core-utils:24.2.1'
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

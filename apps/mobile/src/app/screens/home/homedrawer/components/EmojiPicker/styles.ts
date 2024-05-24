@@ -8,13 +8,13 @@ const styles = StyleSheet.create({
     },
     tabContainer: {
         display: "flex",
-        justifyContent: "center",
         flexDirection: "row",
+        justifyContent: "center",
         gap: 10,
         padding: 6,
-        width: "100%",
+        // width: "100%",
         backgroundColor: Colors.primary,
-        borderRadius: 50
+        borderRadius: 50,
     },
     selected: {
         flex: 1,
