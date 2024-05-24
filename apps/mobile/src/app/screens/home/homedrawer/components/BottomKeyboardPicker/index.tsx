@@ -1,5 +1,6 @@
 import BottomSheet, { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { Colors } from '@mezon/mobile-ui';
 import React, { Ref, forwardRef } from 'react';
 import { Colors } from '@mezon/mobile-ui';
 import { Keyboard } from 'react-native';

@@ -9,9 +9,11 @@ import CreateThreadForm from "../../../components/ThreadDetail/CreateThreadForm"
 import MenuThreadDetail from "../../../components/ThreadDetail/MenuThreadDetail";
 import { Colors, size } from "@mezon/mobile-ui";
 import { SearchIcon } from "@mezon/mobile-components";
+import { useReference } from "@mezon/core";
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
+  const { openThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 	return (
 		<Stack.Navigator
@@ -58,7 +60,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				component={CreateThreadForm}
 				options={{
 					headerShown: true,
-					headerTitle: () => <Text style={{ color: Colors.white, fontSize: size.h5 }}>{currentChannel?.channel_label}</Text>,
+					headerTitle: () => <Text style={{ color: Colors.white, fontSize: size.h5 }}>{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}</Text>,
 					headerTitleStyle: {
 						color: Colors.white,
 					},

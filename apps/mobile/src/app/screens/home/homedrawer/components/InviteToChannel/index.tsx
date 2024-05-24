@@ -16,6 +16,8 @@ import { normalizeString } from '../../../../../utils/helpers';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import { useTranslation } from 'react-i18next';
 import { EMaxUserCanInvite } from '../../enums';
+import { LinkIcon } from '@mezon/mobile-components';
+import Toast from 'react-native-toast-message';
 
 export const InviteToChannel = React.memo(() => {
 	const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
@@ -60,10 +62,17 @@ export const InviteToChannel = React.memo(() => {
 
     const addInviteLinkToClipboard = () => {
         Clipboard.setString(currentInviteLink);
+		Toast.show({
+            type: 'success',
+            props: {
+                text2: t('copyLink'),
+                leadingIcon: <LinkIcon color={Colors.textLink} />
+            }
+        });
     }
 
 	const getListOfUser = () => {
-		if (!searchUserText.trim()) {
+		if (!(searchUserText || '').trim()) {
 			return friendList;
 		}
 		const filteredUserList = friendList.filter((user: IUser) => normalizeString(user.name).includes(normalizeString(searchUserText)));

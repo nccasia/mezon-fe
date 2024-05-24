@@ -2,11 +2,11 @@ import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '
 import React from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import DiscoveryIcon from '../../../../assets/svg/discoveryStudentHubs.svg';
 import PlusGreenIcon from '../../../../assets/svg/guildAddCategoryChannel.svg';
 import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
 import { styles } from './styles';
+import Toast from "react-native-toast-message";
 
 const ServerList = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
@@ -23,10 +23,9 @@ const ServerList = React.memo((props: any) => {
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
 			</View>
 			{clans.map((server) => (
-				<ClanIcon data={server} onPress={handleChangeClan} isActive={currentClan?.clan_id === server?.clan_id} />
+				<ClanIcon data={server} key={server.id} onPress={handleChangeClan} isActive={currentClan?.clan_id === server?.clan_id} />
 			))}
-			<ClanIcon icon={<PlusGreenIcon width={30} height={30} />} data={{}} />
-			<ClanIcon icon={<DiscoveryIcon width={30} height={30} />} data={{}} />
+			<ClanIcon icon={<PlusGreenIcon width={30} height={30} />} data={{}} onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})} />
 		</View>
 	);
 });

@@ -1,4 +1,4 @@
-import { useApp } from "@mezon/core";
+import { useApp, useThreads } from "@mezon/core";
 import { Tooltip } from "flowbite-react";
 
 export type NavLinkProps = {
@@ -9,6 +9,8 @@ export type NavLinkProps = {
 
 function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
 	const { appearanceTheme } = useApp();
+	const { setTurnOffThreadMessage } = useThreads();
+
 	return (
 		<div className="group block relative rounded-3xl">
 			<div className="flex absolute -left-2 items-center h-full">
@@ -19,8 +21,8 @@ function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
 				></div>
 			</div>
 
-			<div className="group-active:translate-y-px">
-				<Tooltip content={clanName} trigger="hover" animation="duration-500" style = { appearanceTheme === "light" ? "light" : "dark"} placement="right">
+			<div className="group-active:translate-y-px" onClick={() => setTurnOffThreadMessage()}>
+				<Tooltip content={<span style={{whiteSpace: 'nowrap'}}>{clanName}</span>} trigger="hover" animation="duration-500" style = { appearanceTheme === "light" ? "light" : "dark"} placement="right">
 					<div
 						className={`${
 							active
@@ -37,3 +39,5 @@ function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
 }
 
 export default NavLinkComponent;
+
+

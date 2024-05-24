@@ -8,10 +8,17 @@
         "pinMessage": "Pin Message",
         "markUnRead": "Mark UnRead",
         "mention": "Mention",
-        "copyMessageLink": "Copy Message Link"
+        "copyMessageLink": "Copy Message Link",
+        "report": "Report",
+        "polls": "Polls",
+        "files": "Files"
     },
     "chatBox": {
         "replyingTo": "Replying to",
         "editingMessage": "Editing Message"
+    },
+    "toast": {
+        "copyText": "Copied Message Text",
+        "attachmentIsLoading": "Attachment is loading, please wait a moment"
     }
 }

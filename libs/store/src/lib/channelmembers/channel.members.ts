@@ -1,4 +1,4 @@
-import { IChannelMember, LoadingStatus } from '@mezon/utils';
+import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -88,6 +88,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		if (repace) {
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
+
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
@@ -125,12 +126,10 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 		//user exist
 		if (channelPresence.joins.length > 0) {
 			const userId = channelPresence.joins[0].user_id;
-			const channelId = channelPresence.channel_id;
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
 			if (!user) {
 				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
 				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
-				thunkAPI.dispatch(fetchChannelMembers({ clanId: '', channelId: channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 		}
 	},
@@ -149,6 +148,20 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 			const userId = join.user_id;
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
 		}
+	}
+});
+
+export const removeMemberChannel = createAsyncThunk('channelMembers/removeChannelUser', async ({ channelId, ids }: RemoveChannelUsers, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.removeChannelUsers(mezon.session, channelId, ids);
+		if (response) {
+			await thunkAPI.dispatch(
+				fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+			);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
 	}
 });
 
@@ -200,7 +213,7 @@ export const channelMembers = createSlice({
 			const payload = action.payload;
 			const member = mapUserIdToEntity(payload.joins[0].user_id, payload.joins[0].username, true);
 			const data = mapChannelMemberToEntity({ id: member.id + payload.channel_id, user: member }, payload.channel_id, payload.joins[0].user_id);
-			channelMembersAdapter.addOne(state, data);
+			channelMembersAdapter.upsertOne(state, data);
 		},
 	},
 	extraReducers: (builder) => {
@@ -209,7 +222,7 @@ export const channelMembers = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-				channelMembersAdapter.addMany(state, action.payload);
+				channelMembersAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
@@ -245,6 +258,7 @@ export const channelMembersActions = {
 	fetchChannelMembersPresence,
 	followUserStatus,
 	updateStatusUser,
+	removeMemberChannel,
 };
 
 /*

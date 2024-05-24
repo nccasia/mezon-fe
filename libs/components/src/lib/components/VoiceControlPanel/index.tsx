@@ -10,7 +10,6 @@ import {
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
-import { useMezonVoice } from '@mezon/voice';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -24,40 +23,26 @@ export type VoiceControlPanelProps = {
 function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const dispatch = useAppDispatch();
 	const currentClan = useSelector(selectCurrentClan);
-	const voice = useMezonVoice();
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
 	const statusCall = useSelector(selectStatusCall);
 
 	const startScreenShare = useCallback(() => {
-		voice.createScreenShare();
-		dispatch(voiceActions.setShowScreen(true));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const stopScreenShare = useCallback(() => {
-		voice.stopScreenShare();
-		dispatch(voiceActions.setShowScreen(false));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
-		if (!statusCall) {
-			dispatch(voiceActions.setStatusCall(false));
-			return;
-		}
-		stopScreenShare();
-		voice.voiceDisconnect();
-		voice.setVoiceOptions((prev) => ({
-			...prev,
-			voiceStart: false,
-		}));
-		dispatch(voiceActions.setStatusCall(false));
-		dispatch(channelsActions.setCurrentVoiceChannelId(''));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const openCamera = useCallback(() => {
-		voice.createLocalTrack(['video']);
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const { toChannelPage } = useAppNavigation();
 	const channelPath = toChannelPage(currentVoiceChannelId, currentVoiceChannel?.clan_id || '');

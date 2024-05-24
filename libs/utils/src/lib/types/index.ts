@@ -17,6 +17,9 @@ import {
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
+	ApiNotificationUserChannel,
+	ApiNotificationSetting,
+	ApiNotificationChannelCategoySetting,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -51,6 +54,18 @@ export type IRolesClan = ApiRole & {
 	id: string;
 };
 
+export type INotificationSetting = ApiNotificationUserChannel
+
+export type IDefaultNotificationClan = ApiNotificationSetting
+
+export type IDefaultNotificationCategory = ApiNotificationSetting
+
+export type IDefaultNotification = ApiNotificationSetting & {
+	id: string;
+};
+export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
+	id: string;
+};
 export type IEventManagement = ApiEventManagement & {
 	id: string;
 };
@@ -272,16 +287,18 @@ export enum SubPanelName {
 	GIFS = 'GIFS',
 	STICKERS = 'STICKER',
 	EMOJI = 'EMOJI',
+	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
 export type IEmoji = {
 	category: string;
 	emoji: string;
-	html: string;
-	name: string;
-	order: number;
+	html?: string;
+	name?: string;
+	order?: number;
 	shortname: string;
-	unicode: string;
+	unicode?: string;
 };
 
 export type IEmoticons = {
@@ -352,6 +369,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
+	name?: string;
 };
 
 export type MentionsInputChangeEvent = {
@@ -404,4 +422,18 @@ export interface ChannelMembersEntity extends IChannelMember {
 export type SortChannel = {
 	isSortChannelByCategoryId: boolean;
 	categoryId: string | null;
+};
+
+export type UpdateClan = {
+	bearerToken: string;
+	clanId: string;
+	creatorId?: string;
+	clanName?: string;
+	logo?: string;
+	banner?: string;
+};
+
+export type RemoveChannelUsers = {
+	channelId: string;
+	ids?: string[];
 };

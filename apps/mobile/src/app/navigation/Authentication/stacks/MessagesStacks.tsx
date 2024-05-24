@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/stack';
 
 import { APP_SCREEN } from "../../ScreenTypes";
-import Notifications from "../../../screens/main/Notifications";
+import Notifications from '../../../screens/Notifications';
 
 // eslint-disable-next-line no-empty-pattern
 export const MessagesStacks = ({ }: any) => {

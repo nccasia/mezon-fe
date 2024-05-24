@@ -25,6 +25,9 @@ export function useApp() {
 	
 	useEffect(()=>{
 		switch(appearanceTheme){
+			case undefined:
+				setAppearanceTheme('dark');
+				break;
 			case "dark":
 				elementHTML.classList.add('dark');
 				break;
@@ -45,6 +48,6 @@ export function useApp() {
 			systemIsDark,
 			elementHTML,
 		}),
-		[isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme, systemIsDark, elementHTML],
+		[ isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme, systemIsDark, elementHTML],
 	);
 }

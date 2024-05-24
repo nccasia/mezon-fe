@@ -57,6 +57,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
 	openOptionMessageState: boolean;
+	quantitiesMessageRemain: number;
 }
 
 export interface MessagesRootState {
@@ -79,6 +80,13 @@ export const fetchMessagesCached = memoize(
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
+			// set default value
+			if (args[2] === undefined) {
+				args[2] = '';
+			}
+			if (args[3] === undefined) {
+				args[3] = 1;
+			}
 			return args[1] + args[2] + args[3];
 		},
 	},
@@ -105,7 +113,7 @@ export const fetchMessages = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
@@ -144,6 +152,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(response.messages.length));
 
 		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
@@ -284,6 +293,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	typingUsers: {},
 	paramEntries: {},
 	openOptionMessageState: false,
+	quantitiesMessageRemain: 0,
 });
 
 export type SetCursorChannelArgs = {
@@ -299,6 +309,9 @@ export const messagesSlice = createSlice({
 	reducers: {
 		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
 			state.paramEntries[action.payload.channelId] = action.payload.param;
+		},
+		setQuatitiesMessageRemain: (state, action) => {
+			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const code = action.payload.code;
@@ -529,3 +542,7 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
+
+export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
+
+

@@ -83,7 +83,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 		<article className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === "light" ? 'lightMode' : ''}`}>
 			{showProfileUser ? (
 				<div
-					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
+					className="dark:bg-black bg-gray-200 mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
 					style={{
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,

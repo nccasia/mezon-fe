@@ -29,6 +29,8 @@ target 'Mobile' do
 
   pod 'FirebaseCore', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true;
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   use_react_native!(
     :path => config[:reactNativePath],

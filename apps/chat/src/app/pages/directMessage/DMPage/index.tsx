@@ -36,7 +36,7 @@ export default function DirectMessage() {
 	}, [isSending, [], messages]);
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
+		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgSecondary bg-[#F0F0F0] h-[100%]">
 			<DmTopbar dmGroupId={directId} />
 			<div className="flex flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full max-h-messageViewChatDM">

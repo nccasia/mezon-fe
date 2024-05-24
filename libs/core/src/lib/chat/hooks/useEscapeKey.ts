@@ -1,4 +1,4 @@
-import { referencesActions } from '@mezon/store';
+import { reactionActions, referencesActions } from '@mezon/store';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -11,6 +11,7 @@ export const useEscapeKey = (handler: () => void) => {
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 				dispatch(referencesActions.setReferenceMessage(null));
 				dispatch(referencesActions.setDataReferences(null));
+				dispatch(reactionActions.setMessageMatchWithRef(false));
 				handler();
 			}
 		};

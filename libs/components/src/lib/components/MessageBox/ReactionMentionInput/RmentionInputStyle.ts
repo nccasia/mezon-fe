@@ -12,10 +12,11 @@ export default {
 		},
 		highlighter: {
 			padding: 9,
+			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
 		},
 		input: {
-			padding: 9,
+			padding: '9px 12px',
 			border: 'none',
 			outline: 'none',
 			whiteSpace: 'pre-wrap',

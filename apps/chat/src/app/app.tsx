@@ -5,15 +5,13 @@ import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { VoiceContextProvider } from '@mezon/voice';
-import { StrictMode, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
-
-const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -47,12 +45,10 @@ function AppWrapper() {
 	}, []);
 
 	return (
-		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
-					<StrictMode>
-						<App />
-					</StrictMode>
+					<App />
 					<ToastContainer
 						position="top-right"
 						autoClose={2200}

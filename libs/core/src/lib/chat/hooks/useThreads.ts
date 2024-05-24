@@ -31,6 +31,21 @@ export function useThreads() {
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
 
+	const setTurnOffThreadMessage = useCallback(
+		() => {
+			setOpenThreadMessageState(false);
+			setValueThread(null);
+		},
+		[dispatch],
+	);
+
+	const setOpenThreadMessageState = useCallback(
+		(value: boolean) => {
+			dispatch(threadsActions.setOpenThreadMessageState(value));
+		},
+		[dispatch],
+	);
+
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
@@ -46,7 +61,7 @@ export function useThreads() {
 	);
 
 	const setValueThread = useCallback(
-		(value: IMessageWithUser) => {
+		(value: IMessageWithUser | null) => {
 			dispatch(threadsActions.setValueThread(value));
 		},
 		[dispatch],
@@ -90,6 +105,8 @@ export function useThreads() {
 			setIsShowCreateThread,
 			setNameValueThread,
 			setValueThread,
+			setOpenThreadMessageState,
+			setTurnOffThreadMessage,
 		}),
 		[
 			isPrivate,
@@ -106,6 +123,8 @@ export function useThreads() {
 			setNameValueThread,
 			setIsShowCreateThread,
 			setValueThread,
+			setOpenThreadMessageState,
+			setTurnOffThreadMessage,
 		],
 	);
 }

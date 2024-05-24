@@ -35,13 +35,14 @@ const ChannelList = React.memo((props: any) => {
 	};
 
 	const setDefaultChannelLoader = async () => {
-		if (categorizedChannels) {
+		const firstChannel = categorizedChannels?.[0]?.channels?.[0];
+		
+		if (categorizedChannels && !!firstChannel) {
 			const channelIdCache = load(STORAGE_KEY_CHANNEL_ID);
 			const clanIdCache = load(STORAGE_KEY_CLAN_ID);
 			if (channelIdCache && clanIdCache) {
 				await jumpToChannel(channelIdCache, clanIdCache);
 			} else {
-				const firstChannel = categorizedChannels?.[0]?.channels?.[0];
 				const channelId = firstChannel?.channel_id;
 				const clanId = firstChannel?.clan_id;
 				await jumpToChannel(channelId, clanId);

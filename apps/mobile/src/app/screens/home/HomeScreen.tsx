@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ChatContextProvider } from '@mezon/core';
 import {
 	appActions, clansActions, getStoreAsync,
-	selectAllClans, selectCurrentClan, notificationActions,
+	selectAllClans, selectCurrentClan, notificationActions, friendsActions, directActions,
 	gifsActions
 } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -18,7 +18,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 	const dispatch = useDispatch();
-	
+
 	return (
 		<Drawer.Navigator
 			screenOptions={{
@@ -96,6 +96,8 @@ const HomeScreen = React.memo((props: any) => {
 		const store = await getStoreAsync();
 
 		store.dispatch(notificationActions.fetchListNotification());
+		store.dispatch(friendsActions.fetchListFriends());
+		store.dispatch(directActions.fetchDirectMessage({}));
 		store.dispatch(clansActions.fetchClans());
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());

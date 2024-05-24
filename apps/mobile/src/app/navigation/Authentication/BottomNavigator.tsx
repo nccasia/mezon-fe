@@ -7,10 +7,10 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
 import HomeScreen from '../../screens/home/HomeScreen';
-import MessagesScreen from '../../screens/main/MessagesScreen';
-import Notifications from '../../screens/main/Notifications';
+import MessagesScreen from '../../screens/messages/MessagesScreen';
 import ProfileScreen from '../../screens/profile/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
+import Notifications from '../../screens/Notifications';
 
 const TabStack = createBottomTabNavigator();
 

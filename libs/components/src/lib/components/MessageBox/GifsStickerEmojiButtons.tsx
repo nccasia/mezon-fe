@@ -11,8 +11,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setReferenceMessage } = useReference();
 	const { setReactionRightState, setReactionBottomState } = useChatReaction();
-	const { setShowCategories, setValueInputSearch } = useGifs();
-	0;
+	const { setShowCategories } = useGifs();
+	const { setValueInputSearch } = useGifsStickersEmoji();
 	const handleOpenGifs = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
@@ -20,6 +20,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
+			setReactionRightState(false);
+			setReactionBottomState(false);
 		},
 		[setSubPanelActive],
 	);
@@ -31,6 +33,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
+			setReactionRightState(false);
+			setReactionBottomState(false);
 		},
 		[setSubPanelActive],
 	);

@@ -5,7 +5,6 @@ import { useApp } from '@mezon/core';
 const ThemeOptions = () => {
 	const { appearanceTheme, setAppearanceTheme, systemIsDark } = useApp();
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
-	
 
 	const onWindowMatch = () =>{
 		if(themeChosen === "system"){

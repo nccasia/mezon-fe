@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
-import { useChatReaction, useReference } from '@mezon/core';
-import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
+import { useChatReaction, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,12 +20,21 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		setReactionBottomState,
 		setUserReactionPanelState,
 		userReactionPanelState,
-		reactionPlaceActive,
 		reactionBottomStateResponsive,
 	} = useChatReaction();
 
-	const { referenceMessage, setReferenceMessage, setOpenReplyMessageState } = useReference();
+	const {
+		referenceMessage,
+		setReferenceMessage,
+		setOpenReplyMessageState,
+		setIdReferenceMessageReply,
+		idMessageRefReply,
+		openReplyMessageState,
+		idMessageRefReaction,
+		setIdReferenceMessageReaction,
+	} = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
+	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -40,7 +49,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	}
 
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
-		if (message.id === referenceMessage?.id) {
+		if (message.id === idMessageRefReaction) {
 			return true;
 		} else {
 			return false;
@@ -61,23 +70,21 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const parentDiv = useRef<HTMLDivElement | null>(null);
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals>();
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
+	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 
 	const handleOnEnterEmoji = (emojiParam: EmojiDataOptionals) => {
 		setHoverEmoji(emojiParam);
-		setReactionBottomState(true);
 		setUserReactionPanelState(true);
-		setReferenceMessage(message);
-		setOpenReplyMessageState(false); //to hide Replymessage Component
+		setIdReferenceMessageReaction(message.id);
 		setEmojiShowUserReaction(emojiParam);
 		setShowSenderPanelIn1s(true);
+		setShowIconSmile(true);
 	};
 
 	const handleOnleaveEmoji = () => {
 		setUserReactionPanelState(false);
-		if (reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
-			setReactionBottomState(true);
-		} else {
-			setReactionBottomState(false);
+		if (subPanelActive === SubPanelName.NONE) {
+			return setShowIconSmile(false);
 		}
 	};
 
@@ -86,11 +93,19 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			checkPositionSenderPanel(hoverEmoji);
 		}
 	}, [hoverEmoji, parentDiv]);
+
+	useEffect(() => {
+		if (subPanelActive === SubPanelName.NONE) {
+			return setShowIconSmile(false);
+		}
+		if (subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
+			return setShowIconSmile(true);
+		}
+	}, [subPanelActive]);
+
 	const PANEL_SENDER_WIDTH = 300;
-	const EMOJI_REACTION_BOTTOM_PANEL = 376;
 
 	const [posToRight, setPosToRight] = useState<boolean>(false);
-	const [moveToTop, setMoveToTop] = useState<boolean>(false);
 
 	const emojiIndexMap: { [key: string]: number } = {};
 	dataReactionCombine.forEach((emoji: EmojiDataOptionals, index: number) => {
@@ -127,26 +142,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	};
 
-	const checkPosEmojiReactionPanel = () => {
-		if (!parentDiv.current) return;
-		const parentRect = parentDiv.current.getBoundingClientRect();
-		const smileButton = smileButtonRef.current;
-
-		if (!smileButton) return;
-		const childRect = smileButton.getBoundingClientRect();
-		const distanceToRight = parentRect.right - childRect.right;
-
-		if (distanceToRight < EMOJI_REACTION_BOTTOM_PANEL) {
-			setMoveToTop(true);
-		} else {
-			setMoveToTop(false);
-		}
-	};
-
-	useEffect(() => {
-		checkPosEmojiReactionPanel();
-	}, [reactionBottomState]);
-
 	// work in mobile
 	useEffect(() => {
 		if (showSenderPanelIn1s) {
@@ -162,11 +157,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
-						<GifStickerEmojiPopup
-							messageEmoji={message}
-							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-							emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM}
-						/>
+						<GifStickerEmojiPopup messageEmojiId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 					</div>
 				</div>
 			)}
@@ -191,7 +182,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
-									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#313338] bg-bgLightMode border-[#313338]'}
+									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
 											reactOnExistEmoji(
@@ -216,8 +207,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											<p>{calculateTotalCount(emoji.senders)}</p>
 										</div>
 
-										{checkMessageToMatchMessageRef(message) && reactionBottomState && lastPositionEmoji(emoji, message) && (
-											<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
+										{checkMessageToMatchMessageRef(message) && showIconSmile && lastPositionEmoji(emoji, message) && (
+											<ReactionBottom smileButtonRef={smileButtonRef} message={message} />
 										)}
 
 										{checkMessageToMatchMessageRef(message) &&

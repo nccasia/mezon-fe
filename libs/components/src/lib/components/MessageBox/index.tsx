@@ -138,7 +138,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				/>
 
 				<div className={`w-full dark:bg-channelTextarea bg-bgLightMode gap-3 flex items-center rounded-e-md`}>
-					<div className={`w-[96%] bg-black gap-3 relative whitespace-pre-wrap`}>
+					<div className={`w-[96%] dark:bg-channelTextarea bg-bgLightMode gap-3 relative whitespace-pre-wrap`}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}
 							listMentions={props.listMentions}

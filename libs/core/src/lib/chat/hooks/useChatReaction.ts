@@ -1,6 +1,8 @@
 import {
 	reactionActions,
 	selectDataReactionCombine,
+	selectMessageMatchWithRef,
+	selectPositionEmojiButtonSmile,
 	selectReactionBottomState,
 	selectReactionBottomStateResponsive,
 	selectReactionPlaceActive,
@@ -27,6 +29,8 @@ export function useChatReaction() {
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
+	const messageMatchWithRefStatus = useSelector(selectMessageMatchWithRef);
+	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -130,6 +134,18 @@ export function useChatReaction() {
 		[dispatch],
 	);
 
+	const setMessageMatchWithRef = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setMessageMatchWithRef(state));
+		},
+		[dispatch],
+	);
+	const setPositionOfSmileButton = useCallback(
+		(state: any) => {
+			dispatch(reactionActions.setPositionOfSmileButton(state));
+		},
+		[dispatch],
+	);
 	return useMemo(
 		() => ({
 			reactionActions,
@@ -148,6 +164,10 @@ export function useChatReaction() {
 			userReactionPanelState,
 			setReactionBottomStateResponsive,
 			reactionBottomStateResponsive,
+			messageMatchWithRefStatus,
+			setMessageMatchWithRef,
+			setPositionOfSmileButton,
+			positionOfSmileButton,
 		}),
 		[
 			reactionActions,
@@ -164,6 +184,10 @@ export function useChatReaction() {
 			setReactionBottomState,
 			setReactionBottomStateResponsive,
 			reactionBottomStateResponsive,
+			messageMatchWithRefStatus,
+			setMessageMatchWithRef,
+			setPositionOfSmileButton,
+			positionOfSmileButton,
 		],
 	);
 }

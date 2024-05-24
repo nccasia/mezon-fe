@@ -1,5 +1,5 @@
 import { ShortUserProfile } from '@mezon/components';
-import { useOnClickOutside } from '@mezon/core';
+import { useChannelMembers, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
@@ -48,6 +48,8 @@ function MemberProfile({
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 
+	const { removeMemberChannel } = useChannelMembers();
+
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -84,6 +86,15 @@ function MemberProfile({
 		setOpenModalRemoveMember(true);
 		setIsShowPanelMember(false);
 		setIsShowUserProfile(false);
+	};
+
+	const handleRemoveMember = async (value: string) => {
+		if (user) {
+			const ids = [user.user?.id ?? ''];
+			await removeMemberChannel({ channelId: user.channelId as string, ids });
+
+			setOpenModalRemoveMember(false);
+		}
 	};
 
 	const handleClickOutSide = () => {
@@ -133,7 +144,7 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-bgSecondary600 bg-bgLightMode'} nameMemberProfile`}
+							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px]'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
@@ -157,9 +168,10 @@ function MemberProfile({
 
 			{openModalRemoveMember && (
 				<ModalRemoveMemberClan
-					onClose={() => setOpenModalRemoveMember(false)}
 					openModal={openModalRemoveMember}
 					username={user?.user?.username}
+					onClose={() => setOpenModalRemoveMember(false)}
+					onRemoveMember={handleRemoveMember}
 				/>
 			)}
 		</div>

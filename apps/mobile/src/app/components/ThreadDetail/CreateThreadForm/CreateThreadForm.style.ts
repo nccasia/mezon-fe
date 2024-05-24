@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
   },
   createChannelContent: {
     position: 'absolute',
-    top: '35%',
+    bottom: 0,
     width: '100%',
     paddingHorizontal: 10
   },
@@ -29,7 +29,6 @@ export const styles = StyleSheet.create({
   },
   threadPolicy: {
     backgroundColor: '#383a40',
-    marginTop: 15,
     borderRadius: 8,
     flexDirection: 'row',
     padding: 10,
@@ -54,7 +53,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: 'white'
+    color: 'white',
+    marginBottom: 20
   },
   threadPolicyInfo: {
     flex: 1,
@@ -69,5 +69,13 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  messageBox: {
+    borderTopColor: Colors.bgGrayDark,
+    borderBottomColor: Colors.bgGrayDark,
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    paddingTop: 10,
+    paddingBottom: 0
+  }
 });
 

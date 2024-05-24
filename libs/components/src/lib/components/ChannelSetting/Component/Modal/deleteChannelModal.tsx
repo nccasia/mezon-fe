@@ -1,19 +1,39 @@
-import { useClans } from '@mezon/core';
-import { channelsActions, useAppDispatch } from '@mezon/store';
+import { useAppNavigation, useClans } from '@mezon/core';
+import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond } from '@mezon/store';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 interface DeleteModalProps {
 	onClose: () => void;
+	onCloseModal?: () => void;
 	channelLable: string;
 	channelId: string;
 }
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, channelLable, channelId }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal, channelLable, channelId }) => {
 	const dispatch = useAppDispatch();
 	const { currentClanId } = useClans();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const channelFirst = useSelector(selectChannelFirst);
+	const channelSecond = useSelector(selectChannelSecond);
+	let channelNavId = channelFirst.id;
+	
+	const { toChannelPage } = useAppNavigation();
+	const navigate = useNavigate();
 
-	const handleDeleteChannel = (channelId: string) => {
+	const handleDeleteChannel = async (channelId: string) => {
+		await dispatch(channelsActions.deleteChannel({ channelId, clanId: currentClanId as string }));
+		if (channelId === currentChannelId) {
+			if(currentChannelId === channelNavId){
+				channelNavId = channelSecond.id;
+			}
+			const channelPath = toChannelPage(channelNavId ?? '', currentClanId ?? '');
+			navigate(channelPath);
+		}
 		onClose();
-		dispatch(channelsActions.deleteChannel({ channelId, clanId: currentClanId as string }));
+		if(onCloseModal){
+			onCloseModal();
+		}
 	};
 
 	return (

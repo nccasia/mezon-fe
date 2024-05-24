@@ -8,6 +8,7 @@ import {
 	useAppDispatch,
 	userClanProfileActions,
 } from '@mezon/store';
+import { ApiUpdateClanDescRequest } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -59,6 +60,13 @@ export function useClans() {
 		[changeCurrentClan, dispatch],
 	);
 
+	const updateClan = React.useCallback(
+		async ({ clan_id, banner, clan_name, creator_id, logo }: ApiUpdateClanDescRequest) => {
+			await dispatch(clansActions.updateClan({ clan_id, banner, clan_name, creator_id, logo }));
+		},
+		[dispatch],
+	);
+
 	const avatarClans = usersClan.map((user) => user.user?.avatar_url).slice(0, 5);
 
 	const remainingMember = usersClan.map((user) => user.user).slice(5);
@@ -74,7 +82,19 @@ export function useClans() {
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,
+			updateClan,
 		}),
-		[clans, usersClan, currentClanId, currentClan, getUserClanProfile, updateUserClanProfile, createClans],
+		[
+			clans,
+			currentClanId,
+			currentClan,
+			usersClan,
+			avatarClans,
+			remainingMember,
+			getUserClanProfile,
+			updateUserClanProfile,
+			createClans,
+			updateClan,
+		],
 	);
 }

@@ -1,4 +1,4 @@
-import { IUser } from "@mezon/utils";
+import { IEmoji, IUser } from "@mezon/utils";
 
 //TODO: delete later
 export const friendList: IUser[] = [
@@ -153,4 +153,69 @@ export const friendList: IUser[] = [
         "avatarSm": "https://th.bing.com/th/id/OIP.6ElGMPJoR4IkEsCIAP1UfwHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7"
       },
 ]
-  
+
+export const emojiFakeData: IEmoji[] = [
+  {
+    emoji: "😩",
+    name: "weary face",
+    shortname: "😩",
+    unicode: "1f629",
+    html: "&#128553;",
+    category: "Smileys & Emotion (face-concerned)",
+    order: 59
+  },
+  {
+    emoji: "😏",
+    name: "smirking face",
+    shortname: "😏",
+    unicode: "1f60f",
+    html: "&#128527;",
+    category: "Smileys & Emotion (face-neutral-skeptical)",
+    order: 26
+  },
+  {
+    emoji: "🙏",
+    name: "folded hands",
+    shortname: "🙏",
+    unicode: "1f64f",
+    html: "&#128591;",
+    category: "People & Body (hands)",
+    order: 1248
+  },
+  {
+    emoji: "🙌",
+    name: "raising hands",
+    shortname: "🙌",
+    unicode: "1f64c",
+    html: "&#128588;",
+    category: "People & Body (hands)",
+    order: 1242
+  },
+  {
+    emoji: "😴",
+    name: "sleeping face",
+    shortname: ":sleeping:",
+    unicode: "1f634",
+    html: "&#128564;",
+    category: "Smileys & Emotion (face-sleepy)",
+    order: 34
+  },
+  {
+    emoji: "😄",
+    name: "grinning face with smiling eyes",
+    shortname: ":smile:",
+    unicode: "1f604",
+    html: "&#128516;",
+    category: "Smileys & Emotion (face-smiling)",
+    order: 6
+  },
+  {
+    emoji: "😅",
+    name: "grinning face with sweat",
+    shortname: ":sweat_smile:",
+    unicode: "1f605",
+    html: "&#128517;",
+    category: "Smileys & Emotion (face-smiling)",
+    order: 7
+  }
+];

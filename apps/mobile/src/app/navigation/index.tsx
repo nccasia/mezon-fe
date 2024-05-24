@@ -6,8 +6,8 @@ import RootNavigation from "./RootNavigator";
 import { NX_CHAT_APP_API_HOST } from '@env';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@mezon/translations';
-
-console.log(NX_CHAT_APP_API_HOST);
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../configs/toastConfig';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -21,6 +21,7 @@ const App = () => {
 		<I18nextProvider i18n={i18n}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<RootNavigation />
+				<Toast config={toastConfig} />
 			</MezonContextProvider>
 		</I18nextProvider>
 	);

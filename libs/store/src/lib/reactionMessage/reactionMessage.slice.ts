@@ -32,6 +32,13 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionDataServerAndSocket: EmojiDataOptionals[];
 	userReactionPanelState: boolean;
 	reactionBottomStateResponsive: boolean;
+	messageMatchWithRef: boolean;
+	positionOfSmileButton: {
+		top: number;
+		right: number;
+		left: number;
+		bottom: number;
+	};
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -69,6 +76,13 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	reactionDataServerAndSocket: [],
 	userReactionPanelState: false,
 	reactionBottomStateResponsive: false,
+	messageMatchWithRef: false,
+	positionOfSmileButton: {
+		top: 0,
+		right: 0,
+		left: 0,
+		bottom: 0,
+	},
 });
 
 export const reactionSlice = createSlice({
@@ -135,6 +149,12 @@ export const reactionSlice = createSlice({
 		setUserReactionPanelState(state, action) {
 			state.userReactionPanelState = action.payload;
 		},
+		setMessageMatchWithRef(state, action) {
+			state.messageMatchWithRef = action.payload;
+		},
+		setPositionOfSmileButton(state, action) {
+			state.positionOfSmileButton = action.payload;
+		},
 	},
 });
 
@@ -168,3 +188,7 @@ export const selectMessageReacted = createSelector(getReactionState, (state: Rea
 export const selectDataReactionCombine = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
 
 export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
+
+export const selectMessageMatchWithRef = createSelector(getReactionState, (state: ReactionState) => state.messageMatchWithRef);
+
+export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (state: ReactionState) => state.positionOfSmileButton);

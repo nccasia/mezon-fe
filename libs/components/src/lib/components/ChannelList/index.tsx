@@ -1,4 +1,4 @@
-import { UserRestrictionZone, useApp, useCategory, useClanRestriction, useEscapeKey } from '@mezon/core';
+import { UserRestrictionZone, useApp, useCategory, useClanRestriction, useClans, useEscapeKey } from '@mezon/core';
 import { categoriesActions, channelsActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -15,6 +15,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const { appearanceTheme } = useApp();
+	const { currentClan } = useClans();
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
@@ -54,11 +55,14 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] thread-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			id="channelList"
 			role="button"
 		>
 			{<CreateNewChannelModal />}
+			{currentClan?.banner && (
+				<div className="h-[136px]">{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}</div>
+			)}
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events />
 			</div>

@@ -24,7 +24,6 @@ export const styles = StyleSheet.create({
         color: Colors.white,
         fontSize: 20,
         marginLeft: 10,
-        fontWeight: 600
     },
     confirm: {
         color: Colors.white,

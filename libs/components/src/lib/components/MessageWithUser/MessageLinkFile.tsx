@@ -37,18 +37,18 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		<div
 			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
-			className={`break-all w-[430px] cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded  ${hideTheInformationFile ? 'border-[#232428] bg-[#2B2D31] border-2' : ''}  relative`}
+			className={`break-all w-[430px] cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded  ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
 			<div className="flex items-center">{thumbnailAttachment}</div>
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
 					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
-					<p>size: {formatFileSize(attachmentData.size || 0)}</p>
+					<p className='dark:text-textDarkTheme text-textLightTheme'>size: {formatFileSize(attachmentData.size || 0)}</p>
 				</div>
 			)}
 			{hideTheInformationFile && hoverShowOptButtonStatus && (
-				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md bg-[#313338] flex flex-row justify-center items-center">
+				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
 					<div
 						onClick={handleDownload}
 						role="button"

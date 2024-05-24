@@ -9,6 +9,11 @@ export type EventModalProps = {
 	onClose: () => void;
 };
 
+enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
+
 const EventModal = (props: EventModalProps) => {
 	const { open, onClose } = props;
 	const { userProfile } = useAuth();
@@ -17,7 +22,7 @@ const EventModal = (props: EventModalProps) => {
 	const { allEventManagement } = useEventManagement();
 
 	return open ? (
-		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 text-white">
+		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black">
 			<div className={`relative w-full sm:h-auto ${openModal ? 'max-w-[472px]' : 'max-w-[600px]'}`}>
 				<div className="rounded-lg overflow-hidden text-sm">
 					{!openModal ? (
@@ -46,7 +51,7 @@ const EventModal = (props: EventModalProps) => {
 								<div className='dark:bg-[#313339] bg-white max-h-80 h-80 overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col'>
 									{allEventManagement.map((event, index)=>{
 										return <div key={index}>
-											<ItemEventManagement topic={event.title || ''} voiceChannel={event.channel_id || ''} titleEvent={event.title || ''} address={event.address} option=""/>
+											<ItemEventManagement topic={event.title || ''} voiceChannel={event.channel_id || ''} titleEvent={event.title || ''} address={event.address} option={event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER} logoRight={event.logo}/>
 										</div>
 									})}
 								</div> :

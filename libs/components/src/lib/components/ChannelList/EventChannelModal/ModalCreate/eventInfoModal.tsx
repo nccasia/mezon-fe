@@ -2,18 +2,31 @@ import { TextArea } from '@mezon/ui';
 import { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { handleUploadFile, useMezon } from '@mezon/transport';
+
+enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
 
 export type EventInfoModalProps = {
 	topic: string;
 	description: string;
+	option: string;
+	logo: string;
+	selectedDateStart: Date;
+	selectedDateEnd: Date;
+	setSelectedDateStart: (value: Date) => void;
+	setSelectedDateEnd: (value: Date) => void;
+	setLogo: (value: string) => void;
 	handleTopic: (content: string) => void;
-	handleTime: (time: string) => void;
+	handleTimeStart: (time: string) => void;
+	handleTimeEnd: (time: string) => void;
 	handleDescription: (content: string) => void;
 };
 
 const EventInfoModal = (props: EventInfoModalProps) => {
-	const { topic, description, handleTopic, handleTime, handleDescription } = props;
-	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const { topic, description, option, logo, selectedDateStart, selectedDateEnd, setSelectedDateStart, setSelectedDateEnd, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription } = props;
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1024);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -26,8 +39,12 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		'Every weekday (Monday to Friday)',
 	];
 
-	const handleDateChange = (date: Date) => {
-		setSelectedDate(date);
+	const handleDateChangeStart = (date: Date) => {
+		setSelectedDateStart(date);
+	};
+
+	const handleDateChangeEnd = (date: Date) => {
+		setSelectedDateEnd(date);
 	};
 
 	const renderOptions = () => {
@@ -50,12 +67,31 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		setCountCharacterDescription(1024 - e.target.value.length);
 	};
 
-	const handleChangeTime = (e:any)=>{
-		handleTime(e.target.value);
+	const handleChangeTimeStart = (e:any)=>{
+		handleTimeStart(e.target.value);
 	}
 
+	const handleChangeTimeEnd = (e:any)=>{
+		handleTimeEnd(e.target.value);
+	}
+
+	const { sessionRef, clientRef } = useMezon();
+	const handleFile = (e: any) => {
+		const file = e?.target?.files[0];
+		const fullfilename = file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+			setLogo(attachment.url ?? '');
+		});
+	};
+
 	return (
-		<div>
+		<div className='max-h-[500px] overflow-y-auto hide-scrollbar'>
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold">Event Topic</h3>
 				<input
@@ -73,8 +109,8 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<DatePicker
 						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 						wrapperClassName="w-full"
-						selected={selectedDate}
-						onChange={handleDateChange}
+						selected={selectedDateStart}
+						onChange={handleDateChangeStart}
 						dateFormat="dd/MM/yyyy"
 						minDate={new Date()}
 					/>
@@ -82,14 +118,39 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<div className="w-1/2">
 					<h3 className="uppercase text-[11px] font-semibold ">Start Time</h3>
 					<select
-						name="time"
-						onChange={handleChangeTime}
+						name="timeStart"
+						onChange={handleChangeTimeStart}
 						className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 					>
 						{renderOptions()}
 					</select>
 				</div>
 			</div>
+			{option === OptionEvent.OPTION_LOCATION && 
+				<div className="mb-4 flex gap-x-4">
+					<div className="w-1/2">
+						<h3 className="uppercase text-[11px] font-semibold ">End Date</h3>
+						<DatePicker
+							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
+							wrapperClassName="w-full"
+							selected={selectedDateEnd}
+							onChange={handleDateChangeEnd}
+							dateFormat="dd/MM/yyyy"
+							minDate={new Date()}
+						/>
+					</div>
+					<div className="w-1/2">
+						<h3 className="uppercase text-[11px] font-semibold ">End Time</h3>
+						<select
+							name="timeEnd"
+							onChange={handleChangeTimeEnd}
+							className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+						>
+							{renderOptions()}
+						</select>
+					</div>
+				</div>
+			}
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold">Event Frequency</h3>
 				<select
@@ -116,6 +177,19 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					></TextArea>
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterDescription}</p>
 				</div>
+			</div>
+			<div className="mb-4">
+				<h3 className="uppercase text-[11px] font-semibold">Cover Image</h3>
+				<label>
+					<div
+						className="text-white font-medium bg-bgSelectItem hover:bg-bgSelectItemHover rounded px-4 py-2 my-2 w-fit"
+						onChange={(e) => handleFile(e)}
+					>
+						Upload Image
+					</div>
+					<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
+				</label>
+				{logo && <img src={logo} alt="logo" className='max-h-[180px] rounded w-full object-cover'/> }
 			</div>
 		</div>
 	);

@@ -1,17 +1,19 @@
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType } from 'mezon-js';
+import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
+import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
-import { eventManagementActions } from '../eventManagement/eventManagement.slice';
+import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
+import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -47,6 +49,8 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermission());
+	thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({clanId}));
+	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan(clanId));
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
 	thunkAPI.dispatch(
@@ -100,6 +104,35 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
+export const updateClan = createAsyncThunk(
+	'clans/updateClans',
+	async ({ clan_id, banner, clan_name, creator_id, logo }: ApiUpdateClanDescRequest, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const request: ApiUpdateClanDescRequest = {
+				clan_id,
+				creator_id,
+				clan_name,
+				logo,
+				banner,
+			};
+
+			const response = await mezon.client.updateClanDesc(mezon.session, clan_id, request);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+
+			thunkAPI.dispatch(fetchClans());
+			return response;
+		} catch (error: any) {
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
+		}
+	},
+);
+
 type UpdateLinkUser = {
 	user_name: string;
 	avatar_url: string;
@@ -107,31 +140,34 @@ type UpdateLinkUser = {
 	about_me: string;
 };
 
-export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
-	try {
-		const mezon = ensureClient(getMezonCtx(thunkAPI));
-		const body = {
-			avatar_url: avatar_url || '',
-			display_name: display_name || '',
-			lang_tag: 'en',
-			location: '',
-			timezone: '',
-			username: user_name,
-			about_me: about_me,
-		};
-		const response = await mezon.client.updateAccount(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+export const updateUser = createAsyncThunk(
+	'clans/updateUser',
+	async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
+		try {
+			const mezon = ensureClient(getMezonCtx(thunkAPI));
+			const body = {
+				avatar_url: avatar_url || '',
+				display_name: display_name || '',
+				lang_tag: 'en',
+				location: '',
+				timezone: '',
+				username: user_name,
+				about_me: about_me,
+			};
+			const response = await mezon.client.updateAccount(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			if (response) {
+				thunkAPI.dispatch(getUserProfile());
+			}
+			return response as true;
+		} catch (error: any) {
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-		if (response) {
-			thunkAPI.dispatch(getUserProfile());
-		}
-		return response as true;
-	} catch (error: any) {
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
+	},
+);
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -205,6 +241,7 @@ export const clansActions = {
 	...clansSlice.actions,
 	fetchClans,
 	createClan,
+	updateClan,
 	changeCurrentClan,
 	updateUser,
 };

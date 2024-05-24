@@ -19,7 +19,6 @@ export interface GifsState extends EntityState<GifCategoriesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	dataGifsSearch: GifEntity[];
-	valueInputToCheckHandleSearchState?: string;
 	dataGifsFeatured: GifEntity[];
 	trendingClickingStatus: boolean;
 	categoriesStatus: boolean;
@@ -30,7 +29,6 @@ export const initialGifsState: GifsState = {
 	loadingStatus: 'not loaded',
 	error: null,
 	dataGifsSearch: [],
-	valueInputToCheckHandleSearchState: '',
 	dataGifsFeatured: [],
 	trendingClickingStatus: false,
 	categoriesStatus: false,
@@ -96,9 +94,7 @@ export const gifsSlice = createSlice({
 	reducers: {
 		add: gifsAdapter.addOne,
 		remove: gifsAdapter.removeOne,
-		setValueInputSearch: (state, action) => {
-			state.valueInputToCheckHandleSearchState = action.payload;
-		},
+
 		setClickedTrendingGif: (state, action) => {
 			state.trendingClickingStatus = action.payload;
 		},
@@ -169,8 +165,6 @@ export const selectGifsEntities = createSelector(getGifsState, selectEntities);
 export const selectGifsDataSearch = createSelector(getGifsState, (state: GifsState) => state.dataGifsSearch);
 
 export const selectLoadingStatusGifs = createSelector(getGifsState, (state: GifsState) => state.loadingStatus);
-
-export const selectValueInputSearch = createSelector(getGifsState, (state: GifsState) => state.valueInputToCheckHandleSearchState);
 
 export const selectDataGifsFeatured = createSelector(getGifsState, (state: GifsState) => state.dataGifsFeatured);
 

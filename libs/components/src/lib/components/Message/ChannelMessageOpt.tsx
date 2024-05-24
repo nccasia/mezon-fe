@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
-import { Ref, forwardRef, useState } from 'react';
+import { IMessageWithUser, SubPanelName } from '@mezon/utils';
+import { Ref, forwardRef, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
@@ -20,9 +20,6 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
-		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
 
@@ -42,22 +39,28 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
-	const handleClickReact = (event: any) => {
-		event.stopPropagation();
-		dispatch(reactionActions.setReactionRightState(true));
-		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
-		dispatch(referencesActions.setOpenReplyMessageState(false));
-		dispatch(reactionActions.setReactionBottomState(false));
-		setSubPanelActive(SubPanelName.NONE);
-		const rect = (event.target as HTMLElement).getBoundingClientRect();
-		const distanceToBottom = window.innerHeight - rect.bottom;
-		if (distanceToBottom > 550) {
-			dispatch(reactionActions.setReactionTopState(true));
-		} else {
-			dispatch(reactionActions.setReactionTopState(false));
-		}
+	const handleOnEnterSmileIcon = () => {
+		dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
 	};
+
+	const handleOnEnterReplyIcon = () => {
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+	};
+
+	const handleClickReact = useCallback(
+		(event: React.MouseEvent<HTMLDivElement>) => {
+			setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT);
+			event.stopPropagation();
+			const rect = (event.target as HTMLElement).getBoundingClientRect();
+			const distanceToBottom = window.innerHeight - rect.bottom;
+			if (distanceToBottom > 550) {
+				dispatch(reactionActions.setReactionTopState(true));
+			} else {
+				dispatch(reactionActions.setReactionTopState(false));
+			}
+		},
+		[setSubPanelActive],
+	);
 
 	const handleThread = () => {
 		setThread(!thread);
@@ -68,7 +71,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	return (
 		<div ref={ref} className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
+			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnterSmileIcon}>
 				<Icons.Smile defaultSize="w-5 h-5" />
 			</div>
 
@@ -77,7 +80,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 					<Icons.PenEdit />
 				</button>
 			) : (
-				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
+				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180" onMouseEnter={handleOnEnterReplyIcon}>
 					<Icons.Reply />
 				</button>
 			)}

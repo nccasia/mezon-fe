@@ -6,6 +6,7 @@ import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { ChannelType } from 'mezon-js';
+import { fetchChannelsCached } from '../channels/channels.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -56,7 +57,7 @@ type fetchDmGroupArgs = {
 export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2 }: fetchDmGroupArgs, thunkAPI) => {
 	thunkAPI.dispatch(friendsActions.fetchListFriends());
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', '', channelType);
+	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
 	
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);

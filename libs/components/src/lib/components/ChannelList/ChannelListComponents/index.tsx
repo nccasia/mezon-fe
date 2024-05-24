@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams } from '@mezon/core';
+import { useAppNavigation, useAppParams, useEventManagement } from '@mezon/core';
 import { selectCurrentClanId } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import EventModal from '../EventChannelModal';
 export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
+	const { numberEventManagement } = useEventManagement();
 
 	const currentClanId = useSelector(selectCurrentClanId);
 
@@ -38,9 +39,11 @@ export const Events = () => {
 					</div>
 					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">3 Events</div>
 				</div>
-				<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
-					<div className="text-white text-xs font-medium">1</div>
-				</div>
+				{numberEventManagement !== 0 &&
+					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
+						<div className="text-white text-xs font-medium">{numberEventManagement}</div>
+					</div>
+				}
 			</div>
 
 			<Link

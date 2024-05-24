@@ -48,6 +48,7 @@ export default function MemberListStatus() {
                     <View style={style.box}>
                         {offlineMembers.map((user) => (
                             <MemberItem
+                                key={user.id}
                                 user={user}
                                 isOffline={true}
                             />

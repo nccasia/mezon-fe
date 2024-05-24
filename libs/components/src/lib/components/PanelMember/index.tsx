@@ -1,7 +1,9 @@
 import { useAuth } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
@@ -13,13 +15,9 @@ type PanelMemberProps = {
 	onRemoveMember: () => void;
 };
 
-const typeChannel = {
-	text: 1,
-	voice: 4,
-};
-
 const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
+	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 
@@ -38,13 +36,12 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 		<div
 			ref={panelRef}
 			onMouseDown={(e) => e.stopPropagation()}
-			onClick={(e) => console.log(123)}
 			style={{
 				left: coords.mouseX - 250,
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
 			}}
-			className="fixed top-full bg-bgProfileBody rounded-sm shadow z-20 w-[250px] py-[10px] px-[10px]"
+			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary rounded-sm shadow z-20 w-[250px] py-[10px] px-[10px]"
 		>
 			<GroupPanelMember>
 				<ItemPanelMember children="Profile" />
@@ -66,7 +63,7 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 					)}
 					label=""
 					placement="left-start"
-					className="!bg-bgProfileBody !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemPanelMember children="Komu" />
 					<ItemPanelMember children="Clan 1" />
@@ -76,12 +73,14 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 				<ItemPanelMember children="Remove Friend" />
 				<ItemPanelMember children="Block" />
 			</GroupPanelMember>
-			<GroupPanelMember>
-				<ItemPanelMember children="Move View" />
-				<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
-				<ItemPanelMember onClick={handleRemoveMember} children={`Kick ${member?.user?.username}`} danger />
-				<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
-			</GroupPanelMember>
+			{userProfile?.user?.id === currentChannel?.creator_id && (
+				<GroupPanelMember>
+					<ItemPanelMember children="Move View" />
+					<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
+					<ItemPanelMember onClick={handleRemoveMember} children={`Kick ${member?.user?.username}`} danger />
+					<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
+				</GroupPanelMember>
+			)}
 		</div>
 	);
 };

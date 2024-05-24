@@ -10,13 +10,13 @@ import Animated, {
   Extrapolate,
   interpolateColor,
 } from 'react-native-reanimated';
-import { styles } from './MezonRadioButton.styles';
+import { styles } from './MezonToggleButton.styles';
 import { Colors } from '@mezon/mobile-ui';
 
 const SWITCH_BUTTON_PADDING = 4;
 const InterpolateXInput = [0, 1];
 
-const MezonRadioButton = ({
+const MezonToggleButton = ({
   onChange,
   value = false,
   containerStyle ={},
@@ -96,4 +96,4 @@ const MezonRadioButton = ({
   );
 };
 
-export default MezonRadioButton;
+export default MezonToggleButton;

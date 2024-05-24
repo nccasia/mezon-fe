@@ -7,10 +7,11 @@ type ThreadHeaderProps = {
 };
 
 const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
-	const { setNameValueThread, setIsShowCreateThread } = useThreads();
+	const { setNameValueThread, setIsShowCreateThread, setTurnOffThreadMessage } = useThreads();
 	const { setValueTextInput } = useMessageValue();
 
 	const handleCloseModal = () => {
+		setTurnOffThreadMessage();
 		setIsShowCreateThread(false);
 		setNameValueThread('');
 		setValueTextInput('', true);

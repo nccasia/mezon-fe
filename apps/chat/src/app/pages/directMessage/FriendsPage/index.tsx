@@ -38,7 +38,7 @@ export default function FriendsPage() {
 	const handleChange = (key: string, value: string) => {
 		switch (key) {
 			case 'username':
-				if (value.trim()) {
+				if ((value || '').trim()) {
 					setRequestAddFriend({ ...requestAddFriend, usernames: [value] });
 				} else {
 					setRequestAddFriend({ ...requestAddFriend, usernames: [] });

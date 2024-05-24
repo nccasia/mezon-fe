@@ -1,4 +1,4 @@
-import { useApp, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -24,6 +24,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
 	const { appearanceTheme } = useApp();
+	const { setTurnOffThreadMessage } = useThreads();
 
 	return (
 		<div
@@ -58,10 +59,12 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<div className="justify-end items-center gap-2 flex">
 							<div className="hidden ssm:flex">
 								<div className="relative justify-start items-center gap-[15px] flex mr-4">
-									<ThreadButton isLightMode={appearanceTheme==='light'}/>
-									<MuteButton isLightMode={appearanceTheme==='light'}/>
-									<PinButton isLightMode={appearanceTheme==='light'}/>
-									<ChannelListButton isLightMode={appearanceTheme==='light'}/>
+									<ThreadButton isLightMode={appearanceTheme === 'light'} />
+									<MuteButton isLightMode={appearanceTheme === 'light'} />
+									<PinButton isLightMode={appearanceTheme === 'light'} />
+									<div onClick={() => setTurnOffThreadMessage()}>
+										<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+									</div>
 								</div>
 								<SearchMessage />
 							</div>
@@ -69,8 +72,8 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightModeSecond'}`}
 								id="inBox"
 							>
-								<InboxButton isLightMode={appearanceTheme==='light'}/>
-								<HelpButton isLightMode={appearanceTheme==='light'}/>
+								<InboxButton isLightMode={appearanceTheme === 'light'} />
+								<HelpButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 							<div className="ssm:hidden mr-5">
 								<ChannelListButton />
@@ -83,7 +86,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	);
 }
 
-function ThreadButton({ isLightMode } : { isLightMode:boolean }) {
+function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -96,7 +99,13 @@ function ThreadButton({ isLightMode } : { isLightMode:boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500" style = { isLightMode ? 'light' : 'dark' }>
+			<Tooltip
+				className={`${isShowThread && 'hidden'}`}
+				content="Threads"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
 				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
@@ -106,7 +115,7 @@ function ThreadButton({ isLightMode } : { isLightMode:boolean }) {
 	);
 }
 
-function MuteButton({ isLightMode } : { isLightMode:boolean }) {
+function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -123,7 +132,7 @@ function MuteButton({ isLightMode } : { isLightMode:boolean }) {
 				content="Notification Settings"
 				trigger="hover"
 				animation="duration-500"
-				style = { isLightMode ? 'light' : 'dark' }
+				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.MuteBell />
@@ -134,7 +143,7 @@ function MuteButton({ isLightMode } : { isLightMode:boolean }) {
 	);
 }
 
-function PinButton({ isLightMode } : { isLightMode:boolean }) {
+function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -146,7 +155,13 @@ function PinButton({ isLightMode } : { isLightMode:boolean }) {
 	useEscapeKey(() => setIsShowPinMessage(false));
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<Tooltip className={`${isShowPinMessage && 'hidden'} w-[142px]`} content="Pinned Messages" trigger="hover" animation="duration-500" style = { isLightMode ? 'light' : 'dark' }>
+			<Tooltip
+				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
+				content="Pinned Messages"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
 				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
 				</button>
@@ -156,7 +171,7 @@ function PinButton({ isLightMode } : { isLightMode:boolean }) {
 	);
 }
 
-export function InboxButton({ isLightMode } : { isLightMode?:boolean }) {
+export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 
@@ -169,7 +184,7 @@ export function InboxButton({ isLightMode } : { isLightMode?:boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style = { isLightMode ? 'light' : 'dark' }>
+			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox />
 				</button>
@@ -179,28 +194,32 @@ export function InboxButton({ isLightMode } : { isLightMode?:boolean }) {
 	);
 }
 
-export function HelpButton({ isLightMode } : { isLightMode?:boolean }) {
+export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 	return (
-		<Tooltip content="Help" trigger="hover" animation="duration-500" style = { isLightMode ? 'light' : 'dark' }>
-			<button>
-				<Icons.Help />
-			</button>
-		</Tooltip>
+		<div className="relative leading-5 h-5">
+			<Tooltip content="Help" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+				<button>
+					<Icons.Help />
+				</button>
+			</Tooltip>
+		</div>
 	);
 }
 
-function ChannelListButton({ isLightMode } : { isLightMode?:boolean }) {
+function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
 	};
 	return (
-		<Tooltip content="Members" trigger="hover" animation="duration-500" style = { isLightMode ? 'light' : 'dark' }>
-			<button onClick={handleClick}>
-				<Icons.MemberList isWhite={isActive} />
-			</button>
-		</Tooltip>
+		<div className="relative leading-5 h-5">
+			<Tooltip content="Members" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+				<button onClick={handleClick}>
+					<Icons.MemberList isWhite={isActive} />
+				</button>
+			</Tooltip>
+		</div>
 	);
 }
 

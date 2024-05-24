@@ -12,5 +12,6 @@ export enum EMessageActionType {
     PinMessage,
     MarkUnRead,
     Mention,
-    CopyMessageLink
+    CopyMessageLink,
+    Report,
 }

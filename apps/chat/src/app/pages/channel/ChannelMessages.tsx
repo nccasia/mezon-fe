@@ -58,7 +58,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className={`dark:bg-bgPrimary
+			className={`dark:bg-bgPrimary pb-5
 			bg-bgLightModeSecond
 			relative h-full overflow-y-scroll
 			overflow-x-hidden flex-col flex

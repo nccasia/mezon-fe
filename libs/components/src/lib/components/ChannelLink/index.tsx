@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useAuth, useClans, useMenu, useOnClickOutside, useReference } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
@@ -86,13 +86,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 		voice.setVoiceOptions((prev) => ({
 			...prev,
-			userId: userProfile?.user?.id,
-			channelId: id,
-			channelName: voiceChannelName.toLowerCase(),
-			clanId: clanId ?? '',
-			clanName: currentClan?.clan_name ?? '',
-			displayName: userProfile?.user?.username ?? '',
-			voiceStart: true,
+			voiceChannelName: voiceChannelName
 		}));
 
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
@@ -105,7 +99,9 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	};
 
 	const { closeMenu, setStatusMenu } = useMenu();
+	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
+		setTurnOffThreadMessage();
 		setReferenceMessage(null);
 		setOpenEditMessageState(false);
 		setOpenReplyMessageState(false);
@@ -203,7 +199,9 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 						onClick={handleCreateLinkInvite}
 					/>
 					{numberNotication !== 0 && (
-						<div className="absolute ml-auto w-4 h-4  top-[2px] text-white  right-3 group-hover:hidden">{numberNotication}</div>
+						<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs">
+							{numberNotication}
+						</div>
 					)}
 				</>
 			)}

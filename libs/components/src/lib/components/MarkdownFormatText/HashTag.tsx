@@ -28,7 +28,7 @@ const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
 			<Link
 				style={{ textDecoration: 'none' }}
 				to={channelPath}
-				className="cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white bg-[#3C4270] hover:bg-[#5865F2]"
+				className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 			>
 				{tagName.startsWith('#') && getChannelById(tagName.slice(1)) && `#${getChannelById(tagName.slice(1)).channel_label}`}
 			</Link>

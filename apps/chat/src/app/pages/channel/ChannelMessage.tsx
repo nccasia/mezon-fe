@@ -1,12 +1,28 @@
-import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useReference } from '@mezon/core';
+import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
+import {
+	useApp,
+	useChannels,
+	useChatMessage,
+	useChatReaction,
+	useChatSending,
+	useDeleteMessage,
+	useDirect,
+	useEmojiSuggestion,
+	useEscapeKey,
+	useReference,
+} from '@mezon/core';
 import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Mention, MentionsInput } from 'react-mentions';
 import { useSelector } from 'react-redux';
-
+import lightMentionsInputStyle from './LightRmentionInputStyle';
+import darkMentionsInputStyle from './RmentionInputStyle';
+import mentionStyle from './RmentionStyle';
+import { useMessageLine } from 'libs/components/src/lib/components/MessageWithUser/useMessageLine';
 type MessageProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
@@ -15,6 +31,20 @@ type MessageProps = {
 	channelId: string;
 	channelLabel: string;
 };
+
+type ChannelsMentionProps = {
+	id: string;
+	display: string;
+	subText: string;
+};
+
+type EmojiData = {
+	id: string;
+	emoji: string;
+	display: string;
+};
+
+const neverMatchingRegex = /($a)/;
 
 export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
@@ -37,8 +67,27 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		return message;
 	}, [message]);
 
+	const convertToPlainTextHashtag = (text: string) => {
+		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
+		const result = text.replace(regex, (match, symbol, p1, p2) => {
+			return symbol === '#' ? `#${p2}` : `@${p1}`;
+		});
+		return result;
+	};
+	
 	const [editMessage, setEditMessage] = useState(mess.content.t);
+	const [content, setContent] = useState(editMessage);
+	useEffect(()=>{
+		setContent(editMessage);
+	}, [editMessage])
 	const [newMessage, setNewMessage] = useState('');
+
+	useEffect(() => {
+		if (editMessage) {
+			const convertedHashtag = convertToPlainTextHashtag(editMessage);
+			setContent(convertedHashtag);
+		}
+	}, [editMessage]);
 
 	const messPre = useMemo(() => {
 		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
@@ -55,9 +104,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (editMessage) {
-				handleSend(editMessage, message.id);
-				setNewMessage(editMessage);
+			if (content) {
+				handleSend(content, message.id);
+				setNewMessage(content);
 				handleCancelEdit();
 			}
 		}
@@ -68,9 +117,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		}
 	};
 	const handelSave = () => {
-		if (editMessage) {
-			handleSend(editMessage, message.id);
-			setNewMessage(editMessage);
+		if (content) {
+			handleSend(content, message.id);
+			setNewMessage(content);
 			handleCancelEdit();
 		}
 	};
@@ -81,15 +130,11 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		},
 		[EditSendMessage],
 	);
-	const onchange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setEditMessage(e.target.value);
-		updateTextareaHeight(e.target);
-	};
-	const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
-		textarea.style.height = 'auto';
-		textarea.style.height = textarea.scrollHeight + 'px';
-	};
-	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	// const onchange = (e: any) => {
+	// 	setEditMessage(e.target.value);
+	// };
+
+	const textareaRef = useRef<any>(null);
 	useEffect(() => {
 		if (openEditMessageState && mess.id === referenceMessage?.id) {
 			textareaRef.current?.focus();
@@ -102,7 +147,32 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		}
 	};
 
+	const { emojis } = useEmojiSuggestion();
+	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
+		if (query.length === 0) return;
+		const matches = emojis
+			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.slice(0, 20)
+			.map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }));
+		callback(matches);
+	};
+
+	const mentionList = UserMentionList(channelId);
+	const { listChannels } = useChannels();
+	const listChannelsMention = listChannels.map((item) => {
+		return {
+			id: item?.channel_id ?? '',
+			display: item?.channel_label ?? '',
+			subText: item?.category_name ?? '',
+		};
+	}) as ChannelsMentionProps[];
+
 	useEscapeKey(handleCancelEdit);
+
+	const { appearanceTheme } = useApp();
+
+
+
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
@@ -128,17 +198,57 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 
 			{openEditMessageState && mess.id === referenceMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-21px]">
-					<textarea
+					<MentionsInput
 						onFocus={handleFocus}
-						ref={textareaRef}
-						defaultValue={mess.content.t}
+						inputRef={textareaRef}
+						value={editMessage}
 						className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
 						onKeyDown={onSend}
-						onChange={(e) => {
-							onchange(e);
+						onChange={(e, newValue) => {
+							setEditMessage(newValue);
 						}}
 						rows={editMessage?.split('\n').length}
-					></textarea>
+						forceSuggestionsAboveCursor={true}
+						style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
+					>
+						<Mention
+							appendSpaceOnAdd={true}
+							data={mentionList ?? []}
+							trigger="@"
+							displayTransform={(id: any, display: any) => {
+								return `@${display}`;
+							}}
+							renderSuggestion={(suggestion) => (
+								<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+							)}
+							className="dark:bg-[#3B416B] bg-bgLightModeButton"
+							style={mentionStyle}
+						/>
+						<Mention
+							markup="#[__display__](__id__)"
+							appendSpaceOnAdd={true}
+							data={listChannelsMention ?? []}
+							trigger="#"
+							displayTransform={(id: any, display: any) => {
+								return `#${display}`;
+							}}
+							style={mentionStyle}
+							renderSuggestion={(suggestion) => (
+								<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
+							)}
+							className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						/>
+						<Mention
+							trigger=":"
+							markup="__id__"
+							regex={neverMatchingRegex}
+							data={queryEmojis}
+							renderSuggestion={(suggestion) => (
+								<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
+							)}
+							className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						/>
+					</MentionsInput>
 					<div className="text-xs flex">
 						<p className="pr-[3px]">escape to</p>
 						<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
@@ -278,18 +388,30 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	};
 	const checkUser = userId === message.sender_id;
 	return (
-		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
+		<div
+			className={`dark:bg-[#151515] bg-bgLightMode rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}
+		>
 			<ul className="flex flex-col gap-1">
 				{checkUser && (
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit} role="button" aria-hidden>
+					<li
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
+						onClick={handleClickEdit}
+						role="button"
+						aria-hidden
+					>
 						Edit Message
 					</li>
 				)}
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply} role="button" aria-hidden>
+				<li
+					className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
+					onClick={handleClickReply}
+					role="button"
+					aria-hidden
+				>
 					Reply
 				</li>
 				<li
-					className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer"
+					className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
 					onClick={() => {
 						handleClickForward();
 					}}
@@ -299,14 +421,19 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 					Forward message
 				</li>
 				<CopyToClipboard text={message.content.t || ''}>
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy} role="button" aria-hidden>
+					<li
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
+						onClick={handleClickCopy}
+						role="button"
+						aria-hidden
+					>
 						Copy Text
 					</li>
 				</CopyToClipboard>
 
 				{checkUser && (
 					<li
-						className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]"
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird rounded-lg text-[15px] cursor-pointer text-[#ff0000]"
 						onClick={handleClickDelete}
 						role="button"
 						aria-hidden

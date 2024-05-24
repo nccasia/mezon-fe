@@ -35,6 +35,9 @@ import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
+import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
+import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -82,6 +85,10 @@ const reducer = {
 	direct: directReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
+	notificationsetting: notificationSettingReducer,
+	defaultnotificationclan: defaultNotificationClanReducer,
+	defaultnotificationcategory: defaultNotificationCategoryReducer,
+	notichannelcategorysetting: channelCategorySettingReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,

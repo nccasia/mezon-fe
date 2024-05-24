@@ -4,10 +4,15 @@ import { styles } from './styles'
 import {useNavigation} from '@react-navigation/native'
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { ThreadIcon } from '@mezon/mobile-components';
+import { useReference, useThreads } from '@mezon/core';
 
 export default function CreateThreadModal() {
+  const { setValueThread } = useThreads();
+  const { setOpenThreadMessageState } = useReference();
   const navigation = useNavigation();
   const handleNavigateCreateForm = () =>{
+    setOpenThreadMessageState(false);
+    setValueThread(null);
     navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL});
   }
   return (

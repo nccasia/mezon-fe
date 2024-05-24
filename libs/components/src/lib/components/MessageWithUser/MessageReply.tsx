@@ -10,8 +10,8 @@ type MessageReplyProps = {
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
-	const [messageRefId, setMessageId] = useState<string>('')
-	const [senderId, setSenderId] = useState<string>('')
+	const [messageRefId, setMessageId] = useState<string>('');
+	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const dispatch = useDispatch();

@@ -1,17 +1,10 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useApp, useAppNavigation, useFriends, useMenu } from '@mezon/core';
-import {
-	gifsStickerEmojiActions,
-	messagesActions,
-	reactionActions,
-	referencesActions,
-	selectAllClans,
-	selectCurrentChannel,
-	selectCurrentClan,
-} from '@mezon/store';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,20 +27,9 @@ function MyApp() {
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const handleClickOutside = () => {
-		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(reactionActions.setReactionBottomState(false));
-		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
-		dispatch(reactionActions.setReactionBottomStateResponsive(false));
-	};
 
-	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
-		setAppearanceTheme(appearanceTheme);
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
 				setCloseMenu(true);
@@ -109,18 +91,24 @@ function MyApp() {
 		};
 	}, []);
 
+	const openPopupForward = useSelector(getIsShowPopupForward);
+	const handleCloseModalForward = () => {
+		dispatch(toggleIsShowPopupForwardFalse());
+	};
 
+	const { appearanceTheme } = useApp();
 	return (
-		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
+		<div className="flex h-screen text-gray-100 overflow-hidden relative">
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')} clanName='DM'>
+					<NavLinkComponent active={pathName.includes('direct')} clanName="DM">
 						<div>
-							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} className="clan" />
+							<Image src={`/assets/images/${appearanceTheme === "dark" ? "mezon-logo-black.svg" : "mezon-logo-white.svg"}`} alt={'logoMezon'} width={48} height={48} className="clan w-full aspect-square" />
 							{quantityPendingRequest !== 0 && (
 								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{quantityPendingRequest}

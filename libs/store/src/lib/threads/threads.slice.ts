@@ -80,7 +80,7 @@ export const threadsSlice = createSlice({
 		setNameThreadError: (state, action: PayloadAction<string>) => {
 			state.nameThreadError = action.payload;
 		},
-		setValueThread: (state, action: PayloadAction<IMessageWithUser>) => {
+		setValueThread: (state, action: PayloadAction<IMessageWithUser | null>) => {
 			state.valueThread = action.payload;
 		},
 		setMessageThreadError: (state, action: PayloadAction<string>) => {

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { BarsIcon, HashSignIcon, SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { Keyboard, KeyboardEvent, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IKeyboardType } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
+import Toast from "react-native-toast-message";
 import { useAnimatedKeyboard } from 'react-native-reanimated';
 import { useEffect } from 'react';
 
@@ -97,7 +98,10 @@ const HomeDefault = React.memo((props: any) => {
 								bottomSheetRef={bottomKeyboardRef}
 							/>
 						) : keyboardType === 'attachment' ? (
-							<AttachmentPicker onDone={() => handleHideKeyboard("attachment")} />
+							<AttachmentPicker
+								currentChannelId={currentChannel.channel_id}
+								currentClanId={currentChannel.clan_id}
+								onDone={() => handleHideKeyboard("attachment")} />
 						) : (
 							<View />
 						)}
@@ -122,6 +126,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 						style={styles.iconBar}
 						onPress={() => {
 							navigation.openDrawer();
+							Keyboard.dismiss();
 						}}
 					>
 						<BarsIcon width={20} height={20} color={Colors.white} />
@@ -133,7 +138,9 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
+			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+				<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
+			</TouchableOpacity>
 		</View>
 	);
 });

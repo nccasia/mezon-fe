@@ -8,7 +8,6 @@ import {
 	selectGifsDataSearch,
 	selectLoadingStatusGifs,
 	selectTrendingClickingStatus,
-	selectValueInputSearch,
 } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,7 +18,6 @@ export function useGifs() {
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
 	const dataGifsFeartured = useSelector(selectDataGifsFeatured);
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);
-	const valueInputToCheckHandleSearch = useSelector(selectValueInputSearch);
 	const trendingClickingStatus = useSelector(selectTrendingClickingStatus);
 	const categoriesStatus = useSelector(selectCategoriesStatus);
 	const buttonArrowBackStatus = useSelector(selectButtonArrowBackStatus);
@@ -27,13 +25,6 @@ export function useGifs() {
 	const fetchGifsDataSearch = useCallback(
 		(valueSearch: string) => {
 			dispatch(gifsActions.fetchGifsDataSearch(valueSearch));
-		},
-		[dispatch],
-	);
-
-	const setValueInputSearch = useCallback(
-		(valueSearch: string) => {
-			dispatch(gifsActions.setValueInputSearch(valueSearch));
 		},
 		[dispatch],
 	);
@@ -67,8 +58,6 @@ export function useGifs() {
 			dataGifCategories,
 			dataGifsSearch,
 			loadingStatusGifs,
-			valueInputToCheckHandleSearch,
-			setValueInputSearch,
 			fetchGifsDataFeatured,
 			dataGifsFeartured,
 			trendingClickingStatus,
@@ -76,15 +65,13 @@ export function useGifs() {
 			categoriesStatus,
 			setShowCategories,
 			buttonArrowBackStatus,
-			setButtonArrowBack
+			setButtonArrowBack,
 		}),
 		[
 			dataGifCategories,
 			fetchGifsDataSearch,
 			dataGifsSearch,
 			loadingStatusGifs,
-			valueInputToCheckHandleSearch,
-			setValueInputSearch,
 			fetchGifsDataFeatured,
 			dataGifsFeartured,
 			trendingClickingStatus,

@@ -12,6 +12,11 @@ enum Tabs_Option {
 	REVIEW = 2,
 }
 
+enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
+
 export type ModalCreateProps = {
 	onClose: () => void;
 	onCloseEventModal: () => void;
@@ -21,11 +26,15 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const { onClose, onCloseEventModal } = props;
 	const [currentModal, setCurrentModal] = useState(0);
 	const [topic, setTopic] = useState('');
-	const [time, setTime] = useState('00:00');
+	const [timeStart, setTimeStart] = useState('00:00');
+	const [timeEnd, setTimeEnd] = useState('00:00');
+	const [selectedDateStart, setSelectedDateStart] = useState<Date>(new Date());
+	const [selectedDateEnd, setSelectedDateEnd] = useState<Date>(new Date());
 	const [voiceChannel, setVoiceChannel] = useState('');
 	const [buttonWork, setButtonWork] = useState(true);
 	const [titleEvent, setTitleEvent] = useState('');
 	const [option, setOption] = useState('');
+	const [logo, setLogo] = useState('');
 	const [description, setDescription] = useState('');
 	const { createEventManagement } = useEventManagement();
 	const { currentClanId } = useClans();
@@ -47,8 +56,12 @@ const ModalCreate = (props: ModalCreateProps) => {
 		setTopic(topic);
 	};
 
-	const handleTime = (time: string) => {
-		setTime(time);
+	const handleTimeStart = (time: string) => {
+		setTimeStart(time);
+	};
+
+	const handleTimeEnd = (time: string) => {
+		setTimeEnd(time);
 	};
 
 	const handleVoiceChannel = (channel: string) => {
@@ -74,18 +87,38 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}
 
 	const handleSubmit = async ()=>{
-		const timeValue = handleTimeISO(time);
-		await createEventManagement(currentClanId || '', voiceChannel, titleEvent, topic, timeValue, timeValue, description);
+
+		const voice = option === OptionEvent.OPTION_SPEAKER ? voiceChannel : '';
+		const title = option === OptionEvent.OPTION_LOCATION ? titleEvent : '';
+
+		const timeValueStart = handleTimeISO(selectedDateStart, timeStart);
+		const timeValueEnd = handleTimeISO(selectedDateStart, timeEnd);
+
+		if(!timeValueEnd){
+			await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueStart, description, logo);
+			hanldeCloseModal();
+			return;
+		}
+		await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueEnd, description, logo);
+		hanldeCloseModal();
+	}
+
+	const hanldeCloseModal = () =>{
 		onClose();
 		onCloseEventModal();
 	}
 
-	const handleTimeISO = (time:string)=>{
-		const currentDate = new Date();
-		const [hours, minutes] = time.split(':');
-		currentDate.setHours(parseInt(hours, 10));
-		currentDate.setMinutes(parseInt(minutes, 10));
-		return currentDate.toISOString();
+	const handleTimeISO = (fullDateStr: Date, timeStr: string)=>{
+		const date = new Date(fullDateStr);
+
+		const year = date.getFullYear();
+		const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+		const day = date.getDate().toString().padStart(2, '0');
+
+		const [hours, minutes] = timeStr.split(':').map(Number);
+		const isoDate = new Date(Date.UTC(year, Number(month) - 1, Number(day), hours, minutes));
+
+		return isoDate.toISOString();
 	}
 
 	useEffect(() => {
@@ -100,7 +133,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentModal, topic]);
 
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4" onClick={()=>console.log()}>
 			<div className="flex gap-x-4 mb-4">
 				{tabs.map((item, index) => {
 					const isCurrent = currentModal === index;
@@ -124,8 +157,24 @@ const ModalCreate = (props: ModalCreateProps) => {
 						handleTitleEvent={handleTitleEvent}
 					/>
 				)}
-				{currentModal === Tabs_Option.EVENT_INFO && <EventInfoModal topic={topic} handleTopic={handleTopic} handleTime={handleTime} description={description} handleDescription={handleDescription}/>}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} />}
+				{currentModal === Tabs_Option.EVENT_INFO && 
+					<EventInfoModal 
+						option={option} 
+						topic={topic} 
+						handleTopic={handleTopic} 
+						handleTimeStart={handleTimeStart} 
+						handleTimeEnd={handleTimeEnd} 
+						description={description} 
+						handleDescription={handleDescription} 
+						logo={logo} 
+						setLogo={setLogo} 
+						selectedDateStart = {selectedDateStart}
+						setSelectedDateStart = {setSelectedDateStart}
+						selectedDateEnd = {selectedDateEnd}
+						setSelectedDateEnd = {setSelectedDateEnd}
+					/>
+				}
+				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} logo={logo}/>}
 			</div>
 			<div className="flex justify-between mt-4 w-full">
 				<button

@@ -7,6 +7,7 @@ const chatBoxHeightThread = '60px';
 const clanWidth = '72px';
 const channelListWidth = '272px';
 const memberWidth = '245px';
+const memberWidthThread = '500px';
 const avatarWidth = '68px';
 const iconWidth = '160px';
 
@@ -27,6 +28,7 @@ module.exports = {
         '1': '1 1 0%',
         '2': '2 1 0%',
         '3': '3 1 0%',
+        '4': '4 1 0%',
       },
       typography: {
         sm: {
@@ -46,6 +48,7 @@ module.exports = {
       width: {
         // widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
         widthMessageViewChat: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth})`,
+        widthMessageViewChatThread: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidthThread})`,
         widthMessageWithUser: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
         widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
         widthMessageTextChat: `calc(100% - 40px)`,
@@ -53,6 +56,7 @@ module.exports = {
         widthSideBar: `calc(100vw - 72px)`,
         widthHeader: `calc(100% - 344px)`,
         widthMemberList: memberWidth,
+        widthNoMemberList: memberWidth,
         widthThumnailAttachment: `calc(100vw - ${clanWidth} - ${channelListWidth})`,
         450: '450px',
         "4/5": "80%",

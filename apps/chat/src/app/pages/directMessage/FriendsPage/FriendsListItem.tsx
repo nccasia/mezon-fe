@@ -66,7 +66,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							</button>
 							<Dropdown
 								label=""
-								className="bg-bgPrimary border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
+								className="dark:bg-bgPrimary bg-bgLightMode border dark:border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
 								dismissOnClick={true}
 								placement="right-start"
 								renderTrigger={() => (
@@ -77,21 +77,21 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							>
 								<Dropdown.Item
 									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex',
 									}}
 								>
 									Start Video Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex',
 									}}
 								>
 									Start Voice Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
 									}}
 									onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>
@@ -99,7 +99,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
 									}}
 									onClick={() => handleBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>

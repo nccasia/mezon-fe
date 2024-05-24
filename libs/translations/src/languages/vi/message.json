@@ -8,10 +8,17 @@
         "pinMessage": "Ghim tin nhắn",
         "markUnRead": "Đánh dấu chưa đọc",
         "mention": "Đề cập",
-        "copyMessageLink": "Sao chép đường dẫn tin nhắn"
+        "copyMessageLink": "Sao chép đường dẫn tin nhắn",
+        "report": "Báo cáo",
+        "polls": "Polls",
+        "files": "Files"
     },
     "chatBox": {
         "replyingTo": "Đang phản hổi",
         "editingMessage": "Đang chỉnh sửa tin nhắn"
+    },
+    "toast": {
+        "copyText": "Đã sao chép nội dung tin nhắn",
+        "attachmentIsLoading": "Attachment is loading, please wait a moment"
     }
 }

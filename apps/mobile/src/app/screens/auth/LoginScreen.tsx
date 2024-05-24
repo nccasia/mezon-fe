@@ -1,79 +1,106 @@
-import { size } from '@mezon/mobile-ui';
+import { useAuth } from '@mezon/core';
+import { Colors, size } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
+import LoadingModal from '../../components/LoadingModal';
 import Button from '../../components/auth/Button';
 import FooterAuth from '../../components/auth/FooterAuth';
 import GoogleLogin from '../../components/auth/GoogleLogin';
 import TextInputUser from '../../components/auth/TextInput';
-import LoadingModal from '../../components/LoadingModal';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
-	password: Yup.string()
-		.min(8, 'Confiem password musr be 8 characters long.')
-		.required('Please enter your password')
-		.matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[#?!@$%^&*-]).{8,}$/, 'Must contain minimum 8 characters, at least one uppercase letter'),
+	password: Yup.string().min(8, 'Confirm password must be 8 characters long.').required('Please enter your password'),
 });
+
+type LoginFormPayload = {
+	email: string;
+	password: string;
+};
+
 const LoginScreen = () => {
 	const navigation = useNavigation();
 	const isLoading = useSelector((state: RootState) => state.auth.loadingStatus);
+	const { loginEmail } = useAuth();
 
+	const handleSubmit = React.useCallback(
+		async (values: LoginFormPayload) => {
+			try {
+				const res = await loginEmail(values.email, values.password, true);
+				if (res === 'Invalid session') {
+					Toast.show({
+						type: 'error',
+						text1: 'User account not found',
+					});
+				}
+			} catch (error) {
+				/* empty */
+			}
+		},
+		[loginEmail],
+	);
 	return (
-		<View style={styles.container}>
+		<KeyboardAvoidingView style={styles.container}>
 			{/* header */}
 			<View style={styles.headerContainer}>
 				<Text style={styles.headerTitle}>WELCOME BACK</Text>
 				<Text style={styles.headerContent}>So glad to meet you again!</Text>
 			</View>
-			<GoogleLogin />
+			<View style={styles.googleButton}>
+				<GoogleLogin />
+			</View>
 			<Text style={styles.orText}>Or</Text>
 			{/* body */}
-			<Formik
-				initialValues={{
-					email: '',
-					password: '',
-				}}
-				validationSchema={LoginSchema}
-				onSubmit={() => Alert.alert('Email or password not correct')}
-			>
-				{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
-					<>
-						{/* email */}
-						<TextInputUser
-							label="Email or phone"
-							value={values.email}
-							onChangeText={handleChange('email')}
-							placeholder="Email or phone"
-							onBlur={() => setFieldTouched('email')}
-							touched={touched.email}
-							error={errors.email}
-							isPass={false}
-						/>
+			<ScrollView style={{ flex: 1 }}>
+				<Formik
+					initialValues={{
+						email: '',
+						password: '',
+					}}
+					validationSchema={LoginSchema}
+					onSubmit={handleSubmit}
+				>
+					{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
+						<>
+							{/* email */}
+							<TextInputUser
+								label="Email or phone"
+								value={values.email}
+								onChangeText={handleChange('email')}
+								placeholder="Email or phone"
+								onBlur={() => setFieldTouched('email')}
+								touched={touched.email}
+								error={errors.email}
+								isPass={false}
+							/>
 
-						{/* password */}
-						<TextInputUser
-							label="Password"
-							value={values.password}
-							onChangeText={handleChange('password')}
-							placeholder="Password"
-							onBlur={() => setFieldTouched('password')}
-							touched={touched.password}
-							error={errors.password}
-							isPass={true}
-						/>
-						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign in'} />
-					</>
-				)}
-			</Formik>
+							{/* password */}
+							<TextInputUser
+								label="Password"
+								value={values.password}
+								onChangeText={handleChange('password')}
+								placeholder="Password"
+								onBlur={() => setFieldTouched('password')}
+								touched={touched.password}
+								error={errors.password}
+								isPass={true}
+							/>
+							{/* button  */}
+							<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign in'} />
+						</>
+					)}
+				</Formik>
+			</ScrollView>
+
 			<FooterAuth content={'Need an account?'} onPress={() => navigation.navigate(APP_SCREEN.REGISTER as never)} title={'Register'} />
 			<LoadingModal isVisible={isLoading === 'loading'} />
-		</View>
+		</KeyboardAvoidingView>
 	);
 };
 
@@ -89,11 +116,12 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		backgroundColor: '#151515',
+		backgroundColor: Colors.secondary,
 		justifyContent: 'center',
 	},
 	headerContainer: {
 		alignItems: 'center',
+		marginTop: size.s_30,
 		paddingVertical: 10,
 		paddingHorizontal: 20,
 	},
@@ -116,5 +144,8 @@ const styles = StyleSheet.create({
 		marginLeft: 5,
 		alignSelf: 'center',
 		paddingTop: 10,
+	},
+	googleButton: {
+		marginVertical: size.s_20,
 	},
 });

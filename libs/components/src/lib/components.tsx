@@ -19,6 +19,7 @@ export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
 export { default as ModalForward } from './components/ForwardMessage/index';
+export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 export { default as ExpiryTimeModal } from './components/ExpiryTime/index';
 export { default as MemberList } from './components/MemberList';
 export { default as MemberProfile } from './components/MemberProfile';

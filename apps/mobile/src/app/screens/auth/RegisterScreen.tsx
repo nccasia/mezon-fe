@@ -1,21 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Yup from 'yup';
 import Button from '../../components/auth/Button';
 import FooterAuth from '../../components/auth/FooterAuth';
-import GoogleLogin from '../../components/auth/GoogleLogin';
 import TextInputUser from '../../components/auth/TextInput';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 
 const RegisterSchema = Yup.object().shape({
 	FullName: Yup.string().min(2, 'Too Short!').required('Required'),
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
-	password: Yup.string()
-		.min(8, 'Confiem password musr be 8 characters long.')
-		.required('Please enter your password')
-		.matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[#?!@$%^&*-]).{8,}$/, 'Must contain minimum 8 characters, at least one uppercase letter'),
+	password: Yup.string().min(8, 'Confirm password must be 8 characters long.').required('Please enter your password'),
 	confirmPassword: Yup.string()
 		.min(8, 'Confiem password musr be 8 characters long.')
 		.oneOf([Yup.ref('password')], 'your password do not match')
@@ -29,93 +25,93 @@ const RegisterSchema = Yup.object().shape({
 const RegisterScreen = () => {
 	const navigation = useNavigation();
 	return (
-		<View style={styles.container}>
+		<KeyboardAvoidingView style={styles.container}>
 			{/* header */}
 			<View style={styles.headerContainer}>
 				<Text style={styles.headerTitle}>Sign up</Text>
 				<Text style={styles.headerContent}>So glad to meet you again!</Text>
 			</View>
-			<GoogleLogin />
-			<Text style={styles.orText}>Or</Text>
 			{/* body */}
-			<Formik
-				initialValues={{
-					FullName: '',
-					email: '',
-					password: '',
-					confirmPassword: '',
-					mobile: '',
-				}}
-				validationSchema={RegisterSchema}
-				onSubmit={(values) => {
-					Alert.alert(JSON.stringify(values));
-				}}
-			>
-				{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
-					<>
-						{/*Full Name */}
-						<TextInputUser
-							label="Full name"
-							value={values.FullName}
-							onChangeText={handleChange('FullName')}
-							placeholder="Full name"
-							onBlur={() => setFieldTouched('FullName')}
-							touched={touched.FullName}
-							error={errors.FullName}
-							isPass={false}
-						/>
-						{/* email */}
-						<TextInputUser
-							label="Email or phone"
-							value={values.email}
-							onChangeText={handleChange('email')}
-							placeholder="Email or phone"
-							onBlur={() => setFieldTouched('email')}
-							touched={touched.email}
-							error={errors.email}
-							isPass={false}
-						/>
+			<ScrollView>
+				<Formik
+					initialValues={{
+						FullName: '',
+						email: '',
+						password: '',
+						confirmPassword: '',
+						mobile: '',
+					}}
+					validationSchema={RegisterSchema}
+					onSubmit={(values) => {
+						Alert.alert(JSON.stringify(values));
+					}}
+				>
+					{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
+						<>
+							{/*Full Name */}
+							<TextInputUser
+								label="Full name"
+								value={values.FullName}
+								onChangeText={handleChange('FullName')}
+								placeholder="Full name"
+								onBlur={() => setFieldTouched('FullName')}
+								touched={touched.FullName}
+								error={errors.FullName}
+								isPass={false}
+							/>
+							{/* email */}
+							<TextInputUser
+								label="Email or phone"
+								value={values.email}
+								onChangeText={handleChange('email')}
+								placeholder="Email or phone"
+								onBlur={() => setFieldTouched('email')}
+								touched={touched.email}
+								error={errors.email}
+								isPass={false}
+							/>
 
-						{/* password */}
-						<TextInputUser
-							label="Password"
-							value={values.password}
-							onChangeText={handleChange('password')}
-							placeholder="Password"
-							onBlur={() => setFieldTouched('password')}
-							touched={touched.password}
-							error={errors.password}
-							isPass={true}
-						/>
-						{/* confirm password  */}
-						<TextInputUser
-							label="Confirm password"
-							value={values.confirmPassword}
-							onChangeText={handleChange('confirmPassword')}
-							placeholder="Confirm Password"
-							onBlur={() => setFieldTouched('confirmPassword')}
-							touched={touched.confirmPassword}
-							error={errors.confirmPassword}
-							isPass={true}
-						/>
-						{/* mobile */}
-						<TextInputUser
-							label="Phone"
-							value={values.mobile}
-							onChangeText={handleChange('mobile')}
-							placeholder="Phone"
-							onBlur={() => setFieldTouched('mobile')}
-							touched={touched.mobile}
-							error={errors.mobile}
-							isPass={false}
-						/>
-						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'} />
-					</>
-				)}
-			</Formik>
+							{/* password */}
+							<TextInputUser
+								label="Password"
+								value={values.password}
+								onChangeText={handleChange('password')}
+								placeholder="Password"
+								onBlur={() => setFieldTouched('password')}
+								touched={touched.password}
+								error={errors.password}
+								isPass={true}
+							/>
+							{/* confirm password  */}
+							<TextInputUser
+								label="Confirm password"
+								value={values.confirmPassword}
+								onChangeText={handleChange('confirmPassword')}
+								placeholder="Confirm Password"
+								onBlur={() => setFieldTouched('confirmPassword')}
+								touched={touched.confirmPassword}
+								error={errors.confirmPassword}
+								isPass={true}
+							/>
+							{/* mobile */}
+							<TextInputUser
+								label="Phone"
+								value={values.mobile}
+								onChangeText={handleChange('mobile')}
+								placeholder="Phone"
+								onBlur={() => setFieldTouched('mobile')}
+								touched={touched.mobile}
+								error={errors.mobile}
+								isPass={false}
+							/>
+							{/* button  */}
+							<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'} />
+						</>
+					)}
+				</Formik>
+			</ScrollView>
 			<FooterAuth content={'Have an account!'} onPress={() => navigation.navigate(APP_SCREEN.LOGIN as never)} title={'Login'} />
-		</View>
+		</KeyboardAvoidingView>
 	);
 };
 

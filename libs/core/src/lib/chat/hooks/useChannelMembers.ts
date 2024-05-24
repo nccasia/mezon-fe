@@ -1,5 +1,13 @@
-import { ChannelMembersEntity, selectMemberByUserId, selectMemberStatus, selectMembersByChannelId } from '@mezon/store';
-import { useMemo } from 'react';
+import {
+	ChannelMembersEntity,
+	channelMembersActions,
+	selectMemberByUserId,
+	selectMemberStatus,
+	selectMembersByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
+import { RemoveChannelUsers } from '@mezon/utils';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 
@@ -8,6 +16,7 @@ export type useChannelMembersOptions = {
 };
 
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
+	const dispatch = useAppDispatch();
 	const rawMembers = useSelector(selectMembersByChannelId(channelId));
 	const onlineStatus = useSelector(selectMemberStatus);
 
@@ -53,10 +62,21 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 		});
 	}, [rawMembers]);
 
-	return {
-		members,
-		rawMembers,
-		onlineMembers,
-		offlineMembers,
-	};
+	const removeMemberChannel = useCallback(
+		async ({ channelId, ids }: RemoveChannelUsers) => {
+			await dispatch(channelMembersActions.removeMemberChannel({ channelId, ids }));
+		},
+		[dispatch],
+	);
+
+	return useMemo(
+		() => ({
+			members,
+			rawMembers,
+			onlineMembers,
+			offlineMembers,
+			removeMemberChannel,
+		}),
+		[members, offlineMembers, onlineMembers, rawMembers, removeMemberChannel],
+	);
 }

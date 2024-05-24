@@ -1,2 +1,7 @@
 export const STORAGE_KEY_CHANNEL_ID = 'STORAGE_KEY_CHANNEL_ID';
 export const STORAGE_KEY_CLAN_ID = 'STORAGE_KEY_CLAN_ID';
+
+export const ActionEmitEvent = {
+  SEND_MESSAGE: '@SEND_MESSAGE',
+  SHOW_KEYBOARD: '@SHOW_KEYBOARD'
+}

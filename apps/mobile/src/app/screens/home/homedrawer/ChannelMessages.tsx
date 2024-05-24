@@ -1,7 +1,7 @@
-import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
+import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import moment from 'moment';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
@@ -20,6 +20,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
 	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
 
+	const {
+		dataReactionCombine,
+	} = useChatReaction();
+
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
 			return `${typingUsers[0].user?.username} is typing...`;
@@ -37,7 +41,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, [markMessageAsSeen, messages]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
-	const sortedMessages = messages.sort((a, b) => moment(b.create_time).valueOf() - moment(a.create_time).valueOf());
 	const onLoadMore = () => {
 		if (hasMoreMessage) {
 			setIsLoadMore(true);
@@ -53,19 +56,28 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		);
 	};
 
+	const renderItem = useCallback(({ item, index }) => {
+		return (
+			<MessageItem
+				message={item}
+				mode={mode}
+				channelId={channelId}
+				dataReactionCombine={dataReactionCombine}
+				channelLabel={channelLabel}
+        preMessage={messages.length > 0 ? messages[index + 1] : undefined}
+			/>
+		);
+	}, [dataReactionCombine, messages]);
+
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			{!sortedMessages?.length && <WelcomeMessage channelTitle={channelLabel} />}
+			{!messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 			<FlatList
 				inverted
-				data={sortedMessages || []}
+				data={messages || []}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
-				renderItem={({ item, index }) => {
-					return (
-						<MessageItem message={item} mode={mode} preMessage={sortedMessages.length > 0 ? sortedMessages?.[index - 1] : undefined} />
-					);
-				}}
+				renderItem={renderItem}
 				keyExtractor={(item) => `${item?.id}`}
 				windowSize={10}
 				removeClippedSubviews={true}

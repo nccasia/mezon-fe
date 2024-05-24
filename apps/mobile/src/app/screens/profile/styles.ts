@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     text: { color: Colors.textGray },
     textBold: { color: Colors.textGray, fontWeight: 'bold' },
     viewImageProfile: { position: 'absolute', width: 100, height: 100, borderRadius: 50, backgroundColor: 'gray', bottom: -50, left: 30, borderWidth: 5, borderColor: Colors.secondary, },
+    textAvatar: {backgroundColor: Colors.bgGrayDark, width: '100%', height: '100%', textAlign: 'center', textAlignVertical: 'center', borderRadius: 50, fontSize: size.h5, color: Colors.white},
     imageProfile: { width: '100%', height: '100%', borderRadius: 50 },
     dotOnline: { position: 'absolute', width: 20, height: 20, borderRadius: 10, backgroundColor: 'green', bottom: 2, right: 0, borderWidth: 2, borderColor: Colors.secondary },
     contentContainer: { marginTop: 60, width: '90%', height: '20%', backgroundColor: Colors.tertiaryWeight, justifyContent: 'center', borderRadius: 20, paddingLeft: 20, paddingRight: 20 },

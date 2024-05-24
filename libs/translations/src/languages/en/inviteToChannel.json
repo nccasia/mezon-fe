@@ -6,5 +6,6 @@
         "youtube": "Youtube",
         "copyLink": "Copy Link",
         "email": "Email"
-    }
+    },
+    "copyLink": "Link Copied!"
 }

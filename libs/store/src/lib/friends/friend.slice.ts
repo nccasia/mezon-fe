@@ -2,9 +2,12 @@ import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 import { Friend } from 'mezon-js';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { channelMembersActions } from '../channelmembers/channel.members';
+import memoize from 'memoizee';
+
 export const FRIEND_FEATURE_KEY = 'friends';
+const LIST_FRIEND_CACHED_TIME = 1000 * 60 * 3;
 
 export interface FriendsEntity extends Friend {
 	id: string;
@@ -26,9 +29,21 @@ export interface FriendsState extends EntityState<FriendsEntity, string> {
 
 export const friendsAdapter = createEntityAdapter<FriendsEntity>();
 
+export const fetchListFriendsCached = memoize(
+	(mezon: MezonValueContext, state: number, limit: number, cursor: string) =>
+		mezon.client.listFriends(mezon.session, state===-1?undefined:state, limit, cursor),
+	{
+		promise: true,
+		maxAge: LIST_FRIEND_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[2] + args[3];
+		},
+	},
+);
+
 export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listFriends(mezon.session, undefined, 100, '');
+	const response = await fetchListFriendsCached(mezon, -1, 100, '');
 	if (!response.friends) {
 		return thunkAPI.rejectWithValue([]);
 	}

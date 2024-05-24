@@ -14,19 +14,23 @@ import { InputField } from '@mezon/ui';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
+import ServerSettingRoleManagement from '../SettingRoleManagement';
 
 export type ModalOpenEdit = {
-	handleOpen: () => void;
+	handleOpen?: () => void;
 };
 const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const { RolesClan } = useRoles();
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [selectedRoleId, setSelectedRoleID] = useState<string>('');
+	const [openEdit, setOpenEdit] = useState<boolean>(false);
+
 	const dispatchRole = useDispatch();
 	const dispatch = useAppDispatch();
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	const handleOpenModalDelete = () => {
 		setShowModal(true);
+		setOpenEdit(true);
 	};
 	const handleCloseModal = () => {
 		setShowModal(false);
@@ -48,10 +52,9 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
-	const {appearanceTheme} = useApp();
+	const { appearanceTheme } = useApp();
 	return (
 		<>
-			<h1 className="text-2xl font-bold tracking-wider mb-8 dark:text-white text-black">Roles</h1>
 			<div className="flex items-center space-x-4">
 				<div className="w-full flex-grow">
 					<InputField
@@ -67,14 +70,14 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 						dispatch(setNameRoleNew('New Role'));
 						dispatch(setAddPermissions([]));
 						dispatch(setAddMemberRoles([]));
-						props.handleOpen();
+						setOpenEdit(true);
 					}}
 				>
 					Create Role
 				</button>
 			</div>
 			<br />
-			<div className={`overflow-y-scroll relative w-full ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
+			<div className={`overflow-y-scroll relative w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 				<table className="w-full divide-y divide-gray-200">
 					<thead className="dark:bg-borderDefault bg-bgLightMode sticky top-0">
 						<tr className="h-11">
@@ -117,7 +120,6 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 											<p
 												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
 												onClick={() => {
-													props.handleOpen();
 													handleRoleClick(role.id);
 												}}
 											>
@@ -145,6 +147,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					</tbody>
 				</table>
 			</div>
+			<ServerSettingRoleManagement flagOption={openEdit} handleClose={() => setOpenEdit(false)} />
 		</>
 	);
 };

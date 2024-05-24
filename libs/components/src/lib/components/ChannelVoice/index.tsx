@@ -1,6 +1,5 @@
 import { useAuth } from '@mezon/core';
 import { selectFriendVoiceChannel, selectNumberMemberVoiceChannel, selectShowScreen } from '@mezon/store';
-import { useMezonVoice } from '@mezon/voice';
 import { IChannelMember } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,8 +15,7 @@ export type ChannelVoiceProps = {
 	jwt: string;
 };
 
-function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt }: ChannelVoiceProps) {
-	const voice = useMezonVoice();
+function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt }: ChannelVoiceProps) {	
 	const { userProfile } = useAuth();
 	const showScreen = useSelector(selectShowScreen);
 	const [isSelectScreen, setIsSelectScreen] = useState(false);
@@ -25,21 +23,6 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 	const numberMember = useSelector(selectNumberMemberVoiceChannel(channelId));
 	const friendVoiceChannel = useSelector(selectFriendVoiceChannel(channelId, userProfile?.user?.id ?? ''));
 
-	useEffect(() => {
-		const targetNode = document.getElementById('meet');
-		voice.setTargetTrackNode(targetNode as HTMLElement);
-
-		const canvasTrack = document.getElementById('canvas');
-		if (canvasTrack !== undefined) {
-			voice.setScreenCanvasElement(canvasTrack as HTMLCanvasElement);
-			voice.setScreenCanvasCtx((canvasTrack as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D);
-		}
-
-		const videoShareElem = document.getElementById('screenvideo');
-		videoShareElem!.style.display = 'none';
-		voice.setScreenVideoElement(videoShareElem as HTMLVideoElement);
-		voice.attachMedia();
-	}, [voice]);
 
 	const handleClick = (event: any) => {
 		const oldElementSelect = document.querySelector('.showScreen');
