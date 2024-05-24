@@ -1,9 +1,9 @@
-import { useGifs } from "@mezon/core";
 import { useState } from "react";
 import { useEffect } from "react";
-import { GifCategoriesEntity, fetchGifsDataSearch } from "@mezon/store-mobile";
+import { GifCategoriesEntity } from "@mezon/store-mobile";
 import GifCategory from "./GifCategory";
 import GiftItem from "./GifItem";
+import { useGifs, useGifsStickersEmoji } from "@mezon/core";
 
 type GifSelectorProps = {
     onSelected: (url: string) => void,
@@ -17,12 +17,16 @@ export default function GifSelector({ onSelected, searchText }: GifSelectorProps
         dataGifCategories,
         dataGifsSearch,
         loadingStatusGifs,
-        valueInputToCheckHandleSearch,
         dataGifsFeartured,
         trendingClickingStatus,
         setButtonArrowBack,
-        setValueInputSearch
+        fetchGifsDataSearch
     } = useGifs();
+
+    const {
+        valueInputToCheckHandleSearch,
+        setValueInputSearch
+    } = useGifsStickersEmoji();
 
     useEffect(() => {
         fetchGifsDataSearch(searchText);

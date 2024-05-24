@@ -2,18 +2,19 @@ import { GifCategoriesEntity } from "@mezon/store-mobile";
 import { Text, TouchableOpacity, View } from "react-native";
 import FastImage from 'react-native-fast-image';
 import styles from "./styles";
-import { useGifs } from "@mezon/core";
+import { useGifs, useGifsStickersEmoji } from "@mezon/core";
 
 interface GifCategoryProps {
     loading?: boolean;
     data: GifCategoriesEntity[];
 }
 export default function GifCategory({ loading, data }: GifCategoryProps) {
-    const { fetchGifsDataSearch, setValueInputSearch } = useGifs();
+    const { fetchGifsDataSearch } = useGifs();
+    const { setValueInputSearch } = useGifsStickersEmoji();
 
     function handlePressCategory(query: string) {
         fetchGifsDataSearch(query);
-        setValueInputSearch(query);        
+        setValueInputSearch(query);
     }
 
     if (loading) {
