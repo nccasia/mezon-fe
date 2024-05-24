@@ -4,7 +4,7 @@ import { BarsIcon, HashSignIcon, SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Keyboard, KeyboardEvent, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
@@ -14,28 +14,55 @@ import BottomKeyboardPicker, { IKeyboardType } from './components/BottomKeyboard
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
 import { useAnimatedKeyboard } from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
+	const [isKeyboardShow, setKeyboardShow] = useState<boolean>(false);
+
 	const [keyboardType, setKeyboardType] = useState<IKeyboardType>('text');
 	const bottomKeyboardRef = useRef<BottomSheet>(null);
 
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IKeyboardType) => {
-		setKeyboardHeight(height);
-		if (isShow) {
-			setKeyboardType(type);
+	function handleShowKeyboard(type?: IKeyboardType) {
+		setKeyboardShow(true);
+		setKeyboardType(type);
+
+		if (type !== "text") {
+			Keyboard.dismiss();
 			bottomKeyboardRef && bottomKeyboardRef.current && bottomKeyboardRef.current.collapse();
 		} else {
-			setKeyboardType('text');
 			bottomKeyboardRef && bottomKeyboardRef.current && bottomKeyboardRef.current.close();
 		}
 	};
 
-	function handleSelected() {
-		onShowKeyboardBottomSheet(false, 0, "text");
+	function handleHideKeyboard(type?: IKeyboardType) {
+		setKeyboardShow(false);
+		setKeyboardType(type);
+
+		if (type === "text") {
+			Keyboard.dismiss();
+		} else {
+			bottomKeyboardRef && bottomKeyboardRef.current && bottomKeyboardRef.current.close();
+		}
 	}
+
+	function handleKeyboardShow(event: KeyboardEvent) {
+		setKeyboardShow(true);
+
+		if (keyboardHeight !== event.endCoordinates.height) {
+			setKeyboardHeight(event.endCoordinates.height);
+		}
+	}
+
+	useEffect(() => {
+		const keyboardListener = Keyboard.addListener('keyboardDidShow', handleKeyboardShow);
+
+		return () => {
+			keyboardListener.remove();
+		};
+	})
 
 	useAnimatedKeyboard();
 
@@ -56,16 +83,17 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+						onShowKeyboard={handleShowKeyboard}
+						onHideKeyboard={handleHideKeyboard}
 					/>
 
-					<View style={{ height: keyboardHeight }} />
+					<View style={{ height: isKeyboardShow ? keyboardHeight : 0 }} />
 
 					<BottomKeyboardPicker height={keyboardHeight} ref={bottomKeyboardRef}>
 						{keyboardType === 'emoji' ? (
-							<EmojiPicker onDone={handleSelected} />
+							<EmojiPicker onDone={() => handleHideKeyboard("emoji")} />
 						) : keyboardType === 'attachment' ? (
-							<AttachmentPicker />
+							<AttachmentPicker onDone={() => handleHideKeyboard("emoji")} />
 						) : (
 							<View />
 						)}

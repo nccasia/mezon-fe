@@ -24,11 +24,13 @@ interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
 	mode: number;
-	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
+	onShowKeyboard: (type?: IKeyboardType) => void;
+	onHideKeyboard: (type?: IKeyboardType) => void;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IKeyboardType>('text');
+
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
@@ -38,7 +40,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isFocus, setIsFocus] = useState<boolean>(false);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
-	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 
 	const { t } = useTranslation(['message']);
 
@@ -139,14 +140,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		}
 	}, [messageActionListNeedToResolve])
 
-	function keyboardWillShow(event: KeyboardEvent) {
-		if (keyboardHeight !== event.endCoordinates.height) {
-			setKeyboardHeight(event.endCoordinates.height);
-		}
-	}
+
 
 	useEffect(() => {
-		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
 			'@SHOW_KEYBOARD',
 			(value) => {
@@ -160,7 +156,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		return () => {
 			showKeyboard.remove();
 			resetInput();
-			keyboardListener.remove();
 		};
 	}, [pushMessageActionIntoStack]);
 
@@ -179,25 +174,23 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		}
 	};
 
-	function handleKeyboardBottomSheetMode(mode: IKeyboardType) {
+	function handleChangeKeyboardMode(mode: IKeyboardType) {
 		setModeKeyBoardBottomSheet(mode);
-		if (mode === 'emoji' || mode === 'attachment') {
-			props.onShowKeyboardBottomSheet(true, keyboardHeight, mode);
-		} else {
+		props.onShowKeyboard(mode);
+
+		if (mode === 'text') {
 			inputRef && inputRef.current && inputRef.current.focus();
-			props.onShowKeyboardBottomSheet(false, keyboardHeight);
 		}
 	}
 
 	function handleInputFocus() {
 		setModeKeyBoardBottomSheet('text');
-		inputRef && inputRef.current && inputRef.current.focus();
-		props.onShowKeyboardBottomSheet(false, keyboardHeight);
+		props.onShowKeyboard("text");
 	}
 
 	function handleInputBlur() {
-		if (modeKeyBoardBottomSheet === 'text')
-			props.onShowKeyboardBottomSheet(false, 0);
+		if (modeKeyBoardBottomSheet === "text")
+			props.onHideKeyboard(modeKeyBoardBottomSheet)
 	}
 
 	return (
@@ -230,7 +223,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				) : (
 					<>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
-							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
+							<AttachmentSwitcher onChange={handleChangeKeyboardMode} mode={modeKeyBoardBottomSheet} />
 						</View>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 							<GiftIcon width={22} height={22} />
@@ -262,7 +255,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher
-							onChange={handleKeyboardBottomSheetMode}
+							onChange={handleChangeKeyboardMode}
 							mode={modeKeyBoardBottomSheet} />
 					</View>
 

@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 
 export type AttachmentPickerProps = {
 	mode?: number;
+	onDone?: () => void
 };
 
 function AttachmentPicker(props: AttachmentPickerProps) {
