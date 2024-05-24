@@ -13,7 +13,7 @@ export default function GifCategory({ loading, data }: GifCategoryProps) {
 
     function handlePressCategory(query: string) {
         fetchGifsDataSearch(query);
-        setValueInputSearch(query);
+        setValueInputSearch(query);        
     }
 
     if (loading) {

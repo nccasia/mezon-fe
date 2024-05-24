@@ -26,10 +26,11 @@ interface IChatBoxProps {
 	mode: number;
 	onShowKeyboard: (type?: IKeyboardType) => void;
 	onHideKeyboard: (type?: IKeyboardType) => void;
+	keyboardType: IKeyboardType;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
-	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IKeyboardType>('text');
+	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IKeyboardType>(props.keyboardType);
 
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
@@ -192,6 +193,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		if (modeKeyBoardBottomSheet === "text")
 			props.onHideKeyboard(modeKeyBoardBottomSheet)
 	}
+
+	useEffect(() => {
+		if (modeKeyBoardBottomSheet !== props.keyboardType)
+			setModeKeyBoardBottomSheet(props.keyboardType)
+	}, [props.keyboardType])
 
 	return (
 		<View style={styles.wrapperChatBox}>

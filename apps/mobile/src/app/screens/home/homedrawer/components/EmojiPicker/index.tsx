@@ -1,21 +1,25 @@
 import { Colors, Fonts } from '@mezon/mobile-ui';
 import React from 'react';
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Keyboard, NativeSyntheticEvent, ScrollView, Text, TextInput, TextInputChangeEventData, TouchableWithoutFeedback, View } from 'react-native';
 import GifSelector from './GifSelector';
 import { useEffect } from 'react';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import styles from './styles';
-import { useChatSending } from '@mezon/core';
+import { useChatSending, useGifs } from '@mezon/core';
 import { useCallback } from 'react';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import StickerSelector from './StickerSelector';
+import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { MutableRefObject } from 'react';
+import { SearchIcon } from '@mezon/mobile-components';
 
 export type IProps = {
-	onDone: () => void
+	onDone: () => void,
+	bottomSheetRef: MutableRefObject<BottomSheetMethods>
 };
 
 interface TextTabProps {
@@ -32,10 +36,11 @@ function TextTab({ selected, title }: TextTabProps) {
 
 type ExpressionType = "emoji" | "gif" | "sticker";
 
-function EmojiPicker({ onDone }: IProps) {
+function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [mode, setMode] = useState<ExpressionType>("gif");
 	const [channelMode, setChannelMode] = useState(0);
+	const [searchText, setSearchText] = useState<string>("");
 
 	useEffect(() => {
 		setChannelMode(ChannelStreamMode.STREAM_MODE_CHANNEL);
@@ -69,24 +74,42 @@ function EmojiPicker({ onDone }: IProps) {
 		onDone && onDone();
 	}
 
-	return (
-		<View style={styles.container}
-		>
-			<View style={styles.tabContainer}>
-				<TextTab selected title='Emoji' />
-				<TextTab title='GIFs' />
-				<TextTab title='Stickers' />
-			</View>
+	function handleInputSearchFocus() {
+		bottomSheetRef && bottomSheetRef.current && bottomSheetRef.current.expand();
+	}
 
-			<View>
-				{mode === "emoji" ? (
-					<Text>Emoji</Text>
-				) : mode === "gif"
-					? <GifSelector onSelected={(url) => handleSelected("gif", url)} />
-					: <StickerSelector onSelected={(url) => handleSelected("sticker", url)} />
-				}
+	function handleInputSearchBlur() {
+		Keyboard.dismiss();
+	}
+
+	return (
+		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
+			<View style={styles.container}>
+				<View style={styles.tabContainer}>
+					<TextTab selected title='Emoji' />
+					<TextTab title='GIFs' />
+					<TextTab title='Stickers' />
+				</View>
+
+				<View style={styles.textInputWrapper}>
+					<SearchIcon height={18} width={18} />
+					<TextInput
+						style={styles.textInput}
+						onFocus={handleInputSearchFocus}
+						onChangeText={setSearchText}
+					/>
+				</View>
+
+				<View>
+					{mode === "emoji" ? (
+						<Text>Emoji</Text>
+					) : mode === "gif"
+						? <GifSelector onSelected={(url) => handleSelected("gif", url)} searchText={searchText} />
+						: <StickerSelector onSelected={(url) => handleSelected("sticker", url)} />
+					}
+				</View>
 			</View>
-		</View>
+		</TouchableWithoutFeedback>
 	);
 }
 

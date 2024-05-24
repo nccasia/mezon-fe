@@ -6,10 +6,11 @@ import GifCategory from "./GifCategory";
 import GiftItem from "./GifItem";
 
 type GifSelectorProps = {
-    onSelected: (url: string) => void
+    onSelected: (url: string) => void,
+    searchText: string
 };
 
-export default function GifSelector({ onSelected }: GifSelectorProps) {
+export default function GifSelector({ onSelected, searchText }: GifSelectorProps) {
     const [gifData, setGifData] = useState<any>();
 
     const {
@@ -24,9 +25,9 @@ export default function GifSelector({ onSelected }: GifSelectorProps) {
     } = useGifs();
 
     useEffect(() => {
-        fetchGifsDataSearch('');
-        setValueInputSearch('');
-    }, [])
+        fetchGifsDataSearch(searchText);
+        setValueInputSearch(searchText);
+    }, [searchText])
 
     useEffect(() => {
         if (dataGifsSearch.length > 0 && valueInputToCheckHandleSearch !== '') {

@@ -39,7 +39,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	function handleHideKeyboard(type?: IKeyboardType) {
 		setKeyboardShow(false);
-		setKeyboardType(type);
+		setKeyboardType("text");
 
 		if (type === "text") {
 			Keyboard.dismiss();
@@ -48,7 +48,7 @@ const HomeDefault = React.memo((props: any) => {
 		}
 	}
 
-	function handleKeyboardShow(event: KeyboardEvent) {
+	function handleShowKeyboardText(event: KeyboardEvent) {
 		setKeyboardShow(true);
 
 		if (keyboardHeight !== event.endCoordinates.height) {
@@ -57,7 +57,7 @@ const HomeDefault = React.memo((props: any) => {
 	}
 
 	useEffect(() => {
-		const keyboardListener = Keyboard.addListener('keyboardDidShow', handleKeyboardShow);
+		const keyboardListener = Keyboard.addListener('keyboardDidShow', handleShowKeyboardText);
 
 		return () => {
 			keyboardListener.remove();
@@ -85,15 +85,19 @@ const HomeDefault = React.memo((props: any) => {
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboard={handleShowKeyboard}
 						onHideKeyboard={handleHideKeyboard}
+						keyboardType={keyboardType}
 					/>
 
 					<View style={{ height: isKeyboardShow ? keyboardHeight : 0 }} />
 
 					<BottomKeyboardPicker height={keyboardHeight} ref={bottomKeyboardRef}>
 						{keyboardType === 'emoji' ? (
-							<EmojiPicker onDone={() => handleHideKeyboard("emoji")} />
+							<EmojiPicker
+								onDone={() => handleHideKeyboard("emoji")}
+								bottomSheetRef={bottomKeyboardRef}
+							/>
 						) : keyboardType === 'attachment' ? (
-							<AttachmentPicker onDone={() => handleHideKeyboard("emoji")} />
+							<AttachmentPicker onDone={() => handleHideKeyboard("attachment")} />
 						) : (
 							<View />
 						)}

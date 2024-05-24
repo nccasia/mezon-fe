@@ -11,10 +11,6 @@ interface GifItemProps {
 }
 
 export default function GiftItem({ loading, data, onPress }: GifItemProps) {
-    useEffect(() => {
-        data && Array.isArray(data) && data.forEach((item) => console.log(item.media_formats.gif.url))
-    }, [data])
-
     if (loading) {
         return <Text>loading...</Text>
     }

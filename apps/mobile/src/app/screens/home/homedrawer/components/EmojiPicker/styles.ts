@@ -1,4 +1,4 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, Fonts } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -21,6 +21,23 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         paddingHorizontal: 20,
         paddingVertical: 6,
+    },
+    textInput: {
+        color: Colors.white,
+        flexGrow: 1,
+        fontSize: 9,
+        height: 40,
+    },
+
+    textInputWrapper: {
+        display: "flex",
+        flexDirection: "row",
+        backgroundColor: Colors.black,
+        marginVertical: 10,
+        alignItems: "center",
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        gap: 10
     }
 });
 
