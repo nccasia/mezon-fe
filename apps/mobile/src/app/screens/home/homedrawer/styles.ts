@@ -105,6 +105,7 @@ export const styles = StyleSheet.create({
 	},
 	listChannels: {
 		backgroundColor: Colors.tertiaryWeight,
+		paddingTop: size.s_14,
 	},
 	channelListSection: {
 		width: '100%',
@@ -337,7 +338,7 @@ export const styles = StyleSheet.create({
 		marginRight: 0,
 	},
 	wrapperMessageBoxCombine: {
-		marginBottom: size.s_10,
+		// marginBottom: size.s_10,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
@@ -372,6 +373,7 @@ export const styles = StyleSheet.create({
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
+		lineHeight: size.s_20
 	},
 	contentMessageMention: {
 		fontSize: size.medium,
@@ -379,11 +381,11 @@ export const styles = StyleSheet.create({
 		color: Colors.textLink,
 	},
 	mentionWrapper: {
-		backgroundColor: Colors.mentionBg,
-		borderRadius: 5,
-		paddingHorizontal: 5,
-		marginRight: 5,
-		marginTop: 5
+		// backgroundColor: Colors.mentionBg,
+		// borderRadius: 5,
+		// paddingHorizontal: 5,
+		// marginRight: 5,
+		// marginTop: 5
 	},
 	loadMoreChannelMessage: {
 		paddingVertical: size.s_20,
@@ -405,6 +407,8 @@ export const styles = StyleSheet.create({
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
 		marginVertical: size.s_6,
+		borderWidth: 0.5,
+		borderColor: Colors.borderPrimary,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',

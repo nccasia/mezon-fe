@@ -231,7 +231,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
-		alert(channelId)
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
@@ -277,7 +276,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		const type = channel?.type;
 
 		return (
-			<View style={styles.mentionWrapper}>
+			<Text style={styles.mentionWrapper}>
 				<Text
 					onPress={() => onChannelMention(channel)}
 					style={styles.contentMessageMention}
@@ -288,30 +287,30 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						: "#"}
 					{channel?.channel_label || ""}
 				</Text>
-			</View>
+			</Text>
 
 		)
 	}
 
 	const renderUserMention = (id: string) => {
 		return (
-			<View style={styles.mentionWrapper}>
+			<Text style={styles.mentionWrapper}>
 				<Text
 					onPress={() => onMention(id)}
 					style={styles.contentMessageMention}
 				>
-					{id + " "}
+					{id}
 				</Text>
-			</View>
+			</Text>
 		)
 	}
 
 	const renderMention = (id: string) => {
 		return id.startsWith("@")
-			? renderUserMention(id)
+			? <Text>{renderUserMention(id)} </Text>
 			: id.startsWith("#")
 				? renderChannelMention(id)
-				: <></>
+				: <Text />
 	}
 
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
@@ -321,7 +320,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			.filter((i) => i !== '@' && i !== '#');
 
 		return parts.map((part, index) => (
-			<Text key={index.toString()}>
+			<Text key={`${index}-${part}-renderTextWithMention'}`}>
 				{!part
 					? <View />
 					: matchesMention.includes(part)
@@ -363,13 +362,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					const regex = /:\b[^:]*\b:/g;
 					if (item.match(regex) && srcEmoji) {
 						return (
-							<Text>
+							<Text key={`${index}-${srcEmoji}-renderTextWithEmoji`}>
 								{' '}
 								<FastImage key={index} source={{ uri: srcEmoji }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />{' '}
 							</Text>
 						);
 					}
-					return <Text>{item} </Text>;
+					return <Text key={`${index}-${item}-renderTextWithEmoji`}>{item} </Text>;
 				})}
 			</Text>
 		);
