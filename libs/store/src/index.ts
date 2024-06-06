@@ -33,3 +33,4 @@ export * from './lib/notificationSetting/notificationSettingChannel.slice';
 export * from './lib/notificationSetting/notificationSettingClan.slice';
 export * from './lib/notificationSetting/notificationSettingCategory.slice';
 export * from './lib/notificationSetting/notificationReactMessage.slice';
+export * from './lib/pinMessages/pinMessage.slice';

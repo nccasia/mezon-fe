@@ -7,11 +7,13 @@ import { DeleteModal } from './Component/Modal/deleteChannelModal';
 export type ChannelSettingItemProps = {
 	onItemClick: (settingName: string) => void;
 	channel: IChannel;
+	stateClose: boolean;
+	stateMenu: boolean;
 	onCloseModal: () => void;
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, onCloseModal, channel } = props;
+	const { onItemClick, onCloseModal, channel, stateMenu, stateClose } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
@@ -21,7 +23,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	};
 
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white dark:text-white text-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
+		<div className={`overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white dark:text-white text-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow  ${(stateClose && !stateMenu) ? 'hidden' : 'flex'}`}>
 			<div className="w-170px">
 				<div className="flex justify-start">
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (

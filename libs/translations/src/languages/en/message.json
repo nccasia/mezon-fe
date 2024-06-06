@@ -21,5 +21,15 @@
     "toast": {
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment"
+    },
+    "directMessage": {
+        "you": "You"
+    },
+    "edited": "(edited)",
+    "newMessage": {
+        "to": "To",
+        "newGroup": "New Group",
+        "addFriend": "Add a Friend",
+        "create": "Create"
     }
 }

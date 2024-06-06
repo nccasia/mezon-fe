@@ -2,7 +2,7 @@ import { useApp, useDirect, useEscapeKey } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ForwardMessageModal from '../ForwardMessage';
@@ -26,8 +26,22 @@ function DirectMessageList() {
 			return isUnique;
 		});
 	};
+	const [sortedFilteredDataDM, setSortedFilteredDataDM] = useState<IChannel[]>([]);
 
-	const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
+	const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
+		return notSortedArr.slice().sort((a, b) => {
+			const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
+			const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+			return timestampB - timestampA;
+		});
+	};
+	
+	useEffect(() => {
+		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
+		const sortedData = sortDMItem(filteredDataDM);
+		setSortedFilteredDataDM(sortedData);
+	}, [dmGroupChatList]);
+
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const onClickOpenModal = () => {
 		setIsOpen(!isOpen);
@@ -71,9 +85,11 @@ function DirectMessageList() {
 				</div>
 			</div>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
-			<div className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === "light" ? 'customSmallScrollLightMode' : 'thread-scroll'}`}>
+			<div
+				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
-					{filteredDataDM.map((directMessage: any, index: number) => {
+					{sortedFilteredDataDM.map((directMessage: any, index: number) => {
 						return <DMListItem key={index} directMessage={directMessage} />;
 					})}
 				</div>

@@ -1,0 +1,13 @@
+{
+  "userAction": {
+    "sendMessage": "Message",
+    "voiceCall": "VoiceCall",
+    "videoCall": "VideoCall"
+  },
+  "aboutMe": {
+    "headerTitle": "ABOUT ME",
+    "roles": {
+      "headerTitle": "ROLES"
+    }
+  }
+}

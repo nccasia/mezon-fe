@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { styles } from './styles';
 import { EAddFriendBy, EAddFriendWays } from '../../../enum';
 import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import { useAuth, useFriends } from '@mezon/core';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, size } from '@mezon/mobile-ui';
 import { requestAddFriendParam } from '@mezon/store-mobile';
 import Toast from 'react-native-toast-message';
 import { UserPlusIcon } from '@mezon/mobile-components';
@@ -24,6 +24,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 		usernames: [],
 		ids: [],
 	});
+    const [isKeyBoardShow, setIsKeyBoardShow] = useState<boolean>(false);
     const { t } = useTranslation('friends');
     const inputRef = useRef(null);
 
@@ -42,6 +43,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
         return () => {
             if (timeoutId) {
                 clearTimeout(timeoutId);
+                resetField();
             }
         }
     }, [type])
@@ -92,36 +94,61 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
         resetField();
     }
 
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+          'keyboardDidShow',
+          () => {
+            setIsKeyBoardShow(true);
+          }
+        );
+    
+        const keyboardDidHideListener = Keyboard.addListener(
+          'keyboardDidHide',
+          () => {
+            setIsKeyBoardShow(false);
+          }
+        );
+
+        return () => {
+          keyboardDidShowListener.remove();
+          keyboardDidHideListener.remove();
+        };
+      }, []);
+
     const addFriendByUsernameContent = () => {
         return (
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.addByUsernameContainer}
+                style={styles.fill}
             >
                 <View style={styles.fill}>
-                    <Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
-                    <Text style={styles.defaultText}>{t('addFriend.whoYouWantToAddFriend')}</Text>
-                    <View style={styles.searchUsernameWrapper}>
-                        <TextInput
-                            ref={inputRef}
-                            value={requestAddFriend.usernames[0]}
-                            placeholder={t('addFriend.searchUsernamePlaceholder')}
-                            placeholderTextColor={Colors.tertiary}
-                            style={styles.searchInput}
-                            onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
-                        />
+                    <View style={styles.fill}>
+                        <Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
+                        <Text style={styles.defaultText}>{t('addFriend.whoYouWantToAddFriend')}</Text>
+                        <View style={styles.searchUsernameWrapper}>
+                            <TextInput
+                                ref={inputRef}
+                                value={requestAddFriend.usernames[0]}
+                                placeholder={t('addFriend.searchUsernamePlaceholder')}
+                                placeholderTextColor={Colors.tertiary}
+                                style={styles.searchInput}
+                                onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
+                            />
+                        </View>
+                        <View style={styles.byTheWayText}>
+                            <Text style={styles.defaultText}>{t('addFriend.byTheWay')}</Text>
+                            <Text style={styles.whiteText}>{userProfile?.user?.username}</Text>
+                        </View>
                     </View>
-                    <View style={styles.byTheWayText}>
-                        <Text style={styles.defaultText}>{t('addFriend.byTheWay')}</Text>
-                        <Text style={styles.whiteText}>{userProfile?.user?.username}</Text>
+                    <View style={[styles.buttonWrapper, isKeyBoardShow && { marginBottom: 120 }]}>
+                        <View style={{height: size.s_50}}>
+                            <MezonButton
+                                disabled={!requestAddFriend.usernames[0]?.length}
+                                onPress={() => sentFriendRequest()}
+                                viewContainerStyle={styles.sendButton}
+                            >{t('addFriend.sendRequestButton')}</MezonButton>
+                        </View>
                     </View>
-                </View>
-                <View style={styles.buttonWrapper}>
-                    <MezonButton
-                        disabled={!requestAddFriend.usernames[0]?.length}
-                        onPress={() => sentFriendRequest()}
-                        viewContainerStyle={styles.sendButton}
-                    >{t('addFriend.sendRequestButton')}</MezonButton>
                 </View>
             </KeyboardAvoidingView>
         )
@@ -146,7 +173,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
             default:
                 return <View />
         }
-    }, [type, requestAddFriend])
+    }, [type, requestAddFriend, isKeyBoardShow])
 
     return (
         <MezonModal

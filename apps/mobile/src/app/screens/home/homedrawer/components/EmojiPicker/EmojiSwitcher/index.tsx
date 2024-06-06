@@ -1,4 +1,5 @@
-import { HashSignIcon, SmilingFaceIcon } from '@mezon/mobile-components';
+import { KeyboardIcon, SmilingFaceIcon } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
@@ -29,7 +30,7 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 	return (
 		<View>
 			<TouchableOpacity onPress={onPickerPress}>
-				{mode !== 'emoji' ? <SmilingFaceIcon width={25} height={25} /> : <HashSignIcon width={25} height={25} />}
+				{mode !== 'emoji' ? <SmilingFaceIcon width={25} height={25} /> : <KeyboardIcon width={25} height={25} color={Colors.white} />}
 			</TouchableOpacity>
 		</View>
 	);

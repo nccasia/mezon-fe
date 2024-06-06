@@ -3,6 +3,26 @@ import { useEffect, useState } from 'react';
 import ListMemberInvite from '.';
 import Modal from '../../../../../ui/src/lib/Modal';
 
+const expireAfter = [
+	'30 minutes',
+	'1 hour',
+	'6 hours',
+	'12 hours',
+	'1 day',
+	'7 day',
+	'Never',
+];
+
+const maxNumberofUses= [
+	'No limit',
+	'1 use',
+	'5 uses',
+	'10 uses',
+	'25 uses',
+	'50 uses',
+	'100 uses',
+]
+
 export type ModalParam = {
 	onClose: () => void;
 	open: boolean;
@@ -12,6 +32,9 @@ export type ModalParam = {
 };
 
 const ModalInvite = (props: ModalParam) => {
+	const [expire, setExpire] = useState('7 day');
+	const [max, setMax] = useState('No limit');
+	const [modalEdit, setModalEdit] = useState(false);
 	const [urlInvite, setUrlInvite] = useState('');
 	const { currentClanId } = useClans();
 	const { createLinkInviteUser } = useInvite();
@@ -53,8 +76,11 @@ const ModalInvite = (props: ModalParam) => {
 			unsecuredCopyToClipboard(content);
 		}
 	};
+
+	const closeModalEdit = () => setModalEdit(false);
 	return (
-		<Modal
+		!modalEdit ?
+		(<Modal
 			title="Invite friends to KOMU"
 			onClose={() => {
 				props.onClose();
@@ -63,7 +89,7 @@ const ModalInvite = (props: ModalParam) => {
 			confirmButton={() => handleCopyToClipboard(urlInvite)}
 			titleConfirm="Copy"
 			subTitleBox="Send invite link to a friend"
-			classSubTitleBox="ml-[0px] mt-[15px] cursor-default"
+			classSubTitleBox="ml-[0px] cursor-default"
 			borderBottomTitle="border-b "
 		>
 			<div>
@@ -90,14 +116,56 @@ const ModalInvite = (props: ModalParam) => {
 						Copy
 					</button>
 				</div>
-				<p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] ">
-					<span className="cursor-default dark:text-white text-black">Your invite link expires in 7 days </span>
-					<a href="" className="text-blue-300">
+				<p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
+					<span className="cursor-default dark:text-white text-black">Your invite link expires in {expire} </span>
+					<p className="text-blue-300 cursor-pointer hover:underline" onClick={()=>setModalEdit(true)}>
 						Edit invite link.
-					</a>
+					</p>
 				</p>
 			</div>
-		</Modal>
+		</Modal>) : 
+		(<Modal 
+			title='Server invite link settings' 
+			onClose={closeModalEdit}
+			showModal={modalEdit}
+			classNameWrapperChild='space-y-5'
+			classNameBox='max-w-[440px]'
+		>
+			<div className='space-y-2'>
+				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Expire After</h3>
+				<select
+					name="expireAfter"
+					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					onChange={(e) => {setExpire(e.target.value)}}
+					value={expire}
+				>
+					{expireAfter.map((item) => (
+						<option key={item} value={item}>
+							{item}
+						</option>
+					))}
+				</select>
+			</div>
+			<div className='space-y-2'>
+				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Max Number of Uses</h3>
+				<select
+					name="maxNumberofUses"
+					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					onChange={(e) => {setMax(e.target.value)}}
+					value={max}
+				>
+					{maxNumberofUses.map((item) => (
+						<option key={item} value={item}>
+							{item}
+						</option>
+					))}
+				</select>
+			</div>
+			<div className='flex justify-end gap-x-4'>
+				<button className='px-4 py-2 rounded bg-slate-500 hover:bg-opacity-85' onClick={closeModalEdit}>Cancel</button>
+				<button className='px-4 py-2 rounded bg-primary hover:bg-opacity-85' onClick={() => {props.onClose(); }}>Generate a New Link</button>
+			</div>
+		</Modal>)
 	);
 };
 export default ModalInvite;

@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { machineId } from 'node-machine-id';
 import App from './app/app';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
@@ -24,6 +25,10 @@ export default class Main {
 		}
 	}
 }
+
+ipcMain.handle('get-device-id', async () => {
+	return await machineId();
+});
 
 // handle setup events as quickly as possible
 Main.initialize();

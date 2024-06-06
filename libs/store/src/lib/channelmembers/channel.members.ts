@@ -59,7 +59,7 @@ const fetchChannelMembersCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3];
+			return args[1] + args[2] + args[3] + args[0].session.token;
 		},
 	},
 );
@@ -301,6 +301,11 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
+export const selectMemberByDisplayName = (displayName: string) =>
+    createSelector(selectAllChannelMembers, (members) => {
+        return members.find((member) => member.user?.display_name === displayName);
+    });
+
 export const selectMembersMap = (channelId?: string | null) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
 		const retval = new Map<string, ChannelMemberAvatar>();
@@ -340,3 +345,4 @@ export const selectMemberByUserId = (userId: string) =>
 	createSelector(selectAllChannelMembers, (entities) => {
 		return entities.find((ent) => ent?.user?.id === userId) || null;
 	});
+

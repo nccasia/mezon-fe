@@ -11,7 +11,7 @@ import {
 	useEscapeKey,
 	useReference,
 } from '@mezon/core';
-import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, pinMessageActions, referencesActions, selectCurrentChannel, selectMemberByUserId, selectPinMessageByChannelId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -332,7 +332,7 @@ function PopupMessage({
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block top-0 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
 					(reactionRightState && mess.id === idMessageRefOpt) ||
 					(reactionBottomState && mess.id === idMessageRefOpt) ||
@@ -356,7 +356,8 @@ function PopupMessage({
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
 	const { userId } = useChatReaction();
-
+	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id))
+	const messageExists = listPinMessages.some(pinMessage => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
@@ -392,6 +393,13 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 	};
+
+	const handlePinMessage = () => {
+		dispatch(pinMessageActions.setChannelPinMessage({channel_id: message.channel_id, message_id: message.id}));
+	};
+	const handleUnPinMessage = () => {
+		dispatch(pinMessageActions.deleteChannelPinMessage({channel_id: message.channel_id, message_id: message.id}));
+	};
 	const checkUser = userId === message.sender_id;
 	return (
 		<div
@@ -426,6 +434,29 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 				>
 					Forward message
 				</li>
+				{messageExists ? (
+					<li
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
+						onClick={() => {
+							handleUnPinMessage();
+						}}
+						role="button"
+						aria-hidden
+					>
+						Unpin message
+					</li>
+				):(
+					<li
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
+						onClick={() => {
+							handlePinMessage();
+						}}
+						role="button"
+						aria-hidden
+					>
+						Pin message
+					</li>
+				)}
 				<CopyToClipboard text={message.content.t || ''}>
 					<li
 						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"

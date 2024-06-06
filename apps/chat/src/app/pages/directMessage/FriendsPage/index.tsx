@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
-import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
+import { FriendsEntity, RootState, channelsActions, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import FriendList from './FriendsList';
 
@@ -34,6 +34,10 @@ export default function FriendsPage() {
 		usernames: [],
 		ids: [],
 	});
+
+	useEffect(() => {
+		dispatch(channelsActions.setCurrentChannelId(''));
+	}, []);
 
 	const handleChange = (key: string, value: string) => {
 		switch (key) {
@@ -152,7 +156,9 @@ export default function FriendsPage() {
 					{openModalAddFriend && (
 						<div className="w-full flex flex-col gap-3">
 							<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
-							<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">You can add friends with their Mezon usernames</span>
+							<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">
+								You can add friends with their Mezon usernames
+							</span>
 
 							<div className="relative">
 								<InputField

@@ -1,12 +1,12 @@
 import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelMessageEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
+import { fetchChannelsCached } from '../channels/channels.slice';
 import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
-import { ChannelType } from 'mezon-js';
-import { fetchChannelsCached } from '../channels/channels.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -62,7 +62,25 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	const channels = response.channeldesc.map(mapDmGroupToEntity);
+	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
+		if (
+			a === undefined ||
+			b === undefined ||
+			a.last_sent_message === undefined ||
+			a.last_seen_message?.id === undefined ||
+			b.last_sent_message === undefined ||
+			b.last_seen_message?.id === undefined
+		) {
+			return 0;
+		}
+		if (a.last_sent_message.id && b.last_sent_message.id && (a.last_sent_message.id < b.last_sent_message.id)) {
+			return 1;
+		}
+
+		return -1;
+	});
+	const channels = sorted.map(mapDmGroupToEntity);
+
 	return channels;
 });
 
@@ -78,7 +96,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+			thunkAPI.dispatch(
+				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+			);
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			await mezon.joinChatDirectMessage(directMessageId, channelName, type);
 			return;
@@ -103,6 +123,19 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		setDmGroupCurrentId: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageId = action.payload;
+		},
+		updateDMSocket: (state, action: PayloadAction<ChannelMessageEvent>) => {
+			const payload = action.payload;
+			const timestamp = (Date.now() / 1000).toString();
+			directAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: { last_sent_message: { 
+					content: payload.content,
+					id: payload.id,
+					sender_id: payload.sender_id,
+					timestamp: timestamp, 
+				} },
+			});
 		},
 	},
 	extraReducers: (builder) => {

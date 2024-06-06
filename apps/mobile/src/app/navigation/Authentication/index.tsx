@@ -1,30 +1,39 @@
 import React, { useEffect } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useAuth } from '@mezon/core';
 import { getAppInfo } from '@mezon/mobile-components';
-import { fcmActions } from '@mezon/store';
+import { fcmActions, selectCurrentClan, selectLoadingMainMobile } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import LoadingModal from '../../components/LoadingModal';
 import { handleFCMToken, setupNotificationListeners } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
+import { FriendStacks } from './stacks/FriendStacks';
 import { MenuClanStacks } from './stacks/MenuSererStack';
 import { MenuThreadDetailStacks } from './stacks/MenuThreadDetailStacks';
 import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
-import { FriendStacks } from './stacks/FriendStacks';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
 	const getInitialRouteName = APP_SCREEN.BOTTOM_BAR;
 	const navigation = useNavigation();
+	const { userProfile } = useAuth();
+	const currentClan = useSelector(selectCurrentClan);
+	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	useEffect(() => {
-		loadFRMConfig();
-	}, []);
+		if (userProfile?.email) loadFRMConfig();
+	}, [userProfile?.email]);
+
+	useEffect(() => {
+		setupNotificationListeners(navigation, currentClan);
+	}, [navigation, currentClan]);
 
 	const loadFRMConfig = async () => {
 		const fcmtoken = await handleFCMToken();
@@ -35,7 +44,6 @@ export const Authentication = () => {
 			// @ts-expect-error
 			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: deviceId, platform: platform }));
 		}
-		setupNotificationListeners(navigation, dispatch);
 	};
 
 	return (
@@ -102,6 +110,7 @@ export const Authentication = () => {
 					}}
 				/>
 			</RootStack.Navigator>
+			<LoadingModal isVisible={isLoadingMain} />
 		</BottomSheetModalProvider>
 	);
 };

@@ -1,8 +1,17 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { selectDataReactionGetFromMessage } from '@mezon/store';
+import {
+	EmojiDataOptionals,
+	IMessageWithUser,
+	SenderInfoOptionals,
+	SubPanelName,
+	calculateTotalCount,
+	getSrcEmoji,
+	updateEmojiReactionData,
+} from '@mezon/utils';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -16,16 +25,19 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		userId,
 		reactionMessageDispatch,
 		reactionBottomState,
-		dataReactionCombine,
 		setUserReactionPanelState,
 		userReactionPanelState,
 		reactionBottomStateResponsive,
+		dataReactionServerAndSocket,
 	} = useChatReaction();
 
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
-	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
+	const { emojiListPNG } = useEmojiSuggestion();
+	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
+
+	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -104,6 +116,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			emojiIndexMap[emoji.id] = index;
 		}
 	});
+
 	const checkPositionSenderPanel = (emoji: EmojiDataOptionals) => {
 		if (!parentDiv.current || !childRef.current || emoji.id === undefined) return;
 		const parentRect = parentDiv.current.getBoundingClientRect();
@@ -148,7 +161,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
-						<GifStickerEmojiPopup messageEmojiId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+						<GifStickerEmojiPopup messageEmojiId={message.id} mode={mode} />
 					</div>
 				</div>
 			)}
@@ -167,24 +180,17 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					?.map((emoji: EmojiDataOptionals, index: number) => {
 						const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 						const checkID = emoji.message_id === message.id;
+						const totalCount = calculateTotalCount(emoji.senders);
 						return (
-							<div key={`${index + message.id}`}>
-								{checkID && (
+							<Fragment key={`${index + message.id}`}>
+								{checkID && totalCount > 0 && (
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
 									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
-											reactOnExistEmoji(
-												emoji.id ?? '',
-												ChannelStreamMode.STREAM_MODE_CHANNEL,
-												message.id ?? '',
-												emoji.emoji ?? '',
-												1,
-												userId ?? '',
-												false,
-											)
+											reactOnExistEmoji(emoji.id ?? '', mode, message.id ?? '', emoji.emoji ?? '', 1, userId ?? '', false)
 										}
 										onMouseEnter={() => {
 											handleOnEnterEmoji(emoji);
@@ -197,8 +203,9 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											{' '}
 											<img src={getSrcEmoji(emoji.emoji ?? '', emojiListPNG)} className="w-4 h-4"></img>{' '}
 										</span>
+
 										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-											<p>{calculateTotalCount(emoji.senders)}</p>
+											<p>{totalCount}</p>
 										</div>
 
 										{checkMessageToMatchMessageRef(message) && showIconSmile && lastPositionEmoji(emoji, message) && (
@@ -220,7 +227,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											)}
 									</div>
 								)}
-							</div>
+							</Fragment>
 						);
 					})}
 			</div>

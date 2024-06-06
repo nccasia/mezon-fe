@@ -2,12 +2,12 @@ import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, useAnimatedState } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-view';
-import ImageViewIOS from 'react-native-image-viewing';
 import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
@@ -18,7 +18,7 @@ type ChannelMessagesProps = {
 	type: string;
 	channelLabel?: string;
 	avatarDM?: string;
-	mode: number;
+	mode: ChannelStreamMode;
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
@@ -30,22 +30,28 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const footerImagesModalRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
+	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+
+	const createAttachmentObject = (attachment: any) => ({
+		source: {
+			uri: attachment.url,
+		},
+		filename: attachment.filename,
+		title: attachment.filename,
+		width: Metrics.screenWidth,
+		height: Metrics.screenHeight - 120,
+		url: attachment.url,
+		uri: attachment.url,
+	});
+
 	const formatAttachments: any[] = useMemo(() => {
-		return attachments.map((attachment) => {
-			const url = `https://cdn.mezon.vn/${attachment.clanId}/${attachment.channelId}/${attachment.filename}`;
-			return {
-				source: {
-					uri: url,
-				},
-				filename: attachment.filename,
-				title: attachment.filename,
-				width: Metrics.screenWidth - 100,
-				height: Metrics.screenHeight - 100,
-				url: url,
-				uri: url,
-			};
-		});
-	}, [attachments]);
+		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
+		const attachmentObjects = attachments
+			.filter((u) => u.url !== imageSelected?.url)
+			.map(createAttachmentObject)
+		return [imageSelectedUrl, ...attachmentObjects];
+	}, [attachments, imageSelected]);
+
 	const [visibleImageModal, setVisibleImageModal] = useAnimatedState<boolean>(false);
 	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
 
@@ -106,20 +112,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		);
 	};
 
-	const getIndexAttachments = (url: string) => {
-		const idx = formatAttachments?.findIndex((item) => item.url?.toString() === url?.toString());
-
-		setIdxSelectedImageModal(idx <= 0 ? 0 : idx);
-		timeOutRef.current = setTimeout(() => {
-			footerImagesModalRef?.current?.scrollTo({
-				y: idx * 50,
-				animated: true,
-			});
-		}, 500);
-	};
-
 	const onOpenImage = (image: ApiMessageAttachment) => {
-		getIndexAttachments(image.url);
+		setImageSelected(image);
+		setIdxSelectedImageModal(0);
+		footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: 0 });
 		setVisibleImageModal(true);
 	};
 
@@ -143,32 +139,39 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const RenderFooterModal = () => {
 		return (
 			<View style={styles.wrapperFooterImagesModal}>
-				<ScrollView ref={footerImagesModalRef} horizontal showsHorizontalScrollIndicator={false} style={styles.footerImagesModal}>
-					{formatAttachments?.map((attachment, idx) => {
-						return (
-							<TouchableOpacity
-								activeOpacity={0.8}
-								onPress={() => {
-									setVisibleImageModal(false);
-									setIdxSelectedImageModal(idx);
-									timeOutRef.current = setTimeout(() => {
-										setVisibleImageModal(true);
-									}, 100);
+				<FlatList
+					ref={footerImagesModalRef}
+					horizontal
+					data={formatAttachments}
+					onScrollToIndexFailed={(info) => {
+						const wait = new Promise((resolve) => setTimeout(resolve, 200));
+						wait.then(() => {
+							footerImagesModalRef.current?.scrollToIndex({ index: info.index, animated: true });
+						});
+					}}
+					renderItem={({ item, index }) => (
+						<TouchableOpacity
+							activeOpacity={0.8}
+							key={`${item.url}_${index}_ImagesModal`}
+							onPress={() => {
+								setVisibleImageModal(false);
+								setIdxSelectedImageModal(index);
+								timeOutRef.current = setTimeout(() => {
+									setVisibleImageModal(true);
+								}, 100);
+							}}
+						>
+							<FastImage
+								style={[styles.imageFooterModal, index === idxSelectedImageModal && styles.imageFooterModalActive]}
+								source={{
+									uri: item.url,
+									priority: FastImage.priority.normal,
 								}}
-							>
-								<FastImage
-									key={`${attachment.url}_${idx}_ImagesModal`}
-									style={[styles.imageFooterModal, idx === idxSelectedImageModal && styles.imageFooterModalActive]}
-									source={{
-										uri: attachment.url,
-										priority: FastImage.priority.normal,
-									}}
-									resizeMode={FastImage.resizeMode.cover}
-								/>
-							</TouchableOpacity>
-						);
-					})}
-				</ScrollView>
+								resizeMode={FastImage.resizeMode.cover}
+							/>
+						</TouchableOpacity>
+					)}
+				/>
 			</View>
 		);
 	};
@@ -200,42 +203,29 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
 			{visibleImageModal && <View style={styles.overlay} />}
-			{Platform.OS === 'ios' ? (
-				<ImageViewIOS
-					backgroundColor={Colors.secondary}
-					images={formatAttachments}
-					imageIndex={idxSelectedImageModal}
-					visible={visibleImageModal}
-					onRequestClose={() => setVisibleImageModal(false)}
-					FooterComponent={RenderFooterModal}
-					onImageIndexChange={(idx) => setIdxSelectedImageModal(idx)}
-				/>
-			) : (
-				<ImageView
-					animationType={'none'}
-					images={formatAttachments}
-					imageIndex={idxSelectedImageModal}
-					isVisible={visibleImageModal}
-					glideAlways
-					isSwipeCloseEnabled
-					isPinchZoomEnabled
-					isTapZoomEnabled
-					onImageChange={(idx: number) => {
-						setIdxSelectedImageModal(idx);
-						footerImagesModalRef?.current?.scrollTo({
-							y: idx * 150,
-							animated: true,
-						});
-					}}
-					controls={{
-						next: true,
-						prev: true,
-						close: Platform.OS === 'android',
-					}}
-					onClose={() => setVisibleImageModal(false)}
-					renderFooter={() => <RenderFooterModal />}
-				/>
-			)}
+			<ImageView
+				animationType={'none'}
+				images={formatAttachments}
+				imageIndex={idxSelectedImageModal}
+				isVisible={visibleImageModal}
+				glideAlways
+				isSwipeCloseEnabled
+				isPinchZoomEnabled
+				isTapZoomEnabled
+				onImageChange={(idx: number) => {
+					setIdxSelectedImageModal(idx);
+					timeOutRef.current = setTimeout(() => {
+						footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: idx });
+					}, 200);
+				}}
+				controls={{
+					next: true,
+					prev: true,
+					close: true,
+				}}
+				onClose={() => setVisibleImageModal(false)}
+				renderFooter={() => <RenderFooterModal />}
+			/>
 		</View>
 	);
 });

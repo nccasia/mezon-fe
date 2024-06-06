@@ -69,7 +69,8 @@ export const styles = StyleSheet.create({
     messageContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        gap: size.s_2
     },
     online: {
         backgroundColor: Colors.green,
@@ -90,5 +91,24 @@ export const styles = StyleSheet.create({
         borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    groupAvatar: {
+        backgroundColor: Colors.bgToggleOnBtn,
+        width: size.s_50,
+        height: size.s_50,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    lastMessage: {
+        fontSize: size.s_12,
+        color: Colors.gray72
+    },
+    dateTime: {
+        fontSize: size.s_12,
+    },
+    channelLabel: {
+        fontSize: size.s_14,
+        flex: 1
     }
 })

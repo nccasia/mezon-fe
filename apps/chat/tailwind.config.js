@@ -9,6 +9,9 @@ const channelListWidth = '272px';
 const memberWidth = '245px';
 const memberWidthThread = '500px';
 const avatarWidth = '68px';
+const widthModalSearch = '400px';
+const widthResultSearch = '420px';
+const heightModalSearch = '300px';
 const iconWidth = '160px';
 
 const plugin = require('tailwindcss/plugin');
@@ -58,17 +61,22 @@ module.exports = {
         widthMemberList: memberWidth,
         widthNoMemberList: memberWidth,
         widthThumnailAttachment: `calc(100vw - ${clanWidth} - ${channelListWidth})`,
+        widthSearchMessage: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${widthResultSearch})`,
+        widthModalSearch: widthModalSearch,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
       },
       height: {
         heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+        heightMessageViewChatMobile: `calc(100vh  - ${chatBoxHeight})`,
         heightMessageViewChatDM: `calc(100vh - ${topBarHeight})`,
         heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
+        heightWithoutTopBarMobile: `calc(100vh)`,
         heightTopBar: topBarHeight,
         heightChatBox: chatBoxHeight,
+        heightModalSearch: heightModalSearch,
         heightHeader: "60px",
         "9/10": "90%",
       },
@@ -78,7 +86,7 @@ module.exports = {
         '2/5': "40%",
         boxChatView: `calc(100vw - 589px)`,
         wrappBoxChatView: `calc(100vw - 377px)`,
-        wrappBoxChatViewMobile: `calc(100vw - 31px)`,
+        wrappBoxChatViewMobile: `calc(100vw)`,
       },
 
       maxHeight: {
@@ -90,6 +98,11 @@ module.exports = {
 
       minHeight: {
         600: '600px',
+        heightModalSearch: heightModalSearch,
+      },
+
+      minWidth:{
+        widthMenuMobile: `calc(100vw - ${clanWidth})`,
       },
 
       fontFamily: {
@@ -125,6 +138,7 @@ module.exports = {
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
+      spin: 'spin 1s linear infinite',
     },
     screens: {
       ssm: "430px",

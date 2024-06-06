@@ -20,7 +20,7 @@ export const MenuClanStacks = ({ }: any) => {
                 name={APP_SCREEN.MENU_CLAN.CREATE_CATEGORY}
                 component={CategoryCreator}
                 options={{
-                    headerTitle: 'Threads',
+                    headerTitle: 'Create Category',
                     headerTitleAlign: "center",
                     headerTintColor: Colors.white,
                     headerStyle: {

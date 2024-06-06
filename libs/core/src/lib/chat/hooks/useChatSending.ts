@@ -23,7 +23,8 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			anonymous?: boolean
+			anonymous?: boolean,
+			mentionEveryone?: boolean
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -34,7 +35,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references, anonymous);
+			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},

@@ -8,10 +8,11 @@ import SettingItem from '../SettingItem';
 type SettingSidebarProps = {
 	onClickItem?: (settingItem: ItemObjProps) => void;
 	handleMenu: (value: boolean) => void;
+	currentSetting: string;
 };
 
-const SettingSidebar = ({ onClickItem, handleMenu }: SettingSidebarProps) => {
-	const [selectedButton, setSelectedButton] = useState<string | null>(ItemSetting.OVERVIEW);
+const SettingSidebar = ({ onClickItem, handleMenu, currentSetting }: SettingSidebarProps) => {
+	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const { currentClan } = useClans();
 
 	const [openModal, setOpenModal] = useState<boolean>(false);

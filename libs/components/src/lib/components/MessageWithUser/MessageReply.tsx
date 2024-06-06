@@ -44,7 +44,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
 						<div className="w-5 h-5">
 							<img
-								className="rounded-full w-full h-full object-cover"
+								className="rounded-full w-full h-full min-w-5 min-h-5 object-cover"
 								src={senderMessage?.user?.avatar_url}
 								alt={senderMessage?.user?.avatar_url}
 							/>

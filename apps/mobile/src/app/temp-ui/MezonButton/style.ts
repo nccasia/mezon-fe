@@ -13,5 +13,8 @@ export const styles = StyleSheet.create({
     },
     disable: {
         opacity: .4,
+    },
+    fill: {
+        flex: 1
     }
 })

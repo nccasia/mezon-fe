@@ -19,7 +19,6 @@
 		"paths": {
 			"@mezon/translations": ["libs/translations/src/i18n.config.ts"],
 			"@mezon/assets": ["libs/assets/src/index.ts"],
-			"@mezon/async-storage-mobile": ["libs/store/src/AsyncLocalStorageMobile.tsx"],
 			"@mezon/components": ["libs/components/src/index.ts"],
 			"@mezon/core": ["libs/core/src/index.ts"],
 			"@mezon/lib-jitsi-meet": ["./node_modules/@mezon/lib-jitsi-meet/types"],

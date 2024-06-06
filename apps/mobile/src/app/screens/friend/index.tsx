@@ -1,22 +1,26 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, FlatList, Pressable } from 'react-native';
+import React, { useState, useMemo, useCallback } from 'react';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import { styles } from './styles';
 import Feather from 'react-native-vector-icons/Feather';
 import { Colors } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { useThrottledCallback } from 'use-debounce';
-import { useFriends } from '@mezon/core';
+import { useDirect, useFriends } from '@mezon/core';
 import { normalizeString } from '../../utils/helpers';
-import { SeparatorWithLine, SeparatorWithSpace, UserItem } from './UserItem';
 import { ChevronIcon, PaperPlaneIcon } from '@mezon/mobile-components';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { IFriendGroupByCharacter } from './types';
+import { FriendListByAlphabet } from '../../components/FriendListByAlphabet';
+import { FriendsEntity } from '@mezon/store-mobile';
+import { EFriendItemAction } from '../../components/FriendItem';
 
 export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
     const { t } = useTranslation(['common', 'friends']);
     const { friends: allUser } = useFriends();
-    const friendList = allUser.filter((user) => user.state === 0);
+    const { createDirectMessageWithUser, listDM } = useDirect();
+    const friendList: FriendsEntity[] = useMemo(() => {
+        return allUser.filter((user) => user.state === 0)
+    }, [allUser]);
 
     const navigateToRequestFriendScreen = () => {
         navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND })
@@ -24,47 +28,39 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 
     const filteredFriendList = useMemo(() => {
         return friendList.filter(friend => normalizeString(friend.user.username).includes(normalizeString(searchText)));
-    }, [friendList]);
-
-    const allFriendGroupByAlphabet = useMemo(() => {
-        const groupedByCharacter = friendList.reduce((acc, friend) => {
-            const firstUserNameCharacter = friend.user.username.charAt(0).toUpperCase();
-            if (!acc[firstUserNameCharacter]) {
-                acc[firstUserNameCharacter] = [];
-            }
-            acc[firstUserNameCharacter].push(friend);
-            return acc;
-        }, {})
-
-        return Object.keys(groupedByCharacter).map((character) => ({
-            character,
-            friendList: groupedByCharacter[character]
-        }));
-    }, [friendList]);
+    }, [friendList, searchText]);
 
     const friendRequestCount = useMemo(() => {
         return {
             sent: allUser.filter(user => user.state === 1).length,
             received: allUser.filter(user => user.state === 2).length,
         }
-    }, [allUser])
+    }, [allUser]);
 
-    const renderListFriendGroupByAlphabet = ({ item }: { item: IFriendGroupByCharacter }) => {
-        return (
-            <View>
-                <Text style={styles.groupFriendTitle}>{item.character}</Text>
-                <View style={styles.groupWrapper}>
-                    <FlatList
-                        data={item.friendList}
-                        style={styles.groupByAlphabetWrapper}
-                        ItemSeparatorComponent={SeparatorWithLine}
-                        keyExtractor={(friend) => friend.id.toString()}
-                        renderItem={({ item }) => <UserItem friend={item} />}
-                    />
-                </View>
-            </View>
-        )
-    }
+    const directMessageWithUser = useCallback(async (userId: string) => {
+        const directMessage = listDM.find(dm => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
+        if (directMessage?.id) {
+            navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: directMessage?.id } });
+            return;
+        }
+		const response = await createDirectMessageWithUser(userId);
+		if (response?.channel_id) {
+            navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: response?.channel_id } });
+		}
+	}, [createDirectMessageWithUser, listDM, navigation]);
+
+    const handleFriendAction = useCallback((friend: FriendsEntity, action: EFriendItemAction) => {
+        switch (action) {
+            case EFriendItemAction.Call:
+                console.log('handle phone call', friend);
+                break;
+            case EFriendItemAction.MessageDetail:
+                directMessageWithUser(friend?.user?.id)
+                break;
+            default:
+                break;
+        }
+    }, [directMessageWithUser])
 
     const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
 
@@ -100,29 +96,12 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
                     <ChevronIcon width={25} color={Colors.textGray} />
                 </Pressable>
             ): null}
-
-            {searchText.trim().length ? (
-                <View>
-                    {filteredFriendList.length ? (
-                        <Text style={styles.friendText}>{t('friends:friends')}</Text>
-                    ): null}
-                    <View style={styles.groupWrapper}>
-                        <FlatList
-                            data={filteredFriendList}
-                            keyExtractor={(friend) => friend.id.toString()}
-                            ItemSeparatorComponent={SeparatorWithLine}
-                            renderItem={({ item }) => <UserItem friend={item} />}
-                        />
-                    </View>
-                </View>
-            ): (
-                <FlatList
-                    data={allFriendGroupByAlphabet}
-                    keyExtractor={(item) => item.character}
-                    ItemSeparatorComponent={SeparatorWithSpace}
-                    renderItem={renderListFriendGroupByAlphabet}
-			    />
-            )}
+            <FriendListByAlphabet
+                isSearching={Boolean(searchText.trim().length)}
+                friendList={filteredFriendList}
+                handleFriendAction={handleFriendAction}
+                showAction={true}
+            />
         </View>
     )
 })

@@ -1,0 +1,13 @@
+{
+  "userAction": {
+    "sendMessage": "Gửi Tin Nhắn",
+    "voiceCall": "Gọi Thoại",
+    "videoCall": "Cuộc Gọi Video"
+  },
+  "aboutMe": {
+    "headerTitle": "VỀ TÔI",
+    "roles": {
+      "headerTitle": "VAI TRÒ"
+    }
+  }
+}

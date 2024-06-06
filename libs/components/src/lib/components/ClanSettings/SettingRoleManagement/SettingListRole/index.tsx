@@ -36,7 +36,7 @@ const SettingListRole = (props: closeEditRole) => {
 	return (
 		<div className="w-1/3 pr-3 flex flex-col">
 			<div className="font-semibold mb-4 flex">
-				<div className="rotate-90 -ml-[10px]">
+				<div className="rotate-90 -ml-[10px] dark:text-textDarkTheme text-textLightTheme">
 					<Icons.ArrowDown defaultSize="size-5" />
 				</div>
 				<div className="cursor-pointer tracking-wide text-sm dark:text-white text-black" onClick={() => props.handleClose()} role="button">
@@ -56,8 +56,8 @@ const SettingListRole = (props: closeEditRole) => {
 							<button
 								onClick={() => handleRoleClick(role.id)}
 								className={`w-full py-2 px-4 rounded text-[15px] ${
-									clickedRole === role.id ? 'bg-[#535353] font-bold hover:op' : 'bg-[#1E1E1E] hover:font-bold'
-								} text-white truncate`}
+									clickedRole === role.id ? 'dark:bg-[#535353] bg-[#b6b6b6] font-bold hover:op' : 'dark:bg-[#1E1E1E] bg-[#cacaca] hover:font-bold'
+								} dark:text-textDarkTheme text-textLightTheme truncate`}
 							>
 								{role.title}
 							</button>

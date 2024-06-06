@@ -5,17 +5,7 @@ import EventInfoModal from './eventInfoModal';
 import LocationModal from './locationModal';
 import ReviewModal from './reviewModal';
 import { useClans, useEventManagement } from '@mezon/core';
-
-enum Tabs_Option {
-	LOCATION = 0,
-	EVENT_INFO = 1,
-	REVIEW = 2,
-}
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { OptionEvent, Tabs_Option } from '@mezon/utils';
 
 export type ModalCreateProps = {
 	onClose: () => void;
@@ -184,11 +174,11 @@ const ModalCreate = (props: ModalCreateProps) => {
 					Back
 				</button>
 				<div className="flex justify-end gap-x-4 w-full">
-					<button className="px-4 py-2 rounded bg-slate-500" onClick={onClose}>
+					<button className="px-4 py-2 rounded bg-slate-500 font-semibold" onClick={onClose}>
 						Cancel
 					</button>
 					<button
-						className={`px-4 py-2 rounded bg-primary ${!buttonWork && 'bg-opacity-50'}`}
+						className={`px-4 py-2 rounded font-semibold bg-primary ${!buttonWork && 'bg-opacity-50'}`}
 						onClick={currentModal === Tabs_Option.REVIEW ? () => handleSubmit() : () => handleNext(currentModal)}
 					>
 						{currentModal === Tabs_Option.REVIEW ? 'Create Event' : 'Next'}

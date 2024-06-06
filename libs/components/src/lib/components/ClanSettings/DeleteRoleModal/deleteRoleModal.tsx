@@ -6,11 +6,11 @@ interface ModalProps {
 
 export const DeleteModal: React.FC<ModalProps> = ({ isOpen, handleDelete, onClose }) => {
 	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{isOpen && (
-				<div className="fixed  inset-0 flex items-center justify-center z-50">
-					<div className="fixed inset-0 bg-black opacity-80"></div>
-					<div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-md text-center">
+				<div className="fixed  inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+					<div className="relative z-10 dark:bg-gray-900  bg-bgLightMode p-6 rounded-md text-center dark:text-textDarkTheme text-textLightTheme">
 						<h2 className="text-[30px] font-semibold mb-4">DELETE ROLE</h2>
 						<p className="text-white-600 text-[16px] whitespace-break-spaces">
 							Are you sure you want to delete the new role role? This action cannot be undone

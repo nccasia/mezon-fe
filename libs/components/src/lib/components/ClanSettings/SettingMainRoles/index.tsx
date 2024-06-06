@@ -30,7 +30,6 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	const handleOpenModalDelete = () => {
 		setShowModal(true);
-		setOpenEdit(true);
 	};
 	const handleCloseModal = () => {
 		setShowModal(false);
@@ -121,6 +120,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
 												onClick={() => {
 													handleRoleClick(role.id);
+													setOpenEdit(true);
 												}}
 											>
 												Edit

@@ -1,4 +1,4 @@
-import { Colors, Fonts } from "@mezon/mobile-ui";
+import { Colors, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: 30,
         flex: 0,
+        paddingTop: size.s_14
     },
 
     optionText: {

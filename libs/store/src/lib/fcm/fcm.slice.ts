@@ -17,7 +17,7 @@ export const registFcmDeviceTokenCached = memoize(
 		promise: true,
 		maxAge: REGIS_FCM_TOKEN_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3];
+			return args[1] + args[2] + args[3] + args[0].session.token;
 		},
 	},
 );

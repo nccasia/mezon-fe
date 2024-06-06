@@ -118,10 +118,12 @@ export const FriendListItem = React.memo((props: { user: IUser }) => {
 				<Text style={styles.friendItemName}>{user?.name}</Text>
 			</View>
 		
-			<MezonButton
-				viewContainerStyle={styles.inviteButton}
-				onPress={() => inviteFriend(user)}
-			>Invite</MezonButton>
+			<View>
+				<MezonButton
+					viewContainerStyle={styles.inviteButton}
+					onPress={() => inviteFriend(user)}
+				>Invite</MezonButton>
+			</View>
 		</View>
 	);
 });

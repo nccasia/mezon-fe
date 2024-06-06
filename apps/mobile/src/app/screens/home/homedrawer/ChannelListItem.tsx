@@ -1,14 +1,14 @@
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
+import { HashSignLockIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, SpeakerLocked, save } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import HashSignWhiteIcon from '../../../../assets/svg/channelText-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText.svg';
-import SpeakerIcon from '../../../../assets/svg/speaker.svg';
-import { ChannelListContext, FastImageRes } from './Reusables';
+import { ChannelListContext } from './Reusables';
 import ThreadListChannel from './ThreadListChannel';
 import { styles } from './styles';
 export const ChannelListItem = React.memo((props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel }) => {
@@ -39,17 +39,18 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 				style={[styles.channelListItem, props.isActive && styles.channelListItemActive]}
 			>
 				{isUnRead && <View style={styles.dotIsNew} />}
-				{props.image != undefined ? (
-					<View style={{ width: 30, height: 30, borderRadius: 50, overflow: 'hidden' }}>
-						<FastImageRes uri={props.image} />
-					</View>
-				) : props.data.type === ChannelType.CHANNEL_TYPE_VOICE ? (
-					<SpeakerIcon width={20} height={20} fill={'#FFFFFF'} />
-				) : isUnRead ? (
-					<HashSignWhiteIcon width={18} height={18} />
-				) : (
-					<HashSignIcon width={18} height={18} />
+				{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					<SpeakerLocked width={15} height={15} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
 				)}
+				{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+					<HashSignLockIcon width={20} height={20} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
+				)}
+				{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					<SpeakerIcon width={16} height={16} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
+				)}
+				{props?.data?.channel_private === undefined &&
+					props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+					(isUnRead ? <HashSignWhiteIcon width={18} height={18} /> : <HashSignIcon width={18} height={18} />)}
 				<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
 			</TouchableOpacity>
 			{!!props?.data?.threads?.length && (

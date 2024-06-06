@@ -173,23 +173,22 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				onCloseModal();
 			}}
 			showModal={props.open}
-			subTitleBox={`Máy chủ của ${currentClan?.clan_name}`}
-			classSubTitleBox="ml-[0px] mt-[15px] cursor-default"
+			subTitleBox={`${currentClan?.clan_name}`}
+			classSubTitleBox="ml-[0px] cursor-default dark:text-zinc-400 text-colorTextLightMode"
 			borderBottomTitle="border-b "
 		>
 			<div>
-				<hr />
 				<div className={`${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
-					<div>CLAN NOTIFICATION SETTINGS</div>
-					<div>
+					<div className='text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2'>CLAN NOTIFICATION SETTINGS</div>
+					<div className='space-y-2'>
 						{notificationTypes.map((notificationType, index) => (
-							<div key={index} className="flex items-center">
+							<div key={index} className="flex items-center gap-x-3 p-[12px] dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded text-sm">
 								<input
 									type="radio"
 									id={`notification-${index}`}
 									name="notification-setting"
 									value={notificationType}
-									className="mr-2"
+									className="relative disabled:bg-slate-500  float-left mr-1 mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:border-neutral-600 dark:checked:border-primary dark:checked:after:border-primary dark:checked:after:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:border-primary dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
 									checked={notificationType === defaultNotificationClan?.notification_setting_type}
 									onChange={(event) => handleNotificationClanChange(event, notificationType)}
 								/>
@@ -197,9 +196,10 @@ const ModalNotificationSetting = (props: ModalParam) => {
 							</div>
 						))}
 					</div>
-					<hr />
-					<div>NOTIFICATION OVERRIDES</div>
-					<div>Add a channel to override its default notification settings</div>
+					
+					<hr className='border-zinc-500 my-4'/>
+					<div className='text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2'>NOTIFICATION OVERRIDES</div>
+					<div className='text-sm font-normal dark:text-textSecondary text-textSecondary800 mb-2'>Add a channel to override its default notification settings</div>
 					<Creatable
 						isClearable
 						onChange={handleChange}
@@ -208,23 +208,23 @@ const ModalNotificationSetting = (props: ModalParam) => {
 						placeholder="Select or create an option..."
 						styles={appearanceTheme === "dark" ? customStyles : lightCustomStyles}
 					/>
-					<div className={`mt-4 overflow-y-auto max-h-[200px] ${appearanceTheme === "light" ? "customScrollLightMode" : ""} `}>
-						<table className="w-full mt-4">
+					<div className={`mt-4 overflow-visible ${appearanceTheme === "light" ? "customScrollLightMode" : ""} `}>
+						<table className="w-full mt-4 hide-scrollbar overflow-hidden space-y-2">
 							<thead>
-								<tr>
-									<th className="w-40 text-left">CHANNEL OR CATEGORY</th>
-									<th className="w-15">ALL</th>
-									<th className="w-15">MENTIONS</th>
-									<th className="w-15">NOTHING</th>
-									<th className="w-15">Mute</th>
+								<tr className="grid grid-cols-7">
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-3">CHANNEL OR CATEGORY</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">ALL</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">MENTIONS</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">NOTHING</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">Mute</th>
 								</tr>
 							</thead>
 							<tbody>
 								{channelCategorySettings.map((channelCategorySetting, index) => (
-									<tr key={index} className="group relative">
-										<td className="w-40">{channelCategorySetting.channel_category_label}</td>
+									<tr key={index} className="group relative grid grid-cols-7 mb-2.5 dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded p-[10px]">
+										<td className="col-span-3">{channelCategorySetting.channel_category_label}</td>
 										{notificationTypes.map((notificationType) => (
-											<td key={notificationType} className="w-15 text-center">
+											<td key={notificationType} className="col-span-1 text-center">
 												<input
 													type="radio"
 													name={`notification-${channelCategorySetting.id}`}
@@ -239,15 +239,15 @@ const ModalNotificationSetting = (props: ModalParam) => {
 												/>
 											</td>
 										))}
-										<td className="w-15 text-center relative">
-                                        <input type="checkbox" />
-                                        <button
-                                            className="absolute top-0 right-0 mt-1 mr-1 text-red-500 hidden group-hover:block"
-                                            onClick={() => handleRemoveOverride(channelCategorySetting.channel_category_title || "", channelCategorySetting.id || "")}
-                                        >
-                                            x
-                                        </button>
-                                    </td>
+										<td className='col-span-1 text-center'>
+                                        	<input type="checkbox" />
+											<button
+												className="absolute top-0 right-0 text-red-500 rounded-full dark:bg-white bg-black size-[15px] justify-center items-center hidden group-hover:flex"
+												onClick={() => handleRemoveOverride(channelCategorySetting.channel_category_title || "", channelCategorySetting.id || "")}
+											>
+												x
+											</button>
+										</td>
 									</tr>
 								))}
 							</tbody>

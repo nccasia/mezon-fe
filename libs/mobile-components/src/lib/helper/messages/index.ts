@@ -1,3 +1,4 @@
+import { ChannelsEntity } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
 
 export function abbreviateText(filename: string) {
@@ -30,3 +31,8 @@ export function getAttachmentUnique(attachments: ApiMessageAttachment[]) {
 		}, {}),
 	);
 }
+
+export const getChannelById = (channelHashtagId: string, channelsEntities?: Record<string, ChannelsEntity>) => {
+	if (!channelsEntities) return;
+	return channelsEntities[channelHashtagId];
+};

@@ -1,5 +1,5 @@
 import { Colors } from '@mezon/mobile-ui';
-import { selectHiddenBottomTabMobile } from '@mezon/store';
+import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import 'react-native-gesture-handler';

@@ -19,7 +19,7 @@ const fetchEventManagementCached = memoize(
 		promise: true,
 		maxAge: EVENT_MANAGEMENT_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1];
+			return args[1] + args[0].session.token;
 		},
 	},
 );

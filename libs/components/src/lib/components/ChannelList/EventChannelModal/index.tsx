@@ -3,16 +3,12 @@ import * as Icons from '../../Icons';
 import ModalCreate from './ModalCreate';
 import { useAuth, useClans, useEventManagement } from '@mezon/core';
 import ItemEventManagement from './ModalCreate/itemEventManagement';
+import { OptionEvent } from '@mezon/utils';
 
 export type EventModalProps = {
 	open: boolean;
 	onClose: () => void;
 };
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
 
 const EventModal = (props: EventModalProps) => {
 	const { open, onClose } = props;

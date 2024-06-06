@@ -1,0 +1,23 @@
+{
+    "header": {
+        "save": "Lưu"
+    },
+    "switch": {
+        "userProfile": "Cá nhân",
+        "serverProfile": "Máy chủ"
+    },
+    "fields": {
+        "displayName": {
+            "label": "Tên hiển thị",
+            "placeholder": ""
+        },
+        "pronouns": {
+            "label": "Danh xưng",
+            "placeholder": ""
+        },
+        "bio": {
+            "label": "Tiểu sử",
+            "placeholder": ""
+        }
+    }
+}

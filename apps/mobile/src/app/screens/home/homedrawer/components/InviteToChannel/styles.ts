@@ -1,8 +1,8 @@
-import { Colors, size } from "@mezon/mobile-ui";
-import { StyleSheet } from "react-native";
+import { Colors, size } from '@mezon/mobile-ui';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-    inviteToChannelWrapper: {
+	inviteToChannelWrapper: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: 50,
@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
 	radioContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
 	},
 	radioItem: {
 		width: 100,
@@ -22,17 +22,17 @@ export const styles = StyleSheet.create({
 		marginRight: 10,
 	},
 	radioItemDeActive: {
-		backgroundColor: Colors.secondary
+		backgroundColor: Colors.secondary,
 	},
 	radioItemActive: {
-		backgroundColor: Colors.bgViolet
+		backgroundColor: Colors.bgViolet,
 	},
 	inviteHeader: {
 		backgroundColor: Colors.secondary,
 		padding: 19,
 		width: '100%',
 		borderTopRightRadius: 8,
-		borderTopLeftRadius: 8
+		borderTopLeftRadius: 8,
 	},
 	inviteHeaderText: {
 		color: Colors.white,
@@ -41,19 +41,27 @@ export const styles = StyleSheet.create({
 	},
 	inviteIconWrapper: {
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+	},
+	shareToInviteIconWrapper: {
+		height: size.s_40,
+		width: size.s_40,
+		borderRadius: size.s_40,
+		alignSelf: 'center',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: Colors.bgGrayLight,
+		overflow: 'hidden',
 	},
 	shareToInviteIcon: {
-		borderRadius: 50,
-		padding: 10,
-		backgroundColor: Colors.bgGrayLight,
 		color: Colors.white,
 	},
 	inviteIconText: {
 		color: Colors.textGray,
+		paddingTop: size.s_6,
 	},
 	searchFriendToInviteWrapper: {
-		backgroundColor: Colors.primary,
+		backgroundColor: Colors.tertiaryWeight,
 		borderRadius: 8,
 		alignItems: 'center',
 		paddingHorizontal: size.s_6,
@@ -62,7 +70,9 @@ export const styles = StyleSheet.create({
 	searchFriendToInviteInput: {
 		width: '93%',
 		borderRadius: 8,
-		color: Colors.white
+		color: Colors.white,
+		paddingVertical: 0,
+		height: size.s_50,
 	},
 	editInviteLinkWrapper: {
 		paddingTop: 17,
@@ -73,70 +83,71 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.bgCharcoal,
 		width: '100%',
 		borderTopRightRadius: 8,
-		borderTopLeftRadius: 8
+		borderTopLeftRadius: 8,
 	},
 	iconAreaWrapper: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		padding: 19,
 		borderBottomColor: Colors.bgCharcoal,
-		borderBottomWidth: 3
+		borderBottomWidth: 3,
 	},
 	searchInviteFriendWrapper: {
-		padding: 19
+		padding: 19,
 	},
 	defaultText: {
-		color: Colors.white
+		color: Colors.white,
 	},
 	linkText: {
-		color: Colors.textLink
+		color: Colors.textLink,
 	},
-    channelInviteTitle: {
+	channelInviteTitle: {
 		fontSize: size.s_14,
 		fontWeight: '600',
 		color: Colors.tertiary,
 	},
-    channelInviteItem: {
+	channelInviteItem: {
 		width: '100%',
 		flexDirection: 'row',
 		alignItems: 'center',
 		paddingVertical: 19,
 		borderRadius: 5,
 	},
-    inviteChannelListWrapper: {
-        marginVertical: 15,
-        paddingVertical: 20,
-        borderBottomWidth: 2,
-        borderTopWidth: 2,
-        borderColor: Colors.borderPrimary,
-        paddingHorizontal: 10
-    },
-    inviteChannelListTitle: {
-        color: Colors.header1,
-        fontSize: 16,
-        fontWeight: '500'
-    },
-    advancedSettingWrapper: {
-        paddingLeft: 10,
-        gap: 10
-    },
-    advancedSettingTitle: {
-        color: Colors.header1,
-        fontSize: 16,
-        fontWeight: '500'
-    },
-    advancedSettingSubTitle: {
-        color: Colors.header2,
-        fontSize: 16,
-        fontWeight: '500'
-    },
-    temporaryMemberWrapper: {
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        paddingTop: 20
-    },
+	inviteChannelListWrapper: {
+		marginVertical: 15,
+		paddingVertical: 20,
+		borderBottomWidth: 2,
+		borderTopWidth: 2,
+		borderColor: Colors.borderPrimary,
+		paddingHorizontal: 10,
+	},
+	inviteChannelListTitle: {
+		color: Colors.header1,
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	advancedSettingWrapper: {
+		paddingLeft: 10,
+		gap: 10,
+	},
+	advancedSettingTitle: {
+		color: Colors.header1,
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	advancedSettingSubTitle: {
+		color: Colors.header2,
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	temporaryMemberWrapper: {
+		justifyContent: 'space-between',
+		flexDirection: 'row',
+		paddingTop: 20,
+		paddingRight: 10,
+	},
 	temporaryMemberTitle: {
 		color: Colors.textGray,
-		fontSize: 16
+		fontSize: 16,
 	},
 });

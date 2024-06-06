@@ -12,6 +12,7 @@ import {
 	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
+	selectStatusLoadingAttachment,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -32,6 +33,14 @@ export function useReference() {
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
+	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+
+	const setStatusLoadingAttachment = useCallback(
+		(status: boolean) => {
+			dispatch(referencesActions.setStatusLoadingAttachment(status));
+		},
+		[dispatch],
+	);
 
 	const setDataReferences = useCallback(
 		(dataReference: ApiMessageRef[]) => {
@@ -69,8 +78,8 @@ export function useReference() {
 	);
 
 	const setAttachmentData = useCallback(
-		(attachent: ApiMessageAttachment | ApiMessageAttachment[]) => {
-			dispatch(referencesActions.setAttachmentData(attachent));
+		(attachment: ApiMessageAttachment | ApiMessageAttachment[]) => {
+			dispatch(referencesActions.setAttachmentData(attachment));
 		},
 		[dispatch],
 	);
@@ -134,6 +143,8 @@ export function useReference() {
 			idMessageRefOpt,
 			setIdReferenceMessageOption,
 			setOpenOptionMessageState,
+			statusLoadingAttachment,
+			setStatusLoadingAttachment,
 		}),
 		[
 			setDataReferences,
@@ -158,6 +169,8 @@ export function useReference() {
 			idMessageRefOpt,
 			setIdReferenceMessageOption,
 			setOpenOptionMessageState,
+			statusLoadingAttachment,
+			setStatusLoadingAttachment,
 		],
 	);
 }

@@ -59,8 +59,9 @@ export const CreateNewChannelModal = () => {
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
+		const typeChannel = payload.type;
 
-		if (newChannelCreatedId) {
+		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_VOICE) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}

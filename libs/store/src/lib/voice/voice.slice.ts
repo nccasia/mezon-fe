@@ -46,7 +46,7 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 				clan_id: clanId,
 				voice_channel_id: channelRes.channel_id || '',
 				clan_name: '',
-				participant: '',
+				participant: channelRes.participant || '',
 				voice_channel_label: '',
 				last_screenshot: '',
 				id: channelRes.jid || '',

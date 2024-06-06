@@ -48,6 +48,7 @@ export const normalizeString = (str: string) => {
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
 export const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
 export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$))/g;
+export const highlightEmojiRegex = /(:\b[^:\s]*\b:)/g;
 
 export const validURL = (string: string) => {
   const res = string.match(urlPattern);
@@ -55,3 +56,4 @@ export const validURL = (string: string) => {
 };
 
 export const clanAndChannelIdLinkRegex = /clans\/(\d+)\/channels\/(\d+)/;
+export const clanDirectMessageLinkRegex = /chat\/direct\/message\/(\d+)\/(\d+)$/;

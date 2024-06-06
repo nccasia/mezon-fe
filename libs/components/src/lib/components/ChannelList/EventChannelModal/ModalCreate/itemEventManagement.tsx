@@ -1,11 +1,7 @@
 import { selectChannelById, selectChannelFirst } from '@mezon/store';
 import * as Icons from '../../../Icons';
 import { useSelector } from 'react-redux';
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { OptionEvent } from '@mezon/utils';
 
 export type ItemEventManagementProps = {
 	option: string;

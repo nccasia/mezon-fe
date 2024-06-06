@@ -5,7 +5,10 @@
         "addFriends": "Add Friends",
         "requestFriend": "Friend Requests",
         "friendRequestSettings": "Friend Request Settings",
-        "language": "Language"
+        "language": "Language",
+        "profile": "Profile",
+        "newMessage": "New Message",
+        "newGroup": "New Group"
     },
     "headerRight": {
         "addFriends": "Add Friends"

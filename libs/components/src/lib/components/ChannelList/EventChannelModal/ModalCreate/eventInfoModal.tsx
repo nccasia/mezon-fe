@@ -5,11 +5,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
+import { OptionEvent } from '@mezon/utils';
+import { useApp } from '@mezon/core';
 
 export type EventInfoModalProps = {
 	topic: string;
@@ -79,15 +77,30 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const handleChangeTimeEnd = (e:any)=>{
 		handleTimeEnd(e.target.value);
 	}
-
+	const {appearanceTheme} = useApp();
+	const [openModal, setOpenModal] = useState(false);
+	const [openModalType, setOpenModalType] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
+		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+		const allowedTypes = ['image/jpeg', 'image/png'];
+		if (!allowedTypes.includes(file.type)) {
+			setOpenModalType(true);
+			e.target.value = null;
+			return;
+		}
+
+		if (sizeImage > 1000000) {
+			setOpenModal(true);
+			e.target.value = null;
+			return;
 		}
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setLogo(attachment.url ?? '');
@@ -97,19 +110,25 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	return (
 		<div className='max-h-[500px] overflow-y-auto hide-scrollbar'>
 			<div className="mb-4">
-				<h3 className="uppercase text-[11px] font-semibold">Event Topic</h3>
+				<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+					Event Topic
+					<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+				</h3>
 				<input
 					type="text"
 					name="location"
 					placeholder="What's your event?"
 					onChange={(e) => handleTopic(e.target.value)}
 					value={topic}
-					className="font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight"
+					className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === "light" ? "lightEventInputAutoFill" : ""}`}
 				/>
 			</div>
 			<div className="mb-4 flex gap-x-4">
 				<div className="w-1/2">
-					<h3 className="uppercase text-[11px] font-semibold ">Start Date</h3>
+					<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+						Start Date
+						<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+					</h3>
 					<DatePicker
 						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 						wrapperClassName="w-full"
@@ -120,7 +139,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					/>
 				</div>
 				<div className="w-1/2">
-					<h3 className="uppercase text-[11px] font-semibold ">Start Time</h3>
+					<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+						Start Time
+						<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+					</h3>
 					<select
 						name="timeStart"
 						onChange={handleChangeTimeStart}
@@ -133,7 +155,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			{option === OptionEvent.OPTION_LOCATION && 
 				<div className="mb-4 flex gap-x-4">
 					<div className="w-1/2">
-						<h3 className="uppercase text-[11px] font-semibold ">End Date</h3>
+						<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+							End Date
+							<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+						</h3>
 						<DatePicker
 							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 							wrapperClassName="w-full"
@@ -144,7 +169,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						/>
 					</div>
 					<div className="w-1/2">
-						<h3 className="uppercase text-[11px] font-semibold ">End Time</h3>
+						<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+							End Time
+							<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+						</h3>
 						<select
 							name="timeEnd"
 							onChange={handleChangeTimeEnd}
@@ -195,6 +223,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				</label>
 				{logo && <img src={logo} alt="logo" className='max-h-[180px] rounded w-full object-cover'/> }
 			</div>
+			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+			
+			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
 		</div>
 	);
 };

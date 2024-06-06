@@ -1,4 +1,4 @@
-import { Icons, MentionReactInput, UserMentionList } from '@mezon/components';
+import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage, useThreads } from '@mezon/core';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -19,7 +19,7 @@ const ThreadBox = () => {
 
 	const { threadRef } = useMezon();
 	const thread = threadRef.current;
-	const { isPrivate, threadCurrentChannel } = useThreads();
+	const { threadCurrentChannel } = useThreads();
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: thread?.id as string,
 		channelLabel: thread?.chanel_label as string,
@@ -70,17 +70,6 @@ const ThreadBox = () => {
 	return (
 		<div className="flex flex-col flex-1 justify-end">
 			<div>
-				{!threadCurrentChannel && (
-					<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
-						<Icons.ThreadIcon defaultSize="w-7 h-7" />
-						{isPrivate === 1 && (
-							<div className="absolute right-4 bottom-4">
-								<Icons.Locked />
-							</div>
-						)}
-					</div>
-				)}
-
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages

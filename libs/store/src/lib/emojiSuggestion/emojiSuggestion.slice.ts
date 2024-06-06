@@ -1,10 +1,16 @@
-import { IEmoji } from '@mezon/utils';
+import { IEmoji, IEmojiImage } from '@mezon/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
 export interface EmojiSuggestionEntity extends IEmoji {
 	id: string;
+}
+
+export interface FetchEmojiMobilePayload {
+	emoji: IEmoji[];
+	emojiImage: IEmojiImage[];
 }
 
 export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity, string> {
@@ -15,12 +21,14 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
 	pressAnyButtonState: boolean;
+	emojiImage?: IEmojiImage[];
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
 	selectId: (emo: EmojiSuggestionEntity) => emo.id || emo.name || '',
 });
 let emojiCache: IEmoji[] = [];
+let emojiImageCache: IEmojiImage[] = [];
 
 export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
 	try {
@@ -37,6 +45,31 @@ export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, t
 		emojiCache = data.emojis;
 		sessionStorage.setItem('emojiCache', JSON.stringify(emojiCache));
 		return emojiCache;
+	} catch (error) {
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const fetchEmojiMobile = createAsyncThunk<any>('emoji/fetchStatusMobile', async (_, thunkAPI) => {
+	try {
+		const cachedEmojiImageData = await AsyncStorage.getItem('emojiImageCache');
+
+		if (cachedEmojiImageData) {
+			emojiImageCache = JSON.parse(cachedEmojiImageData) as IEmojiImage[];
+			return {
+				emojiImage: emojiImageCache,
+			};
+		}
+		// Temp: mock api to get emoji image data
+		const responseEmojiImg = await fetch(`https://api.mockfly.dev/mocks/a82e14d2-488d-41d3-8ca3-8af8e92626b9/emoijmobile`);
+		if (!responseEmojiImg.ok) {
+			throw new Error('Failed to fetch emoji data');
+		}
+		emojiImageCache = await responseEmojiImg.json();
+		await AsyncStorage.setItem('emojiImageCache', JSON.stringify(emojiImageCache));
+		return {
+			emojiImage: emojiImageCache,
+		};
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
 	}
@@ -83,6 +116,19 @@ export const emojiSuggestionSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+
+		builder
+			.addCase(fetchEmojiMobile.pending, (state: EmojiSuggestionState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchEmojiMobile.fulfilled, (state: EmojiSuggestionState, action: PayloadAction<FetchEmojiMobilePayload>) => {
+				state.loadingStatus = 'loaded';
+				state.emojiImage = action.payload.emojiImage;
+			})
+			.addCase(fetchEmojiMobile.rejected, (state: EmojiSuggestionState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	},
 });
 
@@ -91,6 +137,7 @@ export const emojiSuggestionReducer = emojiSuggestionSlice.reducer;
 export const emojiSuggestionActions = {
 	...emojiSuggestionSlice.actions,
 	fetchEmoji,
+	fetchEmojiMobile,
 };
 
 const { selectAll, selectEntities } = emojiSuggestionAdapter.getSelectors();
@@ -106,5 +153,6 @@ export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (em
 
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
-export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
+export const selectEmojiImage = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiImage);
 
+export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);

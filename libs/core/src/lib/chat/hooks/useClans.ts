@@ -8,6 +8,7 @@ import {
 	useAppDispatch,
 	userClanProfileActions,
 } from '@mezon/store';
+import { UserSearchDataProps } from '@mezon/utils';
 import { ApiUpdateClanDescRequest } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -71,6 +72,14 @@ export function useClans() {
 
 	const remainingMember = usersClan.map((user) => user.user).slice(5);
 
+	const listUserSearch: UserSearchDataProps[] = usersClan.map((user) => {
+		return {
+			id: user?.user?.id ?? '',
+			display: user?.user?.username ?? '',
+			avatarUrl: user?.user?.avatar_url ?? '',
+		};
+	});
+
 	return useMemo(
 		() => ({
 			clans,
@@ -79,6 +88,7 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
+			listUserSearch,
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,
@@ -91,6 +101,7 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
+			listUserSearch,
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,

@@ -54,7 +54,7 @@ const ListMemberInvite = (props: ModalParam) => {
             />
             <p className="ml-[0px] mt-[16px] mb-[16px] dark:text-[#AEAEAE] text-black text-[15px] cursor-default">This channel is private, only select members and roles can view this channel.</p>
             <hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
-            <div className={`py-[10px] cursor-default overflow-y-auto max-h-[250px] ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
+            <div className={`py-[10px] cursor-default overflow-y-auto max-h-[200px] ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
                 {listDMInvite ? (
                     <div>
                         {filteredListDMBySearch?.map((dmGroup) => (

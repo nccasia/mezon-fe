@@ -5,7 +5,7 @@ export const mainLoader = async () => {
 	const store = await getStoreAsync();
 	store.dispatch(clansActions.fetchClans());
 	store.dispatch(notificationActions.fetchListNotification());
-	store.dispatch(emojiSuggestionActions.fetchEmoji());
+	// store.dispatch(emojiSuggestionActions.fetchEmoji());
 	store.dispatch(gifsActions.fetchGifCategories());
 	store.dispatch(gifsActions.fetchGifCategoryFeatured());
 

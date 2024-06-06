@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-image-view/src/ImageView.js b/node_modules/react-native-image-view/src/ImageView.js
-index f0c1992..7c80c67 100644
+index f0c1992..2ece98c 100644
 --- a/node_modules/react-native-image-view/src/ImageView.js
 +++ b/node_modules/react-native-image-view/src/ImageView.js
 @@ -110,8 +110,9 @@ export default class ImageView extends Component<PropsType, StateType> {
@@ -10,12 +10,12 @@ index f0c1992..7c80c67 100644
 +          getInitialParams(image, initialScreenDimensions)
          );
 +        this.onChangeDimension = this.onChangeDimension.bind(this);
-         
+ 
          this.state = {
              images: props.images,
 @@ -142,53 +143,53 @@ export default class ImageView extends Component<PropsType, StateType> {
          this.imageTranslateValue = new Animated.ValueXY({x, y});
-         
+ 
          this.panResponder = generatePanHandlers(
 -            (event: EventType): void => this.onGestureStart(event.nativeEvent),
 -            (event: EventType, gestureState: GestureState): void =>
@@ -28,12 +28,12 @@ index f0c1992..7c80c67 100644
 +          (event: EventType, gestureState: GestureState): void =>
 +            this.onGestureRelease(event.nativeEvent, gestureState)
          );
-         
+ 
          const imagesWithoutSize = getImagesWithoutSize(
 -            addIndexesToImages(props.images)
 +          addIndexesToImages(props.images)
          );
-         
+ 
          if (imagesWithoutSize.length) {
              Promise.all(fetchImageSize(imagesWithoutSize)).then(
 -                this.setSizeForImages
@@ -41,16 +41,16 @@ index f0c1992..7c80c67 100644
              );
          }
      }
-     
+ 
      componentDidMount() {
          styles = createStyles(this.state.screenDimensions);
 -        Dimensions.addEventListener('change', this.onChangeDimension);
 +        this.dimensionListener = Dimensions.addEventListener('change', this.onChangeDimension);
      }
-     
+ 
      componentDidUpdate() {
          const {images, imageIndex, isVisible} = this.state;
-         
+ 
          if (
 -            typeof this.props.isVisible !== 'undefined' &&
 -            this.props.isVisible !== isVisible
@@ -58,7 +58,7 @@ index f0c1992..7c80c67 100644
 +          this.props.isVisible !== isVisible
          ) {
              this.onNextImagesReceived(this.props.images, this.props.imageIndex);
-             
+ 
              if (
 -                images !== this.props.images ||
 -                imageIndex !== this.props.imageIndex
@@ -69,7 +69,7 @@ index f0c1992..7c80c67 100644
 -                    addIndexesToImages(this.props.images)
 +                  addIndexesToImages(this.props.images)
                  );
-                 
+ 
                  if (imagesWithoutSize.length) {
                      Promise.all(fetchImageSize(imagesWithoutSize)).then(
 -                        updatedImages =>
@@ -87,7 +87,7 @@ index f0c1992..7c80c67 100644
              }
 @@ -210,8 +211,9 @@ export default class ImageView extends Component<PropsType, StateType> {
      }
-     
+ 
      componentWillUnmount() {
 -        Dimensions.removeEventListener('change', this.onChangeDimension);
 -
@@ -98,7 +98,7 @@ index f0c1992..7c80c67 100644
              clearTimeout(this.glideAlwaysTimer);
          }
 @@ -231,7 +233,7 @@ export default class ImageView extends Component<PropsType, StateType> {
-     
+ 
      onNextImagesReceived(images: Array<ImageType>, imageIndex: number = 0) {
          this.imageInitialParams = images.map(image =>
 -            getInitialParams(image, this.state.screenDimensions)
@@ -108,20 +108,20 @@ index f0c1992..7c80c67 100644
              scale: 1,
 @@ -278,11 +280,11 @@ export default class ImageView extends Component<PropsType, StateType> {
          const {x} = event.nativeEvent.contentOffset || {x: 0};
-         
+ 
          const nextImageIndex = Math.round(
 -            x / this.state.screenDimensions.screenWidth
 +          x / this.state.screenDimensions.screenWidth
          );
-         
+ 
          this.isScrolling =
 -            Math.ceil(x) % this.state.screenDimensions.screenWidth > 10;
 +          Math.ceil(x) % this.state.screenDimensions.screenWidth > 10;
-         
+ 
          if (imageIndex !== nextImageIndex && nextImageIndex >= 0) {
              const nextImageScale = this.getInitialScale(nextImageIndex);
 @@ -348,17 +350,17 @@ export default class ImageView extends Component<PropsType, StateType> {
-         
+ 
          // if image not scaled and fits to the screen
          if (
 -            isSwipeCloseEnabled &&
@@ -135,27 +135,27 @@ index f0c1992..7c80c67 100644
 -                dy * BACKGROUND_OPACITY_MULTIPLIER
 +              dy * BACKGROUND_OPACITY_MULTIPLIER
              );
-             
+ 
              this.imageTranslateValue.y.setValue(y + dy);
              this.modalBackgroundOpacity.setValue(
 -                backgroundOpacity > 1 ? 1 : backgroundOpacity
 +              backgroundOpacity > 1 ? 1 : backgroundOpacity
              );
          }
-         
+ 
 @@ -430,8 +432,8 @@ export default class ImageView extends Component<PropsType, StateType> {
                  this.doubleTapTimer = null;
-                 
+ 
                  scale = scalesAreEqual(imageInitialScale, scale)
 -                    ? scale * SCALE_MAX_MULTIPLIER
 -                    : imageInitialScale;
 +                  ? scale * SCALE_MAX_MULTIPLIER
 +                  : imageInitialScale;
-                 
+ 
                  Animated.timing(this.imageScaleValue, {
                      toValue: scale,
 @@ -449,34 +451,34 @@ export default class ImageView extends Component<PropsType, StateType> {
-         
+ 
          const {x, y} = this.calculateNextTranslate(dx, dy, scale);
          const scrollEnabled =
 -            scale === this.getInitialScale() &&
@@ -164,7 +164,7 @@ index f0c1992..7c80c67 100644
 +          scale === this.getInitialScale() &&
 +          x === imageInitialTranslate.x &&
 +          y === imageInitialTranslate.y;
-         
+ 
          Animated.parallel(
 -            [
 -                modalBackgroundOpacity > 0
@@ -198,7 +198,7 @@ index f0c1992..7c80c67 100644
 +              }),
 +          ].filter(Boolean)
          ).start();
-         
+ 
          // Close modal with animation if image not scaled and high vertical gesture speed
          if (
 -            isSwipeCloseEnabled &&
@@ -212,7 +212,7 @@ index f0c1992..7c80c67 100644
                  toValue: y + 400 * vy,
 @@ -532,8 +534,8 @@ export default class ImageView extends Component<PropsType, StateType> {
      }
-     
+ 
      getImageStyle(
 -        image: ImageType,
 -        index: number
@@ -222,7 +222,7 @@ index f0c1992..7c80c67 100644
          const {imageIndex, screenDimensions} = this.state;
          const {width, height} = image;
 @@ -544,21 +546,21 @@ export default class ImageView extends Component<PropsType, StateType> {
-         
+ 
          // very strange caching, fix it with changing size to 1 pixel
          const {x, y} = calculateInitialTranslate(
 -            width,
@@ -233,7 +233,7 @@ index f0c1992..7c80c67 100644
 +          screenDimensions
          );
          const translateValue = new Animated.ValueXY({x, y});
-         
+ 
          const transform =
 -            index === imageIndex
 -                ? this.imageTranslateValue.getTranslateTransform()
@@ -241,7 +241,7 @@ index f0c1992..7c80c67 100644
 +          index === imageIndex
 +            ? this.imageTranslateValue.getTranslateTransform()
 +            : translateValue.getTranslateTransform();
-         
+ 
          const scale =
 -            index === imageIndex
 -                ? this.imageScaleValue
@@ -251,19 +251,19 @@ index f0c1992..7c80c67 100644
 +            : this.getInitialScale(index);
          // $FlowFixMe
          transform.push({scale});
-         
+ 
 @@ -597,7 +599,7 @@ export default class ImageView extends Component<PropsType, StateType> {
-         
+ 
          return images.map((image, index) => {
              const nextImageSize = nextImages.find(
 -                nextImage => nextImage.index === index
 +              nextImage => nextImage.index === index
              );
-             
+ 
              /* eslint-disable */
 @@ -646,9 +648,9 @@ export default class ImageView extends Component<PropsType, StateType> {
      panResponder: *;
-     
+ 
      calculateNextTranslate(
 -        dx: number,
 -        dy: number,
@@ -283,10 +283,10 @@ index f0c1992..7c80c67 100644
 +                      screenSize / 2 -
 +                      (imageSize * (scale / imageInitialScale)) / 2;
                  }
-                 
+ 
                  return nextTranslate;
 @@ -698,9 +700,9 @@ export default class ImageView extends Component<PropsType, StateType> {
-     
+ 
      togglePanels(isVisible?: boolean) {
          const panelsVisible =
 -            typeof isVisible !== 'undefined'
@@ -297,19 +297,19 @@ index f0c1992..7c80c67 100644
 +            : !this.state.panelsVisible;
          // toggle footer and header
          this.setState({panelsVisible});
-         
+ 
 @@ -720,7 +722,7 @@ export default class ImageView extends Component<PropsType, StateType> {
      }
-     
+ 
      listKeyExtractor = (image: ImageType): string =>
 -        this.state.images.indexOf(image).toString();
 +      this.state.images.indexOf(image).toString();
-     
+ 
      close = () => {
          this.setState({isVisible: false});
 @@ -734,19 +736,19 @@ export default class ImageView extends Component<PropsType, StateType> {
          const loaded = image.loaded && image.width && image.height;
-         
+ 
          return (
 -            <View
 -                style={styles.imageContainer}
@@ -339,7 +339,7 @@ index f0c1992..7c80c67 100644
 +          </View>
          );
      };
-     
+ 
 @@ -765,84 +767,84 @@ export default class ImageView extends Component<PropsType, StateType> {
          const headerTranslate = this.headerTranslateValue.getTranslateTransform();
          const footerTranslate = this.footerTranslateValue.getTranslateTransform();
@@ -361,14 +361,14 @@ index f0c1992..7c80c67 100644
 +              outputRange: [`rgba(${rgb}, 0.9)`, `rgba(${rgb}, 0.2)`],
 +          }
          );
-         
+ 
          const isPrevVisible =
 -            imageScale === imageInitialScale && imageIndex > 0;
 +          imageScale === imageInitialScale && imageIndex > 0;
          const isNextVisible =
 -            imageScale === imageInitialScale && imageIndex < images.length - 1;
 +          imageScale === imageInitialScale && imageIndex < images.length - 1;
-         
+ 
          return (
 -            <Modal
 -                transparent
@@ -384,7 +384,7 @@ index f0c1992..7c80c67 100644
 -                    ]}
 -                />
 +          <Modal
-+            transparent
++            transparent={Platform.OS === 'android'}
 +            visible={isVisible}
 +            animationType={animationType}
 +            onRequestClose={this.close}

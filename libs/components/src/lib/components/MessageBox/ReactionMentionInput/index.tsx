@@ -33,6 +33,7 @@ import {
 	UsersClanEntity,
 	focusToElement,
 	regexToDetectGifLink,
+	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
@@ -41,7 +42,7 @@ import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState }
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
-import { ThreadNameTextField } from '../../../components';
+import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
@@ -49,12 +50,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-
-type Emoji = {
-	emoji: string;
-	name: string;
-	shortname: string;
-};
 
 type ChannelsMentionProps = {
 	id: string;
@@ -76,6 +71,7 @@ export type MentionReactInputProps = {
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
+		mentionEveryone?: boolean,
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
@@ -103,8 +99,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	} = useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
-
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
@@ -120,7 +116,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
-
+	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojiListPNG
@@ -213,13 +209,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
+					mentionEveryone,
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-
 				setAttachmentData([]);
 				setIdReferenceMessageReply('');
 				setOpenReplyMessageState(false);
+				setMentionEveryone(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -235,6 +232,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						valueThread?.references,
 						{ nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate },
 						anonymousMessage,
+						mentionEveryone,
 					);
 					setOpenThreadMessageState(false);
 				} else {
@@ -245,11 +243,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
 						anonymousMessage,
+						mentionEveryone,
 					);
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-
+				setMentionEveryone(false);
 				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -315,6 +314,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}))
 			: [];
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
+
 		if (linkGifDirect && linkGifDirect?.length > 0) {
 			const newAttachmentDataRef = linkGifDirect
 				.filter((item) => item !== null)
@@ -322,7 +322,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					filetype: 'image/gif',
 					url: item,
 				}));
-
 			setAttachmentData(newAttachmentDataRef);
 		}
 
@@ -338,18 +337,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		if (mentions.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
-				mentionedUsers.splice(0, mentionedUsers.length);
-				convertedMentions.forEach((item) => {
-					mentionedUsers.push(item);
-				});
-			} else {
-				for (const mention of mentions) {
-					if (mention.display.startsWith('@')) {
-						mentionedUsers.push({
-							user_id: mention.id.toString() ?? '',
-							username: mention.display ?? '',
-						});
-					}
+				setMentionEveryone(true);
+			}
+			for (const mention of mentions) {
+				if (mention.display.startsWith('@')) {
+					mentionedUsers.push({
+						user_id: mention.id.toString() ?? '',
+						username: mention.display ?? '',
+					});
 				}
 			}
 			setMentionData(mentionedUsers);
@@ -357,6 +352,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(convertedHashtag);
 			setContent('');
+			setValueTextInput('');
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
@@ -383,19 +379,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		return result;
 	};
 
-	const replaceChannelIdsWithDisplay = (text: string, listInput: any[]) => {
-		// Regex to match 19-digit numbers preceded by '#'
-		const regex = /#[0-9]{19}\b/g;
-		// Replace channelId with display name
-		const replacedText = text.replace(regex, (match) => {
-			const channelId = match.substring(1); // Remove '#' from channelId
-			const channel = listInput.find((item) => item.id === channelId);
-			return channel ? `#${channel.display}` : match; // Replace with display name or original match if not found
-		});
-
-		return replacedText;
-	};
-
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
@@ -417,7 +400,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const regexEmoji = /:\b[^:]*\b:/g;
 		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
 		if (emojiArray.length > 0) {
 			return emojiArray[0];
@@ -446,20 +429,43 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 	const { appearanceTheme } = useApp();
+
+	const handleSearchUserMention = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, props.listMentions ?? []));
+	};
+
+	const handleSearchHashtag = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+	};
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
-				<div>
-					<ThreadNameTextField
-						onChange={handleChangeNameThread}
-						onKeyDown={onKeyDown}
-						value={nameValueThread ?? ''}
-						label="Thread Name"
-						placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-						className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
-					/>
-					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
-					{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
+				<div className={`flex flex-col overflow-y-auto h-heightMessageViewChatThread ${appearanceTheme === "light"? "customScrollLightMode" : ""}`}>
+					<div className="flex flex-col justify-end flex-grow">
+						{!threadCurrentChannel && (
+							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
+								<Icons.ThreadIcon defaultSize="w-7 h-7" />
+								{isPrivate === 1 && (
+									<div className="absolute right-4 bottom-4">
+										<Icons.Locked />
+									</div>
+								)}
+							</div>
+						)}
+						<ThreadNameTextField
+							onChange={handleChangeNameThread}
+							onKeyDown={onKeyDown}
+							value={nameValueThread ?? ''}
+							label="Thread Name"
+							placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
+							className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
+						/>
+						{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
+						{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
+					</div>
 				</div>
 			)}
 			{props.isThread && messageThreadError && !threadCurrentChannel && (
@@ -473,20 +479,25 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
+				className="dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
 			>
 				<Mention
 					appendSpaceOnAdd={true}
-					data={props.listMentions ?? []}
+					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							avatarUrl={(suggestion as any).avatarUrl}
+							subText=""
+						/>
 					)}
 					style={mentionStyle}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -494,14 +505,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				<Mention
 					markup="#[__display__](__id__)"
 					appendSpaceOnAdd={true}
-					data={listChannelsMention ?? []}
+					data={handleSearchHashtag}
 					trigger="#"
 					displayTransform={(id: any, display: any) => {
 						return `#${display}`;
 					}}
 					style={mentionStyle}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							symbol="#"
+							subText={(suggestion as ChannelsMentionProps).subText}
+						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>

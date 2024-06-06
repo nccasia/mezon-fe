@@ -3,7 +3,7 @@ import { IMessageNotifyProps } from '../types';
 import { View , Text, Linking} from 'react-native';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import FastImage from 'react-native-fast-image';
-import ImageView from 'react-native-image-viewing';
+ import ImageView from 'react-native-image-view';
 import VideoPlayer from 'react-native-video-player';
 import { Metrics } from '@mezon/mobile-ui';
 import { styles as s } from './MessageNotification.styles';
@@ -177,12 +177,22 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 				{images.length > 0 && renderImages()}
 				{images.length > 0 && (
 					<ImageView
+						animationType={'none'}
 						images={images.map((i) => {
 							return { uri: i.url };
 						})}
 						imageIndex={0}
-						visible={visibleImage}
-						onRequestClose={() => setIsVisibleImage(false)}
+						isVisible={visibleImage}
+						glideAlways
+						isSwipeCloseEnabled
+						isPinchZoomEnabled
+						isTapZoomEnabled
+						controls={{
+							next: true,
+							prev: true,
+							close: true,
+						}}
+						renderFooter={() => setIsVisibleImage(false)}
 					/>
 				)}
 				{documents.length > 0 && renderDocuments()}

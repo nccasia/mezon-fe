@@ -37,7 +37,7 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 			ref={panelRef}
 			onMouseDown={(e) => e.stopPropagation()}
 			style={{
-				left: coords.mouseX - 250,
+				left: coords.mouseX ,
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
 			}}

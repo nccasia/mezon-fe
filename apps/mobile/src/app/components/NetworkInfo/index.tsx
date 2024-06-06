@@ -1,5 +1,5 @@
 import { Colors, size } from '@mezon/mobile-ui';
-import { appActions } from '@mezon/store';
+import { appActions } from '@mezon/store-mobile';
 import NetInfo from '@react-native-community/netinfo';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';

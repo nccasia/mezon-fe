@@ -55,10 +55,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5
-			bg-bgLightModeSecond
+			bg-bgLightPrimary
 			relative h-full overflow-y-scroll
 			overflow-x-hidden flex-col flex
-			
+
 			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}

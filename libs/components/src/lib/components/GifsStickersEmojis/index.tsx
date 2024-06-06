@@ -38,20 +38,12 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 
 	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
-	const [emojiDivWidth, setEmojiDivWidth] = useState<number | undefined>();
-
-	useEffect(() => {
-		if (emojiRefParentDiv.current) {
-			const width = emojiRefParentDiv.current.getBoundingClientRect().width;
-			setEmojiDivWidth(width);
-		}
-	}, [emojiRefParentDiv]);
 
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
 			className={`w-[370px] max-sm:w-full max-sm:pt-0 max-sm:rounded-none max-sm:mt-[-0.5rem] 
-			sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900
+			sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30
 			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
 		>
 			<div className="w-full">

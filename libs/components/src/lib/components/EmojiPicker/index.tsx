@@ -61,11 +61,12 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 				props.messageEmojiId ?? '',
-				emojiPicked,
+				emojiPicked.trim(),
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
 			);
+
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setEmojiSuggestion(emojiPicked);
@@ -249,7 +250,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 				<button
 					key={index}
 					className="text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full"
-					onClick={() => onEmojiSelect(item.shortname)}
+					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img src={item.src}></img>

@@ -1,6 +1,6 @@
-import { useChannels, useNotification } from '@mezon/core';
+import { useApp, useChannels, useNotification } from '@mezon/core';
 import { INotification } from '@mezon/store';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
@@ -13,6 +13,8 @@ const tabDataNotify = [
 ];
 
 function NotificationList() {
+	const tabMentionRef = useRef<HTMLDivElement | null>(null);
+	const tabIndividualRef = useRef<HTMLDivElement | null>(null);
 	const { notification } = useNotification();
 	const [currentTabNotify, setCurrentTabNotify] = useState('individual');
 	const handleChangeTab = (valueTab: string) => {
@@ -25,6 +27,15 @@ function NotificationList() {
 	const notifyMentionItem = notification.filter(
 		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
 	);
+	const {appearanceTheme} = useApp();
+	useEffect(() => {
+		if (currentTabNotify === 'mention' && tabMentionRef.current) {
+			tabMentionRef.current.scrollTop = -tabMentionRef.current.scrollHeight;
+		}
+		if (currentTabNotify === 'individual' && tabIndividualRef.current) {
+			tabIndividualRef.current.scrollTop = -tabIndividualRef.current.scrollHeight;
+		}
+	},[currentTabNotify, notifyMentionItem]);
 
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
@@ -51,14 +62,14 @@ function NotificationList() {
 					</div>
 				</div>
 				{currentTabNotify === 'individual' && (
-					<div className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
+					<div ref={tabIndividualRef} className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
 						{notificationItem.map((notify: INotification) => (
 							<NotificationItem notify={notify} key={notify.id} />
 						))}
 					</div>
 				)}
 				{currentTabNotify === 'mention' && (
-					<div className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
+					<div ref={tabMentionRef} className={`dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto ${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
 						{notifyMentionItem.map((notify: INotification) => (
 							<NotifyMentionItem notify={notify} key={notify.id} />
 						))}

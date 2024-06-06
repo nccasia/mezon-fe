@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import type { Messaging } from 'firebase/messaging';
+
 const firebaseConfig = {
   apiKey: process.env.NX_CHAT_APP_FCM_API_KEY as string,
   authDomain: process.env.NX_CHAT_APP_FCM_AUTH_DOMAIN as string,
@@ -10,21 +12,52 @@ const firebaseConfig = {
   measurementId: process.env.NX_CHAT_APP_FCM_MEASUREMENT_ID as string,
 };
 
-initializeApp(firebaseConfig);
+let messaging: Messaging| null = null;
 
-const messaging = getMessaging();
+function isPlatformSupported() {
+  return 'serviceWorker' in navigator;
+}
+
+function isMessagingAvailable(messaging: Messaging | null): messaging is Messaging {
+  return isPlatformSupported() && messaging !== null;
+}
+
+function initializeFirebase() {
+  if (isPlatformSupported()) {
+    initializeApp(firebaseConfig);
+    messaging = getMessaging();
+  }
+}
+
+
 export const requestForToken = async () => {
   let currentToken = '';
   try {
+    if (!isMessagingAvailable(messaging)) {
+      throw new Error('Platform is not supported');
+    }
+
     currentToken = await getToken(messaging, { vapidKey: process.env.NX_CHAT_APP_FCM_VAPID_KEY as string});
   } catch (error) {
     return '';
   }
   return currentToken;
 };
-export const onMessageListener = () =>
-  new Promise((resolve) => {
-    onMessage(messaging, (payload: any) => {
-      resolve(payload);
-    });
+
+initializeFirebase();
+
+export const onMessageListener = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!isMessagingAvailable(messaging)) {
+        throw new Error('Platform is not supported');
+      }
+
+      onMessage(messaging, (payload) => {
+        resolve(payload);
+      });
+    } catch (e) {
+      reject(e);
+    }
   });
+}

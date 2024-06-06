@@ -2,16 +2,19 @@ import { Icons } from '@mezon/components';
 import { useClans } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanBannerBackgroundProps = {
+	hasChanges: boolean;
 	onUpload: (urlImage: string) => void;
 	onHasChanges: (hasChanges: boolean) => void;
 };
 
-const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
+const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentClan } = useClans();
 
@@ -19,6 +22,7 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
 	const [urlImage, setUrlImage] = useState<string | undefined>(currentClan?.banner ?? undefined);
+	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFile = (e: any) => {
@@ -30,6 +34,12 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+
+		if (!fileTypeImage.includes(file.type)) {
+			setOpenModal(true);
+			e.target.value = null;
+			return;
 		}
 
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
@@ -46,7 +56,14 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		setUrlImage('');
+		if (urlImage && fileInputRef.current) {
+			setUrlImage('');
+			fileInputRef.current.value = '';
+		}
+
+		if (fileInputRef.current && !urlImage) {
+			fileInputRef.current.click();
+		}
 	};
 
 	useEffect(() => {
@@ -55,7 +72,14 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 		} else {
 			onHasChanges(false);
 		}
-	}, [urlImage]);
+	}, [urlImage, currentClan?.banner]);
+
+	useEffect(() => {
+		if (!hasChanges && fileInputRef.current) {
+			setUrlImage(currentClan?.banner ?? undefined);
+			fileInputRef.current.value = '';
+		}
+	}, [hasChanges]);
 
 	return (
 		<div className="flex sbm:flex-row flex-col pt-10 mt-10 border-t border-borderClan gap-x-5 gap-y-[10px]">
@@ -68,7 +92,7 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 					The recommended minimum size is 960x540 and recommended aspect ratio is 16:9.
 				</p>
 				<Button
-					className="h-10 w-fit px-4 mt-4 rounded bg-transparent border border-buttonProfile hover:!bg-buttonProfileHover dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
+					className="h-10 w-fit px-4 mt-4 rounded bg-bgLightModeThird text-textLightTheme dark:text-textDarkTheme border dark:border-buttonProfile hover:!bg-[#9e9e9e] dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
 					onClick={handleOpenFile}
 				>
 					Upload Background
@@ -79,9 +103,9 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 					<label>
 						<div
 							style={{ backgroundImage: `url(${urlImage})` }}
-							className={`bg-cover bg-no-repeat bg-center w-full h-full bg-buttonProfile rounded relative cursor-pointer`}
+							className={`bg-cover bg-no-repeat bg-center w-full h-full dark:bg-buttonProfile bg-bgLightModeThird rounded relative cursor-pointer`}
 						>
-							{!urlImage && <p className="text-white text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
+							{!urlImage && <p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
 						</div>
 						<input ref={fileInputRef} id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 					</label>
@@ -93,6 +117,14 @@ const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundPr
 					</button>
 				</div>
 			</div>
+
+			<ModalValidateFile
+				openModal={openModal}
+				onClose={() => setOpenModal(false)}
+				image="assets/images/file-and-folder.png"
+				title="Only image files are allowed"
+				content="Just uploaf type file (JPEG, PNG), please!"
+			/>
 		</div>
 	);
 };

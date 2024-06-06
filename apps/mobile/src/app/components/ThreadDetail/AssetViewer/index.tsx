@@ -2,11 +2,7 @@ import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, 
 import styles from "./style"
 import MemberListStatus from "../../MemberStatus";
 import AssetsHeader from "../AssetsHeader";
-import { useState } from "react";
-import { useRef } from "react";
-
-interface IProps {
-}
+import { useState, useRef } from "react";
 
 const TabList = [
     "Members",
@@ -16,7 +12,7 @@ const TabList = [
     "Files"
 ]
 
-export default function AssetsViewer({ }: IProps) {
+export default function AssetsViewer() {
     const [pageID, setPageID] = useState<number>(0);
     const ref = useRef<ScrollView>();
 
@@ -56,7 +52,7 @@ export default function AssetsViewer({ }: IProps) {
 function Page2() {
     return (
         <View style={{ width: Dimensions.get("screen").width }}>
-            <Text style={{ color: "white" }}>sdcsx</Text>
+            <Text style={{ color: "white" }}>tab content</Text>
         </View>
     )
 }

@@ -18,11 +18,11 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     navigation.setOptions({
         headerRight: () => (
             <Pressable onPress={handleCreateCategory}>
-                <Text style={{ color: "white", paddingHorizontal: 10 }}>Create</Text>
+                <Text style={{ color: "white", paddingHorizontal: 20 }}>Create</Text>
             </Pressable>
         ),
         headerLeft: () => (
-            <Pressable style={{ padding: 10 }} onPress={handleClose}>
+            <Pressable style={{ padding: 20 }} onPress={handleClose}>
                 <CrossIcon height={16} width={16} />
             </Pressable>
         ),

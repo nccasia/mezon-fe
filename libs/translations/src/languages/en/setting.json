@@ -1,11 +1,45 @@
 {
-    "accountSetting": {},
-    "paymentSettings": {},
-    "appSettings": {
-        "language": "Language"
+    "accountSettings": {
+        "title": "Account Settings",
+        "getNitro": "Get Nitro",
+        "account": "Account",
+        "privacySafety": "Privacy & Safety",
+        "familyCenter": "Family Center",
+        "authorizedApp": "Authorized Apps",
+        "device": "Device",
+        "connection": "Connections",
+        "clip": "Clip",
+        "friendRequests": "Friend Requests",
+        "QRScan": "QR Scan"
     },
-    "support": {},
-    "whatsNew": {},
-    "logOut": "Log Out",
+    "paymentSettings": {
+        "title": "Payment Settings",
+        "serverBoots": "Server Boots",
+        "nitroGift": "Nitro Gifting",
+        "restoreSubscription": "Restore subscription"
+    },
+    "appSettings": {
+        "title": "App Settings",
+        "voice": "Voice",
+        "appearance": "Appearance",
+        "accessibility": "Accessibility",
+        "language": "Language",
+        "chat": "Chat",
+        "webBrowser": "Web Browser",
+        "notifications": "Notifications",
+        "appIcon": "App Icon",
+        "advance": "Advance"
+    },
+    "supportSettings": {
+        "title": "Support",
+        "support": "Support",
+        "uploadLog": "Upload log",
+        "acknowledgement": "Acknowledgement"
+    },
+    "whatsNew": {
+        "title": "What's new",
+        "whatsNew": "What's new"
+    },
+    "logOut": "Logout",
     "removeAccount": "Remove Account"
 }

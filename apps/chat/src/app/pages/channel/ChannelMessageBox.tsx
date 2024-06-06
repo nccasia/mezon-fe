@@ -31,8 +31,9 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
+			mentionEveryone?: boolean
 		) => {
-			sendMessage(content, mentions, attachments, references, anonymous);
+			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
 		},
 		[sendMessage],
 	);

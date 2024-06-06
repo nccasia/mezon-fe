@@ -4,11 +4,11 @@ import { useMezon } from '@mezon/transport';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
-import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -39,26 +39,26 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 	};
 
 	const checkUrl = (url: string | undefined) => {
-		if(url !== undefined && url !== '') return true;
+		if (url !== undefined && url !== '') return true;
 		return false;
 	};
 	const [color, setColor] = useState<string>('#323232');
 
 	const getColor = async () => {
-		if(checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)){
+		if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
 			const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
 			const colorImg = await getColorAverageFromURL(url || '');
-			if(colorImg) setColor(colorImg);
-		}		
-	}
+			if (colorImg) setColor(colorImg);
+		}
+	};
 
-	useEffect(()=>{
+	useEffect(() => {
 		getColor();
-	},[]);
+	}, []);
 
 	return (
 		<div>
-			<div className="h-[60px] rounded-tr-[10px] rounded-tl-[10px]" style={{backgroundColor: color}}></div>
+			<div className="h-[60px] rounded-tl-lg rounded-tr-lg" style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}

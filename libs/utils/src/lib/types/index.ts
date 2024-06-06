@@ -2,6 +2,7 @@ import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
+	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
@@ -11,16 +12,19 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
+	ApiNotifiReactMessage,
+	ApiNotificationChannelCategoySetting,
+	ApiNotificationSetting,
+	ApiNotificationUserChannel,
 	ApiPermission,
+	ApiPinMessage,
+	ApiPinMessageRequest,
 	ApiRole,
+	ApiSearchMessageDocument,
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
-	ApiNotificationUserChannel,
-	ApiNotificationSetting,
-	ApiNotificationChannelCategoySetting,
-	ApiNotifiReactMessage,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -29,6 +33,10 @@ export * from './thumbnailPos';
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
 export type IClan = ApiClanDesc & {
+	id: string;
+};
+
+export type IChannelAttachment = ApiChannelAttachment & {
 	id: string;
 };
 
@@ -55,13 +63,13 @@ export type IRolesClan = ApiRole & {
 	id: string;
 };
 
-export type INotificationSetting = ApiNotificationUserChannel
+export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage
+export type INotifiReactMessage = ApiNotifiReactMessage;
 
-export type IDefaultNotificationClan = ApiNotificationSetting
+export type IDefaultNotificationClan = ApiNotificationSetting;
 
-export type IDefaultNotificationCategory = ApiNotificationSetting
+export type IDefaultNotificationCategory = ApiNotificationSetting;
 
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
@@ -99,11 +107,16 @@ export type IChannel = ApiChannelDescription & {
 	description?: string;
 };
 
+export type IPinMessage = ApiPinMessage & {
+	id: string;
+};
+
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
 	userChannelId?: string;
 	user_id?: string; // use on VoiceChannelList
+	participant?: string; // use on VoiceChannelList
 };
 
 export type IThread = {
@@ -152,6 +165,10 @@ export type IMessage = ChannelMessage & {
 	creationTime?: Date;
 	creationTimeMs?: number;
 	lastSeen?: boolean;
+};
+
+export type SearchMessage = ApiSearchMessageDocument & {
+	id: string;
 };
 
 export type IMessageWithUser = IMessage & {
@@ -304,6 +321,12 @@ export type IEmoji = {
 	unicode?: string;
 };
 
+export type IEmojiImage = {
+	src?: string;
+	shortname: string;
+	category?: string;
+};
+
 export type IEmoticons = {
 	[key: string]: string;
 };
@@ -378,6 +401,13 @@ export type MentionDataProps = {
 	name?: string;
 };
 
+export type UserSearchDataProps = {
+	id: string | number;
+	display?: string;
+	avatarUrl?: string;
+	name?: string;
+};
+
 export type MentionsInputChangeEvent = {
 	target: {
 		value: string;
@@ -414,6 +444,7 @@ export type ILineMention = {
 
 export type IMessageLine = {
 	mentions: ILineMention[];
+	isOnlyEmoji: boolean;
 };
 
 export interface UsersClanEntity extends IUsersClan {
@@ -443,3 +474,20 @@ export type RemoveChannelUsers = {
 	channelId: string;
 	ids?: string[];
 };
+
+export enum Tabs_Option {
+	LOCATION = 0,
+	EVENT_INFO = 1,
+	REVIEW = 2,
+}
+
+export enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
+
+export enum MentionTypeEnum {
+	MENTION = 'MENTION',
+	HASHTAG = 'HASHTAG',
+	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
+}

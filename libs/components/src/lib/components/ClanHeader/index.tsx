@@ -94,7 +94,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				<div className={`h-[60px] relative bg-gray-950`}>
 					<div ref={modalRef} className={`relative h-[60px] top-0`} onClick={handleShowModalClan}>
 						<div
-							className={`cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-white`}
+							className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-bgLightSecondary`}
 						>
 							<p className="dark:text-white text-black text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
 							<button className="w-6 h-8 flex flex-col justify-center">
@@ -123,7 +123,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										/>
 									)}
 									<ItemModal
-										onClick={openNotiSettingModal}
+										onClick={() => {openNotiSettingModal(); setIsShowModalPannelClan(false);}}
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>

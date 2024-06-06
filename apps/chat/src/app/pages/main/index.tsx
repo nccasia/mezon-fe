@@ -1,5 +1,5 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useChatMessages, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useApp, useAppNavigation, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
@@ -100,23 +100,27 @@ function MyApp() {
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 
-	const handleClick = useCallback(
-		() => {
-			setOpenOptionMessageState(false);
-		}, []
-	);
+	const handleClick = useCallback(() => {
+		setOpenOptionMessageState(false);
+	}, []);
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
-				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-bgLightTertiary duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends" onClick={() => setMode('dm')}>
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
-							<Image src={`/assets/images/${appearanceTheme === "dark" ? "mezon-logo-black.svg" : "mezon-logo-white.svg"}`} alt={'logoMezon'} width={48} height={48} className="clan w-full aspect-square" />
+							<Image
+								src={`/assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+								alt={'logoMezon'}
+								width={48}
+								height={48}
+								className="clan w-full aspect-square"
+							/>
 							{quantityPendingRequest !== 0 && (
 								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{quantityPendingRequest}

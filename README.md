@@ -184,3 +184,16 @@ See more about the naming convention [here](https://github.com/airbnb/javascript
 -  Identify and clarify to the team what and where you are going to add to the repo
 -  Do self-test for your own codes
 -  Contact **2 team members** to review your changes
+
+
+## Troubleshooting
+
+### Debug desktop app
+
+See: https://github.com/electron/electron/issues/3331
+
+- 1, First build and package the app as usual
+- 2, Run the app with `./dist/executables/win-unpacked/mezon.exe --remote-debugging-port=8315`
+- 3, Open Chrome and navigate to `chrome://inspect`
+- 4, Click on `Configure...` and add `localhost:8315` to the list
+- 5, Click on `inspect` to open the DevTools

@@ -11,4 +11,8 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		marginTop: -5
 	},
+	iconEmojiInMessage: {
+		width: size.s_18,
+		height: size.s_18,
+	},
 })

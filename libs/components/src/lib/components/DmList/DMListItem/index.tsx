@@ -45,7 +45,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				numberCharacterCollapse={22}
 				avatar={
 					Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar?.length !== 1
-						? '/assets/images/avatar-group.png'
+						? 'assets/images/avatar-group.png'
 						: directMessage?.channel_avatar ?? ''
 				}
 				name={directMessage?.channel_label ?? ''}

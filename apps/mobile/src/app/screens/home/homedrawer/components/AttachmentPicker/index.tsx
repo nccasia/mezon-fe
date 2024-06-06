@@ -15,9 +15,10 @@ export type AttachmentPickerProps = {
 	mode?: number;
 	currentChannelId?: string;
 	currentClanId?: string;
+	onCancel?: () => void;
 };
 
-function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentPickerProps) {
+function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: AttachmentPickerProps) {
 	const { t } = useTranslation(['message']);
 	const { sessionRef, clientRef } = useMezon();
 	const { setAttachmentData } = useReference();
@@ -28,6 +29,11 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 				type: [DocumentPicker.types.allFiles],
 			});
 			const file = res?.[0];
+			setAttachmentData({
+				url: file?.uri || file?.fileCopyUri,
+				filename: file?.name || file?.uri,
+				filetype: file?.type,
+			});
 			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
 
 			const fileFormat: IFile = {
@@ -41,6 +47,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 			handleFiles([fileFormat]);
 		} catch (err) {
 			if (DocumentPicker.isCancel(err)) {
+				onCancel?.();
 				// User cancelled the picker
 			} else {
 				throw err;
@@ -56,7 +63,8 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const fullFilename = `${currentClanId}/${currentChannelId}`.replace(/-/g, '_') + '/' + file.name;
+			const ms = new Date().getTime();
+			const fullFilename = `${currentClanId}/${currentChannelId}/${ms}`.replace(/-/g, '_') + '/' + file.name;
 			return handleUploadFileMobile(client, session, fullFilename, file);
 		});
 

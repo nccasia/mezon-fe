@@ -1,9 +1,9 @@
-import { MessageBox } from '@mezon/components';
-import { useDirectMessages } from '@mezon/core';
+import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox } from '@mezon/components';
+import { useDirectMessages, useGifsStickersEmoji, useMenu, useReference } from '@mezon/core';
 import { RootState } from '@mezon/store';
-import { IMessageSendPayload } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -15,6 +15,14 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
+	const { isShowMemberList } = useMenu();
+	const { subPanelActive } = useGifsStickersEmoji();
+	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
+	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
+	const { idMessageRefReaction } = useReference();
+	const [classNamePopup, setClassNamePopup] = useState<string>(
+		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
+	);
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -36,16 +44,66 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
+	useEffect(() => {
+		if (
+			subPanelActive !== SubPanelName.NONE &&
+			subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
+			subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM
+		) {
+			setIsEmojiOnChat(true);
+		} else {
+			setIsEmojiOnChat(false);
+		}
+	}, [subPanelActive]);
+
+	useEffect(() => {
+		if (
+			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth < 640) ||
+			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
+		) {
+			setIsEmojiOnChat(true);
+		}
+	}, [subPanelActive]);
+
+	useEffect(() => {
+		if (subPanelActive === SubPanelName.EMOJI) {
+			setEmojiAction(EmojiPlaces.EMOJI_EDITOR);
+		}
+		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
+			setEmojiAction(EmojiPlaces.EMOJI_REACTION);
+		}
+	}, [subPanelActive]);
+
 
 	return (
-		<div className="mx-4 relative">
+		<div className="mx-2 relative " role="button" aria-hidden>
+			{isEmojiOnChat && (
+				<div
+					className={classNamePopup}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
+			<ReplyMessageBox />
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
-				// TODO: useMemo for listMentions
 				// listMentions={UserMentionList(directParamId)}
 			/>
+			{isEmojiOnChat && ( // responsive mobile
+				<div
+					className={`relative h-[300px]  overflow-y-scroll w-full hidden max-sm:block animate-slideUp`}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} messageEmojiId={idMessageRefReaction} />
+				</div>
+			)}
 		</div>
 	);
 }

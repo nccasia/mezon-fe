@@ -43,13 +43,13 @@ const ClanSetting = (props: ModalSettingProps) => {
 							</button>
 						</div>
 						<div className={`flex-col flex-1 dark:bg-bgSecondary bg-bgLightSecondary ${(closeMenu && !menu) ? 'hidden' : 'flex'}`}>
-							<SettingSidebar onClickItem={handleSettingItemClick} handleMenu={(value: boolean)=>setMenu(value)}/>
+							<SettingSidebar onClickItem={handleSettingItemClick} handleMenu={(value: boolean)=>setMenu(value)} currentSetting = {currentSetting.id}/>
 						</div>
 
 						<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
 							<div className="flex flex-row flex-1 justify-start h-full">
-								<div className="w-[740px] px-[40px] pt-[60px] pb-[80px]">
-									<div className="relative">
+								<div className="w-[740px] sbm:p-[40px] p-4 pt-[60px] ">
+									<div className="relative h-full max-h-full">
 										<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme">
 											{currentSetting.name}
 										</h2>

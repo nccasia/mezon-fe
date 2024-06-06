@@ -1,0 +1,24 @@
+{
+  "bottomSheet": {
+    "title": "Notification Setting",
+    "labelOptions": {
+      "reactionMessage": "Reaction Message",
+      "categoryDefault": "Use Category Default",
+      "allMessage": "ALL",
+      "notThingMessage": "NOTHING",
+      "mentionMessage": "MENTION"
+    }
+  },
+  "notifySettingThreadModal": {
+    "headerTitle": "Mute this thread",
+    "muteDuration": {
+      "forFifteenMinutes": "For 15 Minutes",
+      "forOneHour": "For 1 Hour",
+      "forThreeHours": "For 3 Hours",
+      "forEightHours": "For 8 Hours",
+      "forTwentyFourHours": "For 24 Hours",
+      "untilTurnItBackOn": "Until turn it back on"
+    },
+    "description": "You are receiving notifications from all messages in this server, but you can override it here"
+  }
+}

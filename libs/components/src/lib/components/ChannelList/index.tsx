@@ -66,7 +66,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events />
 			</div>
-			<hr className="h-[0.08px] w-[272px] dark:border-borderDivider border-white mx-2" />
+			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
 			<div
 				className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ${channelCurrentType === ChannelType.CHANNEL_TYPE_VOICE ? 'pb-[230px]' : 'pb-[120px]'}`}
 			>

@@ -43,6 +43,7 @@ export function useMessageValue(channelId?: string) {
 
 	return useMemo(
 		() => ({
+			currentChannelId,
 			mode,
 			currentDmGroupId,
 			allTextInput,
@@ -50,6 +51,8 @@ export function useMessageValue(channelId?: string) {
 			setValueTextInput,
 			setMode,
 		}),
-		[setValueTextInput, setMode, valueTextInput, allTextInput, currentDmGroupId, mode],
+		[setValueTextInput, setMode, valueTextInput, allTextInput, currentDmGroupId, mode, currentChannelId],
 	);
 }
+
+

@@ -29,8 +29,8 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 
 			{type === ETypeMessage.THREAD && threadCurrentChannel && (
 				<div>
-					<h4 className="text-[32px] font-bold my-2">{threadCurrentChannel?.channel_label}</h4>
-					<div className="mb-1">
+					<h4 className="text-[32px] font-bold my-2 dark:text-textDarkTheme text-textLightTheme">{threadCurrentChannel?.channel_label}</h4>
+					<div className="mb-1 dark:text-textDarkTheme text-textLightTheme">
 						<span className="text-base">Started by &nbsp;</span>
 						<span className="text-base font-semibold">{user?.user?.username}</span>
 					</div>

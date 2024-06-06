@@ -65,7 +65,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 		handleUpdateUser,
 	};
 	return props.flagOption ? (
-		<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary">
+		<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-x-hidden">
 			<SettingListRole handleClose={props.handleClose} />
 			<div className="border-l border-gray-400"></div>
 			<div className=" w-2/3">

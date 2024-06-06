@@ -6,12 +6,40 @@
 	"targets": {
 		"build": {
 			"executor": "nx-electron:build",
-			"outputs": ["{options.outputPath}"],
+			"outputs": [
+				"{options.outputPath}"
+			],
 			"options": {
 				"outputPath": "dist/apps/desktop",
 				"main": "apps/desktop/src/main.ts",
 				"tsConfig": "apps/desktop/tsconfig.app.json",
-				"assets": ["apps/desktop/src/assets"]
+				"assets": [
+					{
+						"glob": "**/*",
+						"input": "apps/desktop/src/assets/",
+						"output": "./assets/"
+					},
+					{
+						"glob": "**/*",
+						"input": "apps/chat/src/assets/",
+						"output": "./assets/"
+					},
+					{
+						"glob": "**/*",
+						"input": "libs/assets/src/assets/",
+						"output": "./assets/"
+					},
+					{
+						"glob": "apps/chat/src/assets/favicon.ico",
+						"input": "./",
+						"output": "./"
+					},
+					{
+						"glob": "apps/chat/src/assets/firebase-messaging-sw.js",
+						"input": "./",
+						"output": "./"
+					}
+				]
 			},
 			"configurations": {
 				"production": {
@@ -57,7 +85,9 @@
 		},
 		"test": {
 			"executor": "@nx/jest:jest",
-			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"outputs": [
+				"{workspaceRoot}/coverage/{projectRoot}"
+			],
 			"options": {
 				"jestConfig": "apps/desktop/jest.config.ts"
 			}

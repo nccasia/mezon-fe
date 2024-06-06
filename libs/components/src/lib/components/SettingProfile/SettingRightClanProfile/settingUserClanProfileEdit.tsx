@@ -117,8 +117,8 @@ const SettingRightClanEdit = ({
 	};
 	return (
 		<>
-			<div className="flex-1 flex mt-[10px] gap-x-8 flex-row">
-				<div className="w-1/2 dark:text-white text-black">
+			<div className="flex-1 flex mt-[10px] gap-x-8 sbm:flex-row flex-col">
+				<div className="flex-1 dark:text-white text-black">
 					<div className="mt-[20px]">
 						<label htmlFor="inputField" className="dark:text-[#CCCCCC] text-black font-bold tracking-wide text-sm">
 							CLAN NICKNAME
@@ -154,7 +154,7 @@ const SettingRightClanEdit = ({
 						</div>
 					</div>
 				</div>
-				<div className="w-1/2 text-white">
+				<div className="flex-1 text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
 					<SettingRightClanCard profiles={editProfile}/>
 				</div>

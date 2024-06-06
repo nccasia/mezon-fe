@@ -34,10 +34,10 @@ export const Events = () => {
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
 						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.EventIcon />
+							<Icons.IconEvents />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">3 Events</div>
+					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">Events</div>
 				</div>
 				{numberEventManagement !== 0 &&
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">

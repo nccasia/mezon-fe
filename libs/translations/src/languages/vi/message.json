@@ -21,5 +21,15 @@
     "toast": {
         "copyText": "Đã sao chép nội dung tin nhắn",
         "attachmentIsLoading": "Attachment is loading, please wait a moment"
+    },
+    "directMessage": {
+        "you": "Bạn"
+    },
+    "edited": "(đã chỉnh sửa)",
+    "newMessage": {
+        "to": "Đến",
+        "newGroup": "Nhóm Mới",
+        "addFriend": "Thêm bạn",
+        "create": "Tạo"
     }
 }

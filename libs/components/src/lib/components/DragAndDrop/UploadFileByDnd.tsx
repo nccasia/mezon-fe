@@ -7,7 +7,7 @@ import DragAndDropUI from './DragAndDropUI';
 
 function FileUploadByDnD() {
 	const { setDraggingState } = useDragAndDrop();
-	const { setAttachmentData } = useReference();
+	const { setAttachmentData, setStatusLoadingAttachment } = useReference();
 	const { sessionRef, clientRef } = useMezon();
 	
 	const currentClanId = useSelector(selectCurrentClanId) || '';
@@ -34,6 +34,7 @@ function FileUploadByDnD() {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(false);
+		setStatusLoadingAttachment(true);
 		const files = e.dataTransfer.files;
 		const session = sessionRef.current;
 		const client = clientRef.current;
@@ -46,6 +47,8 @@ function FileUploadByDnD() {
 		});
 		Promise.all(promises).then((attachments) => {
 			attachments.forEach((attachment) => setAttachmentData(attachment));
+		}).then(() => {
+			setStatusLoadingAttachment(false);
 		});
 	};
 

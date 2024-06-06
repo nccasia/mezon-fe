@@ -53,6 +53,10 @@ function MemberProfile({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		// stop open popup default of web
+		window.oncontextmenu = (e) => {
+			e.preventDefault();
+		};
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
@@ -118,7 +122,7 @@ function MemberProfile({
 							{name.charAt(0).toUpperCase()}
 						</div>
 					)}
-					{!isHideIconStatus && avatar !== '/assets/images/avatar-group.png' ? (
+					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
 						<span
 							className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-[#111] bg-bgLightMode rounded-full`}
 						>
@@ -143,7 +147,7 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-bgLightMode'} nameMemberProfile`}
+							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

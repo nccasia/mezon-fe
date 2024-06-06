@@ -12,18 +12,23 @@ function UserMentionList(channelID: string): MentionDataProps[] {
 		}
 
 		const userMentionRaw = members[0].users;
-		const mentionList = userMentionRaw?.map((item: ChannelMembersEntity) => ({
-            id: item?.user?.id ?? '',
-            display: item?.user?.username ?? '',
-            avatarUrl: item?.user?.avatar_url ?? '',
-        })) ?? [];
-        const hardcodedUser: MentionDataProps = {
-            id: "1775731111020111321",
-            display: 'here',
-            avatarUrl: '',
-        };
-
-        return [...mentionList, hardcodedUser];
+		const mentionList =
+			userMentionRaw?.map((item: ChannelMembersEntity) => ({
+				id: item?.user?.id ?? '',
+				display: item?.user?.username ?? '',
+				avatarUrl: item?.user?.avatar_url ?? '',
+			})) ?? [];
+		const hardcodedUser: MentionDataProps = {
+			id: '1775731111020111321',
+			display: 'here',
+			avatarUrl: '',
+		};
+		const sortedMentionList = [...mentionList].sort((a, b) => {
+			if (a.display.toLowerCase() < b.display.toLowerCase()) return -1;
+			if (a.display.toLowerCase() > b.display.toLowerCase()) return 1;
+			return 0;
+		});
+		return [...sortedMentionList, hardcodedUser];
 	}, [members]);
 
 	return newUserMentionList;

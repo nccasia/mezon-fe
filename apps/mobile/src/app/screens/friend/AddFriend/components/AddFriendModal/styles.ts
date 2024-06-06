@@ -10,9 +10,6 @@ export const styles = StyleSheet.create({
     whiteText: {
         color: Colors.white
     },
-    addByUsernameContainer: {
-        flex: 1,
-    },
     searchInput: {
         borderRadius: size.s_10,
 		color: Colors.white,

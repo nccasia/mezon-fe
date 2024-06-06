@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, Pressable, FlatList } from 'react-native';
 import { styles } from './styles';
 import { useTranslation } from 'react-i18next';
 import { useFriends } from '@mezon/core';
-import { SeparatorWithLine, UserItem } from '../UserItem';
+import { SeparatorWithLine } from '../../../components/Common';
+import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
+import { FriendsEntity } from '@mezon/store-mobile';
 
 enum EFriendRequest {
     Received,
@@ -12,7 +14,7 @@ enum EFriendRequest {
 
 export const RequestFriendScreen = () => {
     const [selectedTab, setSelectedTab] = useState(EFriendRequest.Received);
-    const { friends } = useFriends();
+    const { friends, acceptFriend, deleteFriend } = useFriends();
     const { t } = useTranslation('friends');
     const friendRequestTabs = [
         {
@@ -23,7 +25,20 @@ export const RequestFriendScreen = () => {
             title: t('friendRequest.sent'),
             type: EFriendRequest.Sent
         }
-    ]
+    ];
+
+    const handleFriendAction = useCallback((friend: FriendsEntity, action: EFriendItemAction) => {
+        switch (action) {
+            case EFriendItemAction.Delete:
+                deleteFriend(friend.user.username, friend.user.id);
+                break;
+            case EFriendItemAction.Approve:
+                acceptFriend(friend.user.username, friend.user.id);
+                break;
+            default:
+                break;
+        }
+    }, [acceptFriend, deleteFriend])
 
     const receivedFriendRequestList = useMemo(() => {
         return friends.filter((friend) => friend.state === 2)
@@ -55,7 +70,7 @@ export const RequestFriendScreen = () => {
                         data={selectedTab === EFriendRequest.Received ? receivedFriendRequestList : sentFriendRequestList}
                         ItemSeparatorComponent={SeparatorWithLine}
                         keyExtractor={(friend) => friend.id.toString()}
-                        renderItem={({ item }) => <UserItem friend={item} />}
+                        renderItem={({ item }) => <FriendItem friend={item} handleFriendAction={handleFriendAction} />}
                     />
                 </View>
             </View>

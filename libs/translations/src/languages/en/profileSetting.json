@@ -1,0 +1,23 @@
+{
+    "header": {
+        "save": "Save"
+    },
+    "switch": {
+        "userProfile": "User Profile",
+        "serverProfile": "Server Profile"
+    },
+    "fields": {
+        "displayName": {
+            "label": "Display name",
+            "placeholder": ""
+        },
+        "pronouns": {
+            "label": "Pronouns",
+            "placeholder": ""
+        },
+        "bio": {
+            "label": "About me",
+            "placeholder": ""
+        }
+    }
+}

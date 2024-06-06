@@ -12,7 +12,7 @@ type ChannelMessageOptProps = {
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
 	const { reactionActions, userId } = useChatReaction();
-	const { openOptionMessageState, setOpenThreadMessageState, idMessageRefReply, openReplyMessageState } = useReference();
+	const { setOpenThreadMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);

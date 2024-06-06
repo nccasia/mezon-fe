@@ -9,15 +9,15 @@ export const styles = StyleSheet.create({
 		borderRadius: verticalScale(5),
 	},
   contentMessageBox: {
-		fontSize: size.s_16,
+	  fontSize: size.medium,
 		color: Colors.tertiary,
 	},
 	contentMessageLink: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		color: Colors.textLink,
 	},
   contentMessageMention: {
-		fontSize: size.s_16,
+	  fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
 	},

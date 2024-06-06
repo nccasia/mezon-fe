@@ -23,6 +23,7 @@ export const MezonButton = (props: IMezonButtonProps) => {
   return (
     <TouchableOpacity
       disabled={disabled}
+      style={styles.fill}
       onPress={onPress}
       {...props}
     >

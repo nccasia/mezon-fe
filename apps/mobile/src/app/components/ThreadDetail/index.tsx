@@ -9,7 +9,7 @@ import { useReference, useThreads } from '@mezon/core';
 export default function CreateThreadModal() {
   const { setValueThread } = useThreads();
   const { setOpenThreadMessageState } = useReference();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const handleNavigateCreateForm = () =>{
     setOpenThreadMessageState(false);
     setValueThread(null);

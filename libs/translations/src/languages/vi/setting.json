@@ -1,11 +1,45 @@
 {
-    "accountSetting": {},
-    "paymentSettings": {},
-    "appSettings": {
-        "language": "Ngôn ngữ"
+    "accountSettings": {
+        "title": "Cài đặt tài khoản",
+        "getNitro": "Mua Nitro",
+        "account": "Tài khoản",
+        "privacySafety": "Bảo mật và an toàn",
+        "familyCenter": "Quản lý gia đình",
+        "authorizedApp": "Ứng dụng được cho phép",
+        "device": "Thiết bị",
+        "connection": "Kết nối",
+        "clip": "Clip",
+        "friendRequests": "Yêu cầu kết bạn",
+        "QRScan": "Quét mã QR"
     },
-    "support": {},
-    "whatsNew": {},
+    "paymentSettings": {
+        "title": "Cài đặt thanh toán",
+        "serverBoots": "Nâng cấp máy chủ",
+        "nitroGift": "Tặng nitro",
+        "restoreSubscription": "Khôi phục đăng ký"
+    },
+    "appSettings": {
+        "title": "Cài đặt ứng dụng",
+        "voice": "Giọng nói",
+        "appearance": "Giao diện",
+        "accessibility": "Trợ năng",
+        "language": "Ngôn ngữ",
+        "chat": "Trò chuyện",
+        "webBrowser": "Trình duyệt web",
+        "notifications": "Thông báo",
+        "appIcon": "Biểu tượng",
+        "advance": "Nâng cao"
+    },
+    "supportSettings": {
+        "title": "Hỗ trợ",
+        "support": "Hỗ trợ",
+        "uploadLog": "Tải lên nhật ký sửa lỗi",
+        "acknowledgement": "Lời cám ơn"
+    },
+    "whatsNew": {
+        "title": "Có gì mới",
+        "whatsNew": "Có gì mới"
+    },
     "logOut": "Đăng Xuất",
     "removeAccount": "Xóa Tài Khoản"
 }

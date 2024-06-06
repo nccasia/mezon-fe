@@ -1,9 +1,5 @@
 import { Icons } from 'libs/components/src/lib/components';
 
-export const typeFileImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-export const typeFileVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
-
 export const typeFormats = [
 	{
 		type: 'text/plain',

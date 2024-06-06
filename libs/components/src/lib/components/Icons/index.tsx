@@ -1251,6 +1251,7 @@ export function Search(props: React.HTMLAttributes<SVGElement>) {
 			height="24"
 			className="dark:text-[#949BA4] text-black"
 			viewBox="0 0 24 24"
+			{...props}
 		>
 			<path
 				fill="currentColor"
@@ -2036,9 +2037,22 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 
 export const Location: React.FC<IconProps> = () => {
 	return (
-		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" className='w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode'>
-			<path fill="currentColor" fillRule="evenodd" d="M12 23c3 0 9-8.03 9-13a9 9 0 1 0-18 0c0 4.97 6 13 9 13Zm0-10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd">
-			</path>
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
+			className="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode"
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23c3 0 9-8.03 9-13a9 9 0 1 0-18 0c0 4.97 6 13 9 13Zm0-10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
@@ -2255,7 +2269,15 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 export const TrashIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className='dark:text-[#AEAEAE] text-textLightTheme'>
+		<svg
+			aria-hidden="true"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className="dark:text-[#AEAEAE] text-textLightTheme"
+		>
 			<path
 				fill="currentColor"
 				d="M14.25 1c.41 0 .75.34.75.75V3h5.25c.41 0 .75.34.75.75v.5c0 .41-.34.75-.75.75H3.75A.75.75 0 0 1 3 4.25v-.5c0-.41.34-.75.75-.75H9V1.75c0-.41.34-.75.75-.75h4.5Z"
@@ -2287,7 +2309,15 @@ export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSi
 
 export const Download: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className='dark:text-[#AEAEAE] text-textLightTheme'>
+		<svg
+			aria-hidden="true"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className="dark:text-[#AEAEAE] text-textLightTheme"
+		>
 			<path
 				fill="currentColor"
 				d="M12 2a1 1 0 0 1 1 1v10.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V3a1 1 0 0 1 1-1ZM3 20a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2H3Z"
@@ -2463,6 +2493,54 @@ export function SpinArrowIcon(props: React.HTMLAttributes<SVGAElement>) {
 	);
 }
 
+export function CloseIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="25"
+			height="25"
+			fill="currentColor"
+			className="bi bi-x-circle-fill"
+			viewBox="0 0 16 16"
+			{...props}
+		>
+			<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+		</svg>
+	);
+}
+
+export function ArrowLeftCircle(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-circle" viewBox="0 0 16 16" {...props}>
+  			<path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+		</svg>
+	);
+}
+
+export function ArrowLeftCircleActive(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16" {...props}>
+  			<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+		</svg>
+	);
+}
+
+export function ArrowDownFill(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="currentColor"
+			className="bi bi-caret-down-fill"
+			viewBox="0 0 16 16"
+			{...props}
+		>
+			<path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+		</svg>
+	);
+}
+
 export function FiltersIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
@@ -2484,6 +2562,52 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 				clipRule="evenodd"
 			></path>
 			<path fill="#B5BAC1" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z"></path>
+		</svg>
+	);
+}
+
+export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+			enable-background="new 0 0 128 128"
+			id="Layer_1"
+			version="1.1"
+			viewBox="0 0 128 128"
+			xmlSpace="preserve"
+		>
+			<circle cx="64" cy="64" fill="#4B5F83" id="circle" r="64" />
+			<g id="icon">
+				<path d="M64,99h35c0-16-10.4-29-24.6-33.4C80.1,62,84,55.7,84,48.5c0-11-9-20-20-20" fill="#E6E6E6" id="right" />
+				<path d="M64,28.5c-11,0-20,9-20,20c0,7.2,3.9,13.6,9.6,17.1C39.4,70,29,83,29,99h35" fill="#FFFFFF" id="left" />
+			</g>
+		</svg>
+	);
+}
+
+export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-contentTertiary text-colorTextLightMode' }) {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={defaultSize}
+		>
+			<path
+				fill="currentColor"
+				d="M7 1a1 1 0 0 1 1 1v.75c0 .14.11.25.25.25h7.5c.14 0 .25-.11.25-.25V2a1 1 0 1 1 2 0v.75c0 .14.11.25.25.25H19a3 3 0 0 1 3 3 1 1 0 0 1-1 1H3a1 1 0 0 1-1-1 3 3 0 0 1 3-3h.75c.14 0 .25-.11.25-.25V2a1 1 0 0 1 1-1Z"
+			></path>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M2 10a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-9Zm3.5 2a.5.5 0 0 0-.5.5v3c0 .28.22.5.5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 }

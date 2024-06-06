@@ -13,6 +13,8 @@ export interface AppState {
 	statusMenu: boolean;
 	hiddenBottomTabMobile: boolean;
 	hasInternetMobile: boolean;
+	loadingMainMobile: boolean;
+	isFromFcmMobile: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -24,6 +26,8 @@ export const initialAppState: AppState = {
 	statusMenu: true,
 	hiddenBottomTabMobile: true,
 	hasInternetMobile: false,
+	loadingMainMobile: false,
+	isFromFcmMobile: false,
 };
 
 export const appSlice = createSlice({
@@ -54,6 +58,12 @@ export const appSlice = createSlice({
 		setHasInternetMobile: (state, action) => {
 			state.hasInternetMobile = action.payload;
 		},
+		setLoadingMainMobile: (state, action) => {
+			state.loadingMainMobile = action.payload;
+		},
+		setIsFromFCMMobile: (state, action) => {
+			state.isFromFcmMobile = action.payload;
+		},
 	},
 });
 
@@ -82,4 +92,8 @@ export const selectStatusMenu = createSelector(getAppState, (state: AppState) =>
 
 export const selectHiddenBottomTabMobile = createSelector(getAppState, (state: AppState) => state.hiddenBottomTabMobile);
 
-export const setHasInternetMobile = createSelector(getAppState, (state: AppState) => state.hasInternetMobile);
+export const selectHasInternetMobile = createSelector(getAppState, (state: AppState) => state.hasInternetMobile);
+
+export const selectLoadingMainMobile = createSelector(getAppState, (state: AppState) => state.loadingMainMobile);
+
+export const selectIsFromFCMMobile = createSelector(getAppState, (state: AppState) => state.isFromFcmMobile);

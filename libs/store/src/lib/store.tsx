@@ -39,6 +39,7 @@ import { channelCategorySettingReducer, defaultNotificationCategoryReducer } fro
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
+import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -87,6 +88,7 @@ const reducer = {
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	notificationsetting: notificationSettingReducer,
+	pinmessages: pinMessageReducer,
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: defaultNotificationCategoryReducer,
 	notichannelcategorysetting: channelCategorySettingReducer,

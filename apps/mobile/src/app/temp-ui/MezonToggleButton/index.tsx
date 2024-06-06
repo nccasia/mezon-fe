@@ -12,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { styles } from './MezonToggleButton.styles';
 import { Colors } from '@mezon/mobile-ui';
+import { useEffect } from 'react';
 
 const SWITCH_BUTTON_PADDING = 4;
 const InterpolateXInput = [0, 1];
@@ -33,6 +34,14 @@ const MezonToggleButton = ({
   const [toggled, setToggled] = useState(value);
   const shareValue = useSharedValue(value ? 1 : 0);
   const bgColorBtn = toggled ? toggleBgOnColor : toggleBgOffColor;
+
+  useEffect(() => {
+    setToggled(value);
+    shareValue.value = withTiming(value ? 1 : 0, {
+      duration: 800,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+    });
+  }, [value]);
 
   const containerScale = {
     height: BUTTON_HEIGHT,

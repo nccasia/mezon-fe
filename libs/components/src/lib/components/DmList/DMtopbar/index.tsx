@@ -3,9 +3,9 @@ import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
-import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
+import SearchMessageChannel from '../../SearchMessageChannel';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -17,7 +17,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
-		<div className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white flex-shrink`}>
+		<div
+			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
+		>
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
 					<div onClick={() => setStatusMenu(true)} className="mx-6" role="button">
@@ -27,7 +29,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						numberCharacterCollapse={22}
 						avatar={
 							Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1
-								? '/assets/images/avatar-group.png'
+								? 'assets/images/avatar-group.png'
 								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
 						name={''}
@@ -58,7 +60,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								<Icons.ThreeDot />
 							</button>
 						</div>
-						<SearchMessage />
+						<SearchMessageChannel />
 						<div
 							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
 							id="inBox"

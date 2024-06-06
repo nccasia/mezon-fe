@@ -1,6 +1,7 @@
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import * as Icons from '../Icons';
+import { useReference } from '@mezon/core';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -9,8 +10,10 @@ export type FileSelectionButtonProps = {
 };
 function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }: FileSelectionButtonProps) {
 	const { sessionRef, clientRef } = useMezon();
+	const { setStatusLoadingAttachment } = useReference();
 
 	const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setStatusLoadingAttachment(true);
 		const files = e.target.files;
 		const session = sessionRef.current;
 		const client = clientRef.current;
@@ -21,9 +24,10 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 		const promises = Array.from(files).map((file) => {
 			return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
-
 		Promise.all(promises).then((attachments) => {
 			attachments.forEach((attachment) => onFinishUpload(attachment));
+		}).then(() => {
+			setStatusLoadingAttachment(false);
 		});
 	};
 
@@ -36,7 +40,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 					handleFiles(e);
 					e.target.value = '';
 				}}
-				className="block w-full hidden"
+				className="w-full hidden"
 				multiple
 			/>
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb cursor-pointer">

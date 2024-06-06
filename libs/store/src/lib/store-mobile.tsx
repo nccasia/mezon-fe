@@ -35,6 +35,11 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { eventManagementReducer } from './eventManagement/eventManagement.slice';
+import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
+import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
+import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -73,13 +78,20 @@ const reducer = {
 	users: usersReducer,
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
+	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,
+	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
+	notificationsetting: notificationSettingReducer,
+	defaultnotificationclan: defaultNotificationClanReducer,
+	defaultnotificationcategory: defaultNotificationCategoryReducer,
+	notichannelcategorysetting: channelCategorySettingReducer,
+	notifireactmessage: notifiReactMessageReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,

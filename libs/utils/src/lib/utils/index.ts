@@ -11,7 +11,7 @@ import {
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
-import { ChannelMembersEntity, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
+import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -162,3 +162,81 @@ export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
 	return emoji ? emoji.src : undefined;
 };
+
+export const updateEmojiReactionData = (data: any[]) => {
+	const dataItemReaction: Record<string, EmojiDataOptionals> = {};
+
+	data &&
+		data.forEach((item) => {
+			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
+			if (!dataItemReaction[key]) {
+				dataItemReaction[key] = {
+					id: item.id,
+					emoji: item.emoji,
+					senders: [
+						{
+							sender_id: item.senders[0]?.sender_id ?? '',
+							count: item.senders[0]?.count ?? 0,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						},
+					],
+					channel_id: item.channel_id,
+					message_id: item.message_id,
+				};
+			} else {
+				const existingItem = dataItemReaction[key];
+				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
+
+				if (senderIndex !== -1) {
+					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
+				} else {
+					existingItem.senders.push({
+						sender_id: item.senders[0]?.sender_id ?? '',
+						count: item.senders[0]?.count ?? 0,
+						emojiIdList: [],
+						sender_name: '',
+						avatar: '',
+					});
+				}
+			}
+		});
+	return Object.values(dataItemReaction);
+};
+
+export const checkLastChar = (text: string) => {
+	if (
+		text.charAt(text.length - 1) === ';' ||
+		text.charAt(text.length - 1) === ',' ||
+		text.charAt(text.length - 1) === '.' ||
+		text.charAt(text.length - 1) === ':'
+	) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+export function searchMentionsHashtag(searchValue: any, list: any[]) {
+	if (!searchValue) return list;
+	const lowerCaseSearchValue = searchValue.toLowerCase();
+	return list
+		.filter((mention) => mention.display.toLowerCase().includes(lowerCaseSearchValue))
+		.sort((a, b) => {
+			const displayA = a.display.toLowerCase();
+			const displayB = b.display.toLowerCase();
+			const indexA = displayA.indexOf(lowerCaseSearchValue);
+			const indexB = displayB.indexOf(lowerCaseSearchValue);
+
+			if (indexA !== -1 && indexB !== -1) {
+				return indexA - indexB;
+			} else if (indexA !== -1) {
+				return -1;
+			} else if (indexB !== -1) {
+				return 1;
+			} else {
+				return displayA.localeCompare(displayB);
+			}
+		});
+}

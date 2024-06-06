@@ -4,12 +4,21 @@ import { useMemo } from 'react';
 // TODO: refactor this to sender function
 
 export function useMessageLine(line: string): IMessageLine {
-	const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
-	const mentionDetectEmoji = /:\b[^:]*\b:/g;
+	const combinedRegex = /(?<!`)((?<=\s|^)(@|#)\S+(?=\s|$)|:(?!\d+:)\b[^:`\s]*\b:)(?!`)/g;
+
+	const emojiRegex = /^:\b[^:]*\b:$/;
+
+	const isOnlyEmoji = useMemo(() => {
+		if (!line.trim()) {
+			return false;
+		}
+
+		return emojiRegex.test(line);
+	}, [line]);
 
 	const matches = useMemo(() => {
 		if (line) {
-			return line.match(mentionRegex) || [];
+			return line.match(combinedRegex) || [];
 		} else {
 			return [];
 		}
@@ -56,5 +65,6 @@ export function useMessageLine(line: string): IMessageLine {
 
 	return {
 		mentions,
+		isOnlyEmoji,
 	};
 }

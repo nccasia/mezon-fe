@@ -1,7 +1,7 @@
 import { useClans } from '@mezon/core';
 import React, { useState } from 'react';
 import SettingRightClanEdit from './settingUserClanProfileEdit';
-const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => void }) => {
+const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileClick?: () => void; menuIsOpen: boolean; }) => {
 	const { clans, currentClan } = useClans();
 	const [flagOption, setFlagOption] = useState(false);
 	const [selectedClanId, setSelectedClanId] = useState<string | undefined>(currentClan ? currentClan.id : undefined);
@@ -15,7 +15,7 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	};
 
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+		<div className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? "min-w-[700px]" : ""} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}>
 			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 text-[#AEAEAE] font-bold text-base tracking-wider" onClick={handleUserProfileButtonClick}>

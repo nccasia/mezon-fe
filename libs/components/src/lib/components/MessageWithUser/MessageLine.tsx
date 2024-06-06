@@ -7,10 +7,11 @@ type MessageLineProps = {
 
 // TODO: refactor component for message lines
 const MessageLine = ({ line }: MessageLineProps) => {
-	const { mentions } = useMessageLine(line);
+	const { mentions, isOnlyEmoji } = useMessageLine(line);
+
 	return (
-		<div className="pt-[0.3rem]">
-			<MarkdownFormatText mentions={mentions} />
+		<div className="pt-[0.2rem]  pl-0 mb-0.5">
+			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} />
 		</div>
 	);
 };

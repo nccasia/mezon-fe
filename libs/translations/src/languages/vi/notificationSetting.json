@@ -1,0 +1,24 @@
+{
+  "bottomSheet": {
+    "title": "Cài đặt thông báo",
+    "labelOptions": {
+      "reactionMessage": "Tin nhắn phản ứng",
+      "categoryDefault": "Sử dụng mặc định của danh mục",
+      "allMessage": "TẤT CẢ",
+      "notThingMessage": "KHÔNG CÓ GÌ",
+      "mentionMessage": "NHẮC ĐẾN"
+    }
+  },
+  "notifySettingThreadModal": {
+    "headerTitle": "Tắt thông báo chuỗi này",
+    "muteDuration": {
+      "forFifteenMinutes": "Trong 15 phút",
+      "forOneHour": "Trong 1 giờ",
+      "forThreeHours": "Trong 3 giờ",
+      "forEightHours": "Trong 8 giờ",
+      "forTwentyFourHours": "Trong 24 giờ",
+      "untilTurnItBackOn": "Cho đến khi bật lại"
+    },
+    "description": "Bạn đang nhận được thông báo từ tất cả thư trong máy chủ này, nhưng bạn có thể ghi đè thông báo đó tại đây"
+  }
+}

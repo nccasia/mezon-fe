@@ -1,15 +1,16 @@
 import { Icons, MessageVideo } from '@mezon/components';
+import { fileTypeImage, fileTypeVideo } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { typeFileImage, typeFileVideo, typeFormats } from './TypeFormats';
+import { typeFormats } from './TypeFormats';
 
 export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size?: string, pos?: string) => {
 	const fileType = attachment.filetype;
 
 	const renderIcon = typeFormats.find((typeFormat) => typeFormat.type === fileType);
 
-	const hasFileImage = fileType && typeFileImage.includes(fileType);
+	const hasFileImage = fileType && fileTypeImage.includes(fileType);
 
-	const hasFileVideo = fileType && typeFileVideo.includes(fileType);
+	const hasFileVideo = fileType && fileTypeVideo.includes(fileType);
 
 	return (
 		<div>

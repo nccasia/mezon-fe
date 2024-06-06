@@ -1,4 +1,4 @@
-import { ChatContextProvider, useGifsStickersEmoji } from '@mezon/core';
+import { ChatContextProvider, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName } from '@mezon/utils';
 import { Outlet } from 'react-router-dom';

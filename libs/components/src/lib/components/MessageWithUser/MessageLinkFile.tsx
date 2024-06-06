@@ -52,7 +52,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 					<div
 						onClick={handleDownload}
 						role="button"
-						className="rounded-l-md  w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#393C40]"
+						className="rounded-l-md  w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
 					>
 						<Icons.Download defaultSize="w-4 h-4" />
 					</div>

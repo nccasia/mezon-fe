@@ -32,7 +32,6 @@ export default function InvitePage() {
 	
 	const joinChannel = async () => {
 		if (inviteIdParam) {
-			console.log("invite param", inviteIdParam);
 			inviteUser(inviteIdParam).then((res) => {
 				if (res.channel_id && res.clan_id) {
 					navigate(`/chat/clans/${res.clan_id}/channels/${res.channel_id}`);

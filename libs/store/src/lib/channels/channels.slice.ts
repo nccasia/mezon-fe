@@ -13,6 +13,7 @@ import { threadsActions } from '../threads/threads.slice';
 import memoize from 'memoizee';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
+import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
@@ -27,7 +28,7 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-	return { ...channelRes, id: channelRes.channel_id || '' };
+	return { ...channelRes, id: channelRes.channel_id || '', status: channelRes.meeting_code ? 1 : 0};
 };
 
 interface ChannelMeta {
@@ -79,6 +80,7 @@ export const joinChannel = createAsyncThunk(
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
+			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: channelId}))
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setMode('clan'));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
@@ -165,7 +167,7 @@ export const fetchChannelsCached = memoize(
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[4];
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.token;
 		},
 	},
 );
@@ -178,7 +180,6 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
-
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -186,7 +187,6 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	const channels = response.channeldesc.map(mapChannelToEntity);
 	const meta = channels.map((ch) => extractChannelMeta(ch));
 	thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
-
 	return channels;
 });
 
@@ -252,7 +252,7 @@ export const channelsSlice = createSlice({
 			const payload = action.payload;
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: {channel_label: payload.channel_label},
+				changes: {channel_label: payload.channel_label, status: payload.status},
 			});
 		},
 		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
@@ -388,7 +388,7 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 );
 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
-	channels.filter((channel) => channel.type == ChannelType.CHANNEL_TYPE_VOICE),
+	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE),
 );
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);

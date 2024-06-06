@@ -31,14 +31,26 @@ const ClanSettingOverview = () => {
 
 	const handleSave = async () => {
 		await updateClan(clanRequest);
+	};
+
+	const handleReset = () => {
 		setHasChanges(false);
 	};
 
 	return (
 		<div className="h-full">
-			<ClanLogoName onUpload={handleUploadLogo} onGetClanName={handleChangeName} onHasChanges={(hasChanges) => setHasChanges(hasChanges)} />
-			<ClanBannerBackground onUpload={handleUploadBackground} onHasChanges={(hasChanges) => setHasChanges(hasChanges)} />
-			{hasChanges && <ModalSaveChanges onSave={handleSave} />}
+			<ClanLogoName
+				hasChanges={hasChanges}
+				onUpload={handleUploadLogo}
+				onGetClanName={handleChangeName}
+				onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
+			/>
+			<ClanBannerBackground
+				hasChanges={hasChanges}
+				onUpload={handleUploadBackground}
+				onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
+			/>
+			{hasChanges && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
 		</div>
 	);
 };

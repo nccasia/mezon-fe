@@ -4,6 +4,7 @@ import { Colors } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import { Settings } from "../../../screens/settings";
 import { LanguageSetting } from "../../../screens/settings/LanguageSetting";
+import { ProfileSetting } from "../../../screens/settings/ProfileSetting";
 
 export const SettingStacks = ({ }: any) => {
     const Stack = createStackNavigator();
@@ -36,6 +37,19 @@ export const SettingStacks = ({ }: any) => {
                 component={LanguageSetting}
                 options={{
                     headerTitle: t('headerTitle.language'),
+                    headerTitleAlign: "center",
+                    headerTintColor: Colors.white,
+                    headerStyle: {
+                        backgroundColor: Colors.secondary
+                    },
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.SETTINGS.PROFILE}
+                component={ProfileSetting}
+                options={{
+                    headerTitle: t('headerTitle.profile'),
                     headerTitleAlign: "center",
                     headerTintColor: Colors.white,
                     headerStyle: {

@@ -9,9 +9,10 @@ export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
 interface IProps {
 	height: number;
 	children: React.ReactNode;
+	isStickyHeader: boolean;
 }
 
-export default forwardRef(function BottomKeyboardPicker({ height = 1, children }: IProps, ref: Ref<BottomSheetMethods>) {
+export default forwardRef(function BottomKeyboardPicker({ height = 1, children, isStickyHeader = false }: IProps, ref: Ref<BottomSheetMethods>) {
 	return (
 		<BottomSheet
 			ref={ref}
@@ -22,6 +23,7 @@ export default forwardRef(function BottomKeyboardPicker({ height = 1, children }
 			}}
 		>
 			<BottomSheetScrollView
+				stickyHeaderIndices={isStickyHeader ? [0] : []}
 				style={styles.contentContainer}>
 				{children}
 			</BottomSheetScrollView>

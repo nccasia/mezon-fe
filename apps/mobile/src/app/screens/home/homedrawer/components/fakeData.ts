@@ -1,4 +1,4 @@
-import { IEmoji, IUser } from "@mezon/utils";
+import { IEmojiImage, IUser } from "@mezon/utils";
 
 //TODO: delete later
 export const friendList: IUser[] = [
@@ -154,68 +154,35 @@ export const friendList: IUser[] = [
       },
 ]
 
-export const emojiFakeData: IEmoji[] = [
+export const emojiFakeData: IEmojiImage[] = [
   {
-    emoji: "😩",
-    name: "weary face",
-    shortname: "😩",
-    unicode: "1f629",
-    html: "&#128553;",
-    category: "Smileys & Emotion (face-concerned)",
-    order: 59
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/100_pbdkjg.png",
+    "shortname": ":100:",
+    "category": "People"
   },
   {
-    emoji: "😏",
-    name: "smirking face",
-    shortname: "😏",
-    unicode: "1f60f",
-    html: "&#128527;",
-    category: "Smileys & Emotion (face-neutral-skeptical)",
-    order: 26
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/joy_lusszo.png",
+    "shortname": ":joy:",
+    "category": "People"
   },
   {
-    emoji: "🙏",
-    name: "folded hands",
-    shortname: "🙏",
-    unicode: "1f64f",
-    html: "&#128591;",
-    category: "People & Body (hands)",
-    order: 1248
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056578/emojisSvg/People/like_scoptn.png",
+    "shortname": ":like:",
+    "category": "People"
   },
   {
-    emoji: "🙌",
-    name: "raising hands",
-    shortname: "🙌",
-    unicode: "1f64c",
-    html: "&#128588;",
-    category: "People & Body (hands)",
-    order: 1242
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056626/emojisSvg/Custom/da_wourle.png",
+    "shortname": ":da:",
+    "category": "Custom"
   },
   {
-    emoji: "😴",
-    name: "sleeping face",
-    shortname: ":sleeping:",
-    unicode: "1f634",
-    html: "&#128564;",
-    category: "Smileys & Emotion (face-sleepy)",
-    order: 34
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056636/emojisSvg/Custom/memes_zdnukg.gif",
+    "shortname": ":memes:",
+    "category": "Custom"
   },
   {
-    emoji: "😄",
-    name: "grinning face with smiling eyes",
-    shortname: ":smile:",
-    unicode: "1f604",
-    html: "&#128516;",
-    category: "Smileys & Emotion (face-smiling)",
-    order: 6
+    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/heart_eyes_r0qbvu.png",
+    "shortname": ":heart_eyes:",
+    "category": "People"
   },
-  {
-    emoji: "😅",
-    name: "grinning face with sweat",
-    shortname: ":sweat_smile:",
-    unicode: "1f605",
-    html: "&#128517;",
-    category: "Smileys & Emotion (face-smiling)",
-    order: 7
-  }
 ];

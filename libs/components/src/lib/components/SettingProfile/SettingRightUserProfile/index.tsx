@@ -2,11 +2,12 @@ import { useAccount } from '@mezon/core';
 import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
-import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import ModalValidateFile from '../../ModalValidateFile';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -14,12 +15,14 @@ const SettingRightUser = ({
 	avatar,
 	nameDisplay,
 	aboutMe,
+	menuIsOpen,
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
 	avatar: string;
 	nameDisplay: string;
 	aboutMe: string;
+	menuIsOpen: boolean;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
@@ -111,7 +114,9 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+		<div
+			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
+		>
 			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-semibold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
@@ -119,8 +124,8 @@ const SettingRightUser = ({
 					Clan Profiles
 				</button>
 			</div>
-			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
-				<div className="w-1/2 dark:text-[#CCCCCC] text-black">
+			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 sbm:flex-row flex-col">
+				<div className="flex-1 dark:text-[#CCCCCC] text-black">
 					<div className="mt-[20px]">
 						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
 							DISPLAY NAME
@@ -171,7 +176,7 @@ const SettingRightUser = ({
 						</div>
 					</div>
 				</div>
-				<div className="w-1/2 text-white">
+				<div className="flex-1  text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-semibold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
@@ -195,7 +200,6 @@ const SettingRightUser = ({
 						</button>
 
 						<button
-							// className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
 							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
 								handleUpdateUser();
@@ -207,32 +211,10 @@ const SettingRightUser = ({
 					</div>
 				</div>
 			) : null}
-			<Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
-				<Modal.Body className="bg-red-500 rounded-lg">
-					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
-						<img
-							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
-							src="/assets/images/file-and-folder.png"
-							alt="file"
-						/>
-						<h3 className="text-white text-4xl font-semibold">Your files are too powerful</h3>
-						<h4 className="text-white text-xl">Max file size is 1MB, please!</h4>
-					</div>
-				</Modal.Body>
-			</Modal>
-			<Modal dismissible show={openModalType} onClose={() => setOpenModalType(false)}>
-				<Modal.Body className="bg-red-500 rounded-lg">
-					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
-						<img
-							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
-							src="/assets/images/file-and-folder.png"
-							alt="file"
-						/>
-						<h3 className="text-white text-4xl font-semibold">Only image files are allowed</h3>
-						<h4 className="text-white text-xl">Just uploaf type file (JPEG, PNG), please!</h4>
-					</div>
-				</Modal.Body>
-			</Modal>
+
+			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+			
+			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
 		</div>
 	);
 };

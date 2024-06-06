@@ -1,61 +1,68 @@
 import { useChannelMembers } from "@mezon/core";
-import { selectCurrentChannelId } from "@mezon/store-mobile";
 import { Pressable, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
 import MemberItem from "./MemberItem";
-
 import style from "./style";
 import { AddMemberIcon, AngleRightIcon } from "@mezon/mobile-components";
+import { useContext, useMemo } from "react";
+import { threadDetailContext } from "../ThreadDetail/MenuThreadDetail";
+import { ChannelType } from "mezon-js";
 
 export default function MemberListStatus() {
-    const currentChannelId = useSelector(selectCurrentChannelId);
-    const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannelId });
+    const currentChannel = useContext(threadDetailContext);
+    const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
+    const isDMThread = useMemo(() => {
+        return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+    }, [currentChannel])
 
     return (
         <ScrollView contentContainerStyle={style.container}>
-            <Pressable>
-                <View style={style.inviteBtn}>
-                    <View style={style.iconNameWrapper}>
-                        <View style={style.iconWrapper}>
-                            <AddMemberIcon height={16} width={16} />
+            {currentChannel?.channel_avatar?.length !== 1 ? (
+                <Pressable>
+                    <View style={style.inviteBtn}>
+                        <View style={style.iconNameWrapper}>
+                            <View style={style.iconWrapper}>
+                                <AddMemberIcon height={16} width={16} />
+                            </View>
+                            <Text style={style.text}>{isDMThread ? 'Add Members' : 'Invite Members'}</Text>
                         </View>
-                        <Text style={style.text}>Invite Members</Text>
+                        <View>
+                            <AngleRightIcon height={22} width={22} />
+                        </View>
                     </View>
+                </Pressable>
+            ): null}
+
+            <View>
+                {onlineMembers.length > 0 && (
                     <View>
-                        <AngleRightIcon height={22} width={22} />
+                        <Text style={style.text}>Member - {onlineMembers.length}</Text>
+                        <View style={style.box}>
+                            {onlineMembers.map((user) => (
+                                <MemberItem
+                                    user={user}
+                                    key={user?.user?.id}
+                                />
+                            ))}
+                        </View>
                     </View>
-                </View>
-            </Pressable>
-
-            {onlineMembers.length > 0 && (
-                <View>
-                    <Text style={style.text}>Member - {onlineMembers.length}</Text>
-                    <View style={style.box}>
-                        {onlineMembers.map((user) => (
-                            <MemberItem
-                                user={user}
-                                key={user?.user?.id}
-                            />
-                        ))}
+                )}
+    
+                {offlineMembers.length > 0 && (
+                    <View style={{ marginTop: 20 }}>
+                        <Text style={style.text}>Offline - {offlineMembers.length}</Text>
+                        <View style={style.box}>
+                            {offlineMembers.map((user) => (
+                                <MemberItem
+                                    key={user.id}
+                                    user={user}
+                                    isOffline={true}
+                                />
+                            ))}
+                        </View>
                     </View>
-                </View>
-            )}
-
-            {offlineMembers.length > 0 && (
-                <View style={{ marginTop: 20 }}>
-                    <Text style={style.text}>Offline - {offlineMembers.length}</Text>
-                    <View style={style.box}>
-                        {offlineMembers.map((user) => (
-                            <MemberItem
-                                key={user.id}
-                                user={user}
-                                isOffline={true}
-                            />
-                        ))}
-                    </View>
-                </View>
-            )}
+                )}
+            </View>
         </ScrollView>
     )
 }

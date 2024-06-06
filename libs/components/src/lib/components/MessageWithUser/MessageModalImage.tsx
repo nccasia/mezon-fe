@@ -85,7 +85,7 @@ const MessageModalImage = () => {
 							</div>
 							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
 								{attachments.map((img, index) => {
-									const url = `https://cdn.mezon.vn/${img.clanId}/${img.channelId}/${img.filename}`;
+									const url = img.url;
 									return (
 										<div className={url === urlImg ? 'hidden' : ''} key={`${img.id}_${index}`}>
 											<img
@@ -93,10 +93,10 @@ const MessageModalImage = () => {
 												alt={url}
 												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
 												onDragStart={handleDrag}
-												onClick={() => handleClickImg(url)}
+												onClick={() => handleClickImg(url || '')}
 												onKeyDown={(event) => {
 													if (event.key === 'Enter') {
-														handleClickImg(url);
+														handleClickImg(url || '');
 													}
 												}}
 											/>
