@@ -35,7 +35,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
 				>
 					<div>
-						<div className="flex flex-row items-center m-2">
+						<div className="flex flex-row items-center m-2  dark:text-white text-black">
 							<img src={getSrcEmoji(emojiShowPanel.emoji ?? '', emojiListPNG)} className="w-5 h-5"></img>{' '}
 							<p className="text-sm ml-2">{calculateTotalCount(emojiShowPanel.senders)}</p>
 						</div>
