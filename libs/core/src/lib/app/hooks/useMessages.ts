@@ -1,7 +1,7 @@
-import { selectQuantitiesMessageRemain } from '@mezon/store';
+import { selectHasMoreMessage, selectQuantitiesMessageRemain } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
@@ -12,9 +12,12 @@ type MessageProps = {
 };
 
 export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage, messages }: MessageProps) => {
+	const dispatch = useDispatch();
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
+	const hasMoreMessage2 = useSelector(selectHasMoreMessage);
 	const remain = useSelector(selectQuantitiesMessageRemain);
+	const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
@@ -36,12 +39,20 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
-			if (currentChatRef.scrollTop === 0 && remain !== 0) {
+			// If scrollTop is already 0, do not allow further scrolling up
+			if (currentChatRef.scrollTop === 0) {
+				if (hasMoreMessage2) {
+					return;
+				}
+				console.log(currentChatRef.scrollTop);
+				console.log('r');
+				setShowLoadingMessage(true);
 				const previousHeight = currentChatRef.scrollHeight;
 				setIsFetching(true);
 				await loadMoreMessage();
 				setIsFetching(false);
 				currentChatRef.scrollTop = currentChatRef.scrollHeight - previousHeight;
+				setShowLoadingMessage(false);
 			}
 		};
 
@@ -50,7 +61,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		return () => {
 			currentChatRef?.removeEventListener('wheel', handleWheel);
 		};
-	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
+	}, [loadMoreMessage, chatRef, isFetching, hasMoreMessage2]);
 
-	return isFetching;
+	return { isFetching, showLoadingMessage };
 };

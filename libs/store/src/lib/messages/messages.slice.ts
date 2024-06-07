@@ -58,6 +58,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
+	hasMoreMessagesStatus: boolean;
 }
 
 export interface MessagesRootState {
@@ -154,8 +155,19 @@ export const fetchMessages = createAsyncThunk(
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
 		}
 
-		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+		let hasMore = undefined;
+		console.log(response.messages.length);
+		if (response.messages.length > 0) {
+			hasMore = true;
+		} else {
+			hasMore = false;
+		}
+
+		// thunkAPI.dispatch(messagesActions.setHasMoreMessage(hasMore));
+
+		console.log(hasMore);
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		thunkAPI.dispatch(messagesActions.setHasMoreMessage(hasMore));
 		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(response.messages.length));
 
 		if (response.last_seen_message?.id) {
@@ -299,6 +311,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
+	hasMoreMessagesStatus: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -313,11 +326,16 @@ export const messagesSlice = createSlice({
 	initialState: initialMessagesState,
 	reducers: {
 		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
+			console.log(action.payload.param);
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		setQuatitiesMessageRemain: (state, action) => {
 			state.quantitiesMessageRemain = action.payload;
 		},
+		setHasMoreMessage: (state, action) => {
+			state.hasMoreMessagesStatus = action.payload;
+		},
+
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const code = action.payload.code;
 			switch (code) {
@@ -541,7 +559,7 @@ export const selectParamByChannelId = (channelId: string) =>
 
 export const selectHasMoreMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return param?.[channelId]?.hasMore ?? true;
+		return param?.[channelId]?.hasMore ?? false;
 	});
 
 export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
@@ -555,3 +573,5 @@ export const selectMessageByMessageId = (messageId: string) =>
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
 export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
+
+export const selectHasMoreMessage = createSelector(getMessagesState, (state) => state.hasMoreMessagesStatus);

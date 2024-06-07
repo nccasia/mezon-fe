@@ -1,4 +1,3 @@
-import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -24,8 +23,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 
 	// share logic to load more message
-	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
-
+	const { isFetching, showLoadingMessage } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+	console.log(showLoadingMessage);
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
@@ -52,6 +51,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return array.slice().reverse();
 	}
 
+	console.log('hasMoreMessage', hasMoreMessage);
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5
@@ -63,8 +63,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && hasMoreMessage && <p className=" text-center">Loading messages...</p>}
+			{/* {hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />} */}
+			{showLoadingMessage && <p className=" text-center">Loading messages...</p>}
 
 			{reverseArray(messages).map((message, i) => {
 				return (
