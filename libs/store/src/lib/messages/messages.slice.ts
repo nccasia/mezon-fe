@@ -156,6 +156,10 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		let hasMore = undefined;
+<<<<<<< HEAD
+=======
+		console.log(response.messages.length);
+>>>>>>> 91753c6addca428f403ea909a14fc23f6f697143
 		if (response.messages.length > 0) {
 			hasMore = true;
 		} else {

@@ -23,7 +23,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 
 	// share logic to load more message
+<<<<<<< HEAD
 	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+=======
+	const { isFetching, showLoadingMessage } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+	console.log(showLoadingMessage);
+>>>>>>> 91753c6addca428f403ea909a14fc23f6f697143
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
@@ -63,7 +68,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{/* {hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />} */}
+<<<<<<< HEAD
 			{/* {showLoadingMessage && <p className=" text-center">Loading messages...</p>} */}
+=======
+			{showLoadingMessage && <p className=" text-center">Loading messages...</p>}
+>>>>>>> 91753c6addca428f403ea909a14fc23f6f697143
 
 			{reverseArray(messages).map((message, i) => {
 				return (
