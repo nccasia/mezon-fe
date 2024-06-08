@@ -11,32 +11,32 @@ type MessageProps = {
 	messages: IMessageWithUser[];
 };
 
-export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage, messages }: MessageProps) => {
+export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage }: MessageProps) => {
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
 	const remain = useSelector(selectQuantitiesMessageRemain);
-	useEffect(() => {
-		const currentChatRef = chatRef.current;
-		if (!currentChatRef || isFetching) return;
+	// useEffect(() => {
+	// 	const currentChatRef = chatRef.current;
+	// 	if (!currentChatRef || isFetching) return;
 
-		if (channelId !== currentChannelId) {
-			currentChatRef.scrollTop = currentChatRef.scrollHeight;
-			setCurrentChannelId(channelId);
-		}
-	}, [channelId, currentChannelId, isFetching, chatRef]);
+	// 	if (channelId !== currentChannelId) {
+	// 		currentChatRef.scrollTop = currentChatRef.scrollHeight;
+	// 		setCurrentChannelId(channelId);
+	// 	}
+	// }, [channelId, currentChannelId, isFetching, chatRef]);
 
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
 		currentChatRef.scrollTop = currentChatRef.scrollHeight;
-	}, [channelId, messages.length]);
+	}, [channelId]);
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
-			if (currentChatRef.scrollTop === 0 && remain !== 0) {
+			if (currentChatRef.scrollTop === 0) {
 				const previousHeight = currentChatRef.scrollHeight;
 				setIsFetching(true);
 				await loadMoreMessage();
@@ -52,5 +52,5 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		};
 	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
 
-	return isFetching;
+	return {isFetching};
 };
