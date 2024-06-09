@@ -34,7 +34,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
-	const { emojiListPNG, shiftPressedState, setShiftPressed } = useEmojiSuggestion();
+	const { emojiListPNG } = useEmojiSuggestion();
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 
 	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
@@ -155,24 +155,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			return () => clearTimeout(timer);
 		}
 	}, [showSenderPanelIn1s]);
-
-	const handleShiftKeyDown = (event: KeyboardEvent) => {
-		if (event.shiftKey) {
-			setShiftPressed(true);
-		}
-	};
-	const handleShiftKeyUp = () => {
-		setShiftPressed(false);
-	};
-
-	useEffect(() => {
-		window.addEventListener('keydown', handleShiftKeyDown);
-		window.addEventListener('keyup', handleShiftKeyUp);
-		return () => {
-			window.removeEventListener('keydown', handleShiftKeyDown);
-			window.removeEventListener('keyup', handleShiftKeyUp);
-		};
-	}, []);
 
 	return (
 		<div className="relative">

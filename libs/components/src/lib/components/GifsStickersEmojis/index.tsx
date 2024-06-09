@@ -1,4 +1,4 @@
-import { useAppParams, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useEmojiSuggestion, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -21,6 +21,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 	const [mod, setMod] = useState(0);
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setValueInputSearch } = useGifsStickersEmoji();
+	const { emojiListPNG, shiftPressedState, setShiftPressed } = useEmojiSuggestion();
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -38,6 +39,26 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 
 	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
+
+	const handleShiftKeyDown = (event: KeyboardEvent) => {
+		if (event.shiftKey) {
+			event.stopPropagation();
+			event.preventDefault();
+			setShiftPressed(true);
+		}
+	};
+	const handleShiftKeyUp = () => {
+		setShiftPressed(false);
+	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleShiftKeyDown);
+		window.addEventListener('keyup', handleShiftKeyUp);
+		return () => {
+			window.removeEventListener('keydown', handleShiftKeyDown);
+			window.removeEventListener('keyup', handleShiftKeyUp);
+		};
+	}, []);
 
 	return (
 		<div

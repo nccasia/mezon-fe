@@ -61,7 +61,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 				props.messageEmojiId ?? '',
-				emojiPicked.trim(),
+				emojiPicked,
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
@@ -70,7 +70,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
-			setEmojiSuggestion(emojiPicked.trim());
+			setEmojiSuggestion(emojiPicked);
 			if (!shiftPressedState) {
 				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 				setSubPanelActive(SubPanelName.NONE);
