@@ -11,7 +11,16 @@ import {
 	useEscapeKey,
 	useReference,
 } from '@mezon/core';
-import { directActions, messagesActions, pinMessageActions, referencesActions, selectCurrentChannel, selectMemberByUserId, selectPinMessageByChannelId, useAppDispatch } from '@mezon/store';
+import {
+	directActions,
+	messagesActions,
+	pinMessageActions,
+	referencesActions,
+	selectCurrentChannel,
+	selectMemberByUserId,
+	selectPinMessageByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -20,9 +29,9 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Mention, MentionsInput } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
+import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
-import ModalDeleteMess from './ModalDeleteMess';
 
 type MessageProps = {
 	message: IMessageWithUser;
@@ -47,7 +56,7 @@ type EmojiData = {
 
 const neverMatchingRegex = /($a)/;
 
-export function ChannelMessage(props: Readonly<MessageProps>) {
+export default function ChannelMessage(props: Readonly<MessageProps>) {
 	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const { markMessageAsSeen } = useChatMessage(message.id);
@@ -116,8 +125,8 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (editMessage?.trim()===''){
-				if(editMessage?.length === 0) {
+			if (editMessage?.trim() === '') {
+				if (editMessage?.length === 0) {
 					setDeleteMessage(true);
 				}
 				setEditMessage(message.content.t);
@@ -128,7 +137,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				handleSend(content, message.id);
 				setNewMessage(content);
 				handleCancelEdit();
-			} 
+			}
 		}
 		if (e.key === 'Escape') {
 			e.preventDefault();
@@ -283,7 +292,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			{ deleteMessage && <ModalDeleteMess closeModal={() => setDeleteMessage(false)} mess={message}/> }
+			{deleteMessage && <ModalDeleteMess closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</div>
 	);
 }
@@ -370,8 +379,8 @@ function PopupMessage({
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
 	const { userId } = useChatReaction();
-	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id))
-	const messageExists = listPinMessages.some(pinMessage => pinMessage.message_id === message.id);
+	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
+	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
@@ -409,10 +418,10 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	};
 
 	const handlePinMessage = () => {
-		dispatch(pinMessageActions.setChannelPinMessage({channel_id: message.channel_id, message_id: message.id}));
+		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
 	};
 	const handleUnPinMessage = () => {
-		dispatch(pinMessageActions.deleteChannelPinMessage({channel_id: message.channel_id, message_id: message.id}));
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
 	};
 	const checkUser = userId === message.sender_id;
 	return (
@@ -459,7 +468,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 					>
 						Unpin message
 					</li>
-				):(
+				) : (
 					<li
 						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
 						onClick={() => {

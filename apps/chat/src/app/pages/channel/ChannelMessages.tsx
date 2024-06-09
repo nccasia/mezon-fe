@@ -1,8 +1,11 @@
 import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
-import { ChannelMessage } from './ChannelMessage';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
+// import { ChannelMessage } from './ChannelMessage';
+
+const ChannelMessage = lazy(() => import('./ChannelMessage'));
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -23,7 +26,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { appearanceTheme } = useApp();
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	// share logic to load more message
-	const { isFetching, remain } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+	const { isFetching, remain, position } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
@@ -51,6 +54,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return array.slice().reverse();
 	}
 
+	console.log('rm', remain);
+	useEffect(() => {
+		if (chatRef.current?.scrollTop === 0) {
+			chatRef.current.scrollTop = remain * 200;
+		}
+	}, [remain]);
+
+	console.log(position);
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5
@@ -63,33 +74,32 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && <p className=" text-center">Loading messages...</p>}
+			{/* {isFetching && remain !== 0 && <p className=" text-center">Loading messages...</p>} */}
+			{isFetching && remain !== 0 && Array.from({ length: remain }).map((_, index) => <SkeletonLoader key={index} />)}
 
 			{reverseArray(messages).map((message, i) => {
 				return (
-					<ChannelMessage
-						mode={mode}
-						key={message.id}
-						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-						message={message}
-						preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel ?? ''}
-					/>
+					<Suspense key={message.id} fallback={<SkeletonLoader />}>
+						<ChannelMessage
+							mode={mode}
+							key={message.id}
+							lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+							message={message}
+							preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
+							channelId={channelId}
+							channelLabel={channelLabel ?? ''}
+						/>
+					</Suspense>
 				);
 			})}
 		</div>
 	);
 }
 
-
-
-ChannelMessages.Skeleton = () => {
+const SkeletonLoader = () => {
 	return (
-		<>
-			<ChannelMessage.Skeleton />
-			<ChannelMessage.Skeleton />
-			<ChannelMessage.Skeleton />
-		</>
+		<div className="border border-red-600" style={{ padding: 20 }}>
+			<Skeleton height={30} count={3} />
+		</div>
 	);
 };

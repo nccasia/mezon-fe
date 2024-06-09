@@ -19,7 +19,7 @@ export default function DirectMessageIndex() {
 			<div className="flex flex-row ">
 				<div className="flex flex-col flex-1">
 					<div className="overflow-y-auto bg-bgSecondary  max-h-heightMessageViewChat h-heightMessageViewChat">
-						<ChannelMessages.Skeleton />
+						{/* <ChannelMessages.Skeleton /> */}
 					</div>
 				</div>
 			</div>

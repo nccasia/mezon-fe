@@ -15,6 +15,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
 	const remain = useSelector(selectQuantitiesMessageRemain);
+	const [position, setPosition] = useState<number>(0);
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
@@ -41,7 +42,8 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 				setIsFetching(true);
 				await loadMoreMessage();
 				setIsFetching(false);
-				currentChatRef.scrollTop = currentChatRef.scrollHeight - previousHeight;
+				// currentChatRef.scrollTop = currentChatRef.scrollHeight - previousHeight;
+				// setPosition(currentChatRef.scrollHeight - previousHeight);
 			}
 		};
 
@@ -52,5 +54,5 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		};
 	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
 
-	return { isFetching, remain };
+	return { isFetching, remain, position };
 };

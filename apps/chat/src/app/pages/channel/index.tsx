@@ -71,7 +71,8 @@ export default function ChannelLayout() {
 				<ChannelVoiceOff />
 			);
 		} else {
-			return <ChannelMessages.Skeleton />;
+			// return <ChannelMessages.Skeleton />;
+			return <></>
 		}
 	};
 
