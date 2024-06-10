@@ -35,7 +35,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
+	const { openReplyMessageState, idMessageRefReply, idMessageToJump, idMessageMention } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const { openEditMessageState } = useReference();
@@ -57,18 +57,22 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const propsChild = { isCombine };
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
+	const checkMessageTargetMention = idMessageMention === message.id;
+
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const checkReferences = message.references?.length !== 0;
 
 	const [checkMessageReply, setCheckMessageReply] = useState(false);
 	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
 	const [checkMessageIncludeMention, setCheckMessageIncludeMention] = useState<boolean | undefined>(false);
+	const [checkIdMessageMention, setCheckIdMessageMention] = useState(false);
 
 	useEffect(() => {
 		setCheckMessageReply(checkReplied);
 		setCheckMessageToMove(checkMessageTargetToMoved);
 		setCheckMessageIncludeMention(hasIncludeMention ?? undefined);
-	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump]);
+		setCheckIdMessageMention(checkMessageTargetMention);
+	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump, idMessageMention]);
 
 	const [classNameHighligntParentDiv, setClassNameHightlightParentDiv] = useState<string>('');
 	const [classNameHighligntChildDiv, setClassNameHightlightChildDiv] = useState<string>('');
@@ -95,11 +99,11 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		if (checkMessageReply || checkMessageToMove) {
 			setClassNameHightlightParentDiv('dark:bg-[#383B47]');
 			setClassNameHightlightChildDiv(' dark:bg-blue-500');
-		} else if (checkMessageIncludeMention) {
+		} else if (checkMessageIncludeMention || checkIdMessageMention) {
 			setClassNameHightlightParentDiv('dark:bg-[#403D38]');
 			setClassNameHightlightChildDiv(' dark:bg-[#F0B132]');
 		}
-	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
+	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention, checkIdMessageMention]);
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -113,12 +117,12 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
 						className={` absolute w-0.5 h-full left-0
-						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
+						${hasIncludeMention || checkReplied || (hasIncludeMention && checkMessageTargetToMoved) ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					></div>
 					<div
 						className={`flex h-15 flex-col w-auto px-3 py-0.5
 						${isMention ? 'mt-0' : isCombine ? '' : 'pt-[2px]'}
-						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
+						${hasIncludeMention || checkReplied || (hasIncludeMention && checkMessageTargetToMoved) ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					>
 						{' '}
 						<MessageReply message={message} />

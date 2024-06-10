@@ -19,7 +19,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
-	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump } = useReference();
+	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump, idMessageMention } = useReference();
 	const { appearanceTheme } = useApp();
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	// share logic to load more message
@@ -29,9 +29,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
 		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
+		if (idMessageMention !== '') setMessageIdToJump(idMessageMention);
 		setTimeToJump(0);
 		setPositionToJump('center');
-	}, [getJumpToMessageId, idMessageNotifed, idMessageRefReply, idMessageToJump]);
+	}, [getJumpToMessageId, idMessageNotifed, idMessageRefReply, idMessageToJump, idMessageMention]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;
@@ -81,8 +82,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		</div>
 	);
 }
-
-
 
 ChannelMessages.Skeleton = () => {
 	return (

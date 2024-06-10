@@ -29,6 +29,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (idRefMessage) {
+				console.log("idRefMessage", idRefMessage)
 				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
 				dispatch(referencesActions.setIdReferenceMessageReply(''));
 			}

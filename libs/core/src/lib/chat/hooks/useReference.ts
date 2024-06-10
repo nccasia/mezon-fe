@@ -3,6 +3,7 @@ import {
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
+	selectIdMessageMention,
 	selectIdMessageRefEdit,
 	selectIdMessageRefOption,
 	selectIdMessageRefReaction,
@@ -34,6 +35,7 @@ export function useReference() {
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const idMessageMention = useSelector(selectIdMessageMention);
 
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
@@ -119,6 +121,13 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setIdMessageMenttion = useCallback(
+		(idMessageMention: string) => {
+			dispatch(referencesActions.setIdMessageMention(idMessageMention));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			setDataReferences,
@@ -145,6 +154,8 @@ export function useReference() {
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
+			setIdMessageMenttion,
+			idMessageMention,
 		}),
 		[
 			setDataReferences,
@@ -171,6 +182,8 @@ export function useReference() {
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
+			setIdMessageMenttion,
+			idMessageMention,
 		],
 	);
 }

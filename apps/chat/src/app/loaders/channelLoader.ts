@@ -10,11 +10,11 @@ export const channelLoader: LoaderFunction = async ({ params, request }) => {
 		throw new Error('Channel ID null');
 	}
 
-	if (messageId) {
-		store.dispatch(referencesActions.setIdMessageToJump(messageId));
-	}
 	store.dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+	if (messageId) {
+		store.dispatch(referencesActions.setIdMessageMention(messageId));
+	}
 	return null;
 };
 
