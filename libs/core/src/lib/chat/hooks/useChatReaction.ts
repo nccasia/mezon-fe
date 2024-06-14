@@ -8,6 +8,7 @@ import {
 	selectReactionBottomStateResponsive,
 	selectReactionPlaceActive,
 	selectReactionRightState,
+	selectTriggerUpdateReaction,
 	selectUserReactionPanelState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -33,6 +34,7 @@ export function useChatReaction() {
 	const messageMatchWithRefStatus = useSelector(selectMessageMatchWithRef);
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 	const arrowPosition = useSelector(selectArrowPosition);
+	const triggerUpdateReaction = useSelector(selectTriggerUpdateReaction);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -112,7 +114,12 @@ export function useChatReaction() {
 		},
 		[dispatch],
 	);
-
+	const setTriggerUpdateReaction = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setTriggerUpdateReaction());
+		},
+		[dispatch],
+	);
 	return useMemo(
 		() => ({
 			reactionActions,
@@ -137,6 +144,8 @@ export function useChatReaction() {
 			positionOfSmileButton,
 			arrowPosition,
 			setArrowPosition,
+			setTriggerUpdateReaction,
+			triggerUpdateReaction,
 		}),
 		[
 			reactionActions,
@@ -159,6 +168,8 @@ export function useChatReaction() {
 			positionOfSmileButton,
 			arrowPosition,
 			setArrowPosition,
+			setTriggerUpdateReaction,
+			triggerUpdateReaction,
 		],
 	);
 }

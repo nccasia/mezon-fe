@@ -38,11 +38,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
-	const { dataReactionServerAndSocket } = useChatReaction();
+	const { dataReactionServerAndSocket, triggerUpdateReaction, setTriggerUpdateReaction } = useChatReaction();
 
 	useEffect(() => {
 		setDataReactionCombine(updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]));
-	}, [reactDataFirstGetFromMessage, dataReactionServerAndSocket]);
+	}, [triggerUpdateReaction, reactDataFirstGetFromMessage,channelId]);
 
 	useEffect(() => {
 		setMessageIdToJump(messageMentionId);
@@ -90,7 +90,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+			{isFetching && remain !== 0 && (
+				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
+			)}
 
 			{reverseArray(messages).map((message, i) => {
 				const data = getReactionsByChannelId(dataReactionCombine, message.id);

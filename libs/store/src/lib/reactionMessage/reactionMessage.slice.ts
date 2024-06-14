@@ -40,6 +40,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 		bottom: number;
 	};
 	arrowPosition: boolean;
+	triggerUpdateReaction: boolean;
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -85,6 +86,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		bottom: 0,
 	},
 	arrowPosition: false,
+	triggerUpdateReaction: false,
 });
 
 export const reactionSlice = createSlice({
@@ -161,6 +163,9 @@ export const reactionSlice = createSlice({
 		setArrowPosition(state, action) {
 			state.arrowPosition = action.payload;
 		},
+		setTriggerUpdateReaction(state) {
+			state.triggerUpdateReaction = !state.triggerUpdateReaction;
+		},
 	},
 });
 
@@ -200,3 +205,5 @@ export const selectMessageMatchWithRef = createSelector(getReactionState, (state
 export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (state: ReactionState) => state.positionOfSmileButton);
 
 export const selectArrowPosition = createSelector(getReactionState, (state: ReactionState) => state.arrowPosition);
+
+export const selectTriggerUpdateReaction = createSelector(getReactionState, (state: ReactionState) => state.triggerUpdateReaction);

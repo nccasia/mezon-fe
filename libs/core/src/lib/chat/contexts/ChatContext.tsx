@@ -80,6 +80,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+			console.log('onchannelMessage');
 		},
 		[dispatch],
 	);
@@ -103,7 +104,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
-				dispatch(friendsActions.fetchListFriends({noCache: true}));
+				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
 		[dispatch],
@@ -114,11 +115,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onerror = useCallback((event: unknown) => {
 		try {
-		  console.log(event);
+			console.log(event);
 		} catch (error) {
-		  console.error("An error occurred while handling the error:", error);
+			console.error('An error occurred while handling the error:', error);
 		}
-	  }, []);
+	}, []);
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			if (e && e.sender_id === userId) {
@@ -140,6 +141,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(e: MessageReactionEvent) => {
 			if (e) {
 				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
+				dispatch(reactionActions.setTriggerUpdateReaction());
 			}
 		},
 		[dispatch],
