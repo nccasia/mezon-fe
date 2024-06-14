@@ -38,6 +38,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
+
 	const { dataReactionServerAndSocket, triggerUpdateReaction, setTriggerUpdateReaction } = useChatReaction();
 
 	useEffect(() => {

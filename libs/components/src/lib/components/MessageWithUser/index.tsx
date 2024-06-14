@@ -150,7 +150,7 @@ function MessageWithUser({
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-						<MessageReaction dataReaction={dataReaction} currentChannelId={currentChannelId || ''} message={message} mode={mode} />
+						{/* <MessageReaction dataReaction={dataReaction} currentChannelId={currentChannelId || ''} message={message} mode={mode} /> */}
 						{message && !isMessNotifyMention && (
 							<div
 								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}

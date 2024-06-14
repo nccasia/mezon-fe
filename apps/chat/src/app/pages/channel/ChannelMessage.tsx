@@ -1,4 +1,4 @@
-import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
+import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
 import {
 	useApp,
 	useChannels,
@@ -202,100 +202,106 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { appearanceTheme } = useApp();
 
 	return (
-		<div className="fullBoxText relative group">
-			<MessageWithUser
-				dataReaction={props.dataReaction}
-				message={mess as IMessageWithUser}
-				preMessage={messPre as IMessageWithUser}
-				user={user}
-				mode={mode}
-				newMessage={newMessage}
-				child={
-					<>
-						<PopupMessage
-							reactionRightState={reactionRightState}
-							mess={mess as IMessageWithUser}
-							reactionBottomState={reactionBottomState}
-							openEditMessageState={openEditMessageState}
-							openOptionMessageState={openOptionMessageState}
-							mode={mode}
-							deleteSendMessage={DeleteSendMessage}
-						/>
-						{openEditMessageState && mess.id === idMessageRefEdit && (
-							<div className="inputEdit relative top-[-25px]">
-								<MentionsInput
-									onFocus={handleFocus}
-									inputRef={textareaRef}
-									value={editMessage}
-									className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention' }`}
-									onKeyDown={onSend}
-									onChange={(e, newValue) => {
-										setEditMessage(newValue);
-									}}
-									rows={editMessage?.split('\n').length}
-									forceSuggestionsAboveCursor={true}
-									style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-								>
-									<Mention
-										appendSpaceOnAdd={true}
-										data={mentionList ?? []}
-										trigger="@"
-										displayTransform={(id: any, display: any) => {
-											return `@${display}`;
+		<>
+			<div
+				className="fullBoxText relative group 			
+				border border-green-400"
+			>
+				<MessageWithUser
+					dataReaction={props.dataReaction}
+					message={mess as IMessageWithUser}
+					preMessage={messPre as IMessageWithUser}
+					user={user}
+					mode={mode}
+					newMessage={newMessage}
+					child={
+						<>
+							<PopupMessage
+								reactionRightState={reactionRightState}
+								mess={mess as IMessageWithUser}
+								reactionBottomState={reactionBottomState}
+								openEditMessageState={openEditMessageState}
+								openOptionMessageState={openOptionMessageState}
+								mode={mode}
+								deleteSendMessage={DeleteSendMessage}
+							/>
+							{openEditMessageState && mess.id === idMessageRefEdit && (
+								<div className="inputEdit relative top-[-25px]">
+									<MentionsInput
+										onFocus={handleFocus}
+										inputRef={textareaRef}
+										value={editMessage}
+										className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+										onKeyDown={onSend}
+										onChange={(e, newValue) => {
+											setEditMessage(newValue);
 										}}
-										renderSuggestion={(suggestion) => (
-											<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
-										)}
-										className="dark:bg-[#3B416B] bg-bgLightModeButton"
-										style={mentionStyle}
-									/>
-									<Mention
-										markup="#[__display__](__id__)"
-										appendSpaceOnAdd={true}
-										data={listChannelsMention ?? []}
-										trigger="#"
-										displayTransform={(id: any, display: any) => {
-											return `#${display}`;
-										}}
-										style={mentionStyle}
-										renderSuggestion={(suggestion) => (
-											<SuggestItem
-												name={suggestion.display ?? ''}
-												symbol="#"
-												subText={(suggestion as ChannelsMentionProps).subText}
-											/>
-										)}
-										className="dark:bg-[#3B416B] bg-bgLightModeButton"
-									/>
-									<Mention
-										trigger=":"
-										markup="__id__"
-										regex={neverMatchingRegex}
-										data={queryEmojis}
-										renderSuggestion={(suggestion) => (
-											<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
-										)}
-										className="dark:bg-[#3B416B] bg-bgLightModeButton"
-									/>
-								</MentionsInput>
-								<div className="text-xs flex">
-									<p className="pr-[3px]">escape to</p>
-									<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
-										cancel
-									</p>
-									<p className="pr-[3px]">• enter to</p>
-									<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
-										save
-									</p>
+										rows={editMessage?.split('\n').length}
+										forceSuggestionsAboveCursor={true}
+										style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
+									>
+										<Mention
+											appendSpaceOnAdd={true}
+											data={mentionList ?? []}
+											trigger="@"
+											displayTransform={(id: any, display: any) => {
+												return `@${display}`;
+											}}
+											renderSuggestion={(suggestion) => (
+												<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+											)}
+											className="dark:bg-[#3B416B] bg-bgLightModeButton"
+											style={mentionStyle}
+										/>
+										<Mention
+											markup="#[__display__](__id__)"
+											appendSpaceOnAdd={true}
+											data={listChannelsMention ?? []}
+											trigger="#"
+											displayTransform={(id: any, display: any) => {
+												return `#${display}`;
+											}}
+											style={mentionStyle}
+											renderSuggestion={(suggestion) => (
+												<SuggestItem
+													name={suggestion.display ?? ''}
+													symbol="#"
+													subText={(suggestion as ChannelsMentionProps).subText}
+												/>
+											)}
+											className="dark:bg-[#3B416B] bg-bgLightModeButton"
+										/>
+										<Mention
+											trigger=":"
+											markup="__id__"
+											regex={neverMatchingRegex}
+											data={queryEmojis}
+											renderSuggestion={(suggestion) => (
+												<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
+											)}
+											className="dark:bg-[#3B416B] bg-bgLightModeButton"
+										/>
+									</MentionsInput>
+									<div className="text-xs flex">
+										<p className="pr-[3px]">escape to</p>
+										<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+											cancel
+										</p>
+										<p className="pr-[3px]">• enter to</p>
+										<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
+											save
+										</p>
+									</div>
 								</div>
-							</div>
-						)}
-					</>
-				}
-			/>
-			{lastSeen && <UnreadMessageBreak />}
-			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
-		</div>
+							)}
+						</>
+					}
+				/>
+				{lastSeen && <UnreadMessageBreak />}
+				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
+			</div>
+			<MessageReaction dataReaction={dataReaction} currentChannelId={channelId || ''} message={message} mode={mode} />
+		</>
 	);
 }
 
