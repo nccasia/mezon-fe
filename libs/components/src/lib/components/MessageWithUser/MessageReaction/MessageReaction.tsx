@@ -25,19 +25,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
-	const { emojiListPNG } = useEmojiSuggestion();
-
-	async function reactOnExistEmoji(
-		id: string,
-		mode: number,
-		messageId: string,
-		emoji: string,
-		count: number,
-		message_sender_id: string,
-		action_delete: boolean,
-	) {
-		await reactionMessageDispatch('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
-	}
 
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
 		if (message.id === idMessageRefReaction) {
@@ -66,7 +53,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const [outOfRight, setOutRight] = useState<boolean>(false);
 
-	const handleOnEnterEmoji = (emojiParam: EmojiDataOptionals, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleOnEnterEmoji = (emojiParam: EmojiDataOptionals, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		event.stopPropagation();
 		setHoverEmoji(emojiParam);
 		setUserReactionPanelState(true);
@@ -170,6 +157,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
+
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
@@ -180,7 +168,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 				</div>
 			)}
 
-			<div ref={contentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14  ">
+			<div ref={contentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-16  ">
 				{showSenderPanelIn1s && (
 					<div className="hidden max-sm:block max-sm:-top-[0] absolute">
 						{hoverEmoji &&
@@ -190,68 +178,103 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					</div>
 				)}
 
-				{dataReaction &&
-					dataReaction
-						.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
-						?.map((emoji: EmojiDataOptionals, index: number) => {
-							const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
-							const checkID = emoji.message_id === message.id;
-							const totalCount = calculateTotalCount(emoji.senders);
-							return (
-								<Fragment key={`${index + message.id}`}>
-									{checkID && totalCount > 0 && (
-										<div
-											ref={(element) => (childRef.current[index] = element)}
-											className={` justify-center items-center relative 
-									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
-									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
-											onClick={() =>
-												reactOnExistEmoji(emoji.id ?? '', mode, message.id ?? '', emoji.emoji ?? '', 1, userId ?? '', false)
-											}
-											onMouseEnter={(event) => {
-												handleOnEnterEmoji(emoji, event);
-											}}
-											onMouseLeave={() => {
-												handleOnleaveEmoji();
-											}}
-										>
-											<span className=" absolute left-[5px] ">
-												{' '}
-												<img src={getSrcEmoji(emoji.emoji ?? '', emojiListPNG)} className="w-4 h-4"></img>{' '}
-											</span>
+				{dataReaction?.map((emoji: EmojiDataOptionals, index: number) => {
+					const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
+					const hasUserReaction = userSender?.count && userSender?.count > 0 ? true : false;
+					const totalCount = calculateTotalCount(emoji.senders);
+					return (
+						<Fragment key={`${index + message.id}`}>
+							{totalCount > 0 && (
+								<div ref={(element) => (childRef.current[index] = element)}>
+									<EmojiItem
+										hasUserReaction={hasUserReaction}
+										onMouseEnter={(event) => {
+											handleOnEnterEmoji(emoji, event);
+										}}
+										onMouseLeave={handleOnleaveEmoji}
+										count={totalCount}
+										emojiShortName={emoji.emoji ?? ''}
+										mode={mode}
+										messageId={message.id}
+										emojiId={emoji.id ?? ''}
+									/>
 
-											<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-												<p>{totalCount}</p>
-											</div>
-
-											{checkMessageToMatchMessageRef(message) && showIconSmile && lastPositionEmoji(emoji, message) && (
-												<ReactionBottom smileButtonRef={smileButtonRef} message={message} />
-											)}
-
-											{checkMessageToMatchMessageRef(message) &&
-												userReactionPanelState &&
-												checkEmojiToMatchWithEmojiHover(emoji) &&
-												emojiShowUserReaction && (
-													<div
-														ref={userPanelDiv}
-														className="max-sm:hidden z-50 h-fit"
-														style={{
-															position: 'fixed',
-															top: topPanel,
-															left: outOfRight ? leftPanel - 120 : leftPanel,
-														}}
-													>
-														<UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />
-													</div>
-												)}
-										</div>
+									{checkMessageToMatchMessageRef(message) && showIconSmile && lastPositionEmoji(emoji, message) && (
+										<ReactionBottom smileButtonRef={smileButtonRef} message={message} />
 									)}
-								</Fragment>
-							);
-						})}
+
+									{checkMessageToMatchMessageRef(message) &&
+										userReactionPanelState &&
+										checkEmojiToMatchWithEmojiHover(emoji) &&
+										emojiShowUserReaction && (
+											<div
+												ref={userPanelDiv}
+												className="max-sm:hidden z-50 h-fit"
+												style={{
+													position: 'fixed',
+													top: topPanel,
+													left: outOfRight ? leftPanel - 120 : leftPanel,
+												}}
+											>
+												<UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />
+											</div>
+										)}
+								</div>
+							)}
+						</Fragment>
+					);
+				})}
 			</div>
 		</div>
 	);
 };
 
 export default MessageReaction;
+
+type EmojiItemOpt = {
+	count: number;
+	emojiShortName: string;
+	mode: number;
+	messageId: string;
+	emojiId: string;
+	onMouseEnter?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+	onMouseLeave?: () => void;
+	hasUserReaction: boolean | undefined;
+};
+
+const EmojiItem = ({ count, emojiShortName, mode, messageId, emojiId, onMouseEnter, onMouseLeave, hasUserReaction }: EmojiItemOpt) => {
+	const { emojiListPNG } = useEmojiSuggestion();
+	const getUrlEmoji = getSrcEmoji(emojiShortName, emojiListPNG);
+	const { reactionMessageDispatch, userId } = useChatReaction();
+
+	async function reactOnExistEmoji(
+		id: string,
+		mode: number,
+		messageId: string,
+		emoji: string,
+		count: number,
+		message_sender_id: string,
+		action_delete: boolean,
+	) {
+		await reactionMessageDispatch('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+	}
+
+	return (
+		<button
+			onClick={() => reactOnExistEmoji(emojiId ?? '', mode, messageId ?? '', emojiShortName ?? '', 1, userId ?? '', false)}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
+			className={` justify-center items-center relative 
+				${hasUserReaction ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
+				rounded-sm w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
+		>
+			<span className=" absolute left-[5px] ">
+				{' '}
+				<img src={getUrlEmoji} className="w-4 h-4"></img>{' '}
+			</span>
+			<div className="text-[13px] font-medium top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
+				<p>{count}</p>
+			</div>
+		</button>
+	);
+};

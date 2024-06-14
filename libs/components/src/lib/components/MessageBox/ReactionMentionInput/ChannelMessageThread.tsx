@@ -14,7 +14,6 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 	return (
 		<div className="mb-3">
 			<MessageWithUser
-				dataReaction={[]}
 				message={message}
 				user={user}
 				isMessNotifyMention={true}

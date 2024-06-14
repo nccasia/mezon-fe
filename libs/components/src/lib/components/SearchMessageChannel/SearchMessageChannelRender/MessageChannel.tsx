@@ -13,7 +13,6 @@ const MessageChannel = ({ message }: MessageChannelProps) => {
 	return (
 		<div className="group pb-2 hover:bg-bgLightPrimary dark:hover:bg-bgPrimary1 rounded-lg bg-bgLightPrimary dark:bg-bgPrimary cursor-pointer">
 			<MessageWithUser
-				dataReaction={[]}
 				message={message as IMessageWithUser}
 				user={user}
 				isMessNotifyMention={true}

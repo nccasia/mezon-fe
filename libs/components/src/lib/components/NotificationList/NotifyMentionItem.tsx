@@ -110,7 +110,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					Jump
 				</button>
 				<MessageWithUser
-					dataReaction={[]}
 					message={data}
 					user={user as IChannelMember}
 					isMessNotifyMention={true}

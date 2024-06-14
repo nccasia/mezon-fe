@@ -34,7 +34,6 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 					</div>
 					<div className="p-4">
 						<MessageWithUser
-							dataReaction={[]}
 							message={mess}
 							user={user as IChannelMember}
 							isMessNotifyMention={true}

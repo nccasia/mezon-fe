@@ -1,6 +1,5 @@
-import { MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
-import { EmojiDataOptionals, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -29,7 +28,7 @@ export type MessageWithUserProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
-	dataReaction: EmojiDataOptionals[];
+	// dataReaction: EmojiDataOptionals[];
 };
 
 function MessageWithUser({
@@ -41,7 +40,7 @@ function MessageWithUser({
 	newMessage,
 	child,
 	isMention,
-	dataReaction,
+	// dataReaction,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
@@ -150,7 +149,6 @@ function MessageWithUser({
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-						<MessageReaction dataReaction={dataReaction} currentChannelId={currentChannelId || ''} message={message} mode={mode} />
 						{message && !isMessNotifyMention && (
 							<div
 								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
