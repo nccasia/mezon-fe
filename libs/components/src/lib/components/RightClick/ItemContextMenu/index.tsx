@@ -1,7 +1,6 @@
 import { RightClickList } from '@mezon/utils';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
-
 interface IMenuItem {
 	item: any;
 	urlData: string;
@@ -70,7 +69,7 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 	};
 
 	return (
-		<>
+		<div>
 			{item.name === RightClickList.COPY_LINK ? (
 				<CopyToClipboard text={urlData}>
 					<span
@@ -94,7 +93,7 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 					<span className="w-[10%] flex justify-end mr-1">{item.symbol}</span>
 				</span>
 			)}
-		</>
+		</div>
 	);
 };
 

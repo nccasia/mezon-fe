@@ -1,8 +1,10 @@
 import { useRightClick } from '@mezon/core';
+import { selectMessageByMessageId } from '@mezon/store';
 import { listClickImageInViewer, listClickMessageText } from '@mezon/ui';
 import { RightClickPost } from '@mezon/utils';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
 	onClose: () => void;
@@ -11,46 +13,60 @@ interface IContextMenuProps {
 }
 
 const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }) => {
-	// const { rightClickXy } = useRightClick();
+	const { rightClickXy } = useRightClick();
 	const menuRef = useRef<HTMLDivElement | null>(null);
-	const menuRefHeight = menuRef.current && menuRef.current?.getBoundingClientRect().height;
+	const [topMenu, setTopMenu] = useState<number | 'auto'>('auto');
+	const [bottomMenu, setBottomMenu] = useState<number | 'auto'>('auto');
+	const [rightMenu, setRightMenu] = useState<number | 'auto'>('auto');
+	const [leftMenu, setLeftMenu] = useState<number | 'auto'>('auto');
 	const WINDOW_HEIGHT = window.innerHeight;
-	// const distanceCursorToBottom = WINDOW_HEIGHT - rightClickXy?.y;
-	const [topMenu, setTopMenu] = useState<any>();
-	const [bottomMenu, setBottomMenu] = useState<any>();
-	const [listMenu, setListMenu] = useState<any>();
+	const WINDOW_WIDTH = window.innerWidth;
+	const { getMessageIdRightClicked } = useRightClick();
+	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 
-	console.log(posClick);
+	useLayoutEffect(() => {
+		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
+		const menuRefWidth = menuRef.current?.getBoundingClientRect().width || 0;
+		const distanceCursorToBottom = WINDOW_HEIGHT - rightClickXy?.y;
+		const distanceCursorToRight = WINDOW_WIDTH - rightClickXy?.x;
 
-	// useEffect(() => {
-	// 	if (distanceCursorToBottom < menuRefHeight!) {
-	// 		setTopMenu('auto');
-	// 		setBottomMenu(30);
-	// 	} else {
-	// 		setTopMenu(rightClickXy.y);
-	// 		setBottomMenu('auto');
-	// 	}
-	// }, [rightClickXy]);
+		if (menuRefHeight && menuRefWidth) {
+			const isBottomLimit = distanceCursorToBottom < menuRefHeight;
+			const isRightLimit = distanceCursorToRight < menuRefWidth;
 
-	useEffect(() => {
-		if (posClick === RightClickPost.IMAGE_ON_CHANNEL) {
-			setListMenu([...listClickMessageText, ...listClickImageInViewer]);
-		} else if (posClick === RightClickPost.MESSAGE_ON_CHANNEL) {
-			setListMenu(listClickMessageText);
-		} else if (posClick === RightClickPost.IMAGE_VIEWER) {
-			setListMenu(listClickImageInViewer);
+			if (isBottomLimit && isRightLimit) {
+				setTopMenu('auto');
+				setBottomMenu(30);
+				setLeftMenu('auto');
+				setRightMenu(30);
+			} else if (!isBottomLimit && isRightLimit) {
+				setTopMenu(rightClickXy.y);
+				setBottomMenu('auto');
+				setLeftMenu('auto');
+				setRightMenu(30);
+			} else if (isBottomLimit && !isRightLimit) {
+				setTopMenu('auto');
+				setBottomMenu(30);
+				setLeftMenu(rightClickXy.x);
+				setRightMenu('auto');
+			} else if (!isBottomLimit && !isRightLimit) {
+				setTopMenu(rightClickXy.y);
+				setBottomMenu('auto');
+				setLeftMenu(rightClickXy.x);
+				setRightMenu('auto');
+			}
 		}
-	}, [posClick]);
+	}, [rightClickXy, WINDOW_HEIGHT, WINDOW_WIDTH, getMessageIdRightClicked]);
 
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit    bg-[#111214] rounded   z-50 w-[12rem]"
-			// style={{ top: topMenu, bottom: bottomMenu, left: rightClickXy?.x }}
+			className="fixed h-fit border flex flex-col border-green-400 bg-[#111214] rounded z-40 w-[12rem]  "
+			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>
-			<ul className="list-none m-0  p-2 ">
-				{listMenu?.map((item: any) => {
+			<ul className="m-0 p-2 h-fit flex flex-col">
+				{listClickMessageText?.map((item: any) => {
 					return (
 						<Fragment key={item.name}>
 							<CopyToClipboard text={urlData}>
@@ -59,6 +75,18 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 						</Fragment>
 					);
 				})}
+			</ul>
+			<ul className="m-0 p-2 h-fit flex flex-col z-50">
+				{posClick === RightClickPost.IMAGE_ON_CHANNEL &&
+					listClickImageInViewer?.map((item: any) => {
+						return (
+							<Fragment key={item.name}>
+								<CopyToClipboard text={urlData}>
+									<MenuItem urlData={urlData} item={item} />
+								</CopyToClipboard>
+							</Fragment>
+						);
+					})}
 			</ul>
 		</div>
 	);

@@ -14,7 +14,10 @@ export const listClickImageInViewer = [
 
 export const listClickMessageText = [
 	{ name: 'Add Reaction', symbol: <CopyImageIcon /> },
+	{ name: 'Edit Message', symbol: <CopyImageIcon /> },
 	{ name: 'Pin Message', symbol: <SaveImageIcon /> },
+	{ name: 'Reply', symbol: <SaveImageIcon /> },
+	{ name: 'Create Thread', symbol: <SaveImageIcon /> },
 	{ name: 'Copy Text', symbol: <CopyLinkIcon /> },
 	{ name: 'Apps', symbol: <OpenLinkIcon /> },
 	{ name: 'Mark Unread', symbol: <OpenLinkIcon /> },

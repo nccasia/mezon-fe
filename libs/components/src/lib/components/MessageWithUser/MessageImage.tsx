@@ -1,20 +1,20 @@
 import { useAttachments, useOnClickOutside, useRightClick } from '@mezon/core';
-import { selectRightClickXy } from '@mezon/store';
-import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { RightClickPost, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import ContextMenu from '../RightClick/ContextMenu';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
+	readonly messageIdRightClick: string;
 };
 
-function MessageImage({ attachmentData }: MessageImage) {
+function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const imageRef = useRef<HTMLDivElement | null>(null);
-	const { setRightClickXy } = useRightClick();
+	const { setRightClickXy, setMessageRightClick } = useRightClick();
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
 			setOpenModalAttachment(true);
@@ -32,6 +32,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 		event.preventDefault();
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
+		setMessageRightClick(messageIdRightClick);
 	};
 
 	const handleCloseMenu = () => {
@@ -39,8 +40,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 	};
 
 	useOnClickOutside(imageRef, handleCloseMenu);
-	// const rightClickXy2 = useSelector(selectRightClickXy);
-	// console.log(rightClickXy2);
+
 	return (
 		<div ref={imageRef} className="break-all" onContextMenu={handleContextMenu}>
 			<img
@@ -52,7 +52,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 				onClick={() => handleClick(attachmentData.url || '')}
 				style={imgStyle}
 			/>
-			{/* {isMenuVisible && <ContextMenu urlData={attachmentData.url ?? ''} posClick={RightClickPost.IMAGE_ON_CHANNEL} onClose={handleCloseMenu} />} */}
+			{isMenuVisible && <ContextMenu urlData={attachmentData.url ?? ''} posClick={RightClickPost.IMAGE_ON_CHANNEL} onClose={handleCloseMenu} />}
 		</div>
 	);
 }

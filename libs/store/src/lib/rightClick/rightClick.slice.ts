@@ -1,11 +1,12 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-export const RIGHT_CLICK_FEATURE_KEY = 'RIGHT_CLICK_FEATURE_KEY';
+export const RIGHT_CLICK_FEATURE_KEY = 'rightClick';
 
 export interface RightClickState {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	rightClickXy: any;
+	rightClickXy: { x: number; y: number };
+	messageIdClickedRightClicked: string;
 }
 
 export const initialRightClickState: RightClickState = {
@@ -15,6 +16,7 @@ export const initialRightClickState: RightClickState = {
 		x: NaN,
 		y: NaN,
 	},
+	messageIdClickedRightClicked: '',
 };
 
 export const rightClickSlice = createSlice({
@@ -22,7 +24,10 @@ export const rightClickSlice = createSlice({
 	initialState: initialRightClickState,
 	reducers: {
 		setRightClickXy: (state, action) => {
-			(state.rightClickXy = action.payload)
+			state.rightClickXy = action.payload;
+		},
+		setMessageRightClick: (state, action) => {
+			state.messageIdClickedRightClicked = action.payload;
 		},
 	},
 });
@@ -34,3 +39,5 @@ export const rightClickAction = { ...rightClickSlice.actions };
 export const getRightClickState = (rootState: { [RIGHT_CLICK_FEATURE_KEY]: RightClickState }): RightClickState => rootState[RIGHT_CLICK_FEATURE_KEY];
 
 export const selectRightClickXy = createSelector(getRightClickState, (state: RightClickState) => state.rightClickXy);
+
+export const selectMessageIdRightClicked = createSelector(getRightClickState, (state: RightClickState) => state.messageIdClickedRightClicked);

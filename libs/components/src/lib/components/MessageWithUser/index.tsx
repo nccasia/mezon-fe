@@ -1,5 +1,5 @@
 import { ContextMenu, MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId, selectRightClickXy } from '@mezon/store';
+import { selectCurrentChannelId } from '@mezon/store';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -82,7 +82,8 @@ function MessageWithUser({
 	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
 	const [checkMessageIncludeMention, setCheckMessageIncludeMention] = useState<boolean | undefined>(false);
 	const messageWithUserRef = useRef<HTMLDivElement | null>(null);
-	// const { setRightClickXy } = useRightClick();
+	const { setRightClickXy } = useRightClick();
+	const { setMessageRightClick } = useRightClick();
 
 	useEffect(() => {
 		setCheckMessageReply(checkReplied);
@@ -124,8 +125,9 @@ function MessageWithUser({
 	const [isMenuVisible, setMenuVisible] = useState(false);
 	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
 		event.preventDefault();
-		// selectRightClickXy({ x: event.pageX, y: event.pageY });
+		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
+		setMessageRightClick(message.id);
 	};
 
 	const handleCloseMenu = () => {
@@ -147,6 +149,7 @@ function MessageWithUser({
 				className={`relative ${isCombine ? '' : 'mt-3'} ${checkReferences && 'mt-3'} ${classNameNotification}`}
 				ref={messageWithUserRef}
 				onContextMenu={handleContextMenu}
+				onClick={handleCloseMenu}
 			>
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
@@ -191,13 +194,7 @@ function MessageWithUser({
 				{child?.props.children[0] &&
 					React.isValidElement(child?.props.children[0]) &&
 					React.cloneElement(child?.props.children[0], propsChild)}
-				{/* {isMenuVisible && (
-					<ContextMenu
-						urlData={''}
-						posClick={RightClickPost.MESSAGE_ON_CHANNEL}
-						onClose={handleCloseMenu}
-					/>
-				)} */}
+				{isMenuVisible && <ContextMenu urlData={''} posClick={RightClickPost.MESSAGE_ON_CHANNEL} onClose={handleCloseMenu} />}
 			</div>
 		</>
 	);
