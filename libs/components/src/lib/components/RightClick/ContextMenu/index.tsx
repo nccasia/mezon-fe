@@ -1,8 +1,8 @@
-import { useRightClick } from '@mezon/core';
+import { useAuth, useClans, useRightClick } from '@mezon/core';
 import { selectMessageByMessageId } from '@mezon/store';
 import { listClickImageInViewer, listClickMessageText } from '@mezon/ui';
 import { RightClickPost } from '@mezon/utils';
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
@@ -22,7 +22,21 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 	const WINDOW_HEIGHT = window.innerHeight;
 	const WINDOW_WIDTH = window.innerWidth;
 	const { getMessageIdRightClicked } = useRightClick();
+
+	const [hasOwnerClan, setHasOwnerClan] = useState<boolean>(false);
+	const [hasOwnerMess, setHasOwnerMess] = useState<boolean>(false);
+	const [hasReaction, setHasReaction] = useState<boolean>(false);
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
+	const { currentClan } = useClans();
+	const { userId } = useAuth();
+
+	useEffect(() => {
+		if (currentClan?.creator_id === userId) {
+			setHasOwnerClan(true);
+		}
+	}, [currentClan, userId]);
+
+	console.log(messageRClicked);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -61,12 +75,22 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit border flex flex-col border-green-400 bg-[#111214] rounded z-40 w-[12rem]  "
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>
-			<ul className="m-0 p-2 h-fit flex flex-col">
-				{listClickMessageText?.map((item: any) => {
+			{listClickMessageText.map((item: any) => {
+				return (
+					<Fragment key={item.name}>
+						<CopyToClipboard text={urlData}>
+							<MenuItem urlData={urlData} item={item} />
+						</CopyToClipboard>
+					</Fragment>
+				);
+			})}
+			{posClick === RightClickPost.IMAGE_ON_CHANNEL && <hr className="h-[1px] bg-white my-2"></hr>}
+			{posClick === RightClickPost.IMAGE_ON_CHANNEL &&
+				listClickImageInViewer.map((item: any) => {
 					return (
 						<Fragment key={item.name}>
 							<CopyToClipboard text={urlData}>
@@ -75,19 +99,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 						</Fragment>
 					);
 				})}
-			</ul>
-			<ul className="m-0 p-2 h-fit flex flex-col z-50">
-				{posClick === RightClickPost.IMAGE_ON_CHANNEL &&
-					listClickImageInViewer?.map((item: any) => {
-						return (
-							<Fragment key={item.name}>
-								<CopyToClipboard text={urlData}>
-									<MenuItem urlData={urlData} item={item} />
-								</CopyToClipboard>
-							</Fragment>
-						);
-					})}
-			</ul>
 		</div>
 	);
 };

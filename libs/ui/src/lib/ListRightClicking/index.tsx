@@ -6,14 +6,15 @@ const CopyLinkIcon = () => <Icons.CopyIcon />;
 const OpenLinkIcon = () => <Icons.CopyIcon />;
 
 export const listClickImageInViewer = [
-	{ name: 'Copy Image', symbol: <CopyImageIcon /> },
-	{ name: 'Save Image', symbol: <SaveImageIcon /> },
-	{ name: 'Copy Link', symbol: <CopyLinkIcon /> },
-	{ name: 'Open Link', symbol: <OpenLinkIcon /> },
+	{ name: 'Copy Image', symbol: <></> },
+	{ name: 'Save Image', symbol: <></> },
+	{ name: 'Copy Link', symbol: <></> },
+	{ name: 'Open Link', symbol: <></> },
 ];
 
 export const listClickMessageText = [
 	{ name: 'Add Reaction', symbol: <CopyImageIcon /> },
+	{ name: 'View Reactions', symbol: <CopyImageIcon /> }, // owner 
 	{ name: 'Edit Message', symbol: <CopyImageIcon /> },
 	{ name: 'Pin Message', symbol: <SaveImageIcon /> },
 	{ name: 'Reply', symbol: <SaveImageIcon /> },
@@ -23,8 +24,8 @@ export const listClickMessageText = [
 	{ name: 'Mark Unread', symbol: <OpenLinkIcon /> },
 	{ name: 'Copy Message Link', symbol: <OpenLinkIcon /> },
 	{ name: 'Speak Message', symbol: <OpenLinkIcon /> },
-	{ name: 'Remove Reaction', symbol: <OpenLinkIcon /> },
-	{ name: 'Remove All Reaction', symbol: <OpenLinkIcon /> },
-	{ name: 'Delete Message', symbol: <OpenLinkIcon /> },
-	{ name: 'Report Message', symbol: <OpenLinkIcon /> },
+	{ name: 'Remove Reaction', symbol: <OpenLinkIcon /> }, // owner clan
+	{ name: 'Remove All Reaction', symbol: <OpenLinkIcon /> }, // owner clan
+	{ name: 'Delete Message', symbol: <OpenLinkIcon /> }, // owner message
+	{ name: 'Report Message', symbol: <OpenLinkIcon /> }, // guest
 ];
