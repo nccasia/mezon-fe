@@ -12,4 +12,16 @@ export const listClickImageInViewer = [
 	{ name: 'Open Link', symbol: <OpenLinkIcon /> },
 ];
 
-
+export const listClickMessageText = [
+	{ name: 'Add Reaction', symbol: <CopyImageIcon /> },
+	{ name: 'Pin Message', symbol: <SaveImageIcon /> },
+	{ name: 'Copy Text', symbol: <CopyLinkIcon /> },
+	{ name: 'Apps', symbol: <OpenLinkIcon /> },
+	{ name: 'Mark Unread', symbol: <OpenLinkIcon /> },
+	{ name: 'Copy Message Link', symbol: <OpenLinkIcon /> },
+	{ name: 'Speak Message', symbol: <OpenLinkIcon /> },
+	{ name: 'Remove Reaction', symbol: <OpenLinkIcon /> },
+	{ name: 'Remove All Reaction', symbol: <OpenLinkIcon /> },
+	{ name: 'Delete Message', symbol: <OpenLinkIcon /> },
+	{ name: 'Report Message', symbol: <OpenLinkIcon /> },
+];

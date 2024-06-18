@@ -25,8 +25,8 @@ export { default as MemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
 export { default as ChannelMessageOpt } from './components/Message/ChannelMessageOpt';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
-export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as AttachmentLoading } from './components/MessageBox/AttachmentLoading';
+export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
@@ -34,9 +34,10 @@ export { default as MessageImage } from './components/MessageWithUser/MessageIma
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
+export { default as ContextMenu } from './components/RightClick/ContextMenu';
+export { default as ItemContextMenu } from './components/RightClick/ItemContextMenu';
 export { default as SearchModal } from './components/SearchModal/index';
 export { default as ModalNotificationSetting } from './components/notificationSetting/index';
-
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

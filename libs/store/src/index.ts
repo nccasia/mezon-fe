@@ -29,6 +29,7 @@ export * from './lib/permissionChannel/permissionChannel.slice';
 export * from './lib/pinMessages/pinMessage.slice';
 export * from './lib/policies/policies.slice';
 export * from './lib/reactionMessage/reactionMessage.slice';
+export * from './lib/rightClick/rightClick.slice';
 export * from './lib/roleclan/roleclan.slice';
 export * from './lib/searchmessages/searchmessage.slice';
 export * from './lib/store';

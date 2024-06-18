@@ -1,6 +1,14 @@
-import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId } from '@mezon/store';
-import { EmojiDataOptionals, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { ContextMenu, MessageReaction } from '@mezon/components';
+import { selectCurrentChannelId, selectRightClickXy } from '@mezon/store';
+import {
+	EmojiDataOptionals,
+	IChannelMember,
+	IMessageWithUser,
+	RightClickPost,
+	TIME_COMBINE,
+	checkSameDay,
+	getTimeDifferenceInSeconds,
+} from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -10,7 +18,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useAuth, useChatMessages, useNotification, useReference } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification, useOnClickOutside, useReference, useRightClick } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
 
@@ -73,6 +81,8 @@ function MessageWithUser({
 	const [checkMessageReply, setCheckMessageReply] = useState(false);
 	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
 	const [checkMessageIncludeMention, setCheckMessageIncludeMention] = useState<boolean | undefined>(false);
+	const messageWithUserRef = useRef<HTMLDivElement | null>(null);
+	// const { setRightClickXy } = useRightClick();
 
 	useEffect(() => {
 		setCheckMessageReply(checkReplied);
@@ -110,6 +120,20 @@ function MessageWithUser({
 			setClassNameHightlightChildDiv(' dark:bg-[#F0B132]');
 		}
 	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
+
+	const [isMenuVisible, setMenuVisible] = useState(false);
+	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
+		event.preventDefault();
+		// selectRightClickXy({ x: event.pageX, y: event.pageY });
+		setMenuVisible(true);
+	};
+
+	const handleCloseMenu = () => {
+		setMenuVisible(false);
+	};
+
+	useOnClickOutside(messageWithUserRef, handleCloseMenu);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -119,7 +143,11 @@ function MessageWithUser({
 					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`relative ${isCombine ? '' : 'mt-3'} ${checkReferences && 'mt-3'} ${classNameNotification}`}>
+			<div
+				className={`relative ${isCombine ? '' : 'mt-3'} ${checkReferences && 'mt-3'} ${classNameNotification}`}
+				ref={messageWithUserRef}
+				onContextMenu={handleContextMenu}
+			>
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
 						className={` absolute w-0.5 h-full left-0
@@ -163,6 +191,13 @@ function MessageWithUser({
 				{child?.props.children[0] &&
 					React.isValidElement(child?.props.children[0]) &&
 					React.cloneElement(child?.props.children[0], propsChild)}
+				{/* {isMenuVisible && (
+					<ContextMenu
+						urlData={''}
+						posClick={RightClickPost.MESSAGE_ON_CHANNEL}
+						onClose={handleCloseMenu}
+					/>
+				)} */}
 			</div>
 		</>
 	);

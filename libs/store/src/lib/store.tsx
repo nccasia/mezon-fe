@@ -36,6 +36,7 @@ import { channelCategorySettingReducer, defaultNotificationCategoryReducer } fro
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
+import { rightClickReducer } from './rightClick/rightClick.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { threadsReducer } from './threads/threads.slice';
@@ -106,6 +107,7 @@ const reducer = {
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
+	rightClick: rightClickReducer,
 };
 
 let storeInstance = configureStore({
