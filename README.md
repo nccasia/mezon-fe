@@ -143,6 +143,77 @@ There are several ways to manage the access control:
 -   using `UserRestrictionZone` to control displaying the components based on the user permissions
 -   using `useUserRestriction` to get the user restrictions based on the user permissions
 
+### Toast Notification
+
+Toast notification is managed by the `toasts` slice. each toast has it own message and type. The toast is managed by the `toasts` slice.
+
+Actions
+
+- `addToast`: add a toast to the list
+- `removeToast`: remove a toast from the list
+
+Toast are displayed in the `<ToastContainer />` component.
+
+There are several ways to manage the toast notification:
+
+- dispatch the `addToast` action to add the toast to the list
+- dispatch any action with `withToast` meta
+
+```tsx
+    // add toast notification to any action
+	return thunkAPI.fulfillWithValue(
+		value,
+		withToast({
+			message: 'Clan changed',
+			type: 'success',
+		})
+	);
+
+    // dispatch the addToast action directly
+    thunkAPI.dispatch(
+        addToast({
+            message: 'Clan changed',
+            type: 'success',
+        });
+    );
+```
+
+### Error Handling
+
+Error handling is managed by the `errors` slice. each error has it own message and code. The error is managed by the `errors` slice.
+
+By default, the error is displayed as toast notification. in case you want to disable the toast notification, you could set the `toast` meta to `false`.
+
+```tsx
+    // No toast notification
+    return thunkAPI.rejectWithValue(
+        error,
+        withError({
+            toast: false,
+        })
+    );
+
+    // toast with custom message
+    return thunkAPI.rejectWithValue(
+        error,
+        withError('Custom error message')
+    );
+
+    // fully custom error
+    return thunkAPI.rejectWithValue(
+        error,
+        withError({
+            toast: {
+                message: 'Custom error message',
+                type: 'error',
+                theme: 'dark',
+            }
+        })
+    );
+```
+
+
+
 ## Performance Optimization
 
 ### Performance Factors

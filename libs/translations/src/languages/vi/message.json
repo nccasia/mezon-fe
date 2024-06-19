@@ -31,5 +31,11 @@
         "newGroup": "Nhóm Mới",
         "addFriend": "Thêm bạn",
         "create": "Tạo"
-    }
+    },
+    "reactions": {
+        "noActionTitle": "Không có biểu cảm gì cả",
+        "noActionDescription": "Thật là một thế giới lạnh lùng và vô cảm",
+        "removeActions": "Xoá Biểu Cảm"
+    },
+    "messageDeleteReply": "Tin nhắn gốc đã bị xóa"
 }

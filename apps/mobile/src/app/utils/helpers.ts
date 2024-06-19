@@ -41,6 +41,10 @@ export const isImage = (url?: string) => {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)/.test(url);
 };
 
+export const isVideo = (url?: string) => {
+  return /\.(mp4|webm|ogg|mov)/.test(url);
+};
+
 export const normalizeString = (str: string) => {
   const normalizedStr = str.replace(/\s+/g, '').trim();
   return normalizedStr.toLowerCase();
@@ -51,11 +55,11 @@ export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$)|<#\d+>)/g;
 export const highlightEmojiRegex = /(:\b[^:\s]*\b:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
 export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
-export const emojiRegex = /:[a-z0-9_]+:/g;
+export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
 export const channelIdRegex = /<#(\d+)>/;
 export const codeBlockRegex = /^```[\s\S]*```$/;
 export const codeBlockRegexGlobal = /```[\s\S]*?```/g;
-export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-z0-9_]+:)/g;
+export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
 
 export const validURL = (string: string) => {
   const res = string.match(urlPattern);

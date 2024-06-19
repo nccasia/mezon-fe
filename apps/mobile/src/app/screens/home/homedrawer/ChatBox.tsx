@@ -80,6 +80,9 @@ interface IChatBoxProps {
 	mode: ChannelStreamMode;
 	messageAction?: EMessageActionType;
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
+  hiddenIcon?: {
+    threadIcon: boolean
+  }
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
@@ -655,7 +658,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						<View style={[styles.iconContainer, { backgroundColor: Colors.darkGray }]}>
 							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
-						{!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id) && (
+						{!props?.hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id) && (
 							<TouchableOpacity
 								style={[styles.iconContainer, { backgroundColor: Colors.darkGray, marginRight: isShowAttachControl ? size.s_10 : 0 }]}
 								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}

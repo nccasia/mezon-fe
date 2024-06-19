@@ -1,7 +1,8 @@
 import { useThreads } from '@mezon/core';
 import { threadsActions, useAppDispatch } from '@mezon/store';
 import { threadError } from '@mezon/utils';
-import { KeyboardEvent, useCallback } from 'react';
+import { KeyboardEvent, useCallback, useState } from 'react';
+import { ValidateSpecialCharacters } from '@mezon/utils';
 
 interface ThreadNameTextFieldProps {
 	label?: string;
@@ -16,10 +17,13 @@ interface ThreadNameTextFieldProps {
 const ThreadNameTextField = ({ label, error, placeholder, value, className, onChange, onKeyDown }: ThreadNameTextFieldProps) => {
 	const dispatch = useAppDispatch();
 	const { nameThreadError } = useThreads();
+	const [checkValidate, setCheckValidate] = useState(false);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		dispatch(threadsActions.setNameThreadError(''));
 		const value = e.target.value;
+		const regex = ValidateSpecialCharacters().test(value);
+		setCheckValidate(!regex);
+		dispatch(threadsActions.setNameThreadError(''));
 		onChange(value);
 	};
 
@@ -37,8 +41,9 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 	return (
 		<div className="flex flex-col mt-4 mb-4">
 			<span className="text-xs font-semibold uppercase mb-2 dark:text-textDarkTheme text-textLightTheme">{label}</span>
-			<input value={value} onChange={handleInputChange} type="text" placeholder={placeholder} className={className} onKeyDown={handleKeyDown} />
-			{nameThreadError && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{nameThreadError}</span>}
+			<input value={value} onChange={handleInputChange} type="text" placeholder={placeholder} className={className} onKeyDown={handleKeyDown} maxLength={64}/>
+			{nameThreadError && <span className="text-[#e44141] text-xs italic font-thin">{nameThreadError}</span>}
+			{checkValidate && <span className="text-[#e44141] text-xs italic font-thin">Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</span>}
 		</div>
 	);
 };

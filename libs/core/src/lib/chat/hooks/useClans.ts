@@ -76,6 +76,13 @@ export function useClans() {
 		},
 		[dispatch],
 	);
+	
+	const deleteClan = React.useCallback(
+		async({ clanId } : {clanId: string}) =>{
+			await dispatch(clansActions.deleteClan({clanId}));
+		},
+		[dispatch],
+	);
 
 	const avatarClans = usersClan.map((user) => user.user?.avatar_url).slice(0, 5);
 
@@ -104,6 +111,7 @@ export function useClans() {
 			updateUserClanProfile,
 			createClans,
 			updateClan,
+			deleteClan,
 		}),
 		[
 			clans,
@@ -119,6 +127,7 @@ export function useClans() {
 			updateUserClanProfile,
 			createClans,
 			updateClan,
+			deleteClan,
 		],
 	);
 }

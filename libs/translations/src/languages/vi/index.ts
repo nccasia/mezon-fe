@@ -18,6 +18,9 @@ import screenStack from "./screenStack.json";
 import pinMessage from './pinMessage.json';
 import clanSetting from "./clanSetting.json";
 import clanOverviewSetting from "./clanOverviewSetting.json";
+import categoryMenu from "./categoryMenu.json";
+import channelCreator from "./channelCreator.json"
+import eventMenu from  "./eventMenu.json"
 
 export default {
 	inviteToChannel,
@@ -39,5 +42,8 @@ export default {
 	screenStack,
 	pinMessage,
 	clanSetting,
-	clanOverviewSetting
+	clanOverviewSetting,
+	categoryMenu,
+	channelCreator,
+	eventMenu
 };

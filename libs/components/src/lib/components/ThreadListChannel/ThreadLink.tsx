@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectIsUnreadChannelById } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClan, selectCurrentClanId, selectIsUnreadChannelById } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const { toChannelPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const currentChanel = useSelector(selectCurrentChannel);
+	const clanId = useSelector(selectCurrentClanId)
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();

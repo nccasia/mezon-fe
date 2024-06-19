@@ -1,5 +1,5 @@
 import { CircleIcon } from "@mezon/mobile-components";
-import MezonBadge from "apps/mobile/src/app/temp-ui/MezonBadge";
+import { MezonBadge } from "apps/mobile/src/app/temp-ui";
 import { View, Text } from "react-native";
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
 
     return (
         <View style={styles.info}>
-            <MezonBadge title="Community Server" />
+            <MezonBadge title="Community Clan" />
             <View style={styles.inlineInfo}>
                 <CircleIcon height={10} width={10} color="green" />
                 <Text style={styles.inlineText}>{`${onlineMembers} ${t('info.online')}`}</Text>

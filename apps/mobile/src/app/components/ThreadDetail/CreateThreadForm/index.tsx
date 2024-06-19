@@ -182,6 +182,9 @@ export default function CreateThreadForm() {
 								channelLabel={currentChannel?.channel_label || ''}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+                hiddenIcon={{
+                  threadIcon: true
+                }}
 							/>
 							<View
 								style={{

@@ -44,6 +44,7 @@ const Metrics = {
     elevation: 2
   },
   size: {
+    xs: 3,
     s: 5,
     m: 10,
     l: 15,

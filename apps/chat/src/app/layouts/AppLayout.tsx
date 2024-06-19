@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
-import { onMessageListener, requestForToken } from '@mezon/components';
+import { onMessageListener, requestForToken, ToastController } from '@mezon/components';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -12,6 +12,8 @@ const AppLayout = () => {
 	const { userProfile } = useAuth();
 	const fcmTokenObject = JSON.parse(localStorage.getItem('fcmTokenObject') as string);
 	const navigate = useNavigate();
+
+	// TODO: move this to a firebase context
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
 			const message = payload.notification.body;
@@ -46,6 +48,7 @@ const AppLayout = () => {
 			});
 	};
 
+	// TODO: move this to a firebase context
 	useEffect(() => {
 		onMessageListener()
 			.then(handleNewMessage)
@@ -71,6 +74,7 @@ const AppLayout = () => {
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">
+				<ToastController />
 				<Outlet />
 			</div>
 		</MezonUiProvider>

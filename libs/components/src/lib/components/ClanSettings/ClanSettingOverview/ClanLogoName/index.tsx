@@ -2,12 +2,11 @@ import { Icons } from '@mezon/components';
 import { useClans } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { fileTypeImage } from '@mezon/utils';
+import { ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
-import { Regex } from '../../../ClanHeader/ModalCreateCategory';
 
 type ClanLogoNameProps = {
 	hasChanges: boolean;
@@ -25,7 +24,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 
 	const [urlLogo, setUrlLogo] = useState<string | undefined>(currentClan?.logo ?? '');
 	const [clanName, setClanName] = useState<string | undefined>(currentClan?.clan_name ?? '');
-	const [checkvalidate, setCheckValidate] = useState(!Regex().test(currentClan?.clan_name || ""));
+	const [checkvalidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(currentClan?.clan_name || ''));
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,11 +54,12 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 	const handleChangeClanName = (clanName: string) => {
 		setClanName(clanName);
 		onGetClanName(clanName);
-		const regex = Regex()
-		if (regex.test(clanName) && clanName !== '') {
-			setCheckValidate(false);
-		} else {
+		const regex = ValidateSpecialCharacters();
+
+		if (clanName.length === 0 || clanName.length === 64 || !regex.test(clanName)) {
 			setCheckValidate(true);
+		} else {
+			setCheckValidate(false);
 		}
 	};
 
@@ -82,7 +82,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 	};
 
 	useEffect(() => {
-		if ((clanName !== currentClan?.clan_name || urlLogo !== currentClan?.logo) && !checkvalidate ) {
+		if (clanName !== currentClan?.clan_name || urlLogo !== currentClan?.logo) {
 			onHasChanges(true);
 		} else {
 			onHasChanges(false);
@@ -96,6 +96,12 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 			setClanName(currentClan?.clan_name ?? '');
 		}
 	}, [hasChanges]);
+
+	useEffect(() => {
+		if (clanName === currentClan?.clan_name) {
+			setCheckValidate(false);
+		}
+	}, [clanName]);
 
 	return (
 		<div className="flex sbm:flex-row flex-col gap-[10px]">
@@ -123,7 +129,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 					</div>
 				</div>
 				<div className="flex flex-3 flex-col ml-[10px]">
-					<p className="text-sm mb-2">We recommend an image of at least 512x512 for the server.</p>
+					<p className="text-sm mb-2">We recommend an image of at least 512x512 for the clan.</p>
 					<Button
 						onClick={handleOpenFile}
 						className="h-10 text-sm w-fit mt-2 rounded bg-bgLightModeThird text-textLightTheme dark:text-textDarkTheme border dark:border-buttonProfile hover:!bg-[#9e9e9e] dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
@@ -133,7 +139,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 				</div>
 			</div>
 			<div className="flex flex-1 flex-col">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Server Name</h3>
+				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Clan Name</h3>
 				<div className="w-full">
 					<input
 						type="text"
@@ -141,6 +147,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						onChange={(e) => handleChangeClanName(e.target.value)}
 						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-[#26262B] bg-bgLightModeThird text-base rounded placeholder:text-sm"
 						placeholder="Support has arrived!"
+						maxLength={64}
 					/>
 				</div>
 				{checkvalidate && (

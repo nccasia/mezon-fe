@@ -1,10 +1,7 @@
-import { CrossIcon, HashSignLockIcon, PenIcon } from "@mezon/mobile-components";
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { CrossIcon, HashSignLockIcon } from "@mezon/mobile-components";
+import { Pressable, ScrollView } from "react-native";
 import { APP_SCREEN, MenuClanScreenProps } from "../../navigation/ScreenTypes";
-import { IMezonMenuItemProps } from "../../temp-ui/MezonMenuItem";
-import Toast from "react-native-toast-message";
-import { IMezonMenuSectionProps } from "../../temp-ui/MezonMenuSection";
-import MezonMenu, { reserve } from "../../temp-ui/MezonMenu";
+import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "../../temp-ui";
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
 import LogoClanSelector from "./LogoClanSelector";

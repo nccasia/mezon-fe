@@ -1,0 +1,606 @@
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/.transforms/a88edb773b5438b81888ec4d506ed8a2/results.bin b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/a88edb773b5438b81888ec4d506ed8a2/results.bin
+new file mode 100644
+index 0000000..61a58fa
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/a88edb773b5438b81888ec4d506ed8a2/results.bin
+@@ -0,0 +1 @@
++i/classes_dex
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/results.bin b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/transformed/classes/classes_dex/classes.dex b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..3d7c65d
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/c308bfdcffb126d40f80fe060220c711/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/.transforms/fca5524ce6a670e3913d9e6eb2464508/results.bin b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/fca5524ce6a670e3913d9e6eb2464508/results.bin
+new file mode 100644
+index 0000000..e3f0ff0
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/.transforms/fca5524ce6a670e3913d9e6eb2464508/results.bin
+@@ -0,0 +1 @@
++i/classes_global-synthetics
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/generated/source/buildConfig/debug/com/reactnativereceivesharingintent/BuildConfig.java b/node_modules/react-native-receive-sharing-intent/android/build/generated/source/buildConfig/debug/com/reactnativereceivesharingintent/BuildConfig.java
+new file mode 100644
+index 0000000..2b78a57
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/generated/source/buildConfig/debug/com/reactnativereceivesharingintent/BuildConfig.java
+@@ -0,0 +1,10 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package com.reactnativereceivesharingintent;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "com.reactnativereceivesharingintent";
++  public static final String BUILD_TYPE = "debug";
++}
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..16a30b1
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.reactnativereceivesharingintent" >
++
++    <uses-sdk android:minSdkVersion="16" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+new file mode 100644
+index 0000000..9dc350e
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.reactnativereceivesharingintent",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aar_metadata/debug/aar-metadata.properties b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+new file mode 100644
+index 0000000..776557e
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+@@ -0,0 +1,5 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_library_classes_jar/debug/classes.jar b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..2ffeca6
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_r_class_jar/debug/R.jar b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_r_class_jar/debug/R.jar
+new file mode 100644
+index 0000000..d56d317
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_r_class_jar/debug/R.jar differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_symbol_list/debug/R.txt b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/compile_symbol_list/debug/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..c9a0b81
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Thu Jun 13 10:07:40 ICT 2024
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..6bdaf1d
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..5b5763d
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..54061ad
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/debug/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+new file mode 100644
+index 0000000..eab91a3
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/debug/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/build/intermediates/shader_assets/debug/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/java_res/debug/out/META-INF/react-native-receive-sharing-intent_debug.kotlin_module b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/java_res/debug/out/META-INF/react-native-receive-sharing-intent_debug.kotlin_module
+new file mode 100644
+index 0000000..3aa6361
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/java_res/debug/out/META-INF/react-native-receive-sharing-intent_debug.kotlin_module differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/BuildConfig.class b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/BuildConfig.class
+new file mode 100644
+index 0000000..4aaf2be
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/BuildConfig.class differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentHelper.class b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentHelper.class
+new file mode 100644
+index 0000000..ab2f49f
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentHelper.class differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentModule.class b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentModule.class
+new file mode 100644
+index 0000000..9fc407c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/javac/debug/classes/com/reactnativereceivesharingintent/ReceiveSharingIntentModule.class differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/local_only_symbol_list/debug/R-def.txt b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..636a294
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,7 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="com.reactnativereceivesharingintent" >
++4
++5    <uses-sdk android:minSdkVersion="16" />
++6
++7</manifest>
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+new file mode 100644
+index 0000000..16a30b1
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.reactnativereceivesharingintent" >
++
++    <uses-sdk android:minSdkVersion="16" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/navigation_json/debug/navigation.json b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/navigation_json/debug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/navigation_json/debug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..b008ced
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+new file mode 100644
+index 0000000..754a365
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+@@ -0,0 +1 @@
++com.reactnativereceivesharingintent
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+new file mode 100644
+index 0000000..f2f66fc
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream
+new file mode 100644
+index 0000000..f6c4442
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len
+new file mode 100644
+index 0000000..3085af4
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+new file mode 100644
+index 0000000..98b955c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i
+new file mode 100644
+index 0000000..5886a53
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+new file mode 100644
+index 0000000..2c2b956
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream
+new file mode 100644
+index 0000000..54cccbb
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len
+new file mode 100644
+index 0000000..cfeb6a8
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+new file mode 100644
+index 0000000..fc0e221
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i
+new file mode 100644
+index 0000000..dea487c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+new file mode 100644
+index 0000000..317087c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..54cccbb
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..cfeb6a8
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..b5b6599
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i
+new file mode 100644
+index 0000000..dea487c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+new file mode 100644
+index 0000000..317087c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..14c33a9
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..cfeb6a8
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..b5b6599
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i
+new file mode 100644
+index 0000000..95da4cf
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+new file mode 100644
+index 0000000..631061a
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream
+new file mode 100644
+index 0000000..0828de0
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len
+new file mode 100644
+index 0000000..f07dea1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len
+new file mode 100644
+index 0000000..a9f80ae
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+new file mode 100644
+index 0000000..641a026
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i
+new file mode 100644
+index 0000000..32ee3d7
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+new file mode 100644
+index 0000000..11ec362
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream
+new file mode 100644
+index 0000000..716b862
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len
+new file mode 100644
+index 0000000..3085af4
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+new file mode 100644
+index 0000000..c15602a
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i
+new file mode 100644
+index 0000000..fe37cb6
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream
+new file mode 100644
+index 0000000..da72f9b
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len
+new file mode 100644
+index 0000000..d263632
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+new file mode 100644
+index 0000000..7998725
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i
+new file mode 100644
+index 0000000..de9199e
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+new file mode 100644
+index 0000000..bdf584a
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream
+new file mode 100644
+index 0000000..219c964
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len
+new file mode 100644
+index 0000000..30b8abe
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len
+new file mode 100644
+index 0000000..2a17e6e
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+new file mode 100644
+index 0000000..10cd55f
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i
+new file mode 100644
+index 0000000..07dbf74
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+new file mode 100644
+index 0000000..2ceb12b
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -0,0 +1,2 @@
++2
++0
+\ No newline at end of file
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+new file mode 100644
+index 0000000..f2cbac7
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream
+new file mode 100644
+index 0000000..716b862
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len
+new file mode 100644
+index 0000000..3085af4
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+new file mode 100644
+index 0000000..7d30a43
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i
+new file mode 100644
+index 0000000..da3c6f5
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+new file mode 100644
+index 0000000..5b79225
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+new file mode 100644
+index 0000000..100d205
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+new file mode 100644
+index 0000000..ccfcbf4
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+new file mode 100644
+index 0000000..01bdaa1
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+new file mode 100644
+index 0000000..b5b6599
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i
+new file mode 100644
+index 0000000..f768a77
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+new file mode 100644
+index 0000000..ad8aae5
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+new file mode 100644
+index 0000000..6782b9d
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+new file mode 100644
+index 0000000..1ed3e1d
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+new file mode 100644
+index 0000000..3dd47a7
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+new file mode 100644
+index 0000000..d5da9ea
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+new file mode 100644
+index 0000000..1414a9f
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
+new file mode 100644
+index 0000000..5c5308c
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin
+new file mode 100644
+index 0000000..57431c8
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/react-native-receive-sharing-intent/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..62ee986
+--- /dev/null
++++ b/node_modules/react-native-receive-sharing-intent/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,17 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml:1:1-4:12
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml:1:1-4:12
++	package
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml:2:11-56
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml
++	xmlns:android
++		ADDED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml:1:11-69
++uses-sdk
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml
++INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from /Users/thomas/Documents/ReactNative/mezon-fe/apps/mobile/node_modules/react-native-receive-sharing-intent/android/src/main/AndroidManifest.xml
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-receive-sharing-intent/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..1f79f56
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/META-INF/react-native-receive-sharing-intent_debug.kotlin_module b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/META-INF/react-native-receive-sharing-intent_debug.kotlin_module
+new file mode 100644
+index 0000000..3aa6361
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/META-INF/react-native-receive-sharing-intent_debug.kotlin_module differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/FileDirectory.class b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/FileDirectory.class
+new file mode 100644
+index 0000000..c7fada5
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/FileDirectory.class differ
+diff --git a/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/ReceiveSharingIntentPackage.class b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/ReceiveSharingIntentPackage.class
+new file mode 100644
+index 0000000..ab75c41
+Binary files /dev/null and b/node_modules/react-native-receive-sharing-intent/android/build/tmp/kotlin-classes/debug/com/reactnativereceivesharingintent/ReceiveSharingIntentPackage.class differ
+diff --git a/node_modules/react-native-receive-sharing-intent/src/ReceiveSharingIntent.ts b/node_modules/react-native-receive-sharing-intent/src/ReceiveSharingIntent.ts
+index 735c191..261d1ac 100644
+--- a/node_modules/react-native-receive-sharing-intent/src/ReceiveSharingIntent.ts
++++ b/node_modules/react-native-receive-sharing-intent/src/ReceiveSharingIntent.ts
+@@ -39,12 +39,12 @@ class ReceiveSharingIntentModule implements IReceiveSharingIntent {
+     
+    protected getFileNames(handler: Function, errorHandler: Function, url: string){
+         if(this.isIos){
+-            ReceiveSharingIntent.getFileNames(url).then((data: any)=>{         
++            ReceiveSharingIntent?.getFileNames(url).then((data: any)=>{
+                  let files = this.utils.sortData(data);
+                  handler(files);
+             }).catch((e:any)=>errorHandler(e));
+         }else{
+-            ReceiveSharingIntent.getFileNames().then((fileObject: any) => {
++            ReceiveSharingIntent?.getFileNames().then((fileObject: any) => {
+                 let files = Object.keys(fileObject).map((k) => fileObject[k])
+                 handler(files);
+             }).catch((e:any)=>errorHandler(e));

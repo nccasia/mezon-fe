@@ -1,0 +1,27 @@
+{
+    "actions": {
+        "create": "Create"
+    },
+    "fields": {
+        "channelName": {
+            "title": "Channel Name",
+            "placeholder": "new-channel"
+        },
+        "channelPrivate": {
+            "title": "Private Channel",
+            "descriptionText": "By making a private channel, only select members and roles will be able to view thí channel",
+            "descriptionVoice": "By making a voice channel, only select members and roles will have access to view ỏ connect to this channel"
+        },
+        "channelType": {
+            "title": "Channel Type",
+            "text": {
+                "title": "Text",
+                "description": "Post images, GIFs, stockers, opinions, and puns"
+            },
+            "voice": {
+                "title": "Voice",
+                "description": "Hang out together with voice, video, and screen share"
+            }
+        }
+    }
+}

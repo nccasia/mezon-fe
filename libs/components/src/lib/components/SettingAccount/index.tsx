@@ -55,14 +55,14 @@ const SettingAccount = ({onSettingProfile, menuIsOpen}: SettingAccountProps) => 
 				<div className="rounded-md dark:bg-bgSecondary bg-bgLightModeSecond m-4 p-4">
 					<div className="flex justify-between items-center mb-4">
 						<div>
-							<h4 className="uppercase font-bold text-xs text-zinc-400 mb-1">Display Name</h4>
+							<h4 className="uppercase font-bold text-xs dark:text-zinc-400 text-textLightTheme mb-1">Display Name</h4>
 							<p>You haven't added a display name yet.</p>
 						</div>
 						<div className="bg-zinc-600 h-fit rounded px-4 py-2 cursor-pointer hover:bg-opacity-80 text-white" onClick={handleClick}>Edit</div>
 					</div>
 					<div className="flex justify-between items-center">
 						<div>
-							<h4 className="uppercase font-bold text-xs text-zinc-400 mb-1">Username</h4>
+							<h4 className="uppercase font-bold text-xs dark:text-zinc-400 text-textLightTheme mb-1">Username</h4>
 							<p>{userProfile?.user?.username}</p>
 						</div>
 						<div className="bg-zinc-600 h-fit rounded px-4 py-2 cursor-pointer hover:bg-opacity-80 text-white" onClick={handleClick}>Edit</div>

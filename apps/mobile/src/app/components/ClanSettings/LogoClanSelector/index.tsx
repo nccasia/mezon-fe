@@ -1,7 +1,7 @@
-import { Text,  View } from "react-native";
+import { Text, View } from "react-native";
 import styles from "./style";
 import { useClans } from "@mezon/core";
-import MezonImagePicker from "../../../temp-ui/MezonImagePicker";
+import { MezonImagePicker } from "../../../temp-ui";
 
 export interface IFile {
     uri: string;

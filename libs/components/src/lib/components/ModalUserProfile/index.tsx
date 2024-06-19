@@ -9,12 +9,17 @@ import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
+import NoteUserProfile from './NoteUserProfile';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
+	classWrapper?: string;
+	classBanner?: string;
+	hiddenRole?:boolean;
+	showNote?:boolean;
 };
 
-const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) => {
+const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote }: ModalUserProfileProps) => {
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -54,11 +59,11 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 
 	useEffect(() => {
 		getColor();
-	}, []);
+	}, [userID,[]]);
 
 	return (
-		<div>
-			<div className="h-[60px] rounded-tl-lg rounded-tr-lg" style={{ backgroundColor: color }}></div>
+		<div className={classWrapper}>
+			<div className={classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
@@ -70,11 +75,10 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">{isFooterProfile ? userProfile?.user?.username : (userById ? userById?.user?.username : "Anonymous")}</p>
 						<p className="font-medium tracking-wide text-sm my-0">{isFooterProfile ? userProfile?.user?.display_name : (userById ? userById?.user?.display_name : "Unknown")}</p>
 					</div>
-					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : !hiddenRole && <RoleUserProfile userID={userID} />}
 
-					{!checkOwner(userById?.user?.google_id || '') ? (
+					{(!checkOwner(userById?.user?.google_id || '') && !hiddenRole) ? (
 						<div className="w-full items-center">
 							<input
 								type="text"
@@ -90,6 +94,12 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 							/>
 						</div>
 					) : null}
+					{ showNote && 
+						<>
+							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
+							<NoteUserProfile />
+						</>
+					}
 				</div>
 			</div>
 		</div>

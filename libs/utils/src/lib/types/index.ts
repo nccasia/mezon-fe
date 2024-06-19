@@ -470,9 +470,14 @@ export type UpdateClan = {
 	banner?: string;
 };
 
+export type RemoveClanUsers = {
+	clanId: string;
+	userIds: string[];
+};
+
 export type RemoveChannelUsers = {
 	channelId: string;
-	ids?: string[];
+	userIds: string[];
 };
 
 export enum Tabs_Option {

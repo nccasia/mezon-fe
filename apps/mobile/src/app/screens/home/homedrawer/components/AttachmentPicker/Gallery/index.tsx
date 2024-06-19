@@ -74,7 +74,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				assetType: 'All',
 				...(!!pageInfo && !!after && { after: after }),
 				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
-			})  ;
+			});
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
 		} catch (error) {
@@ -138,12 +138,19 @@ const Gallery = ({ onPickGallery }: IProps) => {
 	const handleGalleryPress = async (file: any) => {
 		try {
 			const image = file?.node?.image;
+			const type = file?.node?.type;
+
 			let filePath = image?.uri;
 			if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
-				const appleId = filePath.substring(5, 41);
+				const ms = new Date().getTime();
 				const ext = image.extension;
-				const destPath = `${RNFS.CachesDirectoryPath}/${appleId}.${ext}`;
-				filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
+				const destPath = `${RNFS.CachesDirectoryPath}/${ms}.${ext}`;
+
+				if (type && type.startsWith('video')) {
+					filePath = await RNFS.copyAssetsVideoIOS(filePath, destPath);
+				} else {
+					filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
+				}
 			}
 			const fileData = await RNFS.readFile(filePath, 'base64');
 

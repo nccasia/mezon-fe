@@ -1,5 +1,5 @@
 import { useChatReaction } from '@mezon/core';
-import { FaceIcon } from '@mezon/mobile-components';
+import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
@@ -13,9 +13,13 @@ import { useSelector } from 'react-redux';
 import { FastImageRes } from '../../Reusables';
 import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
 import { styles } from './styles';
+// import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCallback } from 'react';
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
-	const { message, dataReactionCombine, emojiListPNG, openEmojiPicker } = props || {};
+	const { message, dataReactionCombine = [], emojiListPNG, openEmojiPicker, mode } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { userId, reactionMessageDispatch } = useChatReaction();
 
@@ -28,16 +32,53 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		message_sender_id: string,
 		action_delete?: boolean,
 	) => {
-		await reactionMessageDispatch(id, mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+		await reactionMessageDispatch(
+			id,
+			mode ?? 2,
+			messageId ?? '',
+			emoji ?? '', 1,
+			message_sender_id ?? '',
+			false
+		);
 	};
+
+	const removeEmoji = async (emojiData: EmojiDataOptionals) => {
+		const { id, emoji, senders } = emojiData;
+		const countToRemove = senders.find(sender => sender.sender_id === userId)?.count;
+		await reactionMessageDispatch(
+			id,
+			mode ?? 2,
+			message.id ?? '',
+			emoji,
+			countToRemove,
+			userId ?? '',
+			true
+		);
+	};
+
+	const allReactionDataOnOneMessage = useMemo(() => {
+		return dataReactionCombine.filter((emoji: EmojiDataOptionals) =>
+			emoji.message_id === message.id && emoji.senders.some(sender => sender.count !== 0))
+			.map(emoji => {
+				if (Number(emoji.id) === 0) {
+					const tempId = `${emoji.message_id}-${emoji.emoji}`;
+					return { ...emoji, id: tempId }
+				}
+				return emoji;
+			})
+	}, [dataReactionCombine, message])
 
 	return (
 		<View style={styles.reactionWrapper}>
-			{(dataReactionCombine || [])
-				.filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id)
-				.map((emojiItemData: EmojiDataOptionals, index) => {
+			{allReactionDataOnOneMessage
+				?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 					const isMyReaction = userSender?.count && userSender.count > 0;
+
+					if (calculateTotalCount(emojiItemData.senders) === 0) {
+						return null;
+					}
+
 					return (
 						<Pressable
 							onLongPress={() => setCurrentEmojiSelectedId(emojiItemData.id)}
@@ -65,25 +106,30 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 					);
 				})}
 
-			{(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).length ? (
+			{allReactionDataOnOneMessage.length  ? (
 				<Pressable onPress={() => openEmojiPicker?.()} style={styles.addEmojiIcon}>
 					<FaceIcon color={Colors.gray72} />
 				</Pressable>
 			) : null}
 
 			<ReactionDetail
-				allReactionDataOnOneMessage={(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id)}
+				allReactionDataOnOneMessage={allReactionDataOnOneMessage}
 				emojiSelectedId={currentEmojiSelectedId}
 				onClose={() => setCurrentEmojiSelectedId(null)}
 				emojiListPNG={emojiListPNG}
+				removeEmoji={removeEmoji}
 			/>
 		</View>
 	);
 });
 
 const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
-	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG } = props;
+	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG, removeEmoji } = props;
+	const { userId } = useChatReaction();
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
+	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+	const [showConfirmDeleteEmoji, setShowConfirmDeleteEmoji] = useState<boolean>(false);
+	const { t } = useTranslation('message');
 	const ref = useRef(null);
 
 	const getTabHeader = () => {
@@ -91,7 +137,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 			return (
 				<Pressable
 					key={emojiItem.id}
-					onPress={() => setSelectedTabId(emojiItem.id)}
+					onPress={() => selectEmoji(emojiItem.id)}
 					style={[styles.tabHeaderItem, selectedTabId === emojiItem.id && styles.activeTab]}
 				>
 					<FastImage
@@ -107,20 +153,87 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 		});
 	};
 
+	const selectEmoji = (emojiId: string) => {
+		setSelectedTabId(emojiId);
+		setShowConfirmDeleteEmoji(false);
+	}
+
+	const currentEmojiSelected = useMemo(() => {
+		if (selectedTabId) {
+			return allReactionDataOnOneMessage.find((emoji) => emoji.id === selectedTabId)
+		}
+		return null;
+	}, [selectedTabId, allReactionDataOnOneMessage])
+
+	const onSelectUserId = (userId: string) => {
+		onClose();
+		setSelectedUserId(userId);
+	}
+	
+	const checkToFocusOtherEmoji = useCallback(() => {
+		const areStillEmoji = currentEmojiSelected.senders.filter(sender => sender.sender_id !== userId)
+			.some(sender => sender.count !== 0);
+		if (areStillEmoji) return;
+
+		const emojiDeletedIndex = allReactionDataOnOneMessage.findIndex((emoji) => emoji.id === currentEmojiSelected.id);
+
+		let nextFocusEmoji = allReactionDataOnOneMessage[emojiDeletedIndex + 1];
+		if (!nextFocusEmoji) {
+			nextFocusEmoji = allReactionDataOnOneMessage[emojiDeletedIndex - 1];
+		}
+		setSelectedTabId(nextFocusEmoji?.id || null);
+	}, [allReactionDataOnOneMessage, currentEmojiSelected, userId])
+
+	const onRemoveEmoji = useCallback(async () => {
+		await removeEmoji(currentEmojiSelected);
+		checkToFocusOtherEmoji();
+		setShowConfirmDeleteEmoji(false);
+	}, [removeEmoji, checkToFocusOtherEmoji, currentEmojiSelected])
+
+	const emojiKeyList = useMemo(() => {
+		return allReactionDataOnOneMessage.map(emojiData => emojiData.id)
+	}, [allReactionDataOnOneMessage])
+
+	const isExistingMyEmoji = useMemo(() => {
+		return currentEmojiSelected?.senders?.find(sender => sender?.sender_id === userId)?.count > 0;
+	}, [currentEmojiSelected, userId])
+
 	const getContent = () => {
 		return (
 			<View style={styles.contentWrapper}>
+				<View style={styles.removeEmojiContainer}>
+					<Text style={styles.emojiText}>{currentEmojiSelected?.emoji}</Text>
+					{isExistingMyEmoji ? (
+						<View>
+							{showConfirmDeleteEmoji ? (
+								<Pressable style={styles.confirmDeleteEmoji} onPress={() => onRemoveEmoji()}>
+									<TrashIcon />
+									<Text style={styles.confirmText}>{t('reactions.removeActions')}</Text>
+								</Pressable>
+							): (
+								<Pressable onPress={() => setShowConfirmDeleteEmoji(true)}>
+									<TrashIcon />
+								</Pressable>
+							)}
+						</View>
+					): null}
+				</View>
+
 				{allReactionDataOnOneMessage
 					.filter((item) => item.id === selectedTabId)
 					.map((data) => data.senders)
 					.flat(1)
-					.map((user) => {
+					.map((sender, index) => {
+						if (sender.count === 0) {
+							return null;
+						}
 						return (
-							<View key={user.sender_id}>
-								<MemberReact userId={user.sender_id} />
+							<View key={`${emojiKeyList[index]}`}>
+								<MemberReact userId={sender.sender_id} onSelectUserId={onSelectUserId} />
 							</View>
 						);
-					})}
+					})
+				}
 			</View>
 		);
 	};
@@ -138,38 +251,52 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	}, [emojiSelectedId]);
 
 	return (
-		<BottomSheet
-			ref={ref}
-			height={500}
-			onClose={() => onClose()}
-			draggable
-			customStyles={{
-				container: {
-					backgroundColor: 'transparent',
-				},
-			}}
-		>
-			<View style={styles.bottomSheetWrapper}>
-				<View style={styles.contentHeader}>
-					<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabHeaderWrapper}>
-						{getTabHeader()}
-					</ScrollView>
+		<View>
+			<BottomSheet
+				ref={ref}
+				height={500}
+				onClose={() => onClose()}
+				draggable
+				customStyles={{
+					container: {
+						backgroundColor: 'transparent',
+					},
+				}}
+			>
+				<View style={styles.bottomSheetWrapper}>
+					{allReactionDataOnOneMessage.length ? (
+						<View>
+							<View style={styles.contentHeader}>
+								<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabHeaderWrapper}>
+									{getTabHeader()}
+								</ScrollView>
+							</View>
+							<View>{getContent()}</View>
+						</View>
+					): (
+						<View style={styles.noActionsWrapper}>
+							<Text style={styles.noActionTitle}>{t('reactions.noActionTitle')}</Text>
+							<Text style={styles.noActionContent}>{t('reactions.noActionDescription')}</Text>
+						</View>
+					)}
 				</View>
-				<View>{getContent()}</View>
-			</View>
-		</BottomSheet>
+			</BottomSheet>
+			{/* TODO: update later */}
+			{/* <UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} /> */}
+		</View>
 	);
 });
 
-const MemberReact = React.memo((props: { userId: string }) => {
-	const user = useSelector(selectMemberByUserId(props.userId || ''));
+const MemberReact = React.memo((props: { userId: string, onSelectUserId: (userId: string) => void }) => {
+	const {userId, onSelectUserId} = props;
+	const user = useSelector(selectMemberByUserId(userId || ''));
 
-	const openMemberDetail = () => {
-		console.log(user);
+	const showUserInformation = () => {
+		onSelectUserId(user.user?.id);
 	};
 
 	return (
-		<Pressable style={styles.memberWrapper} onPress={() => openMemberDetail()}>
+		<Pressable style={styles.memberWrapper} onPress={() => showUserInformation()}>
 			<View style={styles.imageWrapper}>
 				{user?.user?.avatar_url ? (
 					<FastImageRes uri={user?.user?.avatar_url} />

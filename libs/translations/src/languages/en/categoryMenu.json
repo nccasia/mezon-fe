@@ -1,0 +1,29 @@
+{
+    "menu": {
+        "watchMenu": {
+            "title": "",
+            "markAsRead": "Mark As Read"
+        },
+        "inviteMenu": {
+            "title": "",
+            "invite": "Invite"
+        },
+        "notification": {
+            "title": "",
+            "muteCategory": "Mute Category",
+            "notification": "Notification Settings"
+        },
+        "organizationMenu": {
+            "title": "",
+            "createChannel": "Create Channel",
+            "edit": "Edit Category"
+        },
+        "devMode": {
+            "title": "Development Mode",
+            "copyServerID": "Copy Server ID"
+        }
+    },
+    "notify": {
+        "serverIDCopied": "Copied Server ID"
+    }
+}

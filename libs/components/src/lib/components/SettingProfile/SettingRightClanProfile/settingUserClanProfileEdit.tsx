@@ -134,7 +134,7 @@ const SettingRightClanEdit = ({
 						/>
 					</div>
 					<div className="mt-[20px]">
-						<p className="text-[#CCCCCC] font-bold tracking-wide text-sm">AVATAR</p>
+						<p className="dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
@@ -155,7 +155,7 @@ const SettingRightClanEdit = ({
 					</div>
 				</div>
 				<div className="flex-1 text-white">
-					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
+					<p className="mt-[20px] dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">PREVIEW</p>
 					<SettingRightClanCard profiles={editProfile}/>
 				</div>
 			</div>

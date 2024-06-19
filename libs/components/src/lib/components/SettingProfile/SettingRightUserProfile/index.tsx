@@ -1,4 +1,4 @@
-import { useAccount } from '@mezon/core';
+import { useAccount, useApp } from '@mezon/core';
 import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
@@ -113,6 +113,7 @@ const SettingRightUser = ({
 		setEditAboutUser(e.target.value);
 		setFlags(true);
 	};
+	const {appearanceTheme} = useApp();
 	return (
 		<div
 			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
@@ -138,6 +139,7 @@ const SettingRightUser = ({
 							className="rounded-[3px] w-full border px-4 py-2 mt-2 focus:outline-none focus:border-white-500 font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
+							maxLength={32}
 						/>
 					</div>
 					<div className="mt-8">
@@ -161,12 +163,13 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className="dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full"
+								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full ${appearanceTheme ==="light" ? "customScrollLightMode" : ""}`}
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}
 								value={editAboutUser}
 								rows={4}
+								maxLength={128}
 							></textarea>
 							<div className="w-full flex justify-end">
 								<span className={`text-${editAboutUser.length > 128 ? '[#EF1515]' : '[#797878]'}`}>
@@ -177,7 +180,7 @@ const SettingRightUser = ({
 					</div>
 				</div>
 				<div className="flex-1  text-white">
-					<p className="mt-[20px] text-[#CCCCCC] font-semibold tracking-wide text-sm">PREVIEW</p>
+					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
 			</div>

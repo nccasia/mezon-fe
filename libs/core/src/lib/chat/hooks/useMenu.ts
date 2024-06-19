@@ -23,7 +23,21 @@ export function useMenu() {
 	);
 
 	return useMemo(
-		() => ({ closeMenu, statusMenu, isShowMemberList, setCloseMenu, setStatusMenu }),
-		[closeMenu, statusMenu, isShowMemberList, setCloseMenu, setStatusMenu],
+		() => (
+			{ 
+				closeMenu, 
+				statusMenu, 
+				isShowMemberList, 
+				setCloseMenu, 
+				setStatusMenu, 
+			}
+		),
+		[
+			closeMenu, 
+			statusMenu, 
+			isShowMemberList, 
+			setCloseMenu, 
+			setStatusMenu,
+		],
 	);
 }

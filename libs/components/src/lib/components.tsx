@@ -38,6 +38,8 @@ export { default as ContextMenu } from './components/RightClick/ContextMenu';
 export { default as ItemContextMenu } from './components/RightClick/ItemContextMenu';
 export { default as SearchModal } from './components/SearchModal/index';
 export { default as ModalNotificationSetting } from './components/notificationSetting/index';
+export { default as ToastController } from './components/ToastController/ToastController';
+
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

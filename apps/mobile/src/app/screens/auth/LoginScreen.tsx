@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
@@ -46,61 +47,63 @@ const LoginScreen = () => {
 		[loginEmail],
 	);
 	return (
-		<KeyboardAvoidingView style={styles.container}>
-			{/* header */}
-			<View style={styles.headerContainer}>
-				<Text style={styles.headerTitle}>WELCOME BACK</Text>
-				<Text style={styles.headerContent}>So glad to meet you again!</Text>
-			</View>
-			<View style={styles.googleButton}>
-				<GoogleLogin />
-			</View>
-			<Text style={styles.orText}>Or</Text>
-			{/* body */}
-			<ScrollView style={{ flex: 1 }}>
-				<Formik
-					initialValues={{
-						email: '',
-						password: '',
-					}}
-					validationSchema={LoginSchema}
-					onSubmit={handleSubmit}
-				>
-					{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
-						<>
-							{/* email */}
-							<TextInputUser
-								label="Email or phone"
-								value={values.email}
-								onChangeText={handleChange('email')}
-								placeholder="Email or phone"
-								onBlur={() => setFieldTouched('email')}
-								touched={touched.email}
-								error={errors.email}
-								isPass={false}
-							/>
+		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+			<KeyboardAvoidingView style={styles.container}>
+				{/* header */}
+				<View style={styles.headerContainer}>
+					<Text style={styles.headerTitle}>WELCOME BACK</Text>
+					<Text style={styles.headerContent}>So glad to meet you again!</Text>
+				</View>
+				<View style={styles.googleButton}>
+					<GoogleLogin />
+				</View>
+				<Text style={styles.orText}>Or</Text>
+				{/* body */}
+				<ScrollView style={{ flex: 1 }}>
+					<Formik
+						initialValues={{
+							email: '',
+							password: '',
+						}}
+						validationSchema={LoginSchema}
+						onSubmit={handleSubmit}
+					>
+						{({ errors, touched, values, handleSubmit, handleChange, setFieldTouched, isValid }) => (
+							<>
+								{/* email */}
+								<TextInputUser
+									label="Email or phone"
+									value={values.email}
+									onChangeText={handleChange('email')}
+									placeholder="Email or phone"
+									onBlur={() => setFieldTouched('email')}
+									touched={touched.email}
+									error={errors.email}
+									isPass={false}
+								/>
 
-							{/* password */}
-							<TextInputUser
-								label="Password"
-								value={values.password}
-								onChangeText={handleChange('password')}
-								placeholder="Password"
-								onBlur={() => setFieldTouched('password')}
-								touched={touched.password}
-								error={errors.password}
-								isPass={true}
-							/>
-							{/* button  */}
-							<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign in'} />
-						</>
-					)}
-				</Formik>
-			</ScrollView>
+								{/* password */}
+								<TextInputUser
+									label="Password"
+									value={values.password}
+									onChangeText={handleChange('password')}
+									placeholder="Password"
+									onBlur={() => setFieldTouched('password')}
+									touched={touched.password}
+									error={errors.password}
+									isPass={true}
+								/>
+								{/* button  */}
+								<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign in'} />
+							</>
+						)}
+					</Formik>
+				</ScrollView>
 
-			<FooterAuth content={'Need an account?'} onPress={() => navigation.navigate(APP_SCREEN.REGISTER as never)} title={'Register'} />
-			<LoadingModal isVisible={isLoading === 'loading'} />
-		</KeyboardAvoidingView>
+				<FooterAuth content={'Need an account?'} onPress={() => navigation.navigate(APP_SCREEN.REGISTER as never)} title={'Register'} />
+				<LoadingModal isVisible={isLoading === 'loading'} />
+			</KeyboardAvoidingView>
+		</SafeAreaView>
 	);
 };
 

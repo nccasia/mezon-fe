@@ -34,7 +34,6 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 					</div>
 					<div className="p-4">
 						<MessageWithUser
-							dataReaction={[]}
 							message={mess}
 							user={user as IChannelMember}
 							isMessNotifyMention={true}
@@ -52,7 +51,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 								DeleteSendMessage(mess.id);
 								closeModal();
 							}}
-							className="px-4 py-2 bg-red-900 rounded hover:bg-opacity-85"
+							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white"
 						>
 							Delete
 						</button>

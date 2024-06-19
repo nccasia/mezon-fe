@@ -78,7 +78,7 @@ const SettingPermissions = () => {
 				<ul className="flex flex-col gap-y-[5px]">
 					{searchResults.map((permission) => (
 						<li key={permission.id} className="flex items-center justify-between">
-							<span className="font-normal">{permission.slug}</span>
+							<span className="font-normal">{permission.title}</span>
 							<label>
 								<input
 									type="checkbox"

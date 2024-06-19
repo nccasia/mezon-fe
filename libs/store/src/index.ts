@@ -36,3 +36,5 @@ export * from './lib/store';
 export * from './lib/threads/threads.slice';
 export * from './lib/users/users.slice';
 export * from './lib/voice/voice.slice';
+export * from './lib/errors/errors.slice';
+export * from './lib/toasts/toasts.slice';

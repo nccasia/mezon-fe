@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Pressable, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import styles from './style';
+import styles from './styles';
 import { CrossIcon, LockIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
+import MezonInput from '../../temp-ui/MezonInput2';
+import { IMezonMenuSectionProps, MezonMenu } from '../../temp-ui';
+import MezonToggleButton from '../../temp-ui/MezonToggleButton';
 
 type CreateCategoryScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CATEGORY;
 export default function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCategoryScreen>) {
@@ -37,6 +39,12 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
         ),
     });
 
+    const ToggleBtn = () => <MezonToggleButton
+        onChange={() => { }}
+        height={25}
+        width={45}
+    />
+
     const handleCreateCategory = async () => {
         if (categoryName.trim().length === 0) return;
 
@@ -54,39 +62,28 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
         navigation.goBack();
     }
 
-    function handleTogglePrivate() {
-        setPrivate(previousState => !previousState);
-    }
+    const menuPrivate: IMezonMenuSectionProps[] = [
+        {
+            bottomDescription: t('fields.catePrivate.description'),
+            items: [
+                {
+                    title: t('fields.catePrivate.title'),
+                    component: <ToggleBtn />,
+                    icon: <LockIcon height={18} width={18} />
+                }
+            ]
+        }
+    ]
 
     return (
         <View style={styles.container}>
-            <View>
-                <Text style={styles.label}>{t('fields.cateName.title')}</Text>
-                <TextInput
-                    placeholderTextColor={'gray'}
-                    placeholder={t('fields.cateName.placeholder')}
-                    style={styles.input}
-                    value={categoryName}
-                    onChangeText={setCategoryName}
-                />
-            </View>
+            <MezonInput
+                value={categoryName}
+                onTextChange={setCategoryName}
+                placeHolder={t('fields.cateName.placeholder')}
+                label={t('fields.cateName.title')} />
 
-            <View>
-                <View style={styles.checkboxWrapper}>
-                    <View style={styles.labelIconWrapper}>
-                        <LockIcon height={18} width={18} />
-                        <Text style={styles.labelNormal}>{t('fields.catePrivate.title')}</Text>
-                    </View>
-                    <Switch
-                        trackColor={{ false: Colors.gray48, true: Colors.green }}
-                        onValueChange={handleTogglePrivate}
-                        value={isPrivate}
-                    />
-                </View>
-                <Text style={styles.description}>
-                    {t('fields.catePrivate.description')}
-                </Text>
-            </View>
+            <MezonMenu menu={menuPrivate} />
         </View>
     )
 }

@@ -29,7 +29,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionBottomState: boolean;
 	reactionRightState: boolean;
 	reactionDataSocket: EmojiDataOptionals;
-	reactionDataServerAndSocket: EmojiDataOptionals[];
+	dataReactionSocketUpdate: EmojiDataOptionals[];
 	userReactionPanelState: boolean;
 	reactionBottomStateResponsive: boolean;
 	messageMatchWithRef: boolean;
@@ -75,7 +75,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		channel_id: '',
 		message_id: '',
 	},
-	reactionDataServerAndSocket: [],
+	dataReactionSocketUpdate: [],
 	userReactionPanelState: false,
 	reactionBottomStateResponsive: false,
 	messageMatchWithRef: false,
@@ -131,7 +131,8 @@ export const reactionSlice = createSlice({
 				message_id: action.payload.message_id ?? '',
 			};
 			if (!action.payload.action) {
-				state.reactionDataServerAndSocket.push(state.reactionDataSocket);
+				const { action, ...newStateReaction } = state.reactionDataSocket;
+				state.dataReactionSocketUpdate.push(newStateReaction);
 			} else if (action.payload.action) {
 				const { action, ...newStateReaction } = state.reactionDataSocket;
 				const dataSocketRemove = {
@@ -143,12 +144,8 @@ export const reactionSlice = createSlice({
 						},
 					],
 				};
-				state.reactionDataServerAndSocket.push(dataSocketRemove);
+				state.dataReactionSocketUpdate.push(dataSocketRemove);
 			}
-		},
-
-		setDataReactionFromServe(state, action) {
-			state.reactionDataServerAndSocket = action.payload;
 		},
 
 		setUserReactionPanelState(state, action) {
@@ -196,7 +193,7 @@ export const selectReactionRightState = createSelector(getReactionState, (state:
 
 export const selectMessageReacted = createSelector(getReactionState, (state: ReactionState) => state.reactionDataSocket);
 
-export const selectDataReactionCombine = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
+export const selectDataSocketUpdate = createSelector(getReactionState, (state: ReactionState) => state.dataReactionSocketUpdate);
 
 export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
 

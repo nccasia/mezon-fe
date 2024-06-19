@@ -6,6 +6,8 @@ import { rendererAppName, rendererAppPort } from './constants';
 
 import { setup } from 'electron-push-receiver';
 
+let deeplinkingUrl;
+
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
 	// be closed automatically when the JavaScript object is garbage collected.
@@ -31,14 +33,6 @@ export default class App {
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
 		App.mainWindow = null;
-	}
-
-	private static onRedirect(event: any, url: string) {
-		if (url !== App.mainWindow.webContents.getURL()) {
-			// this is a normal external redirect, open it in a new browser window
-			event.preventDefault();
-			shell.openExternal(url);
-		}
 	}
 
 	private static onReady() {
@@ -80,16 +74,57 @@ export default class App {
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
 
+		const gotTheLock = App.application.requestSingleInstanceLock();
+		if (gotTheLock) {
+			App.application.on('second-instance', (e, argv) => {
+				if (process.platform == 'win32') {
+					deeplinkingUrl = argv.slice(1);
+
+					const url = argv.pop().slice(1);
+
+					if (url) {
+						const index = url.indexOf('=');
+						const dataString = url.substring(index + 1);
+
+						if (dataString) {
+							App.mainWindow.webContents.send('send-data-to-renderer', dataString);
+							App.loadMainWindow();
+						}
+					}
+				}
+
+				if (App.mainWindow) {
+					if (App.mainWindow.isMinimized()) App.mainWindow.restore();
+					App.mainWindow.focus();
+				}
+			});
+		} else {
+			App.application.quit();
+			return;
+		}
+
+		if (!App.application.isDefaultProtocolClient('mezonapp')) {
+			App.application.setAsDefaultProtocolClient('mezonapp');
+		}
+
+		App.application.on('will-finish-launching', function () {
+			// Protocol handler for osx
+			App.application.on('open-url', function (event, url) {
+				event.preventDefault();
+				deeplinkingUrl = url;
+			});
+		});
+
 		// if main window is ready to show, close the splash window and show the main window
 		App.mainWindow.once('ready-to-show', () => {
 			App.mainWindow.show();
 		});
 
 		// handle all external redirects in a new browser window
-		// App.mainWindow.webContents.on('will-navigate', App.onRedirect);
-		// App.mainWindow.webContents.on('new-window', (event, url, frameName, disposition, options) => {
-		//     App.onRedirect(event, url);
-		// });
+		App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+			shell.openExternal(url);
+			return { action: 'deny' };
+		});
 
 		// Emitted when the window is closed.
 		App.mainWindow.on('closed', () => {
@@ -112,6 +147,11 @@ export default class App {
 					slashes: true,
 				}),
 			);
+		}
+
+		if (process.platform == 'win32') {
+			// Keep only command line / deep linked arguments
+			deeplinkingUrl = process.argv.slice(1);
 		}
 	}
 

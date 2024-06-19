@@ -40,7 +40,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 	}, [currentClan]);
 
 	const scrollToCurrentClan = () => {
-		const currentIndex = clans.findIndex((server) => server.clan_id === currentClan.clan_id);
+		const currentIndex = clans.findIndex((clan) => clan.clan_id === currentClan.clan_id);
 
 		if (currentIndex !== -1 && scrollViewRef.current) {
 			const itemHeight = 50;
@@ -53,19 +53,19 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 	return (
 		<View style={styles.clansBox}>
 			<ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
-				{clans.map((server) => (
+				{clans.map((clan) => (
 					<Pressable
 						onPress={() => {
-							handleChangeClan(server.clan_id);
+							handleChangeClan(clan.clan_id);
 						}}
-						key={server.id}
-						style={[styles.serverItem, { backgroundColor: currentClan?.clan_id === server?.clan_id ? '#141c2a' : Colors.secondary }]}
+						key={clan.id}
+						style={[styles.serverItem, { backgroundColor: currentClan?.clan_id === clan?.clan_id ? '#141c2a' : Colors.secondary }]}
 					>
 						<View style={styles.serverName}>
-							<ClanIcon data={server} />
-							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode='tail'>{server?.clan_name}</Text>
+							<ClanIcon data={clan} />
+							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode='tail'>{clan?.clan_name}</Text>
 						</View>
-						{currentClan?.clan_id === server?.clan_id && <TickIcon width={10} height={10} color={Colors.azureBlue} />}
+						{currentClan?.clan_id === clan?.clan_id && <TickIcon width={10} height={10} color={Colors.azureBlue} />}
 					</Pressable>
 				))}
 			</ScrollView>

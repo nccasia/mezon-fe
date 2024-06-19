@@ -116,7 +116,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									{userProfile?.user?.id === currentClan?.creator_id && (
 										<ItemModal
 											onClick={handleShowServerSettings}
-											children="Server Settings"
+											children="Clan Settings"
 											endIcon={
 												<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />
 											}

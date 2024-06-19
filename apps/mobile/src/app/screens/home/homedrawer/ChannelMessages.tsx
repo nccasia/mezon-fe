@@ -1,18 +1,19 @@
 import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
 import { channelsActions, selectAttachmentPhoto, selectDataReactionGetFromMessage, useAppDispatch } from '@mezon/store-mobile';
+import { updateEmojiReactionData } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Swing } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-view';
 import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { styles } from './styles';
-import { updateEmojiReactionData } from '@mezon/utils';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -48,13 +49,12 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const formatAttachments: any[] = useMemo(() => {
 		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
-		const attachmentObjects = attachments
-			.filter((u) => u.url !== imageSelected?.url)
-			.map(createAttachmentObject)
+		const attachmentObjects = attachments.filter((u) => u.url !== imageSelected?.url).map(createAttachmentObject);
 		return [imageSelectedUrl, ...attachmentObjects];
 	}, [attachments, imageSelected]);
 
 	const [visibleImageModal, setVisibleImageModal] = useAnimatedState<boolean>(false);
+	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useAnimatedState<boolean>(false);
 	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
 
 	useEffect(() => {
@@ -118,30 +118,27 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			</View>
 		);
 	};
-
-	const onOpenImage = (image: ApiMessageAttachment) => {
+	const onOpenImage = useCallback((image: ApiMessageAttachment) => {
 		setImageSelected(image);
 		setIdxSelectedImageModal(0);
 		footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: 0 });
 		setVisibleImageModal(true);
-	};
+	}, []);
 
-	const renderItem = useCallback(
-		({ item, index }) => {
-			return (
-				<MessageItem
-					message={item}
-					mode={mode}
-					channelId={channelId}
-					dataReactionCombine={dataReactionCombine}
-					channelLabel={channelLabel}
-					preMessage={messages.length > 0 ? messages[index + 1] : undefined}
-					onOpenImage={onOpenImage}
-				/>
-			);
-		},
-		[dataReactionCombine, messages],
-	);
+	const renderItem = ({ item, index }) => {
+		const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
+		return (
+			<MessageItem
+				message={item}
+				mode={mode}
+				channelId={channelId}
+				dataReactionCombine={dataReactionCombine}
+				channelLabel={channelLabel}
+				preMessage={preMessage}
+				onOpenImage={onOpenImage}
+			/>
+		);
+	};
 
 	const RenderFooterModal = () => {
 		return (
@@ -162,10 +159,12 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 							key={`${item.url}_${index}_ImagesModal`}
 							onPress={() => {
 								setVisibleImageModal(false);
+								setVisibleImageModalOverlay(true);
 								setIdxSelectedImageModal(index);
 								timeOutRef.current = setTimeout(() => {
 									setVisibleImageModal(true);
-								}, 100);
+									setVisibleImageModalOverlay(false);
+								}, 50);
 							}}
 						>
 							<FastImage
@@ -194,11 +193,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
-				keyExtractor={(item, index) => `${item?.id}-${index}`}
+				keyExtractor={(item) => `${item?.id}`}
+				maxToRenderPerBatch={5}
+				initialNumToRender={5}
 				windowSize={10}
-				removeClippedSubviews={true}
-				maxToRenderPerBatch={20}
-				updateCellsBatchingPeriod={50}
 				onEndReached={onLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
@@ -209,16 +207,17 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				</TouchableOpacity>
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
-			{visibleImageModal && <View style={styles.overlay} />}
+			{visibleImageModalOverlay && (
+				<View style={styles.overlay}>
+					<Swing size={size.s_34 * 2} color={Colors.bgViolet} />
+				</View>
+			)}
 			<ImageView
-				animationType={'none'}
+				animationType={'fade'}
 				images={formatAttachments}
 				imageIndex={idxSelectedImageModal}
 				isVisible={visibleImageModal}
-				glideAlways
-				isSwipeCloseEnabled
-				isPinchZoomEnabled
-				isTapZoomEnabled
+				isSwipeCloseEnabled={false}
 				onImageChange={(idx: number) => {
 					setIdxSelectedImageModal(idx);
 					timeOutRef.current = setTimeout(() => {

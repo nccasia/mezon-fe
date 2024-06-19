@@ -3,6 +3,7 @@ import { machineId } from 'node-machine-id';
 import App from './app/app';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
+import { environment } from './environments/environment';
 
 export default class Main {
 	static initialize() {
@@ -25,6 +26,10 @@ export default class Main {
 		}
 	}
 }
+
+ipcMain.handle('sender-id', () => {
+	return environment.senderId;
+});
 
 ipcMain.handle('get-device-id', async () => {
 	return await machineId();

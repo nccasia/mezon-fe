@@ -69,7 +69,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 								) : (
 									<div>
 										{option?.clan_name && (
-											<div className="w-[40px] h-[40px] bg-bgSurface rounded-full flex justify-center items-center text-contentSecondary text-[20px]">
+											<div className="w-[40px] h-[40px] dark:bg-bgSurface bg-white rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px]">
 												{option.clan_name.charAt(0).toUpperCase()}
 											</div>
 										)}

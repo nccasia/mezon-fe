@@ -15,6 +15,9 @@
 		7E3B23803055DCF57B5EA3BF /* libPods-Mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14A6B301E10399B5B77E2307 /* libPods-Mobile.a */; };
 		8062E008C4D06D4A0E6F7C92 /* libPods-Mobile-MobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68857255654E07272F9D78F5 /* libPods-Mobile-MobileTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		E9B83E6B2C18346C00AE249D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B83E6A2C18346C00AE249D /* ShareViewController.swift */; };
+		E9B83E6E2C18346C00AE249D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */; };
+		E9B83E722C18346C00AE249D /* Mezon.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E9B83E682C18346C00AE249D /* Mezon.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +29,28 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Mobile;
 		};
+		E9B83E702C18346C00AE249D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9B83E672C18346C00AE249D;
+			remoteInfo = Mezon;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E9B83E732C18346C00AE249D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E9B83E722C18346C00AE249D /* Mezon.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* MobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,7 +70,14 @@
 		CC2EF50EB870283F95A556F6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Mobile/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DEA8E515101E02E04AB5E543 /* Pods-Mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.release.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.release.xcconfig"; sourceTree = "<group>"; };
 		E2115CBEE435D659E16F2226 /* Pods-Mobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.debug.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.debug.xcconfig"; sourceTree = "<group>"; };
+		E9066E532C18376200405832 /* MezonDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonDebug.entitlements; sourceTree = "<group>"; };
+		E94005A02C17F0A300D5CF58 /* Mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Mobile.entitlements; path = Mobile/Mobile.entitlements; sourceTree = "<group>"; };
 		E9953BD42BF602930070F1CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E9B83E682C18346C00AE249D /* Mezon.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Mezon.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9B83E6A2C18346C00AE249D /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		E9B83E6D2C18346C00AE249D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		E9B83E6F2C18346C00AE249D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E9B83E772C18349600AE249D /* MezonRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonRelease.entitlements; sourceTree = "<group>"; };
 		E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MobileRelease.entitlements; path = Mobile/MobileRelease.entitlements; sourceTree = "<group>"; };
 		E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -66,6 +97,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E3B23803055DCF57B5EA3BF /* libPods-Mobile.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9B83E652C18346C00AE249D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +130,7 @@
 		13B07FAE1A68108700A75B9A /* Mobile */ = {
 			isa = PBXGroup;
 			children = (
+				E94005A02C17F0A300D5CF58 /* Mobile.entitlements */,
 				E9953BD42BF602930070F1CC /* GoogleService-Info.plist */,
 				E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */,
 				E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */,
@@ -129,6 +168,7 @@
 				13B07FAE1A68108700A75B9A /* Mobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* MobileTests */,
+				E9B83E692C18346C00AE249D /* Mezon */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -143,6 +183,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* Mobile.app */,
 				00E356EE1AD99517003FC87E /* MobileTests.xctest */,
+				E9B83E682C18346C00AE249D /* Mezon.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -156,6 +197,18 @@
 				6DED2867C3377A60B9D7FC8E /* Pods-Mobile-MobileTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		E9B83E692C18346C00AE249D /* Mezon */ = {
+			isa = PBXGroup;
+			children = (
+				E9066E532C18376200405832 /* MezonDebug.entitlements */,
+				E9B83E772C18349600AE249D /* MezonRelease.entitlements */,
+				E9B83E6A2C18346C00AE249D /* ShareViewController.swift */,
+				E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */,
+				E9B83E6F2C18346C00AE249D /* Info.plist */,
+			);
+			path = Mezon;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -194,15 +247,34 @@
 				88E785823D0AC79A87F841BE /* [CP] Embed Pods Frameworks */,
 				A878C0A32B31E89472F79349 /* [CP] Copy Pods Resources */,
 				F2C59326FEC9DCA59A4FEFE3 /* [CP-User] [RNFB] Core Configuration */,
+				E9B83E732C18346C00AE249D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E9B83E712C18346C00AE249D /* PBXTargetDependency */,
 			);
 			name = Mobile;
 			productName = Mobile;
 			productReference = 13B07F961A680F5B00A75B9A /* Mobile.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E9B83E672C18346C00AE249D /* Mezon */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9B83E762C18346C00AE249D /* Build configuration list for PBXNativeTarget "Mezon" */;
+			buildPhases = (
+				E9B83E642C18346C00AE249D /* Sources */,
+				E9B83E652C18346C00AE249D /* Frameworks */,
+				E9B83E662C18346C00AE249D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Mezon;
+			productName = Mezon;
+			productReference = E9B83E682C18346C00AE249D /* Mezon.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -210,6 +282,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -218,6 +291,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					E9B83E672C18346C00AE249D = {
+						CreatedOnToolsVersion = 15.0.1;
 					};
 				};
 			};
@@ -236,6 +312,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* Mobile */,
 				00E356ED1AD99517003FC87E /* MobileTests */,
+				E9B83E672C18346C00AE249D /* Mezon */,
 			);
 		};
 /* End PBXProject section */
@@ -256,6 +333,14 @@
 				E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				72F27102A63F9EE6833F91E0 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9B83E662C18346C00AE249D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9B83E6E2C18346C00AE249D /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +508,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E9B83E642C18346C00AE249D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9B83E6B2C18346C00AE249D /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -431,7 +524,23 @@
 			target = 13B07F861A680F5B00A75B9A /* Mobile */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
+		E9B83E712C18346C00AE249D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9B83E672C18346C00AE249D /* Mezon */;
+			targetProxy = E9B83E702C18346C00AE249D /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E9B83E6D2C18346C00AE249D /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
@@ -489,8 +598,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2115CBEE435D659E16F2226 /* Pods-Mobile.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Mobile/Mobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -513,7 +624,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
 				PRODUCT_NAME = Mobile;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -524,6 +635,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEA8E515101E02E04AB5E543 /* Pods-Mobile.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Mobile/MobileRelease.entitlements;
@@ -548,7 +660,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
 				PRODUCT_NAME = Mobile;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -584,7 +696,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: nguyen.nguyenphuoc@ncc.asia (G5656W7J6A)";
 				COPY_PHASE_STRIP = NO;
 				CXX = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -668,7 +780,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: nguyen.nguyenphuoc@ncc.asia (G5656W7J6A)";
 				COPY_PHASE_STRIP = YES;
 				CXX = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -715,6 +827,99 @@
 			};
 			name = Release;
 		};
+		E9B83E742C18346C00AE249D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Mezon/MezonDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mezon/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Mezon;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E9B83E752C18346C00AE249D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Mezon/MezonRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mezon/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Mezon;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -741,6 +946,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9B83E762C18346C00AE249D /* Build configuration list for PBXNativeTarget "Mezon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9B83E742C18346C00AE249D /* Debug */,
+				E9B83E752C18346C00AE249D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

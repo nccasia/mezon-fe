@@ -48,7 +48,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 					className={`dark:text-textPrimary text-buttonProfile w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight`}
 					onClick={setIsShowDeletePopup}
 				>
-					Delete server
+					Delete clan
 				</button>
 				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
 			</div>

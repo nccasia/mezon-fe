@@ -30,12 +30,12 @@ const ModalRemoveMemberClan = ({ openModal, username, onClose, onRemoveMember }:
 		>
 			<div className="dark:bg-bgPrimary bg-white pt-4 rounded">
 				<div className="px-4">
-					<h1 className="dark:text-white text-textLightTheme text-xl font-semibold">{`Kick ${username} from Server`}</h1>
+					<h1 className="dark:text-white text-textLightTheme text-xl font-semibold">{`Kick ${username} from Clan`}</h1>
 				</div>
 				<form className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="block">
-							<p className="dark:text-[#B5BAC1] text-textPrimaryLight text-base font-normal">{`Are you sure you want to kick @${username} from the server? They will be able to rejoin again with a new invite.`}</p>
+							<p className="dark:text-[#B5BAC1] text-textPrimaryLight text-base font-normal">{`Are you sure you want to kick @${username} from the clan? They will be able to rejoin again with a new invite.`}</p>
 						</div>
 					</div>
 					<div className="px-4">

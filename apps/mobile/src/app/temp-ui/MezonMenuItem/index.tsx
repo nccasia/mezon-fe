@@ -1,5 +1,4 @@
-import { StyleProp, Text, TextStyle, View } from "react-native";
-import { MezonButton } from "../MezonButton";
+import { StyleProp, Text, TextStyle, TouchableOpacity, View } from "react-native";
 import styles from "./styles";
 import { ReactNode } from "react";
 import { AngleRightIcon } from "@mezon/mobile-components";
@@ -12,20 +11,24 @@ export interface IMezonMenuItemProps {
     isLast?: boolean,
     component?: ReactNode,
     textStyle?: StyleProp<TextStyle>,
-    disabled?: boolean
+    disabled?: boolean,
+    description?: string,
 }
-export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled }: IMezonMenuItemProps) {
+export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description }: IMezonMenuItemProps) {
     return (
-        <MezonButton
+        <TouchableOpacity
             disabled={disabled}
             onPress={() => { onPress && onPress() }}
-            viewContainerStyle={styles.btn}>
+            style={styles.btn}>
             {icon}
             <View style={[styles.btnTitleWrapper, disabled && styles.disable, !isLast && styles.borderBottom]}>
-                <Text style={[styles.btnTitle, textStyle]}>{title}</Text>
+                <View style={styles.btnTextWrapper}>
+                    <Text style={[styles.btnTitle, textStyle]}>{title}</Text>
+                    {description && <Text style={[styles.btnDescription]}>{description}</Text>}
+                </View>
                 {component}
                 {expandable && <AngleRightIcon height={24} width={24} />}
             </View>
-        </MezonButton>
+        </TouchableOpacity>
     )
 }

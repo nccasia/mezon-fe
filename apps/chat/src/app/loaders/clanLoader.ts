@@ -9,7 +9,7 @@ export const clanLoader: LoaderFunction = async ({ params }) => {
 	const { clanId } = params;
 	const store = await getStoreAsync();
 	if (!clanId) {
-		throw new Error('Server ID null');
+		throw new Error('Clan ID null');
 	}
 	store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	return {

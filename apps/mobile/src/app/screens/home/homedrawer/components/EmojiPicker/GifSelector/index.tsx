@@ -1,7 +1,7 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { Metrics, size } from '@mezon/mobile-ui';
 import { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import GifCategory from './GifCategory';
 import GiftItem from './GifItem';
 

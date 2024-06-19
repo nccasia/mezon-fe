@@ -1,0 +1,13 @@
+{
+    "menu": {
+      "startEvent": "Bắt đầu sự kiện",
+      "markAsNotInterested": "Đánh dấu Không quan tâm",
+      "markAsInterested": "Đánh dấu Quan tâm",
+      "editEvent": "Chỉnh sửa sự kiện",
+      "cancelEvent": "Hủy sự kiện",
+      "reportEvent": "Báo cáo sự kiện",
+      "copyEventLink": "Sao chép liên kết sự kiện",
+      "copyEventID": "Sao chép ID sự kiện"
+    }
+  }
+  

@@ -16,7 +16,7 @@ export function useCategory() {
 			if (category.category_id && categoryIdSortChannel[category.category_id]) {
 				categoryChannels.sort((a, b) => {
 					if (a.channel_label && b.channel_label) {
-						return a.channel_label.localeCompare(b.channel_label);
+						return b.channel_label.localeCompare(a.channel_label);
 					}
 					return 0;
 				});

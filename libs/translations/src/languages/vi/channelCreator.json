@@ -1,0 +1,27 @@
+{
+  "actions": {
+    "create": "Tạo"
+  },
+  "fields": {
+    "channelName": {
+      "title": "Tên kênh",
+      "placeholder": "kenh-moi"
+    },
+    "channelPrivate": {
+      "title": "Kênh riêng tư",
+      "descriptionText": "Bằng cách tạo một kênh riêng tư, chỉ những thành viên và vai trò được chọn mới có thể xem kênh này.",
+      "descriptionVoice": "Bằng cách tạo một kênh thoại riêng tư, chỉ những thành viên và vai trò được chọn mới có quyền xem hoặc kết nối với kênh này."
+    },
+    "channelType": {
+      "title": "Loại Kênh",
+      "text": {
+        "title": "Văn bản",
+        "description": "Đăng hình ảnh, GIF, huy hiệu, ý kiến và trò chơi chữ"
+      },
+      "voice": {
+        "title": "Giọng nói",
+        "description": "Hẹn gặp nhau cùng với giọng nói, video và chia sẻ màn hình"
+      }
+    }
+  }
+}

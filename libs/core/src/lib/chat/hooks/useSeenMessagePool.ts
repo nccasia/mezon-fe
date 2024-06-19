@@ -3,7 +3,7 @@
 // component triggers updateLastSeenMessage action
 // action contains channelId, messageId, message create time
 // push action into cache, keep the payload with the latest create time
-// set timeout to 1 second, if no new action comes in, send the latest action to server
+// set timeout to 1 second, if no new action comes in, send the latest action to clan
 
 import { messagesActions, seenMessagePool, useAppDispatch } from '@mezon/store';
 import { IMessage } from '@mezon/utils';

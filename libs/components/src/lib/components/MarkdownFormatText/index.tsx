@@ -64,6 +64,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 
 				return (
 					<div key={index} className="lineText contents ">
+						{mentions[index-1]?.matchedText && ' ' }
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks && !isBetween) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
@@ -85,10 +86,10 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 									),
 								}}
 							/>
-						)}{' '}
-						{markdown && ' '}
+						)}
+						{tagName && ' '}
 						{tagName && (
-							<span className='ml-[-0.3rem]'>
+							<span className="">
 								{checkMention(tagName) === MentionTypeEnum.MENTION ? (
 									<MentionUser tagName={tagName} />
 								) : checkMention(tagName) === MentionTypeEnum.HASHTAG ? (
@@ -97,7 +98,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />
 								)}
 							</span>
-						)}{' '}
+						)}
 					</div>
 				);
 			})}

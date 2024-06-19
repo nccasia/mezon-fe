@@ -8,7 +8,7 @@
     },
     "menu": {
         "serverName": {
-            "title": "Server Name"
+            "title": "Clan Name"
         },
         "inactive": {
             "title": "Inactive Settings",
@@ -20,14 +20,14 @@
             "title": "System Message Settings",
             "description": "This is the channel we send system event messages to. These can be turned off at any time.",
             "channel": "Channel",
-            "sendRandomWelcome": "Send a random welcome messages when someone joins this server.",
+            "sendRandomWelcome": "Send a random welcome messages when someone joins this clan.",
             "promptMembersReply": "Prompt members to reply to welcome messages with a sticker.",
-            "sendMessageBoost": "Send a messages when someone boosts this server",
-            "sendHelpfulTips": "Send helpful tips for server setup"
+            "sendMessageBoost": "Send a messages when someone boosts this clan",
+            "sendHelpfulTips": "Send helpful tips for clan setup"
         },
         "deleteServer": {
-            "title": "Delete Server",
-            "delete": "Delete Server"
+            "title": "Delete Clan",
+            "delete": "Delete Clan"
         }
     }
 }

@@ -116,4 +116,20 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 			).length,
 	);
 
+export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) =>{
+	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
+}
+);
+
+export const selectNotificationMessageCountByChannelId = (channelId: string, after = 0) =>
+	createSelector(
+		selectNotificationMessages,
+		(notifications) => {
+
+			return notifications.filter(
+				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+			).length;
+		}
+);
+
 export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);

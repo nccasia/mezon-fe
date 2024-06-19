@@ -100,7 +100,7 @@ const ModalInvite = (props: ModalParam) => {
 				<ListMemberInvite url={urlInvite} channelID={props.channelID} />
 				<div className="relative ">
 					<p className="pt-4 pb-1 text-[20px] mb-12px cursor-default">
-						<span>Or, send a server invite link to a friend</span>
+						<span>Or, send a clan invite link to a friend</span>
 					</p>
 					<input
 						type="text"
@@ -129,7 +129,7 @@ const ModalInvite = (props: ModalParam) => {
 			</div>
 		</Modal>) : 
 		(<Modal 
-			title='Server invite link settings' 
+			title='Clan invite link settings' 
 			onClose={closeModalEdit}
 			showModal={modalEdit}
 			classNameWrapperChild='space-y-5'

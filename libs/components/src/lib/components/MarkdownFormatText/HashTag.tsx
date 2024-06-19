@@ -64,9 +64,11 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	) : (
 		<>
 			<span 
-				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]" 
+				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic" 
 				onClick={() => setOpenModal(true)}
-			># unknow</span>
+			>
+				# unkonwn
+			</span>
 			{ openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)}/> }
 		</>
 	);

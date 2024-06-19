@@ -32,6 +32,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj</string>
+				<string>mezon.mobile</string>
 			</array>
 		</dict>
 	</array>

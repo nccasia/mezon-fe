@@ -31,6 +31,7 @@ export function useAuth() {
 			const action = await dispatch(authActions.authenticateGoogle(token));
 			const session = action.payload;
 			dispatch(accountActions.setAccount(session));
+			return session;
 		},
 		[dispatch],
 	);

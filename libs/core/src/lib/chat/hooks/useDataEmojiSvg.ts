@@ -35,7 +35,6 @@ import ranifiesta from 'libs/assets/src/assets/emojisSvg/Custom/ranifiesta.gif';
 import sadcat from 'libs/assets/src/assets/emojisSvg/Custom/sadcat.png';
 import verify from 'libs/assets/src/assets/emojisSvg/Custom/verify.gif';
 import whatthe from 'libs/assets/src/assets/emojisSvg/Custom/whatthe.png';
-import wow from 'libs/assets/src/assets/emojisSvg/Custom/wow.gif';
 
 import badminton from 'libs/assets/src/assets/emojisSvg/Activities/badminton.png';
 import baseball from 'libs/assets/src/assets/emojisSvg/Activities/baseball.png';
@@ -126,7 +125,6 @@ import joystick from 'libs/assets/src/assets/emojisSvg/Objects/joystick.png';
 import keyboard from 'libs/assets/src/assets/emojisSvg/Objects/keyboard.png';
 import minidisc from 'libs/assets/src/assets/emojisSvg/Objects/minidisc.png';
 import mobile_phone from 'libs/assets/src/assets/emojisSvg/Objects/mobile_phone.png';
-import mouse_three_button from 'libs/assets/src/assets/emojisSvg/Objects/mouse_three_button.png';
 import printer from 'libs/assets/src/assets/emojisSvg/Objects/printer.png';
 import trackball from 'libs/assets/src/assets/emojisSvg/Objects/trackball.png';
 import vhs from 'libs/assets/src/assets/emojisSvg/Objects/vhs.png';
@@ -313,7 +311,6 @@ function useDataEmojiSvg() {
 		{ src: keyboard, shortname: ':keyboard:', category: 'Objects' },
 		{ src: minidisc, shortname: ':minidisc:', category: 'Objects' },
 		{ src: mobile_phone, shortname: ':mobile_phone:', category: 'Objects' },
-		{ src: mouse_three_button, shortname: ':mouse:', category: 'Objects' },
 		{ src: printer, shortname: ':printer:', category: 'Objects' },
 		{ src: trackball, shortname: ':trackball:', category: 'Objects' },
 		{ src: vhs, shortname: ':vhs:', category: 'Objects' },
@@ -338,7 +335,6 @@ function useDataEmojiSvg() {
 		{ src: wink, shortname: ':wink:', category: 'People' },
 		{ src: oneHundred, shortname: ':100:', category: 'People' },
 		{ src: like, shortname: ':like:', category: 'People' },
-
 		{ src: black_heart, shortname: ':black_heart:', category: 'Symbols' },
 		{ src: blue_heart, shortname: ':blue_heart:', category: 'Symbols' },
 		{ src: broken_heart, shortname: ':broken_heart:', category: 'Symbols' },

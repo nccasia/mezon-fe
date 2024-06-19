@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-	
+
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
 		flexDirection: 'column',
@@ -68,9 +68,10 @@ export const styles = StyleSheet.create({
 		paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
 		paddingRight: size.s_40,
 		fontSize: size.medium,
-		paddingTop: size.s_10,
+		paddingTop: size.s_8,
 		backgroundColor: Colors.tertiaryWeight,
 		color: Colors.tertiary,
+		textAlignVertical: 'center',
 	},
 	iconEmoji: {
 		position: 'absolute',
@@ -186,6 +187,7 @@ export const styles = StyleSheet.create({
 	logoClan: {
 		height: verticalScale(70),
 		width: verticalScale(70),
+		resizeMode: 'cover',
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
@@ -245,6 +247,9 @@ export const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: Colors.borderPrimary,
 	},
+  friendItemWrapperInvited: {
+   opacity: 0.6
+  },
 	friendItemContent: {
 		flexDirection: 'row',
 	},
@@ -253,11 +258,15 @@ export const styles = StyleSheet.create({
 		paddingLeft: 10,
 		lineHeight: 20,
 		color: Colors.white,
+    maxWidth: 200
 	},
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
 	},
+  invitedButton: {
+    borderRadius: 15
+  },
 	threadItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -532,11 +541,13 @@ export const styles = StyleSheet.create({
 	},
 	overlay: {
 		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'center',
 		top: 0,
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: Colors.secondary,
+		backgroundColor: 'rgba(000,000,000,0.8)',
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
@@ -545,4 +556,27 @@ export const styles = StyleSheet.create({
 	mb_10: {
 		marginBottom: verticalScale(10),
 	},
+  aboveMessageDeleteReply: {
+		flexDirection: 'row',
+		paddingLeft: size.s_10,
+		gap: 5,
+	},
+  iconMessageDeleteReply: {
+    backgroundColor: Colors.bgCharcoal,
+    width: size.s_20,
+    height: size.s_20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingRight: size.s_6,
+    borderRadius: 50,
+    marginLeft: size.s_6
+  },
+  messageDeleteReplyText: {
+    fontSize: size.small,
+		color: Colors.tertiary,
+		overflow: 'hidden',
+		width: '80%',
+    fontStyle: 'italic'
+  }
 });

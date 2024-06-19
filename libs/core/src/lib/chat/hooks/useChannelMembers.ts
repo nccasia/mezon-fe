@@ -1,12 +1,13 @@
 import {
 	ChannelMembersEntity,
 	channelMembersActions,
+	clansActions,
 	selectMemberByUserId,
 	selectMemberStatus,
 	selectMembersByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
-import { RemoveChannelUsers } from '@mezon/utils';
+import { RemoveChannelUsers, RemoveClanUsers } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -63,8 +64,15 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 	}, [rawMembers]);
 
 	const removeMemberChannel = useCallback(
-		async ({ channelId, ids }: RemoveChannelUsers) => {
-			await dispatch(channelMembersActions.removeMemberChannel({ channelId, ids }));
+		async ({ channelId, userIds }: RemoveChannelUsers) => {
+			await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
+		},
+		[dispatch],
+	);
+
+	const removeMemberClan = useCallback(
+		async ({ clanId, userIds }: RemoveClanUsers) => {
+			await dispatch(clansActions.removeClanUsers({ clanId, userIds }));
 		},
 		[dispatch],
 	);
@@ -76,7 +84,8 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 			onlineMembers,
 			offlineMembers,
 			removeMemberChannel,
+			removeMemberClan,
 		}),
-		[members, offlineMembers, onlineMembers, rawMembers, removeMemberChannel],
+		[members, offlineMembers, onlineMembers, rawMembers, removeMemberChannel, removeMemberClan],
 	);
 }

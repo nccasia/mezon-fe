@@ -11,6 +11,7 @@ import {
 	PenIcon,
 	PinMessageIcon,
 	ReplyMessageIcon,
+	ThreadIcon,
 	TrashIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
@@ -199,7 +200,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.ForwardMessage:
 				return <ReplyMessageIcon />;
 			case EMessageActionType.CreateThread:
-				return <HashtagIcon />;
+				return <ThreadIcon width={20} height={20} />;
 			case EMessageActionType.CopyText:
 				return <CopyIcon />;
 			case EMessageActionType.DeleteMessage:

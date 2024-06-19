@@ -1,14 +1,5 @@
-import { ContextMenu, MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
-import {
-	EmojiDataOptionals,
-	IChannelMember,
-	IMessageWithUser,
-	RightClickPost,
-	TIME_COMBINE,
-	checkSameDay,
-	getTimeDifferenceInSeconds,
-} from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, RightClickPost, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -21,6 +12,7 @@ import { useMessageParser } from './useMessageParser';
 import { useAuth, useChatMessages, useNotification, useOnClickOutside, useReference, useRightClick } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
+import ContextMenu from '../RightClick/ContextMenu';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -37,20 +29,9 @@ export type MessageWithUserProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
-	dataReaction: EmojiDataOptionals[];
 };
 
-function MessageWithUser({
-	message,
-	preMessage,
-	user,
-	isMessNotifyMention,
-	mode,
-	newMessage,
-	child,
-	isMention,
-	dataReaction,
-}: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -181,7 +162,6 @@ function MessageWithUser({
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-						<MessageReaction dataReaction={dataReaction} currentChannelId={currentChannelId || ''} message={message} mode={mode} />
 						{message && !isMessNotifyMention && (
 							<div
 								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}

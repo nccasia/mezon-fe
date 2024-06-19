@@ -1,0 +1,12 @@
+{
+    "menu": {
+        "startEvent": "Start Event",
+        "markAsNotInterested": "Mark As Not Interested",
+        "markAsInterested": "Mark As Interested",
+        "editEvent": "Edit Event",
+        "cancelEvent": "Cancel Event",
+        "reportEvent": "Report Event",
+        "copyEventLink": "Copy Event Link",
+        "copyEventID": "Copy Event ID"
+    }
+}

@@ -76,7 +76,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 				</button>
 			</div>
 			<br />
-			<div className={`overflow-y-scroll relative w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
+			<div className={`overflow-y-auto relative w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 				<table className="w-full divide-y divide-gray-200">
 					<thead className="dark:bg-borderDefault bg-bgLightMode sticky top-0">
 						<tr className="h-11">
@@ -94,7 +94,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					<tbody className="dark:bg-bgSecondary bg-bgLightMode divide-y divide-gray-200">
 						{activeRoles.length === 0 ? (
 							<tr className="h-14">
-								<td className=" text-gray-300 text-center text-[15px]">
+								<td className="dark:text-gray-300 text-gray-600 text-center text-[15px]">
 									<p>No Roles</p>
 								</td>
 							</tr>

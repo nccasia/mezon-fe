@@ -1,6 +1,5 @@
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, messagesActions } from '@mezon/store-mobile';
-import { getStoreAsync } from '@mezon/store-mobile';
+import { STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { appActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import { Alert, Linking, Platform } from 'react-native';
@@ -132,8 +131,8 @@ export const navigateToNotification = async (notification: any, navigation: any,
 			if (isDifferentClan) store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 			setTimeout(
 				() => {
-					save(STORAGE_KEY_CHANNEL_ID, channelId);
-					save(STORAGE_KEY_CLAN_ID, clanId);
+					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+					save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 					store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 					store.dispatch(appActions.setLoadingMainMobile(false));
@@ -196,12 +195,11 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 
 	messaging().onNotificationOpenedApp((remoteMessage) => {
 		console.log('Notification caused app to open from background state:');
-
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
 			currentClan,
-			time: 2500,
+			time: 0,
 		});
 	});
 

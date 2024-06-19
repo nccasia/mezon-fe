@@ -33,7 +33,7 @@ const descriptionMap = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: 'Send messages, images, GIFs, emoji, opinions, and puns',
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
-	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the server',
+	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the clan',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: '',

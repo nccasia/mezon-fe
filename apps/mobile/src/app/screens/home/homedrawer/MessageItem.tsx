@@ -1,6 +1,13 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import {
+	FileIcon,
+	ReplyIcon,
+	ReplyMessageDeleted,
+	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	getUpdateOrAddClanChannelCache,
+	save,
+} from '@mezon/mobile-components';
+import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -24,23 +31,22 @@ import {
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, splitBlockCodeRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, isVideo, splitBlockCodeRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
+import { useTranslation } from 'react-i18next';
+import { openUrl } from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
-import Markdown from 'react-native-markdown-display';
-import { EDITED_FLAG, formatBlockCode, formatEmoji, formatUrls, markdownStyles, renderRulesCustom } from './constants';
-import { openUrl } from "react-native-markdown-display";
+import { RenderVideoChat } from './components/RenderVideoChat';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -56,14 +62,15 @@ export type MessageItemProps = {
 	channelId?: string;
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
+	isNumberOfLine?: boolean;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
-	return prevProps.message === nextProps.message && prevProps.dataReactionCombine === nextProps.dataReactionCombine;
+	return prevProps.message === nextProps.message;
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
+	const { message, mode, dataReactionCombine, preMessage, onOpenImage, isNumberOfLine } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -94,6 +101,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	}, [message, preMessage]);
 	const isShowInfoUser = useMemo(() => !isCombine || (message.references.length && !!user), [isCombine, message.references, user]);
+	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -120,7 +128,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = () => {
+	const renderVideos = (videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -129,29 +137,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					marginTop: size.s_10,
 				}}
 			>
-				{videos.map((video, index) => {
-					return (
-						<VideoPlayer
-							key={`${video?.url}_${index}`}
-							isControlsVisible={false}
-							disableFullscreen={false}
-							video={{ uri: video?.url }}
-							videoWidth={widthMedia + size.s_50}
-							videoHeight={160}
-							hideControlsOnStart={true}
-							resizeMode="cover"
-							style={{
-								width: widthMedia + size.s_50,
-								height: 160,
-								borderRadius: size.s_4,
-								overflow: 'hidden',
-								backgroundColor: Colors.borderDim,
-							}}
-							endWithThumbnail={true}
-							thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
-						/>
-					);
-				})}
+				{videoItem ? (
+					<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
+				) : (
+					videos.map((video, index) => {
+						return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
+					})
+				)}
 			</View>
 		);
 	};
@@ -198,9 +190,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			const checkIsImage = isImage(document?.url);
+			const checkIsImage = isImage(document?.url?.toLowerCase());
 			if (checkIsImage) {
-				return imageItem({ image: document, index, checkImage: checkIsImage });
+				return imageItem({ image: document, index, checkImage: false });
+			}
+			const checkIsVideo = isVideo(document?.url?.toLowerCase());
+
+			if (checkIsVideo) {
+				return renderVideos(document);
 			}
 
 			return (
@@ -255,9 +252,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					text1: 'Updating...',
 				});
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
-				save(STORAGE_KEY_CHANNEL_ID, channelId);
-				save(STORAGE_KEY_CLAN_ID, clanId);
-
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {
@@ -336,7 +332,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						) : (
 							<View style={[styles.replyAvatar]}>
 								<View style={styles.avatarMessageBoxDefault}>
-									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
 								</View>
 							</View>
 						)}
@@ -344,6 +340,17 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							{messageRefFetchFromServe.content.t}
 						</Text>
 					</Pressable>
+				</View>
+			) : null}
+			{!messageRefFetchFromServe && message?.references?.length && message.references ? (
+				<View style={styles.aboveMessageDeleteReply}>
+					<View style={styles.iconReply}>
+						<ReplyIcon width={34} height={30} />
+					</View>
+					<View style={styles.iconMessageDeleteReply}>
+						<ReplyMessageDeleted width={18} height={9} />
+					</View>
+					<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
 				</View>
 			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
@@ -360,7 +367,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
 							<View style={styles.avatarMessageBoxDefault}>
-								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
 							</View>
 						)}
 					</Pressable>
@@ -385,7 +392,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							}}
 							style={styles.messageBoxTop}
 						>
-							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
+							<Text style={styles.userNameMessageBox}>{user?.user?.username || 'Anonymous'}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
 						</TouchableOpacity>
 					) : null}
@@ -393,7 +400,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{images.length > 0 && renderImages()}
 
 					{documents.length > 0 && renderDocuments()}
-					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention)}
+					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine)}
 					<MessageAction
 						message={message}
 						dataReactionCombine={dataReactionCombine}

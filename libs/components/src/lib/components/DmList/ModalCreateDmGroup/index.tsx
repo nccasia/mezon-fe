@@ -93,7 +93,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 											id={`checkbox-item-${index}`}
 											type="checkbox"
 											value={friend.id}
-											className="peer relative appearance-none w-5 h-5 border rounded-sm focus:outline-none dark:checked:bg-gray-300 checked:bg-gray-700"
+											className=""
 											onChange={handleCheckboxChange}
 										/>
 										<label

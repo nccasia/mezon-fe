@@ -4,11 +4,9 @@ import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import MezonMenu, { reserve } from "apps/mobile/src/app/temp-ui/MezonMenu";
+import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
-import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
-import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
 import { ClansEntity } from "@mezon/store-mobile";
 import ClanMenuInfo from "../ClanMenuInfo";
 import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
@@ -18,28 +16,28 @@ import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/typ
 import { MutableRefObject } from "react";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useAuth, useClans } from "@mezon/core";
+import { useBottomSheetModal } from "@gorhom/bottom-sheet";
 
 interface IServerMenuProps {
     clan: ClansEntity;
-    bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
     inviteRef: MutableRefObject<any>;
 }
 
-export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMenuProps) {
+export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const user = useAuth();
-    const { clans } = useClans();
-
     const navigation = useNavigation<AppStackScreenProps['navigation']>();
+    const { clans } = useClans();
+    const { dismiss } = useBottomSheetModal();
 
     const handleOpenInvite = () => {
         inviteRef?.current.open();
-        bottomSheetRef?.current?.dismiss();
+        dismiss();
     }
 
     const handleOpenSettings = () => {
         navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
-        bottomSheetRef?.current?.dismiss();
+        dismiss();
     }
 
     const ToggleBtn = () => <MezonToggleButton
@@ -66,7 +64,7 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
         },
         {
             onPress: () => {
-                bottomSheetRef?.current?.dismiss();
+                dismiss();
                 navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
             },
             title: t('menu.organizationMenu.createCategory'),
@@ -183,7 +181,9 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
 
                 </ScrollView>
 
-                <MezonMenu menu={menu} />
+                <View>
+                    <MezonMenu menu={menu} />
+                </View>
             </View>
         </View>
     )

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     sectionWrapper: {
-        marginBottom: 20
+        marginBottom: 20,
     },
 
     sectionTitle: {

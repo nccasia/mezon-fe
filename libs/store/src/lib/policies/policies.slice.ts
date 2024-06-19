@@ -2,6 +2,8 @@ import { ApiPermission } from 'mezon-js/api.gen';
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
+import { ThunkConfigWithError } from '../errors';
+import { withError } from '../errors/helpers';
 
 export const POLICIES_FEATURE_KEY = 'policies';
 
@@ -30,11 +32,11 @@ type fetchPermissionsUserPayload = {
 	clanId: string;
 };
 
-export const fetchPermissionsUser = createAsyncThunk('policies/fetchPermissionsUser', async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
+export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPayload, ThunkConfigWithError>('policies/fetchPermissionsUser', async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.GetPermissionOfUserInTheClan(mezon.session, clanId);
 	if (!response.permissions) {
-		return thunkAPI.rejectWithValue([]);
+		return thunkAPI.rejectWithValue([], withError('Could not fetch permissions'));
 	}
 	return response.permissions.map(mapPermissionUserToEntity);
 });
@@ -45,7 +47,7 @@ export const fetchPermission = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getListPermission(mezon.session);
 		if (!response.permissions) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 		return response.permissions?.map(mapPermissionUserToEntity);
 	},

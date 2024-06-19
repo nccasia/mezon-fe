@@ -34,7 +34,7 @@ const fetchChannelAttachmentsCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_ATTACHMENTS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[0].session.token;
+			return args[1] + args[2] + args[0].session.username;
 		},
 	},
 );

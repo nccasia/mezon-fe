@@ -1,4 +1,5 @@
 import {
+	directActions,
 	messagesActions,
 	selectHasMoreMessageByChannelId,
 	selectLastMessageIdByChannelId,
@@ -11,6 +12,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import { useChatMessages } from './useChatMessages';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
@@ -27,6 +29,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
+	const { lastMessage } = useChatMessages({ channelId });
 
 	const sendDirectMessage = React.useCallback(
 		async (content: IMessageSendPayload,
@@ -44,6 +47,11 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			}
 
 			await socket.writeChatMessage('DM', channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
+			const timestamp = Date.now() / 1000;
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
+			if (lastMessage) {
+				dispatch(directActions.updateLastSeenTime(lastMessage));
+			}
 		},
 		[sessionRef, clientRef, socketRef, channelRef, mode],
 	);

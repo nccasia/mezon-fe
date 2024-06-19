@@ -40,6 +40,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		}
 	}, [coords.distanceToBottom]);
 
+	console.log(channel);
+
 	return (
 		<div
 			ref={panelRef}
@@ -59,6 +61,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					<ItemPanel children="Hide Names" type="checkbox" />
 				</GroupPanels>
 			)}
+			{channel.parrent_id === "0" &&
+			<>
 			<GroupPanels>
 				<Dropdown
 					trigger="hover"
@@ -100,7 +104,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 				)}
 			</GroupPanels>
 
-			{/* Group panel creator */}
 			{channel.creator_id === userProfile?.user?.id && (
 				<GroupPanels>
 					<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
@@ -110,6 +113,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					<ItemPanel onClick={handleDeleteChannel} children="Delete Channel" />
 				</GroupPanels>
 			)}
+			</>
+			}
 		</div>
 	);
 };

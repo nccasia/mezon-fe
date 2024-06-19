@@ -59,7 +59,7 @@ const fetchChannelMembersCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );
@@ -151,10 +151,10 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 	}
 });
 
-export const removeMemberChannel = createAsyncThunk('channelMembers/removeChannelUser', async ({ channelId, ids }: RemoveChannelUsers, thunkAPI) => {
+export const removeMemberChannel = createAsyncThunk('channelMembers/removeChannelUser', async ({ channelId, userIds }: RemoveChannelUsers, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.removeChannelUsers(mezon.session, channelId, ids);
+		const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
 		if (response) {
 			await thunkAPI.dispatch(
 				fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),

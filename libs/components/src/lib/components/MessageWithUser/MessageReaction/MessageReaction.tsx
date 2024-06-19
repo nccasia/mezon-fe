@@ -7,11 +7,10 @@ type MessageReactionProps = {
 	message: IMessageWithUser;
 	currentChannelId: string;
 	mode: number;
-	dataReaction?: EmojiDataOptionals[] | [];
 };
 
 // TODO: refactor component for message lines
-const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode, dataReaction }) => {
+const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
 	const {
 		userId,
 		reactionMessageDispatch,
@@ -20,12 +19,19 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		userReactionPanelState,
 		reactionBottomStateResponsive,
 		setArrowPosition,
+		convertReactionToMatchInterface,
 	} = useChatReaction();
 
+	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
+		return data.filter((item: any) => item.message_id === mesId && item.channel_id === currentChannelId);
+	};
+
+	const dataReaction = getReactionsByChannelId(convertReactionToMatchInterface, message.id);
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 	const { emojiListPNG } = useEmojiSuggestion();
+
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -36,7 +42,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		message_sender_id: string,
 		action_delete: boolean,
 	) {
-		await reactionMessageDispatch('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+		await reactionMessageDispatch(id, mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
@@ -171,7 +177,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	}, [showSenderPanelIn1s]);
 
 	return (
-		<div className="relative">
+		<div className="relative pl-3">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
@@ -192,14 +198,13 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 
 				{dataReaction &&
 					dataReaction
-						.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
+						.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.channel_id === message.channel_id)
 						?.map((emoji: EmojiDataOptionals, index: number) => {
 							const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
-							const checkID = emoji.message_id === message.id;
 							const totalCount = calculateTotalCount(emoji.senders);
 							return (
 								<Fragment key={`${index + message.id}`}>
-									{checkID && totalCount > 0 && (
+									{totalCount > 0 && (
 										<div
 											ref={(element) => (childRef.current[index] = element)}
 											className={` justify-center items-center relative 

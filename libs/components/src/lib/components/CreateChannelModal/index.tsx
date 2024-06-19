@@ -3,18 +3,20 @@ import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useA
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as Icons from '../Icons';
 import { ChannelLableModal } from './ChannelLabel';
-import { ChannelNameTextField } from './ChannelNameTextField';
+import { ChannelNameModalRef, ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
 
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
+	const InputRef = useRef<ChannelNameModalRef>(null);
+	const [isInputError, setIsInputError] = useState<boolean>(true);
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentCategory = useSelector((state: RootState) => state.channels.currentCategory);
@@ -100,6 +102,13 @@ export const CreateNewChannelModal = () => {
 		setChannelType(-1);
 		setIsPrivate(0);
 	};
+
+	const handleChangeValue = useCallback(() => {
+		const isValid = InputRef.current?.checkInput();
+		setIsInputError(isValid ?? false);
+	}, []);
+
+
 	return (
 		isOpenModal && (
 				<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
@@ -152,14 +161,16 @@ export const CreateNewChannelModal = () => {
 									</div>
 								</div>
 								<ChannelNameTextField
+									ref={InputRef}
 									onChange={handleChannelNameChange}
 									onCheckValidate={checkValidate}
 									type={channelType}
 									channelNameProps="What is channel's name?"
 									error={isErrorName}
+									onHandleChangeValue={handleChangeValue}
 								/>
 								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-								<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} />
+								<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} checkInputError={isInputError}/>
 							</div>
 						</div>
 					</div>

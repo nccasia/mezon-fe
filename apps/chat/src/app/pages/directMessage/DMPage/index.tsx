@@ -3,6 +3,7 @@ import {
 	useApp,
 	useAppNavigation,
 	useAppParams,
+	useChatMessages,
 	useChatReaction,
 	useDirectMessages,
 	useDragAndDrop,
@@ -11,14 +12,26 @@ import {
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
+import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
 
+function useChannelSeen(channelId: string) {
+	const dispatch = useAppDispatch();
+	const { lastMessage } = useChatMessages({ channelId });
+		useEffect(() => {
+			if (lastMessage) {
+				const timestamp = Date.now() / 1000;
+				dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+				dispatch(directActions.updateLastSeenTime(lastMessage));
+			}
+		}, [channelId, dispatch, lastMessage]);
+}
 export default function DirectMessage() {
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
@@ -26,7 +39,10 @@ export default function DirectMessage() {
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
 	const { draggingState, setDraggingState } = useDragAndDrop();
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 
+	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (defaultChannelId) {
@@ -168,8 +184,19 @@ export default function DirectMessage() {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<div className="w-[268px] dark:bg-bgSurface bg-bgLightModeSecond  lg:flex hidden">
+						<div className={`w-[241px] dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'}`}>
 							<MemberListGroupChat directMessageId={directId} />
+						</div>
+					)}
+					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
+						<div className={`w-[340px] dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'}`}>
+							<ModalUserProfile 
+								userID = {Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id} 
+								classWrapper='w-full' 
+								classBanner='h-[120px]' 
+								hiddenRole={true}
+								showNote={true}
+							/>
 						</div>
 					)}
 				</div>

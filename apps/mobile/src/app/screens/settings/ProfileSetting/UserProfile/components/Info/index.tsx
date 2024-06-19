@@ -1,6 +1,6 @@
-import { Keyboard, KeyboardEvent, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import styles from "./styles";
-import MezonInput from "apps/mobile/src/app/temp-ui/MezonInput";
+import { MezonInput } from "apps/mobile/src/app/temp-ui";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useEffect } from "react";

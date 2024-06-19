@@ -1,5 +1,5 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useMenu, useReference } from '@mezon/core';
+import { useApp, useMenu, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -29,7 +29,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const { attachmentDataRef, setAttachmentData, statusLoadingAttachment } = useReference();
-
+	const {appearanceTheme} = useApp();
 	const [finishUpload, setFinishUpload] = useState<boolean>(false);
 
 	const onConvertToFiles = useCallback((content: string) => {
@@ -145,7 +145,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
 				${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
-				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll`}>
+				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
 					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 						return (
 							<Fragment key={index}>

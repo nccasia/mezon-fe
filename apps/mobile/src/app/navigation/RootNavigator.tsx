@@ -20,13 +20,10 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
-import messaging from '@react-native-firebase/messaging';
+import { darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import { AppState } from 'react-native';
-import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
-import { createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -42,25 +39,8 @@ const NavigationMain = () => {
 			setIsLoadingSplashScreen(false);
 		}, 2500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			if (remoteMessage.notification?.title) {
-				Toast.show({
-					type: 'info',
-					text1: remoteMessage.notification?.title,
-					text2: remoteMessage.notification?.body,
-					onPress: async () => {
-						Toast.hide();
-						await navigateToNotification(remoteMessage, null, null);
-					},
-				});
-			}
-		});
-		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
-		});
 
 		return () => {
-			unsubscribe();
 			clearTimeout(timer);
 			appStateSubscription.remove();
 		};

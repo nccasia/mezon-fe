@@ -59,7 +59,7 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 					dismissOnClick={false}
 					renderTrigger={() => (
 						<div>
-							<ItemPanelMember children="Invite to Server" dropdown />
+							<ItemPanelMember children="Invite to Clan" dropdown />
 						</div>
 					)}
 					label=""

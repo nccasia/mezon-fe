@@ -1,5 +1,5 @@
-import { useAppNavigation, useMemberStatus, useMenu } from '@mezon/core';
-import { RootState, directActions, useAppDispatch } from '@mezon/store';
+import { useAppNavigation, useAppParams, useMemberStatus, useMenu } from '@mezon/core';
+import { RootState, directActions, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MemberProfile from '../../MemberProfile';
@@ -10,8 +10,9 @@ export type DirectMessProp = {
 function DMListItem({ directMessage }: DirectMessProp) {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const currentDmGroupId = useSelector((state: RootState) => state.direct.currentDirectMessageId);
 	const pathname = useLocation().pathname;
+	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage.id));
+	const { directId: currentDmGroupId } = useAppParams();
 
 	const { toDmGroupPage } = useAppNavigation();
 	const { closeMenu, setStatusMenu } = useMenu();
@@ -53,6 +54,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				isHideStatus={true}
 				isHideIconStatus={false}
 				key={directMessage.channel_id}
+				isUnReadDirect = {isUnReadChannel}
 			/>
 		</button>
 	);

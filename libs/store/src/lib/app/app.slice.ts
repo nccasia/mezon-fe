@@ -8,6 +8,8 @@ export interface AppState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowMemberList: boolean;
+	isShowMemberListDM: boolean;
+	isUseProfileDM: boolean;
 	initialPath?: string;
 	closeMenu: boolean;
 	statusMenu: boolean;
@@ -21,6 +23,8 @@ export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
 	themeApp: 'dark',
 	isShowMemberList: true,
+	isShowMemberListDM: true,
+	isUseProfileDM: true,
 	initialPath: '/',
 	closeMenu: false,
 	statusMenu: true,
@@ -48,6 +52,12 @@ export const appSlice = createSlice({
 		},
 		setCloseMenu: (state, action) => {
 			state.closeMenu = action.payload;
+		},
+		setIsShowMemberListDM: (state, action) => {
+			state.isShowMemberListDM = action.payload;
+		},
+		setIsUseProfileDM: (state, action) => {
+			state.isUseProfileDM = action.payload;
 		},
 		setStatusMenu: (state, action) => {
 			state.statusMenu = action.payload;
@@ -87,6 +97,10 @@ export const selectIsShowMemberList = createSelector(getAppState, (state: AppSta
 export const selectInitialPath = createSelector(getAppState, (state: AppState) => state.initialPath);
 
 export const selectCloseMenu = createSelector(getAppState, (state: AppState) => state.closeMenu);
+
+export const selectIsShowMemberListDM = createSelector(getAppState, (state: AppState) => state.isShowMemberListDM);
+
+export const selectIsUseProfileDM = createSelector(getAppState, (state: AppState) => state.isUseProfileDM);
 
 export const selectStatusMenu = createSelector(getAppState, (state: AppState) => state.statusMenu);
 

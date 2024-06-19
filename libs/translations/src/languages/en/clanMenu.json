@@ -13,18 +13,18 @@
         },
         "optionsMenu": {
             "title": "",
-            "editServerProfile": "Edit Server Profile",
+            "editServerProfile": "Edit Clan Profile",
             "showAllChannels": "Show All Channels",
             "hideMutedChannels": "Hide Muted Channels",
             "allowDirectMessage": "Allow Direct Message",
             "allowMessageRequest": "Allow Message Request",
-            "reportServer": "Report Server",
-            "leaveServer": "Leave Server"
+            "reportServer": "Report Clan",
+            "leaveServer": "Leave Clan"
         },
         "devMode": {
             "title": "Development Mode",
-            "copyServerID": "Copy Server ID",
-            "serverIDCopied": "Copied Server ID"
+            "copyServerID": "Copy Clan ID",
+            "serverIDCopied": "Copied Clan ID"
         }
     },
     "actions": {

@@ -1,0 +1,29 @@
+{
+    "menu": {
+        "watchMenu": {
+            "title": "",
+            "markAsRead": "Đánh dấu là Đã đọc"
+        },
+        "inviteMenu": {
+            "title": "",
+            "invite": "Mời"
+        },
+        "notification": {
+            "title": "",
+            "muteCategory": "Tắt tiếng Thể loại",
+            "notification": "Cài đặt Thông báo"
+        },
+        "organizationMenu": {
+            "title": "",
+            "createChannel": "Tạo Kênh",
+            "edit": "Chỉnh sửa Thể loại"
+        },
+        "devMode": {
+            "title": "Chế độ Phát triển",
+            "copyServerID": "Sao chép ID Máy chủ"
+        }
+    },
+    "notify": {
+        "serverIDCopied": "Đã sao chép ID Máy chủ"
+    }
+}

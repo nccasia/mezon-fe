@@ -19,37 +19,37 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 	}, [dispatch, openModal]);
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="bg-bgPrimary pt-4 rounded">
+			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded">
 				<div>
-					<h1 className="text-white text-xl font-semibold text-center">Set a custom status</h1>
+					<h1 className="dark:text-textDarkTheme  text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
 				<form className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label value={`What's cookin', ${name}?`} className="text-[#B5BAC1] text-xs uppercase font-semibold" />
+							<Label value={`What's cookin', ${name}?`} className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
 						</div>
 						<input
 							type="text"
-							className="text-[#B5BAC1] outline-none w-full h-10 p-[10px] bg-[#26262B] text-base rounded placeholder:text-sm"
+							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-[#26262B] bg-bgLightModeThird text-base rounded placeholder:text-sm"
 							placeholder="Support has arrived!"
 						/>
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label htmlFor="clearAfter" value="Clear after" className="text-[#B5BAC1] text-xs uppercase font-semibold" />
+							<Label htmlFor="clearAfter" value="Clear after" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
 						</div>
 						<Dropdown
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 bg-[#26262B] hover:[&>*]:text-[#fff] px-3">
+								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-[#26262B] bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
 									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">Today</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
 							label=""
 							placement="bottom-start"
-							className="bg-[#232428] border-none py-0 w-[200px] [&>ul]:py-0"
+							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
 						>
 							<ItemSelect children="Today" />
 							<ItemSelect children="4 hours" />
@@ -60,20 +60,20 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label htmlFor="status" value="Status" className="text-[#B5BAC1] text-xs uppercase font-semibold" />
+							<Label htmlFor="status" value="Status" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
 						</div>
 						<Dropdown
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm h-9 bg-[#26262B] hover:[&>*]:text-[#fff] px-3">
-									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] cursor-pointer list-none select-none">Today</li>
+								<div className="flex items-center justify-between rounded-sm h-9 dark:bg-[#26262B] bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
+									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] cursor-pointer list-none select-none">Online</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
 							label=""
 							placement="bottom-start"
-							className="bg-[#232428] border-none py-0 w-[200px] [&>ul]:py-0"
+							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
 						>
 							<ItemSelect children="Online" startIcon={<Icons.OnlineStatus />} />
 							<ItemSelect children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
@@ -81,9 +81,9 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 							<ItemSelect children="Invisible" startIcon={<Icons.OfflineStatus />} />
 						</Dropdown>
 					</div>
-					<div className="flex justify-end p-4 rounded-b bg-[#2B2D31]">
+					<div className="flex justify-end p-4 rounded-b dark:bg-[#2B2D31] bg-[#dedede]">
 						<Button
-							className="h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent"
+							className="h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent dark:text-textDarkTheme text-textLightTheme"
 							type="button"
 							onClick={onClose}
 						>
@@ -113,11 +113,11 @@ const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps)
 	return (
 		<div
 			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm bg-[#26262B] cursor-pointer  hover:bg-zinc-700 hover:[&>li]:text-[#fff] px-3"
+			className="flex items-center justify-between h-11 rounded-sm dark:bg-[#26262B] bg-bgLightModeThird cursor-pointer  dark:hover:bg-zinc-700 hover:bg-bgLightMode dark:hover:[&>li]:text-[#fff] hover:[&>li]:text-[#000] px-3"
 		>
 			{startIcon && <div className="flex items-center justify-center h-[18px] w-[18px] mr-2">{startIcon}</div>}
-			<li className="text-[14px] text-[#B5BAC1] w-full list-none leading-[44px]">{children}</li>
-			<Icons.Check className="w-[18px] h-[18px" />
+			<li className="text-[14px] dark:text-[#B5BAC1] text-[#777777] w-full list-none leading-[44px]">{children}</li>
+			<Icons.Check className="w-[18px] h-[18px]" />
 		</div>
 	);
 };

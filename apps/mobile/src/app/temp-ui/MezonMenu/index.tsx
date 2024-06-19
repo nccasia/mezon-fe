@@ -1,5 +1,6 @@
 import Toast from "react-native-toast-message";
 import MezonMenuSection, { IMezonMenuSectionProps } from "../MezonMenuSection";
+import { IMezonMenuItemProps } from "../MezonMenuItem";
 
 interface IMezonMenu {
     menu: IMezonMenuSectionProps[];
@@ -20,3 +21,5 @@ export const reserve = () => {
         text1: 'Coming soon'
     });
 }
+
+export { IMezonMenuSectionProps, IMezonMenuItemProps }

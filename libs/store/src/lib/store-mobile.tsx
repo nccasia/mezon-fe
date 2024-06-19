@@ -42,6 +42,11 @@ import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessa
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { errorsReducer, ERRORS_FEATURE_KEY } from './errors/errors.slice';
+import { toastsReducer, TOASTS_FEATURE_KEY } from './toasts/toasts.slice'
+import { errorListenerMiddleware } from './errors/errors.listener';
+import { toastListenerMiddleware } from './toasts/toasts.listener';
+
 
 const persistedReducer = persistReducer(
 	{
@@ -107,6 +112,8 @@ const reducer = {
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
+	[ERRORS_FEATURE_KEY]: errorsReducer,
+	[TOASTS_FEATURE_KEY]: toastsReducer,
 };
 
 let storeInstance = configureStore({
@@ -131,7 +138,7 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 					},
 				},
 				serializableCheck: false,
-			}),
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
 	});
 	storeInstance = store;
 	storeCreated = true;
@@ -166,7 +173,7 @@ export const getStoreAsync = async () => {
 export function useAppDispatch(): AppDispatch {
 	const dispatch = useDispatch<AppDispatch>();
 	const dispatchRef = React.useRef(dispatch);
-
+	
 	const appDispatch: typeof dispatch = React.useCallback(
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		(action: any) => {
@@ -182,6 +189,6 @@ export function useAppDispatch(): AppDispatch {
 		},
 		[],
 	);
-
+	
 	return appDispatch;
 }

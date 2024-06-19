@@ -1,5 +1,5 @@
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
@@ -14,6 +14,12 @@ import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
+
+import { directActions } from '../direct/direct.slice';
+
+import { boolean } from 'yup';
+import { ThunkConfigWithToast, withToast } from '../toasts';
+
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -55,7 +61,7 @@ export type ChangeCurrentClanArgs = {
 	clanId: string;
 };
 
-export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
+export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('clans/changeCurrentClan', async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
 	thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
 	thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
 	thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
@@ -68,6 +74,7 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan(clanId));
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
+	thunkAPI.dispatch(directActions.fetchDirectMessage({}));
 	thunkAPI.dispatch(
 		voiceActions.fetchVoiceChannelMembers({
 			clanId: clanId ?? '',
@@ -127,12 +134,35 @@ export const deleteClan = createAsyncThunk(
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
+			if(response){
+				thunkAPI.dispatch(fetchClans());
+			}
 		}
 		catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
 )
+
+type removeClanUsersPayload = {
+	clanId: string;
+    userIds: string[];
+};
+
+export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userIds} : removeClanUsersPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.removeChannelUsers(mezon.session, clanId, userIds);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		thunkAPI.dispatch(fetchClans())
+		return response;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
+	}
+});
 
 export const updateClan = createAsyncThunk(
 	'clans/updateClans',
@@ -212,6 +242,7 @@ export const clansSlice = createSlice({
 	reducers: {
 		add: clansAdapter.addOne,
 		remove: clansAdapter.removeOne,
+		removeAll: clansAdapter.removeAll,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
 		},
@@ -251,6 +282,19 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+		builder
+			.addCase(deleteClan.pending, (state: ClansState) => {
+				state.loadingStatus = 'loading';
+			})
+		builder
+			.addCase(deleteClan.fulfilled, (state: ClansState) => {
+				state.loadingStatus = 'loaded';
+			})
+		builder
+			.addCase(deleteClan.rejected, (state: ClansState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	},
 });
 
@@ -282,8 +326,10 @@ export const clansActions = {
 	fetchClans,
 	createClan,
 	updateClan,
+	removeClanUsers,
 	changeCurrentClan,
 	updateUser,
+	deleteClan,
 };
 
 /*

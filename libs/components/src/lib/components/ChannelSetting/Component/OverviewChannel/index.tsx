@@ -1,10 +1,9 @@
+import { channelsActions, useAppDispatch } from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
-import { IChannel } from '@mezon/utils';
+import { IChannel, ValidateSpecialCharacters } from '@mezon/utils';
+import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
-import { channelsActions, useAppDispatch } from '@mezon/store';
-import { ApiUpdateChannelDescRequest } from 'mezon-js';
-import { Regex } from '../../../ClanHeader/ModalCreateCategory';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
@@ -19,7 +18,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
-	const [checkvalidate, setCheckValidate] = useState(!Regex().test(channelLabelInit|| ""));
+	const [checkvalidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTopic(e.target.value);
@@ -29,7 +28,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const handleDisplayChannelLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setChannelLabel(value);
-		const regex = Regex()
+		const regex = ValidateSpecialCharacters();
 		if (regex.test(value) && value !== '') {
 			setCheckValidate(false);
 		} else {
@@ -47,9 +46,9 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setTopicInit(topic);
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
-			channel_label: channelLabel ,
+			channel_label: channelLabel,
 			category_id: channel.category_id,
-		}
+		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 	};
 
@@ -92,7 +91,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{((channelLabelInit !== channelLabel || topicInit !== topic) && !checkvalidate) && (
+			{(channelLabelInit !== channelLabel || topicInit !== topic) && !checkvalidate && (
 				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 			)}
 		</div>

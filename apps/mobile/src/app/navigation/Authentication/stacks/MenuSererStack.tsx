@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import CategoryCreator from "../../../components/Category";
 import ClanSetting from "../../../components/ClanSettings";
 import ClanOverviewSetting from "../../../components/ClanSettings/Overview";
+import ChannelCreator from "../../../components/ChannelCreator";
 
 export const MenuClanStacks = ({ }: any) => {
     const Stack = createStackNavigator();
@@ -33,6 +34,14 @@ export const MenuClanStacks = ({ }: any) => {
                 component={CategoryCreator}
                 options={{
                     headerTitle: t('menuClanStack.categoryCreator'),
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.CREATE_CHANNEL}
+                component={ChannelCreator}
+                options={{
+                    headerTitle: t('menuClanStack.channelCreator'),
                 }}
             />
 

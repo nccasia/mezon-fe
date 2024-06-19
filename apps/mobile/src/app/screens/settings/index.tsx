@@ -1,5 +1,5 @@
 import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
-import { authActions, useAppDispatch } from '@mezon/store-mobile';
+import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +7,8 @@ import { Alert, ScrollView } from 'react-native';
 import { styles } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
-import Toast from 'react-native-toast-message';
-import MezonMenu, { reserve } from '../../temp-ui/MezonMenu';
-import MezonMenuItem, { IMezonMenuItemProps } from '../../temp-ui/MezonMenuItem';
-import { IMezonMenuSectionProps } from '../../temp-ui/MezonMenuSection';
+import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
+import MezonMenuItem from '../../temp-ui/MezonMenuItem';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['setting']);
@@ -18,6 +16,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 	const dispatch = useAppDispatch();
 	const logout = () => {
 		dispatch(authActions.logOut());
+		dispatch(channelsActions.removeAll());
+		dispatch(messagesActions.removeAll());
+		dispatch(clansActions.removeAll());
 	};
 
 	const confirmLogout = () => {

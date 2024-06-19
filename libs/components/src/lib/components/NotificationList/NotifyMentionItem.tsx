@@ -110,12 +110,11 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					Jump
 				</button>
 				<MessageWithUser
-					dataReaction={[]}
 					message={data}
 					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					newMessage={""}
+					newMessage={''}
 					isMention={true}
 				/>
 			</div>

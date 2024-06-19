@@ -29,6 +29,7 @@ import ProtectedRoutes from './ProtectedRoutes';
 import ThreadsRoutes from './ThreadsRoutes';
 
 const Login = loadable(() => import('../pages/login'));
+const LoginDesktop = loadable(() => import('../pages/loginDesktop'));
 const Main = loadable(() => import('../pages/main'));
 const DirectMain = loadable(() => import('../pages/directMessage'));
 const InvitePage = loadable(() => import('../pages/invite'));
@@ -64,6 +65,11 @@ export const routes = createBrowserRouter([
 						path: 'login',
 						loader: loginLoader,
 						element: <Login />,
+					},
+					{
+						path: 'login-desktop',
+						loader: loginLoader,
+						element: <LoginDesktop />,
 					},
 				],
 			},

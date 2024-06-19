@@ -91,12 +91,12 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const notificatonSelected = useSelector(selectnotificatonSelected);
 	const channelCategorySettings = useSelector(selectAllchannelCategorySetting);
-    const currentClanId = useSelector(selectCurrentClanId);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 	const sortedChannelCategorySettings = React.useMemo(() => {
 		const settingsCopy = [...channelCategorySettings];
 		settingsCopy.sort((a, b) => {
-			if(a.channel_category_label && b.channel_category_label){
+			if (a.channel_category_label && b.channel_category_label) {
 				if (a.channel_category_label < b.channel_category_label) {
 					return -1;
 				}
@@ -137,7 +137,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
 					category_id: newValue.id,
 					notification_type: defaultNotificationClan?.notification_setting_type,
-                    clan_id: currentClanId || ""
+					clan_id: currentClanId || '',
 				}),
 			);
 		}
@@ -147,7 +147,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					notificationSettingActions.setNotificationSetting({
 						channel_id: newValue.id,
 						notification_type: defaultNotificationClan?.notification_setting_type,
-						clan_id: currentClanId || ""
+						clan_id: currentClanId || '',
 					}),
 				);
 			} else {
@@ -155,7 +155,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					notificationSettingActions.setNotificationSetting({
 						channel_id: newValue.id,
 						notification_type: notificatonSelected?.notification_setting_type,
-						clan_id: currentClanId || ""
+						clan_id: currentClanId || '',
 					}),
 				);
 			}
@@ -168,7 +168,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
 					category_id: channelCategoryId,
 					notification_type: notificationType,
-                    clan_id: currentClanId || ""
+					clan_id: currentClanId || '',
 				}),
 			);
 		}
@@ -177,20 +177,20 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				notificationSettingActions.setNotificationSetting({
 					channel_id: channelCategoryId,
 					notification_type: notificationType,
-                    clan_id: currentClanId || ""
+					clan_id: currentClanId || '',
 				}),
 			);
 		}
 	};
 
-    const handleRemoveOverride = (title: string, id: string) => {
-                if (title=== 'category') {
-                    dispatch(defaultNotificationCategoryActions.deleteDefaultNotificationCategory({category_id:id, clan_id: currentClan?.clan_id}));
-                }
-                if (title === 'channel') {
-                    dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: id, clan_id: currentClanId|| ""}));
-                }
-            }
+	const handleRemoveOverride = (title: string, id: string) => {
+		if (title === 'category') {
+			dispatch(defaultNotificationCategoryActions.deleteDefaultNotificationCategory({ category_id: id, clan_id: currentClan?.clan_id }));
+		}
+		if (title === 'channel') {
+			dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: id, clan_id: currentClanId || '' }));
+		}
+	};
 	return (
 		<Modal
 			title="Notification Setting"
@@ -203,11 +203,14 @@ const ModalNotificationSetting = (props: ModalParam) => {
 			borderBottomTitle="border-b "
 		>
 			<div>
-				<div className={`${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
-					<div className='text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2'>CLAN NOTIFICATION SETTINGS</div>
-					<div className='space-y-2'>
+				<div className={`${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
+					<div className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">CLAN NOTIFICATION SETTINGS</div>
+					<div className="space-y-2">
 						{notificationTypes.map((notificationType, index) => (
-							<div key={index} className="flex items-center gap-x-3 p-[12px] dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded text-sm">
+							<div
+								key={index}
+								className="flex items-center gap-x-3 p-[12px] dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded text-sm"
+							>
 								<input
 									type="radio"
 									id={`notification-${index}`}
@@ -221,23 +224,29 @@ const ModalNotificationSetting = (props: ModalParam) => {
 							</div>
 						))}
 					</div>
-					
-					<hr className='border-zinc-500 my-4'/>
-					<div className='text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2'>NOTIFICATION OVERRIDES</div>
-					<div className='text-sm font-normal dark:text-textSecondary text-textSecondary800 mb-2'>Add a channel to override its default notification settings</div>
-					<Creatable
-						isClearable
-						onChange={handleChange}
-						options={options}
-						value={selectedOption}
-						placeholder="Select or create an option..."
-						styles={appearanceTheme === "dark" ? customStyles : lightCustomStyles}
-					/>
-					<div className={`mt-4 overflow-visible ${appearanceTheme === "light" ? "customScrollLightMode" : ""} `}>
+
+					<hr className="border-zinc-500 my-4" />
+					<div className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">NOTIFICATION OVERRIDES</div>
+					<div className="text-sm font-normal dark:text-textSecondary text-textSecondary800 mb-2">
+						Add a channel to override its default notification settings
+					</div>
+					<div className={appearanceTheme === 'dark' ? "" : "lightModeScrollBarMention"}>
+						<Creatable
+							isClearable
+							onChange={handleChange}
+							options={options}
+							value={selectedOption}
+							placeholder="Select or create an option..."
+							styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+						/>
+					</div>
+					<div className={`mt-4 overflow-visible ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''} `}>
 						<table className="w-full mt-4 hide-scrollbar overflow-hidden space-y-2">
 							<thead>
 								<tr className="grid grid-cols-7">
-									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-3">CHANNEL OR CATEGORY</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-3">
+										CHANNEL OR CATEGORY
+									</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">ALL</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">NOTHING</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">MENTIONS</th>
@@ -246,7 +255,10 @@ const ModalNotificationSetting = (props: ModalParam) => {
 							</thead>
 							<tbody>
 								{sortedChannelCategorySettings.map((channelCategorySetting, index) => (
-									<tr key={index} className="group relative grid grid-cols-7 mb-2.5 dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded p-[10px]">
+									<tr
+										key={index}
+										className="group relative grid grid-cols-7 mb-2.5 dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded p-[10px]"
+									>
 										<td className="col-span-3">{channelCategorySetting.channel_category_label}</td>
 										{notificationTypes.map((notificationType) => (
 											<td key={notificationType} className="col-span-1 text-center">
@@ -264,11 +276,16 @@ const ModalNotificationSetting = (props: ModalParam) => {
 												/>
 											</td>
 										))}
-										<td className='col-span-1 text-center'>
-                                        	<input type="checkbox" />
+										<td className="col-span-1 text-center">
+											<input type="checkbox" />
 											<button
-												className="absolute top-0 right-0 text-red-500 rounded-full dark:bg-white bg-black size-[15px] justify-center items-center hidden group-hover:flex"
-												onClick={() => handleRemoveOverride(channelCategorySetting.channel_category_title || "", channelCategorySetting.id || "")}
+												className="absolute top-0 right-0 text-red-500 rounded-full dark:bg-white bg-bgLightModeThird size-[15px] justify-center items-center hidden group-hover:flex px-3 py-3"
+												onClick={() =>
+													handleRemoveOverride(
+														channelCategorySetting.channel_category_title || '',
+														channelCategorySetting.id || '',
+													)
+												}
 											>
 												x
 											</button>

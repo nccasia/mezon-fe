@@ -58,6 +58,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 		e.stopPropagation();
 		if (urlImage && fileInputRef.current) {
 			setUrlImage('');
+			onUpload('');
 			fileInputRef.current.value = '';
 		}
 
@@ -84,7 +85,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 	return (
 		<div className="flex sbm:flex-row flex-col pt-10 mt-10 border-t border-borderClan gap-x-5 gap-y-[10px]">
 			<div className="flex flex-col flex-1 text-textSecondary">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Server Banner Background</h3>
+				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Clan Banner Background</h3>
 				<p className="text-sm font-normal mb-2 dark:text-textSecondary text-textSecondary800">
 					This image will display at the top of your channels list.
 				</p>
@@ -105,7 +106,9 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 							style={{ backgroundImage: `url(${urlImage})` }}
 							className={`bg-cover bg-no-repeat bg-center w-full h-full dark:bg-buttonProfile bg-bgLightModeThird rounded relative cursor-pointer`}
 						>
-							{!urlImage && <p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
+							{!urlImage && (
+								<p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>
+							)}
 						</div>
 						<input ref={fileInputRef} id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 					</label>

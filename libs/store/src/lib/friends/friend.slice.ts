@@ -36,7 +36,7 @@ export const fetchListFriendsCached = memoize(
 		promise: true,
 		maxAge: LIST_FRIEND_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );

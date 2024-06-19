@@ -32,5 +32,11 @@
         "newGroup": "New Group",
         "addFriend": "Add a Friend",
         "create": "Create"
-    }
+    },
+    "reactions": {
+        "noActionTitle": "No Reactions",
+        "noActionDescription": "What a cold, emotionless world.",
+        "removeActions": "Remove Actions"
+    },
+    "messageDeleteReply": "Original message was deleted"
 }

@@ -1,4 +1,5 @@
 import { InputField } from '@mezon/ui';
+import { ValidateSpecialCharacters } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useState } from 'react';
 
@@ -7,9 +8,6 @@ type ModalCreateCategoryProps = {
 	onClose: () => void;
 	onCreateCategory: (nameCate: string) => void;
 };
-export const Regex = () => {
-	return /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
-}
 
 const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
 	const [nameCate, setNameCate] = useState('');
@@ -18,7 +16,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameCate(value);
-		const regex = Regex()
+		const regex = ValidateSpecialCharacters();
 		if (regex.test(value) && value !== '') {
 			setCheckValidate(false);
 		} else {

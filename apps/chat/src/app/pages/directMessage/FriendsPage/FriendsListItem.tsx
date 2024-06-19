@@ -111,7 +111,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					{friend.state === 1 && (
 						<div className="flex gap-3 items-center">
 							<button
-								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
+								className="dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentSecondary text-textLightTheme rounded-full w-8 h-8 flex items-center justify-center"
 								onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 							>
 								✕
@@ -121,13 +121,13 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					{friend.state === 2 && (
 						<div className="flex gap-3 items-center">
 							<button
-								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
+								className="dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentSecondary text-textLightTheme rounded-full w-8 h-8 flex items-center justify-center"
 								onClick={() => handleAcceptFriend(friend?.user?.username as string, friend.user?.id as string)}
 							>
 								✓
 							</button>
 							<button
-								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
+								className="dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentSecondary text-textLightTheme rounded-full w-8 h-8 flex items-center justify-center"
 								onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 							>
 								✕

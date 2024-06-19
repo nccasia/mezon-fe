@@ -240,3 +240,7 @@ export function searchMentionsHashtag(searchValue: any, list: any[]) {
 			}
 		});
 }
+
+export const ValidateSpecialCharacters = () => {
+	return /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
+};

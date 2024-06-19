@@ -1,29 +1,35 @@
+import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
-import { useState } from 'react';
-import { Regex } from '../../ClanHeader/ModalCreateCategory';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 interface ChannelNameModalProps {
 	type: number;
 	channelNameProps: string;
 	onChange: (value: string) => void;
 	onCheckValidate: (check: boolean) => void;
+	onHandleChangeValue: () => void
 	error: string;
 }
 
-export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelNameProps, type, onChange, onCheckValidate, error }) => {
-	const [checkvalidate, setCheckValidate] = useState(true)
+export type ChannelNameModalRef = {
+	checkInput: () => boolean;
+}
+
+export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
+	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, error } = props;
+	const [checkvalidate, setCheckValidate] = useState(true);
 	const [checkNameChannel, setCheckNameChannel] = useState(true);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		onChange(value);
-		if (value==='') {
-			setCheckNameChannel(true)
-		}else{
-			setCheckNameChannel(false)
+		if (value === '') {
+			setCheckNameChannel(true);
+		} else {
+			setCheckNameChannel(false);
 		}
-		const regex = Regex();
+		const regex = ValidateSpecialCharacters();
 		if (regex.test(value)) {
 			setCheckValidate(false);
 			onCheckValidate(true);
@@ -43,6 +49,14 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 		[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	};
 
+	useImperativeHandle(ref, () => ({
+        checkInput: () => checkvalidate || checkNameChannel,
+    }));
+
+	useEffect(() => {
+		onHandleChangeValue();
+	},[checkvalidate, checkNameChannel, onHandleChangeValue]);
+
 	return (
 		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
 			<ChannelLableModal labelProp={channelNameProps} />
@@ -56,13 +70,16 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
 							onChange={handleInputChange}
 							placeholder="Enter the channel's name"
+							maxLength={64}
 						/>
 					</div>
 				</div>
 			</div>
 			{checkvalidate || checkNameChannel ? (
-			<p className='text-[#e44141] text-xs italic font-thin'>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>)
-			:null}
+				<p className="text-[#e44141] text-xs italic font-thin">
+					Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+				</p>
+			) : null}
 		</div>
 	);
-};
+});

@@ -64,13 +64,13 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 		isOpen && (
 			<div className="fixed  inset-0 flex items-center justify-center z-50">
 				<div className="fixed inset-0 bg-black opacity-80"></div>
-				<div className="relative z-10 dark:bg-gray-900 bg-[#151515] p-6 rounded-[5px] text-center h-[400px] w-[530px] flex flex-col justify-between gap-y-2">
+				<div className="relative z-10 dark:bg-gray-900 bg-bgLightModeSecond p-6 rounded-[5px] text-center h-[400px] w-[530px] flex flex-col justify-between gap-y-2">
 					<div>
 						<h2 className="text-[30px] font-semibold">Add members</h2>
 						<p className="text-white-600 text-[16px] mb-4">{activeRole?.title}</p>
 						<div className="w-full flex mb-3">
 							<input
-								className="flex-grow bg-black p-[7px] pl-3 border rounded-lg"
+								className="flex-grow dark:bg-black bg-white p-[7px] pl-3 border rounded-lg"
 								type="text"
 								placeholder="Search Permissions"
 								value={searchTerm}

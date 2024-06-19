@@ -29,10 +29,12 @@ export const addChannelUsers = createAsyncThunk('channelUsers/addChannelUsers', 
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
+
 type removeChannelUsersPayload = {
 	channelId: string;
     userId: string
 };
+
 export const removeChannelUsers = createAsyncThunk('channelUsers/removeChannelUsers', async ( {channelId, userId} : removeChannelUsersPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));

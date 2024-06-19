@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { ReactNode } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from "react-native";
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 interface IMezonTabViewProps {
-    views: JSX.Element[],
+    views: ReactNode[],
     onChange?: (pageIndex: number) => void;
     pageIndex: number;
 }
@@ -36,10 +38,13 @@ export default function MezonTabView({ views, onChange, pageIndex }: IMezonTabVi
             pagingEnabled
             snapToAlignment='center'
             onScroll={handleScrollTabView}
+            showsHorizontalScrollIndicator={false}
             ref={ref}>
             {views.map((view, index) =>
                 <ScrollView key={index.toString()}>
-                    {view}
+                    <View style={{ width: Dimensions.get("screen").width }}>
+                        {view}
+                    </View>
                 </ScrollView>
             )}
         </ScrollView>

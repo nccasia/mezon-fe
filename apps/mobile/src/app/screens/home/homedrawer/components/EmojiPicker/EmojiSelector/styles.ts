@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 	},
 	wrapperIconEmoji: {
-		width: (Metrics.screenWidth - size.s_20) / 9,
+		width: (Metrics.screenWidth - size.s_22) / 9,
 		paddingVertical: size.s_10,
 		alignSelf: 'center',
 	},

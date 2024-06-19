@@ -36,6 +36,7 @@ export interface IDetailReactionBottomSheet {
 	emojiSelectedId: string | null;
 	onClose: () => void;
 	emojiListPNG?: IEmojiImage[];
+	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 }
 export interface IPayloadThreadSendMessage {
 	content: IMessageSendPayload;

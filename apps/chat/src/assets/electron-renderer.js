@@ -5,7 +5,9 @@ const NOTIFICATION_SERVICE_ERROR = 'PUSH_RECEIVER:::NOTIFICATION_SERVICE_ERROR'
 const NOTIFICATION_RECEIVED = 'PUSH_RECEIVER:::NOTIFICATION_RECEIVED'
 const TOKEN_UPDATED = 'PUSH_RECEIVER:::TOKEN_UPDATED'
 
-console.log('electron-renderer.js loaded');
+window.electron?.senderId('sender-id').then((senderId) => {
+  window.electron?.send(START_NOTIFICATION_SERVICE, senderId);
+});
 
 window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
   localStorage.setItem('fcmToken', token);
@@ -13,6 +15,10 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
     const fcmTokenObject = { token, deviceId };
     localStorage.setItem('fcmTokenObject', JSON.stringify(fcmTokenObject));
   })
+});
+
+window.electron?.onDeepLinkUrl((deepLinkUrl) => {
+  localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 
 window.electron?.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
@@ -34,6 +40,3 @@ window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
     console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);
   }
 });
-
-const senderId = '285548761692';
-window.electron?.send(START_NOTIFICATION_SERVICE, senderId);

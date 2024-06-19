@@ -3,6 +3,7 @@ import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/s
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
+import { UsersClanEntity } from '@mezon/utils';
 
 const SettingManageMembers = () => {
 	const { RolesClan, updateRole } = useRoles();
@@ -63,12 +64,16 @@ const SettingManageMembers = () => {
 			<br />
 			<div>
 				<ul className="flex flex-col gap-y-[5px]">
-					{searchResults.map((member: any) => (
-						<li key={member.user.id} className="flex justify-between items-center">
-							<span>{member.user.display_name}</span>
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className='flex gap-x-2'>
+								<img src={member?.user?.avatar_url} alt={member?.user?.display_name} className='size-6 rounded-full' />
+								<span className='dark:text-white text-black'>{member?.user?.display_name}</span>
+								<span className='dark:text-colorNeutral text-colorTextLightMode font-medium'>{member?.user?.username}</span>
+							</div>
 							{clickRole !== 'New Role' ? (
-								<div className="w-4 h-4 rounded-full flex justify-center items-center hover:bg-slate-800">
-									<span onClick={() => handleRemoveMember(member.user.id)} className="text-white cursor-pointer" role="button">
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span onClick={() => handleRemoveMember(member?.user?.id || '')} className="text-white cursor-pointer" role="button">
 										x
 									</span>
 								</div>
