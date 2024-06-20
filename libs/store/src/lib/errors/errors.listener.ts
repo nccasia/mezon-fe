@@ -1,8 +1,13 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { Toast, ToastPayload, toastActions } from '../toasts';
+import { trackError } from '@mezon/utils';
 
 // Create the middleware instance and methods
-export const errorListenerMiddleware = createListenerMiddleware();
+export const errorListenerMiddleware = createListenerMiddleware({
+	onError: (error, listenerApi) => {
+		console.error('errorListenerMiddleware', error);
+	}
+});
 
 function isErrorPredicate(action: any) {
 	return !!action.error;
@@ -30,6 +35,7 @@ function getErrorFromRejectedWithValue(action: any) {
 	return {
 		message,
 		error: action.error,
+		action: action,
 		config: action.meta.error || {
 			toast: true,
 		},
@@ -75,7 +81,8 @@ errorListenerMiddleware.startListening({
 	predicate: isErrorPredicate,
 	effect: async (action, listenerApi) => {
 		const error = normalizeError(action);
-		console.log('error', error);
+
+		trackError(error);
 
 		if (!error) {
 			return;

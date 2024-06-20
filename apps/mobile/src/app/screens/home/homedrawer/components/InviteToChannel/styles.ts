@@ -150,4 +150,12 @@ export const styles = StyleSheet.create({
 		color: Colors.textGray,
 		fontSize: 16,
 	},
+  textUnknown: {
+    textAlign: 'center',
+    color: Colors.white,
+    paddingHorizontal: size.s_16,
+    fontSize: size.label,
+    fontWeight: '600',
+    marginTop: size.s_16
+  }
 });

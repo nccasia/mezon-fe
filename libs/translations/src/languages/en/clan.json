@@ -5,5 +5,6 @@
   "createServer": "Create Clan",
   "byCreatingClan":"By creating a clan, you agree to Mezon’s",
   "upload": "UPLOAD",
-  "addClan": "Add Clan"
+  "addClan": "Add Clan",
+  "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)."
 }

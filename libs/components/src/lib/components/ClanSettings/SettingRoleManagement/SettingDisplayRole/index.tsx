@@ -1,19 +1,17 @@
-import { useRoles } from '@mezon/core';
-import { getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setNameRoleNew, toggleIsShowFalse, toggleIsShowTrue } from '@mezon/store';
+import { RolesClanEntity, getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setNameRoleNew, toggleIsShowFalse, toggleIsShowTrue } from '@mezon/store';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
-	handlSaveClose: () => void;
+	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = () => {
+const SettingDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
-	const { RolesClan } = useRoles();
 	const clickRole = useSelector(getSelectedRoleId);
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
@@ -36,7 +34,7 @@ const SettingDisplayRole = () => {
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions, activeRole]);
+	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
 		<div className="w-full flex flex-col gap-y-5 text-[15px]">

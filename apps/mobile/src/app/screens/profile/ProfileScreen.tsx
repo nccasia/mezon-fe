@@ -63,7 +63,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
             <ScrollView style={styles.contentWrapper}>
                 <View style={styles.contentContainer}>
                     <TouchableOpacity style={styles.viewInfo} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
-                        <Text style={styles.textName}>{user?.userProfile?.user?.username}</Text>
+                        <Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
                         <Feather name="chevron-down" style={styles.iconColor} />
                     </TouchableOpacity>
 
@@ -83,8 +83,19 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                 </View>
 
                 <View style={styles.contentContainer}>
-                    <Text style={styles.text}>{t('mezonMemberSince')}</Text>
-                    <Text style={styles.text}>{memberSince}</Text>
+                    <View style={{gap: size.s_20}}>
+                        {user?.userProfile?.user?.about_me ? (
+                            <View>
+                                <Text style={styles.text}>{t('aboutMe')}</Text>
+                                <Text style={styles.whiteText}>{user?.userProfile?.user?.about_me}</Text>
+                            </View>
+                        ): null}
+
+                        <View>
+                            <Text style={styles.text}>{t('mezonMemberSince')}</Text>
+                            <Text style={styles.whiteText}>{memberSince}</Text>
+                        </View>
+                    </View>
                 </View>
 
                 <TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>

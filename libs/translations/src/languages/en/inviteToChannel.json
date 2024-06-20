@@ -7,5 +7,14 @@
         "copyLink": "Copy Link",
         "email": "Email"
     },
-    "copyLink": "Link Copied!"
+    "copyLink": "Link Copied!",
+    "unknownChannel": "UNKNOWN CHANNEL",
+    "yourLinkInvite":"Your invite link expires in 7 days ",
+    "editInviteLink": "Edit invite link.",
+    "inviteChannel": "INVITE CHANNEL",
+    "advancedSettings":"ADVANCED SETTINGS",
+    "expireAfter":"EXPIRE AFTER",
+    "maxUsers":"MAX USERS",
+    "temporaryMembership":"Temporary Membership",
+    "memberAutoKick":"Members are automatically kicked when they disconnect unless a role is assigned."
 }

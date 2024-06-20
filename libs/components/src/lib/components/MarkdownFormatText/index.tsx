@@ -7,6 +7,8 @@ import ExpiryTimeModal from '../ExpiryTime';
 import ChannelHashtag from './HashTag';
 import MentionUser from './MentionUser';
 import PreClass from './PreClass';
+import clx from 'classnames';
+
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
@@ -15,6 +17,8 @@ type MarkdownFormatTextProps = {
 const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) => {
 	const { getLinkInvite } = useInvite();
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => <ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />);
+	const { appearanceTheme } = useApp();
+	
 	const getLinkinvite = (children: any) => {
 		const inviteId = children.split('/invite/')[1];
 		if (inviteId) {
@@ -31,7 +35,6 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 			window.open(children, '_blank');
 		}
 	};
-	const { appearanceTheme } = useApp();
 
 	const checkMention = (syntax: string) => {
 		const isMention = syntax.startsWith('@');
@@ -46,11 +49,13 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 		}
 	};
 
+	const classes = clx('prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 leading-[0]', {
+		lightMode: appearanceTheme === 'light',
+	});
+
 	return (
 		<article
-			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
-			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
-			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 leading-[0] ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+			className={classes}
 		>
 			{mentions.map((part, index) => {
 				const tagName = part.matchedText;

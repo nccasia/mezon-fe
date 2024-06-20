@@ -1,15 +1,14 @@
-import { useRoles } from '@mezon/core';
-import { getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
-import { useState } from 'react';
+import { RolesClanEntity, getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
+import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
-const SettingValueDisplayRole = () => {
+
+const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>('Display');
-	const { RolesClan } = useRoles();
 	const clickRole = useSelector(getSelectedRoleId);
-	const activeRole = RolesClan.find((role) => role.id === clickRole);
+	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole),[RolesClan, clickRole]);
 	const dispatch = useDispatch();
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
@@ -51,9 +50,9 @@ const SettingValueDisplayRole = () => {
 					{selectedButton === 'Manage Members' && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400" />}
 				</button>
 			</div>
-			{selectedButton === 'Display' && <SettingDisplayRole />}
-			{selectedButton === 'Permissions' && <SettingPermissions />}
-			{selectedButton === 'Manage Members' && <SettingManageMembers />}
+			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan}/>}
+			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan}/>}
+			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan}/>}
 		</>
 	);
 };

@@ -839,7 +839,7 @@ export function LocationIcon({ width = 24, height = 24, color = 'white', ...prop
 			/>
 		</Svg>
 	);
-};
+}
 
 export function ShareIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
@@ -882,3 +882,26 @@ export function ReplyMessageDeleted({ width = 24, height = 24, color = '#a1a1a9'
 	)
 }
 
+export function CircleExclamation({ width = 24, height = 24, color = '#a1a1a9', ...props }: SvgProps) {
+	return (
+    <Svg width= {width} height = {height}  viewBox="0 0 512 512" {...props}>
+      <Path fill={color} d="M256 512a256 256 0 100-512 256 256 0 100 512zm0-384c13.3 0 24 10.7 24 24v112c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1164 0 32 32 0 11-64 0z" />
+    </Svg>
+	)
+}
+
+export function AvatarUser({ width = 24, height = 24, ...props }: SvgProps) {
+	return (
+    <Svg  width= {width} height = {height}  viewBox="0 0 128 128" {...props}>
+      <Circle cx={64} cy={64} fill="#4B5F83" r={64} />
+      <Path
+        d="M64 99h35c0-16-10.4-29-24.6-33.4C80.1 62 84 55.7 84 48.5c0-11-9-20-20-20"
+        fill="#E6E6E6"
+      />
+      <Path
+        d="M64 28.5c-11 0-20 9-20 20 0 7.2 3.9 13.6 9.6 17.1C39.4 70 29 83 29 99h35"
+        fill="#FFF"
+      />
+    </Svg>
+	)
+}

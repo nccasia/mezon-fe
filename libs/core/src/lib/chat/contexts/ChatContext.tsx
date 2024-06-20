@@ -31,6 +31,7 @@ import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
+import { sleep } from 'libs/store/src/lib/helpers';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -74,16 +75,28 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelmessage = useCallback(
-		(message: ChannelMessageEvent) => {
+		async (message: ChannelMessageEvent) => {
+			const timestamp = Date.now() / 1000;
+			const mess = mapMessageChannelToEntity(message);
+
+			const senderId = message.sender_id;
+
+			// Workaround for the case when the user sends a message to himself
+			//  delay 1s to update the message
+			// wait for the response from the server to update the message first
+			// before updating the message from the socket
+			if (senderId === userId) {
+				await sleep(100);
+			}
+
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
-			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
-			const timestamp = Date.now() / 1000;
+			dispatch(messagesActions.newMessage(mess));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 		},
-		[dispatch],
+		[dispatch, userId],
 	);
 
 	const onchannelpresence = useCallback(

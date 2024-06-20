@@ -52,7 +52,7 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 	}
 	const response = await fetchListFriendsCached(mezon, -1, 100, '');
 	if (!response.friends) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	const listFriends = response.friends.map(mapFriendToEntity);
 	const userIds = listFriends.map((friend) => friend.user?.id || '');

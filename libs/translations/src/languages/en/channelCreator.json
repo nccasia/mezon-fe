@@ -5,7 +5,8 @@
     "fields": {
         "channelName": {
             "title": "Channel Name",
-            "placeholder": "new-channel"
+            "placeholder": "new-channel",
+            "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)."
         },
         "channelPrivate": {
             "title": "Private Channel",

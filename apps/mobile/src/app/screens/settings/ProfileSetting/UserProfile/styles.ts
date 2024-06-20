@@ -10,12 +10,10 @@ const styles = StyleSheet.create({
     btnIcon: {
         padding: 7,
         borderRadius: 10,
-        backgroundColor: Colors.green
+        backgroundColor: Colors.bgViolet
     },
     
     btnGroup: {
-        // backgroundColor: "red",
-        display: "flex",
         flexDirection: "row",
         justifyContent: "flex-end",
         paddingHorizontal: 10,

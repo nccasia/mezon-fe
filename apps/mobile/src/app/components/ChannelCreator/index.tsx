@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { IMezonMenuSectionProps, MezonMenu, MezonOption } from "../../temp-ui";
 import { ChannelType } from "mezon-js";
 import { useAppDispatch } from "@mezon/store";
+import { validInput } from "../../utils/validate";
 
 type CreateChannelScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CHANNEL;
 export default function ChannelCreator({ navigation, route }: MenuClanScreenProps<CreateChannelScreen>) {
@@ -48,7 +49,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
     });
 
     async function handleCreateChannel() {
-        if (channelName.trim().length === 0) return;
+        if (!validInput(channelName)) return;
 
         const body: ApiCreateChannelDescRequest = {
             clan_id: currentClanId?.toString(),
@@ -111,8 +112,8 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
                 value={channelName}
                 onTextChange={setChannelName}
                 label={t('fields.channelName.title')}
+                errorMessage={t('fields.channelName.errorMessage')}
                 placeHolder={t('fields.channelName.placeholder')} />
-
             <View style={styles.menu}>
                 <MezonOption
                     title={t('fields.channelType.title')}

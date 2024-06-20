@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
-	handlSaveClose: () => void;
+	handleSaveClose: () => void;
 	handleUpdateUser: () => Promise<void>;
 };
 export type PropsModalSettingSave = {
@@ -30,7 +30,7 @@ const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 				<button
 					className="text-[15px] ml-auto bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 					onClick={() => {
-						PropsSave.handlSaveClose();
+						PropsSave.handleSaveClose();
 						PropsSave.handleUpdateUser();
 					}}
 				>

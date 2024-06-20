@@ -11,6 +11,7 @@ import { RemoveChannelUsers, RemoveClanUsers } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { ChannelType } from 'mezon-js';
 
 export type useChannelMembersOptions = {
 	channelId?: string | null;
@@ -71,8 +72,11 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 	);
 
 	const removeMemberClan = useCallback(
-		async ({ clanId, userIds }: RemoveClanUsers) => {
+		async ({ clanId, channelId, userIds }: RemoveClanUsers) => {
 			await dispatch(clansActions.removeClanUsers({ clanId, userIds }));
+			await dispatch(
+				channelMembersActions.fetchChannelMembers({ clanId: clanId, channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+			);
 		},
 		[dispatch],
 	);

@@ -1,17 +1,17 @@
-import { useClans, useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/store';
+import { useRoles } from '@mezon/core';
+import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
 import { UsersClanEntity } from '@mezon/utils';
 
-const SettingManageMembers = () => {
-	const { RolesClan, updateRole } = useRoles();
+const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
+	const { updateRole } = useRoles();
 	const dispatchRole = useDispatch();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const addUsers: string[] = useSelector(getNewAddMembers);
 	const clickRole = useSelector(getSelectedRoleId);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
@@ -29,14 +29,14 @@ const SettingManageMembers = () => {
 	useEffect(() => {
 		const results = commonUsers?.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
 		setSearchResults(results || []);
-	}, [searchTerm, addUsers, clickRole]);
+	}, [searchTerm, addUsers, clickRole, commonUsers]);
 
 	useEffect(() => {
 		if (clickRole !== 'New Role') {
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 			dispatchRole(setAddMemberRoles(memberIDRoles));
 		}
-	}, [activeRole]);
+	}, [activeRole, clickRole, dispatchRole]);
 
 	const handleRemoveMember = async (userID: string) => {
 		const userIDArray = userID?.split(',');
@@ -82,7 +82,7 @@ const SettingManageMembers = () => {
 					))}
 				</ul>
 			</div>
-			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} />
+			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} RolesClan={RolesClan}/>
 		</>
 	);
 };

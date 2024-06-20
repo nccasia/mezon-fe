@@ -1,9 +1,13 @@
 {
   "emptyThread": {
-    "textNoThread": "Không có cuộc thảo luận nào",
-    "textNotify": "Hãy tập trung vào cuộc trò chuyện với một cuộc thảo luận - một kênh văn bản tạm thời.",
-    "createThreads": "Tạo Cuộc Thảo Luận"
+    "textNoThread": "Không có chủ đề nào",
+    "textNotify": "Giữ cuộc trò chuyện tập trung với các chủ đề - một kênh văn bản tạm thời.",
+    "createThreads": "Tạo Chủ Đề"
   },
-  "otherThreads": "các cuộc thảo luận khác",
-  "joinedThreads": "các cuộc thảo luận đã tham gia"
+  "otherThreads": "Chủ đề khác",
+  "joinedThreads": "Chủ đề đã tham gia",
+  "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ gồm chữ cái, số, _ hoặc -).",
+  "threadName": "Tên Chủ Đề",
+  "privateThread": "Chủ Đề Riêng Tư",
+  "onlyPeopleInviteThread": "Chỉ những người bạn mời và quản trị viên mới có thể xem chủ đề này"
 }

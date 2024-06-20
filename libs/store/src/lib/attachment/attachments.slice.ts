@@ -50,7 +50,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 
 		if (!response.attachments) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));

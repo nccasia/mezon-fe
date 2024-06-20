@@ -132,7 +132,9 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				>
 					Log Out
 				</button>
-				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
+				{ openModal &&
+					<LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />
+				}
 				<div className="h-9"></div>
 			</div>
 		</div>

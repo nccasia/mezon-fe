@@ -37,7 +37,7 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 
 		const response = await mezon.client.listChannelVoiceUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
 		if (!response.voice_channel_users) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const members = response.voice_channel_users.map((channelRes) => {

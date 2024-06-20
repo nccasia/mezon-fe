@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
-import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
-import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { useAuth, useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
+import { messagesActions, reactionActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { Ref, forwardRef, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,7 +11,9 @@ type ChannelMessageOptProps = {
 
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
-	const { reactionActions, userId } = useChatReaction();
+	
+	const { userId } = useAuth();
+
 	const { setOpenThreadMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);

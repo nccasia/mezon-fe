@@ -1,57 +1,35 @@
 import { Text, View } from "react-native";
 import styles from "./styles";
-import { MezonInput } from "apps/mobile/src/app/temp-ui";
+import { MezonInput } from "../../../../../../../app/temp-ui";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useAuth } from "@mezon/core";
-
-interface IDetailUser {
-    username: string;
-    displayName: string;
-    bio: string;
-}
+import { IUserProfileValue } from "../../..";
 
 interface IDetailInfoProps {
-    value: IDetailUser,
-    onChange: (value: IDetailUser) => void
+    value: IUserProfileValue,
+    onChange: (value: Partial<IUserProfileValue>) => void
 }
 export default function DetailInfo({ value, onChange }: IDetailInfoProps) {
     const { t } = useTranslation(['profileSetting']);
-    const [displayName, setDisplayName] = useState<string>(value.displayName);
-    const [username, setUsername] = useState<string>(value.username);
-    const [bio, setBio] = useState<string>(value.bio);
-    const auth = useAuth();
-
-    useEffect(() => {
-        onChange({ bio, displayName, username })
-    }, [displayName, username, , bio])
 
     return (
         <View style={styles.container}>
             <View style={styles.nameWrapper}>
-                <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.username}>{username}</Text>
+                <Text style={styles.name}>{value?.displayName || value?.username}</Text>
+                <Text style={styles.username}>{value?.username}</Text>
             </View>
 
             <MezonInput
-                value={displayName}
-                onTextChange={setDisplayName}
-                placeHolder={auth.userProfile.user.display_name}
+                value={value?.displayName}
+                onTextChange={(newValue) => onChange({displayName: newValue})}
+                placeHolder={value?.username}
+                maxCharacter={32}
                 label={t('fields.displayName.label')}
             />
 
             <MezonInput
-                value=""
-                // onTextChange=
-                textarea
-                placeHolder=""
-                label={t("fields.pronouns.label")}
-            />
-
-            <MezonInput
-                value={bio}
-                onTextChange={setBio}
+                value={value?.aboutMe}
+                onTextChange={(newValue) => onChange({aboutMe: newValue})}
+                maxCharacter={128}
                 textarea
                 placeHolder=""
                 label={t("fields.bio.label")}

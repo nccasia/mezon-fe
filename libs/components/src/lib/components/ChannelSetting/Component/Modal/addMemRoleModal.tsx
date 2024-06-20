@@ -4,7 +4,7 @@ import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import * as Icons from '../../../Icons';
 import { useClans, useRoles } from '@mezon/core';
 import { useMemo, useState } from 'react';
-import { channelUsersActions, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
+import { channelUsersActions, selectAllRolesClan, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 interface AddMemRoleProps {
 	onClose: () => void;
@@ -13,7 +13,7 @@ interface AddMemRoleProps {
 
 export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 	const isPrivate = channel.channel_private;
-	const { RolesClan } = useRoles();
+	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
 	const RolesAddChannel = RolesChannel.filter((role) =>typeof role.role_channel_active === 'number' && role.role_channel_active === 1);

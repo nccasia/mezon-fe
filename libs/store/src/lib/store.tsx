@@ -171,25 +171,4 @@ export const getStoreAsync = async () => {
 	return storeInstance;
 };
 
-export function useAppDispatch(): AppDispatch {
-	const dispatch = useDispatch<AppDispatch>();
-	const dispatchRef = React.useRef(dispatch);
-
-	const appDispatch: typeof dispatch = React.useCallback(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(action: any) => {
-			const result = dispatchRef.current(action);
-			if (result instanceof Promise) {
-				return result.then((res) => {
-					trackActionError(res);
-					return res;
-				});
-			}
-			trackActionError(result);
-			return result;
-		},
-		[],
-	);
-
-	return appDispatch;
-}
+export const useAppDispatch = () => useDispatch<AppDispatch>();

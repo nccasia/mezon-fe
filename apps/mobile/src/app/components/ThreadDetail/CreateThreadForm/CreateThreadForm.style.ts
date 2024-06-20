@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		width: '100%',
-		paddingHorizontal: 10,
+		paddingHorizontal: size.s_10,
 	},
 	createChannelIcon: {
 		height: 60,
@@ -55,10 +55,12 @@ export const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: Colors.white,
 		paddingHorizontal: size.s_10,
-		marginBottom: size.s_20,
 		height: size.s_40,
 		paddingVertical: 0,
 	},
+  inputContainer: {
+		marginBottom: size.s_20,
+  },
 	threadPolicyInfo: {
 		flex: 1,
 	},
@@ -80,4 +82,5 @@ export const styles = StyleSheet.create({
 		paddingTop: 10,
 		paddingBottom: 0,
 	},
+  errorMessage: {paddingRight: size.s_20}
 });

@@ -26,7 +26,6 @@ export interface IMessageActionNeedToResolve {
 export interface IMessageReactionProps {
 	message: IMessageWithUser;
 	mode: number;
-	dataReactionCombine?: EmojiDataOptionals[];
 	emojiListPNG?: IEmojiImage[];
 	openEmojiPicker?: () => void;
 }

@@ -128,7 +128,10 @@ export const navigateToNotification = async (notification: any, navigation: any,
 			const clanId = linkMatch[1];
 			const isDifferentClan = currentClan?.clan_id !== clanId;
 			const channelId = linkMatch[2];
-			if (isDifferentClan) store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+			if (isDifferentClan) {
+        store.dispatch(clansActions.joinClan({ clanId: clanId }));
+        store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+      }
 			setTimeout(
 				() => {
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);

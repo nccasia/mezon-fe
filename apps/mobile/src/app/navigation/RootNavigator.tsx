@@ -20,8 +20,8 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
-import { AppState } from 'react-native';
+import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
+import { AppState, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 
@@ -130,6 +130,7 @@ const RootNavigation = () => {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<StatusBar backgroundColor={Colors.secondary} barStyle="light-content" />
 			<ChatContextProvider>
 				<NavigationMain />
 			</ChatContextProvider>

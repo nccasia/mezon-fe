@@ -87,7 +87,7 @@ const SettingRightUser = ({
 		setFlags(false);
 		setFlagsRemoveAvartar(false);
 	};
-	const handlSaveClose = () => {
+	const handleSaveClose = () => {
 		setFlags(false);
 	};
 	const editProfile: Profilesform = {
@@ -206,7 +206,7 @@ const SettingRightUser = ({
 							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
 								handleUpdateUser();
-								handlSaveClose();
+								handleSaveClose();
 							}}
 						>
 							Save Changes

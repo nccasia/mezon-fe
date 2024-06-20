@@ -18,7 +18,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
-	const [checkvalidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
+	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTopic(e.target.value);
@@ -72,7 +72,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					onChange={handleDisplayChannelLabel}
 					className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
 				/>
-				{checkvalidate && (
+				{checkValidate && (
 					<p className="text-[#e44141] text-xs italic font-thin">
 						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 					</p>
@@ -87,11 +87,12 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 						onChange={handleChangeTextArea}
 						rows={1}
 						refTextArea={textAreaRef}
+						maxLength={1024}
 					></TextArea>
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || topicInit !== topic) && !checkvalidate && (
+			{(channelLabelInit !== channelLabel || topicInit !== topic) && !checkValidate && (
 				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 			)}
 		</div>

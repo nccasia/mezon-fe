@@ -4,7 +4,8 @@ import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
-
+import { useSelector } from 'react-redux';
+import { selectAllDirectMessages } from '@mezon/store';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -16,7 +17,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const accountId = userProfile?.user?.id ?? '';
 	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
 	const { createDirectMessageWithUser } = useDirect();
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);

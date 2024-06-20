@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useDirect, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById } from '@mezon/store';
+import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -10,7 +10,6 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
-import { ChannelType } from 'mezon-js';
 import DirectUnreads from './directUnreads';
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -25,13 +24,16 @@ function MyApp() {
 		navigate(toClanPage(clanId));
 	};
 	
-	const { listDirectMessageUnread: dmGroupChatUnreadList } = useDirect();
-
+	const { directId: currentDmGroupId } = useAppParams();
+	const listDirectMessage = useSelector(selectDirectsUnreadlist);
+	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const dispatchDirect = useAppDispatch();
-	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
+	const { setCloseMenu, setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
@@ -58,7 +60,6 @@ function MyApp() {
 		};
 	}, []);
 
-	const currentChannel = useSelector(selectCurrentChannel);
 	const handleMenu = (event: any) => {
 		const elementClick = event.target;
 		const wrapElement = document.querySelector('#menu');
@@ -107,23 +108,6 @@ function MyApp() {
 		setOpenOptionMessageState(false);
 	}, []);
 
-	const joinToChatAndNavigate = useCallback(
-		(
-			DMid?: string,
-			type?: number,
-		) => {
-			dispatchDirect(directActions.joinDirectMessage({
-							directMessageId: DMid || "",
-							channelName: '',
-							type: type,
-						}),
-					);
-			if (closeMenu) {
-						setStatusMenu(false);
-					}
-		},
-		[dispatchDirect],
-	);
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
@@ -151,7 +135,7 @@ function MyApp() {
 					</NavLinkComponent>
 				</NavLink>
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
-					<DirectUnreads key={dmGroupChatUnread.id} directMessage ={dmGroupChatUnread} onSend={joinToChatAndNavigate}/>
+					<DirectUnreads key={dmGroupChatUnread.id} directMessage ={dmGroupChatUnread}/>
 				))}
 				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (

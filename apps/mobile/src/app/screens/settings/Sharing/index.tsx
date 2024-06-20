@@ -1,7 +1,7 @@
-import { useCategory, useDirect, useReference } from '@mezon/core';
-import { CloseIcon, FileIcon, PenIcon, SearchIcon, SendIcon, abbreviateText, getAttachmentUnique } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState, verticalScale } from '@mezon/mobile-ui';
-import { channelsActions, directActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
+import { useCategory, useReference } from '@mezon/core';
+import { CloseIcon, PenIcon, SearchIcon, SendIcon, getAttachmentUnique } from '@mezon/mobile-components';
+import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { channelsActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -13,11 +13,12 @@ import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery';
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
-	const { listDM } = useDirect();
+	const listDM = useSelector(selectDirectsOpenlist);
 	const { categorizedChannels } = useCategory();
 	const currentClan = useSelector(selectCurrentClan);
 	const mezon = useMezon();
@@ -119,7 +120,6 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any }) => {
-		await mezon.joinChatDirectMessage(channelSelected.id, '', Number(channelSelected?.type));
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
@@ -132,13 +132,7 @@ export const Sharing = ({ data, onClose }) => {
 		);
 	};
 
-	const sendToGroup = async (dataSend: { text: any }) => {
-		if (channelSelected.parrent_id !== '0') {
-			await mezon.joinChatChannel(channelSelected.id);
-		} else {
-			await mezon.joinChatThread(channelSelected.id);
-		}
-
+	const sendToGroup = async (dataSend: { text: any }) => {		
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
@@ -232,24 +226,6 @@ export const Sharing = ({ data, onClose }) => {
 		setAttachmentData(removedAttachment);
 	}
 
-	const renderFileView = (attachment: ApiMessageAttachment) => {
-		const splitFiletype = attachment.filetype.split('/');
-		const type = splitFiletype[splitFiletype.length - 1];
-		return (
-			<View style={styles.fileViewer}>
-				<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
-				<View style={{ maxWidth: '75%' }}>
-					<Text style={styles.fileName} numberOfLines={1}>
-						{abbreviateText(attachment.filename)}
-					</Text>
-					<Text style={styles.typeFile} numberOfLines={1}>
-						{type}
-					</Text>
-				</View>
-			</View>
-		);
-	};
-
 	return (
 		<SafeAreaView style={styles.wrapper}>
 			<View style={styles.header}>
@@ -284,7 +260,11 @@ export const Sharing = ({ data, onClose }) => {
 											key={`${media?.url}_${index}_media_sharing`}
 											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
 										>
-											{isFile ? renderFileView(media) : <FastImage source={{ uri: media?.url }} style={styles.itemMedia} />}
+											{isFile ? (
+												<AttachmentFilePreview attachment={media} />
+											) : (
+												<FastImage source={{ uri: media?.url }} style={styles.itemMedia} />
+											)}
 											{isUploaded && (
 												<TouchableOpacity
 													style={styles.iconRemoveMedia}

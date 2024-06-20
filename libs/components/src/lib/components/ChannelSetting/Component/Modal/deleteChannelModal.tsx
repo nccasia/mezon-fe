@@ -1,5 +1,5 @@
 import { useAppNavigation, useClans } from '@mezon/core';
-import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond } from '@mezon/store';
+import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ interface DeleteModalProps {
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal, channelLable, channelId }) => {
 	const dispatch = useAppDispatch();
-	const { currentClanId } = useClans();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelSecond = useSelector(selectChannelSecond);

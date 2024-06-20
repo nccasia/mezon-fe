@@ -1,10 +1,14 @@
-import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EmojiDataOptionals, IMessageSendPayload, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, lruMemoize } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
+import { ChannelMessage, ChannelMessageAck, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
+import { withError } from '../errors/helpers';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { channelsActions } from '../channels/channels.slice';
+import { shallowEqual } from 'react-redux';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -34,6 +38,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
+	channel_id: string;
 }
 
 export type UserTypingState = {
@@ -58,7 +63,14 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
+	channelMessagesIds: Record<string, string[]>;
 }
+
+export type FetchMessagesMeta = {
+	arg: {
+		channelId: string;
+	};
+};
 
 export interface MessagesRootState {
 	[MESSAGES_FEATURE_KEY]: MessagesState;
@@ -71,7 +83,7 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 
 export const TYPING_TIMEOUT = 3000;
 
-export const messagesAdapter = createEntityAdapter<MessagesEntity>();
+
 
 export const fetchMessagesCached = memoize(
 	(mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>
@@ -110,12 +122,12 @@ export const fetchMessages = createAsyncThunk(
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
-		await thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
+		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
 			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
@@ -148,7 +160,6 @@ export const fetchMessages = createAsyncThunk(
 			});
 			return Object.values(emojiDataItems);
 		});
-
 
 		if (reactionData.length > 0) {
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
@@ -243,11 +254,126 @@ export const updateLastSeenMessage = createAsyncThunk(
 				now.toString(),
 			);
 		} catch (e) {
-			console.log(e);
-			return thunkAPI.rejectWithValue([]);
+			return thunkAPI.rejectWithValue('Error updating last seen message');
 		}
 	},
+	{
+		condition: (args, { getState }) => {
+			const state = getState() as MessagesRootState;
+			const message = selectMessageByMessageId(args.messageId)(state);
+			if (!message) {
+				return false;
+			}
+			if (message.isSending) {
+				return false;
+			}
+			return true;
+		}
+	}
 );
+
+type SendMessagePayload = {
+	clanId: string;
+	channelId: string;
+	channelLabel: string;
+	content: IMessageSendPayload;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
+	anonymous?: boolean;
+	mentionEveryone?: boolean;
+	mode: number;
+	senderId: string;
+};
+
+export const sendMessage = createAsyncThunk(
+	'messages/sendMessage',
+	async (payload: SendMessagePayload, thunkAPI) => {
+		const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId, channelLabel } = payload;
+		const id = Date.now().toString();
+
+
+		async function doSend() {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
+			// const channel = mezon.channelRef.current;
+
+			if (!client || !session || !socket || !channelId) {
+				throw new Error('Client is not initialized');
+			}
+
+			const res = await socket.writeChatMessage(
+				clanId,
+				channelId,
+				channelLabel,
+				mode,
+				content,
+				mentions,
+				attachments,
+				references,
+				anonymous,
+				mentionEveryone,
+			);
+			
+			return res;
+		}
+
+		async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
+			try {
+				const res = await doSend();
+				return res;
+			} catch (error) {
+				if (retryCount > 0) {
+					const r = await sendWithRetry(retryCount - 1);
+					return r;
+				} else {
+					throw error;
+				}
+			}
+		}
+		
+		async function fakeItUntilYouMakeIt() {
+			const fakeMessage: ChannelMessage = {
+				id,
+				code: 0, // Add new message
+				channel_id: channelId,
+				channel_label: channelLabel,
+				// @ts-ignore
+				content: content,
+				create_time: new Date().toISOString(),
+				sender_id: senderId,
+				username: '',
+				avatar: '',
+				isSending: true,
+		
+			};
+			const fakeMess = mapMessageChannelToEntity(fakeMessage);
+
+			thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
+
+			const res = await sendWithRetry(1);
+
+			const timestamp = Date.now() / 1000;
+			thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+
+			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
+			
+			thunkAPI.dispatch(messagesActions.markAsSent({id, mess }));
+		}
+
+		try {
+			await fakeItUntilYouMakeIt();
+		} catch (error) {
+			console.error('Error sending message', error);
+			thunkAPI.dispatch(messagesActions.markAsError(id));
+			return thunkAPI.rejectWithValue('Error sending message');
+		}
+	}
+);
+
 
 type UpdateTypingArgs = {
 	channelId: string;
@@ -289,6 +415,10 @@ export type SetUserTypingArgs = {
 	isTyping: boolean;
 };
 
+const messagesAdapter = createEntityAdapter<MessagesEntity>({
+	sortComparer: orderMessageByTimeMsAscending,
+});
+
 export const initialMessagesState: MessagesState = messagesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -299,14 +429,30 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
+	channelMessagesIds: {},
 });
 
 export type SetCursorChannelArgs = {
 	channelId: string;
 	param: FetchMessageParam;
 };
+export type MarkAsSentArgs = {
+	id: string;
+	mess: IMessageWithUser;
+};
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
+
+const filterChannelMessagesIds = (updatedMessagesState: MessagesState, channelId: string) => {
+	return updatedMessagesState.ids.filter((id) => updatedMessagesState.entities[id]?.channel_id === channelId);
+};
+
+function updateChannelMessagesIds(state: MessagesState, channelId: string, updatedMessagesState: MessagesState) {
+	state.channelMessagesIds = {
+		...state.channelMessagesIds,
+		[channelId]: filterChannelMessagesIds(updatedMessagesState, channelId),
+	}
+}
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
@@ -316,17 +462,22 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		setQuatitiesMessageRemain: (state, action) => {
-			action.payload;
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const code = action.payload.code;
+			const channelId = action.payload.channel_id;
+			let updatedMessagesState = state;
 			switch (code) {
 				case 0:
-					messagesAdapter.addOne(state, action.payload);
+					if(state.entities[action.payload.id]) {
+						messagesAdapter.setOne(state, action.payload);
+					} else {
+						messagesAdapter.addOne(state, action.payload);
+					}
 					break;
 				case 1:
-					messagesAdapter.updateOne(state, {
+					updatedMessagesState = messagesAdapter.updateOne(state, {
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
@@ -335,13 +486,13 @@ export const messagesSlice = createSlice({
 					});
 					break;
 				case 2:
-					messagesAdapter.removeOne(state, action.payload.id);
+					updatedMessagesState = messagesAdapter.removeOne(state, action.payload.id);
 					break;
 				default:
 					break;
 			}
 
-			if (action.payload.channel_id) {
+			if (channelId) {
 				// TODO: check duplicates with setChannelLastMessage
 				state.unreadMessagesEntries = {
 					...state.unreadMessagesEntries,
@@ -352,6 +503,9 @@ export const messagesSlice = createSlice({
 				if (state?.typingUsers?.[typingUserKey]) {
 					delete state.typingUsers[typingUserKey];
 				}
+
+				// update channelMessagesIds
+				updateChannelMessagesIds(state, channelId, updatedMessagesState)
 			}
 		},
 
@@ -363,8 +517,41 @@ export const messagesSlice = createSlice({
 				},
 			});
 		},
-		remove: messagesAdapter.removeOne,
-		removeAll: messagesAdapter.removeAll,
+		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
+			console.log('markAsSent', action.payload);
+			const { mess, id } = action.payload;
+			const channelId = mess.channel_id;
+			
+			// Add the new message if it doesn't exist
+			if (!state.entities[mess.id]) {
+				messagesAdapter.addOne(state, mess);
+			}
+				
+			// Remove the message with the old id
+			messagesAdapter.removeOne(state, id);
+		
+			state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
+		},
+		markAsError: (state, action: PayloadAction<string>) => {
+			messagesAdapter.updateOne(state, {
+				id: action.payload,
+				changes: {
+					isError: true,
+				},
+			});
+		},
+		remove: (state, action: PayloadAction<string>) => {
+			const message = state.entities[action.payload];
+			messagesAdapter.removeOne(state, action.payload);
+			const channelId = message?.channel_id;
+			if (channelId) {
+				state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
+			}
+		},
+		removeAll: (state) => {
+			messagesAdapter.removeAll(state);
+			state.channelMessagesIds = {};
+		},
 		setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
@@ -405,9 +592,18 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.pending, (state: MessagesState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
-				messagesAdapter.setMany(state, action.payload);
+			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[], string, FetchMessagesMeta>) => {
+				const isNew = action.payload.some(({ id }) => !state.entities[id]);
+
+				if (!isNew) return state;
+
+				const reversedMessages = action.payload.reverse();
+				messagesAdapter.setMany(state, reversedMessages);
 				state.loadingStatus = 'loaded';
+				const channelId = action?.meta?.arg?.channelId;
+				if (channelId) {
+					state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
+				}
 			})
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
@@ -442,6 +638,7 @@ export const messagesReducer = messagesSlice.reducer;
 
 export const messagesActions = {
 	...messagesSlice.actions,
+	sendMessage,
 	fetchMessages,
 	updateLastSeenMessage,
 	updateTypingUsers,
@@ -464,7 +661,7 @@ export const messagesActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = messagesAdapter.getSelectors();
+const { selectAll, selectEntities, selectById } = messagesAdapter.getSelectors();
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
 
@@ -477,7 +674,16 @@ export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	return 0;
 }
 
+export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.creationTimeMs && b.creationTimeMs) {
+		return +a.creationTimeMs - +b.creationTimeMs;
+	}
+	return 0;
+}
+
 export const selectMessagesEntities = createSelector(getMessagesState, selectEntities);
+
+export const selectChannelMessagesIds = createSelector(getMessagesState, (state) => state.channelMessagesIds);
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
@@ -557,3 +763,47 @@ export const selectMessageByMessageId = (messageId: string) =>
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
 export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
+
+// V2
+
+export const selectMessageIdsByChannelIdV2 = createSelector(
+	[selectChannelMessagesIds, (_, channelId) => channelId],
+	(channelMessagesIds, channelId) => {
+		return channelId ? channelMessagesIds?.[channelId] : null;
+	},
+	{
+		memoize: lruMemoize,
+		memoizeOptions: {
+			equalityCheck: shallowEqual,
+			resultEqualityCheck: shallowEqual,
+			maxSize: 10,
+		},
+		argsMemoize: lruMemoize,
+		argsMemoizeOptions: {
+			equalityCheck: shallowEqual,
+			resultEqualityCheck: shallowEqual,
+			maxSize: 10,
+		},
+	},
+);
+
+export const selectMessageEntityById = createSelector([getMessagesState, (_, messageId) => messageId], (messagesState, messageId) =>
+	selectById(messagesState, messageId),
+);
+
+export const selectPreviousMessageByMessageId = (channelId: string, messageId: string) =>
+	createSelector([(state) => selectMessageIdsByChannelIdV2(state, channelId), getMessagesState], (messageIds, messagesState) => {
+		const prevMessageId = messageIds?.find((_, index) => messageIds[index + 1] === messageId);
+		if (!prevMessageId) return undefined;
+		const prevMessageEntity = selectById(messagesState, prevMessageId);
+		if (prevMessageEntity && typeof prevMessageEntity.content === 'object' && typeof (prevMessageEntity.content as any).id === 'string') {
+			return prevMessageEntity.content;
+		}
+		return prevMessageEntity;
+	});
+
+export const selectLastSeenMessage = (channelId: string, messageId: string) =>
+	createSelector([selectLastMessageIdByChannelId(channelId), selectUnreadMessageIdByChannelId(channelId)], (lastMessageId, unreadMessageId) => {
+		return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
+	});
+

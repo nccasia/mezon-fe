@@ -4,19 +4,20 @@ import { View } from "react-native";
 import { useState } from "react";
 
 interface IMezonOptionProps {
-    title: string;
-    onChange?: (value: number) => void;
+    title?: string;
+    onChange?: (value: number | string) => void;
     data: {
         description?: string;
         title: string;
-        value: number;
-    }[]
+        value: number | string;
+    }[],
+    value?: number | string;
 }
 
-export default function MezonOption({ data, title, onChange }: IMezonOptionProps) {
-    const [currentValue, setCurrentValue] = useState<number>(data?.[0].value || 0);
+export default function MezonOption({ data, title, onChange, value }: IMezonOptionProps) {
+    const [currentValue, setCurrentValue] = useState<number | string>(value || data?.[0]?.value || 0);
 
-    function handleChange(value: number) {
+    function handleChange(value: number | string) {
         setCurrentValue(value);
         onChange && onChange(value);
     }

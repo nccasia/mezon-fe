@@ -1,4 +1,4 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Colors, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.gray48,
         backgroundColor: Colors.primary,
         borderWidth: 1,
-        borderRadius: 15,
+        borderRadius: 10
     },
 
     fakeInputFocus: {
@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 15
+        paddingHorizontal: size.s_14,
+        paddingVertical: size.s_10,
     },
 
     label: {
@@ -38,9 +39,7 @@ const styles = StyleSheet.create({
     input: {
         paddingVertical: 0,
         color: Colors.white,
-        flexBasis: 20,
         flexGrow: 1,
-        height: size.s_40
     },
 
     clearBtn: {
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
 
     count: {
         color: Colors.white,
-        fontSize: 14,
+        fontSize: Fonts.size.h8,
         marginRight: 10
     }
 })

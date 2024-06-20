@@ -1,11 +1,20 @@
 {
-    "title": "Mời bạn bè",
-    "iconTitle": {
-        "twitter": "Twitter",
-        "faceBook": "Facebook",
-        "youtube": "Youtube",
-        "copyLink": "Sao Chép Link",
-        "email": "Email"
-    },
-    "copyLink": "Đã sao chép đường dẫn!"
+  "title": "mời bạn bè",
+  "iconTitle": {
+      "twitter": "Twitter",
+      "faceBook": "Facebook",
+      "youtube": "Youtube",
+      "copyLink": "Sao chép liên kết",
+      "email": "Email"
+  },
+  "copyLink": "Đã sao chép liên kết!",
+  "unknownChannel": "CHANNEL KHÔNG XÁC ĐỊNH",
+  "yourLinkInvite": "Liên kết mời của bạn sẽ hết hạn trong 7 ngày",
+  "editInviteLink": "Chỉnh sửa liên kết mời.",
+  "inviteChannel": "MỜI VÀO CHANNEL",
+  "advancedSettings": "CÀI ĐẶT NÂNG CAO",
+  "expireAfter": "HẾT HẠN SAU",
+  "maxUsers": "SỐ NGƯỜI TỐI ĐA",
+  "temporaryMembership": "Thành viên tạm thời",
+  "memberAutoKick": "Thành viên sẽ bị tự động đá ra khi họ ngắt kết nối trừ khi được gán một vai trò."
 }

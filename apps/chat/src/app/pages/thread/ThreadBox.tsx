@@ -17,12 +17,10 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 
-	const { threadRef } = useMezon();
-	const thread = threadRef.current;
 	const { threadCurrentChannel } = useThreads();
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
-		channelId: thread?.id as string,
-		channelLabel: thread?.chanel_label as string,
+		channelId: threadCurrentChannel?.id as string,
+		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
 

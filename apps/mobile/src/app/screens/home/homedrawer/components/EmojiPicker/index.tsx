@@ -1,14 +1,14 @@
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { useChatSending, useDirectMessages } from '@mezon/core';
-import { SearchIcon } from '@mezon/mobile-components';
-import { Colors, Fonts } from '@mezon/mobile-ui';
+import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { ArrowLeftIcon, SearchIcon } from '@mezon/mobile-components';
+import { Block, Colors, Fonts, size } from '@mezon/mobile-ui';
 import { selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EmojiSelector from './EmojiSelector';
@@ -42,14 +42,14 @@ type ExpressionType = 'emoji' | 'gif' | 'sticker';
 function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
-
+	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
 	const [mode, setMode] = useState<ExpressionType>('emoji');
 	const [channelMode, setChannelMode] = useState(0);
 	const [searchText, setSearchText] = useState<string>('');
 
-	const dmMode = currentDirectMessage ?
-		Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP) :
-		'';
+	const dmMode = currentDirectMessage
+		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
+		: '';
 
 	useEffect(() => {
 		setChannelMode(ChannelStreamMode.STREAM_MODE_CHANNEL);
@@ -126,10 +126,24 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 				</View>
 
 				{mode !== 'emoji' && (
-					<View style={styles.textInputWrapper}>
-						<SearchIcon height={18} width={18} />
-						<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
-					</View>
+					<Block flexDirection={'row'} gap={size.s_10} width={'100%'} alignItems={'center'}>
+						{mode === 'gif' && !!valueInputToCheckHandleSearch && (
+							<TouchableOpacity
+								style={{ paddingVertical: size.s_10 }}
+								onPress={() => {
+									setSearchText('');
+									setValueInputSearch('');
+								}}
+							>
+								<ArrowLeftIcon />
+							</TouchableOpacity>
+						)}
+
+						<View style={styles.textInputWrapper}>
+							<SearchIcon height={18} width={18} />
+							<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
+						</View>
+					</Block>
 				)}
 
 				{mode === 'emoji' ? (

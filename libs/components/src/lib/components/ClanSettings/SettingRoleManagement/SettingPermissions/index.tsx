@@ -1,8 +1,10 @@
-import { useClans, useRoles, useUserPolicy } from '@mezon/core';
+import { useUserPolicy } from '@mezon/core';
 import {
+	RolesClanEntity,
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
+	selectCurrentClan,
 	setAddPermissions,
 	setRemovePermissions,
 	setSelectedPermissions,
@@ -15,13 +17,12 @@ import { useDispatch, useSelector } from 'react-redux';
 export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
-	handlSaveClose: () => void;
+	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-const SettingPermissions = () => {
+const SettingPermissions = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	const dispatch = useDispatch();
-	const { RolesClan } = useRoles();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
 	const clickRole = useSelector(getSelectedRoleId);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -60,7 +61,7 @@ const SettingPermissions = () => {
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions, activeRole]);
+	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
 		<>

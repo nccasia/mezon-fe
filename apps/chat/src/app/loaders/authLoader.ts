@@ -1,4 +1,4 @@
-import { accountActions, authActions, getStoreAsync, selectInitialPath } from '@mezon/store';
+import { accountActions, authActions, clansActions, getStoreAsync, selectInitialPath } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
 
 export interface IAuthLoaderData {
@@ -24,6 +24,7 @@ function getRedirectTo(initialPath?: string): string {
 
 export const authLoader = async () => {
 	const store = await getStoreAsync();
+	store.dispatch(clansActions.joinClan({clanId: "0"}),);
 	try {
 		const response = await store.dispatch(authActions.refreshSession());
 		if ((response as unknown as IWithError).error) {

@@ -1,8 +1,8 @@
-import { useApp, useEventManagement, useOnClickOutside } from '@mezon/core';
-import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId } from '@mezon/store';
+import { useEventManagement, useOnClickOutside } from '@mezon/core';
+import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId, selectTheme } from '@mezon/store';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../../../ChannelLink';
 import * as Icons from '../../../Icons';
@@ -17,25 +17,25 @@ export type ItemEventManagementProps = {
 	address?: string;
 	logo?: string;
 	logoRight?: string;
-	start: string; 
+	start: string;
 	end?: string;
 	event?: EventManagementEntity;
 	createTime?: string;
-	checkUserCreate?:boolean;
+	checkUserCreate?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
 };
 
-const ItemEventManagement = (props: ItemEventManagementProps)=>{
-    const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, setOpenModalDetail } = props;
-	const { setChooseEvent } = useEventManagement();
+const ItemEventManagement = (props: ItemEventManagementProps) => {
+	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, setOpenModalDetail } =
+		props;
+	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
-	const { deleteEventManagement } = useEventManagement();
-	const checkOptionVoice = option === OptionEvent.OPTION_SPEAKER;
-	const checkOptionLocation = option === OptionEvent.OPTION_LOCATION;
+	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
+	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const [openPanel, setOpenPanel] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
@@ -44,9 +44,11 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 		distanceToBottom: 0,
 	});
 
-	const isSameDay = () => {
+	const isSameDay = useMemo(() => {
 		return compareDate(new Date(), createTime || '');
-	};
+	}, [createTime]);
+
+	const time = useMemo(() => timeFomat(start), [start]);
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
@@ -77,14 +79,15 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 
 	return (
 		<div
-			className="dark:bg-black bg-bgModifierHoverLight rounded-lg overflow-hidden"
+			className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden"
 			onClick={
 				setOpenModalDetail && event
 					? () => {
 							setOpenModalDetail(true);
 							setChooseEvent(event);
 						}
-					: () => {}
+					: // eslint-disable-next-line @typescript-eslint/no-empty-function
+						() => {}
 			}
 			ref={panelRef}
 		>
@@ -92,11 +95,11 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 			<div className="p-4 border-b dark:border-slate-600 border-white">
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
-						{createTime && isSameDay() && (
-							<div className="text-primary rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
+						{createTime && isSameDay && (
+							<div className="text-[#7289da] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
 						)}
 						<Icons.IconEvents />
-						<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{timeFomat(start)}</p>
+						<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{time}</p>
 					</div>
 					{event?.creator_id && (
 						<Tooltip
@@ -110,7 +113,7 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 					)}
 				</div>
 				<div className="flex justify-between">
-					<p className="hover:underline font-bold dark:text-white text-black flex-grow basis-3/5">{topic}</p>
+					<p className="hover:underline font-bold dark:text-white text-black flex-grow basis-3/5 text-base">{topic}</p>
 					{logoRight && <img src={logoRight} alt="logoRight" className="w-[60%] max-h-[100px] object-cover rounded flex-grow basis-2/5" />}
 				</div>
 			</div>
@@ -146,12 +149,12 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 							<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black rotate-90" />
 						</div>
 
-						<button className="flex gap-x-1 rounded px-4 py-2 border bg-zinc-600 hover:bg-opacity-80">
+						<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
 							{checkOptionVoice && <Icons.IconShareEventVoice />}
 							{checkOptionLocation && <Icons.IConShareEventLocation />}
 							Share
 						</button>
-						<button className="flex gap-x-1 rounded px-4 py-2 border bg-zinc-600 hover:bg-opacity-80">
+						<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
 							<Icons.MuteBell defaultSize="size-4 text-white" />
 							Interested
 						</button>

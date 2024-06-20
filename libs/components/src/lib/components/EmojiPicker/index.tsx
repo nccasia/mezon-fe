@@ -1,9 +1,9 @@
-import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannelId, selectMessageByMessageId } from '@mezon/store';
+import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectMessageByMessageId, selectReactionPlaceActive } from '@mezon/store';
 import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Icons } from '../../components';
 
 export type EmojiCustomPanelOptions = {
@@ -13,13 +13,15 @@ export type EmojiCustomPanelOptions = {
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
+	const dispatch = useDispatch();
+
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
 	const { emojis, categoriesEmoji, emojiListPNG, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
-	const { reactionPlaceActive } = useChatReaction();
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
 		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
@@ -48,19 +50,36 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		<Icons.Ribbon defaultSize="w-7 h-7" />,
 	];
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
-	const { reactionMessageDispatch, setReactionPlaceActive } = useChatReaction();
+	const { reactionMessageDispatch } = useChatReaction();
+
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
+	const currentChannel = useSelector(selectCurrentChannel);
+	const { directId } = useAppParams();
+	const [channelLabel, setChannelLabel] = useState('');
+	const [channelID, setChannelID] = useState('');
+	const direct = useSelector(selectDirectById(directId || ''));
 
+	useEffect(() => {
+		if (direct != undefined) {
+			setChannelLabel('');
+			setChannelID(direct.id);
+		} else {
+			setChannelLabel(currentChannel?.channel_label || '');
+			setChannelID(currentChannel?.id || '');
+		}
+	}, [currentChannel, directId]);
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+				channelID ?? '',
+				channelLabel ?? '',
 				props.messageEmojiId ?? '',
 				emojiPicked.trim(),
 				1,
@@ -73,7 +92,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setAddEmojiActionChatbox(!addEmojiState);
 			setEmojiSuggestion(emojiPicked);
 			if (!shiftPressedState) {
-				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 				setSubPanelActive(SubPanelName.NONE);
 			}
 		}

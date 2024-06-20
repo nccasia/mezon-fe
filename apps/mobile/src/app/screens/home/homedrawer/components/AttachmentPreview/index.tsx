@@ -1,9 +1,10 @@
-import { abbreviateText, CloseIcon, FileIcon, PlayIcon } from '@mezon/mobile-components';
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { CloseIcon, PlayIcon } from '@mezon/mobile-components';
+import { size, verticalScale } from '@mezon/mobile-ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import colors from 'tailwindcss/colors';
+import AttachmentFilePreview from '../AttachmentFilePreview';
 import styles from './styles';
 
 interface IProps {
@@ -12,23 +13,6 @@ interface IProps {
 }
 
 const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
-	const renderFileView = (attachment: ApiMessageAttachment) => {
-		const splitFiletype = attachment.filetype.split('/');
-		const type = splitFiletype[splitFiletype.length - 1];
-		return (
-			<View style={styles.fileViewer}>
-				<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
-				<View style={{ maxWidth: '75%' }}>
-					<Text style={styles.fileName} numberOfLines={1}>
-						{abbreviateText(attachment.filename)}
-					</Text>
-					<Text style={styles.typeFile} numberOfLines={1}>
-						{type}
-					</Text>
-				</View>
-			</View>
-		);
-	};
 	return (
 		<ScrollView
 			horizontal
@@ -42,7 +26,11 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 				const isUploaded = !!attachment?.size;
 				return (
 					<View key={index + attachment.filename} style={styles.attachmentItem}>
-						{isFile ? renderFileView(attachment) : <Image source={{ uri: attachment.url }} style={styles.attachmentItemImage} />}
+						{isFile ? (
+							<AttachmentFilePreview attachment={attachment} />
+						) : (
+							<Image source={{ uri: attachment.url }} style={styles.attachmentItemImage} />
+						)}
 						{isUploaded && (
 							<TouchableOpacity
 								style={styles.iconClose}

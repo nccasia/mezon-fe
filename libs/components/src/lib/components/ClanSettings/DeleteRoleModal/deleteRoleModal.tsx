@@ -1,14 +1,10 @@
 interface ModalProps {
-	isOpen: boolean;
 	onClose: () => void;
 	handleDelete: () => void;
 }
 
-export const DeleteModal: React.FC<ModalProps> = ({ isOpen, handleDelete, onClose }) => {
+export const DeleteModal: React.FC<ModalProps> = ({ handleDelete, onClose }) => {
 	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<>
-			{isOpen && (
 				<div className="fixed  inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
 					<div className="relative z-10 dark:bg-gray-900  bg-bgLightMode p-6 rounded-md text-center dark:text-textDarkTheme text-textLightTheme">
 						<h2 className="text-[30px] font-semibold mb-4">DELETE ROLE</h2>
@@ -36,7 +32,5 @@ export const DeleteModal: React.FC<ModalProps> = ({ isOpen, handleDelete, onClos
 						</div>
 					</div>
 				</div>
-			)}
-		</>
 	);
 };

@@ -3,6 +3,8 @@ import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Icons } from '../../components';
+import { useSelector } from 'react-redux';
+import { selectReactionPlaceActive } from '@mezon/store';
 
 export const InputSearch: React.FC = () => {
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -12,7 +14,8 @@ export const InputSearch: React.FC = () => {
 	const searchInputRef = useRef<HTMLInputElement | null>(null);
 	const { trendingClickingStatus, setClickedTrendingGif, categoriesStatus, setShowCategories, buttonArrowBackStatus, setButtonArrowBack } =
 		useGifs();
-	const { reactionPlaceActive } = useChatReaction();
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+
 	const { setValueInputSearch, valueInputToCheckHandleSearch, valuePlaceHolder } = useGifsStickersEmoji();
 
 	const debouncedSetValueSearchGif = useDebouncedCallback((value) => {

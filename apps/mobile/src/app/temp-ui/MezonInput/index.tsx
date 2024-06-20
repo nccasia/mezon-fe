@@ -4,7 +4,6 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { CloseIcon } from "@mezon/mobile-components";
 import { useRef } from "react";
 import { useState } from "react";
-import { size } from "@mezon/mobile-ui";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -48,7 +47,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
-            <View style={[styles.fakeInput, renderBorder(), inputWrapperStyle]}>
+            <View style={[styles.fakeInput, textarea && {paddingTop: 10}, renderBorder(), inputWrapperStyle]}>
                 <View style={styles.inputBox}>
                     <TextInput
                         ref={ref}
@@ -58,14 +57,14 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         numberOfLines={textarea ? 4 : 1}
                         textAlignVertical={textarea ? 'top' : 'center'}
                         maxLength={maxCharacter}
-                        style={[styles.input, textarea && { height: size.s_100 }]}
+                        style={[styles.input]}
                         placeholder={placeHolder}
                         placeholderTextColor="gray"
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                     />
 
-                    {!textarea &&
+                    {!textarea && value.length > 0 &&
                         <TouchableOpacity
                             onPress={handleClearBtn}
                             style={styles.clearBtn}>
@@ -73,9 +72,10 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         </TouchableOpacity>
                     }
                 </View>
+                
                 {showCount && textarea &&
                     <View style={styles.lineCountWrapper}>
-                        <Text style={styles.count}>{`${value?.length || 1}/${maxCharacter}`}</Text>
+                        <Text style={styles.count}>{`${value?.length || '0'}/${maxCharacter}`}</Text>
                     </View>
                 }
             </View>

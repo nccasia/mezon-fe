@@ -101,7 +101,7 @@ const SettingRightClanEdit = ({
 		}
 		setFlagOptionsfalse?.();
 	};
-	const handlSaveClose = () => {
+	const handleSaveClose = () => {
 		setFlagOptionsfalse?.();
 	};
 	const handleUpdateUser = async () => {
@@ -112,7 +112,7 @@ const SettingRightClanEdit = ({
 	const saveProfile: ModalSettingSave = {
 		flagOption: flagOption,
 		handleClose,
-		handlSaveClose,
+		handleSaveClose,
 		handleUpdateUser,
 	};
 	return (

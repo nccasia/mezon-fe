@@ -1,6 +1,6 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, removeMemberChannel, selectCurrentClanId } from '@mezon/store';
+import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store';
 import { useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
 import { OfflineStatus, OnlineStatus } from '../Icons';
@@ -51,7 +51,7 @@ function MemberProfile({
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 
-	const { removeMemberClan, removeMemberChannel } = useChannelMembers();
+	const { removeMemberClan } = useChannelMembers();
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -98,8 +98,7 @@ function MemberProfile({
 	const handleRemoveMember = async (value: string) => {
 		if (user) {
 			const userIds = [user.user?.id ?? ''];
-			await removeMemberClan({ clanId: currentClanId as string, userIds });
-			await removeMemberChannel({ channelId: user.channelId as string, userIds });
+			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
 
 			setOpenModalRemoveMember(false);
 		}

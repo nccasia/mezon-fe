@@ -18,6 +18,7 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
 });
 
 window.electron?.onDeepLinkUrl((deepLinkUrl) => {
+  localStorage.removeItem('deepLinkUrl');
   localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 

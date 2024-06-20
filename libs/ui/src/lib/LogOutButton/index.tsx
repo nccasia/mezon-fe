@@ -16,7 +16,9 @@ export function LogOutButton() {
 
 	return (
 		<>
-			<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
+			{openModal &&
+				<LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />
+			}
 			<button
 				onClick={handleOpenModal}
 				className="inline-flex m-4 h-10 items-center justify-center gap-2 
@@ -47,15 +49,13 @@ export function LogOutButton() {
 }
 
 interface ModalProps {
-	isOpen: boolean;
 	onClose: () => void;
 	handleLogOut: () => void;
 }
 
-export const LogoutModal: React.FC<ModalProps> = ({ isOpen, handleLogOut, onClose }) => {
+export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => {
 	return (
-		isOpen && (
-			<div className="fixed  inset-0 flex items-center justify-center z-50">
+		<div className="fixed  inset-0 flex items-center justify-center z-50">
 				<div className="fixed inset-0 bg-black opacity-80"></div>
 				<div className="relative z-10 dark:bg-bgPrimary bg-bgLightModeSecond p-6 rounded-[5px] text-center">
 					<h2 className="text-[30px] font-semibold mb-4 dark:text-white text-black">Log Out</h2>
@@ -78,6 +78,5 @@ export const LogoutModal: React.FC<ModalProps> = ({ isOpen, handleLogOut, onClos
 					</div>
 				</div>
 			</div>
-		)
 	);
 };

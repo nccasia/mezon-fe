@@ -172,11 +172,12 @@ export const styles = StyleSheet.create({
 	},
 	wrapperClanIcon: {
 		alignItems: 'center',
+    position: 'relative'
 	},
 	clanIcon: {
-		height: verticalScale(50),
-		width: verticalScale(50),
-		borderRadius: verticalScale(15),
+		height: verticalScale(55),
+		width: verticalScale(55),
+		borderRadius: verticalScale(50),
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -203,17 +204,18 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.secondary,
 	},
 	lineActiveClan: {
-		backgroundColor: Colors.black,
+		backgroundColor: Colors.azureBlue,
 		width: 4,
 		height: '80%',
 		top: '10%',
-		left: 0,
+		left: -13,
 		borderTopRightRadius: 10,
 		borderBottomEndRadius: 10,
 		position: 'absolute',
 	},
 	clanIconActive: {
 		backgroundColor: Colors.black,
+    borderRadius: verticalScale(15),
 	},
 	containerThreadList: {
 		paddingLeft: size.s_24,
@@ -533,7 +535,7 @@ export const styles = StyleSheet.create({
 	wrapperPlusClan: {
 		height: verticalScale(50),
 		width: verticalScale(50),
-		borderRadius: verticalScale(15),
+		borderRadius: verticalScale(50),
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',

@@ -1,7 +1,9 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
+import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
 type IMessageHeadProps = {
@@ -13,12 +15,17 @@ type IMessageHeadProps = {
 const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
+
+	const currentClan = useSelector(selectCurrentClan);
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const panelRefShort = useRef<HTMLDivElement>(null);
 	const [positionLeft, setPositionLeft] = useState(0);
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionBottom, setPositionBottom] = useState(false);
+
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
@@ -77,7 +84,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
 				>
-					{username ? username : 'Anonymous'}
+					{clanProfile?.nick_name || username || 'Anonymous'}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>

@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
 	},
 
 	textInputWrapper: {
+		flex: 1,
 		display: 'flex',
 		flexDirection: 'row',
 		backgroundColor: Colors.black,

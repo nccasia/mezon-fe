@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
-import { useApp, useAuth, useChannels, useDirect, useSendForwardMessage } from '@mezon/core';
-import { RootState, channelsActions, useAppDispatch } from '@mezon/store';
+import { useApp, useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
+import { RootState, channelsActions, selectAllDirectMessages, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, removeDuplicatesById } from '@mezon/utils';
 import { Button, Checkbox, Label, Modal } from 'flowbite-react';
@@ -22,9 +22,8 @@ type OpjectSend = {
 const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	const { appearanceTheme } = useApp();
 	const dispatch = useAppDispatch();
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
-	const listChannel = listChannels.filter((Channel) => Channel.type === 1);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
@@ -58,13 +57,10 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
 				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
 				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				await mezon.joinChatChannel(selectedObjectIdSend.id);
 				sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
@@ -312,7 +308,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 							onClick={() => sentToMessage()}
 							className="h-10 px-4 rounded dark:bg-bgSelectItem bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent"
 						>
-							Save
+							Send
 						</Button>
 					</div>
 				</div>

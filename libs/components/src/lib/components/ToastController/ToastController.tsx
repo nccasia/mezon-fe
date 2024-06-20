@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectToasts } from '@mezon/store';
 import { ToastContainer, toast as showToast } from 'react-toastify';
@@ -22,11 +22,17 @@ function getToastFn(type: ToastPayload['type']) {
 const ToastController: React.FC = () => {
     const dispatch = useDispatch();
     const toasts = useSelector(selectToasts);
+    const trackedToasts = useRef<any>({});
 
     useEffect(() => {
-        toasts.forEach((toast) => {
+        for (const toast of toasts) {
+            if (trackedToasts.current[toast.id]) {
+                continue;
+            }
+
             const toastFn = getToastFn(toast.type);
-            toastFn(toast.message, {
+
+            const id = toastFn(toast.message, {
                 position: toast.position,
                 autoClose: toast.autoClose,
                 hideProgressBar: toast.hideProgressBar,
@@ -36,11 +42,24 @@ const ToastController: React.FC = () => {
                 theme: toast.theme,
                 toastId: toast.id,
             });
-        });
-    }, [toasts, dispatch]);
+
+            trackedToasts.current[toast.id] = id;
+        }
+    }, [toasts, trackedToasts, dispatch]);
 
     return (
-        <ToastContainer />
+        <ToastContainer
+            position="top-right"
+            autoClose={2200}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+        />
     );
 };
 

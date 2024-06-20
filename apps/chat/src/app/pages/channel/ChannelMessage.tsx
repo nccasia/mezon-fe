@@ -1,30 +1,30 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import {
-	useApp,
-	useChannels,
-	useChatMessage,
-	useChatReaction,
-	useChatSending,
-	useDeleteMessage,
-	useDirect,
-	useEmojiSuggestion,
-	useEscapeKey,
-	useReference,
-} from '@mezon/core';
+import { useApp, useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
 	pinMessageActions,
 	referencesActions,
+	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectIdMessageRefEdit,
+	selectLastSeenMessage,
 	selectMemberByUserId,
+	selectMessageEntityById,
+	selectOpenEditMessageState,
+	selectOpenOptionMessageState,
 	selectPinMessageByChannelId,
+	selectPreviousMessageByMessageId,
+	selectReactionBottomState,
+	selectReactionPlaceActive,
+	selectReactionRightState,
 	useAppDispatch,
 } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Mention, MentionsInput } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -34,11 +34,9 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 
 type MessageProps = {
-	message: IMessageWithUser;
-	preMessage?: IMessageWithUser;
-	lastSeen?: boolean;
-	mode: number;
 	channelId: string;
+	messageId: string;
+	mode: number;
 	channelLabel: string;
 };
 
@@ -56,49 +54,71 @@ type EmojiData = {
 
 const neverMatchingRegex = /($a)/;
 
-export function ChannelMessage(props: Readonly<MessageProps>) {
-	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
+const convertToPlainTextHashtag = (text: string) => {
+	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
+	const result = text.replace(regex, (match, symbol, p1, p2) => {
+		return symbol === '#' ? `#${p2}` : `@${p1}`;
+	});
+	return result;
+};
+
+export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Readonly<MessageProps>) {
+	const message = useSelector((state) => selectMessageEntityById(state, messageId));
+	const messPre = useSelector(selectPreviousMessageByMessageId(channelId, messageId));
+	const reactionRightState = useSelector(selectReactionRightState);
+	const reactionBottomState = useSelector(selectReactionBottomState);
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
+	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const [deleteMessage, setDeleteMessage] = useState(false);
-	const { markMessageAsSeen } = useChatMessage(message.id);
+	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
+	// TODO: separate EditSendMessage and SendMessage to different hooks
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
-	const { reactionRightState, reactionBottomState } = useChatReaction();
-	const { openEditMessageState, openOptionMessageState, idMessageRefEdit } = useReference();
+
+	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
 
 	const mess = useMemo(() => {
-		if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
+		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
 			return message.content;
 		}
 		return message;
 	}, [message]);
 
-	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `#${p2}` : `@${p1}`;
-		});
-		return result;
-	};
 	const [newMessage, setNewMessage] = useState('');
 	const [editMessage, setEditMessage] = useState(mess.content.t);
 	const [content, setContent] = useState(editMessage);
 
 	const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
-		const regex = /#[0-9]{19}\b/g;
+		const regex = /<#[0-9]{19}\b>/g;
 		const replacedText = text.replace(regex, (match) => {
-			const channelId = match.substring(1);
+			const channelId = match.substring(2, match.length - 1);
 			const channel = listInput.find((item) => item.id === channelId);
 			return channel ? `#[${channel.display}](${channelId})` : match;
 		});
 
 		return replacedText;
 	};
+
+	const { listChannels } = useChannels();
+
+	const listChannelsMention = useMemo(
+		() =>
+			listChannels.map((item) => {
+				return {
+					id: item?.channel_id ?? '',
+					display: item?.channel_label ?? '',
+					subText: item?.category_name ?? '',
+				};
+			}) as ChannelsMentionProps[],
+		[listChannels],
+	);
 
 	useEffect(() => {
 		if (editMessage) {
@@ -107,14 +127,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 			setEditMessage(replacedText);
 			setContent(convertedHashtag);
 		}
-	}, [editMessage]);
-
-	const messPre = useMemo(() => {
-		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
-			return preMessage.content;
-		}
-		return preMessage;
-	}, [preMessage]);
+	}, [editMessage, listChannelsMention]);
 
 	const handleCancelEdit = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
@@ -163,7 +176,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		[EditSendMessage],
 	);
 
-	const textareaRef = useRef<any>(null);
+	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	useEffect(() => {
 		if (openEditMessageState && mess.id === idMessageRefEdit) {
 			textareaRef.current?.focus();
@@ -187,14 +200,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	};
 
 	const mentionList = UserMentionList(channelId);
-	const { listChannels } = useChannels();
-	const listChannelsMention = listChannels.map((item) => {
-		return {
-			id: item?.channel_id ?? '',
-			display: item?.channel_label ?? '',
-			subText: item?.category_name ?? '',
-		};
-	}) as ChannelsMentionProps[];
 
 	useEscapeKey(handleCancelEdit);
 
@@ -226,7 +231,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 										onFocus={handleFocus}
 										inputRef={textareaRef}
 										value={editMessage}
-										className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+										className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 										onKeyDown={onSend}
 										onChange={(e, newValue) => {
 											setEditMessage(newValue);
@@ -279,7 +284,14 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 									</MentionsInput>
 									<div className="text-xs flex">
 										<p className="pr-[3px]">escape to</p>
-										<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+										<p
+											className="pr-[3px] text-[#3297ff]"
+											style={{ cursor: 'pointer' }}
+											onClick={() => {
+												handleCancelEdit();
+												setEditMessage(mess.content.t);
+											}}
+										>
 											cancel
 										</p>
 										<p className="pr-[3px]">• enter to</p>
@@ -295,7 +307,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>
-			<MessageReaction currentChannelId={channelId || ''} message={message} mode={mode} />
+			<MessageReaction message={message} mode={mode} />
 		</>
 	);
 }
@@ -330,20 +342,17 @@ function PopupMessage({
 	reactionBottomState,
 	openEditMessageState,
 	openOptionMessageState,
-	mode,
-	isCombine,
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { idMessageRefOpt } = useReference();
-	const { reactionPlaceActive } = useChatReaction();
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
-	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
 		if (channelMessageDiv) {
-			const rect = channelMessageDiv.getBoundingClientRect();
-			setPickerPosition({ top: rect.top, left: rect.left, bottom: rect.bottom });
+			channelMessageDiv.getBoundingClientRect();
 		}
 		return 0;
 	};
@@ -352,13 +361,11 @@ function PopupMessage({
 		if (reactionRightState && idMessageRefOpt === mess.id) {
 			getDivHeightToTop();
 		}
-	}, [reactionRightState]);
+	}, [idMessageRefOpt, mess.id, reactionRightState]);
 
-	return (
-		<>
-			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
-				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
+	return reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM ? (
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
 					(reactionRightState && mess.id === idMessageRefOpt) ||
 					(reactionBottomState && mess.id === idMessageRefOpt) ||
@@ -367,21 +374,21 @@ function PopupMessage({
 						? ''
 						: 'hidden group-hover:block'
 				} `}
-				>
-					<div className="relative">
-						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-					</div>
+		>
+			<div className="relative">
+				<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
+			</div>
 
-					{openOptionMessageState && mess.id === idMessageRefOpt && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
-				</div>
-			)}
-		</>
-	);
+			{openOptionMessageState && mess.id === idMessageRefOpt && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
+		</div>
+	) : null;
 }
+
+export const MemorizedChannelMessage = memo(ChannelMessage);
 
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
-	const { userId } = useChatReaction();
+	const { userId } = useAuth();
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
@@ -410,8 +417,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
-	const { listDM: dmGroupChatList } = useDirect();
-
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const handleClickForward = () => {
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));

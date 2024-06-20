@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { useDMInvite, useDirect, useSendInviteMessage } from '@mezon/core';
 import { DirectEntity, UsersClanEntity, selectCurrentChannel } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { ICategoryChannel } from '@mezon/utils';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ export interface IListMemberInviteProps {
 	channelID?: string;
 }
 
-export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean }) => {
+export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean, clanIconStyle?: ViewStyle }) => {
 	return (
 		<TouchableOpacity
 			activeOpacity={props?.onPress ? 0.7 : 1}
@@ -42,7 +42,7 @@ export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: an
 				}
 			}}
 		>
-			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive]}>
+			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive, props?.clanIconStyle]}>
 				{props.icon ? (
 					props.icon
 				) : props?.data?.logo ? (
@@ -87,7 +87,7 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 	);
 });
 
-export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; onLongPress: () => void; collapseItems: any }) => {
+export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; onLongPress: (channel: IChannel | ICategoryChannel) => void; collapseItems: any }) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
 	const currentChanel = useSelector(selectCurrentChannel);
 
@@ -96,7 +96,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 			<ChannelListHeader
 				title={props.data.category_name}
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
-				onLongPress={() => props?.onLongPress()}
+				onLongPress={() => props?.onLongPress(props.data)}
 				isCollapsed={isCollapsed}
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
@@ -109,6 +109,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 							key={Math.floor(Math.random() * 9999999).toString() + index}
 							isActive={isActive}
 							currentChanel={currentChanel}
+              onLongPress={()=>{props?.onLongPress(item)}}
 						/>
 					);
 				})}
@@ -219,7 +220,6 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 	}, [listUserInvite, searchTerm]);
 
 	const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
-		await mezon.joinChatDirectMessage(channelSelected.id, '', Number(channelSelected?.type));
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
@@ -235,7 +235,6 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response?.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(linkInvite, response.channel_id);
 		}
 	};

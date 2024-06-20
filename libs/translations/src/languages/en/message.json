@@ -38,5 +38,6 @@
         "noActionDescription": "What a cold, emotionless world.",
         "removeActions": "Remove Actions"
     },
-    "messageDeleteReply": "Original message was deleted"
+    "messageDeleteReply": "Original message was deleted",
+    "forwardMessagesSuccessfully": "Forward messages successfully!"
 }

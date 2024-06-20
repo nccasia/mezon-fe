@@ -165,6 +165,8 @@ export type IMessage = ChannelMessage & {
 	creationTime?: Date;
 	creationTimeMs?: number;
 	lastSeen?: boolean;
+	isSending?: boolean;
+	isError?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -472,6 +474,7 @@ export type UpdateClan = {
 
 export type RemoveClanUsers = {
 	clanId: string;
+	channelId: string;
 	userIds: string[];
 };
 
@@ -496,3 +499,15 @@ export enum MentionTypeEnum {
 	HASHTAG = 'HASHTAG',
 	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
 }
+
+export type ContenSubmitEventProps = {
+	topic: string;
+	titleEvent: string;
+	timeStart: string;
+	timeEnd: string;
+	selectedDateStart: Date;
+	selectedDateEnd: Date;
+	voiceChannel: string;
+	logo: string;
+	description: string;
+};

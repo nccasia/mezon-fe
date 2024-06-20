@@ -33,7 +33,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 				scrollToCurrentClan();
 			}, 200);
 		}
-		
+
 		return () => {
 			timeout && clearTimeout(timeout);
 		};
@@ -62,7 +62,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 						style={[styles.serverItem, { backgroundColor: currentClan?.clan_id === clan?.clan_id ? '#141c2a' : Colors.secondary }]}
 					>
 						<View style={styles.serverName}>
-							<ClanIcon data={clan} />
+							<ClanIcon data={clan}  clanIconStyle={styles.clanIcon}/>
 							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode='tail'>{clan?.clan_name}</Text>
 						</View>
 						{currentClan?.clan_id === clan?.clan_id && <TickIcon width={10} height={10} color={Colors.azureBlue} />}

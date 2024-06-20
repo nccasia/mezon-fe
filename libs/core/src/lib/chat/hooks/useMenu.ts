@@ -1,12 +1,8 @@
-import { appActions, selectCloseMenu, selectIsShowMemberList, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { appActions, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export function useMenu() {
 	const dispatch = useAppDispatch();
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
-	const isShowMemberList = useSelector(selectIsShowMemberList);
 
 	const setCloseMenu = React.useCallback(
 		async (status: boolean) => {
@@ -25,17 +21,11 @@ export function useMenu() {
 	return useMemo(
 		() => (
 			{ 
-				closeMenu, 
-				statusMenu, 
-				isShowMemberList, 
 				setCloseMenu, 
 				setStatusMenu, 
 			}
 		),
 		[
-			closeMenu, 
-			statusMenu, 
-			isShowMemberList, 
 			setCloseMenu, 
 			setStatusMenu,
 		],

@@ -12,10 +12,11 @@ export function isFormalError(error: unknown): error is FormalError {
 
 export function trackError(rawError: unknown) {
 	const formalError = isFormalError(rawError) ? rawError : extractActionError(rawError);
-	console.error(formalError);
+	console.log(formalError);
 }
 
 export function trackActionError(action: PayloadAction<unknown, string, unknown>, raise = false) {
+
 	if ('error' in action === false) {
 		return;
 	}

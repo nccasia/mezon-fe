@@ -23,7 +23,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 		},
 		[sendMessage],
 	);
-
+	// TODO: separate data to another file
 	const avts = [
 		{ id: 1, url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
 		{ id: 2, url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },

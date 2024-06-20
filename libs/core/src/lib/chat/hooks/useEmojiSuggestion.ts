@@ -13,19 +13,22 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import useDataEmojiSvg from './useDataEmojiSvg';
 
+const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+
+const filterEmojiData = (emojis: IEmoji[]) => {
+	return emojis.map(({ emoji, shortname, category, name }) => ({
+		name,
+		emoji,
+		shortname,
+		category,
+	}));
+};
+
 export function useEmojiSuggestion() {
 	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
 	const { emojiListPNG } = useDataEmojiSvg();
 
-	function filterEmojiData(emojis: IEmoji[]) {
-		return emojis.map(({ emoji, shortname, category, name }) => ({
-			name,
-			emoji,
-			shortname,
-			category,
-		}));
-	}
-	const emojis = filterEmojiData(emojisMetaData ?? []);
+	const emojis = useMemo(() => filterEmojiData(emojisMetaData ?? []), [emojisMetaData]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
@@ -68,7 +71,6 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
-	const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	return useMemo(
 		() => ({
 			emojis,
@@ -93,7 +95,6 @@ export function useEmojiSuggestion() {
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
-			categoriesEmoji,
 			emojiListPNG,
 			setAddEmojiActionChatbox,
 			addEmojiState,

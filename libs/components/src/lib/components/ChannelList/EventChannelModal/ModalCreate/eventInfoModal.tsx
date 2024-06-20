@@ -1,38 +1,26 @@
+import { useApp } from '@mezon/core';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
+import { ContenSubmitEventProps } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { handleUploadFile, useMezon } from '@mezon/transport';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
-import { OptionEvent } from '@mezon/utils';
-import { useApp } from '@mezon/core';
 import { compareDate, compareTime } from '../timeFomatEvent';
 
 export type EventInfoModalProps = {
-	topic: string;
-	description: string;
-	option: string;
-	logo: string;
-	selectedDateStart: Date;
-	selectedDateEnd: Date;
-	timeStart: string;
-	timeEnd: string;
+	contentSubmit: ContenSubmitEventProps;
+	choiceLocation: boolean;
 	timeStartDefault: string;
 	timeEndDefault: string;
-	setSelectedDateStart: (value: Date) => void;
-	setSelectedDateEnd: (value: Date) => void;
-	setLogo: (value: string) => void;
-	handleTopic: (content: string) => void;
-	handleTimeStart: (time: string) => void;
-	handleTimeEnd: (time: string) => void;
-	handleDescription: (content: string) => void;
 	setErrorTime: (status: boolean) => void;
+	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
 };
 
 const EventInfoModal = (props: EventInfoModalProps) => {
-	const { topic, description, option, logo, selectedDateStart, selectedDateEnd, timeStart, timeEnd, timeStartDefault, timeEndDefault, setSelectedDateStart, setSelectedDateEnd, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription, setErrorTime } = props;
+	const { contentSubmit, timeStartDefault, setErrorTime, setContentSubmit, choiceLocation } = props;
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1000);
 	const [errorStart, setErrorStart] = useState(false);
 	const [errorEnd, setErrorEnd] = useState(false);
@@ -52,58 +40,35 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	];
 
 	const handleDateChangeStart = (date: Date) => {
-		setSelectedDateStart(date);
+		setContentSubmit((prev) => ({ ...prev, selectedDateStart: date }));
 	};
 
 	const handleDateChangeEnd = (date: Date) => {
-		setSelectedDateEnd(date);
-		setCheckDaySame(compareDate(selectedDateStart, date));
-	};
-
-	const renderOptions = () => {
-		const options = [];
-		for (let hour = 0; hour < 24; hour++) {
-			for (let minute = 0; minute < 60; minute += 30) {
-				const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-				options.push(
-					<option key={timeString} value={timeString}>
-						{timeString}
-					</option>,
-				);
-			}
-		}
-		return options;
+		setContentSubmit((prev) => ({ ...prev, selectedDateEnd: date }));
+		setCheckDaySame(compareDate(contentSubmit.selectedDateStart, date));
 	};
 
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		if (e.target.value.length > 1000) {
-		return;
-		}
-		handleDescription(e.target.value);
+		setContentSubmit((prev) => ({ ...prev, description: e.target.value }));
 		setCountCharacterDescription(1000 - e.target.value.length);
 	};
 
-	const handleChangeTimeStart = (e:any)=>{
+	const handleChangeTimeStart = (e: any) => {
 		const time = e.target.value;
-		handleTimeStart(time);
-		if(compareTime(timeStartDefault, time, true)){
-			setErrorStart(false);
-		} else {
-			setErrorStart(true);
-		}
+		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
+		setErrorStart(!compareTime(timeStartDefault, time, true));
+	};
 
-	}
-
-	const handleChangeTimeEnd = (e:any)=>{
-		handleTimeEnd(e.target.value);
-		if((checkDaySame && compareTime(timeStart, e.target.value)) || (!checkDaySame)) {
+	const handleChangeTimeEnd = (e: any) => {
+		setContentSubmit((prev) => ({ ...prev, timeEnd: e.target.value }));
+		if ((checkDaySame && compareTime(contentSubmit.timeStart, e.target.value)) || !checkDaySame) {
 			setErrorEnd(false);
 		} else {
 			setErrorEnd(true);
 		}
-	}
+	};
 
-	const {appearanceTheme} = useApp();
+	const { appearanceTheme } = useApp();
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
@@ -129,29 +94,29 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 			return;
 		}
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
-			setLogo(attachment.url ?? '');
+			setContentSubmit((prev) => ({ ...prev, logo: attachment.url ?? '' }));
 		});
 	};
 
 	useEffect(() => {
-		if(!checkDaySame){
+		if (!checkDaySame) {
 			setErrorEnd(false);
 		}
-		if(checkDaySame  && !compareTime(timeStart, timeEnd) && option === OptionEvent.OPTION_LOCATION ){
+		if (checkDaySame && !compareTime(contentSubmit.timeStart, contentSubmit.timeEnd) && choiceLocation) {
 			setErrorEnd(true);
 		}
-	}, [checkDaySame, timeStart, timeEnd]);
+	}, [checkDaySame, contentSubmit.timeStart, contentSubmit.timeEnd, choiceLocation]);
 
 	useEffect(() => {
-		if(errorEnd || errorStart){
+		if (errorEnd || errorStart) {
 			setErrorTime(true);
 		} else {
 			setErrorTime(false);
 		}
-	}, [errorEnd, errorStart]);
+	}, [errorEnd, errorStart, setErrorTime]);
 
 	return (
-		<div className='max-h-[500px] overflow-y-auto hide-scrollbar' onClick={renderOptions}>
+		<div className="max-h-[500px] overflow-y-auto hide-scrollbar">
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
 					Event Topic
@@ -161,9 +126,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					type="text"
 					name="location"
 					placeholder="What's your event?"
-					onChange={(e) => handleTopic(e.target.value)}
-					value={topic}
-					className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === "light" ? "lightEventInputAutoFill" : ""}`}
+					onChange={(e) => setContentSubmit((prev) => ({ ...prev, topic: e.target.value }))}
+					value={contentSubmit.topic}
+					className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
 				/>
 			</div>
 			<div className="mb-4 flex gap-x-4">
@@ -175,7 +140,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<DatePicker
 						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 						wrapperClassName="w-full"
-						selected={selectedDateStart}
+						selected={contentSubmit.selectedDateStart}
 						onChange={handleDateChangeStart}
 						dateFormat="dd/MM/yyyy"
 						minDate={new Date()}
@@ -186,10 +151,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						Start Time
 						<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
 					</h3>
-					<TimePicker value={timeStart} name='timeStart' handleChangeTime={handleChangeTimeStart}/>
+					<TimePicker value={contentSubmit.timeStart} name="timeStart" handleChangeTime={handleChangeTimeStart} />
 				</div>
 			</div>
-			{option === OptionEvent.OPTION_LOCATION && 
+			{choiceLocation && (
 				<div className="mb-4 flex gap-x-4">
 					<div className="w-1/2">
 						<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
@@ -199,7 +164,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						<DatePicker
 							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 							wrapperClassName="w-full"
-							selected={selectedDateEnd}
+							selected={contentSubmit.selectedDateEnd}
 							onChange={handleDateChangeEnd}
 							dateFormat="dd/MM/yyyy"
 							minDate={new Date()}
@@ -210,10 +175,10 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 							End Time
 							<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
 						</h3>
-						<TimePicker value={timeEnd} name='timeEnd' handleChangeTime={handleChangeTimeEnd}/>
+						<TimePicker value={contentSubmit.timeEnd} name="timeEnd" handleChangeTime={handleChangeTimeEnd} />
 					</div>
 				</div>
-			}
+			)}
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold">Event Frequency</h3>
 				<select
@@ -226,8 +191,8 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						</option>
 					))}
 				</select>
-				{errorStart && <p className='text-[#e44141] text-xs font-thin'>The start time must be in the future.</p>}
-				{errorEnd && <p className='text-[#e44141] text-xs font-thin'>The end time must be bigger than start time.</p>}
+				{errorStart && <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p>}
+				{errorEnd && <p className="text-[#e44141] text-xs font-thin">The end time must be bigger than start time.</p>}
 			</div>
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold">Description</h3>
@@ -235,10 +200,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<TextArea
 						placeholder="Let everyone know how to use this channel!"
 						className="resize-none h-auto min-h-[87px] w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
-						value={description}
+						value={contentSubmit.description}
 						onChange={handleChangeTextArea}
 						rows={1}
 						refTextArea={textAreaRef}
+						maxLength={1000}
 					></TextArea>
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterDescription}</p>
 				</div>
@@ -254,11 +220,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					</div>
 					<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
 				</label>
-				{logo && <img src={logo} alt="logo" className='max-h-[180px] rounded w-full object-cover'/> }
+				{contentSubmit.logo && <img src={contentSubmit.logo} alt="logo" className="max-h-[180px] rounded w-full object-cover" />}
 			</div>
-			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
-			
-			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
+			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
+
+			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</div>
 	);
 };

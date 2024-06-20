@@ -126,7 +126,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 				onClose={() => setOpenModal(false)}
 				image="assets/images/file-and-folder.png"
 				title="Only image files are allowed"
-				content="Just uploaf type file (JPEG, PNG), please!"
+				content="Just upload type file (JPEG, PNG), please!"
 			/>
 		</div>
 	);

@@ -24,7 +24,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 
 	const [urlLogo, setUrlLogo] = useState<string | undefined>(currentClan?.logo ?? '');
 	const [clanName, setClanName] = useState<string | undefined>(currentClan?.clan_name ?? '');
-	const [checkvalidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(currentClan?.clan_name || ''));
+	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(currentClan?.clan_name || ''));
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -150,7 +150,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						maxLength={64}
 					/>
 				</div>
-				{checkvalidate && (
+				{checkValidate && (
 					<p className="text-[#e44141] text-xs italic font-thin">
 						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 					</p>
@@ -162,7 +162,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 				onClose={() => setOpenModal(false)}
 				image="assets/images/file-and-folder.png"
 				title="Only image files are allowed"
-				content="Just uploaf type file (JPEG, PNG), please!"
+				content="Just upload type file (JPEG, PNG), please!"
 			/>
 		</div>
 	);

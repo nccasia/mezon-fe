@@ -31,6 +31,8 @@ const Backdrop = (props: BottomSheetBackdropProps) => {
     <BottomSheetBackdrop
       {...props}
       style={containerStyle}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
       pressBehavior="close"
     />
   )

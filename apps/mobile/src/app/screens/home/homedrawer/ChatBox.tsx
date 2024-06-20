@@ -142,7 +142,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const {
 		sendDirectMessage,
 		sendMessageTyping: directMessageTyping,
-		messages,
 	} = useDirectMessages({
 		channelId: props.channelId ?? '',
 		mode: props.mode,

@@ -1,7 +1,7 @@
 import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { fetchChannelsCached } from '../channels/channels.slice';
 import { friendsActions } from '../friends/friend.slice';
@@ -66,6 +66,36 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 	}
 });
 
+export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', async (body: ApiDeleteChannelDescRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.closeDirectMess(mezon.session, body);
+		if (response) {
+			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			return response;
+		} else {
+			return thunkAPI.rejectWithValue([]);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
+export const openDirectMessage = createAsyncThunk('direct/openDirectMessage', async (body: ApiDeleteChannelDescRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.openDirectMess(mezon.session, body);
+		if (response) {
+			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			return response;
+		} else {
+			return thunkAPI.rejectWithValue([]);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 type fetchDmGroupArgs = {
 	cursor?: string;
 	limit?: number;
@@ -83,7 +113,7 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);	
 	
 	if (!response.channeldesc) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
 		if (
@@ -125,9 +155,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			);
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: directMessageId}))
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.joinChatDirectMessage(directMessageId, channelName, type);
-			return;
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);
@@ -243,6 +270,8 @@ export const directActions = {
 	fetchDirectMessage,
 	createNewDirectMessage,
 	joinDirectMessage,
+	closeDirectMessage,
+	openDirectMessage
 };
 
 const { selectAll, selectEntities } = directAdapter.getSelectors();
@@ -277,6 +306,13 @@ export const selectDirectsUnreadlist = createSelector(
 			const channel = state.dmMetadata.entities[dm.id];
 			return channel ? channel.lastSeenTimestamp < channel.lastSentTimestamp : false;
 		});
+	}
+);
+
+export const selectDirectsOpenlist = createSelector(
+	selectAllDirectMessages,
+	(directMessages) => {
+		return directMessages.filter((dm) => dm.active === 1);
 	}
 );
 

@@ -1,5 +1,5 @@
-import { useAppNavigation, useAppParams, useClans, useEventManagement } from '@mezon/core';
-import { clansActions, selectCurrentClanId } from '@mezon/store';
+import { useAppNavigation, useAppParams, useClans } from '@mezon/core';
+import { selectCurrentClanId, selectNumberEvent } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,7 @@ import EventModal from '../EventChannelModal';
 export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
-	const { numberEventManagement } = useEventManagement();
+	const numberEventManagement = useSelector(selectNumberEvent);
 	const { showNumEvent, setClanShowNumEvent } = useClans();
 
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -45,11 +45,11 @@ export const Events = () => {
 						{numberEventManagement > 1 && `${numberEventManagement} Events`}
 					</div>
 				</div>
-				{(numberEventManagement !== 0 && showNumEvent) &&
+				{numberEventManagement !== 0 && showNumEvent && (
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
 						<div className="text-white text-xs font-medium">{numberEventManagement}</div>
 					</div>
-				}
+				)}
 			</div>
 
 			<Link
@@ -65,7 +65,7 @@ export const Events = () => {
 					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">Members</div>
 				</div>
 			</Link>
-			<EventModal open={showModal} onClose={closeModal} />
+			{showModal && <EventModal onClose={closeModal} numberEventManagement={numberEventManagement} />}
 		</>
 	);
 };
