@@ -30,12 +30,12 @@ import {
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
+import { Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, isVideo, splitBlockCodeRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, linkGoogleMeet, splitBlockCodeRegex, isVideo } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
@@ -249,11 +249,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const channelId = channel?.channel_id;
 			const clanId = channel?.clan_id;
 
-			if (type === ChannelType.CHANNEL_TYPE_VOICE) {
-				Toast.show({
-					type: 'info',
-					text1: 'Updating...',
-				});
+			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
+          const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+          const urlSupported = await Linking.canOpenURL(urlVoice);
+           if(urlSupported)
+            Linking.openURL(urlVoice)
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);

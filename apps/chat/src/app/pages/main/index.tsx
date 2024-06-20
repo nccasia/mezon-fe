@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist } from '@mezon/store';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -31,7 +31,9 @@ function MyApp() {
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
+	const { setCloseMenu, setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {

@@ -1,11 +1,11 @@
 import { channelsActions, messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
-import { useReference } from './useReference';
 import { useSelector } from 'react-redux';
+import { ChannelStreamMode } from 'mezon-js';
 
 export type UseThreadMessage = {
 	channelId: string;
@@ -66,11 +66,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			if (!client || !session || !socket || !thread || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			if (mode === 4) {
-				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
-			} else {
-				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
-			}
+			await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
 		},
 		[sessionRef, clientRef, socketRef, thread, currentClanId, mode, channelId, channelLabel],
 	);

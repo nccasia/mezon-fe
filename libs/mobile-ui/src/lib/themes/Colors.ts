@@ -147,6 +147,7 @@ const colors = {
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',
+  midnightIndigoBg: '#3b426e',
 	// background button
 	pink: '#e148c7',
 	bgButton: '#5865f2',
@@ -154,7 +155,7 @@ const colors = {
 	bgToggleOffBtn: '#c3c3c3',
 	charcoalBlack: '#1e1f22',
 	mentionBg: 'rgba(60, 66, 112, 0.5)',
-  darkGray: '#333333'
+  darkGray: '#333333',
 };
 
 export { colors, lightThemeColor, darkThemeColor };

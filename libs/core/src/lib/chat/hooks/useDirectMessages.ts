@@ -1,7 +1,7 @@
 import {
 	directActions,
 	messagesActions,
-	selectCurrentChannel,
+	selectDirectById,
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -22,7 +22,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
-	const channel = useSelector(selectCurrentChannel);
+	const channel = useSelector(selectDirectById(channelId));
 
 	const sendDirectMessage = React.useCallback(
 		async (content: IMessageSendPayload,
@@ -37,8 +37,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
-
-			await socket.writeChatMessage('DM', channel.id, channel.channel_label ?? '', mode, content, mentions, attachments, references);
+			await socket.writeChatMessage('DM', channel.id, '', mode, content, mentions, attachments, references);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {

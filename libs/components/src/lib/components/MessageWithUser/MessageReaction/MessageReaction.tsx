@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useEffect, useRef, useState } from 'react';
@@ -35,7 +35,16 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 	const { emojiListPNG } = useEmojiSuggestion();
 	const currentChannel = useSelector(selectCurrentChannel);
-
+	const [channelLabel, setChannelLabel] = useState("");
+	const direct = useSelector(selectDirectById(message.channel_id));
+	
+	useEffect(()=>{
+		if (direct != undefined) {
+			setChannelLabel("")
+		} else {
+			setChannelLabel(currentChannel?.channel_label || "")
+		}
+	},[message])
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,
@@ -47,8 +56,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	) {
 		await reactionMessageDispatch(id, 
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannelId,
-			currentChannel?.channel_label ?? '',
+			message.channel_id,
+			channelLabel ?? '',
 			messageId ?? '', 
 			emoji ?? '', 1, message_sender_id ?? '', false);
 	}

@@ -1,10 +1,11 @@
+import { SpeakerIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmojiImage, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
+import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import {
 	channelIdRegex,
@@ -16,6 +17,7 @@ import {
 	splitBlockCodeRegex,
 	urlRegex,
 } from '../../../../../app/utils/helpers';
+import FastImage from 'react-native-fast-image';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -32,6 +34,11 @@ export default function openUrl(url, customCallback) {
  * Todo: move to helper
  */
 export const EDITED_FLAG = 'edited-flag';
+export const TYPE_MENTION = {
+	userMention: '@',
+	hashtag: '#',
+	voiceChannel: '##voice',
+};
 /**
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
@@ -86,7 +93,7 @@ export const markdownStyles = {
 	mention: {
 		fontSize: size.medium,
 		color: Colors.textGray,
-		backgroundColor: Colors.bgMention,
+		backgroundColor: '#3b426e',
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -99,6 +106,18 @@ export const markdownStyles = {
 	hr: {
 		backgroundColor: Colors.white,
 		height: 2,
+	},
+	voiceChannel: {
+		backgroundColor: Colors.midnightIndigoBg,
+		flexDirection: 'row',
+		gap: size.s_2,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	textVoiceChannel: {
+		fontSize: size.medium,
+		color: Colors.textGray,
+		lineHeight: size.s_20,
 	},
 };
 
@@ -142,6 +161,16 @@ export const renderRulesCustom = {
 		}
 
 		if (payload.startsWith('@') || payload.startsWith('#')) {
+			if (payload.includes('##voice')) {
+				return (
+					<Text key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+						<View style={[styles.voiceChannel]}>
+							<SpeakerIcon style={{ bottom: 0 }} width={12} height={12} color={Colors.white} />
+							<Text style={styles.textVoiceChannel}>{content}</Text>
+						</View>
+					</Text>
+				);
+			}
 			return (
 				<Text key={node.key} style={[styles.mention]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 					{content}
@@ -320,13 +349,15 @@ const RenderTextContent = React.memo(
 				style={markdownStyles as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
-					if (url.startsWith('@')) {
+					if (url.startsWith(TYPE_MENTION.userMention)) {
 						onMention && onMention(url);
 						return false;
 					}
-
-					if (url.startsWith('#')) {
-						const channelId = url.slice(1);
+					if (url.startsWith(TYPE_MENTION.hashtag)) {
+						let channelId = url.slice(1);
+						if (url.includes(TYPE_MENTION.voiceChannel)) {
+							channelId = url.replace(`${TYPE_MENTION.voiceChannel}`, '');
+						}
 						const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
 						onChannelMention && onChannelMention(channel);
 						return false;
@@ -355,7 +386,11 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
-						const channel = getChannelById(channelId, channelsEntities);
+						const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
+						if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+							return `[${channel.channel_label}](##voice${channelId})`;
+						}
+
 						return `[#${channel.channel_label}](#${channelId})`;
 					}
 				}

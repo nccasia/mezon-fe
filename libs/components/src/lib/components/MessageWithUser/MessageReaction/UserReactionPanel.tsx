@@ -1,8 +1,9 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type UserReactionPanelProps = {
@@ -14,12 +15,21 @@ type UserReactionPanelProps = {
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
+	const [channelLabel, setChannelLabel] = useState("");
 	const currentChannel = useSelector(selectCurrentChannel);
+	const direct = useSelector(selectDirectById(message.channel_id));
+	useEffect(()=>{
+		if (direct != undefined) {
+			setChannelLabel("")
+		} else {
+			setChannelLabel(currentChannel?.channel_label || "")
+		}
+	},[message])
 	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(id, mode, 
-			currentChannel?.id ?? '', 
-			currentChannel?.channel_label ?? '', 
+			message.channel_id ?? '', 
+			channelLabel ?? '', 
 			messageId, emoji, countRemoved, message_sender_id, true);
 	};
 

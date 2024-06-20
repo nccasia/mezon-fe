@@ -70,6 +70,7 @@ export default class App {
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js'),
 			},
+			icon: join(__dirname, 'favicon.ico'),
 		});
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
@@ -82,13 +83,16 @@ export default class App {
 
 					const url = argv.pop().slice(1);
 
+					console.log('url: ', url);
+
 					if (url) {
 						const index = url.indexOf('=');
 						const dataString = url.substring(index + 1);
+						console.log('dataString: ', dataString);
 
 						if (dataString) {
 							App.mainWindow.webContents.send('send-data-to-renderer', dataString);
-							App.loadMainWindow();
+							// App.loadMainWindow();
 						}
 					}
 				}
@@ -102,6 +106,8 @@ export default class App {
 			App.application.quit();
 			return;
 		}
+
+		App.mainWindow.webContents.openDevTools();
 
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
