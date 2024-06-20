@@ -1,7 +1,6 @@
-import { useAuth, useChannels, useDirect, useSendForwardMessage } from '@mezon/core';
+import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, CrossIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { getSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -15,6 +14,7 @@ import MessageItem from '../../MessageItem';
 import { styles } from './styles';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
+import { selectDirectsOpenlist } from '@mezon/store-mobile';
 
 type OpjectSend = {
 	id: string;
@@ -32,11 +32,10 @@ interface ForwardMessageModalProps {
 const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProps) => {
 	const [searchText, setSearchText] = useState('');
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { listChannels } = useChannels();
 	const { userProfile } = useAuth();
 	const { sendForwardMessage } = useSendForwardMessage();
-	const mezon = useMezon();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);

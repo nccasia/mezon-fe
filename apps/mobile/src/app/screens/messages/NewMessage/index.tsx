@@ -1,7 +1,7 @@
 import { useDirect, useFriends } from '@mezon/core';
 import { ChevronIcon, UserGroupIcon, UserIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { FriendsEntity } from '@mezon/store-mobile';
+import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -14,13 +14,15 @@ import { normalizeString } from '../../../utils/helpers';
 import { styles } from './styles';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { User } from 'mezon-js';
+import { useSelector } from 'react-redux';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const { t } = useTranslation(['']);
 	const { friends: allUser } = useFriends();
-	const { createDirectMessageWithUser, listDM } = useDirect();
+	const { createDirectMessageWithUser } = useDirect();
+	const listDM = useSelector(selectDirectsOpenlist);
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
 	}, [allUser]);
