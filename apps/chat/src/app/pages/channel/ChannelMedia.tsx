@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff } from '@mezon/components';
-import { ChannelsEntity } from '@mezon/store-mobile';
+import { ChannelsEntity } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import ChannelMessages from './ChannelMessages';
 
