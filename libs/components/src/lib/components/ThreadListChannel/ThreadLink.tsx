@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectCurrentClan, selectCurrentClanId, selectIsUnreadChannelById } from '@mezon/store';
+import { selectCurrentChannel, selectIsUnreadChannelById } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,7 +19,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const { toChannelPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const currentChanel = useSelector(selectCurrentChannel);
-	const clanId = useSelector(selectCurrentClanId)
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();
@@ -87,7 +86,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			<Link
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full overflow-x-hidden whitespace-nowrap ${(active || isUnReadChannel) ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full overflow-x-hidden whitespace-nowrap ${active || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
 				onClick={() => {

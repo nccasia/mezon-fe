@@ -31,13 +31,10 @@ export function useThreads() {
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
 
-	const setTurnOffThreadMessage = useCallback(
-		() => {
-			setOpenThreadMessageState(false);
-			setValueThread(null);
-		},
-		[dispatch],
-	);
+	const setTurnOffThreadMessage = useCallback(() => {
+		setOpenThreadMessageState(false);
+		setValueThread(null);
+	}, [dispatch]);
 
 	const setOpenThreadMessageState = useCallback(
 		(value: boolean) => {
@@ -79,9 +76,13 @@ export function useThreads() {
 		return threads;
 	}, [channels, currentChannel, currentChannelId]);
 
-	const threadChannelOld = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) > 30);
+	const threadChannelOld = useMemo(() => {
+		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) > 30);
+	}, [threadChannel]);
 
-	const threadChannelOnline = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
+	const threadChannelOnline = useMemo(() => {
+		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
+	}, [threadChannel]);
 
 	const threadCurrentChannel = useMemo(() => {
 		if (listThreadId && currentChannelId) {
