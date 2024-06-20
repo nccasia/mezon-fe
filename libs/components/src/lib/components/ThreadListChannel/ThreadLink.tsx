@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectCurrentClanId, selectIsUnreadChannelById } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClan, selectCurrentClanId, selectIsUnreadChannelById } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,9 +59,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
-	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
-
+	const { closeMenu, setStatusMenu } = useMenu();
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = (thread: IChannel) => {
 		setOpenEditMessageState(false);

@@ -1,6 +1,6 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
-import { channelsActions, selectCloseMenu, selectCurrentChannel, selectIsShowMemberList, selectShowScreen, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { useDragAndDrop, useMenu, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -23,9 +23,7 @@ export default function ChannelMain() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
-	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const { isSearchMessage } = useSearchMessages();
 

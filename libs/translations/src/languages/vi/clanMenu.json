@@ -3,28 +3,28 @@
         "watchMenu": {
             "title": "",
             "markAsRead": "Đánh dấu đã đọc",
-            "browseChannels": "Tìm channel"
+            "browseChannels": "Tìm kênh"
         },
         "organizationMenu": {
             "title": "",
-            "createChannel": "Tạo channel",
-            "createCategory": "Tạo category",
+            "createChannel": "Tạo kênh",
+            "createCategory": "Tạo danh mục",
             "createEvent": "Tạo sự kiên"
         },
         "optionsMenu": {
             "title": "",
-            "editServerProfile": "Sửa hồ sơ clan",
-            "showAllChannels": "Hiện tất cả các channels",
-            "hideMutedChannels": "Ẩn tất cả các channels",
+            "editServerProfile": "Sửa hồ sơ máy chủ",
+            "showAllChannels": "Hiện tất cả các kênh",
+            "hideMutedChannels": "Ẩn tất cả các kênh",
             "allowDirectMessage": "Cho phép gửi tin nhắn trực tiếp",
             "allowMessageRequest": "Cho phép gửi yêu cầu tin nhắn",
-            "reportServer": "Báo cáo clan",
-            "leaveServer": "Rời clan"
+            "reportServer": "Báo cáo máy chủ",
+            "leaveServer": "Rời máy chủ"
         },
         "devMode": {
             "title": "Chế độ nhà phát triển",
-            "copyServerID": "Sao chép ID clan",
-            "serverIDCopied": "Đã sao chép ID clan"
+            "copyServerID": "Sao chép ID máy chủ",
+            "serverIDCopied": "Đã sao chép ID máy chủ"
         }
     },
     "actions": {

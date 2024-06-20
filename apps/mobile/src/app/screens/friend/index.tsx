@@ -10,18 +10,16 @@ import { normalizeString } from '../../utils/helpers';
 import { ChevronIcon, PaperPlaneIcon } from '@mezon/mobile-components';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { FriendListByAlphabet } from '../../components/FriendListByAlphabet';
-import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { FriendsEntity } from '@mezon/store-mobile';
 import { EFriendItemAction } from '../../components/FriendItem';
 import { User } from 'mezon-js';
 import { UserInformationBottomSheet } from '../../components/UserInformationBottomSheet';
-import { useSelector } from 'react-redux';
 
 export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
     const { t } = useTranslation(['common', 'friends']);
     const { friends: allUser } = useFriends();
-    const { createDirectMessageWithUser } = useDirect();
-    const listDM = useSelector(selectDirectsOpenlist);
+    const { createDirectMessageWithUser, listDM } = useDirect();
     const friendList: FriendsEntity[] = useMemo(() => {
         return allUser.filter((user) => user.state === 0)
     }, [allUser]);

@@ -839,7 +839,7 @@ export function LocationIcon({ width = 24, height = 24, color = 'white', ...prop
 			/>
 		</Svg>
 	);
-}
+};
 
 export function ShareIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
@@ -890,18 +890,3 @@ export function CircleExclamation({ width = 24, height = 24, color = '#a1a1a9', 
 	)
 }
 
-export function AvatarUser({ width = 24, height = 24, ...props }: SvgProps) {
-	return (
-    <Svg  width= {width} height = {height}  viewBox="0 0 128 128" {...props}>
-      <Circle cx={64} cy={64} fill="#4B5F83" r={64} />
-      <Path
-        d="M64 99h35c0-16-10.4-29-24.6-33.4C80.1 62 84 55.7 84 48.5c0-11-9-20-20-20"
-        fill="#E6E6E6"
-      />
-      <Path
-        d="M64 28.5c-11 0-20 9-20 20 0 7.2 3.9 13.6 9.6 17.1C39.4 70 29 83 29 99h35"
-        fill="#FFF"
-      />
-    </Svg>
-	)
-}

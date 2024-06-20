@@ -11,7 +11,7 @@
   },
   "notifySettingThreadModal": {
     "headerTitleMuteThread": "Tắt thông báo chủ đề này",
-    "headerTitleMuteChannel": "Tắt thông báo channel này",
+    "headerTitleMuteChannel": "Tắt thông báo kênh này",
     "muteDuration": {
       "forFifteenMinutes": "Trong 15 phút",
       "forOneHour": "Trong 1 giờ",

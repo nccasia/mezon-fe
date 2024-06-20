@@ -20,10 +20,10 @@
         },
         "devMode": {
             "title": "Development Mode",
-            "copyServerID": "Copy Clan ID"
+            "copyServerID": "Copy Server ID"
         }
     },
     "notify": {
-        "serverIDCopied": "Copied Clan ID"
+        "serverIDCopied": "Copied Server ID"
     }
 }

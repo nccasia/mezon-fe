@@ -7,13 +7,14 @@ import {
 	useChatReaction,
 	useDragAndDrop,
 	useGifsStickersEmoji,
+	useMenu,
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, directActions, selectCloseMenu, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectMessageByChannelId, selectReactionTopState, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectMessageByChannelId, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -60,8 +61,7 @@ export default function DirectMessage() {
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { idMessageRefReaction } = useReference();
 	const { subPanelActive } = useGifsStickersEmoji();
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+	const { closeMenu, statusMenu } = useMenu();
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
 	const { positionOfSmileButton } = useChatReaction();
@@ -87,8 +87,6 @@ export default function DirectMessage() {
 			setDraggingState(true);
 		}
 	};
-	const checkTypeDm = useMemo(() => Number(type) === ChannelType.CHANNEL_TYPE_GROUP ? isShowMemberListDM : isUseProfileDM, [isShowMemberListDM, isUseProfileDM, type]);
-
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
@@ -100,8 +98,8 @@ export default function DirectMessage() {
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row h-full w-full">
-					<div className={`flex-col flex-1 w-full h-full max-h-messageViewChatDM ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}>
+				<div className="flex flex-row ">
+					<div className="flex flex-col flex-1 w-full h-full max-h-messageViewChatDM">
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink" ref={messagesContainerRef}>
 							{
 								<ChannelMessages
@@ -181,12 +179,12 @@ export default function DirectMessage() {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<div className={`dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}>
+						<div className={`w-[241px] dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'}`}>
 							<MemberListGroupChat directMessageId={directId} />
 						</div>
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
-						<div className={`dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}>
+						<div className={`w-[340px] dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'}`}>
 							<ModalUserProfile 
 								userID = {Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id} 
 								classWrapper='w-full' 

@@ -1,5 +1,5 @@
-import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
-import { channelsActions, selectAllAccount, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
+import { useAppNavigation, useAppParams, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
+import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
 import { ChannelType } from 'mezon-js';
@@ -11,7 +11,6 @@ import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
 import { Spinner } from 'flowbite-react';
-import { useSelector } from 'react-redux';
 
 export type ChannelLinkProps = {
 	clanId?: string;
@@ -41,8 +40,8 @@ export const classes = {
 };
 
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
-	const userProfile = useSelector(selectAllAccount);
-	const currentClan = useSelector(selectCurrentClan);
+	const { userProfile } = useAuth();
+	const { currentClan } = useClans();
 	const voice = useMezonVoice();
 
 	const [openSetting, setOpenSetting] = useState(false);
@@ -107,8 +106,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		setIsShowPanelChannel(false);
 	};
 
-	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
+	const { closeMenu, setStatusMenu } = useMenu();
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
 		setTurnOffThreadMessage();

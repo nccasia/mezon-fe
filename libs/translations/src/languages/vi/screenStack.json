@@ -1,8 +1,8 @@
 {
     "menuClanStack": {
-        "categoryCreator": "Tạo Category",
-        "channelCreator": "Tạo Channel",
-        "clanSetting": "Cài đặt Clan",
+        "categoryCreator": "Tạo Danh mục",
+        "channelCreator": "Tạo Kênh",
+        "clanSetting": "Cài đặt máy chủ",
         "clanOverviewSetting": "Tổng quan"
     }
 }

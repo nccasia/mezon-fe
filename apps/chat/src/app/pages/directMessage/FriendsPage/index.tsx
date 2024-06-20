@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
-import { FriendsEntity, RootState, channelsActions, friendsActions, requestAddFriendParam, selectCloseMenu, selectMemberStatus, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { FriendsEntity, RootState, channelsActions, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -84,9 +84,7 @@ export default function FriendsPage() {
 
 	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
 
-	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">

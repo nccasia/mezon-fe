@@ -1,10 +1,10 @@
 {
-  "title": "Tùy Chỉnh Clan Của Bạn",
-  "subTitle": "Tạo cho clan mới của bạn một phong cách riêng với tên và biểu tượng. Bạn luôn có thể thay đổi nó sau này.",
-  "clanName": "Tên Clan",
-  "createServer": "Tạo Clan",
-  "byCreatingClan":"Bằng cách tạo clan, bạn đồng ý với Mezon",
+  "title": "Tùy Chỉnh Máy Chủ Của Bạn",
+  "subTitle": "Tạo cho bang hội mới của bạn một phong cách riêng với tên và biểu tượng. Bạn luôn có thể thay đổi nó sau này.",
+  "clanName": "Tên Bang Hội",
+  "createServer": "Tạo Máy Chủ",
+  "byCreatingClan":"Bằng cách tạo bang hội, bạn đồng ý với Mezon",
   "upload": "TẢI LÊN",
-  "addClan": "Tạo clan",
-  "errorMessage": "Vui lòng nhập tên channel hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
+  "addClan": "Tạo Bang Hội",
+  "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
 }

@@ -8,6 +8,7 @@ import {
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
+	useMenu,
 	useMessageValue,
 	useReference,
 	useThreads,
@@ -16,13 +17,11 @@ import {
 	ChannelsEntity,
 	channelUsersActions,
 	referencesActions,
-	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
-	selectStatusMenu,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -370,8 +369,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const { openReplyMessageState, openEditMessageState } = useReference();
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+	const { closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
 		if (closeMenu && statusMenu) {
 			return;

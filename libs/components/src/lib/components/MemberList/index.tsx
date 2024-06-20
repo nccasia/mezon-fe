@@ -1,5 +1,5 @@
-import { useChannelMembers } from '@mezon/core';
-import { ChannelMembersEntity, selectCloseMenu, selectCurrentChannelId } from '@mezon/store';
+import { useChannelMembers, useMenu } from '@mezon/core';
+import { ChannelMembersEntity, selectCurrentChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import MemberItem from './MemberItem';
 
@@ -8,7 +8,7 @@ export type MemberListProps = { className?: string };
 function MemberList() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannelId });
-	const closeMenu = useSelector(selectCloseMenu);
+	const { closeMenu } = useMenu();
 
 	return (
 		<div className={`self-stretch h-[268px] flex-col justify-start items-start flex p-4 gap-[24px] w-full ${closeMenu ? 'pt-20' : 'pt-4'}`}>

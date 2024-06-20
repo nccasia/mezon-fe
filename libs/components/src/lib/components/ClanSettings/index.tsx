@@ -4,10 +4,9 @@ import ClanSettingOverview from './ClanSettingOverview';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
+import { useMenu } from '@mezon/core';
 import * as Icons from '../Icons';
 import DeleteClanModal from '../DeleteClanModal';
-import { useSelector } from 'react-redux';
-import { selectCloseMenu } from '@mezon/store';
 
 export type ModalSettingProps = {
 	open: boolean;
@@ -21,7 +20,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 		setCurrentSetting(settingItem);
 	};
 	const [menu, setMenu] = useState(true);
-	const closeMenu = useSelector(selectCloseMenu);
+	const { closeMenu } = useMenu();
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
 	useEffect(()=>{
 		if(currentSetting.id === ItemSetting.DELETE_SERVER){

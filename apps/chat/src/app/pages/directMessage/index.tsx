@@ -1,16 +1,13 @@
 import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
-import { useAuth, useEscapeKey } from '@mezon/core';
+import { useAuth, useEscapeKey, useMenu } from '@mezon/core';
 import { useState } from 'react';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
-import { useSelector } from 'react-redux';
-import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
 
 export default function Direct() {
 	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+	const { statusMenu, closeMenu } = useMenu();
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};

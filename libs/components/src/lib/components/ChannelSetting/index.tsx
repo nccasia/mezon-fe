@@ -7,8 +7,7 @@ import PermissionsChannel from './Component/PermissionsChannel';
 import ChannelSettingItem from './channelSettingItem';
 import ExitSetting from './exitSetting';
 import * as Icons from '../Icons';
-import { useSelector } from 'react-redux';
-import { selectCloseMenu } from '@mezon/store';
+import { useMenu } from '@mezon/core';
 
 export type ModalSettingProps = {
 	open: boolean;
@@ -28,7 +27,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 		}
 	};
 
-	const closeMenu = useSelector(selectCloseMenu);
+	const { closeMenu } = useMenu();
 
 	return (
 		<div>

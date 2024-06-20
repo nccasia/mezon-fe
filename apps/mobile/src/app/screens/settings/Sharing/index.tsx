@@ -1,7 +1,7 @@
-import { useCategory, useReference } from '@mezon/core';
+import { useCategory, useDirect, useReference } from '@mezon/core';
 import { CloseIcon, PenIcon, SearchIcon, SendIcon, getAttachmentUnique } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { channelsActions, directActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -18,7 +18,7 @@ import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
-	const listDM = useSelector(selectDirectsOpenlist);
+	const { listDM } = useDirect();
 	const { categorizedChannels } = useCategory();
 	const currentClan = useSelector(selectCurrentClan);
 	const mezon = useMezon();

@@ -15,15 +15,15 @@
         },
         "organizationMenu": {
             "title": "",
-            "createChannel": "Tạo Channel",
+            "createChannel": "Tạo Kênh",
             "edit": "Chỉnh sửa Thể loại"
         },
         "devMode": {
             "title": "Chế độ Phát triển",
-            "copyServerID": "Sao chép ID Clan"
+            "copyServerID": "Sao chép ID Máy chủ"
         }
     },
     "notify": {
-        "serverIDCopied": "Đã sao chép ID Clan"
+        "serverIDCopied": "Đã sao chép ID Máy chủ"
     }
 }
