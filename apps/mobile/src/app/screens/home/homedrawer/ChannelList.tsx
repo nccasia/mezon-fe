@@ -31,7 +31,9 @@ const ChannelList = React.memo((props: any) => {
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
-	const { allEventManagement } = useEventManagement();
+	// const { allEventManagement } = useEventManagement();
+	//TODO: update later
+	const allEventManagement = [];
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
