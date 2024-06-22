@@ -17,7 +17,6 @@ export function useSeenMessagePool() {
 			dispatch(
 				messagesActions.updateLastSeenMessage({
 					channelId: action.channelId,
-					channelLabel: action.channelLabel,
 					messageId: action.messageId,
 				}),
 			);

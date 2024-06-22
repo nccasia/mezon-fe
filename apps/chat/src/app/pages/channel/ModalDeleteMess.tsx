@@ -1,7 +1,8 @@
 import { MessageWithUser } from '@mezon/components';
-import { useDeleteMessage } from '@mezon/core';
+import { useDeleteMessage,  } from '@mezon/core';
 import { selectMemberClanByUserId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 type ModalDeleteMessProps = {
@@ -19,6 +20,25 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		mode: mode,
 	});
 
+	const handleDeleteMess = () => {
+		DeleteSendMessage(mess.id);
+		closeModal();
+	}
+
+	const handleEnter = (e: any) => {
+		if (e.key === 'Enter') {
+        	handleDeleteMess(); 
+      	}
+	}
+
+	useEffect(() =>{
+		document.addEventListener('keydown', handleEnter);
+
+		return () => {
+			document.removeEventListener('keydown', handleEnter);
+			};
+	},[])
+	
 	return (
 		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
@@ -42,10 +62,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 							Cancel
 						</button>
 						<button
-							onClick={() => {
-								DeleteSendMessage(mess.id);
-								closeModal();
-							}}
+							onClick={handleDeleteMess}
 							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white"
 						>
 							Delete

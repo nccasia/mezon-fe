@@ -1,8 +1,5 @@
-import { selectDataReactionGetFromMessage, selectDataSocketUpdate } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { updateEmojiReactionData } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useClans } from './useClans';
 
 export type UseMessageReactionOption = {
@@ -11,10 +8,6 @@ export type UseMessageReactionOption = {
 
 export function useChatReaction() {
 	const { currentClanId } = useClans();
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-	const dataReactionSocket = useSelector(selectDataSocketUpdate);
-	const combineDataServerAndSocket = [...reactDataFirstGetFromMessage, ...dataReactionSocket];
-	const convertReactionToMatchInterface = updateEmojiReactionData(combineDataServerAndSocket);
 	const { clientRef, sessionRef, socketRef } = useMezon();
 
 	const reactionMessageDispatch = useCallback(
@@ -22,7 +15,6 @@ export function useChatReaction() {
 			id: string,
 			mode: number,
 			channelId: string,
-			channelLabel: string,
 			messageId: string,
 			emoji: string,
 			count: number,
@@ -36,7 +28,7 @@ export function useChatReaction() {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeMessageReaction(id, channelId, channelLabel, mode, messageId, emoji, count, message_sender_id, action_delete);
+			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId],
 	);
@@ -49,8 +41,7 @@ export function useChatReaction() {
 	return useMemo(
 		() => ({
 			reactionMessageDispatch,
-			convertReactionToMatchInterface,
 		}),
-		[reactionMessageDispatch, convertReactionToMatchInterface],
+		[reactionMessageDispatch],
 	);
 }

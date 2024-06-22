@@ -1,9 +1,9 @@
-import { useClans } from '@mezon/core';
 import TableMemberHeader from './TableMemberHeader';
 import TableMemberItem from './TableMemberItem';
-
+import { useSelector } from 'react-redux';
+import { selectAllUsesClan } from '@mezon/store';
 const TableMember = () => {
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	return (
 		<div className="flex flex-col flex-1 min-h-[48px]">
 			<TableMemberHeader />

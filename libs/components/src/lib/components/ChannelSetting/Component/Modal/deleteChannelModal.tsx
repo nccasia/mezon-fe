@@ -1,4 +1,4 @@
-import { useAppNavigation, useClans } from '@mezon/core';
+import { useAppNavigation } from '@mezon/core';
 import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 interface DeleteModalProps {
 	onClose: () => void;
 	onCloseModal?: () => void;
-	channelLable: string;
+	channelLabel: string;
 	channelId: string;
 }
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal, channelLable, channelId }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal, channelLabel, channelId }) => {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -42,7 +42,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 			<div className="relative z-10 dark:bg-gray-900 bg-bgLightModeSecond p-6 rounded-[5px] text-center">
 				<h2 className="text-[30px] font-semibold mb-4">Delete Channel</h2>
 				<p className="text-white-600 mb-6 text-[16px]">
-					Are you sure you want to delete <b>{channelLable}</b>?This cannot be undone.
+					Are you sure you want to delete <b>{channelLabel}</b>?This cannot be undone.
 				</p>
 				<div className="flex justify-center mt-10 text-[14px]">
 					<button

@@ -1,9 +1,10 @@
-import { useApp, useChannels, useNotification } from '@mezon/core';
-import { INotification } from '@mezon/store';
+import { useChannels, useNotification } from '@mezon/core';
+import { INotification, selectTheme } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
+import { useSelector } from 'react-redux';
 
 export type MemberListProps = { className?: string };
 
@@ -27,7 +28,7 @@ function NotificationList() {
 	const notifyMentionItem = notification.filter(
 		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
 	);
-	const {appearanceTheme} = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
 		if (currentTabNotify === 'mention' && tabMentionRef.current) {
 			tabMentionRef.current.scrollTop = -tabMentionRef.current.scrollHeight;

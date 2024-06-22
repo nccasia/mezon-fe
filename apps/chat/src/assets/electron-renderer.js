@@ -35,7 +35,8 @@ window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   if (serverNotificationPayload.notification.body) {
 
     new Notification(serverNotificationPayload.notification.title, {
-      body: serverNotificationPayload.notification.body
+      body: serverNotificationPayload.notification.body,
+      icon: serverNotificationPayload.notification.image
     })
   } else {
     console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);

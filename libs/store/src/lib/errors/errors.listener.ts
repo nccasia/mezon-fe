@@ -47,7 +47,7 @@ function normalizeError(error: any) {
 		return getErrorFromRejectedWithValue(error);
 	}
 
-	return null;
+	return error;
 }
 
 function createErrorToast(error: any): ToastPayload {

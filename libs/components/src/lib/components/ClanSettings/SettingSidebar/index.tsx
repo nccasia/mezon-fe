@@ -1,4 +1,3 @@
-import { useClans } from '@mezon/core';
 import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';

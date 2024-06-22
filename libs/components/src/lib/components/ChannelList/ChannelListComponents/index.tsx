@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useClans } from '@mezon/core';
-import { selectCurrentClanId, selectNumberEvent } from '@mezon/store';
+import { selectCurrentClanId, selectNumberEvent, selectShowNumEvent } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -10,10 +10,10 @@ export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const numberEventManagement = useSelector(selectNumberEvent);
-	const { showNumEvent, setClanShowNumEvent } = useClans();
-
+	
+	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
-
+	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const [showModal, setShowModal] = useState(false);
 
 	const closeModal = () => {

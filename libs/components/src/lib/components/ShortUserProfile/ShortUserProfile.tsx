@@ -13,9 +13,9 @@ const ShortUserProfile = ({ userID }: ShortUserProfilePopup) => {
 	};
 	return (
 		<div className="relative">
-			<button onClick={handleClickOutside} className="text-white w-full">
+			<div onClick={handleClickOutside} className="text-white w-full" role='button'>
 				<ModalUserProfile userID={userID} />
-			</button>
+			</div>
 		</div>
 	);
 };

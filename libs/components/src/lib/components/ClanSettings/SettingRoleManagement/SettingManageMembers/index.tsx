@@ -29,7 +29,7 @@ const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	useEffect(() => {
 		const results = commonUsers?.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
 		setSearchResults(results || []);
-	}, [searchTerm, addUsers, clickRole, commonUsers]);
+	}, [searchTerm, addUsers, clickRole]);
 
 	useEffect(() => {
 		if (clickRole !== 'New Role') {

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Icons } from '../../../components';
 import { useApp } from '@mezon/core';
+import { useSelector } from 'react-redux';
+import { selectTheme } from '@mezon/store';
 
 const ThemeOptions = () => {
-	const { appearanceTheme, setAppearanceTheme, systemIsDark } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
+	const { setAppearanceTheme, systemIsDark } = useApp();
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
 
 	const onWindowMatch = () =>{

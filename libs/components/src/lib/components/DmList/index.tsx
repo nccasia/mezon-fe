@@ -1,5 +1,5 @@
-import { useApp, useEscapeKey } from '@mezon/core';
-import { selectDirectsOpenlist, useAppDispatch } from '@mezon/store';
+import { useEscapeKey } from '@mezon/core';
+import { selectDirectsOpenlist, selectTheme, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
@@ -58,7 +58,7 @@ function DirectMessageList() {
 	};
 
 	useEscapeKey(() => setIsOpen(false));
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
 			<div className="absolute">

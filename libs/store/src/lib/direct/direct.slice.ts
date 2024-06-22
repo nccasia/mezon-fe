@@ -9,6 +9,7 @@ import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { attachmentActions } from '../attachment/attachments.slice';
+import { clansActions } from '../clans/clans.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -57,6 +58,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
+			thunkAPI.dispatch(clansActions.joinClan({clanId: '0'}));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -104,14 +106,14 @@ type fetchDmGroupArgs = {
 	noCache?: boolean;
 };
 
-export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2, noCache }: fetchDmGroupArgs, thunkAPI) => {	
+export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2, noCache }: fetchDmGroupArgs, thunkAPI) => {
 	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		fetchChannelsCached.clear(mezon,100,1, '', channelType);
 	}
-	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);	
-	
+	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
+
 	if (!response.channeldesc) {
 		return [];
 	}
@@ -183,11 +185,11 @@ export const directSlice = createSlice({
 			const timestamp = (Date.now() / 1000).toString();
 			directAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: { last_sent_message: { 
+				changes: { last_sent_message: {
 					content: payload.content,
 					id: payload.id,
 					sender_id: payload.sender_id,
-					timestamp: timestamp, 
+					timestamp: timestamp,
 				} },
 			});
 		},
@@ -196,11 +198,11 @@ export const directSlice = createSlice({
 			const timestamp = (Date.now() / 1000).toString();
 			directAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: { last_seen_message: { 
+				changes: { last_seen_message: {
 					content: payload.content,
 					id: payload.id,
 					sender_id: payload.sender_id,
-					timestamp: timestamp, 
+					timestamp: timestamp,
 				} },
 			});
 		},
@@ -232,11 +234,11 @@ export const directSlice = createSlice({
 				channel.notifiCount = 0
 				directAdapter.updateOne(state, {
 					id: action.payload.channelId,
-					changes: { 
+					changes: {
 						count_mess_unread: 0
 					},
 				});
-				
+
 			}
 		},
 		setNotifiDirectCount: (state, action: PayloadAction<{ channelId: string, notifiCount: number }>) => {
@@ -316,5 +318,5 @@ export const selectDirectsOpenlist = createSelector(
 	}
 );
 
-export const selectDirectById = (id: string) => 
+export const selectDirectById = (id: string) =>
 createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);

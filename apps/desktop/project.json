@@ -1,96 +1,111 @@
 {
-	"name": "desktop",
-	"$schema": "../../node_modules/nx/schemas/project-schema.json",
-	"sourceRoot": "apps/desktop/src",
-	"projectType": "application",
-	"targets": {
-		"build": {
-			"executor": "nx-electron:build",
-			"outputs": [
-				"{options.outputPath}"
-			],
-			"options": {
-				"outputPath": "dist/apps/desktop",
-				"main": "apps/desktop/src/main.ts",
-				"tsConfig": "apps/desktop/tsconfig.app.json",
-				"assets": [
-					{
-						"glob": "**/*",
-						"input": "apps/desktop/src/assets/",
-						"output": "./assets/"
-					},
-					{
-						"glob": "**/*",
-						"input": "apps/chat/src/assets/",
-						"output": "./assets/"
-					},
-					{
-						"glob": "**/*",
-						"input": "libs/assets/src/assets/",
-						"output": "./assets/"
-					},
-					{
-						"glob": "apps/chat/src/assets/favicon.ico",
-						"input": "./",
-						"output": "./"
-					},
-					{
-						"glob": "apps/chat/src/assets/firebase-messaging-sw.js",
-						"input": "./",
-						"output": "./"
-					}
-				]
-			},
-			"configurations": {
-				"production": {
-					"optimization": true,
-					"extractLicenses": true,
-					"inspect": false,
-					"fileReplacements": [
-						{
-							"replace": "apps/desktop/src/environments/environment.ts",
-							"with": "apps/desktop/src/environments/environment.prod.ts"
-						}
-					]
-				}
-			}
-		},
-		"serve": {
-			"executor": "nx-electron:execute",
-			"options": {
-				"buildTarget": "desktop:build"
-			}
-		},
-		"package": {
-			"executor": "nx-electron:package",
-			"options": {
-				"name": "desktop",
-				"frontendProject": "chat",
-				"sourcePath": "dist/apps",
-				"outputPath": "dist/packages",
-				"prepackageOnly": true
-			}
-		},
-		"make": {
-			"executor": "nx-electron:make",
-			"options": {
-				"name": "desktop",
-				"frontendProject": "chat",
-				"sourcePath": "dist/apps",
-				"outputPath": "dist/executables"
-			}
-		},
-		"lint": {
-			"command": "eslint apps/desktop/**/*.ts"
-		},
-		"test": {
-			"executor": "@nx/jest:jest",
-			"outputs": [
-				"{workspaceRoot}/coverage/{projectRoot}"
-			],
-			"options": {
-				"jestConfig": "apps/desktop/jest.config.ts"
-			}
-		}
-	}
+  "name": "desktop",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/desktop/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx-electron:build",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "win": {
+        "icon": "apps/chat/src/assets/icon-desktop.ico",
+        "target": "nsis",
+        "appId": "Mezon"
+      },
+      "options": {
+        "outputPath": "dist/apps/desktop",
+        "main": "apps/desktop/src/main.ts",
+        "tsConfig": "apps/desktop/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/desktop/src/assets/",
+            "output": "./assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/chat/src/assets/",
+            "output": "./assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/assets/src/assets/",
+            "output": "./assets/"
+          },
+          {
+            "glob": "apps/chat/src/assets/favicon.ico",
+            "input": "./",
+            "output": "./"
+          },
+          {
+            "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
+            "input": "./",
+            "output": "./"
+          }
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/desktop/src/environments/environment.ts",
+              "with": "apps/desktop/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "nx-electron:execute",
+      "options": {
+        "buildTarget": "desktop:build"
+      }
+    },
+    "package": {
+      "executor": "nx-electron:package",
+      "options": {
+        "name": "desktop",
+        "frontendProject": "chat",
+        "sourcePath": "dist/apps",
+        "outputPath": "dist/packages",
+        "prepackageOnly": true,
+        "win": {
+          "icon": "apps/chat/src/assets/icon-desktop.ico",
+          "target": "nsis",
+          "appId": "Mezon"
+        }
+      }
+    },
+    "make": {
+      "executor": "nx-electron:make",
+      "options": {
+        "name": "desktop",
+        "frontendProject": "chat",
+        "sourcePath": "dist/apps",
+        "outputPath": "dist/executables",
+        "win": {
+          "icon": "apps/chat/src/assets/icon-desktop.ico",
+          "target": "nsis",
+          "appId": "Mezon"
+        }
+      }
+    },
+    "lint": {
+      "command": "eslint apps/desktop/**/*.ts"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "apps/desktop/jest.config.ts"
+      }
+    }
+  }
 }

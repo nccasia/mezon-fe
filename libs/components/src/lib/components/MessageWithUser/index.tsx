@@ -1,18 +1,17 @@
-import { selectCurrentChannelId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, RightClickPost, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
+import { selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
+import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import classNames from 'classnames';
+import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
+import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
-import { useAuth, useChatMessages, useNotification, useReference } from '@mezon/core';
-import { useSelector } from 'react-redux';
-import MessageContent from './MessageContent';
-import ContextMenu from '../RightClick/ContextMenu';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -35,7 +34,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { openReplyMessageState, idMessageRefReply, idMessageToJump, idMessageRefEdit } = useReference();
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const userLogin = useAuth();
@@ -103,7 +104,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 
 	const messageDividerClass = classNames(
 		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
-		{ hidden: checkSameDay(preMessage?.create_time as string, message?.create_time as string) || isMessNotifyMention }
+		{ hidden: checkSameDay(preMessage?.create_time as string, message?.create_time as string) || isMessNotifyMention },
 	);
 
 	const containerClass = classNames('relative', 'message-container', {
@@ -118,18 +119,16 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ [classNameHighlightParentDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
 		{ [classNameHighlightChildDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 
-	const messageContentClass = classNames(
-		'flex flex-col whitespace-pre-wrap text-base w-full cursor-text',
-	);
+	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
 	return (
 		<>
@@ -149,21 +148,36 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageHead message={message} user={user} isCombine={isCombine} />
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
-										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} isSending={message.isSending} isError={message.isError} />
-										{child?.props.children[1] && React.isValidElement(child?.props.children[1]) && React.cloneElement(child?.props.children[1], propsChild)}
+										<MessageContent
+											message={message}
+											user={user}
+											isCombine={isCombine}
+											newMessage={newMessage}
+											isSending={message.isSending}
+											isError={message.isError}
+										/>
+										{child?.props.children[1] &&
+											React.isValidElement(child?.props.children[1]) &&
+											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
 						{message && !isMessNotifyMention && (
-							<div className={classNames('absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600', { hidden: isCombine })}>
+							<div
+								className={classNames('absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600', {
+									hidden: isCombine,
+								})}
+							>
 								<Icons.Sent />
 							</div>
 						)}
 					</div>
 				</div>
-				{child?.props.children[0] && React.isValidElement(child?.props.children[0]) && React.cloneElement(child?.props.children[0], propsChild)}
+				{child?.props.children[0] &&
+					React.isValidElement(child?.props.children[0]) &&
+					React.cloneElement(child?.props.children[0], propsChild)}
 			</div>
 		</>
 	);

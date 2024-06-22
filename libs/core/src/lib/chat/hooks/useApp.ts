@@ -44,11 +44,10 @@ export function useApp() {
 		() => ({
 			isShowMemberList,
 			setIsShowMemberList,
-			appearanceTheme,
 			setAppearanceTheme,
 			systemIsDark,
 			elementHTML,
 		}),
-		[ isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme, systemIsDark, elementHTML],
+		[ isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark, elementHTML],
 	);
 }

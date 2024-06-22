@@ -1,13 +1,14 @@
-import { useApp, useDMInvite } from "@mezon/core";
+import { useDMInvite } from "@mezon/core";
 import { ChangeEvent, useMemo, useState } from "react";
 import ListMemberInviteItem from "./ListMemberInviteItem"
-import { DirectEntity } from "@mezon/store";
+import { DirectEntity, selectTheme } from "@mezon/store";
+import { useSelector } from "react-redux";
 export type ModalParam = {
     url: string;
     channelID?: string;
 }
 const ListMemberInvite = (props: ModalParam) => {
-    const {appearanceTheme} = useApp();
+    const appearanceTheme = useSelector(selectTheme);
     const { listDMInvite, listUserInvite } = useDMInvite(props.channelID);
     const [searchTerm, setSearchTerm] = useState('');
     const [sendIds, setSendIds] = useState<Record<string, boolean>>({});

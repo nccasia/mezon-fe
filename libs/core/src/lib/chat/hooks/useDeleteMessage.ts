@@ -1,7 +1,6 @@
-import { messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useMemo } from 'react';
-import { useClans } from './useClans';
 import { useSelector } from 'react-redux';
 
 export type UseDeleteMessageOptions = {
@@ -12,7 +11,7 @@ export type UseDeleteMessageOptions = {
 
 export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
-	const { currentClanId } = useClans();
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
@@ -28,7 +27,7 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 			}
 			dispatch(messagesActions.remove(messageId));
 
-			await socket.removeChatMessage(channelId, channel.channel_label ?? '', mode, messageId);
+			await socket.removeChatMessage(channelId, mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, currentClanId, dispatch, channelId, mode],
 	);

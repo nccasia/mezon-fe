@@ -11,7 +11,7 @@ import {
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
-import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
+import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, IMessageWithUser, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -177,9 +177,6 @@ export const updateEmojiReactionData = (data: any[]) => {
 						{
 							sender_id: item.senders[0]?.sender_id ?? '',
 							count: item.senders[0]?.count ?? 0,
-							emojiIdList: [],
-							sender_name: '',
-							avatar: '',
 						},
 					],
 					channel_id: item.channel_id,
@@ -195,14 +192,40 @@ export const updateEmojiReactionData = (data: any[]) => {
 					existingItem.senders.push({
 						sender_id: item.senders[0]?.sender_id ?? '',
 						count: item.senders[0]?.count ?? 0,
-						emojiIdList: [],
-						sender_name: '',
-						avatar: '',
 					});
 				}
 			}
 		});
 	return Object.values(dataItemReaction);
+};
+
+export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
+	const emojiDataItems: Record<string, EmojiDataOptionals> = {};
+	message.reactions!.forEach((reaction) => {
+		const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+
+		if (!emojiDataItems[key]) {
+			emojiDataItems[key] = {
+				id: reaction.id,
+				emoji: reaction.emoji,
+				senders: [
+					{
+						sender_id: reaction.sender_id,
+						count: reaction.count,
+					},
+				],
+				channel_id: message.channel_id,
+				message_id: message.id,
+			};
+		} else {
+			const existingItem = emojiDataItems[key];
+
+			if (existingItem.senders.length > 0) {
+				existingItem.senders[0].count = reaction.count;
+			}
+		}
+	});
+	return Object.values(emojiDataItems);
 };
 
 export const checkLastChar = (text: string) => {

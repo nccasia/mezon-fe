@@ -37,7 +37,6 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				channelId,
 				clanId: currentClanId ?? '',
 				mode,
-				channelLabel,
 				content,
 				mentions,
 				attachments,
@@ -47,11 +46,11 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				senderId: currentUserId,
 			}))
 		},
-		[dispatch, channelId, currentClanId, mode, channelLabel, currentUserId],
+		[dispatch, channelId, currentClanId, mode, currentUserId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
+		dispatch(messagesActions.sendTypingUser({ channelId, mode }));
 	}, [channelId, channelLabel, dispatch, mode]);
 
 	// TODO: why "Edit" not "edit"?
@@ -68,11 +67,8 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			let channelLabelEdit = ""
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				channelLabelEdit = channel?.channel_label || "";
-			} 
-			await socket.updateChatMessage(channelId, channelLabelEdit, mode, messageId, editMessage);
+			
+			await socket.updateChatMessage(channelId, mode, messageId, editMessage);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, mode, channelId],
 	);

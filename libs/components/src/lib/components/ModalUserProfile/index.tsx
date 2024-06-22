@@ -1,7 +1,5 @@
-import { useAuth, useDirect, useSendInviteMessage } from '@mezon/core';
-import { selectCurrentClan, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { ChannelType } from 'mezon-js';
+import { useDirect, useSendInviteMessage } from '@mezon/core';
+import { selectAllAccount, selectMemberByUserId } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -20,14 +18,11 @@ type ModalUserProfileProps = {
 };
 
 const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote }: ModalUserProfileProps) => {
-	const { userProfile } = useAuth();
-	const mezon = useMezon();
+	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 
-	const currentClan = useSelector(selectCurrentClan);
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, userID as string));
 
 	const [content, setContent] = useState<string>('');
 
@@ -75,10 +70,10 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? clanProfile?.nick_name : 'Anonymous'}
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : 'Anonymous'}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById?.user?.display_name : 'Unknown'}
+							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : 'Unknown'}
 						</p>
 					</div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}

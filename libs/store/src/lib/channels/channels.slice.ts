@@ -13,6 +13,7 @@ import { notifiReactMessageActions } from '../notificationSetting/notificationRe
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { threadsActions } from '../threads/threads.slice';
+import { clansActions } from '../clans/clans.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -78,11 +79,11 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
-			}			
+			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setMode('clan'));
-			
+
 			return channel;
 		} catch (error) {
 			console.log(error);
@@ -98,6 +99,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+      thunkAPI.dispatch(clansActions.joinClan({clanId: body.clan_id as string}));
 			if (response.parrent_id !== '0') {
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string }),

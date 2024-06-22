@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
-import { useApp, useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
-import { RootState, channelsActions, selectAllDirectMessages, useAppDispatch } from '@mezon/store';
+import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
+import { RootState, channelsActions, selectAllDirectMessages, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, removeDuplicatesById } from '@mezon/utils';
 import { Button, Checkbox, Label, Modal } from 'flowbite-react';
@@ -20,7 +20,7 @@ type OpjectSend = {
 	channel_label?: string;
 };
 const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
@@ -57,14 +57,13 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
-					selectedObjectIdSend.channel_label || '',
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
 					selectedMessage,
 				);

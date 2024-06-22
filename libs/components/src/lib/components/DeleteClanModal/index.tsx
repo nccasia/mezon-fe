@@ -1,5 +1,7 @@
 import { useClans } from '@mezon/core';
+import { selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import React, { FormEvent, MouseEvent, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 interface DeleteClanModalProps {
@@ -7,7 +9,9 @@ interface DeleteClanModalProps {
 }
 
 const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose }) => {
-	const {deleteClan, currentClanId, currentClan} = useClans();
+	const {deleteClan} = useClans();
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
 	const [inputValue, setInputValue] = useState('');
 	const [inputValueIsMatchClanName, setInputValueIsMatchClanName] = useState(true);
 	const navigate = useNavigate();

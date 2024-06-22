@@ -1,8 +1,7 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
-import { useChatReaction } from '@mezon/core';
-import { selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
-import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount } from '@mezon/utils';
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { selectDataSocketUpdate, selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
+import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount, convertReactionDataFromMessage, updateEmojiReactionData } from '@mezon/utils';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
 
@@ -17,13 +16,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
 	const [checkHasEmoji, setCheckHasEmoji] = useState<boolean>(false);
 	const contentDiv = useRef<HTMLDivElement | null>(null);
-	const { convertReactionToMatchInterface } = useChatReaction();
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
-	const getReactionsByMessageId = (data: EmojiDataOptionals[], mesId: string) => {
-		return data.filter((item: any) => item.message_id === mesId);
-	};
-	const dataReaction = getReactionsByMessageId(convertReactionToMatchInterface, message.id);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
 		if (message.id === idMessageRefReaction) {
@@ -32,12 +26,37 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			return false;
 		}
 	};
+	const [reactionSocketByMessageId, setReationSocketByMessageId] = useState<EmojiDataOptionals[]>([]);
+	function filterByMessageId(array: EmojiDataOptionals[], messageId: string) {
+		return array.filter((item) => item.message_id === messageId);
+	}
+	const dataSocketConvert = useSelector(selectDataSocketUpdate);
+	const [reactionMessage, setReactionMessage] = useState<EmojiDataOptionals[]>([]);
+	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
+
+	useEffect(() => {
+		setReationSocketByMessageId(filterByMessageId(dataSocketConvert, message.id));
+	}, [dataSocketConvert]);
+
+	useEffect(() => {
+		if (message.reactions && message.reactions?.length > 0) {
+			const resultConverted = convertReactionDataFromMessage(message);
+			setReactionMessage(resultConverted);
+		}
+	}, [message]);
+
+	useEffect(() => {
+		const sortedReactionMessage = [...reactionMessage].sort((a, b) => (a?.emoji || '').localeCompare(b?.emoji || ''));
+		const combine = [...sortedReactionMessage, ...reactionSocketByMessageId];
+		const result = updateEmojiReactionData(combine);
+		setDataReactionCombine(result);
+	}, [reactionSocketByMessageId, reactionMessage]);
 
 	useLayoutEffect(() => {
-		if (dataReaction.length === 0) {
+		if (dataReactionCombine.length === 0) {
 			return setCheckHasEmoji(false);
 		}
-		const checkCount = calculateTotalCount(dataReaction[0]!.senders);
+		const checkCount = calculateTotalCount(dataReactionCombine[0]!.senders);
 		const checkCountEmoji = () => {
 			if (checkCount === 0) {
 				setCheckHasEmoji(false);
@@ -46,7 +65,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			}
 		};
 		checkCountEmoji();
-	}, [dataReaction]);
+	}, [dataReactionCombine]);
 
 	return (
 		<div className="relative pl-3">
@@ -64,7 +83,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 					onMouseEnter={() => setShowIconSmile(true)}
 					onMouseLeave={() => setShowIconSmile(false)}
 				>
-					{dataReaction?.map((emoji: EmojiDataOptionals, index: number) => {
+					{dataReactionCombine?.map((emoji: EmojiDataOptionals, index: number) => {
 						return (
 							<Fragment key={`${index + message.id}`}>
 								<ItemEmoji message={message} mode={mode} emoji={emoji} />

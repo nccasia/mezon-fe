@@ -119,7 +119,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 				{showModal && (
 					<DeleteModal
 						onClose={() => setShowModal(false)}
-						channelLable={thread.channel_label || ''}
+						channelLabel={thread.channel_label || ''}
 						channelId={thread.channel_id as string}
 					/>
 				)}

@@ -1,9 +1,7 @@
-import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectCloseMenu, selectStatusMenu } from '@mezon/store';
+import { ForwardMessageModal, MessageModalImage, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
+import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, selectDirectsUnreadlist, selectTheme, selectCloseMenu, selectStatusMenu, selectOpenModalAttachment } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
-import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -12,6 +10,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
 function MyApp() {
+	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
@@ -100,9 +99,23 @@ function MyApp() {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
+	useEffect(()=>{
+		switch(appearanceTheme){
+			case "dark":
+				elementHTML.classList.add('dark');
+				break;
+			case "light":
+				elementHTML.classList.remove('dark');
+				break;
+			default:
+				break;
+		}
+	}, [appearanceTheme])
+	
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const handleClick = useCallback(() => {
 		setOpenOptionMessageState(false);
@@ -189,7 +202,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
-			<MessageModalImage />
+			{openModalAttachment && <MessageModalImage />}
 		</div>
 	);
 }

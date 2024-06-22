@@ -8,7 +8,7 @@ import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 import { useSelector } from 'react-redux';
-import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
+import { selectAttachmentData, selectCloseMenu, selectStatusLoadingAttachment, selectStatusMenu, selectTheme } from '@mezon/store';
 
 export type MessageBoxProps = {
 	readonly onSend: (
@@ -30,8 +30,10 @@ export type MessageBoxProps = {
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const { attachmentDataRef, setAttachmentData, statusLoadingAttachment } = useReference();
-	const {appearanceTheme} = useApp();
+	const { setAttachmentData  } = useReference();
+	const attachmentDataRef = useSelector(selectAttachmentData);
+	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const appearanceTheme = useSelector(selectTheme);
 	const [finishUpload, setFinishUpload] = useState<boolean>(false);
 
 	const onConvertToFiles = useCallback((content: string) => {

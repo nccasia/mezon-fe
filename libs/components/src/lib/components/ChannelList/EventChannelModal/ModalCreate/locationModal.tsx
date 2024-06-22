@@ -1,8 +1,8 @@
-import { useApp } from '@mezon/core';
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity, selectTheme } from '@mezon/store';
 import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import * as Icons from '../../../Icons';
+import { useSelector } from 'react-redux';
 
 export type LocationModalProps = {
 	contentSubmit: ContenSubmitEventProps;
@@ -24,7 +24,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const onChangeTitle = (e: any) => {
 		setContentSubmit((prev) => ({ ...prev, titleEvent: e.target.value }));
 	};
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	useEffect(() => {
 		if (voicesChannel.length <= 0) {

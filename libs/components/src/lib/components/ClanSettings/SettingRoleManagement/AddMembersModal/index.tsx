@@ -31,13 +31,13 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 			const filteredMemberIds = membersNotInRoles.filter((member) => addUsers.includes(member.id)).map((member) => member.id);
 			setSelectedUsers(filteredMemberIds);
 		}
-	}, [addUsers, isOpen, memberRoles, membersNotInRoles]);
+	}, [isOpen, memberRoles]);
 
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 
 	useEffect(() => {
 		setSearchResults(membersNotInRoles);
-	}, [clickRole, memberRoles, membersNotInRoles]);
+	}, [clickRole, memberRoles]);
 
 	const handleUserToggle = (permissionId: string) => {
 		setSelectedUsers((prevPermissions) => {
@@ -52,7 +52,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 	useEffect(() => {
 		const results = membersNotInRoles.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
 		setSearchResults(results);
-	}, [membersNotInRoles, searchTerm]);
+	}, [searchTerm]);
 
 	const handleUpdateRole = async () => {
 		if (clickRole === 'New Role') {

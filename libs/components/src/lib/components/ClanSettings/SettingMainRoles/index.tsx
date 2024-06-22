@@ -2,6 +2,7 @@ import { useApp } from '@mezon/core';
 import {
 	rolesClanActions,
 	selectAllRolesClan,
+	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
 	setNameRoleNew,
@@ -48,8 +49,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
-
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
 			<div className="flex items-center space-x-4">
@@ -104,15 +104,16 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								setOpenEdit={setOpenEdit}
 							/>
 						)}
-						{showModal &&
-							<DeleteModal
-								handleDelete={() => handleDeleteRole(selectedRoleId)}
-								onClose={() => setShowModal(false)}
-							/>
-                    	}
+						
 					</tbody>
 				</table>
 			</div>
+			{showModal &&
+				<DeleteModal
+					handleDelete={() => handleDeleteRole(selectedRoleId)}
+					onClose={() => setShowModal(false)}
+				/>
+			}
 			<ServerSettingRoleManagement flagOption={openEdit} handleClose={() => setOpenEdit(false)} RolesClan={RolesClan}/>
 		</>
 	);

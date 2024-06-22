@@ -1,9 +1,10 @@
-import { useApp, useAppNavigation, useFriends } from '@mezon/core';
-import { IFriend, directActions, useAppDispatch } from '@mezon/store';
+import { useAppNavigation, useFriends } from '@mezon/core';
+import { IFriend, directActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 interface ModalCreateDMProps {
 	onClose: () => void;
@@ -17,7 +18,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const navigate = useNavigate();
 	const { friends } = useFriends();
 	const [length, setLength] = useState<number>(selectedFriends.length);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 

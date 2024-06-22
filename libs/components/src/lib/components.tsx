@@ -30,6 +30,7 @@ export { default as AttachmentPreviewThumbnail } from './components/MessageBox/A
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
+export { default as MessageModalImage } from './components/MessageWithUser/MessageModalImage';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
@@ -55,6 +56,7 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+export { default as ForwardMessageModal } from './components/ForwardMessage';
 
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/Firebase/firebase';

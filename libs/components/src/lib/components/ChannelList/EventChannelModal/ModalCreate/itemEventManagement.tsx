@@ -96,7 +96,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
 						{createTime && isSameDay && (
-							<div className="text-[#7289da] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
+							<div className="text-[#5765F2] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
 						)}
 						<Icons.IconEvents />
 						<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{time}</p>

@@ -70,7 +70,7 @@ export default class App {
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js'),
 			},
-			icon: join(__dirname, 'favicon.ico'),
+			icon: join(__dirname, 'assets', 'favicon.ico'),
 		});
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
@@ -153,6 +153,7 @@ export default class App {
 		if (process.platform == 'win32') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
+      App.application.setAppUserModelId('Mezon');
 		}
 	}
 

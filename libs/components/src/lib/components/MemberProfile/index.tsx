@@ -1,12 +1,12 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentClanId } from '@mezon/store';
 import { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import { OfflineStatus, OnlineStatus } from '../Icons';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
-import { useSelector } from 'react-redux';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -53,6 +53,7 @@ function MemberProfile({
 
 	const { removeMemberClan } = useChannelMembers();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const userProfile = useSelector(selectAllAccount);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -145,15 +146,15 @@ function MemberProfile({
 								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>
 									{!status ? 'Offline' : 'Online'}
 								</span>
-								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode">{name}</p>
+								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode">{userProfile?.user?.username}</p>
 							</>
 						)}
 					</div>
 					{!isHideUserName && (
 						<p
 							className={`text-base font-medium
-							${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile 
-							${(isUnReadDirect) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+							${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile
+							${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

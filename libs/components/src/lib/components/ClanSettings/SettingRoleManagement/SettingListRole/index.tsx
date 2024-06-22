@@ -1,5 +1,5 @@
 import { useApp } from '@mezon/core';
-import { RolesClanEntity, getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
+import { RolesClanEntity, getIsShow, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../Icons';
@@ -9,7 +9,7 @@ type closeEditRole = {
 };
 const SettingListRole = (props: closeEditRole) => {
 	const {RolesClan, handleClose} = props;
-	const {appearanceTheme} = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const isChange = useSelector(getIsShow);
 
 	const clickRole = useSelector(getSelectedRoleId);

@@ -1,9 +1,10 @@
-import { useClans } from '@mezon/core';
 import { UsersClanEntity } from '@mezon/utils';
 import { useMemo } from 'react';
 import SelectGroup from '../SelectGroup';
 import SelectItem from '../SelectItem';
 import { searchOptions } from '../constant';
+import { useSelector } from 'react-redux';
+import { selectAllUsesClan } from '@mezon/store';
 
 type SearchMessageChannelModalProps = {
 	valueDisplay?: string;
@@ -20,7 +21,7 @@ const SearchMessageChannelModal = ({
 	isShowSearchOptions,
 	onClickSearchOptions,
 }: SearchMessageChannelModalProps) => {
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 
 	const userClanSearch = useMemo(() => {
 		return usersClan.length

@@ -16,7 +16,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
 
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-	const { emojis, categoriesEmoji, emojiListPNG, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
+	const { categoriesEmoji, emojiListPNG, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
@@ -60,26 +60,22 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { setShiftPressed } = useEmojiSuggestion();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId } = useAppParams();
-	const [channelLabel, setChannelLabel] = useState('');
 	const [channelID, setChannelID] = useState('');
 	const direct = useSelector(selectDirectById(directId || ''));
 
 	useEffect(() => {
-		if (direct != undefined) {
-			setChannelLabel('');
+		if (direct !== undefined) {
 			setChannelID(direct.id);
 		} else {
-			setChannelLabel(currentChannel?.channel_label || '');
 			setChannelID(currentChannel?.id || '');
 		}
-	}, [currentChannel, directId]);
+	}, [currentChannel, direct, directId]);
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 				channelID ?? '',
-				channelLabel ?? '',
 				props.messageEmojiId ?? '',
 				emojiPicked.trim(),
 				1,

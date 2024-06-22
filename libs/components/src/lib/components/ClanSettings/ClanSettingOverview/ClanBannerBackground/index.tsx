@@ -1,6 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useClans } from '@mezon/core';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
@@ -16,7 +15,7 @@ type ClanBannerBackgroundProps = {
 
 const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';

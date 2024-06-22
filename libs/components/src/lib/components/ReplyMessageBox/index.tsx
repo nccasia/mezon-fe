@@ -1,11 +1,10 @@
-import { useReference } from '@mezon/core';
-import { referencesActions, selectMemberByUserId, selectMessageByMessageId, selectOpenReplyMessageState } from '@mezon/store';
+import { referencesActions, selectIdMessageRefReply, selectMemberByUserId, selectMessageByMessageId, selectOpenReplyMessageState } from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 
 function ReplyMessageBox() {
 	const dispatch = useDispatch();
-	const { idMessageRefReply } = useReference();
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const refMessage = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const getSenderMessage = useSelector(selectMemberByUserId(refMessage?.sender_id));
 	const messageReplyState = useSelector(selectOpenReplyMessageState);

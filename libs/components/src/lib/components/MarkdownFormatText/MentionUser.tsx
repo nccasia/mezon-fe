@@ -1,5 +1,5 @@
-import { useClans, useOnClickOutside } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { useOnClickOutside } from '@mezon/core';
+import { selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
 import { checkLastChar } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -13,7 +13,7 @@ type ChannelHashtagProps = {
 
 const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const [foundUser, setFoundUser] = useState<any>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

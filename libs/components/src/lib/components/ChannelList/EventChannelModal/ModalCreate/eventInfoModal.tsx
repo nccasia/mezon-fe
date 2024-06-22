@@ -1,5 +1,4 @@
-import { useApp } from '@mezon/core';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
 import { ContenSubmitEventProps } from '@mezon/utils';
@@ -68,7 +67,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		}
 	};
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const { sessionRef, clientRef } = useMezon();

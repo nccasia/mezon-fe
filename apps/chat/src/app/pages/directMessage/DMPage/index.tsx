@@ -1,11 +1,12 @@
 import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
+import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
 	RootState,
 	directActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
+	selectIdMessageRefReaction,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectMessageByChannelId,
@@ -61,7 +62,7 @@ export default function DirectMessage() {
 	}, [isSending, [], messages]);
 
 	const reactionTopState = useSelector(selectReactionTopState);
-	const { idMessageRefReaction } = useReference();
+	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -174,7 +175,6 @@ export default function DirectMessage() {
 							{directId && (
 								<ChannelTyping
 									channelId={directId}
-									channelLabel={''}
 									mode={
 										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 									}

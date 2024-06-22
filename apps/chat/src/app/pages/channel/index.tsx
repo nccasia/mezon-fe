@@ -102,7 +102,6 @@ export default function ChannelMain() {
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}
-										channelLabel={currentChannel?.channel_label || ''}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 									/>
 								)}

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { RootState, authActions, useAppDispatch } from '@mezon/store';
+import { RootState, authActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Loading } from 'libs/ui/src/lib/Loading/index';
 import { BaseSyntheticEvent, useCallback, useState } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import * as Icons from '../../Icons';
-import { useApp } from '@mezon/core';
 
 export type LoginFormPayload = {
 	userEmail: string;
@@ -73,7 +72,7 @@ function LoginForm(props: LoginFormProps) {
 		dispatch(authActions.refreshStatus());
 	};
 
-	const {appearanceTheme} = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<div className="flex-col justify-start items-center flex lg:w-[496px] h-fit lg:px-0 w-450 max-w-full">

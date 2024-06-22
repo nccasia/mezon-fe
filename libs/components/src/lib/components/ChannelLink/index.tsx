@@ -248,7 +248,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			{showModal && (
 				<DeleteModal
 					onClose={() => setShowModal(false)}
-					channelLable={channel.channel_label || ''}
+					channelLabel={channel.channel_label || ''}
 					channelId={channel.channel_id as string}
 				/>
 			)}
