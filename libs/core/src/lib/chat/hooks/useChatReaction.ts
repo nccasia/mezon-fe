@@ -32,12 +32,7 @@ export function useChatReaction() {
 		},
 		[sessionRef, clientRef, socketRef, currentClanId],
 	);
-	const setTriggerUpdateReaction = useCallback(
-		(state: boolean) => {
-			dispatch(reactionActions.setTriggerUpdateReaction());
-		},
-		[dispatch],
-	);
+
 	return useMemo(
 		() => ({
 			reactionMessageDispatch,

@@ -12,20 +12,27 @@ export const listClickImageInViewer = [
 	{ name: 'Open Link', symbol: <></> },
 ];
 
-export const listClickMessageText = [
-	{ name: 'Add Reaction', symbol: <CopyImageIcon /> },
-	{ name: 'View Reactions', symbol: <CopyImageIcon /> }, // owner 
-	{ name: 'Edit Message', symbol: <CopyImageIcon /> },
-	{ name: 'Pin Message', symbol: <SaveImageIcon /> },
-	{ name: 'Reply', symbol: <SaveImageIcon /> },
-	{ name: 'Create Thread', symbol: <SaveImageIcon /> },
-	{ name: 'Copy Text', symbol: <CopyLinkIcon /> },
-	{ name: 'Apps', symbol: <OpenLinkIcon /> },
-	{ name: 'Mark Unread', symbol: <OpenLinkIcon /> },
-	{ name: 'Copy Message Link', symbol: <OpenLinkIcon /> },
-	{ name: 'Speak Message', symbol: <OpenLinkIcon /> },
-	{ name: 'Remove Reaction', symbol: <OpenLinkIcon /> }, // owner clan
-	{ name: 'Remove All Reaction', symbol: <OpenLinkIcon /> }, // owner clan
-	{ name: 'Delete Message', symbol: <OpenLinkIcon /> }, // owner message
-	{ name: 'Report Message', symbol: <OpenLinkIcon /> }, // guest
+export const listClickMessageTextDefault = [
+	{ id: 0, name: 'Add Reaction', symbol: <CopyImageIcon /> },
+	{ id: 1, name: 'View Reactions', symbol: <CopyImageIcon /> },
+	{ id: 3, name: 'Pin Message', symbol: <SaveImageIcon /> },
+	{ id: 4, name: 'Reply', symbol: <SaveImageIcon /> },
+	{ id: 5, name: 'Create Thread', symbol: <SaveImageIcon /> },
+	{ id: 6, name: 'Copy Text', symbol: <CopyLinkIcon /> },
+	{ id: 7, name: 'Apps', symbol: <OpenLinkIcon /> },
+	{ id: 8, name: 'Mark Unread', symbol: <OpenLinkIcon /> },
+	{ id: 9, name: 'Copy Message Link', symbol: <OpenLinkIcon /> },
+	{ id: 10, name: 'Speak Message', symbol: <OpenLinkIcon /> },
 ];
+
+export const listClickMessageTextOwnerMessage = [
+	{ id: 2, name: 'Edit Message', symbol: <CopyImageIcon /> }, // owner message
+	{ id: 13, name: 'Delete Message', symbol: <OpenLinkIcon /> }, // owner message
+];
+
+export const listClickMessageTextOwnerClan = [
+	{ id: 11, name: 'Remove Reaction', symbol: <OpenLinkIcon /> }, // owner clan
+	{ id: 12, name: 'Remove All Reaction', symbol: <OpenLinkIcon /> }, // owner clan
+];
+
+export const listClickMessageTextGuest = [{ id: 14, name: 'Report Message', symbol: <OpenLinkIcon /> }];

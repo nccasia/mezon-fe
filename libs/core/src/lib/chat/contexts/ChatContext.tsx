@@ -156,7 +156,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(e: MessageReactionEvent) => {
 			if (e) {
 				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
-				dispatch(reactionActions.setTriggerUpdateReaction());
 			}
 		},
 		[dispatch],
