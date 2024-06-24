@@ -109,7 +109,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 							key={Math.floor(Math.random() * 9999999).toString() + index}
 							isActive={isActive}
 							currentChanel={currentChanel}
-              onLongPress={()=>{props?.onLongPress(item)}}
+							onLongPress={() => { props?.onLongPress(item) }}
 						/>
 					);
 				})}
@@ -259,11 +259,11 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 		<View>
 			{filteredListDMBySearch?.length
 				? filteredListDMBySearch?.map((dmGroupItem) => (
-						<FriendListItem onPress={handleSendInVite} key={dmGroupItem.id} dmGroup={dmGroupItem} isSent={sendIds[dmGroupItem.id]} />
-					))
+					<FriendListItem onPress={handleSendInVite} key={dmGroupItem.id} dmGroup={dmGroupItem} isSent={sendIds[dmGroupItem.id]} />
+				))
 				: filteredListUserBySearch?.map((user) => (
-						<FriendListItem onPress={handleSendInVite} key={user.id} user={user} isSent={sendIds[user.id]} />
-					))}
+					<FriendListItem onPress={handleSendInVite} key={user.id} user={user} isSent={sendIds[user.id]} />
+				))}
 		</View>
 	);
 });

@@ -12,6 +12,8 @@ import {
 	getStoreAsync,
 	messagesActions,
 	selectIsUnreadChannelById,
+	selectLastChannelTimestamp,
+	selectNotificationMentionCountByChannelId,
 	selectVoiceChannelMembersByChannelId,
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
@@ -26,11 +28,20 @@ import { ChannelListContext } from './Reusables';
 import ThreadListChannel from './ThreadListChannel';
 import UserListVoiceChannel from './UserListVoiceChannel';
 import { styles } from './styles';
+
+function useChannelBadgeCount(channelId: string) {
+	const lastChannelTimestamp = useSelector(selectLastChannelTimestamp(channelId));
+	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(channelId, lastChannelTimestamp));
+
+	return numberNotification;
+}
+
 export const ChannelListItem = React.memo(
 	(props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel; onLongPress: () => void }) => {
 		const useChannelListContentIn = React.useContext(ChannelListContext);
 		const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 		const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
+		const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 
 		const handleRouteData = async (thread?: IChannel) => {
 			const store = await getStoreAsync();
@@ -55,22 +66,32 @@ export const ChannelListItem = React.memo(
 					activeOpacity={1}
 					onPress={() => handleRouteData()}
 					onLongPress={props.onLongPress}
-					style={[styles.channelListItem, props.isActive && styles.channelListItemActive]}
+					style={[styles.channelListLink, props.isActive && styles.channelListItemActive]}
 				>
-					{isUnRead && <View style={styles.dotIsNew} />}
-					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<SpeakerLocked width={15} height={15} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
-					)}
-					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<HashSignLockIcon width={20} height={20} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
-					)}
-					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<SpeakerIcon width={16} height={16} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
-					)}
-					{props?.data?.channel_private === undefined &&
-						props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-						(isUnRead ? <HashSignWhiteIcon width={18} height={18} /> : <HashSignIcon width={18} height={18} />)}
-					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
+					<View style={[styles.channelListItem]}>
+						{isUnRead && <View style={styles.dotIsNew} />}
+
+						{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+							<SpeakerLocked width={15} height={15} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
+						)}
+						{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+							<HashSignLockIcon width={20} height={20} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
+						)}
+						{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+							<SpeakerIcon width={16} height={16} color={isUnRead ? Colors.white : Colors.bgGrayDark} />
+						)}
+						{props?.data?.channel_private === undefined &&
+							props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+							(isUnRead ? <HashSignWhiteIcon width={18} height={18} /> : <HashSignIcon width={18} height={18} />)}
+
+						<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
+					</View>
+
+					{numberNotification > 0 &&
+						<View style={styles.channelDotWrapper}>
+							<Text style={styles.channelDot}>{numberNotification}</Text>
+						</View>
+					}
 				</TouchableOpacity>
 				{!!props?.data?.threads?.length && (
 					<ThreadListChannel threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} />
