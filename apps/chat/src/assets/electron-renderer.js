@@ -18,6 +18,7 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
 });
 
 window.electron?.onDeepLinkUrl((deepLinkUrl) => {
+  localStorage.removeItem('deepLinkUrl');
   localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 
@@ -34,7 +35,8 @@ window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   if (serverNotificationPayload.notification.body) {
 
     new Notification(serverNotificationPayload.notification.title, {
-      body: serverNotificationPayload.notification.body
+      body: serverNotificationPayload.notification.body,
+      icon: serverNotificationPayload.notification.image
     })
   } else {
     console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);

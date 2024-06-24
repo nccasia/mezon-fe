@@ -7,22 +7,16 @@ import AddVoiceFriend from './ChannelVoiceOff/AddVoiceFriend';
 import ChannelMemberAvatar from './ChannelVoiceOff/ChannelMemberAvatar';
 
 export type ChannelVoiceProps = {
-	clanId: string;
-	clanName: string;
 	channelId: string;
-	channelLabel: string;
-	userName: string;
-	jwt: string;
 };
 
-function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt }: ChannelVoiceProps) {	
+function ChannelVoice({ channelId }: ChannelVoiceProps) {
 	const { userProfile } = useAuth();
 	const showScreen = useSelector(selectShowScreen);
 	const [isSelectScreen, setIsSelectScreen] = useState(false);
 	const [classIdMeet, setClassIdMeet] = useState('');
 	const numberMember = useSelector(selectNumberMemberVoiceChannel(channelId));
 	const friendVoiceChannel = useSelector(selectFriendVoiceChannel(channelId, userProfile?.user?.id ?? ''));
-
 
 	const handleClick = (event: any) => {
 		const oldElementSelect = document.querySelector('.showScreen');

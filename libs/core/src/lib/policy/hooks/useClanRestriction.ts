@@ -1,13 +1,14 @@
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
-import { useClans } from '../../chat/hooks/useClans';
 import { useUserRestriction } from './useUserRestriction';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { useSelector } from 'react-redux';
+import { selectCurrentClan } from '@mezon/store';
 
 export type ClanRestrictionReturnType = [boolean, { isClanCreator: boolean }];
 
 export function useClanRestriction(restrictions: EPermission[]) :ClanRestrictionReturnType {
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const { userProfile } = useAuth();
 	const isAllowed = useUserRestriction(restrictions)
 	

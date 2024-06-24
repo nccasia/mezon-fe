@@ -1,13 +1,15 @@
-import { useApp, useRoles } from '@mezon/core';
-import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
+import { useApp } from '@mezon/core';
+import { RolesClanEntity, getIsShow, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../Icons';
 type closeEditRole = {
+	RolesClan: RolesClanEntity[];
 	handleClose: () => void;
 };
 const SettingListRole = (props: closeEditRole) => {
-	const {appearanceTheme} = useApp();
+	const {RolesClan, handleClose} = props;
+	const appearanceTheme = useSelector(selectTheme);
 	const isChange = useSelector(getIsShow);
 
 	const clickRole = useSelector(getSelectedRoleId);
@@ -15,7 +17,6 @@ const SettingListRole = (props: closeEditRole) => {
 	const [nameRoleNew] = useState('New role');
 
 	const dispatch = useDispatch();
-	const { RolesClan } = useRoles();
 	const handleRoleClick = (roleId: string) => {
 		if (!isChange) {
 			const activeRole = RolesClan.find((role) => role.id === roleId);
@@ -39,7 +40,7 @@ const SettingListRole = (props: closeEditRole) => {
 				<div className="rotate-90 -ml-[10px] dark:text-textDarkTheme text-textLightTheme">
 					<Icons.ArrowDown defaultSize="size-5" />
 				</div>
-				<div className="cursor-pointer tracking-wide text-sm dark:text-white text-black" onClick={() => props.handleClose()} role="button">
+				<div className="cursor-pointer tracking-wide text-sm dark:text-white text-black" onClick={() => handleClose()} role="button">
 					BACK
 				</div>
 			</div>

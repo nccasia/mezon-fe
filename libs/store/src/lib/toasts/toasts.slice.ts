@@ -15,11 +15,12 @@ const addToast = createAsyncThunk(
   'toasts/addToast',
   async (payload: ToastPayload, thunkAPI) => {
     const id = Date.now();
+    
     const newToast: Toast = {
       id,
       message: payload.message,
       position: payload.position || 'top-right',
-      autoClose: payload.autoClose || 5000,
+      autoClose: payload.autoClose || 3000,
       hideProgressBar: payload.hideProgressBar || false,
       closeOnClick: payload.closeOnClick || true,
       pauseOnHover: payload.pauseOnHover || true,
@@ -27,7 +28,7 @@ const addToast = createAsyncThunk(
       theme: payload.theme || 'light',
       type: payload.type || 'info',
     };
-    
+
     thunkAPI.dispatch(toastsSlice.actions.addOneToast(newToast));
 
     await sleep(3000)

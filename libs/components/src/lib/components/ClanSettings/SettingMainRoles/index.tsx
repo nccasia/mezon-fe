@@ -1,6 +1,8 @@
-import { useApp, useRoles } from '@mezon/core';
+import { useApp } from '@mezon/core';
 import {
 	rolesClanActions,
+	selectAllRolesClan,
+	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
 	setNameRoleNew,
@@ -11,29 +13,24 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
+import { useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import ServerSettingRoleManagement from '../SettingRoleManagement';
+import ListActiveRole from './listActiveRole';
+import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
 
 export type ModalOpenEdit = {
 	handleOpen?: () => void;
 };
 const ServerSettingMainRoles = (props: ModalOpenEdit) => {
-	const { RolesClan } = useRoles();
+	const RolesClan = useSelector(selectAllRolesClan);
 	const [showModal, setShowModal] = useState<boolean>(false);
-	const [selectedRoleId, setSelectedRoleID] = useState<string>('');
 	const [openEdit, setOpenEdit] = useState<boolean>(false);
-
+	const [selectedRoleId, setSelectedRoleID] = useState<string>('');
 	const dispatchRole = useDispatch();
 	const dispatch = useAppDispatch();
-	const activeRoles = RolesClan.filter((role) => role.active === 1);
-	const handleOpenModalDelete = () => {
-		setShowModal(true);
-	};
-	const handleCloseModal = () => {
-		setShowModal(false);
-	};
+	const activeRoles = useMemo(() => RolesClan.filter((role) => role.active === 1),[RolesClan]);
+
 	const handleRoleClick = (roleId: string) => {
 		setSelectedRoleID(roleId);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
@@ -48,10 +45,11 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		dispatchRole(setAddMemberRoles(memberIDRoles));
 		dispatchRole(setRemoveMemberRoles([]));
 	};
+	
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
 			<div className="flex items-center space-x-4">
@@ -99,55 +97,24 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								</td>
 							</tr>
 						) : (
-							activeRoles.map((role) => (
-								<tr key={role.id} className="h-14 dark:text-white text-black">
-									<td className="text-center ">
-										<p
-											className="text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2"
-											onClick={() => {
-												handleCloseModal();
-											}}
-										>
-											{role.title}
-										</p>
-									</td>
-									<td className=" text-[15px] text-center">
-										<p>{role.role_user_list?.role_users?.length ?? 0}</p>
-									</td>
-									<td className="  flex h-14 justify-center items-center">
-										<div className="flex gap-x-1 ">
-											<p
-												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
-												onClick={() => {
-													handleRoleClick(role.id);
-													setOpenEdit(true);
-												}}
-											>
-												Edit
-											</p>
-											<p
-												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
-												onClick={() => {
-													handleOpenModalDelete();
-													handleRoleClick(role.id);
-												}}
-											>
-												Delete
-											</p>
-										</div>
-										<DeleteModal
-											isOpen={showModal}
-											handleDelete={() => handleDeleteRole(selectedRoleId)}
-											onClose={handleCloseModal}
-										/>
-									</td>
-								</tr>
-							))
+							<ListActiveRole 
+								activeRoles={activeRoles} 
+								setShowModal={setShowModal}
+								handleRoleClick={handleRoleClick}
+								setOpenEdit={setOpenEdit}
+							/>
 						)}
+						
 					</tbody>
 				</table>
 			</div>
-			<ServerSettingRoleManagement flagOption={openEdit} handleClose={() => setOpenEdit(false)} />
+			{showModal &&
+				<DeleteModal
+					handleDelete={() => handleDeleteRole(selectedRoleId)}
+					onClose={() => setShowModal(false)}
+				/>
+			}
+			<ServerSettingRoleManagement flagOption={openEdit} handleClose={() => setOpenEdit(false)} RolesClan={RolesClan}/>
 		</>
 	);
 };

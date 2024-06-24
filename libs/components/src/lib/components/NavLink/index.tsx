@@ -1,5 +1,7 @@
-import { useApp, useThreads } from "@mezon/core";
+import { useThreads } from "@mezon/core";
 import { Tooltip } from "flowbite-react";
+import { useSelector } from "react-redux";
+import { selectTheme } from '@mezon/store';
 
 export type NavLinkProps = {
 	readonly active?: boolean;
@@ -8,7 +10,7 @@ export type NavLinkProps = {
 };
 
 function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { setTurnOffThreadMessage } = useThreads();
 
 	return (

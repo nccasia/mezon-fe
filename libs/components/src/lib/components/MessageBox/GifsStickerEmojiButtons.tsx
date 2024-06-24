@@ -1,15 +1,17 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { reactionActions } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 export type GifStickerEmojiButtonsProps = {
 	activeTab: SubPanelName;
 };
 
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
+	const dispatch = useDispatch();
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
-	const { setReactionRightState, setReactionBottomState } = useChatReaction();
 	const { setShowCategories } = useGifs();
 	const { setValueInputSearch } = useGifsStickersEmoji();
 	const handleOpenGifs = useCallback(
@@ -18,8 +20,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setSubPanelActive(SubPanelName.GIFS);
 			setShowCategories(true);
 			setValueInputSearch('');
-			setReactionRightState(false);
-			setReactionBottomState(false);
+			dispatch(reactionActions.setReactionRightState(false));
+			dispatch(reactionActions.setReactionBottomState(false));
 		},
 		[setSubPanelActive],
 	);
@@ -30,8 +32,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setSubPanelActive(SubPanelName.STICKERS);
 			setShowCategories(true);
 			setValueInputSearch('');
-			setReactionRightState(false);
-			setReactionBottomState(false);
+			dispatch(reactionActions.setReactionRightState(false));
+			dispatch(reactionActions.setReactionBottomState(false));
 		},
 		[setSubPanelActive],
 	);
@@ -41,9 +43,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			e.stopPropagation();
 			setShowCategories(true);
 			setValueInputSearch('');
-			setReactionRightState(false);
-			setReactionBottomState(false);
-			
+			dispatch(reactionActions.setReactionRightState(false));
+			dispatch(reactionActions.setReactionBottomState(false));
 			if (subPanelActive === SubPanelName.EMOJI) {
 				setSubPanelActive(SubPanelName.NONE);
 			} else {

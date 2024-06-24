@@ -2,12 +2,16 @@ import { useMenu } from '@mezon/core';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import * as Icons from '../../Icons';
+import { useSelector } from 'react-redux';
+import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
 
 export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
 	const isPrivate = channel?.channel_private;
 	const type = Number(channel?.type);
 	const name = channel?.channel_label;
-	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+	const { setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 
 	return (
 		<div className={`flex flex-row items-center gap-x-5 relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>

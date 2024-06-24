@@ -83,7 +83,7 @@ export const fetchChannelMembers = createAsyncThunk(
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
 		if (!response.channel_users) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));

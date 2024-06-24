@@ -20,7 +20,9 @@ const styles = StyleSheet.create({
     sectionTitle: {
         textAlign: "center",
         color: Colors.white,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        flexGrow: 1,
+        flexBasis: 10
     },
 
     sectionRight: {

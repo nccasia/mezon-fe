@@ -11,17 +11,20 @@ const styles = StyleSheet.create({
         top: 2,
         left: 0,
         padding: 5,
+        gap: 5,
         paddingHorizontal: 10,
         paddingVertical: 10
     },
 
     titleNameWrapper: {
+        maxWidth: '85%',
         display: "flex",
         backgroundColor: Colors.gray4850,
         paddingHorizontal: 10,
         paddingVertical: 3,
         borderRadius: 20,
         flexDirection: "row",
+        justifyContent: "space-between",
         gap: 5,
         alignItems: "center",
     },

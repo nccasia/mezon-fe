@@ -1,7 +1,8 @@
 import { MessageWithUser } from '@mezon/components';
-import { useDeleteMessage } from '@mezon/core';
+import { useDeleteMessage,  } from '@mezon/core';
 import { selectMemberClanByUserId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 type ModalDeleteMessProps = {
@@ -19,18 +20,32 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		mode: mode,
 	});
 
+	const handleDeleteMess = () => {
+		DeleteSendMessage(mess.id);
+		closeModal();
+	}
+
+	const handleEnter = (e: any) => {
+		if (e.key === 'Enter') {
+        	handleDeleteMess(); 
+      	}
+	}
+
+	useEffect(() =>{
+		document.addEventListener('keydown', handleEnter);
+
+		return () => {
+			document.removeEventListener('keydown', handleEnter);
+			};
+	},[])
+	
 	return (
 		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeSecond rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
+			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
 				<div className="dark:text-white text-black">
-					<div className="flex justify-between p-4">
-						<div>
-							<h3 className="font-bold ">Delete Message</h3>
-							<p>Are you sure you want to delete this message?</p>
-						</div>
-						<span className="text-5xl leading-3 dark:hover:text-white hover:text-black cursor-pointer" onClick={closeModal}>
-							×
-						</span>
+					<div className="p-4 pb-0">
+						<h3 className="font-bold pb-4">Delete Message</h3>
+						<p>Are you sure you want to delete this message?</p>
 					</div>
 					<div className="p-4">
 						<MessageWithUser
@@ -47,10 +62,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 							Cancel
 						</button>
 						<button
-							onClick={() => {
-								DeleteSendMessage(mess.id);
-								closeModal();
-							}}
+							onClick={handleDeleteMess}
 							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white"
 						>
 							Delete

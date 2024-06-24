@@ -1,7 +1,5 @@
 import { MezonContextValue } from '@mezon/transport';
-import { trackActionError } from '@mezon/utils';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
-import React from 'react';
 import { useDispatch } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -29,6 +27,8 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
+import { errorListenerMiddleware } from './errors/errors.listener';
+import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
@@ -40,13 +40,10 @@ import { rightClickReducer } from './rightClick/rightClick.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { threadsReducer } from './threads/threads.slice';
+import { toastListenerMiddleware } from './toasts/toasts.listener';
+import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import { errorsReducer, ERRORS_FEATURE_KEY } from './errors/errors.slice';
-import { toastsReducer, TOASTS_FEATURE_KEY } from './toasts/toasts.slice'
-import { errorListenerMiddleware } from './errors/errors.listener';
-import { toastListenerMiddleware } from './toasts/toasts.listener';
-
 
 const persistedReducer = persistReducer(
 	{
@@ -138,6 +135,7 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 						mezon,
 					},
 				},
+				immutableCheck: false,
 				serializableCheck: false,
 			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
 	});
@@ -171,25 +169,4 @@ export const getStoreAsync = async () => {
 	return storeInstance;
 };
 
-export function useAppDispatch(): AppDispatch {
-	const dispatch = useDispatch<AppDispatch>();
-	const dispatchRef = React.useRef(dispatch);
-
-	const appDispatch: typeof dispatch = React.useCallback(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(action: any) => {
-			const result = dispatchRef.current(action);
-			if (result instanceof Promise) {
-				return result.then((res) => {
-					trackActionError(res);
-					return res;
-				});
-			}
-			trackActionError(result);
-			return result;
-		},
-		[],
-	);
-
-	return appDispatch;
-}
+export const useAppDispatch = () => useDispatch<AppDispatch>();

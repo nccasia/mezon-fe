@@ -4,7 +4,7 @@
     },
     "switch": {
         "userProfile": "Cá nhân",
-        "serverProfile": "Máy chủ"
+        "serverProfile": "Clan"
     },
     "fields": {
         "displayName": {
@@ -19,5 +19,11 @@
             "label": "Tiểu sử",
             "placeholder": ""
         }
+    },
+    "changedAlert": {
+        "title": "Loại bỏ thay đổi chưa được lưu?",
+        "description": "Có những thay đổi chưa được lưu, bạn có chắc muốn loại bỏ chúng?",
+        "discard": "Bỏ",
+        "keepEditing": "Tiếp tục chỉnh sửa"
     }
 }

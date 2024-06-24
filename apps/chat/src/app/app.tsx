@@ -6,7 +6,6 @@ import { RouterProvider } from 'react-router-dom';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { VoiceContextProvider } from '@mezon/voice';
 import { useEffect, useMemo } from 'react';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
 import './app.module.scss';
@@ -49,18 +48,6 @@ function AppWrapper() {
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
 						<App />
-						<ToastContainer
-							position="top-right"
-							autoClose={2200}
-							hideProgressBar={false}
-							newestOnTop={false}
-							closeOnClick
-							rtl={false}
-							pauseOnFocusLoss
-							draggable
-							pauseOnHover
-							theme="light"
-						/>
 				</VoiceContextProvider>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>

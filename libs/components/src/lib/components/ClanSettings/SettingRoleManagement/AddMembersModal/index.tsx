@@ -1,18 +1,20 @@
-import { useClans, useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/store';
+import { useRoles } from '@mezon/core';
+import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 interface ModalProps {
 	isOpen: boolean;
+	RolesClan: RolesClanEntity[];
 	onClose: () => void;
 }
 
-export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
-	const { RolesClan, updateRole } = useRoles();
+export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClose }) => {
+	const { updateRole } = useRoles();
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
-	const { usersClan, currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
+	const usersClan = useSelector(selectAllUsesClan);
 	const addUsers = useSelector(getNewAddMembers);
 
 	const clickRole = useSelector(getSelectedRoleId);

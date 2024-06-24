@@ -4,13 +4,17 @@ import { ScrollView } from "react-native-gesture-handler";
 import MemberItem from "./MemberItem";
 import style from "./style";
 import { AddMemberIcon, AngleRightIcon } from "@mezon/mobile-components";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { threadDetailContext } from "../ThreadDetail/MenuThreadDetail";
 import { ChannelType } from "mezon-js";
+import { UserInformationBottomSheet } from "../UserInformationBottomSheet";
+import { ChannelMembersEntity } from "@mezon/utils";
 
 export default function MemberListStatus() {
     const currentChannel = useContext(threadDetailContext);
     const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
+    const [ selectedUser, setSelectedUser ] = useState<ChannelMembersEntity | null>(null);
+
     const isDMThread = useMemo(() => {
         return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
     }, [currentChannel])
@@ -40,6 +44,7 @@ export default function MemberListStatus() {
                         <View style={style.box}>
                             {onlineMembers.map((user) => (
                                 <MemberItem
+                                    onPress={(user)=> {setSelectedUser(user)}}
                                     user={user}
                                     key={user?.user?.id}
                                 />
@@ -47,7 +52,6 @@ export default function MemberListStatus() {
                         </View>
                     </View>
                 )}
-    
                 {offlineMembers.length > 0 && (
                     <View style={{ marginTop: 20 }}>
                         <Text style={style.text}>Offline - {offlineMembers.length}</Text>
@@ -57,12 +61,14 @@ export default function MemberListStatus() {
                                     key={user.id}
                                     user={user}
                                     isOffline={true}
+                                    onPress={(user)=> {setSelectedUser(user)}}
                                 />
                             ))}
                         </View>
                     </View>
                 )}
             </View>
+            <UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={() => setSelectedUser(null)}  />
         </ScrollView>
     )
 }

@@ -1,5 +1,5 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useApp, useMenu, useReference } from '@mezon/core';
+import { useApp, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -7,6 +7,8 @@ import { Fragment, ReactElement, useCallback, useState } from 'react';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
+import { useSelector } from 'react-redux';
+import { selectAttachmentData, selectCloseMenu, selectStatusLoadingAttachment, selectStatusMenu, selectTheme } from '@mezon/store';
 
 export type MessageBoxProps = {
 	readonly onSend: (
@@ -28,8 +30,10 @@ export type MessageBoxProps = {
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const { attachmentDataRef, setAttachmentData, statusLoadingAttachment } = useReference();
-	const {appearanceTheme} = useApp();
+	const { setAttachmentData  } = useReference();
+	const attachmentDataRef = useSelector(selectAttachmentData);
+	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const appearanceTheme = useSelector(selectTheme);
 	const [finishUpload, setFinishUpload] = useState<boolean>(false);
 
 	const onConvertToFiles = useCallback((content: string) => {
@@ -134,7 +138,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
 	);
 
-	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		// Ngăn chặn sự kiện lan truyền lên phần tử cha
 		event.stopPropagation();

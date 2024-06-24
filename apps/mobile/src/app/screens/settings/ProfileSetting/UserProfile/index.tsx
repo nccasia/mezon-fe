@@ -10,32 +10,31 @@ import { useSelector } from 'react-redux';
 import BannerAvatar, { IFile } from './components/Banner';
 import DetailInfo from './components/Info';
 import styles from './styles';
+import { useCallback } from 'react';
+import { EProfileTab, IUserProfileValue } from '..';
+import { useNavigation } from '@react-navigation/native';
 
 interface IUserProfile {
-	trigger: number;
+	triggerToSave: EProfileTab;
+	userProfileValue: IUserProfileValue;
+	setCurrentUserProfileValue: (updateFn: (prevValue: IUserProfileValue) => IUserProfileValue) => void;
 }
 
-export default function UserProfile({ trigger }: IUserProfile) {
+export default function UserProfile({ triggerToSave, userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
 	const auth = useAuth();
 	const { updateUser } = useAccount();
 	const { sessionRef, clientRef } = useMezon();
 	const currentChannel = useSelector(selectCurrentChannel);
-
-	const [avatar, setAvatar] = useState<string>(auth.userProfile.user.avatar_url);
-	const [displayName, setDisplayName] = useState<string>(auth.userProfile.user.display_name);
-	const [username, setUsername] = useState<string>(auth.userProfile.user.username);
-	const [bio, setBio] = useState<string>(auth.userProfile.user.about_me);
 	const [file, setFile] = useState<IFile>(null);
+	const navigation = useNavigation();
 
-	function handleAvatarChange(data: IFile) {
-		setAvatar(data.uri);
+	const handleAvatarChange = (data: IFile) => {
+		setCurrentUserProfileValue((prevValue) => ({...prevValue, imgUrl: data?.uri}))
 		setFile(data);
 	}
 
-	function handleDetailChange({ displayName, username, bio }: { displayName: string; username: string; bio: string }) {
-		setDisplayName(displayName);
-		setUsername(username);
-		setBio(bio);
+	const handleDetailChange = (newValue: Partial<IUserProfileValue>) => {
+		setCurrentUserProfileValue((prevValue) => ({...prevValue, ...newValue}))
 	}
 
 	function handleHashtagPress() {
@@ -45,7 +44,10 @@ export default function UserProfile({ trigger }: IUserProfile) {
 		});
 	}
 
-	async function handleImageFile() {
+	const getImageUrlToSave = useCallback(async () => {
+		if (!file) {
+			return userProfileValue?.imgUrl;
+		}
 		const session = sessionRef.current;
 		const client = clientRef.current;
 
@@ -57,37 +59,48 @@ export default function UserProfile({ trigger }: IUserProfile) {
 		const res = await handleUploadFileMobile(client, session, fullFilename, file);
 
 		return res.url;
-	}
+	}, [clientRef, sessionRef, currentChannel, file, userProfileValue])
 
-	async function updateUserProfile() {
-		const imgUrl = await handleImageFile();
-		setAvatar(imgUrl);
-		updateUser(username, imgUrl, displayName, bio);
-		Toast.show({
-			type: 'info',
-			text1: 'Update profile success',
-		});
+	const updateUserProfile = async () => {
+		const imgUrl = await getImageUrlToSave();
+		const { username, displayName, aboutMe } = userProfileValue;
+
+		const response = await updateUser(username, imgUrl, displayName || username, aboutMe);
+		if (response) {
+			Toast.show({
+				type: 'info',
+				text1: 'Update profile success',
+			});
+			setFile(null);
+			navigation.goBack();
+		}
 	}
 
 	useEffect(() => {
-		if (trigger) {
+		if (triggerToSave === EProfileTab.UserProfile) {
 			updateUserProfile();
 		}
-	}, [trigger]);
+	}, [triggerToSave]);
 
 	return (
 		<View style={styles.container}>
-			<BannerAvatar avatar={avatar} onChange={handleAvatarChange} />
+			<BannerAvatar avatar={userProfileValue?.imgUrl} onChange={handleAvatarChange} />
 
 			<View style={styles.btnGroup}>
-				<View style={styles.btnIcon}>
-					<TouchableOpacity onPress={handleHashtagPress}>
-						<HashSignIcon width={16} height={16} />
-					</TouchableOpacity>
-				</View>
+				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
+					<HashSignIcon width={16} height={16} />
+				</TouchableOpacity>
 			</View>
 
-			<DetailInfo value={{ displayName, username, bio }} onChange={handleDetailChange} />
+			<DetailInfo
+				value={{
+					displayName: userProfileValue.displayName,
+					username: userProfileValue.username,
+					aboutMe: userProfileValue.aboutMe,
+					imgUrl: userProfileValue.imgUrl
+				}}
+				onChange={handleDetailChange}
+			/>
 		</View>
 	);
 }

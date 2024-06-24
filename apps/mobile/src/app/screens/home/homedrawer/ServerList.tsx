@@ -22,6 +22,7 @@ const ServerList = React.memo((props: any) => {
 		}, 200);
 		const store = await getStoreAsync();
 		store.dispatch(appActions.setLoadingMainMobile(true));
+    store.dispatch(clansActions.joinClan({ clanId: clanId }));
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
 
@@ -40,7 +41,7 @@ const ServerList = React.memo((props: any) => {
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
 			</View>
 			<View style={styles.mb_10}>
-				<ClanIcon data={currentClan} onPress={handleChangeClan} />
+				<ClanIcon data={currentClan} onPress={handleChangeClan} isActive={true}/>
 			</View>
 
 			<Tooltip

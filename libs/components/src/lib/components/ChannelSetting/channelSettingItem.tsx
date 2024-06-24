@@ -92,7 +92,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				<DeleteModal
 					onCloseModal = {onCloseModal}
 					onClose={() => setShowModal(false)}
-					channelLable={channel?.channel_label || ''}
+					channelLabel={channel?.channel_label || ''}
 					channelId={channel.channel_id as string}
 				/>
 			)}

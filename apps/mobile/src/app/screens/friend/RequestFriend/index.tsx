@@ -6,6 +6,8 @@ import { useFriends } from '@mezon/core';
 import { SeparatorWithLine } from '../../../components/Common';
 import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
 import { FriendsEntity } from '@mezon/store-mobile';
+import { User } from 'mezon-js';
+import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 
 enum EFriendRequest {
     Received,
@@ -14,6 +16,7 @@ enum EFriendRequest {
 
 export const RequestFriendScreen = () => {
     const [selectedTab, setSelectedTab] = useState(EFriendRequest.Received);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null); 
     const { friends, acceptFriend, deleteFriend } = useFriends();
     const { t } = useTranslation('friends');
     const friendRequestTabs = [
@@ -34,6 +37,9 @@ export const RequestFriendScreen = () => {
                 break;
             case EFriendItemAction.Approve:
                 acceptFriend(friend.user.username, friend.user.id);
+                break;
+            case EFriendItemAction.ShowInformation:
+                setSelectedUser(friend.user)
                 break;
             default:
                 break;
@@ -74,6 +80,8 @@ export const RequestFriendScreen = () => {
                     />
                 </View>
             </View>
+
+            <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
         </View>
     )
 }

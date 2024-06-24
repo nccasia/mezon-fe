@@ -1,12 +1,8 @@
-import { EventManagementEntity, eventManagementActions, selectAllEventManagement, selectChannelById, selectChooseEvent, selectNumberEvent, useAppDispatch } from "@mezon/store";
+import { EventManagementEntity, eventManagementActions, useAppDispatch } from "@mezon/store";
 import { useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
 
 export function useEventManagement(){
     const dispatch = useAppDispatch();
-    const allEventManagement = useSelector(selectAllEventManagement);
-	const numberEventManagement = useSelector(selectNumberEvent);
-	const chooseEvent = useSelector(selectChooseEvent);
 
 	const setChooseEvent = useCallback(
 		async (event: EventManagementEntity) => {
@@ -31,17 +27,11 @@ export function useEventManagement(){
 
     return useMemo(
 		() => ({
-			chooseEvent,
-			allEventManagement,
-			numberEventManagement,
             createEventManagement,
 			deleteEventManagement,
 			setChooseEvent,
 		}),
 		[
-			chooseEvent,
-            allEventManagement,
-			numberEventManagement,
             createEventManagement,
 			deleteEventManagement,
 			setChooseEvent,

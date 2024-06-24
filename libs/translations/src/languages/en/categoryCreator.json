@@ -6,7 +6,8 @@
     "fields": {
         "cateName": {
             "title": "Category Name",
-            "placeholder": "New Category"
+            "placeholder": "New Category",
+            "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)."
         },
         "catePrivate": {
             "title": "Private Category",

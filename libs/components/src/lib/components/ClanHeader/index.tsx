@@ -1,5 +1,5 @@
-import { useAuth, useCategory, useClans, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useCategory, useOnClickOutside } from '@mezon/core';
+import { categoriesActions, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -24,8 +24,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
-	const { userProfile } = useAuth();
-	const { currentClan } = useClans();
+	const userProfile = useSelector(selectAllAccount);
+	const currentClan = useSelector(selectCurrentClan);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -33,7 +33,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
-	const [isShowModalPannelClan, setIsShowModalPannelClan] = useState<boolean>(false);
+	const [isShowModalPanelClan, setIsShowModalPanelClan] = useState<boolean>(false);
 
 	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => (
 		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
@@ -58,25 +58,25 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	};
 
 	const handleShowModalClan = () => {
-		setIsShowModalPannelClan(!isShowModalPannelClan);
+		setIsShowModalPanelClan(!isShowModalPanelClan);
 	};
 
 	const handleShowCreateCategory = () => {
 		setOpenCreateCate(true);
-		setIsShowModalPannelClan(false);
+		setIsShowModalPanelClan(false);
 	};
 
 	const handleShowInviteClanModal = () => {
 		openInviteClanModal();
-		setIsShowModalPannelClan(false);
+		setIsShowModalPanelClan(false);
 	};
 
 	const handleShowServerSettings = () => {
 		setOpenServerSettings(true);
-		setIsShowModalPannelClan(false);
+		setIsShowModalPanelClan(false);
 	};
 
-	useOnClickOutside(modalRef, () => setIsShowModalPannelClan(false));
+	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
 	return (
 		<>
@@ -101,7 +101,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								<Icons.ArrowDown />
 							</button>
 						</div>
-						{isShowModalPannelClan && (
+						{isShowModalPanelClan && (
 							<div
 								onClick={(e) => e.stopPropagation()}
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
@@ -124,7 +124,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									)}
 									{userProfile?.user?.id === currentClan?.creator_id && (
 										<ItemModal
-											onClick={() => {openNotiSettingModal(); setIsShowModalPannelClan(false);}}
+											onClick={() => {openNotiSettingModal(); setIsShowModalPanelClan(false);}}
 											children="Notification Settings"
 											endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 										/>
@@ -136,13 +136,13 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			)}
 
-			<ClanSetting
-				// open={openServerSettings}
-				open={openServerSettings}
-				onClose={() => {
-					setOpenServerSettings(false);
-				}}
-			/>
+			{openServerSettings &&
+				<ClanSetting
+					onClose={() => {
+						setOpenServerSettings(false);
+					}}
+				/>
+			}
 
 			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />
 		</>

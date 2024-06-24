@@ -1,5 +1,5 @@
 import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { appActions, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
+import { appActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
@@ -19,9 +19,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
-	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+	const { setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
@@ -40,7 +42,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
-			<div className="justify-start items-center gap-1 flex w-full">
+			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
@@ -65,9 +67,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>
-							<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-								<Icons.IconPhoneDM />
-							</Tooltip>
+								<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+									<Icons.IconPhoneDM />
+								</Tooltip>
 							</button>
 							<button>
 								<Tooltip content='Start Video Call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
@@ -107,6 +109,20 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 					</div>
 				</div>
+				{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP &&
+					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className='sbm:hidden'>
+						<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+							<Icons.MemberList isWhite={isShowMemberListDM}/>
+						</Tooltip>
+					</button>
+				}
+				{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM &&  
+					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className='sbm:hidden'>
+						<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+							<Icons.IconUserProfileDM />
+						</Tooltip>
+					</button>
+				}
 			</div>
 		</div>
 	);

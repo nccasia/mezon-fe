@@ -11,7 +11,7 @@ type ModalCreateCategoryProps = {
 
 const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
 	const [nameCate, setNameCate] = useState('');
-	const [checkvalidate, setCheckValidate] = useState(true);
+	const [checkValidate, setCheckValidate] = useState(true);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -54,7 +54,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						value={nameCate}
 					/>
 				</div>
-				{checkvalidate && (
+				{checkValidate && (
 					<p className="text-[#e44141] text-xs italic font-thin">
 						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 					</p>
@@ -63,9 +63,9 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 			<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
 				<button onClick={onClose}>Cancel</button>
 				<button
-					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkvalidate ? 'opacity-50 cursor-not-allowed' : ''}`}
+					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={handleCreateCate}
-					disabled={checkvalidate}
+					disabled={checkValidate}
 				>
 					Create Category
 				</button>

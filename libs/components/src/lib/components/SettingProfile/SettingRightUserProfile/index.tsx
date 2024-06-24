@@ -1,5 +1,5 @@
-import { useAccount, useApp } from '@mezon/core';
-import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useAccount } from '@mezon/core';
+import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, selectTheme, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
@@ -87,7 +87,7 @@ const SettingRightUser = ({
 		setFlags(false);
 		setFlagsRemoveAvartar(false);
 	};
-	const handlSaveClose = () => {
+	const handleSaveClose = () => {
 		setFlags(false);
 	};
 	const editProfile: Profilesform = {
@@ -113,7 +113,7 @@ const SettingRightUser = ({
 		setEditAboutUser(e.target.value);
 		setFlags(true);
 	};
-	const {appearanceTheme} = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div
 			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
@@ -206,7 +206,7 @@ const SettingRightUser = ({
 							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
 								handleUpdateUser();
-								handlSaveClose();
+								handleSaveClose();
 							}}
 						>
 							Save Changes

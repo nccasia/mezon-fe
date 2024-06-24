@@ -1,5 +1,6 @@
-import { selectCurrentChannelId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, RightClickPost, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
+import { IChannelMember, RightClickPost } from '@mezon/utils';
+import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -9,10 +10,10 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useAuth, useChatMessages, useNotification, useOnClickOutside, useReference, useRightClick } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification, useOnClickOutside, useRightClick } from '@mezon/core';
 import { useSelector } from 'react-redux';
-import MessageContent from './MessageContent';
 import ContextMenu from '../RightClick/ContextMenu';
+import MessageContent from './MessageContent';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -21,8 +22,7 @@ export type ReactedOutsideOptional = {
 };
 
 export type MessageWithUserProps = {
-	message: IMessageWithUser;
-	preMessage?: IMessageWithUser;
+	message: MessagesEntity;
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -31,27 +31,20 @@ export type MessageWithUserProps = {
 	isMention?: boolean;
 };
 
-function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { openReplyMessageState, idMessageRefReply, idMessageToJump, idMessageRefEdit } = useReference();
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const userLogin = useAuth();
 
-	const isCombine = useMemo(() => {
-		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
-		return (
-			timeDiff < TIME_COMBINE &&
-			preMessage?.user?.id === message?.user?.id &&
-			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
-		);
-	}, [message, preMessage]);
+	const isCombine = !message.isStartedMessageGroup;
 
-	const attachments = useMemo(() => {
-		return message.attachments;
-	}, [message.attachments]);
+	const attachments = useMemo(() => message.attachments, [message.attachments]);
 
 	const propsChild = { isCombine };
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
@@ -72,8 +65,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		setCheckMessageIncludeMention(hasIncludeMention ?? undefined);
 	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump]);
 
-	const [classNameHighligntParentDiv, setClassNameHightlightParentDiv] = useState<string>('');
-	const [classNameHighligntChildDiv, setClassNameHightlightChildDiv] = useState<string>('');
+	const [classNameHighlightParentDiv, setClassNameHighlightParentDiv] = useState<string>('');
+	const [classNameHighlightChildDiv, setClassNameHighlightChildDiv] = useState<string>('');
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
 
 	useEffect(() => {
@@ -95,13 +88,41 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 
 	useEffect(() => {
 		if (checkMessageReply || checkMessageToMove) {
-			setClassNameHightlightParentDiv('dark:bg-[#383B47]');
-			setClassNameHightlightChildDiv(' dark:bg-blue-500');
+			setClassNameHighlightParentDiv('dark:bg-[#383B47]');
+			setClassNameHighlightChildDiv('dark:bg-blue-500');
 		} else if (checkMessageIncludeMention) {
-			setClassNameHightlightParentDiv('dark:bg-[#403D38]');
-			setClassNameHightlightChildDiv(' dark:bg-[#F0B132]');
+			setClassNameHighlightParentDiv('dark:bg-[#403D38]');
+			setClassNameHighlightChildDiv('dark:bg-[#F0B132]');
 		}
 	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
+
+	const messageDividerClass = classNames(
+		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
+		{ hidden: !message.isStartedMessageOfTheDay || isMessNotifyMention },
+	);
+
+	const containerClass = classNames('relative', 'message-container', {
+		'mt-3': !isCombine || checkReferences,
+		'is-sending': message.isSending,
+		'is-error': message.isError,
+		[classNameNotification]: classNameNotification,
+	});
+
+	const parentDivClass = classNames(
+		'flex h-15 flex-col w-auto px-3',
+		{ 'mt-0': isMention },
+		{ 'pt-[2px]': !isCombine },
+		{ [classNameHighlightParentDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
+	);
+
+	const childDivClass = classNames(
+		'absolute w-0.5 h-full left-0',
+		{ [classNameHighlightChildDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
+	);
+
+	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
 	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
@@ -119,44 +140,38 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 
 	return (
 		<>
-			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent">
-					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-				</div>
-			)}
-			<div
-				className={`relative ${isCombine ? '' : 'mt-3'} ${checkReferences && 'mt-3'} ${classNameNotification}`}
-				ref={messageWithUserRef}
-				onContextMenu={handleContextMenu}
-				onClick={handleCloseMenu}
-			>
-				<div className={` relative rounded-sm  overflow-visible `}>
-					<div
-						className={` absolute w-0.5 h-full left-0
-						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
-					></div>
-					<div
-						className={`flex h-15 flex-col w-auto px-3
-						${isMention ? 'mt-0' : isCombine ? '' : 'pt-[2px]'}
-						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
-					>
-						{' '}
+			<div className={messageDividerClass}>
+				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+				<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
+				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+			</div>
+			<div className={containerClass}>
+				<div className="relative rounded-sm overflow-visible">
+					<div className={childDivClass}></div>
+					<div className={parentDivClass}>
 						<MessageReply message={message} />
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
+						<div
+							className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12"
+							ref={divMessageWithUser}
+							onContextMenu={handleContextMenu}
+							onClick={handleCloseMenu}
+						>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} />
-								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-[2px]'} textChat`}>
-									<div
-										className="flex flex-col text-[#CCCCCC] whitespace-pre-wrap text-base w-full cursor-text"
-										style={{ wordBreak: 'break-word' }}
-									>
-										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
+								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+										<MessageContent
+											message={message}
+											user={user}
+											isCombine={isCombine}
+											newMessage={newMessage}
+											isSending={message.isSending}
+											isError={message.isError}
+										/>
 										{child?.props.children[1] &&
 											React.isValidElement(child?.props.children[1]) &&
-											React.cloneElement(child?.props.children[1], propsChild)}
+											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -164,7 +179,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						</div>
 						{message && !isMessNotifyMention && (
 							<div
-								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
+								className={classNames('absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600', {
+									hidden: isCombine,
+								})}
 							>
 								<Icons.Sent />
 							</div>
@@ -182,7 +199,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 
 MessageWithUser.Skeleton = () => {
 	return (
-		<div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer  flex-shrink-1">
+		<div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer flex-shrink-1">
 			<Skeleton circle={true} width={38} height={38} />
 		</div>
 	);

@@ -4,6 +4,7 @@ export type FormalError = {
 	message: string;
 	name: string;
 	stack: string;
+	action: any;
 };
 
 export function isFormalError(error: unknown): error is FormalError {
@@ -12,16 +13,17 @@ export function isFormalError(error: unknown): error is FormalError {
 
 export function trackError(rawError: unknown) {
 	const formalError = isFormalError(rawError) ? rawError : extractActionError(rawError);
-	console.error(formalError);
+	console.log(formalError);
 }
 
 export function trackActionError(action: PayloadAction<unknown, string, unknown>, raise = false) {
+
 	if ('error' in action === false) {
 		return;
 	}
 
 	if (action.error) {
-		const error = extractActionError(action.error);
+		const error = extractActionError(action);
 		trackError(error);
 
 		if (raise) {
@@ -30,12 +32,22 @@ export function trackActionError(action: PayloadAction<unknown, string, unknown>
 	}
 }
 
-export function extractActionError(error: unknown): FormalError {
-	if (typeof error === 'string') {
+export function extractActionError(action: any): FormalError {
+	if(!action){
+		return {
+			message: "un not error",
+			name: 'Error',
+			stack: '',
+			action: '',
+		};
+	}
+	const error = action.error
+	if (typeof action === 'string') {
 		return {
 			message: error,
 			name: 'Error',
 			stack: '',
+			action: action,
 		};
 	}
 
@@ -44,6 +56,7 @@ export function extractActionError(error: unknown): FormalError {
 			message: error.message,
 			name: error.name,
 			stack: error.stack ?? '',
+			action: action,
 		};
 	}
 
@@ -53,6 +66,7 @@ export function extractActionError(error: unknown): FormalError {
 			name: '',
 			stack: '',
 			...JSON.parse(JSON.stringify(error)),
+			action: action,
 		};
 	}
 
@@ -60,5 +74,6 @@ export function extractActionError(error: unknown): FormalError {
 		message: 'Unknown error',
 		name: 'Error',
 		stack: '',
+		action: action,
 	};
 }

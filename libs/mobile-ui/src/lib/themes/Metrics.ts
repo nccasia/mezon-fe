@@ -5,6 +5,8 @@ export const { width, height } = Dimensions.get('window');
 //Guideline sizes are based on standard ~5" screen mobile device
 const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 812;
+const CONTAINER_FLUID_SPACING = 16;
+const CONTAINER_SPACING = 24;
 
 const horizontalScale = (size: number) => (width / guidelineBaseWidth) * size;
 const verticalScale = (size: number) => (height / guidelineBaseHeight) * size;
@@ -53,9 +55,40 @@ const Metrics = {
     xxxl: 30
   }
 };
+
+const propsToStyle = <T = Record<string, number | string>>(
+  arrStyle: Array<T>,
+) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return arrStyle
+    .filter(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      (x) => x !== undefined && !Object.values(x).some((v) => v === undefined),
+    )
+    .reduce((prev: Record<string, number | string>, curr) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const firstKey = Object.keys(curr)[0] as keyof T;
+      const firstValue = curr[firstKey];
+      
+      if (
+        !['opacity', 'zIndex', 'flex'].includes(firstKey as string) &&
+        typeof firstValue === 'number'
+      ) {
+        (curr[firstKey] as unknown as number) = verticalScale(firstValue);
+      }
+      return { ...prev, ...curr };
+    }, {} as Record<string, number | string>);
+};
+
 export {
   horizontalScale,
   verticalScale,
   moderateScale,
+  propsToStyle,
+  CONTAINER_FLUID_SPACING,
+  CONTAINER_SPACING,
   Metrics
 };

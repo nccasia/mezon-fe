@@ -1,11 +1,8 @@
-import { attachmentActions, selectAttachment, selectOpenModalAttachment, useAppDispatch } from "@mezon/store";
+import { attachmentActions, useAppDispatch } from "@mezon/store";
 import { useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
 
 export function useAttachments() {
     const dispatch = useAppDispatch();
-    const attachment = useSelector(selectAttachment);
-    const openModalAttachment = useSelector(selectOpenModalAttachment);
 
     const setAttachment = useCallback(
 		(status: string) => {
@@ -23,14 +20,10 @@ export function useAttachments() {
 
     return useMemo(
 		() => ({
-            attachment,
-            openModalAttachment,
             setAttachment,
             setOpenModalAttachment,
 		}),
 		[
-			attachment,
-            openModalAttachment,
             setAttachment,
             setOpenModalAttachment,
 		],

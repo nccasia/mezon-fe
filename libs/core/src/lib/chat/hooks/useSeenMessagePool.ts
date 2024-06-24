@@ -7,27 +7,29 @@
 
 import { messagesActions, seenMessagePool, useAppDispatch } from '@mezon/store';
 import { IMessage } from '@mezon/utils';
+import { useCallback, useMemo } from 'react';
 
 export function useSeenMessagePool() {
 	const dispatch = useAppDispatch();
 
-	const initWorker = () => {
+	const initWorker = useCallback(() => {
 		seenMessagePool.registerSeenMessageWorker((action) => {
-			dispatch(				
-				messagesActions.updateLastSeenMessage({
-					channelId: action.channelId,
-					channelLabel: action.channelLabel,
-					messageId: action.messageId,
-				}),
-			);
+			// temp check fake message
+			if (action.messageId?.length !== 13)
+				dispatch(
+					messagesActions.updateLastSeenMessage({
+						channelId: action.channelId,
+						messageId: action.messageId,
+					}),
+				);
 		});
-	};
+	}, [dispatch]);
 
-	const unInitWorker = () => {
+	const unInitWorker = useCallback(() => {
 		seenMessagePool.unRegisterSeenMessageWorker();
-	};
+	}, []);
 
-	const markMessageAsSeen = (message: IMessage) => {
+	const markMessageAsSeen = useCallback((message: IMessage) => {
 		seenMessagePool.addSeenMessage({
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,
@@ -35,11 +37,14 @@ export function useSeenMessagePool() {
 			messageCreatedAt: message.creationTimeMs ? +message.creationTimeMs : 0,
 			messageSeenAt: +Date.now(),
 		});
-	};
+	}, []);
 
-	return {
-		markMessageAsSeen,
-		initWorker,
-		unInitWorker,
-	};
+	return useMemo(
+		() => ({
+			markMessageAsSeen,
+			initWorker,
+			unInitWorker,
+		}),
+		[initWorker, markMessageAsSeen, unInitWorker],
+	);
 }

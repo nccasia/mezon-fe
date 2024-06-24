@@ -18,7 +18,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -26,11 +27,15 @@ import ChatBox from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
+import { validInput } from '../../../utils/validate';
+import { ErrorInput } from '../../ErrorInput';
 import { styles } from './CreateThreadForm.style';
 
 export default function CreateThreadForm() {
 	const dispatch = useAppDispatch();
 	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
+	const { t } = useTranslation(['createThread']);
+	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -110,7 +115,7 @@ export default function CreateThreadForm() {
 			const valueForm = { isPrivate: isPrivate ? 1 : 0, nameValueThread: nameValueThread ?? valueThread?.content.t };
 			const contentMessage = openThreadMessageState ? { t: valueThread.content.t, contentThread: content.t } : { t: content.t };
 
-			if (nameValueThread) {
+			if (validInput(nameValueThread)) {
 				handleSendMessageThread(contentMessage, [], [], [], valueForm);
 			}
 		});
@@ -132,14 +137,21 @@ export default function CreateThreadForm() {
 	return (
 		<View style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
-				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
-					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values }) => (
+				<Formik
+					validate={(values) => {
+						setIsCheckValid(validInput(values?.nameValueThread));
+					}}
+					innerRef={formikRef}
+					initialValues={{ nameValueThread: null, isPrivate: false }}
+					onSubmit={() => {}}
+				>
+					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
 							<View style={styles.iconContainer}>
 								<ThreadIcon width={22} height={22} />
 							</View>
-							<Text style={styles.threadName}>Thread Name</Text>
-							<SafeAreaView>
+							<Text style={styles.threadName}>{t('threadName')}</Text>
+							<SafeAreaView style={styles.inputContainer}>
 								<TextInput
 									onChangeText={handleChange('nameValueThread')}
 									onBlur={handleBlur('nameValueThread')}
@@ -148,12 +160,13 @@ export default function CreateThreadForm() {
 									placeholder="New Thread"
 									style={styles.inputThreadName}
 								/>
+								{!isCheckValid && <ErrorInput style={styles.errorMessage} errorMessage={t('errorMessage')} />}
 							</SafeAreaView>
 							{!openThreadMessageState && (
 								<View style={styles.threadPolicy}>
 									<View style={styles.threadPolicyInfo}>
-										<Text style={styles.threadPolicyTitle}>Private Thread</Text>
-										<Text style={styles.threadPolicyContent}>Only people you invite and moderators can see this thread</Text>
+										<Text style={styles.threadPolicyTitle}>{t('privateThread')}</Text>
+										<Text style={styles.threadPolicyContent}>{t('onlyPeopleInviteThread')}</Text>
 									</View>
 									<Switch
 										value={values.isPrivate}
@@ -182,9 +195,9 @@ export default function CreateThreadForm() {
 								channelLabel={currentChannel?.channel_label || ''}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
-                hiddenIcon={{
-                  threadIcon: true
-                }}
+								hiddenIcon={{
+									threadIcon: true,
+								}}
 							/>
 							<View
 								style={{

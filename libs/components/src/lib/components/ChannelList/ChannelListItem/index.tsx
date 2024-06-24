@@ -42,7 +42,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnReadChannel}
-				numberNotication={numberNotification}
+				numberNotification={numberNotification}
 				channelType={channel?.type}
 			/>
 			{channel.threads && <ThreadListChannel threads={channel.threads} />}

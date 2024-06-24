@@ -1,18 +1,15 @@
 import {
 	directActions,
 	messagesActions,
-	selectHasMoreMessageByChannelId,
-	selectLastMessageIdByChannelId,
-	selectMessageByChannelId,
-	selectUnreadMessageIdByChannelId,
+	selectDirectById,
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useChatMessages } from './useChatMessages';
+import { useSelector } from 'react-redux';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
@@ -20,16 +17,12 @@ export type UseDirectMessagesOptions = {
 };
 
 export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions) {
-	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
+	const { clientRef, sessionRef, socketRef } = useMezon();
 
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
-
-	const messages = useSelector(selectMessageByChannelId(channelId));
-	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
-	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const { lastMessage } = useChatMessages({ channelId });
+	const channel = useSelector(selectDirectById(channelId));
 
 	const sendDirectMessage = React.useCallback(
 		async (content: IMessageSendPayload,
@@ -39,21 +32,19 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-			const channel = channelRef.current;
 
 			if (!client || !session || !socket || !channel) {
 				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
-
-			await socket.writeChatMessage('DM', channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
+			await socket.writeChatMessage('DM', channel.id, mode, content, mentions, attachments, references);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
 				dispatch(directActions.updateLastSeenTime(lastMessage));
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelRef, mode],
+		[sessionRef, clientRef, socketRef, channel, mode, dispatch, lastMessage],
 	);
 
 	const loadMoreMessage = React.useCallback(async () => {
@@ -61,20 +52,16 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId: channelId, channelLabel: '', mode: mode}));
-	}, [channelId, dispatch]);
+		dispatch(messagesActions.sendTypingUser({ channelId: channelId, mode: mode}));
+	}, [channelId, dispatch, mode]);
 
 	return useMemo(
 		() => ({
 			client,
-			messages,
-			unreadMessageId,
-			lastMessageId,
-			hasMoreMessage,
 			sendDirectMessage,
 			loadMoreMessage,
 			sendMessageTyping,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessageTyping, sendDirectMessage, loadMoreMessage],
+		[client, sendMessageTyping, sendDirectMessage, loadMoreMessage],
 	);
 }

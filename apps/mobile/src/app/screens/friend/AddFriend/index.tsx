@@ -9,9 +9,12 @@ import { AddFriendModal } from './components/AddFriendModal';
 import { SeparatorWithLine } from '../../../components/Common';
 import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
 import { FriendsEntity } from '@mezon/store-mobile';
+import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
+import { User } from 'mezon-js';
 
 export const AddFriendScreen = () => {
     const { friends, acceptFriend, deleteFriend } = useFriends();
+    const [ selectedUser, setSelectedUser ] = useState<User | null>(null);
     const { t } = useTranslation('friends');
     const [currentAddFriendType, setCurrentAddFriendType] = useState<EAddFriendWays | null>(null);
     const receivedFriendRequestList = useMemo(() => {
@@ -25,6 +28,9 @@ export const AddFriendScreen = () => {
                 break;
             case EFriendItemAction.Approve:
                 acceptFriend(friend.user.username, friend.user.id);
+                break;
+            case EFriendItemAction.ShowInformation:
+                setSelectedUser(friend.user)
                 break;
             default:
                 break;
@@ -73,6 +79,7 @@ export const AddFriendScreen = () => {
             </View>
 
             <AddFriendModal type={currentAddFriendType} onClose={() => setCurrentAddFriendType(null)} />
+            <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
         </View>
     )
 }

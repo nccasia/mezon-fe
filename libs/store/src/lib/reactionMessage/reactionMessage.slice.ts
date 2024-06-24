@@ -2,7 +2,6 @@ import { EmojiDataOptionals, EmojiPlaces, IEmoji } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const REACTION_FEATURE_KEY = 'reaction';
-
 export const mapReactionToEntity = (reaction: UpdateReactionMessageArgs) => {
 	return reaction;
 };
@@ -39,8 +38,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 		left: number;
 		bottom: number;
 	};
-	arrowPosition: boolean;
-	triggerUpdateReaction: boolean;
+	emojiHover: EmojiDataOptionals | null;
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -85,8 +83,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		left: 0,
 		bottom: 0,
 	},
-	arrowPosition: false,
-	triggerUpdateReaction: false,
+	emojiHover: null,
 });
 
 export const reactionSlice = createSlice({
@@ -96,6 +93,9 @@ export const reactionSlice = createSlice({
 		add: reactionAdapter.addOne,
 		remove: reactionAdapter.removeOne,
 
+		setEmojiHover(state, action) {
+			state.emojiHover = action.payload;
+		},
 		setReactionPlaceActive(state, action) {
 			state.reactionPlaceActive = action.payload;
 		},
@@ -122,9 +122,6 @@ export const reactionSlice = createSlice({
 					{
 						sender_id: action.payload.sender_id || '',
 						count: action.payload.action ? action.payload.count : 1,
-						emojiIdList: [],
-						sender_name: '',
-						avatar: '',
 					},
 				],
 				channel_id: action.payload.channel_id ?? '',
@@ -156,12 +153,6 @@ export const reactionSlice = createSlice({
 		},
 		setPositionOfSmileButton(state, action) {
 			state.positionOfSmileButton = action.payload;
-		},
-		setArrowPosition(state, action) {
-			state.arrowPosition = action.payload;
-		},
-		setTriggerUpdateReaction(state) {
-			state.triggerUpdateReaction = !state.triggerUpdateReaction;
 		},
 	},
 });
@@ -201,6 +192,4 @@ export const selectMessageMatchWithRef = createSelector(getReactionState, (state
 
 export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (state: ReactionState) => state.positionOfSmileButton);
 
-export const selectArrowPosition = createSelector(getReactionState, (state: ReactionState) => state.arrowPosition);
-
-export const selectTriggerUpdateReaction = createSelector(getReactionState, (state: ReactionState) => state.triggerUpdateReaction);
+export const selectEmojiHover = createSelector(getReactionState, (state: ReactionState) => state.emojiHover);

@@ -46,8 +46,8 @@ export const isVideo = (url?: string) => {
 };
 
 export const normalizeString = (str: string) => {
-  const normalizedStr = str.replace(/\s+/g, '').trim();
-  return normalizedStr.toLowerCase();
+  const normalizedStr = str?.replace?.(/\s+/g, '')?.trim();
+  return normalizedStr?.toLowerCase?.();
 }
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
 export const mentionRegex = /(?<=(^|[^`]))(@\S+|#[^\s#]+)(?=\s|$)|<#\d+>/g;
@@ -68,3 +68,6 @@ export const validURL = (string: string) => {
 
 export const clanAndChannelIdLinkRegex = /clans\/(\d+)\/channels\/(\d+)/;
 export const clanDirectMessageLinkRegex = /chat\/direct\/message\/(\d+)\/(\d+)$/;
+
+export const validTextInputRegex = /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
+export const linkGoogleMeet = 'https://meet.google.com/';

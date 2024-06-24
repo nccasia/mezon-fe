@@ -6,6 +6,19 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.secondary,
         flex: 1,
         paddingBottom: 20
+    },
+    backArrow: {
+        paddingLeft: size.s_12
+    },
+    saveChangeButton: {
+        paddingRight: size.s_12,
+        fontSize: size.regular
+    },
+    changed: {
+        color: Colors.textViolet
+    },
+    notChange: {
+        color: Colors.titleSteelGray
     }
 })
 

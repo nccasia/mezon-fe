@@ -6,7 +6,8 @@
     "fields": {
         "cateName": {
             "title": "Danh mục mới",
-            "placeholder": "Tên danh mục"
+            "placeholder": "Tên danh mục",
+            "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
         },
         "catePrivate": {
             "title": "Danh mục riêng",

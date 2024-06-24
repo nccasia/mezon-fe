@@ -1,10 +1,7 @@
-import { channelMembersActions, rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, rolesClanActions, useAppDispatch } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 export function useRoles(channelID?: string) {
-	const RolesClan = useSelector(selectAllRolesClan);
-
 	const dispatch = useAppDispatch();
 	const deleteRole = React.useCallback(
 		async (roleId: string) => {
@@ -49,11 +46,10 @@ export function useRoles(channelID?: string) {
 	);
 	return useMemo(
 		() => ({
-			RolesClan,
 			deleteRole,
 			createRole,
 			updateRole,
 		}),
-		[RolesClan, deleteRole, createRole, updateRole],
+		[deleteRole, createRole, updateRole],
 	);
 }

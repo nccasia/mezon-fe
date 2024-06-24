@@ -12,8 +12,9 @@ import { FriendListByAlphabet } from "../../../components/FriendListByAlphabet";
 import { FriendsEntity, directActions, useAppDispatch } from "@mezon/store-mobile";
 import { EFriendItemAction } from "../../../components/FriendItem";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
-import { ChannelType } from "mezon-js";
+import { ChannelType, User } from "mezon-js";
 import { APP_SCREEN } from "../../../navigation/ScreenTypes";
+import { UserInformationBottomSheet } from "../../../components/UserInformationBottomSheet";
 
 export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
@@ -21,6 +22,7 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const [ friendIdSelectedList, setFriendIdSelectedList ] = useState<string[]>([]);
     const { friends: allUser } = useFriends();
     const dispatch = useAppDispatch();
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     const friendList: FriendsEntity[] = useMemo(() => {
         return allUser.filter((user) => user.state === 0)
@@ -36,7 +38,7 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const handleFriendAction = useCallback((friend: FriendsEntity, action: EFriendItemAction) => {
         switch (action) {
             case EFriendItemAction.ShowInformation:
-                console.log('handle Show Information', friend);
+                setSelectedUser(friend?.user);
                 break;
             default:
                 break;
@@ -100,6 +102,8 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
                         onSelectedChange={onSelectedChange}
                     />
                 </View>
+
+                <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
             </View>
         </TouchableWithoutFeedback>
     )

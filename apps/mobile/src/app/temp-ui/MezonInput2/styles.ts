@@ -15,6 +15,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 0,
 		height: size.s_50,
 	},
+  errorInput: {
+    paddingHorizontal: size.s_20,
+  }
 })
 
 export default styles;

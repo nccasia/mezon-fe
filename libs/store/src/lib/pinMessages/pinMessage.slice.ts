@@ -52,7 +52,7 @@ export const fetchChannelPinMessages = createAsyncThunk(
 		}
 		const response = await fetchChannelPinMessagesCached(mezon, channelId);
 		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
         if (!response.pin_messages_list) {

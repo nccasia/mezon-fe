@@ -3,6 +3,7 @@
         "categoryCreator": "Create Category",
         "clanSetting": "Clan Settings",
         "channelCreator": "Create Channel",
-        "clanOverviewSetting": "Overview Settings"
+        "clanOverviewSetting": "Overview Settings",
+        "eventCreator": "Create Event"
     }
 }

@@ -1,6 +1,6 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useApp, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectCurrentVoiceChannel } from '@mezon/store';
+import { MezonPolicyProvider, useApp, useAuth, useThreads } from '@mezon/core';
+import { selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectCurrentVoiceChannel, selectStatusMenu } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,9 +11,10 @@ import ThreadsMain from '../pages/thread';
 
 const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const { userProfile } = useAuth();
-	const { closeMenu, statusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 
 	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
@@ -41,7 +42,7 @@ const ClanLayout = () => {
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
 					<FooterProfile
-						name={userProfile?.user?.username || ''}
+						name={userProfile?.user?.display_name || ''}
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
 						userId={userProfile?.user?.id || ''}

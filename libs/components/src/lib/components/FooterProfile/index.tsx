@@ -1,9 +1,10 @@
-import { useApp, useAuth, useOnClickOutside, useVoice } from '@mezon/core';
+import { useAuth, useOnClickOutside, useVoice } from '@mezon/core';
 import {
 	ChannelsEntity,
 	selectMemberByUserId,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
+	selectTheme,
 	useAppDispatch,
 	userClanProfileActions,
 	voiceActions,
@@ -30,7 +31,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	const dispatch = useAppDispatch();
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const profileRef = useRef<HTMLDivElement | null>(null);
 

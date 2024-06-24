@@ -1,12 +1,12 @@
-import { useApp, useAuth } from '@mezon/core';
-import { selectIsLogin, selectSession } from '@mezon/store';
+import { useAuth } from '@mezon/core';
+import { selectIsLogin, selectSession, selectTheme } from '@mezon/store';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 const LoginDesktop = () => {
 	const { loginByGoogle } = useAuth();
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const isLogin = useSelector(selectIsLogin);
 	const session = useSelector(selectSession);

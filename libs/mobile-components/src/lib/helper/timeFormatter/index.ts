@@ -118,3 +118,8 @@ export const getTimeFormatDay = () => {
 export const isSameDay = (time: string) => {
     return compareDate(new Date(), time || '');
 }
+
+export function getNearTime(minutes: number): Date {
+    const next = new Date((new Date()).getTime() + minutes * 60000);
+    return new Date(next.getFullYear(), next.getMonth(), next.getDate(), next.getHours())
+}

@@ -1,9 +1,9 @@
-import { useClans, useEscapeKey, useInvite } from '@mezon/core';
+import { useEscapeKey, useInvite } from '@mezon/core';
 import { useEffect, useState } from 'react';
 import ListMemberInvite from '.';
 import Modal from '../../../../../ui/src/lib/Modal';
 import { useSelector } from 'react-redux';
-import { selectChannelById, selectCurrentClan } from '@mezon/store';
+import { selectChannelById, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 
 const expireAfter = [
 	'30 minutes',
@@ -38,7 +38,7 @@ const ModalInvite = (props: ModalParam) => {
 	const [max, setMax] = useState('No limit');
 	const [modalEdit, setModalEdit] = useState(false);
 	const [urlInvite, setUrlInvite] = useState('');
-	const { currentClanId } = useClans();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
 
 	const { onClose, channelID } = props;

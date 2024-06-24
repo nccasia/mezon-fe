@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import MezonInput from '../../temp-ui/MezonInput2';
 import { IMezonMenuSectionProps, MezonMenu } from '../../temp-ui';
 import MezonToggleButton from '../../temp-ui/MezonToggleButton';
+import { validInput } from '../../utils/validate';
 
 type CreateCategoryScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CATEGORY;
 export default function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCategoryScreen>) {
@@ -46,7 +47,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
     />
 
     const handleCreateCategory = async () => {
-        if (categoryName.trim().length === 0) return;
+        if (!validInput(categoryName)) return;
 
         const body: ApiCreateCategoryDescRequest = {
             clan_id: currentClanId?.toString(),
@@ -81,8 +82,8 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
                 value={categoryName}
                 onTextChange={setCategoryName}
                 placeHolder={t('fields.cateName.placeholder')}
+                errorMessage={t('fields.cateName.errorMessage')}
                 label={t('fields.cateName.title')} />
-
             <MezonMenu menu={menuPrivate} />
         </View>
     )

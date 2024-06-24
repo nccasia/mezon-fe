@@ -1,11 +1,10 @@
-import { Image, Platform, View } from "react-native";
+import { Image, View } from "react-native";
 import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { PenIcon } from "@mezon/mobile-components";
 import Toast from "react-native-toast-message";
-import { useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker"
-import { useMixImageColor } from "apps/mobile/src/app/hooks/useMixImageColor";
+import { useMixImageColor } from "../../../../../../../app/hooks/useMixImageColor";
 
 export interface IFile {
     uri: string;
@@ -21,7 +20,6 @@ interface IBannerAvatarProps {
 
 export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
     const { color } = useMixImageColor(avatar);
-    const [imageUrl, setImageUrl] = useState<string>(avatar);
 
     function reserve() {
         Toast.show({
@@ -51,7 +49,6 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
             };
 
             // TODO: Update banner color
-            setImageUrl(response.assets[0].uri);
             onChange && onChange(fileFormat);
         }
     }
@@ -71,7 +68,7 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
             <View style={styles.avatarContainer}>
                 <Image
                     style={styles.avatar}
-                    source={{ uri: imageUrl }}
+                    source={{ uri: avatar || '' }}
                 />
 
                 <View style={[styles.btnGroup, styles.absolute]}>

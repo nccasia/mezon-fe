@@ -8,7 +8,7 @@ import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
-import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
@@ -90,7 +90,7 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
 
 		if (!response.clandesc) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const clans = response.clandesc.map(mapClanToEntity);
@@ -152,7 +152,7 @@ type removeClanUsersPayload = {
 export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userIds} : removeClanUsersPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.removeChannelUsers(mezon.session, clanId, userIds);
+		const response = await mezon.client.removeClanUsers(mezon.session, clanId, userIds);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
@@ -228,7 +228,20 @@ export const updateUser = createAsyncThunk(
 		}
 	},
 );
-
+interface JoinClanPayload {
+	clanId: string;
+}
+export const joinClan = createAsyncThunk<void, JoinClanPayload>(
+	'direct/joinClan',
+	async ({ clanId }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			await mezon.socketRef.current?.joinClanChat(clanId);
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
 export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
@@ -330,6 +343,7 @@ export const clansActions = {
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
+	joinClan,
 };
 
 /*

@@ -1,7 +1,15 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, AngleRight, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
+import { Block, Colors, size } from '@mezon/mobile-ui';
+import {
+	ChannelsEntity,
+	channelMembersActions,
+	directActions,
+	selectChannelsEntities,
+	selectCurrentChannel,
+	selectDmGroupCurrentId,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -29,17 +37,22 @@ const HomeDefault = React.memo((props: any) => {
 	const [showForwardModal, setShowForwardModal] = useState(false);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
+	const dispatch = useAppDispatch();
 
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+	const prevChannelRef = useRef<ChannelsEntity>();
+	const currentDmGroupIdRef = useRef<string>();
+
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
 		if (isShow) {
 			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.collapse();
+			bottomPickerRef.current?.collapse();
 		} else {
 			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
+			bottomPickerRef.current?.close();
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
@@ -65,17 +78,36 @@ const HomeDefault = React.memo((props: any) => {
 		bottomSheetRef.current?.close();
 		setIsShowSettingNotifyBottomSheet(false);
 	};
-
 	const renderBackdrop = useCallback((props) => <BottomSheetBackdrop {...props} opacity={0.5} onPress={closeBottomSheet} appearsOnIndex={1} />, []);
 
 	useFocusEffect(
 		useCallback(() => {
 			setIsFocusChannelView(true);
+			if (prevChannelRef.current !== currentChannel || (currentDmGroupIdRef.current !== currentDmGroupId && currentDmGroupId)) {
+				fetchMemberChannel();
+			}
+			prevChannelRef.current = currentChannel;
+			currentDmGroupIdRef.current = currentDmGroupId;
 			return () => {
 				setIsFocusChannelView(false);
+				currentDmGroupIdRef.current = null;
 			};
-		}, []),
+		}, [currentChannel, currentDmGroupId]),
 	);
+
+	const fetchMemberChannel = async () => {
+		if (currentDmGroupId) {
+			dispatch(directActions.setDmGroupCurrentId(''));
+		}
+
+		await dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: currentChannel.clan_id || '',
+				channelId: currentChannel.channel_id || '',
+				channelType: currentChannel.type,
+			}),
+		);
+	};
 
 	const onOpenDrawer = () => {
 		onShowKeyboardBottomSheet(false, 0, 'text');
@@ -99,6 +131,15 @@ const HomeDefault = React.memo((props: any) => {
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
+					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
+							<TouchableOpacity
+								style={{ flex: 1 }}
+								onPress={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text')}
+							></TouchableOpacity>
+						</Block>
+					)}
+
 					<ChatBox
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}

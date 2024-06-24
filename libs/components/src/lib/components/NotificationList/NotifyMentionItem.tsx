@@ -1,5 +1,5 @@
-import { useAppNavigation, useClans, useJumpToMessage, useNotification, useReference } from '@mezon/core';
-import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId } from '@mezon/store';
+import { useAppNavigation, useJumpToMessage, useNotification, useReference } from '@mezon/core';
+import { INotification, selectChannelById, selectCurrentChannelId, selectCurrentClan, selectMemberClanByUserId } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -46,7 +46,7 @@ function parseObject(obj: any) {
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { deleteNotify } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
 	const { toChannelPage, navigate } = useAppNavigation();

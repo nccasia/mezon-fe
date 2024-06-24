@@ -20,11 +20,12 @@ import { friendList } from '../fakeData';
 import { styles } from './styles';
 
 export const InviteToChannel = React.memo(
-	React.forwardRef(({}: any, refRBSheet: React.Ref<any>) => {
+	React.forwardRef(({currentCategory}: any, refRBSheet: React.Ref<any>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
+    const [isUnknownChannel, setIsKnownChannel] = useState<boolean>(false);
 
 		const { currentClanId, currentClan } = useClans();
 		const { createLinkInviteUser } = useInvite();
@@ -33,9 +34,12 @@ export const InviteToChannel = React.memo(
 		//TODO: get from API
 		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 		const [expiredTimeSelected, setExpiredTimeSelected] = useState<number>(2);
-		const [isTemporaryMembership, setIsTemporaryMembership] = useState(false);
+		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
 		const { categorizedChannels } = useCategory();
 
+    useEffect(()=>{
+      setIsKnownChannel(!currentCategory?.channel_id)
+    },[currentCategory])
 		const openEditLinkModal = () => {
 			//@ts-ignore
 			refRBSheet?.current?.close();
@@ -119,8 +123,11 @@ export const InviteToChannel = React.memo(
 			<View style={styles.inviteToChannelWrapper}>
 				<Pressable
 					onPress={
-						//@ts-ignore
-						() => refRBSheet.current.open()
+            () =>{
+              setIsKnownChannel(false)
+              //@ts-ignore
+              refRBSheet.current.open()
+            }
 					}
 				>
 					<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
@@ -140,70 +147,74 @@ export const InviteToChannel = React.memo(
 					<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 						<View style={[styles.inviteWrapper, isKeyboardVisible && { marginTop: size.s_50 }]}>
 							<View style={styles.inviteHeader}>
-								<Text style={styles.inviteHeaderText}>Invite a friend</Text>
+								<Text style={styles.inviteHeaderText}>{t('title')}</Text>
 							</View>
-							<View style={styles.iconAreaWrapper}>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
-								</Pressable>
-							</View>
+              {
+                isUnknownChannel ? <Text style={styles.textUnknown}>{t('unknownChannel')}</Text> : (<>
+                  <View style={styles.iconAreaWrapper}>
+                  <Pressable style={styles.inviteIconWrapper}>
+                    <View style={styles.shareToInviteIconWrapper}>
+                      <Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
+                    </View>
+                    <Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
+                  </Pressable>
+                  <Pressable style={styles.inviteIconWrapper}>
+                    <View style={styles.shareToInviteIconWrapper}>
+                      <Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
+                    </View>
+                    <Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
+                  </Pressable>
+                  <Pressable style={styles.inviteIconWrapper}>
+                    <View style={styles.shareToInviteIconWrapper}>
+                      <Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
+                    </View>
+                    <Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
+                  </Pressable>
+                  <Pressable style={styles.inviteIconWrapper}>
+                    <View style={styles.shareToInviteIconWrapper}>
+                      <Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
+                    </View>
+                    <Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
+                  </Pressable>
+                  <Pressable style={styles.inviteIconWrapper}>
+                    <View style={styles.shareToInviteIconWrapper}>
+                      <Feather size={25} name="mail" style={styles.shareToInviteIcon} />
+                    </View>
+                    <Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
+                  </Pressable>
+                </View>
 
-							<View style={styles.searchInviteFriendWrapper}>
-								<View style={styles.searchFriendToInviteWrapper}>
-									<TextInput
-										placeholder={'Invite friend to channel'}
-										placeholderTextColor={Colors.tertiary}
-										style={styles.searchFriendToInviteInput}
-										onChangeText={setSearchUserText}
-									/>
-									<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
-								</View>
-								<View style={styles.editInviteLinkWrapper}>
-									<Text style={styles.defaultText}>Your invite link expires in 7 days </Text>
-									<Pressable onPress={() => openEditLinkModal()}>
-										<Text style={styles.linkText}>Edit invite link.</Text>
-									</Pressable>
-								</View>
-							</View>
-							<ScrollView
-								bounces={false}
-								showsVerticalScrollIndicator={false}
-								nestedScrollEnabled={true}
-								contentContainerStyle={{ paddingBottom: size.s_20 }}
-							>
-								<ListMemberInvite
-									searchTerm={searchUserText}
-									urlInvite={currentInviteLink}
-									channelID={categorizedChannels.at(0)?.channels.at(0)?.channel_id}
-								/>
-							</ScrollView>
+                <View style={styles.searchInviteFriendWrapper}>
+                  <View style={styles.searchFriendToInviteWrapper}>
+                    <TextInput
+                      placeholder={'Invite friend to channel'}
+                      placeholderTextColor={Colors.tertiary}
+                      style={styles.searchFriendToInviteInput}
+                      onChangeText={setSearchUserText}
+                    />
+                    <Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+                  </View>
+                  <View style={styles.editInviteLinkWrapper}>
+                    <Text style={styles.defaultText}>{t('yourLinkInvite')}</Text>
+                    <Pressable onPress={() => openEditLinkModal()}>
+                      <Text style={styles.linkText}>{t('editInviteLink')}</Text>
+                    </Pressable>
+                  </View>
+                </View>
+                <ScrollView
+                  bounces={false}
+                  showsVerticalScrollIndicator={false}
+                  nestedScrollEnabled={true}
+                  contentContainerStyle={{ paddingBottom: size.s_20 }}
+                >
+                  <ListMemberInvite
+                    searchTerm={searchUserText}
+                    urlInvite={currentInviteLink}
+                    channelID={categorizedChannels.at(0)?.channels.at(0)?.channel_id}
+                  />
+                </ScrollView>
+                </>)
+                }
 						</View>
 					</TouchableWithoutFeedback>
 				</BottomSheet>
@@ -215,15 +226,15 @@ export const InviteToChannel = React.memo(
 					visibleChange={onVisibleEditLinkModalChange}
 				>
 					<View style={styles.inviteChannelListWrapper}>
-						<Text style={styles.inviteChannelListTitle}>INVITE CHANNEL</Text>
+						<Text style={styles.inviteChannelListTitle}>{t('inviteChannel')}</Text>
 						<View style={styles.channelInviteItem}>
 							{/* <HashSignIcon width={18} height={18} /> */}
 							<Text style={styles.channelInviteTitle}>{currentClan?.clan_name}</Text>
 						</View>
 					</View>
 					<View style={styles.advancedSettingWrapper}>
-						<Text style={styles.advancedSettingTitle}>ADVANCED SETTINGS</Text>
-						<Text style={styles.advancedSettingSubTitle}>EXPIRE AFTER</Text>
+						<Text style={styles.advancedSettingTitle}>{t('advancedSettings')}</Text>
+						<Text style={styles.advancedSettingSubTitle}>{t('expireAfter')}</Text>
 						<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 							<View style={styles.radioContainer}>
 								{LINK_EXPIRE_OPTION.map((option) => (
@@ -246,7 +257,7 @@ export const InviteToChannel = React.memo(
 								))}
 							</View>
 						</ScrollView>
-						<Text style={styles.advancedSettingSubTitle}>MAX USERS</Text>
+						<Text style={styles.advancedSettingSubTitle}>{t('maxUsers')}</Text>
 						<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 							<View style={styles.radioContainer}>
 								{MAX_USER_OPTION.map((option) => (
@@ -270,12 +281,12 @@ export const InviteToChannel = React.memo(
 							</View>
 						</ScrollView>
 						<View style={styles.temporaryMemberWrapper}>
-							<Text style={styles.temporaryMemberTitle}>Temporary Membership</Text>
+							<Text style={styles.temporaryMemberTitle}>{t('temporaryMembership')}</Text>
 							<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
 						</View>
 						<View style={{ flexDirection: 'row' }}>
 							<Text style={{ color: Colors.textGray }}>
-								Members are automatically kicked when they disconnect unless a role is assigned.
+              {t('memberAutoKick')}
 							</Text>
 						</View>
 					</View>

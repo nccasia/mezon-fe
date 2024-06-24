@@ -1,50 +1,31 @@
-import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import {
-	useAppNavigation,
-	useAuth,
-	useChangeChannelId,
-	useClans,
-	useDragAndDrop,
-	useMenu,
-	useSearchMessages,
-	useThreads,
-	useVoice,
-} from '@mezon/core';
-import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
+import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
+import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { channelsActions, selectCloseMenu, selectCurrentChannel, selectIsShowMemberList, selectShowScreen, selectStatusMenu, useAppDispatch } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
-import ChannelMessages from './ChannelMessages';
 import { ChannelTyping } from './ChannelTyping';
 
 // TODO: move this to core
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const { idChannelSelected, currentClanId, setIdChannelSelected } = useChangeChannelId();
-	const { navigate, toChannelPage } = useAppNavigation();
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
-		setIdChannelSelected(channelId);
-		if (idChannelSelected) {
-			const path = toChannelPage(idChannelSelected, currentClanId || '');
-			navigate(path);
-		}
-	}, [channelId, idChannelSelected, dispatch]);
+	}, [channelId, dispatch]);
 }
 
-export default function ChannelLayout() {
+export default function ChannelMain() {
 	const { draggingState, setDraggingState } = useDragAndDrop();
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const { currentClan } = useClans();
-	const { userProfile } = useAuth();
-	const { sessionRef } = useMezon();
-	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const { isSearchMessage } = useSearchMessages();
 
@@ -64,34 +45,6 @@ export default function ChannelLayout() {
 		console.log('not implemented');
 	}, []);
 
-	const renderChannelMedia = () => {
-		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {
-			return (
-				<ChannelMessages
-					channelId={currentChannel?.id}
-					channelLabel={currentChannel.channel_label}
-					type="CHANNEL"
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
-			);
-		} else if (currentChannel && currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			return statusCall ? (
-				<ChannelVoice
-					jwt={sessionRef.current?.token || ''}
-					channelId={currentChannel.channel_id || ''}
-					channelLabel={currentChannel.channel_label || ''}
-					clanId={currentClan?.id || ''}
-					clanName={currentClan?.clan_name || ''}
-					userName={userProfile?.user?.username || 'unknown'}
-				/>
-			) : (
-				<ChannelVoiceOff />
-			);
-		} else {
-			return <ChannelMessages.Skeleton />;
-		}
-	};
-
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -104,7 +57,7 @@ export default function ChannelLayout() {
 		if (isShowMemberList) {
 			setIsShowCreateThread(false);
 		}
-	}, [isShowMemberList]);
+	}, [isShowMemberList, setIsShowCreateThread]);
 
 	return (
 		<>
@@ -122,7 +75,7 @@ export default function ChannelLayout() {
 							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
 							ref={messagesContainerRef}
 						>
-							{renderChannelMedia()}
+							<ChannelMedia currentChannel={currentChannel} statusCall={statusCall} key={currentChannel?.channel_id} />
 						</div>
 						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 							<div className="flex-1 bg-[#1E1E1E]">
@@ -149,7 +102,6 @@ export default function ChannelLayout() {
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}
-										channelLabel={currentChannel?.channel_label || ''}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 									/>
 								)}

@@ -15,7 +15,7 @@ import {
 	TrashIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { AppDispatch, pinMessageActions, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { AppDispatch, pinMessageActions, selectCurrentChannel, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import { IEmojiImage } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -54,7 +54,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleActionReply = () => {
 		onClose();
@@ -113,7 +113,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const handleActionUnPinMessage = () => {
     if(message)
 		onClose();
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId || '', message_id: message.id }));
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannel.id || '', message_id: message.id }));
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -246,7 +246,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {
-		await reactionMessageDispatch('', mode, messageId || '', emoji.shortname, 1, senderId ?? '', false);
+		await reactionMessageDispatch('', mode, currentChannel.id, currentChannel.channel_label, messageId || '', emoji.shortname, 1, senderId ?? '', false);
 		onClose();
 	};
 

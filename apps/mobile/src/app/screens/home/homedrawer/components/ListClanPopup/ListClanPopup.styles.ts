@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		borderRadius: 8,
 		padding: size.s_6,
-		marginBottom: size.s_10,
+		marginBottom: size.s_4,
 	},
 	serverName: {
 		flexDirection: 'row',
@@ -45,4 +45,5 @@ export const styles = StyleSheet.create({
 		fontWeight: '600',
 		maxWidth: 150,
 	},
+  clanIcon: {width: verticalScale(45), height: verticalScale(45)}
 });

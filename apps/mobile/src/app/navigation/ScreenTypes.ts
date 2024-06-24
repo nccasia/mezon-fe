@@ -1,3 +1,4 @@
+import { OptionEvent } from "@mezon/utils";
 import { CompositeNavigationProp, CompositeScreenProps, NavigatorScreenParams, ParamListBase } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -56,6 +57,9 @@ export const APP_SCREEN = {
     STACK: 'ROUTES.MENU_CLAN.STACk',
     CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY',
     CREATE_CHANNEL: 'ROUTES.MENU_CLAN.CREATE_CHANNEL',
+    CREATE_EVENT: 'ROUTES.MENU_CLAN.CREATE_EVENT',
+    CREATE_EVENT_DETAILS: 'ROUTES.MENU_CLAN.CREATE_EVENT_DETAILS',
+    CREATE_EVENT_PREVIEW: 'ROUTES.MENU_CLAN.CREATE_EVENT_PREVIEW',
     SETTINGS: 'ROUTES.MENU_CLAN.SETTINGS',
     OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING'
   },
@@ -108,6 +112,22 @@ type MenuClanStackParamList = {
   [APP_SCREEN.MENU_CLAN.CREATE_CHANNEL]: {
     categoryId: string;
   };
+  [APP_SCREEN.MENU_CLAN.CREATE_EVENT]: undefined
+  [APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS]: {
+    type: OptionEvent;
+    channelId: string;
+    location: string
+  }
+  [APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW]: {
+    type: OptionEvent;
+    channelId: string;
+    location: string;
+    startTime: Date;
+    endTime: Date;
+    title: string;
+    description: string;
+    frequency: number;
+  }
   [APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
   [APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
 };
@@ -135,8 +155,6 @@ type AppStackParamList = {
   [APP_SCREEN.MENU_CLAN.STACK]: NavigatorScreenParams<MenuClanStackParamList>,
   [APP_SCREEN.SETTINGS.STACK]: NavigatorScreenParams<SettingStackParamList>,
 }
-
-type a = keyof Record<string, object | undefined>;
 
 type CustomStackScreenProps<
   U extends ParamListBase,

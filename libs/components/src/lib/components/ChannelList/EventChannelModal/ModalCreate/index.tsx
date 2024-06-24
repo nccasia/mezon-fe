@@ -1,12 +1,13 @@
-import { selectVoiceChannelAll } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { useEventManagement } from '@mezon/core';
+import { selectCurrentClanId, selectVoiceChannelAll } from '@mezon/store';
+import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
 import EventInfoModal from './eventInfoModal';
+import HeaderEventCreate from './headerEventCreate';
 import LocationModal from './locationModal';
 import ReviewModal from './reviewModal';
-import { useClans, useEventManagement } from '@mezon/core';
-import { OptionEvent, Tabs_Option } from '@mezon/utils';
-import { getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
 
 export type ModalCreateProps = {
 	onClose: () => void;
@@ -15,25 +16,29 @@ export type ModalCreateProps = {
 
 const ModalCreate = (props: ModalCreateProps) => {
 	const { onClose, onCloseEventModal } = props;
-	const [currentModal, setCurrentModal] = useState(0);
-	const [topic, setTopic] = useState('');
-	const [timeStart, setTimeStart] = useState('00:00');
-	const [timeEnd, setTimeEnd] = useState('00:00');
-	const [selectedDateStart, setSelectedDateStart] = useState<Date>(new Date());
-	const [selectedDateEnd, setSelectedDateEnd] = useState<Date>(new Date());
+	const currentClanId = useSelector(selectCurrentClanId);
 	const voicesChannel = useSelector(selectVoiceChannelAll);
-	const [voiceChannel, setVoiceChannel] = useState(voicesChannel[0]?.id || '');
+	const tabs = ['Location', 'Event Info', 'Review'];
+	const [currentModal, setCurrentModal] = useState(0);
+	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
+		topic: '',
+		titleEvent: '',
+		timeStart: '00:00',
+		timeEnd: '00:00',
+		selectedDateStart: new Date(),
+		selectedDateEnd: new Date(),
+		voiceChannel: voicesChannel[0]?.id || '',
+		logo: '',
+		description: '',
+	});
 	const [buttonWork, setButtonWork] = useState(true);
-	const [titleEvent, setTitleEvent] = useState('');
 	const [option, setOption] = useState('');
-	const [logo, setLogo] = useState('');
-	const [description, setDescription] = useState('');
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
 	const { createEventManagement } = useEventManagement();
-	const { currentClanId } = useClans();
 
-	const tabs = ['Location', 'Event Info', 'Review'];
+	const choiceSpeaker = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
+	const choiceLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
 
 	const handleNext = (currentModal: number) => {
 		if (buttonWork && currentModal < tabs.length - 1 && !errorTime && !errorOption) {
@@ -45,65 +50,44 @@ const ModalCreate = (props: ModalCreateProps) => {
 		setCurrentModal(currentModal - 1);
 	};
 
-	const handleTopic = (topic: string) => {
-		setTopic(topic);
-	};
-
-	const handleTimeStart = (time: string) => {
-		setTimeStart(time);
-	};
-
-	const handleTimeEnd = (time: string) => {
-		setTimeEnd(time);
-	};
-
-	const handleVoiceChannel = (channel: string) => {
-		setVoiceChannel(channel);
-	};
-
 	const handleOption = (option: string) => {
 		setOption(option);
 	};
 
-	const handleTitleEvent = (title: string) => {
-		setTitleEvent(title);
-	};
-
 	const handleCurrentModal = (number: number) => {
-		if( errorOption || errorTime ){
+		if (errorOption || errorTime) {
 			return;
 		}
 
-		if (buttonWork || number < 1 ) {
+		if (buttonWork || number < 1) {
 			setCurrentModal(number);
 		}
 	};
 
-	const handleDescription = (content: string) => {
-		setDescription(content);
-	}
+	const handleSubmit = async () => {
+		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
+		const title = choiceLocation ? contentSubmit.titleEvent : '';
 
-	const handleSubmit = async ()=>{
+		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 
-		const voice = option === OptionEvent.OPTION_SPEAKER ? voiceChannel : '';
-		const title = option === OptionEvent.OPTION_LOCATION ? titleEvent : '';
-
-		const timeValueStart = handleTimeISO(selectedDateStart, timeStart);
-		const timeValueEnd = handleTimeISO(selectedDateEnd, timeEnd);
-
-		if(option === OptionEvent.OPTION_SPEAKER){
-			await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueStart, description, logo);
-			hanldeCloseModal();
-			return;
-		}
-		await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueEnd, description, logo);
+		await createEventManagement(
+			currentClanId || '',
+			voice,
+			title,
+			contentSubmit.topic,
+			timeValueStart,
+			choiceSpeaker ? timeValueStart : timeValueEnd,
+			contentSubmit.description,
+			contentSubmit.logo,
+		);
 		hanldeCloseModal();
-	}
+	};
 
-	const hanldeCloseModal = () =>{
+	const hanldeCloseModal = () => {
 		onClose();
 		onCloseEventModal();
-	}
+	};
 
 	useEffect(() => {
 		if (currentModal >= 1) {
@@ -111,77 +95,57 @@ const ModalCreate = (props: ModalCreateProps) => {
 		} else {
 			setButtonWork(true);
 		}
-		if (topic !== '') {
+		if (contentSubmit.topic !== '') {
 			setButtonWork(true);
 		}
-	}, [currentModal, topic]);
+	}, [currentModal, contentSubmit.topic]);
 
 	useEffect(() => {
-		if((option === OptionEvent.OPTION_LOCATION && titleEvent ==='') || (option === OptionEvent.OPTION_SPEAKER && voiceChannel ==='')){
+		if ((choiceLocation && contentSubmit.titleEvent === '') || (choiceSpeaker && contentSubmit.voiceChannel === '')) {
 			setErrorOption(true);
 		} else {
 			setErrorOption(false);
 		}
-	}, [option, titleEvent, voiceChannel])
+	}, [choiceLocation, choiceSpeaker, contentSubmit.titleEvent, contentSubmit.voiceChannel, option]);
 
-	const defaultTimeStart = getCurrentTimeRounded();
-	const defaultTimeEnd = getCurrentTimeRounded(true);
-	
+	const defaultTimeStart = useMemo(() => getCurrentTimeRounded(), []);
+	const defaultTimeEnd = useMemo(() => getCurrentTimeRounded(true), []);
+
 	useEffect(() => {
-		setTimeStart(defaultTimeStart);
-		setTimeEnd(defaultTimeEnd);
-	},[]);
+		setContentSubmit((prev) => ({ ...prev, timeStart: defaultTimeStart }));
+		setContentSubmit((prev) => ({ ...prev, timeEnd: defaultTimeEnd }));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4" >
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
 			<div className="flex gap-x-4 mb-4">
-				{tabs.map((item, index) => {
-					const isCurrent = currentModal === index;
-					return (
-						<div className="flex-grow text-[10px]" key={index} onClick={() => handleCurrentModal(index)}>
-							<div className={`w-full h-[6px] rounded mb-2 ${isCurrent ? 'bg-[#959CF7] ' : 'bg-slate-500'}`}></div>
-							<p className={isCurrent ? 'text-[#959CF7]' : 'text-slate-500'}>{item}</p>
-						</div>
-					);
-				})}
+				<HeaderEventCreate tabs={tabs} currentModal={currentModal} onHandleTab={(num: number) => handleCurrentModal(num)} />
 			</div>
 			<div>
 				{currentModal === Tabs_Option.LOCATION && (
 					<LocationModal
-						option={option}
-						voice={voiceChannel}
+						contentSubmit={contentSubmit}
+						choiceSpeaker={choiceSpeaker}
+						choiceLocation={choiceLocation}
 						voicesChannel={voicesChannel}
-						titleEvent={titleEvent}
 						handleOption={handleOption}
-						handleVoiceChannel={handleVoiceChannel}
-						handleTitleEvent={handleTitleEvent}
+						setContentSubmit={setContentSubmit}
 					/>
 				)}
-				{currentModal === Tabs_Option.EVENT_INFO && 
-					<EventInfoModal 
-						option={option} 
-						topic={topic} 
-						handleTopic={handleTopic} 
-						handleTimeStart={handleTimeStart} 
-						handleTimeEnd={handleTimeEnd} 
-						description={description} 
-						handleDescription={handleDescription} 
-						logo={logo} 
-						setLogo={setLogo} 
-						timeStart={timeStart}
-						timeEnd={timeEnd}
+				{currentModal === Tabs_Option.EVENT_INFO && (
+					<EventInfoModal
+						contentSubmit={contentSubmit}
+						choiceLocation={choiceLocation}
 						timeStartDefault={defaultTimeStart}
 						timeEndDefault={defaultTimeEnd}
-						selectedDateStart = {selectedDateStart}
-						setSelectedDateStart = {setSelectedDateStart}
-						selectedDateEnd = {selectedDateEnd}
-						setSelectedDateEnd = {setSelectedDateEnd}
-						setErrorTime={(status:boolean) => setErrorTime(status)}
+						setContentSubmit={setContentSubmit}
+						setErrorTime={(status: boolean) => setErrorTime(status)}
 					/>
-				}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} logo={logo} start={handleTimeISO(selectedDateStart, timeStart)}/>}
+				)}
+				{currentModal === Tabs_Option.REVIEW && <ReviewModal contentSubmit={contentSubmit} option={option} />}
 			</div>
-			<div className="flex justify-between mt-4 w-full">
+			<div className="flex justify-between mt-4 w-full text-white">
 				<button
 					className={`py-2 text-[#84ADFF] font-bold ${(currentModal === Tabs_Option.LOCATION || errorTime) && 'hidden'}`}
 					onClick={() => handleBack(currentModal)}
@@ -192,20 +156,22 @@ const ModalCreate = (props: ModalCreateProps) => {
 					<button className="px-4 py-2 rounded bg-slate-500 font-semibold" onClick={onClose}>
 						Cancel
 					</button>
-					{ currentModal === Tabs_Option.REVIEW ?  
+					{currentModal === Tabs_Option.REVIEW ? (
 						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption ) && 'text-slate-400 bg-opacity-50'}`}
-							onClick={(option === '' || errorOption ) ? () => {} : () => handleSubmit()}
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+							// eslint-disable-next-line @typescript-eslint/no-empty-function
+							onClick={option === '' || errorOption ? () => {} : () => handleSubmit()}
 						>
 							Create Event
-						</button> :
+						</button>
+					) : (
 						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'text-slate-400 bg-opacity-50'}`}
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
 							onClick={() => handleNext(currentModal)}
 						>
 							Next
 						</button>
-					}
+					)}
 				</div>
 			</div>
 		</div>

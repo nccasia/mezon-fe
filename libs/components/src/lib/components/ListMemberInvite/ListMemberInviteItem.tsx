@@ -20,7 +20,6 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(url, response.channel_id);
 		}
 	};
@@ -31,7 +30,6 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			directMessageWithUser(userId);
 		}
 		if (directParamId && dmGroup) {
-			mezon.joinChatDirectMessage(directParamId, '', type);
 			sendInviteMessage(url, directParamId);
 			onSend(dmGroup);
 		}

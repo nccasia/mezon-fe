@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 export function useApp() {
 	const dispatch = useAppDispatch();
 	const isShowMemberList = useSelector(selectIsShowMemberList);
+	// TODO: separate theme into a separate hook
 	const appearanceTheme = useSelector(selectTheme);
 	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
 	const elementHTML = document.documentElement;
@@ -43,11 +44,10 @@ export function useApp() {
 		() => ({
 			isShowMemberList,
 			setIsShowMemberList,
-			appearanceTheme,
 			setAppearanceTheme,
 			systemIsDark,
 			elementHTML,
 		}),
-		[ isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme, systemIsDark, elementHTML],
+		[ isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark, elementHTML],
 	);
 }

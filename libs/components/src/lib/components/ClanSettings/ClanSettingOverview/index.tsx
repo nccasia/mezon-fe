@@ -1,13 +1,15 @@
 import { useClans } from '@mezon/core';
+import { selectCurrentClan } from '@mezon/store';
 import { ApiUpdateClanDescRequest } from 'mezon-js';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import ClanBannerBackground from './ClanBannerBackground';
 import ClanLogoName from './ClanLogoName';
 import ModalSaveChanges from './ModalSaveChanges';
 
 const ClanSettingOverview = () => {
-	const { currentClan, updateClan } = useClans();
-
+	const { updateClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const [hasChanges, setHasChanges] = useState<boolean>(false);
 	const [clanRequest, setClanRequest] = useState<ApiUpdateClanDescRequest>({
 		banner: currentClan?.banner ?? '',

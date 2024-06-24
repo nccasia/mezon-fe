@@ -6,7 +6,6 @@ import {
 	selectLastMessageIdByChannelId,
 	selectMessageByChannelId,
 	selectMessageByUserId,
-	selectQuantitiesMessageRemain,
 	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
@@ -29,7 +28,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 
 	const messages = useSelector(selectMessageByChannelId(channelId));
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
+	const lastMessageId = useSelector((state) => selectLastMessageIdByChannelId(state, channelId));
 	const lastMessage = useSelector(selectLastMessageByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const messageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
@@ -61,6 +60,16 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			setOpenOptionMessageState,
 			lastMessage,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage, setOpenOptionMessageState, lastMessage],
+		[
+			client,
+			messages,
+			unreadMessageId,
+			lastMessageId,
+			hasMoreMessage,
+			lastMessageByUserId,
+			loadMoreMessage,
+			setOpenOptionMessageState,
+			lastMessage,
+		],
 	);
 }

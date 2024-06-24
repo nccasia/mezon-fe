@@ -4,23 +4,23 @@ import ClanSettingOverview from './ClanSettingOverview';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
-import { useMenu } from '@mezon/core';
 import * as Icons from '../Icons';
 import DeleteClanModal from '../DeleteClanModal';
+import { useSelector } from 'react-redux';
+import { selectCloseMenu } from '@mezon/store';
 
 export type ModalSettingProps = {
-	open: boolean;
 	onClose: () => void;
 };
 
 const ClanSetting = (props: ModalSettingProps) => {
-	const { open, onClose } = props;
+	const { onClose } = props;
 	const [currentSetting, setCurrentSetting] = useState<ItemObjProps>(listItemSetting[0]);
 	const handleSettingItemClick = (settingItem: ItemObjProps) => {
 		setCurrentSetting(settingItem);
 	};
 	const [menu, setMenu] = useState(true);
-	const { closeMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
 	useEffect(()=>{
 		if(currentSetting.id === ItemSetting.DELETE_SERVER){
@@ -28,8 +28,6 @@ const ClanSetting = (props: ModalSettingProps) => {
 		}
 	}, [currentSetting.id]);
 	return (
-		<div>
-			{open ? (
 				<div className="  flex fixed inset-0  w-screen z-10">
 					<div className="flex flex-row w-screen">
 						<div className='h-fit absolute top-5 right-5 block sbm:hidden'>
@@ -71,8 +69,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 						<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
 					</div>
 				</div>
-			) : null}
-		</div>
+			
 	);
 };
 

@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primary,
         borderRadius: 50,
         margin: 10,
-        padding: 5,
+        padding: 2,
         gap: 10
     },
 
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     },
 
     switchButtonActive: {
-        backgroundColor: Colors.green
+        backgroundColor: Colors.bgViolet
     },
 
     switchText: {

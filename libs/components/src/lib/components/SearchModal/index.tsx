@@ -1,10 +1,11 @@
-import { useApp, useAppNavigation, useAuth, useChannels, useClans, useDirect, useFriends } from '@mezon/core';
+import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
-
+import { useSelector } from 'react-redux';
+import { directActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -16,18 +17,18 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const accountId = userProfile?.user?.id ?? '';
 	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
 	const { createDirectMessageWithUser } = useDirect();
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const { friends } = useFriends();
-
+	const dispatch = useAppDispatch();
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
@@ -92,6 +93,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
+				dispatch(directActions.openDirectMessage({channel_id: user.idDM || ""}))
 				const directChat = toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? 2);
 				navigate(directChat);
 			} else {

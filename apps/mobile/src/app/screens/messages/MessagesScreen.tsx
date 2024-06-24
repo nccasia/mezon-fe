@@ -7,11 +7,11 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { styles } from './styles';
 import { useTranslation } from 'react-i18next';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { useAuth, useDirect, useMemberStatus } from '@mezon/core';
+import { useAuth, useMemberStatus } from '@mezon/core';
 import { emojiRegex, normalizeString } from '../../utils/helpers';
 import { useThrottledCallback } from 'use-debounce';
 import { useSelector } from 'react-redux';
-import { DirectEntity, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
+import { DirectEntity, selectDirectsOpenlist, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
 import { removeBlockCode } from '../home/homedrawer/constants';
 import FastImage from 'react-native-fast-image';
 import { getSrcEmoji } from '@mezon/utils';
@@ -58,7 +58,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 			const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 			return {
 				time: moment.unix(timestamp).format('DD/MM/YYYY HH:mm'),
-				textContent: formatLastMessageContent(text)
+				textContent: formatLastMessageContent(text?.trim())
 			}
 		}
 		return null;
@@ -100,7 +100,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { t } = useTranslation(['dmMessage', 'common']);
 
 	const sortDM = (a, b) => {
@@ -111,7 +111,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const filterDmGroupsByChannelLabel = (data: DirectEntity[]) => {
 		const uniqueLabels = new Set();
-		return data.filter((obj: DirectEntity) => {
+		return data?.filter((obj: DirectEntity) => {
 			const isUnique = !uniqueLabels.has(obj.channel_label);
 			uniqueLabels.add(obj.channel_label);
 			return isUnique;
@@ -119,7 +119,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	};
 
 	const filteredDataDM = useMemo(() => {
-		return filterDmGroupsByChannelLabel(dmGroupChatList).filter(dm => normalizeString(dm.channel_label).includes(normalizeString(searchText)));
+		return filterDmGroupsByChannelLabel(dmGroupChatList)?.filter?.(dm => normalizeString(dm.channel_label)?.includes(normalizeString(searchText)));
 	}, [dmGroupChatList, searchText]);
 
 	const navigateToAddFriendScreen = () => {

@@ -26,17 +26,6 @@ export async function ensureSession(mezon: MezonContextValue): Promise<MezonValu
 	});
 }
 
-export async function ensureChannel(mezon: MezonContextValue, id: string): Promise<MezonValueContext> {
-	return new Promise((resolve, reject) => {
-		const interval = setInterval(() => {
-			if (mezon.channelRef.current && mezon.channelRef.current.id === id) {
-				clearInterval(interval);
-				resolve(ensureClient(mezon));
-			}
-		}, 100);
-	});
-}
-
 export async function ensureSocket(mezon: MezonContextValue): Promise<MezonValueContext> {
 	return new Promise((resolve, reject) => {
 		const interval = setInterval(() => {

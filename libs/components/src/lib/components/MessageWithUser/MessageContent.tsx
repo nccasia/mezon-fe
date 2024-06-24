@@ -12,9 +12,11 @@ type IMessageContentProps = {
 	message: IMessageWithUser;
 	isCombine?: boolean;
 	newMessage?: string;
+	isSending?: boolean;
+	isError?: boolean;
 };
 
-const MessageContent = ({ user, message, isCombine, newMessage }: IMessageContentProps) => {
+const MessageContent = ({ user, message, isCombine, newMessage, isSending, isError }: IMessageContentProps) => {
 	const { attachments, lines } = useMessageParser(message);
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);

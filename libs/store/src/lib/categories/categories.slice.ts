@@ -33,7 +33,7 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
 	if (!response.categorydesc) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	return response.categorydesc.map(mapCategoryToEntity);
 });

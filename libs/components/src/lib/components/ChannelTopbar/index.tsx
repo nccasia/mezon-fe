@@ -1,5 +1,5 @@
-import { useApp, useEscapeKey, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectnotificatonSelected } from '@mezon/store';
+import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { appActions, searchMessagesActions, selectCloseMenu, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectStatusMenu, selectTheme, selectnotificatonSelected } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -24,9 +24,10 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { setTurnOffThreadMessage } = useThreads();
-	const { closeMenu, statusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 
 	return (
 		<div

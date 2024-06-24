@@ -1,8 +1,7 @@
-import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
+import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, selectAttachmentPhoto, selectDataReactionGetFromMessage, useAppDispatch } from '@mezon/store-mobile';
-import { updateEmojiReactionData } from '@mezon/utils';
+import { channelsActions, selectAttachmentPhoto, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +23,7 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const { messages, unreadMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
 	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
@@ -67,11 +66,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		};
 	}, []);
 
-	const { dataReactionServerAndSocket } = useChatReaction();
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-
-	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
-
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
 			return `${typingUsers[0].user?.username} is typing...`;
@@ -93,7 +87,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const onLoadMore = () => {
 		setIsLoadMore(true);
-		loadMoreMessage().finally(() => setIsLoadMore(false));
+		if (!isLoadMore) loadMoreMessage().finally(() => setIsLoadMore(false));
 	};
 
 	const handleScroll = (event: { nativeEvent: { contentOffset: { y: any } } }) => {
@@ -125,20 +119,22 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		setVisibleImageModal(true);
 	}, []);
 
-	const renderItem = ({ item, index }) => {
-		const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
-		return (
-			<MessageItem
-				message={item}
-				mode={mode}
-				channelId={channelId}
-				dataReactionCombine={dataReactionCombine}
-				channelLabel={channelLabel}
-				preMessage={preMessage}
-				onOpenImage={onOpenImage}
-			/>
-		);
-	};
+	const renderItem = useCallback(
+		({ item, index }) => {
+			const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
+			return (
+				<MessageItem
+					message={item}
+					mode={mode}
+					channelId={channelId}
+					channelLabel={channelLabel}
+					preMessage={preMessage}
+					onOpenImage={onOpenImage}
+				/>
+			);
+		},
+		[messages, mode, channelId, channelLabel, onOpenImage],
+	);
 
 	const RenderFooterModal = () => {
 		return (

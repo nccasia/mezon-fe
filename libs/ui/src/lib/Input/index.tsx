@@ -1,5 +1,6 @@
-import { useApp } from '@mezon/core';
+import { selectTheme } from '@mezon/store';
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'dangerouslySetInnerHTML'> {
 	type: string;
@@ -10,7 +11,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 }
 
 const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, required, ...rest }) => {
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className="w-full">
 			<div className={'text-[14px]'}>

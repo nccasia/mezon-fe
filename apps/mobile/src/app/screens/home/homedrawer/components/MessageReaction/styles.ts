@@ -89,6 +89,11 @@ export const styles = StyleSheet.create({
 		height: size.s_40,
 		borderRadius: size.s_40,
 		overflow: 'hidden',
+		backgroundColor: Colors.bgGrayDark
+	},
+	image: {
+		width: '100%',
+		height: '100%'
 	},
 	memberName: {
 		marginLeft: size.s_12,

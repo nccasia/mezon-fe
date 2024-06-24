@@ -32,14 +32,22 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
 	const isPendingFriendRequest = [1,2].includes(friend.state);
 
     const onPressAction = (actionType: EFriendItemAction) => {
+        if (selectMode) {
+            onSelectChange(friend, !isChecked);
+            return;
+        }
         handleFriendAction(friend, actionType);
+    }
+
+    const onLongPress = () => {
+        handleFriendAction(friend, EFriendItemAction.ShowInformation);
     }
     
     return (
         <TouchableOpacity
             style={styles.userItem}
             onPress={() => onPressAction(showAction ? EFriendItemAction.ShowInformation : EFriendItemAction.MessageDetail)}
-            onLongPress={() => onPressAction(EFriendItemAction.ShowInformation)}
+            onLongPress={() => onLongPress()}
         >
             <View>
                 {friend.user.avatar_url ? (

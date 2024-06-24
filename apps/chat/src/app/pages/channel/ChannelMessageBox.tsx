@@ -1,8 +1,10 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useGifsStickersEmoji, useMenu, useReference } from '@mezon/core';
+import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { selectIdMessageRefReaction, selectIsShowMemberList } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -14,14 +16,14 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
-	const { isShowMemberList } = useMenu();
+	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [classNamePopup, setClassNamePopup] = useState<string>(
 		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
 	);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
-	const { idMessageRefReaction } = useReference();
+	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 
 	const handleSend = useCallback(
 		(

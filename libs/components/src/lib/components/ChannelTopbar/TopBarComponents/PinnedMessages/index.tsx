@@ -1,12 +1,13 @@
-import { useApp } from '@mezon/core';
 import EmptyPinMessage from './EmptyPinMessage';
+import { useSelector } from 'react-redux';
+import { selectTheme } from '@mezon/store';
 
 type PinnedMessagesProps = {
 	onClose?: () => void;
 };
 
 const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
-	const {appearanceTheme} = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md w-[420px] max-h-[80vh] shadow-sm overflow-hidden">
