@@ -3,17 +3,19 @@ import { IChannelMember, RightClickPost } from '@mezon/utils';
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
+import {  IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
+import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useAuth, useChatMessages, useNotification, useOnClickOutside, useRightClick } from '@mezon/core';
-import { useSelector } from 'react-redux';
+import {useOnClickOutside } from '@mezon/core';
 import ContextMenu from '../RightClick/ContextMenu';
-import MessageContent from './MessageContent';
 
 export type ReactedOutsideOptional = {
 	id: string;

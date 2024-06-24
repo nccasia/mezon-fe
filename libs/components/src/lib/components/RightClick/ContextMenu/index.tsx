@@ -1,8 +1,8 @@
 import { useAuth, useClans, useRightClick } from '@mezon/core';
 import { selectMessageByMessageId } from '@mezon/store';
-import { listClickImageInViewer, listClickMessageText } from '@mezon/ui';
+import { listClickImageInViewer, listClickMessageTextDefault, listClickMessageTextOwnerClan, listClickMessageTextOwnerMessage } from '@mezon/ui';
 import { RightClickPost } from '@mezon/utils';
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
@@ -29,14 +29,20 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const { currentClan } = useClans();
 	const { userId } = useAuth();
+	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickMessageTextDefault);
 
-	useEffect(() => {
-		if (currentClan?.creator_id === userId) {
-			setHasOwnerClan(true);
+	useLayoutEffect(() => {
+		const checkOwnerClan = currentClan?.creator_id === userId;
+		const checkOwnerMessage = messageRClicked.sender_id === userId;
+		const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
+		if (checkOwnerClan && checkOwnerMessage) {
+			if (checkMessHasReaction) {
+				setListTextToMatch([...listClickMessageTextDefault, ...listClickMessageTextOwnerMessage, ...listClickMessageTextOwnerClan]);
+			} else {
+				setListTextToMatch([...listClickMessageTextDefault, ...listClickMessageTextOwnerMessage]);
+			}
 		}
-	}, [currentClan, userId]);
-
-	console.log(messageRClicked);
+	}, [messageRClicked]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -47,7 +53,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 		if (menuRefHeight && menuRefWidth) {
 			const isBottomLimit = distanceCursorToBottom < menuRefHeight;
 			const isRightLimit = distanceCursorToRight < menuRefWidth;
-
 			if (isBottomLimit && isRightLimit) {
 				setTopMenu('auto');
 				setBottomMenu(30);
@@ -64,22 +69,26 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 				setLeftMenu(rightClickXy.x);
 				setRightMenu('auto');
 			} else if (!isBottomLimit && !isRightLimit) {
-				setTopMenu(rightClickXy.y);
-				setBottomMenu('auto');
+				setTopMenu('auto');
+				setBottomMenu(30);
 				setLeftMenu(rightClickXy.x);
 				setRightMenu('auto');
 			}
 		}
 	}, [rightClickXy, WINDOW_HEIGHT, WINDOW_WIDTH, getMessageIdRightClicked]);
 
+	function sortListById(arrayList: any[]) {
+		return arrayList.sort((a, b) => a.id - b.id);
+	}
+
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2 z-50"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>
-			{listClickMessageText.map((item: any) => {
+			{sortListById(listTextToMatch)?.map((item: any) => {
 				return (
 					<Fragment key={item.name}>
 						<CopyToClipboard text={urlData}>
