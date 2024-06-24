@@ -141,7 +141,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const handleChildContextMenu = (event: React.MouseEvent) => {
-		// Ngăn chặn sự kiện lan truyền lên phần tử cha
 		event.stopPropagation();
 	};
 	return (
