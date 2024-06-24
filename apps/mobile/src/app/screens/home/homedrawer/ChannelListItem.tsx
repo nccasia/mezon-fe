@@ -39,8 +39,8 @@ function useChannelBadgeCount(channelId: string) {
 export const ChannelListItem = React.memo(
 	(props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel; onLongPress: () => void }) => {
 		const useChannelListContentIn = React.useContext(ChannelListContext);
-		const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 		const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
+		const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.channel_id));
 		const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 
 		const handleRouteData = async (thread?: IChannel) => {
