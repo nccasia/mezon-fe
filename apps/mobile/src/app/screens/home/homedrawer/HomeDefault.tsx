@@ -1,5 +1,14 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, AngleRight, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	AngleRight,
+	HashSignLockIcon,
+	MuteIcon,
+	SearchIcon,
+	ThreadIcon,
+	UnMuteIcon,
+	getChannelById,
+} from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -186,6 +195,10 @@ const HomeDefault = React.memo((props: any) => {
 	);
 });
 
+export enum EOpenThreadDetailFrom {
+  SearchChannel = "search_channel"
+}
+
 const HomeDefaultHeader = React.memo(
 	({
 		navigation,
@@ -198,26 +211,30 @@ const HomeDefaultHeader = React.memo(
 		openBottomSheet: () => void;
 		onOpenDrawer: () => void;
 	}) => {
-		const navigateMenuThreadDetail = () => {
-			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
+		const navigateMenuThreadDetail = (openThreadDetailFrom?: EOpenThreadDetailFrom) => {
+      console.log('openThreadDetailFrom: ', openThreadDetailFrom);
+
+			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET , params: { openThreadDetailFrom } });
 		};
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const [channelOfThread, setChannelOfThread] = useState<ChannelsEntity>(null);
 		const { statusMute } = useStatusMuteChannel();
+		const [isThread, setIsThread] = useState<boolean>(false);
 
 		useEffect(() => {
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
+			setIsThread(!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id));
 		}, [currentChannel, channelsEntities]);
 		return (
 			<View style={styles.homeDefaultHeader}>
-				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
+				<TouchableOpacity style={{ flex: 1 }} onPress={()=> navigateMenuThreadDetail()}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
 							<BarsLogo width={20} height={20} />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
-								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
+								{isThread ? (
 									<ThreadIcon width={20} height={20}></ThreadIcon>
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
@@ -238,14 +255,19 @@ const HomeDefaultHeader = React.memo(
 						)}
 					</View>
 				</TouchableOpacity>
-				{!!currentChannel?.channel_label && (
+				{!!currentChannel?.channel_label && isThread && (
 					<TouchableOpacity onPress={() => openBottomSheet()}>
-						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
 						{statusMute === EActionMute.Mute ? (
 							<MuteIcon width={22} height={22} style={{ marginRight: 20 }} />
 						) : (
 							<UnMuteIcon width={22} height={22} style={{ marginRight: 20 }} />
 						)}
+					</TouchableOpacity>
+				)}
+				{!!currentChannel?.channel_label && !isThread && (
+					<TouchableOpacity onPress={() => {navigateMenuThreadDetail(EOpenThreadDetailFrom.SearchChannel)
+          }}>
+						{<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />}
 					</TouchableOpacity>
 				)}
 			</View>

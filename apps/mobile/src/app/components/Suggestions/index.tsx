@@ -12,9 +12,11 @@ export interface MentionSuggestionsProps {
 }
 
 const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestions }) => {
-	if (keyword == null) {
-		return null;
-	}
+  console.log('suggestions: ', suggestions);
+
+	// if (keyword == null) {
+	// 	return null;
+	// }
 	suggestions = suggestions.map((item) => ({
 		...item,
 		name: item.display,
@@ -24,8 +26,8 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 	};
 	return (
 		<FlatList
-			style={{ maxHeight: 200 }}
-			data={suggestions?.filter((item) => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
+			style={{ maxHeight: '100%' }}
+			data={suggestions}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
 					<SuggestItem isDisplayDefaultAvatar={true} name={item.display ?? ''} avatarUrl={item.avatarUrl} subText="" />

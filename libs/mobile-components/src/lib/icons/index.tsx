@@ -78,12 +78,12 @@ export function CrossIcon({ width = 60, height = 60, color = 'white', ...props }
 	);
 }
 
-export function SearchIcon({ width = 60, height = 60, ...props }: SvgProps) {
+export function SearchIcon({ width = 60, height = 60, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg width={height} height={width} viewBox="0 0 60 60" fill="none" {...props}>
+		<Svg width={height} height={width} viewBox="0 0 60 60" {...props}>
 			<Path
 				d="M54.2675 51.1217L40.785 37.6392C43.5075 34.1492 45 29.8867 45 25.3892C45 20.0467 42.9175 15.0242 39.14 11.2492C35.365 7.46916 30.3425 5.38916 25 5.38916C19.6575 5.38916 14.635 7.46916 10.86 11.2492C7.0825 15.0242 5 20.0467 5 25.3892C5 30.7317 7.0825 35.7542 10.86 39.5292C14.635 43.3092 19.6575 45.3892 25 45.3892C29.4975 45.3892 33.76 43.8992 37.25 41.1742L50.7325 54.6542L54.2675 51.1217ZM25 40.3892C20.9925 40.3892 17.2275 38.8292 14.395 35.9967C11.56 33.1642 10 29.3967 10 25.3892C10 21.3842 11.56 17.6167 14.395 14.7842C17.2275 11.9492 20.9925 10.3892 25 10.3892C29.0075 10.3892 32.7725 11.9492 35.605 14.7842C38.44 17.6167 40 21.3842 40 25.3892C40 29.3967 38.44 33.1642 35.605 35.9967C32.7725 38.8292 29.0075 40.3892 25 40.3892Z"
-				fill="#FFFFFF"
+				fill={color}
 			/>
 		</Svg>
 	);
@@ -124,7 +124,7 @@ export function SettingIcon({ width = 60, height = 60, color = 'white', ...props
 	);
 }
 
-export function AngleRightIcon({ width = 60, height = 60, color = "#c7c7c7", ...props }: SvgProps) {
+export function AngleRightIcon({ width = 60, height = 60, color = '#c7c7c7', ...props }: SvgProps) {
 	return (
 		<Svg fill={color} width={width} height={height} viewBox="-12 0 32 32" {...props}>
 			<Path d="M0.88 23.28c-0.2 0-0.44-0.080-0.6-0.24-0.32-0.32-0.32-0.84 0-1.2l5.76-5.84-5.8-5.84c-0.32-0.32-0.32-0.84 0-1.2 0.32-0.32 0.84-0.32 1.2 0l6.44 6.44c0.16 0.16 0.24 0.36 0.24 0.6s-0.080 0.44-0.24 0.6l-6.4 6.44c-0.2 0.16-0.4 0.24-0.6 0.24z"></Path>
@@ -681,15 +681,9 @@ export function TickIcon({ width = 20, height = 20, color = 'white', ...props }:
 	);
 }
 
-
 export function AddThread({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg
-			width={width}
-			height={height}
-			viewBox="0 0 24 24"
-			{...props}
-		>
+		<Svg width={width} height={height} viewBox="0 0 24 24" {...props}>
 			<Path
 				d="M19 14a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 01-2 0v-3h-3a1 1 0 010-2h3v-3a1 1 0 011-1zm-7 5c0-.22.03-.44.08-.66a.56.56 0 00-.21-.58l-8.84-6.22a1 1 0 00-1.3.13l-.69.69a1 1 0 000 1.41l9.2 9.2a1 1 0 001.4 0l.36-.36a1 1 0 000-1.41l-.35-.36.37-.37a.56.56 0 00.12-.56A3 3 0 0112 19zm3-3h.16c.33 0 .56-.32.3-.53a.98.98 0 00-.07-.06L6.9 9.76a1 1 0 10-1.1 1.66l7.3 4.88c.17.1.39.1.56.02.4-.2.86-.32 1.34-.32zm.82-2.61c.25.17.6.07.77-.17.12-.17.26-.32.42-.46.29-.26.32-.76 0-.98L9.73 6.93a1 1 0 00-1.11 1.66l7.2 4.8zM12 2.81a1 1 0 010-1.41l.36-.36a1 1 0 011.41 0l9.2 9.2a1 1 0 010 1.4l-.7.7a1 1 0 01-1.3.13l-9.54-6.72a1 1 0 01-.08-1.58l1-1L12 2.8z"
 				fill={color}
@@ -701,10 +695,14 @@ export function AddThread({ width = 20, height = 20, color = 'white', ...props }
 export function LockIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg role="img" width={width} height={height} fill="none" viewBox="0 0 24 24">
-			<Path fill={color} fillRule="evenodd" d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z" clipRule="evenodd">
-			</Path>
+			<Path
+				fill={color}
+				fillRule="evenodd"
+				d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z"
+				clipRule="evenodd"
+			></Path>
 		</Svg>
-	)
+	);
 }
 export function CircleIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
@@ -712,32 +710,40 @@ export function CircleIcon({ width = 24, height = 24, color = 'white', ...props 
 			<Path stroke="none" d="M0 0h24v24H0z" fill="none" />
 			<Path d="M7 3.34a10 10 0 1 1 -4.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 4.995 -8.336z" />
 		</Svg>
-	)
+	);
 }
 
 export function VerifyIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg width={width} height={height} viewBox="0 0 24 24" fill={color}  >
+		<Svg width={width} height={height} viewBox="0 0 24 24" fill={color}>
 			<Path stroke="none" d="M0 0h24v24H0z" fill="none" />
 			<Path d="M12.01 2.011a3.2 3.2 0 0 1 2.113 .797l.154 .145l.698 .698a1.2 1.2 0 0 0 .71 .341l.135 .008h1a3.2 3.2 0 0 1 3.195 3.018l.005 .182v1c0 .27 .092 .533 .258 .743l.09 .1l.697 .698a3.2 3.2 0 0 1 .147 4.382l-.145 .154l-.698 .698a1.2 1.2 0 0 0 -.341 .71l-.008 .135v1a3.2 3.2 0 0 1 -3.018 3.195l-.182 .005h-1a1.2 1.2 0 0 0 -.743 .258l-.1 .09l-.698 .697a3.2 3.2 0 0 1 -4.382 .147l-.154 -.145l-.698 -.698a1.2 1.2 0 0 0 -.71 -.341l-.135 -.008h-1a3.2 3.2 0 0 1 -3.195 -3.018l-.005 -.182v-1a1.2 1.2 0 0 0 -.258 -.743l-.09 -.1l-.697 -.698a3.2 3.2 0 0 1 -.147 -4.382l.145 -.154l.698 -.698a1.2 1.2 0 0 0 .341 -.71l.008 -.135v-1l.005 -.182a3.2 3.2 0 0 1 3.013 -3.013l.182 -.005h1a1.2 1.2 0 0 0 .743 -.258l.1 -.09l.698 -.697a3.2 3.2 0 0 1 2.269 -.944zm3.697 7.282a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
 		</Svg>
-	)
+	);
 }
 
 export function BellIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg width={width} height={height} viewBox="0 0 24 24" fill={color}  >
+		<Svg width={width} height={height} viewBox="0 0 24 24" fill={color}>
 			<Path stroke="none" d="M0 0h24v24H0z" fill="none" />
 			<Path d="M14.235 19c.865 0 1.322 1.024 .745 1.668a3.992 3.992 0 0 1 -2.98 1.332a3.992 3.992 0 0 1 -2.98 -1.332c-.552 -.616 -.158 -1.579 .634 -1.661l.11 -.006h4.471z" />
 			<Path d="M12 2c1.358 0 2.506 .903 2.875 2.141l.046 .171l.008 .043a8.013 8.013 0 0 1 4.024 6.069l.028 .287l.019 .289v2.931l.021 .136a3 3 0 0 0 1.143 1.847l.167 .117l.162 .099c.86 .487 .56 1.766 -.377 1.864l-.116 .006h-16c-1.028 0 -1.387 -1.364 -.493 -1.87a3 3 0 0 0 1.472 -2.063l.021 -.143l.001 -2.97a8 8 0 0 1 3.821 -6.454l.248 -.146l.01 -.043a3.003 3.003 0 0 1 2.562 -2.29l.182 -.017l.176 -.004z" />
 		</Svg>
-	)
+	);
 }
 
 export function AddUserIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg
-			width={width} height={height} viewBox="0 0 24 24" fill="none" stroke={color} stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			width={width}
+			height={height}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke={color}
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
 			<Path stroke="none" d="M0 0h24v24H0z" fill="none" />
 			<Path d="M5 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
 			<Path d="M3 21v-2a4 4 0 0 1 4 -4h4c.96 0 1.84 .338 2.53 .901" />
@@ -745,16 +751,20 @@ export function AddUserIcon({ width = 24, height = 24, color = 'white', ...props
 			<Path d="M16 19h6" />
 			<Path d="M19 16v6" />
 		</Svg>
-	)
+	);
 }
 
 export function AddFillIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg width={width} height={height} viewBox="0 0 24 24" fill={color}>
 			<Path stroke="none" d="M0 0h24v24H0z" fill="none" />
-			<Path d="M12 2l.324 .001l.318 .004l.616 .017l.299 .013l.579 .034l.553 .046c4.785 .464 6.732 2.411 7.196 7.196l.046 .553l.034 .579c.005 .098 .01 .198 .013 .299l.017 .616l.005 .642l-.005 .642l-.017 .616l-.013 .299l-.034 .579l-.046 .553c-.464 4.785 -2.411 6.732 -7.196 7.196l-.553 .046l-.579 .034c-.098 .005 -.198 .01 -.299 .013l-.616 .017l-.642 .005l-.642 -.005l-.616 -.017l-.299 -.013l-.579 -.034l-.553 -.046c-4.785 -.464 -6.732 -2.411 -7.196 -7.196l-.046 -.553l-.034 -.579a28.058 28.058 0 0 1 -.013 -.299l-.017 -.616c-.003 -.21 -.005 -.424 -.005 -.642l.001 -.324l.004 -.318l.017 -.616l.013 -.299l.034 -.579l.046 -.553c.464 -4.785 2.411 -6.732 7.196 -7.196l.553 -.046l.579 -.034c.098 -.005 .198 -.01 .299 -.013l.616 -.017c.21 -.003 .424 -.005 .642 -.005zm0 6a1 1 0 0 0 -1 1v2h-2l-.117 .007a1 1 0 0 0 .117 1.993h2v2l.007 .117a1 1 0 0 0 1.993 -.117v-2h2l.117 -.007a1 1 0 0 0 -.117 -1.993h-2v-2l-.007 -.117a1 1 0 0 0 -.993 -.883z" fill={color} stroke-width="0" />
+			<Path
+				d="M12 2l.324 .001l.318 .004l.616 .017l.299 .013l.579 .034l.553 .046c4.785 .464 6.732 2.411 7.196 7.196l.046 .553l.034 .579c.005 .098 .01 .198 .013 .299l.017 .616l.005 .642l-.005 .642l-.017 .616l-.013 .299l-.034 .579l-.046 .553c-.464 4.785 -2.411 6.732 -7.196 7.196l-.553 .046l-.579 .034c-.098 .005 -.198 .01 -.299 .013l-.616 .017l-.642 .005l-.642 -.005l-.616 -.017l-.299 -.013l-.579 -.034l-.553 -.046c-4.785 -.464 -6.732 -2.411 -7.196 -7.196l-.046 -.553l-.034 -.579a28.058 28.058 0 0 1 -.013 -.299l-.017 -.616c-.003 -.21 -.005 -.424 -.005 -.642l.001 -.324l.004 -.318l.017 -.616l.013 -.299l.034 -.579l.046 -.553c.464 -4.785 2.411 -6.732 7.196 -7.196l.553 -.046l.579 -.034c.098 -.005 .198 -.01 .299 -.013l.616 -.017c.21 -.003 .424 -.005 .642 -.005zm0 6a1 1 0 0 0 -1 1v2h-2l-.117 .007a1 1 0 0 0 .117 1.993h2v2l.007 .117a1 1 0 0 0 1.993 -.117v-2h2l.117 -.007a1 1 0 0 0 -.117 -1.993h-2v-2l-.007 -.117a1 1 0 0 0 -.993 -.883z"
+				fill={color}
+				stroke-width="0"
+			/>
 		</Svg>
-	)
+	);
 }
 export function KeyframeIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
@@ -764,7 +774,7 @@ export function KeyframeIcon({ width = 24, height = 24, color = 'white', ...prop
 			<Path d="M16.382 4.214a1 1 0 0 1 1.32 .074l.084 .094l4.576 5.823c.808 .993 .848 2.396 .13 3.419l-.12 .158l-4.586 5.836a1 1 0 0 1 -1.644 -1.132l.072 -.104l4.596 -5.85a.845 .845 0 0 0 .06 -.978l-.07 -.1l-4.586 -5.836a1 1 0 0 1 .168 -1.404z" />
 			<Path d="M12.382 4.214a1 1 0 0 1 1.32 .074l.084 .094l4.576 5.823c.808 .993 .848 2.396 .13 3.419l-.12 .158l-4.586 5.836a1 1 0 0 1 -1.644 -1.132l.072 -.104l4.596 -5.85a.845 .845 0 0 0 .06 -.978l-.07 -.1l-4.586 -5.836a1 1 0 0 1 .168 -1.404z" />
 		</Svg>
-	)
+	);
 }
 
 export function EmptyPinIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
@@ -786,30 +796,19 @@ export function EmptyPinIcon({ width = 24, height = 24, color = 'white', ...prop
 					d="M24.28 74.972a5.563 5.563 0 01-5.57 5.558 5.563 5.563 0 01-5.57-5.558 5.563 5.563 0 015.57-5.558 5.563 5.563 0 015.57 5.558m55.698 0a5.563 5.563 0 01-5.57 5.558 5.563 5.563 0 01-5.57-5.558 5.563 5.563 0 015.57-5.558 5.563 5.563 0 015.57 5.558"
 					fill="#222426"
 				/>
-				<Path
-					d="M57.698 94.804a17.862 17.862 0 00-22.28 0"
-					stroke="#222426"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={3}
-				/>
+				<Path d="M57.698 94.804a17.862 17.862 0 00-22.28 0" stroke="#222426" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
 				<G fill="#3b3e42">
 					<Path d="M63.523 34.498L48.747 46.433c-.925.749-2.145-.468-1.396-1.392l5.265-6.489 6.697-8.255M85.5 12.317l6.09 6.077a.99.99 0 010 1.4l-1.404 1.4a3.975 3.975 0 01-5.613 0L72.645 9.293a3.954 3.954 0 010-5.601l1.403-1.4a.994.994 0 011.404 0l3.641 3.633" />
 					<Path d="M66.284 37.253L51.946 22.946a.99.99 0 010-1.401l1.052-1.05a7.95 7.95 0 0111.227 0l9.121 9.101a7.91 7.91 0 010 11.204l-1.052 1.05a.993.993 0 01-1.403 0l-2.001-1.997" />
 					<Path d="M72.996 29.247l-8.42-8.402 9.823-9.803 8.42 8.402" />
 				</G>
-				<G
-					stroke="#222426"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={3}
-				>
+				<G stroke="#222426" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3}>
 					<Path d="M85.5 12.317l6.09 6.077a.99.99 0 010 1.4l-1.404 1.4a3.975 3.975 0 01-5.613 0L72.645 9.293a3.954 3.954 0 010-5.601l1.403-1.4a.994.994 0 011.404 0l3.641 3.633m-12.809 31.33L51.946 22.945a.99.99 0 010-1.401l1.052-1.05a7.95 7.95 0 0111.227 0l9.121 9.101a7.91 7.91 0 010 11.204l-1.052 1.05a.993.993 0 01-1.403 0l-2.001-1.997m-4.315-19.008l9.824-9.803m8.42 8.402l-9.823 9.803" />
 					<Path d="M59.313 30.297L47.352 45.041c-.75.923.47 2.14 1.395 1.393l14.776-11.936" />
 				</G>
 			</G>
 		</Svg>
-	)
+	);
 }
 
 export function CalendarIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
@@ -819,18 +818,12 @@ export function CalendarIcon({ width = 24, height = 24, color = 'white', ...prop
 			<Path d="M16 2a1 1 0 0 1 .993 .883l.007 .117v1h1a3 3 0 0 1 2.995 2.824l.005 .176v12a3 3 0 0 1 -2.824 2.995l-.176 .005h-12a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-12a3 3 0 0 1 2.824 -2.995l.176 -.005h1v-1a1 1 0 0 1 1.993 -.117l.007 .117v1h6v-1a1 1 0 0 1 1 -1zm3 7h-14v9.625c0 .705 .386 1.286 .883 1.366l.117 .009h12c.513 0 .936 -.53 .993 -1.215l.007 -.16v-9.625z" />
 			<Path d="M12 12a1 1 0 0 1 .993 .883l.007 .117v3a1 1 0 0 1 -1.993 .117l-.007 -.117v-2a1 1 0 0 1 -.117 -1.993l.117 -.007h1z" />
 		</Svg>
-	)
+	);
 }
 
 export function LocationIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg
-			role="img"
-			width={width}
-			height={height}
-			fill="none"
-			viewBox="0 0 24 24"
-		>
+		<Svg role="img" width={width} height={height} fill="none" viewBox="0 0 24 24">
 			<Path
 				fill={color}
 				fillRule="evenodd"
@@ -844,10 +837,14 @@ export function LocationIcon({ width = 24, height = 24, color = 'white', ...prop
 export function ShareIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg role="img" width={width} height={height} fill="none" viewBox="0 0 24 24">
-			<Path fill={color} d="M13 16V5.41l3.3 3.3a1 1 0 1 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L11 5.4V16a1 1 0 1 0 2 0Z" >
-			</Path>
-			<Path fill={color} d="M4 15a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z">
-			</Path>
+			<Path
+				fill={color}
+				d="M13 16V5.41l3.3 3.3a1 1 0 1 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L11 5.4V16a1 1 0 1 0 2 0Z"
+			></Path>
+			<Path
+				fill={color}
+				d="M4 15a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z"
+			></Path>
 		</Svg>
 	);
 }
@@ -879,29 +876,56 @@ export function ReplyMessageDeleted({ width = 24, height = 24, color = '#a1a1a9'
 				fill={color}
 			/>
 		</Svg>
-	)
+	);
 }
 
 export function CircleExclamation({ width = 24, height = 24, color = '#a1a1a9', ...props }: SvgProps) {
 	return (
-    <Svg width= {width} height = {height}  viewBox="0 0 512 512" {...props}>
-      <Path fill={color} d="M256 512a256 256 0 100-512 256 256 0 100 512zm0-384c13.3 0 24 10.7 24 24v112c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1164 0 32 32 0 11-64 0z" />
-    </Svg>
-	)
+		<Svg width={width} height={height} viewBox="0 0 512 512" {...props}>
+			<Path
+				fill={color}
+				d="M256 512a256 256 0 100-512 256 256 0 100 512zm0-384c13.3 0 24 10.7 24 24v112c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1164 0 32 32 0 11-64 0z"
+			/>
+		</Svg>
+	);
 }
 
 export function AvatarUser({ width = 24, height = 24, ...props }: SvgProps) {
 	return (
-    <Svg  width= {width} height = {height}  viewBox="0 0 128 128" {...props}>
-      <Circle cx={64} cy={64} fill="#4B5F83" r={64} />
-      <Path
-        d="M64 99h35c0-16-10.4-29-24.6-33.4C80.1 62 84 55.7 84 48.5c0-11-9-20-20-20"
-        fill="#E6E6E6"
-      />
-      <Path
-        d="M64 28.5c-11 0-20 9-20 20 0 7.2 3.9 13.6 9.6 17.1C39.4 70 29 83 29 99h35"
-        fill="#FFF"
-      />
+		<Svg width={width} height={height} viewBox="0 0 128 128" {...props}>
+			<Circle cx={64} cy={64} fill="#4B5F83" r={64} />
+			<Path d="M64 99h35c0-16-10.4-29-24.6-33.4C80.1 62 84 55.7 84 48.5c0-11-9-20-20-20" fill="#E6E6E6" />
+			<Path d="M64 28.5c-11 0-20 9-20 20 0 7.2 3.9 13.6 9.6 17.1C39.4 70 29 83 29 99h35" fill="#FFF" />
+		</Svg>
+	);
+}
+
+export function ListSearchIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 512 512" {...props}>
+			<Path
+				fill={color}
+				d="M40 48c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zm152 16c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24v-48c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zm24 136c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24v-48c0-13.3-10.7-24-24-24H40z"
+			/>
+		</Svg>
+	);
+}
+
+export function CircleXMark({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 512 512" {...props}>
+			<Path
+				fill={color}
+				d="M256 512a256 256 0 100-512 256 256 0 100 512zm-81-337c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+			/>
+		</Svg>
+	);
+}
+
+export function AngleLeft({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 320 512" {...props}>
+      <Path fill={color} d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
     </Svg>
-	)
+	);
 }

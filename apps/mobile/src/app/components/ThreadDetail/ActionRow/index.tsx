@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import styles from './style';
+import { EOpenThreadDetailFrom } from '../../../screens/home/homedrawer/HomeDefault';
 
 export default function ActionRow() {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -20,7 +21,10 @@ export default function ActionRow() {
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => {},
+			action: () => {
+			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET ,
+        params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel } });
+      },
 			icon: <SearchIcon width={22} height={22} />,
 			hidden: true,
 		},

@@ -121,7 +121,7 @@ const ChannelList = React.memo((props: any) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<CalendarIcon height={20} width={20} />
-						<Text style={{ color: 'white' }}>{`${allEventManagement.length} Events`}</Text>
+						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
 				<FlatList
@@ -148,7 +148,7 @@ const ChannelList = React.memo((props: any) => {
 			</MezonBottomSheet>
 
 			<MezonBottomSheet
-				title={`${allEventManagement.length} Events`}
+				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}
 				headerRight={
 					currentClan?.creator_id === user?.userId && (

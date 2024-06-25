@@ -92,6 +92,8 @@ const SearchMessageChannel = () => {
 	};
 
 	const handleClickSearchOptions = (value: string) => {
+    console.log('value: ', value);
+
 		setValueInputSearch(valueInputSearch + value);
 		searchRef.current?.focus();
 	};
@@ -137,7 +139,7 @@ const SearchMessageChannel = () => {
 										<div className="flex items-center justify-between">
 											<div className="flex flex-row items-center flex-1 overflow-x-hidden">
 												<h3 className="text-xs font-medium text-textLightTheme dark:text-textPrimary uppercase mr-1 flex-shrink-0">
-													Search for:
+													Search forsdasf:
 												</h3>
 												<p className="text-sm font-semibold w-full mr-[10px] whitespace-normal text-ellipsis overflow-x-hidden">
 													{valueDisplay}
