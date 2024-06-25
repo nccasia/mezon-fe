@@ -5,6 +5,9 @@
 	"scripts": {
 		"postinstall": "patch-package"
 	},
+	"resolutions": {
+		"promise": "^8.0.3"
+	},
 	"dependencies": {
 		"@gorhom/bottom-sheet": "^4.6.1",
 		"@notifee/react-native": "^7.8.2",
@@ -21,6 +24,7 @@
 		"@react-navigation/native": "^6.1.17",
 		"@react-navigation/native-stack": "^6.9.26",
 		"@react-navigation/stack": "^6.3.29",
+		"@sentry/react-native": "^5.24.1",
 		"@testing-library/jest-native": "*",
 		"@testing-library/react-native": "*",
 		"expo": "^50.0.0",
