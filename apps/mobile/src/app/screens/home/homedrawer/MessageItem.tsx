@@ -7,7 +7,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
+import { Block, Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -237,6 +237,26 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		});
 	};
 
+  const renderInvite = () => {
+		return (
+      <Block style={{borderRadius: 8,backgroundColor: Colors.bgCharcoal, width: '100%', paddingHorizontal: size.s_10, paddingVertical: size.s_10}}>
+        <Text color={Colors.white}>YOU SENT AN INVITE TO JOIN A SERVER</Text>
+        <Block>
+          <Block style={{backgroundColor: '#18181b', height: 50, width: 50, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <Text color={Colors.white}>T</Text>
+          </Block>
+          <Block>
+            <Text color={Colors.white}>loi.huynhphuc server</Text>
+            <Text color={Colors.white}># general</Text>
+          </Block>
+        </Block>
+        <TouchableOpacity style={{backgroundColor: 'red', width: '100%', padding: size.s_6 , borderRadius: size.s_6}}>
+          <Text color={Colors.white} style={{textAlign: 'center'}}>Joined</Text>
+        </TouchableOpacity>
+      </Block>
+    )
+	};
+
 	const onMention = useCallback(
 		async (mentionedUser: string) => {
 			try {
@@ -391,6 +411,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 					{documents.length > 0 && renderDocuments()}
 					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine)}
+          {renderInvite()}
 					<MessageAction
 						message={message}
 						mode={mode}
