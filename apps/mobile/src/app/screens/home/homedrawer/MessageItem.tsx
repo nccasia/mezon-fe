@@ -65,6 +65,8 @@ export type MessageItemProps = {
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
+	isNewContent?: boolean;
+
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -87,7 +89,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
-  const [isMessageReplyDeleted, setIsMessageReplyDeleted] = useState<boolean>(false);
+	const [isMessageReplyDeleted, setIsMessageReplyDeleted] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -121,9 +123,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return { videos, images, documents };
 	};
 
-  useEffect(()=>{
-    setIsMessageReplyDeleted(!messageRefFetchFromServe && message?.references && message?.references?.length)
-  },[ messageRefFetchFromServe, message.references])
+	useEffect(() => {
+		setIsMessageReplyDeleted(!messageRefFetchFromServe && message?.references && message?.references?.length)
+	}, [messageRefFetchFromServe, message.references])
 
 	useEffect(() => {
 		if (!isEmpty(message)) {
@@ -286,10 +288,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const clanId = channel?.clan_id;
 
 			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
-          const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-          const urlSupported = await Linking.canOpenURL(urlVoice);
-           if(urlSupported)
-            Linking.openURL(urlVoice)
+				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+				const urlSupported = await Linking.canOpenURL(urlVoice);
+				if (urlSupported)
+					Linking.openURL(urlVoice)
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
@@ -323,6 +325,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
+			{props.isNewContent &&
+				<View style={styles.newMessageLine}>
+					<View style={styles.newMessageContainer}>
+						<Text style={styles.newMessageText}>NEW MESSAGE</Text>
+					</View>
+				</View>}
+
+
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
@@ -378,6 +388,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				) : (
 					<View style={styles.wrapperAvatarCombine} />
 				)}
+
 				<Pressable
 					style={[styles.rowMessageBox]}
 					onLongPress={() => {

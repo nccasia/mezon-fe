@@ -1,7 +1,7 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { selectAttachmentPhoto, selectCurrentChannel, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -33,6 +33,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const dispatch = useAppDispatch();
+	const channel = useSelector(selectCurrentChannel);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -47,6 +48,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,
 	});
+
+	const [newMessageID, setNewMessageID] = useState("");
 
 	const formatAttachments: any[] = useMemo(() => {
 		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
@@ -114,13 +117,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const renderItem = useCallback(
 		({ item }) => {
-			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} />;
+			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} isNewContent={newMessageID === item} />;
 		},
-		[mode, channelId, channelLabel, onOpenImage],
+		[mode, channelId, channelLabel, onOpenImage, newMessageID],
 	);
 
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
+		const idx = data.findLastIndex((id) => id === channel?.last_seen_message?.id);
+		console.log(idx - 1);
+
+		if (idx !== -1 && idx - 1 >= 0) {
+			setNewMessageID(data[idx - 1]);
+		}
 		return data.reverse();
 	}, [messages]);
 
