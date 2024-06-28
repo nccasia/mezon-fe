@@ -1,21 +1,21 @@
 import { Icons } from '@mezon/components';
 
-const AddReaction = () => <Icons.RightArrowRightClick />;
-const Reply = () => <Icons.ReplyRightClick />;
-const CreateThread = () => <Icons.ThreadIconRightClick />;
-const CopyText = () => <Icons.CopyTextRightClick />;
-const App = () => <Icons.RightArrowRightClick />;
-const MarkUnread = () => <Icons.UnreadRightClick />;
-const CopyMessageLink = () => <Icons.CopyMessageLinkRightClick />;
-const PinMessage = () => <Icons.PinMessageRightClick />;
-const UnPinMessage = () => <Icons.PinMessageRightClick />;
-const SpeakingMessage = () => <Icons.SpeakMessageRightClick />;
-const EditMessage = () => <Icons.EditMessageRightClick />;
-const DeleteMessage = () => <Icons.DeleteMessageRightClick />;
-const RemoveReactions = () => <Icons.RightArrowRightClick />;
-const ViewReactions = () => <Icons.ViewReactionRightClick />;
-const ReportMessage = () => <Icons.ReportMessageRightClick />;
-const ForwardMessage = () => <Icons.ForwardRightClick />;
+export const AddReaction = () => <Icons.RightArrowRightClick />;
+export const Reply = () => <Icons.ReplyRightClick />;
+export const CreateThread = () => <Icons.ThreadIconRightClick />;
+export const CopyText = () => <Icons.CopyTextRightClick />;
+export const App = () => <Icons.RightArrowRightClick />;
+export const MarkUnread = () => <Icons.UnreadRightClick />;
+export const CopyMessageLink = () => <Icons.CopyMessageLinkRightClick />;
+export const PinMessage = () => <Icons.PinMessageRightClick />;
+export const UnPinMessage = () => <Icons.PinMessageRightClick />;
+export const SpeakingMessage = () => <Icons.SpeakMessageRightClick />;
+export const EditMessage = () => <Icons.EditMessageRightClick />;
+export const DeleteMessage = () => <Icons.DeleteMessageRightClick />;
+export const RemoveReactions = () => <Icons.RightArrowRightClick />;
+export const ViewReactions = () => <Icons.ViewReactionRightClick />;
+export const ReportMessage = () => <Icons.ReportMessageRightClick />;
+export const ForwardMessage = () => <Icons.ForwardRightClick />;
 
 export const imageList = [
 	{ name: 'Copy Image', symbol: <></> },

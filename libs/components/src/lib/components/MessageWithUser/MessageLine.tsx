@@ -16,7 +16,7 @@ const MessageLine = ({ line, messageId }: MessageLineProps) => {
 			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} />
 			{imageLinks.length > 0 &&
 				imageLinks?.map((item, index) => {
-					return <MessageImage key={index} messageIdRightClick={messageId ?? ''} attachmentData={{ url: item.matchedText }} />;
+					return <MessageImage key={index} attachmentData={{ url: item.matchedText }} />;
 				})}
 		</div>
 	);

@@ -48,8 +48,6 @@ export { default as MessageVideo } from './components/MessageWithUser/MessageVid
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
-export { default as ContextMenu } from './components/RightClick/ContextMenu';
-export { default as ItemContextMenu } from './components/RightClick/ItemContextMenu';
 export { default as SearchMessageChannelRender } from './components/SearchMessageChannel/SearchMessageChannelRender';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';

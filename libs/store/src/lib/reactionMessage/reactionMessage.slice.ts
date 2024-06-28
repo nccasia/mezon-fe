@@ -39,6 +39,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 		bottom: number;
 	};
 	emojiHover: EmojiDataOptionals | null;
+	reactionOnMessageList: string[];
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -84,6 +85,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		bottom: 0,
 	},
 	emojiHover: null,
+	reactionOnMessageList: [],
 });
 
 export const reactionSlice = createSlice({
@@ -154,6 +156,9 @@ export const reactionSlice = createSlice({
 		setPositionOfSmileButton(state, action) {
 			state.positionOfSmileButton = action.payload;
 		},
+		setReactionMessageList: (state, action) => {
+			state.reactionOnMessageList = action.payload;
+		},
 	},
 });
 
@@ -193,3 +198,5 @@ export const selectMessageMatchWithRef = createSelector(getReactionState, (state
 export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (state: ReactionState) => state.positionOfSmileButton);
 
 export const selectEmojiHover = createSelector(getReactionState, (state: ReactionState) => state.emojiHover);
+
+export const selectReactionOnMessageList = createSelector(getReactionState, (state: ReactionState) => state.reactionOnMessageList);

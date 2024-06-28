@@ -1,36 +1,31 @@
-import { ContextMenu, Icons } from '@mezon/components';
-import { useAuth, useGifsStickersEmoji, useReference, useRightClick, useThreads } from '@mezon/core';
+import { Icons } from '@mezon/components';
+import { useAuth, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
-import { IMessageWithUser, RightClickPos, SubPanelName } from '@mezon/utils';
-import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
+	handleContextMenu: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
-const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
 	const dispatch = useAppDispatch();
-	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const { userId } = useAuth();
 	const { setOpenThreadMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const { setMessageRightClick } = useRightClick();
-	const { setRightClickXy } = useRightClick();
 	const refOpt = useRef<HTMLDivElement>(null);
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 
 		event.stopPropagation();
 	};
-	const posClickActive = useSelector(selectPosClickingActive);
 
 	const handleClickEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -38,7 +33,6 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 
 		event.stopPropagation();
 	};
@@ -61,7 +55,6 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 			} else {
 				dispatch(reactionActions.setReactionTopState(false));
 			}
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 		},
 		[setSubPanelActive],
 	);
@@ -71,20 +64,14 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 
 		setValueThread(message);
 	};
 
 	const handleClickOption = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		event.stopPropagation();
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.MORE));
-		setMessageRightClick(message.id);
-		setRightClickXy({ x: position.left, y: position.top });
-		dispatch(rightClickAction.setVisibleOpt(true));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+		handleContextMenu(event);
 	};
+
 	const [position, setPosition] = useState({ top: 0, left: 0 });
 
 	useEffect(() => {
@@ -131,8 +118,6 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 						<Icons.ThreeDot />
 					</button>
 				</div>
-
-				{posClickActive === RightClickPos.MORE && message.id === getMessageIdRightClicked && <ContextMenu urlData={''} />}
 			</div>
 		</div>
 	);

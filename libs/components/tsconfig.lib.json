@@ -20,5 +20,5 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "../core/src/lib/auth/hooks/useMemberStatus.ts"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "../core/src/lib/auth/hooks/useMemberStatus.ts", "../../apps/chat/src/app/pages/channel/MessageContextMenu.tsx"]
 }

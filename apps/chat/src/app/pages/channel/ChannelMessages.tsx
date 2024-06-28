@@ -11,9 +11,10 @@ import {
 	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
+import { MessageContextMenuProvider } from './MessageContextMenuContext';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -37,8 +38,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
-	// share logic to load more message
-
+	
 	const dispatch = useAppDispatch();
 
 	const loadMoreMessage = useCallback(async () => {
@@ -73,6 +73,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage, timeToJump, positionToJump]);
 
+	const messagesView = useMemo(() => {
+		return messages.map((messageId) => {
+			return (
+				<MemorizedChannelMessage
+					key={messageId}
+					messageId={messageId}
+					channelId={channelId}
+					mode={mode}
+					channelLabel={channelLabel ?? ''}
+				/>
+			);
+		});
+	}, [messages, channelId, mode, channelLabel]);
+
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5
@@ -87,18 +101,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			{isFetching && remain !== 0 && (
 				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 			)}
-
-			{messages?.map((messageId) => {
-				return (
-					<MemorizedChannelMessage
-						key={messageId}
-						messageId={messageId}
-						channelId={channelId}
-						mode={mode}
-						channelLabel={channelLabel ?? ''}
-					/>
-				);
-			})}
+			<MessageContextMenuProvider>
+				{messagesView}
+			</MessageContextMenuProvider>
 		</div>
 	);
 }

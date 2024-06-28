@@ -49,5 +49,5 @@ export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
 export * from './lib/chat/hooks/useVoice';
 export * from './lib/chat/hooks/useSettingFooter';
-export * from './lib/chat/hooks/useRightClick';
+export * from './lib/chat/hooks/useSeenMessagePool';
 export * from './lib/policy';

@@ -60,6 +60,7 @@
     "node-machine-id": "^1.1.12",
     "nx-electron": "^18.0.1",
     "react": "18.2.0",
+    "react-contexify": "^6.0.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-datepicker": "^6.9.0",
     "react-dom": "18.2.0",

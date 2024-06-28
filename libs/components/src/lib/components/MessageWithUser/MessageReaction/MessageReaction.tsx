@@ -1,5 +1,11 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
-import { selectDataSocketUpdate, selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
+import {
+	reactionActions,
+	selectDataSocketUpdate,
+	selectIdMessageRefReaction,
+	selectReactionBottomState,
+	selectReactionBottomStateResponsive,
+} from '@mezon/store';
 import {
 	EmojiDataOptionals,
 	IMessageWithUser,
@@ -8,7 +14,6 @@ import {
 	convertReactionDataFromMessage,
 	updateEmojiReactionData,
 } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
@@ -68,7 +73,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	useEffect(() => {
 		const handleDataReaction = updateEmojiReactionData(dataSocketConvert);
 		const filter = extractMessageIds(handleDataReaction);
-		dispatch(rightClickAction.setReactionMessageList(filter));
+		dispatch(reactionActions.setReactionMessageList(filter));
 	}, [dataSocketConvert]);
 
 	return (
