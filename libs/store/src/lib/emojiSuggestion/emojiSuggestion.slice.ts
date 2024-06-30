@@ -1,6 +1,7 @@
 import { IEmoji, IEmojiImage } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -31,23 +32,13 @@ export const emojiSuggestionAdapter = createEntityAdapter({
 let emojiCache: IEmoji[] = [];
 let emojiImageCache: IEmojiImage[] = [];
 
-export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
+export const fetchEmoji = createAsyncThunk<any>('emoji/fetchEmoji', async (_, thunkAPI) => {
 	try {
-		const cachedData = sessionStorage.getItem('emojiCache');
-		if (cachedData) {
-			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
-			return cachedEmojis;
-		}
-		const response = await fetch(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
-		if (!response.ok) {
-			throw new Error('Failed to fetch emoji data');
-		}
-		const data = await response.json();
-		emojiCache = data.emojis;
-		sessionStorage.setItem('emojiCache', JSON.stringify(emojiCache));
-		return emojiCache;
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listClanEmoji(mezon.session);
+		console.log(response)
 	} catch (error) {
-		return thunkAPI.rejectWithValue(error);
+		return thunkAPI.rejectWithValue([]);
 	}
 });
 
