@@ -32,7 +32,7 @@ export const brandColors = {
 export const themeColors: ThemeColor = {
     dark: {
         primary: "#1c1d22",
-        secondary: "#27272f",
+        secondary: "#242427",
         tertiary: "#141319",
         border: "#2e2f34",
         borderDim: "#2f2f37",

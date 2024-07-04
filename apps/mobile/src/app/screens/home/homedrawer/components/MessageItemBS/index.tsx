@@ -1,4 +1,4 @@
-import { useAuth, useChatReaction } from '@mezon/core';
+import { useAuth, useChatReaction, useDeleteMessage } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	CopyIcon,
@@ -16,7 +16,7 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
 import { AppDispatch, pinMessageActions, selectCurrentChannel, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store-mobile';
-import { IEmojiImage } from '@mezon/utils';
+import { IEmojiImage, IMessageWithUser } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -35,7 +35,7 @@ import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const dispatch = useDispatch<AppDispatch>();
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
@@ -53,8 +53,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
-	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
+	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isDM = useMemo(() => {
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
+	}, [mode])
 
 	const handleActionReply = () => {
 		onClose();
@@ -99,7 +102,10 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 					onPress: () => console.log('Cancel Pressed'),
 					style: 'cancel',
 				},
-				{ text: 'Yes', onPress: () => onConfirmDeleteMessage() },
+				{ text: 'Yes', onPress: () => onConfirmAction({
+					type: EMessageActionType.DeleteMessage,
+					message
+				})},
 			],
 			{ cancelable: false },
 		);
@@ -135,22 +141,22 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionReportMessage = () => {
-		console.log('CopyMessageLink');
+		onClose();
+		timeoutRef.current = setTimeout(() => {
+			onConfirmAction({
+				type: EMessageActionType.Report
+			})
+		}, Platform.OS === 'ios' ? 500 : 0)
 	};
 
 	const handleForwardMessage = () => {
 		onClose();
-		const payload: IMessageActionNeedToResolve = {
-			type: EMessageActionType.ForwardMessage,
-			targetMessage: message,
-		};
 		timeoutRef.current = setTimeout(() => {
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
-			} else {
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_IN_DM_MODAL, payload);
-			}
-		}, 500);
+			onConfirmAction({
+				type: EMessageActionType.ForwardMessage,
+				message
+			})
+		}, Platform.OS === 'ios' ? 500 : 0)
 	};
 
 	const implementAction = (type: EMessageActionType) => {
@@ -229,22 +235,24 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
-		const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
+		const messageExists = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
 		const listOfActionOnlyMyMessage = [
 			EMessageActionType.EditMessage,
 			EMessageActionType.DeleteMessage,
-			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 		];
 		const listOfActionOnlyOtherMessage = [
 			EMessageActionType.Report,
+		];
+		const listOfActionShouldHide = [
 			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+			isDM && EMessageActionType.CreateThread
 		];
 		if (isMyMessage) {
-			return getMessageActions(t).filter((action) => !listOfActionOnlyOtherMessage.includes(action.type));
+			return getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage,...listOfActionShouldHide].includes(action.type));
 		}
 
-		return getMessageActions(t).filter((action) => !listOfActionOnlyMyMessage.includes(action.type));
-	}, [t, userProfile, message, listPinMessages]);
+		return getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage,...listOfActionShouldHide].includes(action.type));
+	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
 		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
@@ -361,7 +369,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			height={
 				isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type)
 					? Metrics.screenHeight / 1.4
-					: Metrics.screenHeight / 2
+					: Metrics.screenHeight / 1.7
 			}
 			onClose={() => {
 				onClose();

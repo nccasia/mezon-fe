@@ -5,8 +5,8 @@ import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import MessageLine from '../../../../MessageWithUser/MessageLine';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
+import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
 	thread: ChannelsEntity;
@@ -47,8 +47,8 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 						<div className="flex flex-row items-center h-6">
 							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
 							<span className="text-[#17AC86] text-sm font-semibold leading-4">{username}:&nbsp;</span>
-							<div className="overflow-hidden h-6 max-w-[140px]">
-								<MessageLine line={(messages[0]?.content.t as string) ?? JSON.parse(thread.last_sent_message.content).t} />
+							<div className="overflow-hidden max-w-[140px]">
+								<ThreadModalContent messages={messages} thread={thread} />
 							</div>
 							<div className="overflow-x-hidden">
 								<p className="text-xs font-medium leading-4 ml-2">

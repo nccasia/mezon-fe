@@ -24,8 +24,6 @@ import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker'
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import { styles } from './styles';
-import ForwardMessageModal from "../../home/homedrawer/components/ForwardMessage";
-import {IMessageWithUser} from "@mezon/utils";
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -49,8 +47,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [showForwardModal, setShowForwardModal] = useState(false);
-	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 	
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -93,16 +89,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		);
 		return null;
 	}, [currentDmGroup]);
-	
-	useEffect(() => {
-		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_FORWARD_IN_DM_MODAL, (payload) => {
-			setMessageForward(payload.targetMessage);
-			setShowForwardModal(true);
-		});
-		return () => {
-			showKeyboard.remove();
-		};
-	}, []);
 	
 	useEffect(() => {
 		return () => {
@@ -198,11 +184,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					)}
 				</View>
 			) : null}
-			{showForwardModal && (
-				<View style={{flex: 1}}>
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
-				</View>
-			)}
 		</SafeAreaView>
 	);
 };

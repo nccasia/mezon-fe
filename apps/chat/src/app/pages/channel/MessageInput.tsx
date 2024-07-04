@@ -33,15 +33,15 @@ type EmojiData = {
 };
 
 const convertToPlainTextHashtag = (text: string) => {
-    const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
-    const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
-        if (atSymbol) {
-            return `@${atUsername}`;
-        } else {
-            return `<#${hashId}>`;
-        }
-    });
-    return result;
+	const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
+	const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
+		if (atSymbol) {
+			return `@${atUsername}`;
+		} else {
+			return `<#${hashId}>`;
+		}
+	});
+	return result;
 };
 
 const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
@@ -69,23 +69,25 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
-	const mentionList = UserMentionList(channelId);
+	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
 
-	const listChannelsMention = useMemo(
-		() =>
-			listChannels.map((item) => {
+	const listChannelsMention = useMemo(() => {
+		if (mode !== 3 && mode !== 4) {
+			return listChannels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.category_name ?? '',
 				};
-			}),
-		[listChannels],
-	);
+			});
+		} else {
+			return [];
+		}
+	}, [mode, listChannels]);
 
 	useEffect(() => {
 		if (editMessage) {
@@ -164,7 +166,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onFocus={handleFocus}
 					inputRef={textareaRef}
 					value={editMessage}
-					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
 					rows={editMessage?.split('\n').length}

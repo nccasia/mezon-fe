@@ -402,7 +402,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
-	name?: string;
+	displayName?: string;
 };
 
 export type UserSearchDataProps = {

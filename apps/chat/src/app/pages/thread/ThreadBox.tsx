@@ -1,10 +1,17 @@
 import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage, useThreads } from '@mezon/core';
-import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
+import {
+	RootState,
+	clansActions,
+	createNewChannel,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	useAppDispatch,
+} from '@mezon/store';
 import { ETypeMessage, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -34,7 +41,8 @@ const ThreadBox = () => {
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_TEXT,
 			};
-			await dispatch(createNewChannel(body));
+			const thread = await dispatch(createNewChannel(body));
+			return thread.payload;
 		},
 		[currentChannel, currentChannelId, currentClanId, dispatch],
 	);
@@ -49,14 +57,17 @@ const ThreadBox = () => {
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
-					await createThread(value);
+					const thread = await createThread(value);
+					if (thread) {
+						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
+						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
+					}
 				}
-				await sendMessageThread(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, sendMessageThread, sessionUser],
+		[createThread, currentClanId, dispatch, sendMessageThread, sessionUser],
 	);
 
 	const handleTyping = useCallback(() => {
@@ -83,7 +94,7 @@ const ThreadBox = () => {
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
-					listMentions={UserMentionList(threadCurrentChannel?.channel_id as string)}
+					listMentions={UserMentionList({channelID: threadCurrentChannel?.channel_id as string})}
 					isThread
 				/>
 			</div>

@@ -1,5 +1,5 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
-import { CheckIcon, CrossIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { CheckIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { getSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -262,7 +262,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				</ScrollView>
 				<View style={styles.messageWrapper}>
 					<ScrollView>
-						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
+						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
 					</ScrollView>
 				</View>
 				<TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>

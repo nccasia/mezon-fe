@@ -68,7 +68,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							</button>
 							<Dropdown
 								label=""
-								className="dark:bg-bgPrimary bg-bgLightMode border dark:border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
+								className="dark:bg-[#242529] bg-bgLightMode border dark:border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
 								dismissOnClick={true}
 								placement="right-start"
 								renderTrigger={() => (
@@ -79,21 +79,21 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex font-semibold',
 									}}
 								>
 									Start Video Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex font-semibold',
 									}}
 								>
 									Start Voice Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex font-semibold',
 									}}
 									onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>
@@ -101,7 +101,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex font-semibold',
 									}}
 									onClick={() => handleBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>

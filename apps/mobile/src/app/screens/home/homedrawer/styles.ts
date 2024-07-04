@@ -87,6 +87,7 @@ export const styles = StyleSheet.create({
 	containerDrawerContent: {
 		flex: 1,
 		flexDirection: 'row',
+		backgroundColor: Colors.secondary,
 	},
 	homeDefault: {
 		backgroundColor: Colors.secondary,
@@ -393,7 +394,7 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_2,
 	},
 	repliedTextAvatar: {
-		fontSize: size.s_16,
+		fontSize: size.s_12,
 		color: Colors.white,
 	},
 	repliedMessageWrapper: {

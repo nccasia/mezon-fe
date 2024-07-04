@@ -9,9 +9,10 @@ type IMessageAvatarProps = {
 	isCombine: boolean;
 	isEditing?: boolean;
 	isShowFull?: boolean;
+	mode?: number;
 };
 
-const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMessageAvatarProps) => {
+const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +46,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 	return (
 		<div className="relative group">
 			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
-				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
+				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} className="min-w-10 min-h-10" />
 			</div>
 			{isShowPanelChannel ? (
 				<div
@@ -53,7 +54,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode}/>
 				</div>
 			) : null}
 		</div>

@@ -1,5 +1,6 @@
+import { useEmojiSuggestion } from '@mezon/core';
 import { selectAllUsesClan, selectChannelById } from '@mezon/store';
-import { checkLastChar } from '@mezon/utils';
+import { checkLastChar, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -8,19 +9,25 @@ import { EmojiMarkdown } from '../../MarkdownFormatText';
 
 interface IHashtagMentionById {
 	id: string;
+	posMention?: boolean;
 }
 
-const HashTagMentionById = ({ id }: IHashtagMentionById) => {
+const HashTagMentionById = ({ id, posMention }: IHashtagMentionById) => {
+	const { emojis } = useEmojiSuggestion();
+	const checkEmojiIsExist = getSrcEmoji(id.trim(), emojis);
+
 	return (
-		<>
+		<span>
 			{id.startsWith('@') ? (
 				<MentionReply mentionId={id} />
 			) : id.startsWith('<') ? (
-				<HashTagReply hashtagId={id} />
-			) : (
+				<HashTagReply hashtagId={id} posMention={posMention} />
+			) : checkEmojiIsExist ? (
 				<EmojiMarkdown emojiSyntax={id} onlyEmoji={false} posReply={true} />
+			) : (
+				<span>{id}</span>
 			)}
-		</>
+		</span>
 	);
 };
 
@@ -28,9 +35,10 @@ export default memo(HashTagMentionById);
 
 interface IHashtag {
 	hashtagId: string;
+	posMention?: boolean;
 }
 
-const HashTagReply = ({ hashtagId }: IHashtag) => {
+const HashTagReply = ({ hashtagId, posMention }: IHashtag) => {
 	const getChannelById = (hashtagId: string) => {
 		const channel = useSelector(selectChannelById(hashtagId));
 		return channel;
@@ -38,11 +46,17 @@ const HashTagReply = ({ hashtagId }: IHashtag) => {
 	const channel = getChannelById(hashtagId.slice(2, -1));
 
 	return getChannelById(hashtagId.slice(2, -1)) ? (
-		<span className="font-medium  rounded-sm  !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ">
+		<span className="font-medium rounded-sm  !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ">
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
-				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 ml-[-0.5rem]" defaultFill="#3297FF" />
+				<Icons.Speaker
+					defaultSize={`inline mt-[-0.2rem] w-4 h-4 ${posMention ? 'ml-[-0.05rem] mr-[0.5rem]' : 'ml-[-0.5rem]'}`}
+					defaultFill="#3297FF"
+				/>
 			) : (
-				<Icons.Hashtag defaultSize="inline mt-[-0.5rem] w-4 h-4 ml-[-0.5rem]" defaultFill="#3297FF" />
+				<Icons.Hashtag
+					defaultSize={`inline mt-[-0.5rem] w-4 h-4 ${posMention ? 'ml-[-0.05rem] mr-[0.5rem]' : 'ml-[-0.5rem]'}`}
+					defaultFill="#3297FF"
+				/>
 			)}
 			<span className="ml-[-0.5rem]">{channel.channel_label}</span>
 		</span>

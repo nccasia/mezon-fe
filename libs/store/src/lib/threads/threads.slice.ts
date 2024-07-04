@@ -1,5 +1,6 @@
 import { IMessageWithUser, IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -21,6 +22,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	nameValueThread?: Record<string, string>;
 	valueThread: IMessageWithUser | null;
 	openThreadMessageState: boolean;
+	currentThread?: ApiChannelDescription;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -104,6 +106,9 @@ export const threadsSlice = createSlice({
 		setOpenThreadMessageState(state, action) {
 			state.openThreadMessageState = action.payload;
 		},
+		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
+			state.currentThread = action.payload;
+		},
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -180,6 +185,8 @@ export const selectListThreadId = createSelector(getThreadsState, (state) => sta
 export const selectValueThread = createSelector(getThreadsState, (state) => state.valueThread);
 
 export const selectOpenThreadMessageState = createSelector(getThreadsState, (state: ThreadsState) => state.openThreadMessageState);
+
+export const selectCurrentThread = createSelector(getThreadsState, (state: ThreadsState) => state.currentThread);
 
 export const selectNameValueThread = (channelId: string) =>
 	createSelector(getThreadsState, (state) => {

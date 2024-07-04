@@ -2,6 +2,7 @@ import { referencesActions, selectMemberByUserId, selectMessageByMessageId } fro
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import * as Icons from '../../Icons/index';
 import { useMessageLine } from '../useMessageLine';
 import MarkUpOnReply from './MarkUpOnReply';
@@ -53,10 +54,11 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
 						<div className="w-5 h-5">
-							<img
-								className="rounded-full w-full h-full min-w-5 min-h-5 object-cover"
+							<AvatarImage
+								className="w-5 h-5"
+								alt="user avatar"
+								userName={senderMessage?.user?.username}
 								src={senderMessage?.user?.avatar_url}
-								alt={senderMessage?.user?.avatar_url}
 							/>
 						</div>
 

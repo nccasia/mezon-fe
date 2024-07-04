@@ -15,9 +15,10 @@ import PreClass from './PreClass';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
+	mode?: number;
 };
 
-const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji }) => {
+const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji, mode }) => {
 	// TODO: move the invitation logic to upper level
 	const { getLinkInvite } = useInvite();
 
@@ -115,17 +116,14 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 						<span className="">
 							{isMention ? (
 								<>
-									{' '}
-									<MentionUser tagName={tagName} />{' '}
-								</>
+								<MentionUser tagName={tagName} mode={mode}/>{' '}
+							</>
 							) : isHashtag ? (
 								<>
-									{' '}
 									<ChannelHashtag channelHastagId={tagName} />{' '}
 								</>
 							) : isEmojiSyntax ? (
 								<>
-									{' '}
 									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />{' '}
 								</>
 							) : (
@@ -159,14 +157,11 @@ export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmo
 		}
 	}, [posReply]);
 
+	const srcEmoji = getSrcEmoji(emojiSyntax.trim(), emojis);
+
 	return (
 		<span style={{ userSelect: 'none' }}>
-			<img
-				src={getSrcEmoji(emojiSyntax.trim(), emojis)}
-				alt={getSrcEmoji(emojiSyntax.trim(), emojis)}
-				className={className}
-				onDragStart={(e) => e.preventDefault()}
-			/>{' '}
+			<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
 		</span>
 	);
 };

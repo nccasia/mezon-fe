@@ -19,6 +19,7 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 				isMessNotifyMention={true}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 				isMention={true}
+				isShowFull={true}
 			/>
 		</div>
 	);

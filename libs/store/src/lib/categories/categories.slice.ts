@@ -159,3 +159,5 @@ export const selectCurrentCategory = createSelector(selectCategoriesEntities, se
 );
 
 export const selectDefaultCategory = createSelector(selectAllCategories, categories => categories[0]);
+
+export const selectCategoriesIds = createSelector(getCategoriesState, (entities) => entities.ids);

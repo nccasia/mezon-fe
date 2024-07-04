@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
     supperContainer: {
-        flex: 1
+      flex: 1,
+	    backgroundColor: colors.primary,
     },
 	container: {
 		flex: 1,

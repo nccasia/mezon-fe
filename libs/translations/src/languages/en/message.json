@@ -40,5 +40,17 @@
         "removeActions": "Remove Actions"
     },
     "messageDeleteReply": "Original message was deleted",
-    "forwardMessagesSuccessfully": "Forward messages successfully!"
+    "forwardMessagesSuccessfully": "Forward messages successfully!",
+    "reportMessage": {
+        "reportSummary": "Report summary",
+        "reviewYourReportBeforeSubmitting": "Review your report before submitting.",
+        "reportCategory": "Report Category",
+        "title": "Report message",
+        "subTitle": "Please select the option that best describe the problem.",
+        "selectedMessage": "Selected message",
+        "submitDescription": "By submitting this report you confirm that it is truthful and made in good faith. Please follow our Community Guidelines and do not submit false or duplicate reports.",
+        "submitReport": "Submit Report",
+        "cancel": "Cancel",
+        "reportSubmitted": "Report submitted"
+    }
 }

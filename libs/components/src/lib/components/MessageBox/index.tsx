@@ -195,6 +195,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							currentChannelId={props.currentChannelId ?? ''}
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
+							mode={props.mode}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

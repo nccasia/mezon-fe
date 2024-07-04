@@ -9,12 +9,13 @@ type IMessageContentProps = {
 	newMessage?: string;
 	isSending?: boolean;
 	isError?: boolean;
+	mode?: number;
 };
 
-const MessageText = ({ message, lines, isEdited }: { message: IMessageWithUser; lines: string; isEdited?: boolean }) => (
+const MessageText = ({ message, lines, isEdited, mode }: { message: IMessageWithUser; lines: string; isEdited?: boolean; mode?:number }) => (
 	<div className="flex w-full">
 		<div id={message.id} className="w-full">
-			<MessageLine line={lines} messageId={message.id} />
+			<MessageLine line={lines} messageId={message.id} mode={mode}/>
 		</div>
 		{isEdited && (
 			<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edited)</p>
@@ -22,10 +23,9 @@ const MessageText = ({ message, lines, isEdited }: { message: IMessageWithUser; 
 	</div>
 );
 
-const MessageContent = ({ message }: IMessageContentProps) => {
+const MessageContent = ({ message, mode }: IMessageContentProps) => {
 	const { attachments, lines, hasAttachments, isEdited } = useMessageParser(message);
-
-	return <MessageText message={message} lines={lines as string} isEdited={isEdited} />;
+	return <MessageText message={message} lines={lines as string} isEdited={isEdited} mode={mode}/>;
 };
 
 export default MessageContent;

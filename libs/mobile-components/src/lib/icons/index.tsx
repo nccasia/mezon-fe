@@ -1159,3 +1159,20 @@ export function AppleIcon({ width = 24, height = 24, color = 'white', ...props }
 		</Svg>
 	);
 }
+
+export function DotIcon({ width = 10, height = 10, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			viewBox="0 0 32 32"
+			fill="none"
+			{...props}
+		>
+				<Path
+				d="M16 32c8.837 0 16-7.163 16-16S24.837 0 16 0 0 7.163 0 16s7.163 16 16 16z"
+				fill={color}
+				/>
+		</Svg>
+	)
+  }

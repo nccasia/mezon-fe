@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
 import { toastConfig } from '../../configs/toastConfig';
 import { styles } from './style';
+import { ArrowLeftIcon } from '@mezon/mobile-components';
 
 interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	visible: boolean;
@@ -15,6 +16,9 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	onConfirm?: () => void | undefined;
 	style?: ViewStyle;
 	headerStyles?: ViewStyle;
+	onBack?: () => void;
+	rightClose?: boolean;
+	visibleBackButton?: boolean;
 }
 
 export const MezonModal = (props: IMezonModalProps) => {
@@ -29,6 +33,9 @@ export const MezonModal = (props: IMezonModalProps) => {
 		style = {},
 		animationType = 'slide',
 		headerStyles = {},
+		onBack,
+		rightClose = false,
+		visibleBackButton = false,
 	} = props;
 
 	const setVisible = (value: boolean) => {
@@ -49,21 +56,34 @@ export const MezonModal = (props: IMezonModalProps) => {
 	return (
 		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
 			<View style={styles.container}>
-				<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
-					<View style={styles.headerContent}>
+				{rightClose ? (
+					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
+						{visibleBackButton ? (
+							<Pressable onPress={() => onBack && onBack()}>
+								<ArrowLeftIcon />
+							</Pressable>
+						): <View />}
 						<Pressable onPress={() => setVisible(false)}>
 							<Feather size={27} name="x" style={styles.closeIcon} />
 						</Pressable>
-						{isTitleString ? <Text style={[styles.textTitle, titleStyle]}>{title}</Text> : <View style={titleStyle}>{title}</View>}
 					</View>
-					{confirmText ? (
-						<Pressable onPress={() => pressConfirm()}>
-							<Text style={styles.confirm}>{confirmText}</Text>
-						</Pressable>
-					) : (
-						<View />
-					)}
-				</View>
+				): (
+					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
+						<View style={styles.headerContent}>
+							<Pressable onPress={() => setVisible(false)}>
+								<Feather size={27} name="x" style={styles.closeIcon} />
+							</Pressable>
+							{isTitleString ? <Text style={[styles.textTitle, titleStyle]}>{title}</Text> : <View style={titleStyle}>{title}</View>}
+						</View>
+						{confirmText ? (
+							<Pressable onPress={() => pressConfirm()}>
+								<Text style={styles.confirm}>{confirmText}</Text>
+							</Pressable>
+						) : (
+							<View />
+						)}
+					</View>
+				)}
 				<View style={[styles.fill, style]}>{children}</View>
 			</View>
 			<Toast config={toastConfig} />

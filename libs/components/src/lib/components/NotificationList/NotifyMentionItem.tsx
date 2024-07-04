@@ -5,12 +5,18 @@ import {
 	selectChannelById,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectMemberByUserId,
 	selectMemberClanByUserId,
+	selectMessageByMessageId,
 } from '@mezon/store';
-import { IChannelMember } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { IMessageWithUser } from '@mezon/utils';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import MessageWithUser from '../MessageWithUser';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
+import MessageHead from '../MessageWithUser/MessageHead';
+import MarkUpOnReply from '../MessageWithUser/MessageReply/MarkUpOnReply';
+import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
+import { useMessageLine } from '../MessageWithUser/useMessageLine';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
 };
@@ -57,10 +63,11 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
+	const messageId = notify.content.message_id;
 	const { toChannelPage, navigate } = useAppNavigation();
 	const { jumpToMessage } = useJumpToMessage();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-
+	const message = useSelector(selectMessageByMessageId(messageId));
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
 	const dispatchMessageMention = async () => {
@@ -78,7 +85,11 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				<div className="flex flex-row items-center gap-2">
 					<div>
 						{currentClan?.logo ? (
-							<img src={currentClan.logo} className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10" alt={currentClan.logo} />
+							<img
+								src={currentClan.logo}
+								className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
+								alt={currentClan.logo}
+							/>
 						) : (
 							<div>
 								{currentClan?.clan_name && (
@@ -116,16 +127,52 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				>
 					Jump
 				</button>
-				<MessageWithUser
-					message={data}
-					user={user as IChannelMember}
-					isMessNotifyMention={true}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isMention={true}
-				/>
+				{message !== undefined && <MentionTabContent message={message} />}
 			</div>
 		</div>
 	);
 }
 
 export default NotifyMentionItem;
+
+interface IMentionTabContent {
+	message: IMessageWithUser;
+}
+
+function MentionTabContent({ message }: IMentionTabContent) {
+	const dispatch = useDispatch();
+	const { mentions } = useMessageLine(message?.content?.t ?? '');
+	const getIdMessageToJump = useCallback(
+		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
+			e.stopPropagation();
+			if (idRefMessage) {
+				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
+			}
+		},
+		[dispatch],
+	);
+	const senderMessage = useSelector(selectMemberByUserId(message?.sender_id));
+
+	const checkMessageHasReply = useMemo(() => {
+		return message.references && message.references?.length > 0;
+	}, [message.references]);
+	return (
+		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
+			{checkMessageHasReply && (
+				<div className="max-w-full overflow-hidden">
+					<MessageReply message={message} />
+				</div>
+			)}
+
+			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+				<AvatarImage alt="user avatar" className="w-15 h-15" userName={senderMessage?.user?.username} src={senderMessage?.user?.avatar_url} />
+
+				<div className="h-full ">
+					<MessageHead message={message} user={senderMessage} isCombine={true} isShowFull={true} />
+					<MarkUpOnReply posMention={true} onClickToMove={(e) => getIdMessageToJump(message?.id, e)} mention={mentions} />
+				</div>
+			</div>
+		</div>
+	);
+}

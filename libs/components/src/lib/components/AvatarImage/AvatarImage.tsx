@@ -1,5 +1,6 @@
 import { DetailedHTMLProps, ImgHTMLAttributes, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { twMerge } from 'tailwind-merge';
 
 export type AvatarImageProp = {
 	userName?: string;
@@ -10,7 +11,7 @@ export const AvatarImage = ({ userName, src, alt, className = '', ...rest }: Ava
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 
-	const computedClassName = 'size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer' + className;
+	const computedClassName = twMerge('size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className);
 
 	const handleLoadStart = () => {
 		setIsLoading(true);

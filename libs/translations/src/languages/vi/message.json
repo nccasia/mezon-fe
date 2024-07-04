@@ -39,5 +39,17 @@
         "removeActions": "Xoá Biểu Cảm"
     },
     "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
-    "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!"
+    "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
+    "reportMessage": {
+        "reportSummary": "Tóm tắt báo cáo",
+        "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",
+        "reportCategory": "Danh mục báo cáo",
+        "title": "Báo cáo tin nhắn",
+        "subTitle": "Vui lòng chọn tùy chọn mô tả tốt nhất vấn đề.",
+        "selectedMessage": "Tin nhắn đã chọn",
+        "submitDescription": "Bằng cách gửi báo cáo này, bạn xác nhận rằng nó là chính xác và được thực hiện với thiện chí. Vui lòng tuân theo Nguyên tắc Cộng đồng của chúng tôi và không gửi báo cáo sai hoặc trùng lặp.",
+        "submitReport": "Gửi Báo Cáo",
+        "cancel": "Hủy",
+        "reportSubmitted": "Đã gửi báo cáo"
+    }
 }

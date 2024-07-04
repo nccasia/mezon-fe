@@ -8,13 +8,14 @@ import { Image, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { styles } from './styles';
+import { useMemberStatus } from '@mezon/core';
 
 export const ThreadHeader = memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
-	const userStatus = true;
+	const userStatus = useMemberStatus(currentChannel?.user_id?.length === 1 ? currentChannel?.user_id[0] : '');
 	const navigation = useNavigation<any>();
 	return (
 		<View style={styles.channelLabelWrapper}>

@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond, selectCurrentClanId } from '@mezon/store';
+import { channelsActions, selectChannelFirst, selectChannelSecond, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,21 +17,21 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelSecond = useSelector(selectChannelSecond);
 	let channelNavId = channelFirst.id;
-	
+
 	const { toChannelPage } = useAppNavigation();
 	const navigate = useNavigate();
 
 	const handleDeleteChannel = async (channelId: string) => {
 		await dispatch(channelsActions.deleteChannel({ channelId, clanId: currentClanId as string }));
 		if (channelId === currentChannelId) {
-			if(currentChannelId === channelNavId){
+			if (currentChannelId === channelNavId) {
 				channelNavId = channelSecond.id;
 			}
 			const channelPath = toChannelPage(channelNavId ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}
 		onClose();
-		if(onCloseModal){
+		if (onCloseModal) {
 			onCloseModal();
 		}
 	};
@@ -55,7 +55,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 					<button
 						color="blue"
 						onClick={() => handleDeleteChannel(channelId)}
-						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+						className="px-4 py-2 bg-colorDanger dark:bg-colorDanger text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
 					>
 						Delete
 					</button>

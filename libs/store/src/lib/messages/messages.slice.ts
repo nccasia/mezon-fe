@@ -874,5 +874,7 @@ const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: Mess
 
 	const startIndex = Math.max(index - 1, 0);
 
-	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), false);
+	const itemCount = channelEntity.ids.length;
+
+	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), itemCount > 2 ? false : true);
 };

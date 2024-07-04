@@ -3,7 +3,12 @@ import { ChannelMembersEntity } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
 import { useMemo } from 'react';
 
-function UserMentionList(channelID: string): MentionDataProps[] {
+interface UserMentionListProps {
+	channelID: string;
+	channelMode?: number;
+}
+
+function UserMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
 	const { members } = useChannelMembers({ channelId: channelID });
 
 	const newUserMentionList = useMemo(() => {
@@ -17,6 +22,7 @@ function UserMentionList(channelID: string): MentionDataProps[] {
 				id: item?.user?.id ?? '',
 				display: item?.user?.username ?? '',
 				avatarUrl: item?.user?.avatar_url ?? '',
+				displayName: item?.user?.display_name ?? '',
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
 			id: '1775731111020111321',
@@ -28,7 +34,11 @@ function UserMentionList(channelID: string): MentionDataProps[] {
 			if (a.display.toLowerCase() > b.display.toLowerCase()) return 1;
 			return 0;
 		});
-		return [...sortedMentionList, hardcodedUser];
+		if (channelMode === 4) {
+			return [...sortedMentionList];
+		} else {
+			return [...sortedMentionList, hardcodedUser];
+		}
 	}, [members]);
 
 	return newUserMentionList;

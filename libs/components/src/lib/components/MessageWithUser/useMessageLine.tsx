@@ -16,9 +16,8 @@ export function useMessageLine(line: string): IMessageLine {
 	const processMatches = (regex: RegExp, inputLine: string) => {
 		let lastIndex = 0;
 		let nonMatchText = inputLine;
-
 		const matches = inputLine.match(regex) || [];
-
+		
 		const processedMatches = matches.map((match, i) => {
 			const startIndex = inputLine.indexOf(match, lastIndex);
 			const endIndex = startIndex + match.length;

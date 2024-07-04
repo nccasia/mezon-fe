@@ -1,5 +1,5 @@
-import { ArrowLeftIcon, HashSignIcon, HashSignLockIcon, Icons, ThreadIcon, getChannelById } from "@mezon/mobile-components";
-import { Colors, useTheme } from "@mezon/mobile-ui";
+import { Icons, getChannelById } from "@mezon/mobile-components";
+import { useTheme } from "@mezon/mobile-ui";
 import { ChannelsEntity, selectChannelsEntities } from "@mezon/store-mobile";
 import useStatusMuteChannel, { EActionMute } from "apps/mobile/src/app/hooks/useStatusMuteChannel";
 import { APP_SCREEN } from "apps/mobile/src/app/navigation/ScreenTypes";

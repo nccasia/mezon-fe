@@ -21,6 +21,7 @@ type ModalUserProfileProps = {
 	showNote?: boolean;
 	message?: IMessageWithUser;
 	showPopupLeft?: boolean;
+	mode?: number;
 };
 
 export type OpenModalProps = {
@@ -37,6 +38,7 @@ const ModalUserProfile = ({
 	showNote,
 	message,
 	showPopupLeft,
+	mode,
 }: ModalUserProfileProps) => {
 	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
@@ -44,7 +46,7 @@ const ModalUserProfile = ({
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-
+	// console.log("userById: ", userById);
 	const [content, setContent] = useState<string>('');
 
 	const initOpenModal = {
@@ -150,7 +152,7 @@ const ModalUserProfile = ({
 					{(checkAddFriend.myPendingFriend && !showPopupLeft) && <PendingFriend user={userById}/>}
 
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : !hiddenRole && userById && <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : (mode !== 4) && (mode !== 3) && !hiddenRole && userById && <RoleUserProfile userID={userID} />}
 
 					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
 						<div className="w-full items-center mt-2">

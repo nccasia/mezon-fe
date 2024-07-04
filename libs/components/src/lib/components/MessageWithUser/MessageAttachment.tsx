@@ -25,7 +25,6 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 			documents.push(attachment);
 		}
 	});
-
 	return { videos, images, documents };
 };
 

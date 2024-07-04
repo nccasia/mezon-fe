@@ -185,8 +185,8 @@ export default function CreateThreadForm() {
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}
-										channelLabel={currentChannel?.channel_label}
-                    isNumberOfLine={true}
+                    					isNumberOfLine={true}
+										preventAction
 									/>
 								</View>
 							)}

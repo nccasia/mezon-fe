@@ -1,6 +1,7 @@
 import { IUserAccount, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import memoize from 'memoizee';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
 export interface IAccount {
@@ -20,9 +21,21 @@ export const initialAccountState: AccountState = {
 	userProfile: null,
 };
 
+const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 3;
+const fetchUserProfileCached = memoize(
+	(mezon: MezonValueContext) => mezon.client.getAccount(mezon.session),
+	{
+		promise: true,
+		maxAge: CHANNEL_PROFILE_CACHED_TIME,
+		normalizer: (args) => {
+			return args[0].session.username || '';
+		},
+	},
+);
+
 export const getUserProfile = createAsyncThunk<IUserAccount>('account/user', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getAccount(mezon.session);
+	const response = await fetchUserProfileCached(mezon);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}

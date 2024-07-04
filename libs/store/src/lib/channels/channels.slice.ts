@@ -312,6 +312,7 @@ export const channelsSlice = createSlice({
 		},
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
+			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
 		},
 	},
 	extraReducers: (builder) => {
@@ -454,19 +455,37 @@ export const selectChannelSecond = createSelector(selectAllChannels, (channels) 
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
-export const selectDefaultChannelIdByClanId = (clanId: string, categoryId?: string, isSelectedChannel?: any) =>
-	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const filteredChannels = channels.filter((channel) => {
-			if (isSelectedChannel && isSelectedChannel[clanId]) {
-				return channel.channel_id === isSelectedChannel[clanId];
-			}
-			if (categoryId) {
-				return channel.parrent_id === '0' && channel.category_id === categoryId;
-			}
-			return channel.parrent_id === '0';
-		});
-		return filteredChannels.length > 0 ? filteredChannels[0].id : null;
-	});
+export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
+    createSelector(selectChannelsByClanId(clanId), (channels) => {
+		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+        if (idsSelectedChannel && idsSelectedChannel[clanId]) {
+            const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
+            if (selectedChannel) {
+                return selectedChannel.id;
+            }
+        }
+
+        if (categories) {
+            for (const category of categories) {
+                const filteredChannel = channels.find(channel =>
+                    channel.parrent_id === '0' &&
+                    channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
+                    channel.category_id === category
+                );
+                if (filteredChannel) {
+                    return filteredChannel.id;
+                }
+            }
+        }
+
+        const defaultChannel = channels.find(channel =>
+            channel.parrent_id === '0' &&
+            channel.type === ChannelType.CHANNEL_TYPE_TEXT
+        );
+
+        return defaultChannel ? defaultChannel.id : null;
+    });
+
 
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {

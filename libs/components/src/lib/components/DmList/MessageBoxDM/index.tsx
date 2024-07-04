@@ -1,4 +1,4 @@
-import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox } from '@mezon/components';
+import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
 import { RootState, selectIdMessageRefReaction, selectIsShowMemberList } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
@@ -92,7 +92,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				onSend={handleSend}
 				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
-				// listMentions={UserMentionList(directParamId)}
+				listMentions={UserMentionList({channelID: directParamId, channelMode: mode})}
 				mode={mode}
 			/>
 			{isEmojiOnChat && ( // responsive mobile

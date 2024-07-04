@@ -89,7 +89,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			)}
 			<ReplyMessageBox />
 			<MessageBox
-				listMentions={UserMentionList(channelId)}
+				listMentions={UserMentionList({channelID: channelId})}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

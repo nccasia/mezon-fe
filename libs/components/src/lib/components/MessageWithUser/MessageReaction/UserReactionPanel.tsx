@@ -1,7 +1,7 @@
-import { Icons } from '@mezon/components';
+import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById } from '@mezon/store';
-import { AvatarComponent, NameComponent } from '@mezon/ui';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -94,7 +94,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({ emoji, emojiListPNG, count })
 	return (
 		<div>
 			<div className="flex flex-row items-center m-2 dark:text-white text-black">
-				<img src={getSrcEmoji(emoji ?? '', emojiListPNG)} className="w-5 h-5" />
+				<img src={getSrcEmoji(emoji ?? '', emojiListPNG)} className="w-5 h-5 min-h-5 min-w-5" />
 				<p className="text-sm ml-2">{count}</p>
 			</div>
 			<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none" />
@@ -122,10 +122,14 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 		);
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
+	const user = useSelector(selectMemberByUserId(sender.sender_id));
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
-			<AvatarComponent id={sender.sender_id ?? ''} />
+			<div className="w-8 h-8">
+				<AvatarImage className="w-8 h-8" alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
+			</div>
+
 			<NameComponent id={sender.sender_id ?? ''} />
 			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (

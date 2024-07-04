@@ -23,7 +23,7 @@ import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
 import { styles } from './styles';
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
-	const { message, emojiListPNG, openEmojiPicker, mode } = props || {};
+	const { message, emojiListPNG, openEmojiPicker, mode, preventAction = false } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction();
 	const userProfile = useSelector(selectAllAccount);
@@ -113,8 +113,9 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 
 				return (
 					<Pressable
-						onLongPress={() => setCurrentEmojiSelectedId(emojiItemData.id)}
-						onPress={() =>
+						onLongPress={() => !preventAction && setCurrentEmojiSelectedId(emojiItemData.id)}
+						onPress={() => {
+							if (preventAction) return;
 							reactOnExistEmoji(
 								emojiItemData.id ?? '',
 								ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -124,6 +125,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 								userId ?? '',
 								false,
 							)
+						}
 						}
 						key={index + emojiItemData.id}
 						style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
@@ -139,7 +141,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			})}
 
 			{allReactionDataOnOneMessage?.length ? (
-				<Pressable onPress={() => openEmojiPicker?.()} style={styles.addEmojiIcon}>
+				<Pressable onPress={() => !preventAction && openEmojiPicker?.()} style={styles.addEmojiIcon}>
 					<FaceIcon color={Colors.gray72} />
 				</Pressable>
 			) : null}
@@ -328,7 +330,7 @@ const MemberReact = React.memo((props: { userId: string; onSelectUserId: (userId
 			<View style={styles.imageWrapper}>
 				{user?.user?.avatar_url ? (
 					<View>
-						<Image source={{ uri: user?.user?.avatar_url }} resizeMode="contain" style={styles.image} />
+						<Image source={{ uri: user?.user?.avatar_url }} resizeMode="cover" style={styles.image} />
 					</View>
 				) : (
 					<View style={styles.avatarBoxDefault}>

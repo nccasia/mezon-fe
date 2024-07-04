@@ -11,9 +11,10 @@ type IMessageHeadProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isShowFull?: boolean;
+	mode?: number;
 };
 
-const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
@@ -82,7 +83,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base text-textLightUserName dark:text-white font-medium tracking-wider cursor-pointer break-all username"
+					className="text-base text-textLightUserName font-medium tracking-wider cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
@@ -103,7 +104,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode}/>
 				</div>
 			)}
 		</div>
