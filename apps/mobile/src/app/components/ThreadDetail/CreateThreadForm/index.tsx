@@ -24,8 +24,8 @@ import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaV
 import { Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import ChatBox from '../../../screens/home/homedrawer/ChatBox';
-import MessageItem from '../../../screens/home/homedrawer/MessageItem';
+import ChatBox from '../../../screens/home/homedrawer/components/HomeDeafult/ChatBox';
+import MessageItem from '../../../screens/home/homedrawer/components/HomeDeafult/MessageItem';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { validInput } from '../../../utils/validate';

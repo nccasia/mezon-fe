@@ -1,6 +1,6 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
-import { ArrowDownIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { ArrowDownIcon, Icons } from '@mezon/mobile-components';
+import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	selectAllUserClanProfile,
@@ -18,11 +18,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
-import { ImageListModal } from '../../../components/ImageListModal';
-import MessageItem from './MessageItem';
-import WelcomeMessage from './WelcomeMessage';
-import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import { styles } from './styles';
+import { ImageListModal } from '../../../../../../components/ImageListModal';
+import MessageItem from '../MessageItem';
+import WelcomeMessage from '../../../WelcomeMessage';
+import MessageItemSkeleton from '../../../../../../components/Skeletons/MessageItemSkeleton';
+import { style } from './styles';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -33,6 +33,8 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
+	const {themeValue} = useTheme();
+	const styles = style(themeValue);
 	const { loadMoreMessage } = useChatMessages({ channelId });
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
@@ -207,7 +209,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			/>
 			{showScrollToBottomButton && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
-					<ArrowDownIcon color={Colors.tertiary} />
+					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20}/>
 				</TouchableOpacity>
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}

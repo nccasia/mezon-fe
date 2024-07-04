@@ -6,4 +6,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: colors.secondary,
 		flex: 1,
 	},
+
+	channelView: {
+		flex: 1, 
+		backgroundColor: colors.secondary
+	}
 });

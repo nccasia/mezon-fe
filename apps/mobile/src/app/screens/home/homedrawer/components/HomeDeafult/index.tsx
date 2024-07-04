@@ -15,8 +15,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DeviceEventEmitter, Keyboard, Platform, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../components/NotificationSetting';
-import ChannelMessages from '../../ChannelMessages';
-import ChatBox from '../../ChatBox';
+import ChannelMessages from './ChannelMessage';
+import ChatBox from './ChatBox';
 import AttachmentPicker from '../AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from '../BottomKeyboardPicker';
 import EmojiPicker from '../EmojiPicker';
@@ -25,7 +25,8 @@ import HomeDefaultHeader from './HomeDeafultHeader';
 import { style } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
-	const styles = style(useTheme().themeValue);
+	const {themeValue} = useTheme();
+	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -114,8 +115,9 @@ const HomeDefault = React.memo((props: any) => {
 				currentChannel={currentChannel}
 				onOpenDrawer={onOpenDrawer}
 			/>
+			
 			{currentChannel && isFocusChannelView && (
-				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
+				<View style={styles.channelView}>
 					<ChannelMessages
 						channelId={currentChannel.channel_id}
 						type="CHANNEL"
@@ -141,7 +143,7 @@ const HomeDefault = React.memo((props: any) => {
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: Colors.secondary,
+							backgroundColor: themeValue.secondary,
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
@@ -169,7 +171,7 @@ const HomeDefault = React.memo((props: any) => {
 				backdropComponent={renderBackdrop}
 				index={-1}
 				snapPoints={snapPoints}
-				backgroundStyle={{ backgroundColor: Colors.secondary }}
+				backgroundStyle={{ backgroundColor: themeValue.secondary }}
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>

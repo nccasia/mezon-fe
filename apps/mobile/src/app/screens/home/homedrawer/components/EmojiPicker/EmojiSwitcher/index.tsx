@@ -1,5 +1,5 @@
-import { KeyboardIcon, SmilingFaceIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
@@ -10,6 +10,7 @@ export type IProps = {
 };
 
 function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
+	const { themeValue } = useTheme();
 	const [mode, setMode] = useState<IModeKeyboardPicker>(_mode);
 
 	const onPickerPress = () => {
@@ -30,7 +31,9 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 	return (
 		<View>
 			<TouchableOpacity onPress={onPickerPress}>
-				{mode !== 'emoji' ? <SmilingFaceIcon width={25} height={25} /> : <KeyboardIcon width={25} height={25} color={Colors.white} />}
+				{mode !== 'emoji'
+					? <Icons.ReactionIcon width={22} height={22} color={themeValue.text} />
+					: <Icons.KeyboardIcon width={22} height={22} color={themeValue.text} />}
 			</TouchableOpacity>
 		</View>
 	);

@@ -10,7 +10,7 @@ import { default as CheckBox } from 'react-native-bouncy-checkbox';
 import { TextInput } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
 import { useSelector } from 'react-redux';
-import MessageItem from '../../MessageItem';
+import MessageItem from '../HomeDeafult/MessageItem';
 import { styles } from './styles';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';

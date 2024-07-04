@@ -1,22 +1,17 @@
 import React, { useMemo, useState } from 'react';
-import { Image, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { useDMInvite, useDirect, useSendInviteMessage } from '@mezon/core';
-import { DirectEntity, UsersClanEntity, selectCurrentChannel } from '@mezon/store-mobile';
+import { DirectEntity, UsersClanEntity } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import Images from '../../../../assets/Images';
-import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import { MezonButton } from '../../../temp-ui';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
-import { ChannelListItem } from './components/ChannelList/ChannelListItem';
 import { styles } from './styles';
-import { SortIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+
 
 export const ChannelListContext = React.createContext({} as any);
 export interface IFriendListItemProps {

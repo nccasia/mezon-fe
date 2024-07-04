@@ -17,8 +17,8 @@ import { DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'reac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import ChannelMessages from '../../home/homedrawer/ChannelMessages';
-import ChatBox from '../../home/homedrawer/ChatBox';
+import ChannelMessages from '../../home/homedrawer/components/HomeDeafult/ChannelMessage';
+import ChatBox from '../../home/homedrawer/components/HomeDeafult/ChatBox';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';

@@ -8,7 +8,7 @@ import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { styles as s } from './NotificationItem.styles';
-import MessageItem from '../../home/homedrawer/MessageItem';
+import MessageItem from '../../home/homedrawer/components/HomeDeafult/MessageItem';
 import { ChannelStreamMode } from 'mezon-js';
 
 function parseObject(obj: any) {

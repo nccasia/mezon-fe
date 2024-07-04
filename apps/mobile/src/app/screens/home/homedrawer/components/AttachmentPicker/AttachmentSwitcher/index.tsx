@@ -1,7 +1,8 @@
-import { PlusIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
+import { useTheme } from '@mezon/mobile-ui';
 
 export type AttachmentPickerProps = {
 	mode: IModeKeyboardPicker;
@@ -9,6 +10,7 @@ export type AttachmentPickerProps = {
 };
 
 function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
+	const { themeValue } = useTheme();
 	const [mode, setMode] = useState<IModeKeyboardPicker>(_mode);
 
 	const onPickerPress = () => {
@@ -28,7 +30,7 @@ function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
 
 	return (
 		<TouchableOpacity onPress={onPickerPress}>
-			<PlusIcon width={20} height={20} />
+			<Icons.PlusLargeIcon width={22} height={22} color={themeValue.textStrong} />
 		</TouchableOpacity>
 	);
 }
