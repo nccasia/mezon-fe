@@ -17,16 +17,11 @@ import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
-import { AppState, Text, View } from 'react-native';
+import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import BarsLogo from '../../../assets/svg/bars.svg';
-import SearchLogo from '../../../assets/svg/discoverySearch.svg';
-import HashSignIcon from '../../../assets/svg/loading.svg';
-import UsersLogo from '../../../assets/svg/users.svg';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
-import HomeDefault from './homedrawer/HomeDefault';
-import { styles } from './styles';
+import HomeDefault from './homedrawer/components/HomeDeafult';
 
 const Drawer = createDrawerNavigator();
 
@@ -57,34 +52,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				name="HomeDefault"
 				component={HomeDefault}
 				options={{
-					headerTitleAlign: 'left',
-					headerStyle: {
-						backgroundColor: 'grey',
-					},
-					headerShown: false,
-					headerLeft(vals) {
-						return (
-							<View style={styles.drawerHeaderLeft} {...vals} onTouchEnd={() => navigation.openDrawer()}>
-								<BarsLogo width={20} height={20} />
-							</View>
-						);
-					},
-					headerTitle(props) {
-						return (
-							<View style={styles.drawerHeaderTitle}>
-								<HashSignIcon width={18} height={18} />
-								<Text style={styles.drawerHeaderTitleTxt}>welcome-and-rules</Text>
-							</View>
-						);
-					},
-					headerRight(props) {
-						return (
-							<View style={styles.drawerHeaderRight}>
-								<SearchLogo width={22} height={22} />
-								<UsersLogo width={22} height={22} />
-							</View>
-						);
-					},
+					headerShown: false
 				}}
 			/>
 		</Drawer.Navigator>

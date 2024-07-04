@@ -1,6 +1,6 @@
 import {Colors, horizontalScale, size, verticalScale} from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-import homeDefault from "../../HomeDefault";
+import homeDefault from "../HomeDeafult";
 
 const styles = StyleSheet.create({
 	container: {
