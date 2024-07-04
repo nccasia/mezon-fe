@@ -1,5 +1,5 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
-import { ArrowDownIcon, Icons } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -20,7 +20,7 @@ import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../../../../components/ImageListModal';
 import MessageItem from '../MessageItem';
-import WelcomeMessage from '../../../WelcomeMessage';
+import WelcomeMessage from '../WelcomeMessage';
 import MessageItemSkeleton from '../../../../../../components/Skeletons/MessageItemSkeleton';
 import { style } from './styles';
 
@@ -33,7 +33,7 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const {themeValue} = useTheme();
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { loadMoreMessage } = useChatMessages({ channelId });
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
@@ -209,7 +209,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			/>
 			{showScrollToBottomButton && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
-					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20}/>
+					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />
 				</TouchableOpacity>
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}

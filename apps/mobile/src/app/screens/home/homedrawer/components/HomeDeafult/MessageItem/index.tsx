@@ -398,7 +398,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						<View style={styles.newMessageContainer}>
 							<Text style={styles.newMessageText}>NEW MESSAGE</Text>
 						</View>
-					</View>}
+					</View>
+				}
+				
 				{messageRefFetchFromServe ? (
 					<View style={styles.aboveMessage}>
 						<View style={styles.iconReply}>

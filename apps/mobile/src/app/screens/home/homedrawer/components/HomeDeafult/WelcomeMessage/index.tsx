@@ -1,12 +1,14 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
-
-import { FastImageRes } from './Reusables';
-import { styles } from './styles';
+import { FastImageRes } from '../../../Reusables';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
 
 const WelcomeMessage = React.memo((props: { channelTitle: string; uri?: string }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<View style={styles.wrapperWelcomeMessage}>
 			<View style={styles.iconWelcomeMessage}>
@@ -15,7 +17,7 @@ const WelcomeMessage = React.memo((props: { channelTitle: string; uri?: string }
 						<FastImageRes uri={props.uri} />
 					</View>
 				) : (
-					<HashSignIcon width={50} height={50} />
+					<Icons.TextIcon width={50} height={50} color={themeValue.textStrong} />
 				)}
 			</View>
 			{!!props.channelTitle && (
