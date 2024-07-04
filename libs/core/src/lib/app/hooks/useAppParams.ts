@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 export function useAppParams() {
 	const { clanId, channelId, directId, type } = useParams();
-	// const { pathname: currentURL } = useLocation();
+	const { pathname: currentURL } = useLocation();
 
 	return useMemo(
 		() => ({
@@ -11,8 +11,8 @@ export function useAppParams() {
 			channelId,
 			directId,
 			type,
-			currentURL: "",
+			currentURL,
 		}),
-		[clanId, channelId, directId, type],
+		[clanId, channelId, directId, type, currentURL],
 	);
 }
