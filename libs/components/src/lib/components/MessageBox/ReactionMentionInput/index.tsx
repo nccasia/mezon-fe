@@ -68,7 +68,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import channelList from "../../ChannelList";
 
 type ChannelsMentionProps = {
 	id: string;
@@ -318,7 +317,6 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 }, [props.mode, listChannels]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-    console.log ('list: ', listChannelsMention)
 		const mentionList =
 			members[0].users?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
@@ -570,8 +568,9 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
               <SuggestItem
                 valueHightLight={valueHighlight}
                 name={suggestion.display ?? ''}
-                symbol={(suggestion as MentionDataProps).type?.toString() ?? '#'}
+                symbol={'' + (suggestion as MentionDataProps).type?.toString() + (suggestion as MentionDataProps).isPrivate?.toString()}
                 subText={(suggestion as ChannelsMentionProps).subText}
+                trigger={"#"}
               />
             </>
             
