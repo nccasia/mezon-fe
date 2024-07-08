@@ -70,10 +70,12 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 					) : (
 						<Icons.ThreadIcon defaultSize="w-6 h-6" />
 					)}
+     
 					<p
 						className={`mt-[2px] text-base font-semibold cursor-default ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
 					>
-						{channel.channel_label}
+            type: {typeof(Icons.SpeakerLocked) }
+						{/*{channel.channel_label}*/}
 					</p>
 				</div>
 			)}

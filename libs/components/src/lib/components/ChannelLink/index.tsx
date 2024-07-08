@@ -4,7 +4,7 @@ import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
@@ -54,6 +54,9 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		mouseY: 0,
 		distanceToBottom: 0,
 	});
+  useEffect (() => {
+    console.log ('channel:', channel)
+  }, []);
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);

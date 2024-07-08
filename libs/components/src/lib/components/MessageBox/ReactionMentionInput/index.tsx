@@ -55,7 +55,7 @@ import {
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import {Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem} from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
@@ -68,6 +68,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import channelList from "../../ChannelList";
 
 type ChannelsMentionProps = {
 	id: string;
@@ -308,6 +309,8 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 				id: item?.channel_id ?? '',
 				display: item?.channel_label ?? '',
 				subText: item?.category_name ?? '',
+        isPrivate: item?.channel_private ?? 0,
+        type: item?.type
 			};
 		}) as ChannelsMentionProps[];
 	}
@@ -315,6 +318,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 }, [props.mode, listChannels]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+    console.log ('list: ', listChannelsMention)
 		const mentionList =
 			members[0].users?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
@@ -538,14 +542,14 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
 						return (
-							<SuggestItem
-								valueHightLight={valueHighlight}
-								name={suggestion.displayName ?? ''}
-								avatarUrl={suggestion.avatarUrl ?? ''}
-								subText={suggestion.display ?? ''}
-								subTextStyle="lowercase text-xs"
-								showAvatar
-							/>
+                <SuggestItem
+                  valueHightLight={valueHighlight}
+                  name={suggestion.displayName ?? ''}
+                  avatarUrl={suggestion.avatarUrl ?? ''}
+                  subText={suggestion.display ?? ''}
+                  subTextStyle="lowercase text-xs"
+                  showAvatar
+                />
 						);
 					}}
 					style={mentionStyle}
@@ -560,13 +564,17 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 						return `#${display}`;
 					}}
 					style={mentionStyle}
-					renderSuggestion={(suggestion) => (
-						<SuggestItem
-							valueHightLight={valueHighlight}
-							name={suggestion.display ?? ''}
-							symbol="#"
-							subText={(suggestion as ChannelsMentionProps).subText}
-						/>
+					renderSuggestion={(suggestion: SuggestionDataItem) => (
+            <>
+              {/*{JSON.stringify(suggestion)}*/}
+              <SuggestItem
+                valueHightLight={valueHighlight}
+                name={suggestion.display ?? ''}
+                symbol={(suggestion as MentionDataProps).type?.toString() ?? '#'}
+                subText={(suggestion as ChannelsMentionProps).subText}
+              />
+            </>
+            
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>

@@ -398,6 +398,8 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+  isPrivate?: number;
+  type?: number;
 };
 
 export type UserSearchDataProps = {
@@ -509,3 +511,5 @@ export type ContenSubmitEventProps = {
 	logo: string;
 	description: string;
 };
+
+
