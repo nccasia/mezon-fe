@@ -15,13 +15,13 @@ import {
   selectStatusMenu,
   useAppDispatch,
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { ETypeChannel, EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-import ThreadsMain from '../../thread';
+
 
 function useChannelSeen(channelId: string) {
   const dispatch = useAppDispatch();
@@ -67,7 +67,7 @@ export default function DirectMessage() {
   const closeMenu = useSelector(selectCloseMenu);
   const statusMenu = useSelector(selectStatusMenu);
   const { isShowCreateThread } = useThreads();
-  const { isShowMemberList, setIsShowMemberList } = useApp();
+  const { isShowMemberList } = useApp();
   const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 
   const HEIGHT_EMOJI_PANEL: number = 457;
@@ -95,11 +95,7 @@ export default function DirectMessage() {
     () => (Number(type) === ChannelType.CHANNEL_TYPE_GROUP ? isShowMemberListDM : isUseProfileDM),
     [isShowMemberListDM, isUseProfileDM, type],
   );
-  useEffect(() => {
-    if (isShowCreateThread) {
-      setIsShowMemberList(false);
-    }
-  }, [isShowCreateThread]);
+
   return (
     <>
       {draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
@@ -119,7 +115,7 @@ export default function DirectMessage() {
                 <ChannelMessages
                   channelId={directId ?? ''}
                   channelLabel={currentDmGroup?.channel_label}
-                  type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
+                  type={currentDmGroup?.user_id?.length === 1 ? ETypeChannel.DM : ETypeChannel.GROUP}
                   mode={
                     currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
                   }
@@ -214,15 +210,7 @@ export default function DirectMessage() {
           )}
         </div>
       </div>
-      {isShowCreateThread && (
-        <>
-          <div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-white" />
-          <div className="w-[480px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-l-lg">
-            <ThreadsMain />
-          </div>
 
-        </>
-      )}
     </>
   );
 }

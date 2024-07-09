@@ -326,7 +326,7 @@ export enum MemberProfileType {
 export type IReaction = ApiMessageReaction & {
 	id: string;
 	message_id: string;
-}
+};
 
 export type IEmoji = {
 	src: string;
@@ -403,7 +403,7 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
-  user?: ApiUser;
+	user?: ApiUser;
 };
 
 export type UserSearchDataProps = {
@@ -429,7 +429,10 @@ export enum ETypeMessage {
 	CHANNEL = 'CHANNEL',
 	THREAD = 'THREAD',
 }
-
+export enum ETypeChannel {
+	DM = 'DM',
+	GROUP = 'GROUP',
+}
 export type ThreadError = {
 	name: string;
 	message: string;

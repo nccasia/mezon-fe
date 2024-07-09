@@ -682,8 +682,11 @@ input:-webkit-autofill:active {
 		padding: 9px 10px !important;
 
 	}
+  position: absolute !important;
+  bottom: 0;
+  width: 100%;
+
 }
 .maxHeightThreadMessage{
-  max-height: calc(50vh - 75px);
-  // position: absolute;
+  max-height: calc(100vh - 124px);
 }

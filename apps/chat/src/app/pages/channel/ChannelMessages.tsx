@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 import { MessageContextMenuProvider } from './ContextMenu/MessageContextMenuContext';
 
+
 type ChannelMessagesProps = {
 	channelId: string;
 	type: string;
@@ -94,6 +95,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					channelId={channelId}
 					isHighlight={messageId === idMessageNotifed}
 					mode={mode}
+          type={type}
 					channelLabel={channelLabel ?? ''}
 				/>
 			);

@@ -475,7 +475,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 	}, [dispatch, isFocused]);
 
 	return (
-		<div className={`relative flex flex-col h-full justify-end `}>
+		<div className={`relative flex flex-col h-full justify-start `}>
 			{props.isThread && !threadCurrentChannel && (
 				<div
 					className={`flex flex-col overflow-y-auto maxHeightThreadMessage ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
