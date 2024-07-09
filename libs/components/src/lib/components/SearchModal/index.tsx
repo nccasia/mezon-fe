@@ -22,7 +22,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
 	const usersClan = useSelector(selectAllUsesClan);
 	const { friends } = useFriends();
 	const dispatch = useAppDispatch();
@@ -40,6 +40,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.channel_label ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
+						displayName:'',
 						typeChat: 3,
 					};
 				})
@@ -72,12 +73,19 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
-						displayName: itemUserClan?.user.display_name ?? '',
 						idDM: '',
 					};
 				})
 			: [];
-		const listSearch = [...listDMSearch, ...listFriendsSearch, ...listUserClanSearch, ...listGroupSearch];
+		const friendsMap = new Map(listFriendsSearch.map(friend => [friend.id, friend]));
+		const listSearch = [ 
+			...listDMSearch.map(itemDM => {
+				const friend = friendsMap.get(itemDM.id);
+				return friend ? { ...itemDM, displayName: friend.displayName || itemDM.displayName } : itemDM;
+		  	}),
+			...listGroupSearch,
+			...listUserClanSearch
+		];
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
 	}, [accountId, friends, listDM, listGroup, usersClan]);
 

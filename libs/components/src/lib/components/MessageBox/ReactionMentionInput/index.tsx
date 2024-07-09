@@ -24,6 +24,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDataReferences,
+	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsShowMemberList,
@@ -479,13 +480,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [getRefMessageReply]);
 
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if (currentChannelId && valueTextInput) {
+		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
 			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
 			setContent(convertedHashtag);
 			focusToElement(editorRef);
 		}
-	}, [currentChannelId, valueTextInput]);
+	}, [currentChannelId, currentDmGroupId, valueTextInput]);
 
 	useEffect(() => {
 		if (isFocused) {

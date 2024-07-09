@@ -60,7 +60,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 				{ !specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (<Icons.Speaker defaultSize="w-5 5-5" />)}
 				{ specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (<Icons.SpeakerLocked defaultSize="w-5 h-5" />)}
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
-				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
+				<span className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}>{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
 		</div>

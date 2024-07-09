@@ -113,18 +113,18 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 	}
 
 	const filterData = useCallback((input: string) => {
-		const inputData = input.trim();
+		const inputData = input.trim().toLowerCase();
 		if(inputData.startsWith('@')){
 			const searchValue = inputData.substring(1);
-      		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.includes(searchValue));
+      		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.toLowerCase().includes(searchValue));
 			setFilterItem({
 				listMembersNotInChannel: filteredMembers,
 				listRolesNotAddChannel: [],
 			});
 			return;
 		}
-		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.includes(inputData));
-		const filteredRoles = listRolesNotAddChannel.filter(item => item?.title?.includes(inputData));
+		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.toLowerCase().includes(inputData));
+		const filteredRoles = listRolesNotAddChannel.filter(item => item?.title?.toLowerCase().includes(inputData));
 		setFilterItem({
 			listMembersNotInChannel: filteredMembers,
 			listRolesNotAddChannel: filteredRoles,
