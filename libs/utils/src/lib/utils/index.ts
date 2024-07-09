@@ -1,3 +1,4 @@
+import { useEmojiSuggestion } from '@mezon/core';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -161,6 +162,7 @@ export const convertMarkdown = (markdown: string): string => {
 };
 
 export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
+
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
 	return emoji ? emoji.src : undefined;
 };

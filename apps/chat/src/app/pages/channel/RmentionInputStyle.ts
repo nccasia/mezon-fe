@@ -11,10 +11,11 @@ export default {
 			outline: 'none',
 		},
 		highlighter: {
+			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
 		},
 		input: {
-			padding: '9px 12px',
+			padding: '9px 10px',
 			border: 'none',
 			outline: 'none',
 			whiteSpace: 'pre-wrap',
@@ -36,25 +37,19 @@ export default {
 	},
 
 	suggestions: {
-		border: '1px solid #0B0B0B',
-		boxShadow: '1px 2px #000',
-		padding: '5px 0px 5px 2px',
 		width: '100%',
-		borderRadius: 12,
-		marginBottom: 20,
-		backgroundColor: '#272822',
+		left: '0px',
+		top: '20px',
 		list: {
-			maxHeight: 400,
 			overflowY: 'auto',
-			backgroundColor: '#272822',
-			padding: '5px 8px 5px 10px',
+			maxHeight: '450px',
 		},
 		item: {
-			padding: '5px 15px',
-			borderBottom: '1px solid rgba(0,0,0,0.15)',
+			margin: '0 8px',
+			padding: '8px',
 			'&focused': {
-				backgroundColor: '#41433A',
-				borderRadius: 6,
+				backgroundColor: '#35373C',
+				borderRadius: 3,
 			},
 		},
 	},

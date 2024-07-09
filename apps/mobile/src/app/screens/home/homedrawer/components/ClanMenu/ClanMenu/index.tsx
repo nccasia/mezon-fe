@@ -33,7 +33,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { dismiss } = useBottomSheetModal();
 
     const handleOpenInvite = () => {
-        inviteRef?.current.open();
+        inviteRef?.current.present();
         dismiss();
     }
 

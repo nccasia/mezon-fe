@@ -6,6 +6,7 @@ import {
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiDirectChannelVoice,
 	ApiEventManagement,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
@@ -74,6 +75,9 @@ export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
 };
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
+	id: string;
+};
+export type IDirectChannelVoid = ApiDirectChannelVoice & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -330,7 +334,7 @@ export type IReaction = ApiMessageReaction & {
 
 export type IEmoji = {
 	src: string;
-	category: string;
+	category: string ;
 	shortname: string;
 };
 
@@ -523,3 +527,10 @@ export enum SHOW_POSITION {
 	IN_LINK = 'IN_LINK',
 	NONE = 'NONE',
 }
+
+export type EmojiStorage = {
+	emoji: string;
+	messageId: string;
+	senderId: string;
+	action: boolean;
+};

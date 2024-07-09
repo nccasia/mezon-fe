@@ -1,6 +1,6 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { emojiSuggestionActions, reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment, useCallback, useEffect, useState } from 'react';
@@ -111,6 +111,7 @@ type SenderItemProps = {
 };
 
 const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId, removeEmojiSender, hideSenderOnPanel }) => {
+	const dispatch = useDispatch();
 	const handleRemoveEmojiSender = async (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
 		await removeEmojiSender(
@@ -120,6 +121,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			sender.sender_id ?? '',
 			sender.count ?? 0,
 		);
+
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
 	const user = useSelector(selectMemberByUserId(sender.sender_id));

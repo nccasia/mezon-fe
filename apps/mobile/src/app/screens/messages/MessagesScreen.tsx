@@ -181,7 +181,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			/>
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				<Icons.ChatIcon width={32} height={25} style={{ marginLeft: -5 }} />
+				<Icons.MessagePlusIcon width={22} height={22} />
 			</Pressable>
 		</View>
 	);

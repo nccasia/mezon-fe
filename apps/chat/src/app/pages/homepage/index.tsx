@@ -18,7 +18,7 @@ function Homepage() {
 	return (
 		<div className="relative">
 			<div
-				className="layout relative z-10 flex flex-col items-center text-textDarkTheme"
+				className="layout relative z-10 flex flex-col items-center text-textDarkTheme h-fit min-h-screen"
 				style={{ backgroundImage: 'url(../../../assets/homepage-bg.png)' }}
 			>
 				<div
@@ -72,8 +72,8 @@ function Homepage() {
 								<div className='w-[150px] -z-10 relative top-[19px] left-[20px]'>
 									<img src={DancingRobot} alt="" className='w-full' />
 								</div>
-								<div className="top-text text-[50px] font-black leading-[60px]">GROUP CHAT THAT’S ALL FUN & GAMES</div>
-								<div className="bottom-text text-[24px]">
+								<div className="top-text text-[50px] max-md:text-[30px] font-black leading-[60px] max-md:leading-[40px]">GROUP CHAT THAT’S ALL FUN & GAMES</div>
+								<div className="bottom-text text-[24px] max-md:text-[17px]">
 									Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your
 									own space to talk, play, and hang out.
 								</div>

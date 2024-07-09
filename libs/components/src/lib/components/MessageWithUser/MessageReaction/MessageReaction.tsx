@@ -28,7 +28,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-
 	const messageReactions = useMessageReaction(message.id);
 	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id));
 

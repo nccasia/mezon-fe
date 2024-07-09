@@ -18,6 +18,7 @@ export type Attributes = {
     textNormal: HexColor,
     white: HexColor,
     black: HexColor,
+    bgInputPrimary: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -51,7 +52,8 @@ export const themeColors: ThemeColor = {
         secondaryWeight: '#212122',
         secondaryLight: '#2A2D31',
         white: '#FFFFFF',
-        black: '#000000'
+        black: '#000000',
+        bgInputPrimary: '#2a2e31',
     },
     light: {
         primary: "#f2f3f5",
@@ -68,6 +70,7 @@ export const themeColors: ThemeColor = {
         secondaryWeight: '#F0F0F0',
         secondaryLight: '#2A2D31',
         white: '#000000',
-        black: '#FFFFFF'
+        black: '#FFFFFF',
+        bgInputPrimary: '#a0a1a6',
     }
 }

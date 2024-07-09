@@ -1,4 +1,4 @@
-import { EmojiDataOptionals, EmojiPlaces, IReaction } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -81,7 +81,7 @@ export type WriteMessageReactionArgs = {
 };
 
 export const writeMessageReaction = createAsyncThunk(
-	"messages/writeMessageReaction",
+	'messages/writeMessageReaction',
 	async ({ id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -95,7 +95,7 @@ export const writeMessageReaction = createAsyncThunk(
 
 			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
-			return thunkAPI.rejectWithValue("Error while writing message reaction");
+			return thunkAPI.rejectWithValue('Error while writing message reaction');
 		}
 	},
 );
@@ -152,6 +152,15 @@ export const reactionSlice = createSlice({
 				...action.payload,
 				count: action.payload.count || 1,
 			};
+
+			const emojiLastest: EmojiStorage = {
+				emoji: reactionDataSocket.emoji ?? '',
+				messageId: reactionDataSocket.message_id ?? '',
+				senderId: reactionDataSocket.sender_id ?? '',
+				action: reactionDataSocket.action ?? false,
+			};
+
+			saveRecentEmoji(emojiLastest);
 
 			const isAdd = !action.payload.action;
 			// Server not send id
@@ -215,6 +224,26 @@ export const reactionSlice = createSlice({
 		},
 	},
 });
+function saveRecentEmoji(emojiLastest: EmojiStorage) {
+	const storedEmojis = localStorage.getItem('recentEmojis');
+	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
+
+	const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
+		return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
+	});
+
+	if (emojiLastest.action === true) {
+		if (duplicateIndex !== -1) {
+			emojisRecentParse.splice(duplicateIndex, 1);
+		}
+	} else {
+		if (duplicateIndex === -1) {
+			emojisRecentParse.push(emojiLastest);
+		}
+	}
+
+	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
+}
 
 function combineMessageReactions(state: ReactionState, messageId: string): EmojiDataOptionals[] {
 	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);

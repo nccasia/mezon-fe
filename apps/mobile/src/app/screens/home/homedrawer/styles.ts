@@ -264,7 +264,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	iconBar: {
 		paddingLeft: size.s_14,
-		paddingRight: size.s_18,
+		paddingRight: size.s_14,
 		paddingVertical: size.s_14,
 	},
 	wrapperServerList: {
@@ -294,12 +294,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingTop: 10,
 		paddingLeft: 10,
 		lineHeight: 20,
-		color: Colors.white,
+		color: colors.text,
 		maxWidth: 200
 	},
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
+		borderRadius: 15,
+		minWidth: size.s_60,
+		backgroundColor: Colors.bgDarkSlate
 	},
 	invitedButton: {
 		borderRadius: 15
@@ -651,13 +654,13 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	threadHeaderLabel: {
 		color: colors.textStrong,
 		fontWeight: "700",
-		marginLeft: size.s_10,
+		marginLeft: size.s_8,
 		fontSize: size.label,
 		width: '85%'
 	},
 	channelHeaderLabel: {
 		color: colors.textStrong,
-		marginLeft: size.s_10,
+		marginLeft: size.s_8,
 		fontSize: size.medium,
 		maxWidth: '85%'
 	},
@@ -717,5 +720,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	sortButton: {
 		paddingHorizontal: size.s_14, paddingVertical: size.s_6
+	},
+	iconBell: {
+		paddingRight: size.s_14,
 	}
 });

@@ -1,4 +1,5 @@
 import {
+	useAppParams,
 	useChannelMembers,
 	useChannels,
 	useClickUpToEdit,
@@ -17,6 +18,7 @@ import {
 	referencesActions,
 	selectAllAccount,
 	selectAllUsesClan,
+	selectAllDirectChannelVoids,
 	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -68,6 +70,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import { ChannelStreamMode } from 'mezon-js';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -112,7 +115,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-
+	const commonChannelVoids = useSelector(selectAllDirectChannelVoids)
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
@@ -301,18 +304,31 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
-const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-	if (props.mode !== 3 && props.mode !== 4) {
-		return listChannels.map((item) => {
-			return {
-				id: item?.channel_id ?? '',
-				display: item?.channel_label ?? '',
-				subText: item?.category_name ?? '',
-			};
-		}) as ChannelsMentionProps[];
-	}
-	return [];
-}, [props.mode, listChannels]);
+	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
+		if (props.mode !== 3 && props.mode !== 4) {
+			return listChannels.map((item) => {
+				return {
+					id: item?.channel_id ?? '',
+					display: item?.channel_label ?? '',
+					subText: item?.category_name ?? '',
+				};
+			}) as ChannelsMentionProps[];
+		}
+		return [];
+	}, [props.mode, listChannels]);
+
+	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
+		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
+			return commonChannelVoids.map((item) => {
+				return {
+					id: item?.channel_id ?? '',
+					display: item?.channel_label ?? '',
+					subText: item?.clan_name ?? '',
+				};
+			}) as ChannelsMentionProps[];
+		}
+		return [];
+	}, [props.mode, commonChannelVoids]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const mentionList =
@@ -424,7 +440,11 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
-		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+		if (props.mode === ChannelStreamMode.STREAM_MODE_DM){
+			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
+		} else {
+			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+		}
 	};
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
@@ -566,6 +586,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 							name={suggestion.display ?? ''}
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
+							channelId={suggestion.id}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"

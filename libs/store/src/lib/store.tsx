@@ -43,6 +43,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -95,6 +96,7 @@ const reducer = {
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: defaultNotificationCategoryReducer,
 	notichannelcategorysetting: channelCategorySettingReducer,
+	directchannelvoid: directChannelVoidReducer,
 	notifireactmessage: notifiReactMessageReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,

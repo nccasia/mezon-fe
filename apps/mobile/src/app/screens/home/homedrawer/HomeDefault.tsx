@@ -1,27 +1,13 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, Icons, getChannelById } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import {
-	ChannelsEntity,
-	channelMembersActions,
-	selectChannelsEntities,
-	selectCurrentChannel,
-	useAppDispatch,
-} from '@mezon/store-mobile';
+import { ChannelsEntity, channelMembersActions, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-	AppState,
-	DeviceEventEmitter,
-	Keyboard,
-	PanResponder,
-	Platform,
-	Text,
-	TouchableOpacity,
-	View
-} from 'react-native';
+import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
@@ -88,12 +74,12 @@ const HomeDefault = React.memo((props: any) => {
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-		
+
 		return () => {
 			appStateSubscription.remove();
 		};
 	}, []);
-	
+
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'background') {
 			Keyboard.dismiss();
@@ -120,23 +106,11 @@ const HomeDefault = React.memo((props: any) => {
 		Keyboard.dismiss();
 	};
 
-	const panResponder = useRef(
-		PanResponder.create({
-			onStartShouldSetPanResponder: () => true,
-			onMoveShouldSetPanResponder: (evt, gestureState) => {
-				const { dx, dy } = gestureState;
-				return Math.abs(dx) > Math.abs(dy);
-			},
-			onPanResponderRelease: (evt, gestureState) => {
-				const { dx } = gestureState;
-				if (dx > 50) {
-					onOpenDrawer();
-				} else {
-					return false;
-				}
-			},
-		}),
-	).current;
+	const handleGesture = (event: { nativeEvent: { translationX: number; state: number } }) => {
+		if (event.nativeEvent.translationX >= 5 && event.nativeEvent.state === State.CANCELLED) {
+			onOpenDrawer();
+		}
+	};
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -148,13 +122,15 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
-					<View style={[styles.homeDefault]} {...panResponder.panHandlers}>
-						<ChannelMessages
-							channelId={currentChannel.channel_id}
-							channelLabel={currentChannel?.channel_label}
-							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-						/>
-					</View>
+					<PanGestureHandler onGestureEvent={handleGesture} onHandlerStateChange={handleGesture} activeOffsetX={[-10, 10]}>
+						<View style={{ flex: 1 }}>
+							<ChannelMessages
+								channelId={currentChannel.channel_id}
+								channelLabel={currentChannel?.channel_label}
+								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							/>
+						</View>
+					</PanGestureHandler>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
 							<TouchableOpacity style={{ flex: 1 }} onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}></TouchableOpacity>
@@ -265,7 +241,7 @@ const HomeDefaultHeader = React.memo(
 					</View>
 				</TouchableOpacity>
 				{!!currentChannel?.channel_label && (
-					<TouchableOpacity onPress={() => openBottomSheet()}>
+					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
 						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
 						{statusMute === EActionMute.Mute ? (
 							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />

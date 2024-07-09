@@ -24,7 +24,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
-		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
+		return emojis.filter((emoji) => emoji?.shortname?.includes(searchTerm));
 	};
 
 	useEffect(() => {
@@ -39,6 +39,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, [valueInputToCheckHandleSearch]);
 
 	const categoryIcons = [
+		<Icons.ClockHistory defaultSize="w-7 h-7" />,
 		<Icons.PenEdit defaultSize="w-7 h-7" />,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
@@ -70,9 +71,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setChannelID(currentChannel?.id || '');
 		}
 	}, [currentChannel, direct, directId]);
-	
+
 	const handleEmojiSelect = async (emojiPicked: string) => {
-		
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
@@ -84,11 +84,11 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				messageEmoji?.sender_id ?? '',
 				false,
 			);
-
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
 			setEmojiSuggestion(emojiPicked);
+
 			if (!shiftPressedState) {
 				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 				setSubPanelActive(SubPanelName.NONE);
@@ -187,9 +187,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				<div className="w-9 h-9 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
-				<div className="w-9 h-9 max-sm:hidden  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
-					<Icons.ClockHistory defaultSize="w-7 h-7" />
-				</div>
 				<hr className=" bg-gray-200 border w-full max-sm:h-full max-sm:w-[1px] max-sm:hidden" />
 				{categoriesWithIcons.map((item, index) => {
 					return (
@@ -249,7 +246,7 @@ type DisplayByCategoriesProps = {
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
-			.filter((emoji) => emoji.category.includes(categoryParam))
+			.filter((emoji) => emoji?.category?.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
 				category: emoji.category,
@@ -292,7 +289,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={item.src}></img>
+					<img draggable="false" src={item?.src}></img>
 				</button>
 			))}
 		</div>

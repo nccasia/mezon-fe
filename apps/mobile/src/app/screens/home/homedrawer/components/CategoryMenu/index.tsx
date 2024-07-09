@@ -42,7 +42,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.inviteMenu.invite'),
             onPress: () => {
-                inviteRef.current.open()
+                inviteRef.current.present()
                 dismiss();
             },
             icon: <Icons.GroupPlusIcon color={themeValue.textStrong}/>

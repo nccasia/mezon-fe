@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { selectChannelById, selectCurrentChannel } from '@mezon/store';
+import { ChannelsEntity, selectChannelById, selectDirectChannelVoidById, selectCurrentChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ type ChannelHashtagProps = {
 };
 
 const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
+	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
@@ -24,7 +25,12 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		return undefined;
 	};
 	const getChannelById = (channelHastagId: string) => {
-		const channel = useSelector(selectChannelById(channelHastagId));
+		let channel: ChannelsEntity
+		if (directId !== undefined) {
+			channel = useSelector(selectDirectChannelVoidById(directId+channelHastagId))
+		} else{
+			channel = useSelector(selectChannelById(channelHastagId));
+		}
 		return channel;
 	};
 
@@ -41,20 +47,20 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	}, [channel, currentChannelId, clanId, channelHastagId]);
 
 	const handleClick = useCallback(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channelHastagId && directId)) {
 			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}
 	}, [channel]);
 
-	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && getChannelById(channelHastagId.slice(2, -1)) ? (
+	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) && getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
 			to={channelPath ?? ''}
 			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 		>
-			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
+			{(channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channelHastagId && directId)) ? (
 				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill="#3297FF" />
 			) : (
 				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill="#3297FF" />

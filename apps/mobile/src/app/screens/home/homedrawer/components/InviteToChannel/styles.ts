@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	radioContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -20,16 +20,16 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.bgViolet,
 	},
 	inviteHeader: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.tertiary,
 		padding: 19,
 		width: '100%',
-		borderTopRightRadius: 8,
-		borderTopLeftRadius: 8,
+		
 	},
 	inviteHeaderText: {
-		color: Colors.white,
+		color: colors.white,
 		fontWeight: 'bold',
 		fontSize: 15,
+		textAlign: 'center'
 	},
 	inviteIconWrapper: {
 		justifyContent: 'center',
@@ -42,18 +42,18 @@ export const styles = StyleSheet.create({
 		alignSelf: 'center',
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: Colors.bgGrayLight,
+		backgroundColor: colors.textNormal,
 		overflow: 'hidden',
 	},
 	shareToInviteIcon: {
-		color: Colors.white,
+		color: colors.white,
 	},
 	inviteIconText: {
-		color: Colors.textGray,
+		color: colors.text,
 		paddingTop: size.s_6,
 	},
 	searchFriendToInviteWrapper: {
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: colors.bgInputPrimary,
 		borderRadius: 8,
 		alignItems: 'center',
 		paddingHorizontal: size.s_6,
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
 	searchFriendToInviteInput: {
 		width: '93%',
 		borderRadius: 8,
-		color: Colors.white,
+		color: colors.white,
 		paddingVertical: 0,
 		height: size.s_50,
 	},
@@ -82,13 +82,13 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		padding: 19,
 		borderBottomColor: Colors.bgCharcoal,
-		borderBottomWidth: 3,
+		borderBottomWidth: 1,
 	},
 	searchInviteFriendWrapper: {
 		padding: 19,
 	},
 	defaultText: {
-		color: Colors.white,
+		color: colors.text,
 	},
 	linkText: {
 		color: Colors.textLink,
@@ -142,12 +142,22 @@ export const styles = StyleSheet.create({
 		color: Colors.textGray,
 		fontSize: 16,
 	},
-  textUnknown: {
-    textAlign: 'center',
-    color: Colors.white,
-    paddingHorizontal: size.s_16,
-    fontSize: size.label,
-    fontWeight: '600',
-    marginTop: size.s_16
-  }
+	textUnknown: {
+		textAlign: 'center',
+		color: Colors.white,
+		paddingHorizontal: size.s_16,
+		fontSize: size.label,
+		fontWeight: '600',
+		marginTop: size.s_16
+	},
+	bottomSheetWrapper: {
+		flex: 1,
+		width: '100%',
+		height: '100%',
+		overflow: 'hidden',
+		paddingBottom: size.s_10,
+		backgroundColor: colors.tertiary,
+		borderTopRightRadius: 8,
+		borderTopLeftRadius: 8,
+	},
 });

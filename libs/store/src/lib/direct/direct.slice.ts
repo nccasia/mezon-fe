@@ -1,15 +1,16 @@
 import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { fetchChannelsCached } from '../channels/channels.slice';
+import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { clansActions } from '../clans/clans.slice';
 import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
+import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -144,17 +145,32 @@ interface JoinDirectMessagePayload {
 	directMessageId: string;
 	channelName?: string;
 	type?: number;
+	noCache?: boolean;
+}
+interface members {
+    id: string;
+    channelId: string | undefined;
+    userChannelId: string | undefined;
+    role_id?: string[] | undefined;
+    thread_id?: string | undefined;
+    user?: ApiUser | undefined;
 }
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
 	'direct/joinDirectMessage',
-	async ({ directMessageId, channelName, type }, thunkAPI) => {
+	async ({ directMessageId, channelName, type, noCache = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache }));
+			
+			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
 			);
+			const members = fetchChannelMembersResult.payload as members[];
+			const userIds = members.map((member: any) => member.user.id);
+			if (type === ChannelType.CHANNEL_TYPE_DM) {
+				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({userIds:userIds, directId: directMessageId}))
+			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
@@ -164,6 +180,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		}
 	},
 );
+
 
 export const initialDirectState: DirectState = directAdapter.getInitialState({
 	loadingStatus: 'not loaded',

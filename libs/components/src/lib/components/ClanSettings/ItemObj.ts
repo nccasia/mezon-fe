@@ -10,6 +10,7 @@ export const ItemSetting = {
 	STICKERS: 'Stickers',
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: "integrations",
+  NOTIFICATION_SOUND: "notification-sound"
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -18,4 +19,5 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
 	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
+  { id: ItemSetting.NOTIFICATION_SOUND, name: "Notification Sound"}
 ];

@@ -13,10 +13,10 @@ interface IReactionItem {
 
 const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, messageId }) => {
 	const { directId } = useAppParams();
-	const { emojis } = useEmojiSuggestion();
+	const { emojiConverted } = useEmojiSuggestion();
 
 	const { reactionMessageDispatch } = useChatReaction();
-	const getUrl = getSrcEmoji(emojiShortCode, emojis ?? []);
+	const getUrl = getSrcEmoji(emojiShortCode, emojiConverted ?? []);
 	const userId = useAuth();
 
 	const [channelID, setChannelID] = useState('');

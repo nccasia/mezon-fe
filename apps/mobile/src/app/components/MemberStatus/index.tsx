@@ -16,6 +16,7 @@ import { APP_SCREEN } from "../../navigation/ScreenTypes";
 import { useTranslation } from "react-i18next";
 import { DirectEntity } from '@mezon/store-mobile';
 import { InviteToChannel } from '../../screens/home/homedrawer/components/InviteToChannel';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 enum EActionButton {
 	AddMembers = 'Add Members',
@@ -28,13 +29,13 @@ export const MemberListStatus = React.memo(() => {
     const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
     const [ selectedUser, setSelectedUser ] = useState<ChannelMembersEntity | null>(null);
     const { t } = useTranslation();
-	const bottomSheetRef = useRef(null);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
 
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
 	const handleAddOrInviteMembers = useCallback((action: EActionButton) => {
-		if (action === EActionButton.InviteMembers) bottomSheetRef?.current?.open();
+		if (action === EActionButton.InviteMembers) bottomSheetRef?.current?.present();
 	}, []);
 
 	const navigateToNewGroupScreen = () => {

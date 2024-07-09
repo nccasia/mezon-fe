@@ -42,7 +42,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.inviteMenu.invite'),
             onPress: () => {
-                inviteRef.current.open()
+                inviteRef.current.present()
                 dismiss();
             },
             icon: <Icons.GroupPlusIcon color={themeValue.textStrong}/>
@@ -50,7 +50,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.inviteMenu.favorite'),
             onPress: () => {
-                inviteRef.current.open()
+                inviteRef.current.present()
                 dismiss();
             },
             icon: <Icons.StarIcon color={themeValue.textStrong}/>
@@ -58,7 +58,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.inviteMenu.copyLink'),
             onPress: () => {
-                inviteRef.current.open()
+                inviteRef.current.present()
                 dismiss();
             },
             icon: <Icons.LinkIcon color={themeValue.textStrong}/>

@@ -1,7 +1,7 @@
 import { UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -11,6 +11,7 @@ import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import { useEditMessage } from './useEditMessage';
+import CustomModalMentions from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/CustomModalMentions';
 
 type MessageInputProps = {
 	messageId: string;
@@ -153,10 +154,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			handleCancelEdit();
 		}
 	};
+	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
 		setEditMessage(value);
+		if (newPlainTextValue.endsWith('@')) {
+			setTitleMention('Members');
+		} else if (newPlainTextValue.endsWith('#')) {
+			setTitleMention('Text channels');
+		} else if (newPlainTextValue.endsWith(':')) {
+			setTitleMention('Emoji matching');
+		}
 	};
 
 	return (
@@ -172,6 +181,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					rows={editMessage?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
+					customSuggestionsContainer={(children: React.ReactNode) => {
+						return <CustomModalMentions children={children} titleModalMention={titleMention} />;
+					}}
 				>
 					<Mention
 						markup="@[__display__]"
@@ -181,9 +193,17 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => {
 							return `@${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
-						)}
+						renderSuggestion={(suggestion: MentionDataProps) => {
+							return (
+								<SuggestItem
+									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
+									avatarUrl={suggestion.avatarUrl ?? ''}
+									subText={suggestion.display === 'here' ? 'Notify everyone who has permission to see this channel' : suggestion.display  ?? ''}
+									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + 'text-xs'}
+									showAvatar={suggestion.display !== 'here'}
+								/>
+							);
+						}}
 						style={mentionStyle}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
@@ -195,7 +215,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => `#${display}`}
 						style={mentionStyle}
 						renderSuggestion={(suggestion) => (
-							<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as any).subText} />
+							<SuggestItem
+								name={suggestion.display ?? ''}
+								symbol="#"
+								channelId={suggestion.id}
+								subText={(suggestion as ChannelsMentionProps).subText}
+							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>

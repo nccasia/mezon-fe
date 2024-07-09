@@ -13,7 +13,7 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -73,6 +73,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
 				channelType: currentChannel?.type,
+				noCache: true,
 			}),
 		);
 	}, [currentChannel, dispatch]);
@@ -85,6 +86,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				directMessageId: currentDmGroup.id,
 				channelName: currentDmGroup.channel_label,
 				type: currentDmGroup.type,
+				noCache: true,
 			}),
 		);
 		return null;
@@ -101,6 +103,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			directMessageLoader();
 		}
 	}, [currentDmGroup?.id]);
+
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, [currentDmGroup?.id]);
+
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'active') {
+			await fetchMemberChannel();
+			await directMessageLoader();
+		}
+	};
 
 	useEffect(() => {
 		if (from && from === APP_SCREEN.HOME) {
