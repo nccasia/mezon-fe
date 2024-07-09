@@ -15,7 +15,7 @@ import {
   selectStatusMenu,
   useAppDispatch,
 } from '@mezon/store';
-import { ETypeChannel, EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { ETypeMessage, EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -115,7 +115,7 @@ export default function DirectMessage() {
                 <ChannelMessages
                   channelId={directId ?? ''}
                   channelLabel={currentDmGroup?.channel_label}
-                  type={currentDmGroup?.user_id?.length === 1 ? ETypeChannel.DM : ETypeChannel.GROUP}
+                  type={currentDmGroup?.user_id?.length === 1 ? ETypeMessage.DM : ETypeMessage.GROUP}
                   mode={
                     currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
                   }

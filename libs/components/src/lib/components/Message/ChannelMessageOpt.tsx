@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useThreads } from '@mezon/core';
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
-import { ETypeChannel, IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
+import { ETypeMessage, IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import clx from 'classnames';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -32,7 +32,7 @@ const ChannelMessageOpt = ({ type, message, handleContextMenu }: ChannelMessageO
       <div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
         <div className="w-fit h-full flex justify-between" ref={refOpt}>
           {items.map((item, index) => {
-            if (type !== ETypeChannel.DM || index !== 2) {
+            if (type !== ETypeMessage.DM || index !== 2) {
               return (
                 <button
                   key={index}

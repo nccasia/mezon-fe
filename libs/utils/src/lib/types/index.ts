@@ -428,11 +428,10 @@ export type UserMentionsOpt = {
 export enum ETypeMessage {
 	CHANNEL = 'CHANNEL',
 	THREAD = 'THREAD',
-}
-export enum ETypeChannel {
-	DM = 'DM',
+  DM = 'DM',
 	GROUP = 'GROUP',
 }
+
 export type ThreadError = {
 	name: string;
 	message: string;
