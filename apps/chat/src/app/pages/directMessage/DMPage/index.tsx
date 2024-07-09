@@ -106,7 +106,8 @@ export default function DirectMessage() {
       <div
         className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible`}
+			  h-[100%] overflow-visible
+        z-10`}
         onDragEnter={handleDragEnter}
       >
         {' '}
