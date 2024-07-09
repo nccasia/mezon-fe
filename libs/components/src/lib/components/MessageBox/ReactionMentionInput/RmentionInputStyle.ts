@@ -12,14 +12,21 @@ export default {
 		},
 		highlighter: {
 			padding: 9,
-			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
+			maxHeight: '50vh',
+			overflow: 'hidden',
 		},
 		input: {
+			width: '100%',
 			padding: '9px 10px',
 			border: 'none',
 			outline: 'none',
 			whiteSpace: 'pre-wrap',
+			maxHeight: '50vh',
+			overflow: 'hidden',
+			overflowY: 'auto',
+			paddingRight: '90px',
+			paddingLeft: '40px',
 		},
 	},
 
@@ -38,8 +45,8 @@ export default {
 	},
 
 	suggestions: {
-		left: '-40px',
 		top: '20px',
+		width: '100% !important',
 		list: {
 			overflowY: 'auto',
 			maxHeight: '450px',
