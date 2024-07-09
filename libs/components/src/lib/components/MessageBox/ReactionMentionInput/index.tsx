@@ -475,10 +475,10 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 	}, [dispatch, isFocused]);
 
 	return (
-		<div className="relative">
+		<div className={`relative flex flex-col h-full justify-end `}>
 			{props.isThread && !threadCurrentChannel && (
 				<div
-					className={`flex flex-col overflow-y-auto h-heightMessageViewChatThread ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`flex flex-col overflow-y-auto maxHeightThreadMessage ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 				>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
@@ -521,7 +521,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 						width: `${isShowMemberList ? widthMessageViewChat : isShowCreateThread ? widthMessageViewChatThread : isSearchMessage ? widthSearchMessage : widthThumbnailAttachment}`,
 					},
 				}}
-				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
+				className={`mentions ${props.isThread && 'NoPaddingReactMentionInput'} dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

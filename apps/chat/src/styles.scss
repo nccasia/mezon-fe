@@ -673,3 +673,17 @@ input:-webkit-autofill:active {
 		color: #5865f2;
 	}
 }
+
+.mentions__suggestions {
+	width: 100% !important;
+}
+.NoPaddingReactMentionInput {
+	.mentions__input {
+		padding: 9px 10px !important;
+
+	}
+}
+.maxHeightThreadMessage{
+  max-height: calc(50vh - 75px);
+  // position: absolute;
+}

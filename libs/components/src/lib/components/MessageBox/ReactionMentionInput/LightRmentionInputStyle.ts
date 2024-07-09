@@ -46,6 +46,8 @@ export default {
 
 	suggestions: {
 		top: '20px',
+		width: '100% !important',
+
 		list: {
 			overflowY: 'auto',
 			maxHeight: '450px',
