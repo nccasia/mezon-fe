@@ -155,6 +155,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		setText(allCachedMessage?.[props?.channelId] || '');
 	}
 
+	const resetCachedText = async () => {
+		const allCachedMessage = await getAllCachedMessage();
+		delete allCachedMessage[props?.channelId];
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
+			...allCachedMessage
+		});
+	}
+
 	useEffect(() => {
 		if (props?.channelId) {
 			setMessageFromCache();
@@ -306,6 +314,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		setText('');
 		[EMessageActionType.CreateThread].includes(props.messageAction) &&
 			DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+		resetCachedText();
 	}, [
 		sendMessage,
 		handleSendDM,
