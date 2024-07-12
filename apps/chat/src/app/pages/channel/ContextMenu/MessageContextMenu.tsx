@@ -10,6 +10,7 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
@@ -46,12 +47,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-
 	const checkMessageInRealtimeList = useCallback((arrayMessageIdReaction: string[], messageId: string) => {
 		return arrayMessageIdReaction.includes(messageId);
 	}, []);
@@ -109,8 +110,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(setSelectedMessage(message));
 	};
 
-	const handlePinMessage = () => {
+	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+		dispatch(pinMessageActions.joinPinMessage({ clanId: currentClanId ?? '', channelId: currentChannel?.channel_id ?? '', messageId: message?.id }));
 	};
 
 	const handleUnPinMessage = () => {
