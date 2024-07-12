@@ -462,6 +462,10 @@ export const selectCurrentChannel = createSelector(selectChannelsEntities, selec
 	clanId ? clansEntities[clanId] : null,
 );
 
+export const selectLastSeenPinMessageChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
+	clanId ? clansEntities[clanId].last_pin_message : '',
+);
+
 export const selectClanId = () => createSelector(selectCurrentChannel, (channel) => channel?.clan_id);
 
 export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, selectCurrentVoiceChannelId, (clansEntities, clanId) =>

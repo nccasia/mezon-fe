@@ -10,7 +10,7 @@ export type NotifyProps = {
 };
 
 function NotificationItem({ notify }: NotifyProps) {
-	const { deleteNotify, setMessageNotifedId } = useNotification();
+	const { deleteNotify } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const userName = notify?.content?.username;
 	let notice = notify?.subject;
@@ -19,8 +19,6 @@ function NotificationItem({ notify }: NotifyProps) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);
 	}
-
-	
 
 	const messageID = useMemo(() => {
 		return notify.content.message_id;
