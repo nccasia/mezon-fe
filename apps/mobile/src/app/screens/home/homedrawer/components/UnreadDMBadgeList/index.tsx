@@ -18,7 +18,7 @@ export const UnreadDMBadgeList = React.memo(() => {
             case ChannelType.CHANNEL_TYPE_DM:
                 return (
                     <View>
-                        <Image source={{uri: dm?.channel_avatar[0]}} resizeMode='cover' style={styles.groupAvatar} />
+                        <Image source={{uri: dm?.channel_avatar?.[0]}} resizeMode='cover' style={styles.groupAvatar} />
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
                         </View>

@@ -31,7 +31,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<View style={styles.avatarSize}>
-								<Image source={{ uri: currentChannel.channel_avatar[0] }} style={[styles.friendAvatar, styles.avatarSize]} />
+								<Image source={{ uri: currentChannel.channel_avatar?.[0] }} style={[styles.friendAvatar, styles.avatarSize]} />
 								<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 							</View>
 						)}
