@@ -165,26 +165,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = useCallback((videoItem?: any) => {
-		return (
-			<View
-				style={{
-					height: 170,
-					width: widthMedia + size.s_50,
-					marginTop: size.s_10,
-				}}
-			>
-				{videoItem ? (
-					<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
-				) : (
-					videos.map((video, index) => {
-						return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
-					})
-				)}
-			</View>
-		);
-	}, [videos]);
-
 	const imageItem = useCallback(({ image, index, checkImage }) => {
 		return (
 			<TouchableOpacity
@@ -250,7 +230,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
 			if (checkIsVideo) {
-				return renderVideos(document);
+				return <RenderVideoChat videoURL={document.url} />;
 			}
 
 			return (
@@ -519,7 +499,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 							</TouchableOpacity>
 						) : null}
-						{videos?.length > 0 && renderVideos()}
+						{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
 						{images?.length > 0 && renderImages()}
 
 						{documents?.length > 0 && renderDocuments()}
