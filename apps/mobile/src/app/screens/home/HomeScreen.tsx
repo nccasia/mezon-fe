@@ -10,6 +10,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClan,
 } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { delay } from 'lodash';
 import React, { useEffect } from 'react';
@@ -64,6 +65,7 @@ const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useDispatch();
+	const { sessionRef } = useMezon();
 
 	useCheckUpdatedVersion();
 
@@ -96,6 +98,7 @@ const HomeScreen = React.memo((props: any) => {
 			return null;
 		}
 		const store = await getStoreAsync();
+		sessionRef.current.token = '';
 		await store.dispatch(authActions.refreshSession());
 		dispatch(appActions.setLoadingMainMobile(false));
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
