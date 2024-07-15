@@ -1,6 +1,6 @@
 import { useAttachments } from '@mezon/core';
 import { attachmentActions } from '@mezon/store';
-import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
 import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -19,7 +19,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
-	const { setImageURL } = useMessageContextMenu();
+	const { setImageURL,setPositionShow } = useMessageContextMenu();
 
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
@@ -43,6 +43,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 	const handleContextMenu = useCallback(() => {
 		setImageURL(attachmentData?.url ?? '');
 		onContextMenu;
+		setPositionShow(SHOW_POSITION.NONE)
 	}, [attachmentData?.url]);
 
 	if (imageError || !attachmentData.url) {

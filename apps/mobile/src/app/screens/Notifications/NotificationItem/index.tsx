@@ -7,11 +7,9 @@ import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { ENotifyBsToShow, NotifyProps } from '../types';
-import MessageItem from '../../home/homedrawer/MessageItem';
-import { ChannelStreamMode } from 'mezon-js';
 import { useTheme } from '@mezon/mobile-ui';
 import { style } from './NotificationItem.styles';
-import UseMentionList from '../../../hooks/useUserMentionList';
+import MessageNotification from '../MessageNotification';
 
 function parseObject(obj: any) {
 	let attachments;
@@ -64,7 +62,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 	const channelInfo = useSelector(selectChannelById(notify?.content?.channel_id));
 	const data = parseObject(notify?.content);
 	const { messageTimeDifference } = useMessageParser(data);
-	const listMentions = UseMentionList(notify?.content?.channel_id || '');
+
 
 	return (
 		<TouchableOpacity
@@ -85,13 +83,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 							{notify?.subject} - {channelInfo?.channel_label}:
 						</Text>
 						<View style={styles.contentMessage}>
-							<MessageItem
-                listMentions={listMentions}
-								message={data}
-								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								channelId={data?.channel_id}
-								preventAction
-							/>
+							<MessageNotification message={data} channelId={data?.channel_id}/>
 						</View>
 					</View>
 					<Text style={styles.notifyDuration}>{messageTimeDifference}</Text>

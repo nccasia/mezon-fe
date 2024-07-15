@@ -12,7 +12,7 @@ import { styles } from './UserSettingProfile.style';
 
 enum EActionSettingUserProfile {
 	Manage = 'Manage',
-	TimeOut = 'TimeOut',
+	TimeOut = 'Timeout',
 	Kick = 'Kick',
 	Ban = 'Ban',
 }

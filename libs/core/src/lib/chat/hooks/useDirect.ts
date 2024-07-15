@@ -9,7 +9,7 @@ type UseDirectParams = {
 	autoFetch: boolean, 
 }
 
-export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : false}) {
+export function useDirect({autoFetch = false}:UseDirectParams = {autoFetch : false}) {
 	const dispatch = useAppDispatch();
 	const isLoadDM = useSelector(selectIsLoadDMData);
 	const createDirectMessageWithUser = useCallback(

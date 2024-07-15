@@ -195,7 +195,6 @@ export default function CreateThreadForm() {
 							{valueThread && openThreadMessageState && (
 								<View style={styles.messageBox}>
 									<MessageItem
-										listMentions={listMentions}
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}

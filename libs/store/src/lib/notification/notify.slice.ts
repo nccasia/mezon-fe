@@ -21,6 +21,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	error?: string | null;
 	messageNotifedId: string;
 	isMessageRead: boolean;
+	newNotificationStatus: boolean;
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -51,6 +52,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	error: null,
 	messageNotifedId: '',
 	isMessageRead: false,
+	newNotificationStatus: false,
 });
 const NOTIFICATION_CODE = -9;
 
@@ -66,7 +68,30 @@ export const notificationSlice = createSlice({
 		setIsMessageRead(state, action) {
 			state.isMessageRead = action.payload;
 		},
+
+		setNotiListUnread(state, action) {
+			let storedIds = localStorage.getItem('notiUnread');
+			let ids = storedIds ? JSON.parse(storedIds) : [];
+			ids.push(action.payload.id);
+			localStorage.setItem('notiUnread', JSON.stringify(ids));
+		},
+
+		setStatusNoti(state) {
+			const ids = localStorage.getItem('notiUnread');
+			state.newNotificationStatus = !state.newNotificationStatus
+		},
+
+		setReadNotiStatus(state, action) {
+			let storedIds = localStorage.getItem('notiUnread');
+			let ids = storedIds ? JSON.parse(storedIds) : [];
+			
+			if(ids && ids?.length > 0){
+				const updatedIdsList = ids.filter((id:string) =>  id !== action.payload)
+				localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList))
+			} else {}
+		},
 	},
+
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchListNotification.pending, (state: NotificationState) => {
@@ -135,3 +160,6 @@ export const selectNotificationMessageCountByChannelId = (channelId: string, aft
 export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);
 
 export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
+
+export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
+

@@ -1,7 +1,7 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
-import { MemberProfileType } from '@mezon/utils';
+import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -31,6 +31,7 @@ export type MemberProfileProps = {
 	positionType?: MemberProfileType;
 	countMember?: number;
 	dataMemberCreate?: DataMemberCreate;
+	isHiddenAvatarPanel?: boolean;
 };
 
 function MemberProfile({
@@ -53,9 +54,10 @@ function MemberProfile({
 	positionType,
 	countMember,
 	dataMemberCreate,
+	isHiddenAvatarPanel,
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
-	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
+	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
 	const [top, setTop] = useState(0);
 	const [coords, setCoords] = useState<Coords>({
@@ -83,7 +85,7 @@ function MemberProfile({
 
 		const distanceToBottom = windowHeight - mouseY;
 
-		if (event.button === 0) {
+		if (event.button === MouseButton.LEFT) {
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
 			setTop(mouseY - 50);
@@ -91,9 +93,9 @@ function MemberProfile({
 				setPositionTop(true);
 			}
 		}
-		if (event.button === 2) {
+		if (event.button === MouseButton.RIGHT) {
 			setCoords({ mouseX, mouseY, distanceToBottom });
-			setIsShowPanelMember(!isShowPanelMember);
+			setIsShowPanel(!isShowPanel);
 		}
 	};
 
@@ -102,12 +104,12 @@ function MemberProfile({
 	};
 
 	const handleClosePannelMember = () => {
-		setIsShowPanelMember(false);
+		setIsShowPanel(false);
 	};
 
 	const handleClickRemoveMember = () => {
 		setOpenModalRemoveMember(true);
-		setIsShowPanelMember(false);
+		setIsShowPanel(false);
 		setIsShowUserProfile(false);
 	};
 
@@ -122,7 +124,7 @@ function MemberProfile({
 
 	const handleClickOutSide = () => {
 		setIsShowUserProfile(false);
-		setIsShowPanelMember(false);
+		setIsShowPanel(false);
 	};
 
 	useOnClickOutside(panelRef, handleClickOutSide);
@@ -194,8 +196,8 @@ function MemberProfile({
 					)}
 				</div>
 			</div>
-			{isShowPanelMember && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} />
+			{(isShowPanel && !isHiddenAvatarPanel) && (
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} dataMemberCreate={dataMemberCreate}/>
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div

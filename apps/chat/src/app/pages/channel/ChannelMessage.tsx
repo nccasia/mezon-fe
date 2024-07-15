@@ -73,7 +73,8 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 
 	return (
 		<>
-			<div className="fullBoxText relative group ">
+			<div  className="fullBoxText relative group ">
+				
 				<MessageWithUser
 					message={mess as IMessageWithUser}
 					user={user}

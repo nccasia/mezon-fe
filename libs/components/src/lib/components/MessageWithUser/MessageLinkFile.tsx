@@ -2,6 +2,7 @@ import { RenderAttachmentThumbnail } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
 import { Icons } from '../../components';
+import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;

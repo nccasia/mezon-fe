@@ -1,3 +1,5 @@
+import { MouseButton } from "../types";
+
 type Color = number[];
 
 type Coordinates = [number, number];
@@ -239,7 +241,7 @@ export default class CanvasFreeDrawing {
   }
 
   mouseDown(event: MouseEvent): void {
-    if (event.button !== 0) return;
+    if (event.button !== MouseButton.LEFT) return;
     this.drawPoint(event.offsetX, event.offsetY);
   }
 

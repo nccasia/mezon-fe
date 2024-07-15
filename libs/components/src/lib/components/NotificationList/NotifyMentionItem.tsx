@@ -1,5 +1,13 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { INotification, referencesActions, selectChannelById, selectCurrentClan, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import {
+	INotification,
+	notificationActions,
+	referencesActions,
+	selectChannelById,
+	selectCurrentClan,
+	selectMemberByUserId,
+	selectMessageByMessageId,
+} from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +18,7 @@ import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageLine } from '../MessageWithUser/useMessageLine';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
+	readonly isUnreadTab?: boolean;
 };
 
 function parseObject(obj: any) {
@@ -47,7 +56,7 @@ function parseObject(obj: any) {
 	return parsedObj;
 }
 
-function NotifyMentionItem({ notify }: NotifyMentionProps) {
+function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
 	const currentClan = useSelector(selectCurrentClan);
@@ -61,65 +70,93 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 		return notify.content.channel_id;
 	}, [notify.content.channel_id]);
 
+	const notiId = useMemo(() => {
+		return notify.id;
+	}, [notify.id]);
+
 	const message = useSelector(selectMessageByMessageId(messageID));
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
 	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
 
+	const handleMarkAsRead = useCallback(() => {
+		dispatch(notificationActions.setReadNotiStatus(notiId));
+		dispatch(notificationActions.setStatusNoti());
+	}, []);
+
 	const handleClickJump = useCallback(() => {
 		dispatch(referencesActions.setIdMessageToJump(messageID));
 		directToMessageById();
+		handleMarkAsRead();
+	}, []);
+
+	const handleClickDeleteMessage = useCallback(() => {
+		handleMarkAsRead();
+		deleteNotify(notiId);
 	}, []);
 
 	return (
-		<div className="flex flex-col gap-2 py-3 px-3 w-full">
-			<div className="flex justify-between">
-				<div className="flex flex-row items-center gap-2">
-					<div>
-						{currentClan?.logo ? (
-							<img
-								src={currentClan.logo}
-								className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
-								alt={currentClan.logo}
-							/>
-						) : (
+		<>
+			{message !== undefined && (
+				<div className="flex flex-col gap-2 py-3 px-3 w-full">
+					<div className="flex justify-between">
+						<div className="flex flex-row items-center gap-2">
 							<div>
-								{currentClan?.clan_name && (
-									<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
-										{currentClan.clan_name.charAt(0).toUpperCase()}
+								{currentClan?.logo ? (
+									<img
+										src={currentClan.logo}
+										className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
+										alt={currentClan.logo}
+									/>
+								) : (
+									<div>
+										{currentClan?.clan_name && (
+											<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
+												{currentClan.clan_name.charAt(0).toUpperCase()}
+											</div>
+										)}
 									</div>
 								)}
 							</div>
-						)}
+							<div className="flex flex-col gap-1">
+								<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
+									# <p className=" hover:underline">{channelInfo?.channel_label}</p>
+								</div>
+								<div className="text-[10px] uppercase">
+									{currentClan?.clan_name} {'>'} {channelInfo?.category_name}
+								</div>
+							</div>
+						</div>
+						<div className="flex flex-row">
+							{isUnreadTab && (
+								<button
+									className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+									onClick={handleMarkAsRead}
+								>
+									✔
+								</button>
+							)}
+
+							<button
+								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+								onClick={handleClickDeleteMessage}
+							>
+								✕
+							</button>
+						</div>
 					</div>
-					<div className="flex flex-col gap-1">
-						<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
-							# <p className=" hover:underline">{channelInfo?.channel_label}</p>
-						</div>
-						<div className="text-[10px] uppercase">
-							{currentClan?.clan_name} {'>'} {channelInfo?.category_name}
-						</div>
+					<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
+						<button
+							className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+							onClick={handleClickJump}
+						>
+							Jump
+						</button>
+						{<MentionTabContent message={message} />}
 					</div>
 				</div>
-				<button
-					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-					onClick={() => {
-						deleteNotify(notify.id);
-					}}
-				>
-					✕
-				</button>
-			</div>
-			<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
-				<button
-					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
-					onClick={handleClickJump}
-				>
-					Jump
-				</button>
-				{message !== undefined && <MentionTabContent message={message} />}
-			</div>
-		</div>
+			)}
+		</>
 	);
 }
 

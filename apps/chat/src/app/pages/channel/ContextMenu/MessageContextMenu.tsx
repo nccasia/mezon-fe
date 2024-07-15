@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
 import { useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
@@ -53,12 +53,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-	const checkMessageInRealtimeList = useCallback((arrayMessageIdReaction: string[], messageId: string) => {
-		return arrayMessageIdReaction.includes(messageId);
-	}, []);
-	const messageHasReaction = useMemo(() => {
-		return message?.reactions && message?.reactions?.length > 0 ? true : false;
-	}, [message?.reactions?.length]);
 	const [checkAdmintrator, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
 	const checkSenderMessage = useMemo(() => {
 		return message?.sender_id === userId;
@@ -112,7 +106,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
-		dispatch(pinMessageActions.joinPinMessage({ clanId: currentClanId ?? '', channelId: currentChannel?.channel_id ?? '', messageId: message?.id }));
+		dispatch(
+			pinMessageActions.joinPinMessage({ clanId: currentClanId ?? '', channelId: currentChannel?.channel_id ?? '', messageId: message?.id }),
+		);
 	};
 
 	const handleUnPinMessage = () => {
@@ -129,7 +125,20 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	};
 
 	const checkPos = useMemo(() => {
-		return posShowMenu === SHOW_POSITION.NONE;
+		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
+			return true;
+		}
+		{
+			return false;
+		}
+	}, [posShowMenu]);
+
+	const isClickedSticker = useMemo(() => {
+		return posShowMenu === SHOW_POSITION.IN_STICKER;
+	}, [posShowMenu]);
+
+	const isClickedEmoji = useMemo(() => {
+		return posShowMenu === SHOW_POSITION.IN_EMOJI;
 	}, [posShowMenu]);
 
 	const reactionStatus = useSelector(selectIsMessageHasReaction(messageId));
@@ -169,7 +178,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-
 		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		return [enableOne, enableAll];
@@ -202,18 +210,33 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [checkElementIsImage, elementTarget, imageSrc]);
 
 	useMemo(() => {
+		if (isClickedEmoji) {
+			setEnableCopyLinkItem(true);
+			setEnableOpenLinkItem(true);
+			setEnableCopyImageItem(false);
+			setEnableSaveImageItem(false);
+			return;
+		}
+		if (isClickedSticker) {
+			setEnableCopyLinkItem(false);
+			setEnableOpenLinkItem(false);
+			setEnableCopyImageItem(false);
+			setEnableSaveImageItem(false);
+			return;
+		}
 		if (checkElementIsImage) {
 			setEnableCopyLinkItem(true);
 			setEnableOpenLinkItem(true);
 			setEnableCopyImageItem(true);
 			setEnableSaveImageItem(true);
+			return
 		} else {
 			setEnableCopyLinkItem(false);
 			setEnableOpenLinkItem(false);
 			setEnableCopyImageItem(false);
 			setEnableSaveImageItem(false);
 		}
-	}, [checkElementIsImage, elementTarget]);
+	}, [checkElementIsImage, elementTarget, isClickedSticker]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
@@ -421,6 +444,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		pinMessageStatus,
 		checkPos,
 		urlImage,
+		posShowMenu,
 	]);
 
 	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;

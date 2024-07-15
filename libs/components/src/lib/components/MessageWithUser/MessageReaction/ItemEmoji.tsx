@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -28,6 +28,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [channelLabel, setChannelLabel] = useState('');
 	const direct = useSelector(selectDirectById(message.channel_id));
+	const currentClanId = useSelector(selectCurrentClanId)
 
 	useEffect(() => {
 		if (direct != undefined) {
@@ -49,7 +50,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			message.clan_id || '',
+			currentClanId || '',
 			message.channel_id,
 			messageId ?? '',
 			emoji ?? '',

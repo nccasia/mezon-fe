@@ -1,6 +1,6 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 type IMessageAvatarProps = {
@@ -19,7 +19,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 	const [positionBottom, setPositionBottom] = useState(false);
 	const [positionTop, setPositionTop] = useState(0);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (event.button === 0) {
+		if (event.button === MouseButton.LEFT) {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -46,7 +46,16 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 	return (
 		<div className="relative group">
 			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
-				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} className="min-w-10 min-h-10" />
+				<AvatarImage
+					onContextMenu={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+					}}
+					alt="user avatar"
+					userName={user?.user?.username}
+					src={user?.user?.avatar_url}
+					className="min-w-10 min-h-10"
+				/>
 			</div>
 			{isShowPanelChannel ? (
 				<div
@@ -54,7 +63,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode}/>
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode} />
 				</div>
 			) : null}
 		</div>

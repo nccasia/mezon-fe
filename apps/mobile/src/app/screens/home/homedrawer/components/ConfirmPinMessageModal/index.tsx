@@ -69,7 +69,7 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
                 <Text style={styles.descriptionText}>{EMessageActionType.PinMessage === type ? t('confirmPinMessage') : t('confirmUnPinMessage')}</Text>
                 <View style={styles.messageBox}>
                     <ScrollView>
-                        {message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
+                        {message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
                     </ScrollView>
                 </View>
                 <View style={styles.buttonsWrapper}>

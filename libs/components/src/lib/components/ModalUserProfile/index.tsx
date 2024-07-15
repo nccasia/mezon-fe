@@ -1,4 +1,4 @@
-import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { clansActions, selectAllAccount, selectFriendStatus, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -55,11 +55,12 @@ const ModalUserProfile = ({
 	};
 	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
 
+	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
+
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			await dispatch(clansActions.joinClan({ clanId: response.clan_id as string }));
-			var channelMode = 0
+			let channelMode = 0;
 			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM
 			}
@@ -68,6 +69,8 @@ const ModalUserProfile = ({
 			}
 			sendInviteMessage(content, response.channel_id, channelMode);
 			setContent('');
+			const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
+			navigate('/'+directChat);
 		}
 	};
 	const handleContent = (e: React.ChangeEvent<HTMLInputElement>) => {

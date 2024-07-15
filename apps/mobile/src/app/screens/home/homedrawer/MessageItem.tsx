@@ -24,10 +24,10 @@ import {
 	selectMessageEntityById,
 	selectIdMessageToJump,
 	referencesActions,
-	selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
-	selectAllAccount,
+  selectAllAccount,
+  selectAllUsesClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, MentionDataProps, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
@@ -51,7 +51,6 @@ import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { Swipeable } from 'react-native-gesture-handler';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
-import UseMentionList from "../../../hooks/useUserMentionList";
 
 const widthMedia = Metrics.screenWidth - 140;
 
@@ -101,7 +100,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous, [message?.sender_id]);
-	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const userProfile = useSelector(selectAllAccount);
 	const hasIncludeMention = useMemo(() => {
@@ -113,8 +111,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const listMentions = UseMentionList(props.channelId || '');
-
+  const usersClan = useSelector(selectAllUsesClan);
 	const checkMessageTargetToMoved = useMemo(() => {
 		return idMessageToJump === message?.id;
 	}, [idMessageToJump, message?.id]);
@@ -411,7 +408,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									</>
 								) : (
 									<>
-										{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, listMentions, true)}
+										{renderTextContent({
+                      lines: messageRefFetchFromServe?.content?.t?.trim(),
+                      isEdited: false,
+                      translate: t,
+                      channelsEntities,
+                      emojiListPNG,
+                      isNumberOfLine: true,
+                      clansProfile,
+                      currentClan,
+                      isMessageReply: true,
+                      mode
+                    })}
 									</>
 								)}
 							</View>
@@ -504,7 +512,20 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 						{documents?.length > 0 && renderDocuments()}
 						<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
-							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, listMentions)}
+							{renderTextContent({
+                lines,
+                isEdited,
+                translate: t,
+                channelsEntities,
+                emojiListPNG,
+                onMention,
+                onChannelMention,
+                isNumberOfLine,
+                clansProfile,
+                currentClan,
+                isMessageReply: false,
+                mode
+              })}
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						{!preventAction ? (

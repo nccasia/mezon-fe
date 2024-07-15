@@ -1,6 +1,14 @@
 import { Colors, size } from '@mezon/mobile-ui';
-import { ChannelsEntity, ClansEntity, UserClanProfileEntity } from '@mezon/store-mobile';
-import { IEmoji, MentionDataProps, getSrcEmoji } from '@mezon/utils';
+import {
+	ChannelMembersEntity,
+	ChannelsEntity,
+	ClansEntity,
+	UserClanProfileEntity,
+	UsersClanEntity,
+	selectAllChannelMembers,
+	selectAllUsesClan,
+} from '@mezon/store-mobile';
+import { IEmoji, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
@@ -8,6 +16,7 @@ import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import {
 	channelIdRegex,
 	codeBlockRegex,
@@ -85,7 +94,7 @@ export const markdownStyles = {
 	iconEmojiInMessage: {
 		width: size.s_20,
 		height: size.s_20,
-    	},
+	},
 	editedText: {
 		fontSize: size.small,
 		color: Colors.gray72,
@@ -149,10 +158,25 @@ export type IMarkdownProps = {
 	onMention?: (url: string) => void;
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
-	clanProfile?: UserClanProfileEntity[];
+	clansProfile?: UserClanProfileEntity[];
 	currentClan?: ClansEntity;
-	listMentions: MentionDataProps[];
 	isMessageReply?: boolean;
+	mode?: number;
+};
+
+type TRenderTextContentProps = {
+	lines: string;
+	isEdited?: boolean;
+	translate?: TFunction;
+	channelsEntities?: Record<string, ChannelsEntity>;
+	emojiListPNG?: IEmoji[];
+	onMention?: (url: string) => void;
+	onChannelMention?: (channel: ChannelsEntity) => void;
+	isNumberOfLine?: boolean;
+	clansProfile?: UserClanProfileEntity[];
+	currentClan?: ClansEntity;
+	isMessageReply?: boolean;
+	mode?: number;
 };
 
 /**
@@ -184,7 +208,7 @@ export const renderRulesCustom = {
 		}
 
 		if (content?.startsWith('::')) {
-			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
+			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />;
 		}
 
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
@@ -214,7 +238,7 @@ export const renderRulesCustom = {
 			</Text>
 		);
 	},
-  image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => {
+	image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => {
 		const { src } = node.attributes;
 		return (
 			<View key={node.key} style={{ padding: 1 }}>
@@ -287,7 +311,7 @@ export const formatEmoji = (text: string, emojiImages: IEmoji[] = [], isMessageR
 			} else {
 				if (part.match(emojiRegex)) {
 					const srcEmoji = getSrcEmoji(part, emojiImages);
-          return isMessageReply ? `![${part}](${srcEmoji})` : `[:${part}](${srcEmoji})`;
+					return isMessageReply ? `![${part}](${srcEmoji})` : `[:${part}](${srcEmoji})`;
 				}
 				return part;
 			}
@@ -323,11 +347,13 @@ const RenderTextContent = React.memo(
 		onMention,
 		onChannelMention,
 		isNumberOfLine,
-		clanProfile,
+		clansProfile,
 		currentClan,
-		listMentions,
 		isMessageReply,
+		mode,
 	}: IMarkdownProps) => {
+		const usersClan = useSelector(selectAllUsesClan);
+		const usersInChannel = useSelector(selectAllChannelMembers);
 		if (!lines) return null;
 
 		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
@@ -339,7 +365,7 @@ const RenderTextContent = React.memo(
 		let content: string = lines?.trim();
 
 		if (matchesMentions) {
-			content = formatMention(content, matchesMentions, channelsEntities, clanProfile, currentClan, listMentions);
+			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClan, usersInChannel, usersClan, mode);
 		}
 
 		if (matchesUrls) {
@@ -436,9 +462,11 @@ const formatMention = (
 	text: string,
 	matchesMention: RegExpMatchArray,
 	channelsEntities: Record<string, ChannelsEntity>,
-	clanProfile: UserClanProfileEntity[],
+	clansProfile: UserClanProfileEntity[],
 	currentClan?: ClansEntity,
-	listMentions?: MentionDataProps[],
+	usersInChannel?: ChannelMembersEntity[],
+	usersClan?: UsersClanEntity[],
+	mode?: number,
 ) => {
 	const parts = text?.split?.(splitBlockCodeRegex);
 	return parts
@@ -448,17 +476,7 @@ const formatMention = (
 			} else {
 				if (matchesMention.includes(part)) {
 					if (part.startsWith('@')) {
-						const nameMention = part?.slice(1);
-						const userMention = listMentions?.find((user) => nameMention === user?.user?.username);
-						const { user } = userMention || {};
-						const clanProfileByIdUser = clanProfile?.find(
-							(clanProfile) => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
-						);
-						if (clanProfileByIdUser) {
-							return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
-						}
-						if (userMention)
-							return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
+						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClan);
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
@@ -486,34 +504,67 @@ const getChannelById = (channelHashtagId: string, channelsEntities: Record<strin
 	}
 };
 
-export const renderTextContent = (
-	lines: string,
-	isEdited?: boolean,
-	t?: TFunction,
-	channelsEntities?: Record<string, ChannelsEntity>,
-	emojiListPNG?: IEmoji[],
-	onMention?: (url: string) => void,
-	onChannelMention?: (channel: ChannelsEntity) => void,
-	isNumberOfLine?: boolean,
-	clanProfile?: UserClanProfileEntity[],
-	currentClan?: ClansEntity,
-	listMentions?: MentionDataProps[],
-	isMessageReply?: boolean,
-) => {
+export const renderTextContent = ({
+	lines,
+	isEdited = false,
+	translate,
+	channelsEntities,
+	emojiListPNG,
+	onMention,
+	onChannelMention,
+	isNumberOfLine = false,
+	clansProfile,
+	currentClan,
+	isMessageReply = false,
+	mode,
+}: TRenderTextContentProps) => {
 	return (
 		<RenderTextContent
 			lines={lines}
 			isEdited={isEdited}
-			t={t}
+			t={translate}
 			channelsEntities={channelsEntities}
 			emojiListPNG={emojiListPNG}
 			onMention={onMention}
 			onChannelMention={onChannelMention}
 			isNumberOfLine={isNumberOfLine}
-			clanProfile={clanProfile}
+			clansProfile={clansProfile}
 			currentClan={currentClan}
-			listMentions={listMentions}
 			isMessageReply={isMessageReply}
+			mode={mode}
 		/>
 	);
+};
+
+const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
+  if (mode === 4 || mode === 3) {
+    return usersInChannel?.find(channelUser => channelUser?.user?.username === nameMention);
+  } else {
+    return usersClan?.find(userClan => userClan?.user?.username === nameMention);
+  }
+};
+
+const renderMention = (part: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[], clansProfile: UserClanProfileEntity[], currentClan: ClansEntity) => {
+  const nameMention = part?.slice(1);
+
+  if (nameMention === "here") {
+    return `[@here](@here)`;
+  }
+
+  const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
+  const { user } = userMention || {};
+
+  const clanProfileByIdUser = clansProfile?.find(
+    clanProfile => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
+  );
+
+  if (clanProfileByIdUser) {
+    return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
+  }
+
+  if (userMention) {
+    return user?.display_name
+      ? `[@${user?.display_name}](@${user?.username})`
+      : `@[${user?.username}](@${user?.username})`;
+  }
 };

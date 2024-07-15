@@ -523,6 +523,8 @@ export type ContenSubmitEventProps = {
 export enum SHOW_POSITION {
 	IN_VIEWER = 'IN_VIEWER',
 	IN_LINK = 'IN_LINK',
+	IN_EMOJI = 'IN_EMOJI',
+	IN_STICKER = 'IN_STICKER',
 	NONE = 'NONE',
 }
 
@@ -537,4 +539,10 @@ export enum Direction_Mode {
 	AROUND_TIMESTAMP = 1,
 	AFTER_TIMESTAMP = 2,
 	BEFORE_TIMESTAMP = 3,
+}
+
+export enum MouseButton {
+	LEFT = 0,
+	MIDDLE = 1,
+	RIGHT = 2,
 }

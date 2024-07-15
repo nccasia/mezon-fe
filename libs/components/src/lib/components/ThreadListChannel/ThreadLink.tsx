@@ -7,7 +7,7 @@ import {
 	selectIsUnreadChannelById,
 	useAppDispatch,
 } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
+import { IChannel, MouseButton } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -53,7 +53,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
 
-		if (event.button === 2) {
+		if (event.button === MouseButton.RIGHT) {
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);

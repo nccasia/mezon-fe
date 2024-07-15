@@ -7,9 +7,10 @@ import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
-import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
+import { ChannelType } from 'mezon-js';
+import LabelDm from './labelDm';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -39,46 +40,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		[dispatch],
 	);
 
-	const inputRef = useRef<HTMLInputElement | null>(null);
-	const [openEditName, setOpenEditName] = useState(false);
-	const [label, setLabel] = useState(currentDmGroup?.channel_label);
-	const handleOpenEditName = () => {
-		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
-			setOpenEditName(true);
-		}
-	}
-
-	const handleChange = (event: any) => {
-		setLabel(event.target.value);
-	};
-
-	const handleKeyDown = (event: any) => {
-		if (event.key === 'Enter') {
-			setOpenEditName(false);
-			handleSave()
-		}
-	};
-
-	const handleSave = async () => {
-		const updateChannel: ApiUpdateChannelDescRequest = {
-			channel_id: dmGroupId || '',
-			channel_label: label,
-			category_id: '',
-		};
-		await dispatch(channelsActions.updateChannel(updateChannel));
-	};
-
-	useEffect(() => {
-		if (openEditName && inputRef.current) {
-			inputRef.current.focus();
-		}
-	}, [openEditName]);
-
-	useEffect(() => {
-		setOpenEditName(false);
-		setLabel(currentDmGroup?.channel_label);
-	}, [currentDmGroup?.channel_label, dmGroupId])
-
 	return (
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
@@ -100,11 +61,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						isHideStatus={true}
 						isHideIconStatus={false}
 						key={currentDmGroup?.channel_id}
+						isHiddenAvatarPanel={true}
 					/>
-					{!openEditName && <h2 className="shrink-1 dark:text-white text-black text-ellipsis" onClick={handleOpenEditName}>{label}</h2>}
-					{openEditName &&
-						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded' />
-					}
+					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup}/>
 				</div>
 
 				<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">

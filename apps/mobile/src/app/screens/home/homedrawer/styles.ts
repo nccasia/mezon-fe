@@ -17,6 +17,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
+    paddingHorizontal: size.s_6
 	},
 	aboveTextBoxWrapper: {
 		flexDirection: 'column',
@@ -336,7 +337,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		marginBottom: size.s_2,
-		paddingRight: size.s_50,
+		paddingRight: size.s_28,
 	},
 	aboveMessage: {
 		flexDirection: 'row',

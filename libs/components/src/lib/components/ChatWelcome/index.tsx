@@ -23,7 +23,11 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 				</div>
 			) : (
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
+				avatarDM ?
+				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />:
+				<div className="h-[75px] w-[75px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-4xl">
+					{name?.charAt(0).toUpperCase()}
+				</div>
 			)}
 
 			<div>

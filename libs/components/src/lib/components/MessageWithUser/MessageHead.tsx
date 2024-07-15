@@ -1,7 +1,7 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
@@ -29,7 +29,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 	const [positionBottom, setPositionBottom] = useState(false);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (event.button === 0) {
+		if (event.button === MouseButton.LEFT) {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;

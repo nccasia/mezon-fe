@@ -264,7 +264,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				</ScrollView>
 				<View style={styles.messageWrapper}>
 					<ScrollView>
-						{message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
+						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
 					</ScrollView>
 				</View>
 				<TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>

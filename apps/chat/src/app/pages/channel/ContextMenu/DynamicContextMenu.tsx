@@ -48,7 +48,12 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 
 	const { posShowMenu } = useMessageContextMenu();
 	const checkPos = useMemo(() => {
-		return posShowMenu === SHOW_POSITION.NONE;
+		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
+			return true;
+		}
+		{
+			return false;
+		}
 	}, [posShowMenu]);
 
 	const children = useMemo(() => {

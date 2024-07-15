@@ -98,6 +98,7 @@ export default memo(function MezonImagePicker({
 						path: file.uri,
 						mediaType: 'photo',
 						includeBase64: true,
+						compressImageQuality: 1
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);

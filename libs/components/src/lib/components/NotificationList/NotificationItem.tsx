@@ -14,7 +14,6 @@ function NotificationItem({ notify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const userName = notify?.content?.username;
 	let notice = notify?.subject;
-	const currentClanId = useSelector(selectCurrentClanId);
 	if (userName) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);

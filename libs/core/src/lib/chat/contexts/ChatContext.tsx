@@ -120,9 +120,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id ) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			}
+
+			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
+				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
+				dispatch(notificationActions.setStatusNoti())
+			}
+
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));

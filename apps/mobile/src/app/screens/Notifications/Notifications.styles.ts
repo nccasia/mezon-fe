@@ -7,6 +7,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		width: WIDTH,
 		height: HEIGHT,
 		backgroundColor: colors.primary,
+    paddingVertical: size.s_10
 	},
 
 	notificationsHeader: {

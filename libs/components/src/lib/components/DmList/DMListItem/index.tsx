@@ -79,7 +79,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				avatar={
 					Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar?.length !== 1
 						? 'assets/images/avatar-group.png'
-						: directMessage?.channel_avatar ?? ''
+						: directMessage?.channel_avatar?.at(0) ?? ''
 				}
 				name={directMessage?.channel_label ?? ''}
 				status={userStatus}

@@ -1,6 +1,7 @@
 import { useEmojiSuggestion, useInvite } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
-import { ILineMention, MentionTypeEnum, convertMarkdown, getSrcEmoji } from '@mezon/utils';
+import { ILineMention, MentionTypeEnum, SHOW_POSITION, convertMarkdown, getSrcEmoji } from '@mezon/utils';
+import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import clx from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -190,10 +191,18 @@ export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmo
 		}
 	}, [posReply]);
 
-	const srcEmoji = getSrcEmoji(emojiSyntax.trim(), emojis);
+	const srcEmoji = useMemo(() => {
+		return getSrcEmoji(emojiSyntax.trim(), emojis);
+	}, [emojiSyntax.trim()]);
+	const { setImageURL, setPositionShow } = useMessageContextMenu();
+
+	const handleContextMenu = useCallback(() => {
+		setImageURL(srcEmoji);
+		setPositionShow(SHOW_POSITION.IN_EMOJI);
+	}, [srcEmoji]);
 
 	return (
-		<span style={{ userSelect: 'none' }}>
+		<span onContextMenu={handleContextMenu} style={{ userSelect: 'none' }}>
 			<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
 		</span>
 	);
