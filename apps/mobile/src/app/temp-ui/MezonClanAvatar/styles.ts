@@ -12,7 +12,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         width: '100%',
         justifyContent: "center",
         alignItems: 'center',
-        backgroundColor: baseColor.blurple
+        // backgroundColor: baseColor.blurple
     },
 
     altText: {
