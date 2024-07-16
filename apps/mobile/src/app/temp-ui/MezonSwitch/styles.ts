@@ -18,6 +18,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
         height: 26,
         borderRadius: 13,
         backgroundColor: baseColor.white,
+        justifyContent: "center",
+        alignItems: "center"
     },
     circleEnabled: {
         transform: [{ translateX: 20 }],

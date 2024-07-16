@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, IMezonOptionData, MezonMenu, MezonOption } from '../../../temp-ui';
+import { IMezonMenuSectionProps, IMezonOptionData, MezonMenu, MezonOption, MezonSwitch } from '../../../temp-ui';
 import { style } from './styles';
 
 type AppearanceSettingScreen = typeof APP_SCREEN.SETTINGS.APPEARANCE;
@@ -11,6 +11,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 	const { theme, themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['appearanceSetting']);
+	const { t: tTheme } = useTranslation(['appThemeSetting'])
 
 	const menuTheme = useMemo(
 		() =>
@@ -21,7 +22,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 						{
 							title: t('menu.theme.theme'),
 							expandable: true,
-							previewValue: theme,
+							previewValue: tTheme(`fields.${theme}`),
 							onPress: () => {
 								navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
 									screen: APP_SCREEN.SETTINGS.APP_THEME,
@@ -31,11 +32,12 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 						{
 							title: t('menu.theme.syncAcrossClients.title'),
 							description: t('menu.theme.syncAcrossClients.description'),
+							component: <MezonSwitch iconYesNo />
 						},
 					],
 				},
 			] as IMezonMenuSectionProps[],
-		[],
+		[theme],
 	);
 
 	const menuSearch = useMemo(
@@ -47,6 +49,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 						{
 							title: t('menu.search.showResultCount.title'),
 							description: t('menu.search.showResultCount.description'),
+							component: <MezonSwitch iconYesNo />
 						},
 					],
 				},

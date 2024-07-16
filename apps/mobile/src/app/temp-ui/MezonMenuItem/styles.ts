@@ -23,6 +23,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     btnDescription: {
+        marginTop: Metrics.size.s,
         color: colors.text,
         fontSize: Fonts.size.h9,
     },

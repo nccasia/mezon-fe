@@ -41,7 +41,7 @@ export default function AppThemeSetting({ navigation }: SettingScreenProps<AppTh
 						/>
 					),
 					value: ThemeModeAuto.AUTO,
-					title: t('fields.auto'),
+					title: t('fields.system'),
 				},
 			] satisfies IMezonSlideOptionsData[],
 		[],
