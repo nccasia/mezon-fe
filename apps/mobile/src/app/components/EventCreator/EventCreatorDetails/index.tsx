@@ -1,15 +1,14 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { style } from "./styles";
+import { getDayName, getDayWeekName, getDayYearName, getNearTime, Icons } from "@mezon/mobile-components";
+import { Fonts, useTheme } from "@mezon/mobile-ui";
+import { OptionEvent } from "@mezon/utils";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
 import { MezonDateTimePicker, MezonInput, MezonSelect } from "../../../temp-ui";
 import MezonButton from "../../../temp-ui/MezonButton2";
-import { useState } from "react";
-import { getDayName, getDayWeekName, getDayYearName, getNearTime, Icons } from "@mezon/mobile-components";
-import { OptionEvent } from "@mezon/utils";
-import Toast from "react-native-toast-message";
-import { Fonts, useTheme } from "@mezon/mobile-ui";
-import { useMemo } from "react";
+import { style } from "./styles";
 
 type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
 export default function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<CreateEventScreenDetails>) {
@@ -76,30 +75,31 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
         },
     ], [startTime]);
 
-	function handleFrequencyChange(value: number) {
-		setEventFrequency(value);
-	}
+    function handleFrequencyChange(value: number) {
+        setEventFrequency(value);
+    }
 
-	function handlePressNext() {
-		if (eventTitle?.trim()?.length === 0) {
-			Toast.show({
-				type: 'error',
-				text1: t('notify.titleBlank'),
-			});
-			return;
-		}
+    function handlePressNext() {
+        if (eventTitle?.trim()?.length === 0) {
+            Toast.show({
+                type: 'error',
+                text1: t('notify.titleBlank'),
+            });
+            return;
+        }
 
-		navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
-			type,
-			channelId,
-			location,
-			title: eventTitle,
-			description: eventDescription,
-			startTime,
-			endTime,
-			frequency: eventFrequency,
-		});
-	}
+        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
+            type,
+            channelId,
+            location,
+            title: eventTitle,
+            description: eventDescription,
+            startTime,
+            endTime,
+            frequency: eventFrequency,
+            onGoBack: onGoBack
+        });
+    }
 
     return (
         <View style={styles.container}>
