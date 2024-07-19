@@ -1,6 +1,6 @@
 {
-    "roleDescription": "Sử dụng vai trò để nhóm các thành viên trong máy chủ của bạn và gán quyền",
-    "defaultRole": "Quyền mặc định cho tất cả thành viên máy chủ",
+    "roleDescription": "Sử dụng vai trò để nhóm các thành viên trong clan của bạn và gán quyền",
+    "defaultRole": "Quyền mặc định cho tất cả thành viên clan",
     "roles": "Vai trò",
     "members": "Thành viên",
     "noRole": "Hiện tại không có vai trò nào",

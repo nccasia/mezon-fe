@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/components';
+import { AvatarImage, Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
 import {
 	RolesClanEntity,
@@ -104,10 +104,12 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 									<li key={permission.id}>
 										<label htmlFor={permission.id} className="w-full inline-flex justify-between items-center">
 											<div className="inline-flex gap-x-2">
-												<img
+												<AvatarImage 
+													alt={permission?.user?.username || ''}
+													userName={permission?.user?.username}
+													className="min-w-5 min-h-5 max-w-5 max-h-5"
 													src={permission?.user?.avatar_url}
-													alt={permission?.user?.display_name}
-													className="size-6 object-cover rounded-full"
+													classNameText='text-[9px] pt-[3px]'
 												/>
 												<p>{permission?.user?.display_name}</p>
 												<p className="text-contentTertiary">{permission?.user?.username}</p>

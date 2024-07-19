@@ -108,6 +108,7 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
+	usernames?: string;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -564,4 +565,8 @@ export enum NotificationCode {
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
 	USER_REPLIED = -11,
+}
+
+export enum EMessageCode {
+	FIRST_MESSAGE = 11,
 }

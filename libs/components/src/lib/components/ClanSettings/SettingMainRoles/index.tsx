@@ -13,7 +13,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
 import ServerSettingRoleManagement from '../SettingRoleManagement';
@@ -29,7 +29,9 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const [selectedRoleId, setSelectedRoleID] = useState<string>('');
 	const dispatchRole = useDispatch();
 	const dispatch = useAppDispatch();
-	const activeRoles = useMemo(() => rolesClan.filter((role) => role.active === 1), [rolesClan]);
+	const roles = useMemo(() => rolesClan.filter((role) => role.active === 1), [rolesClan]);
+	const [activeRoles, setActiveRoles] = useState(roles);
+	const numRoles = useMemo(() => activeRoles.length, [activeRoles]);
 
 	const handleRoleClick = (roleId: string) => {
 		setSelectedRoleID(roleId);
@@ -50,6 +52,12 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
 	const appearanceTheme = useSelector(selectTheme);
+
+	const [valueSearch, setValueSearch] = useState('');
+	useEffect(() => {
+		setActiveRoles(roles.filter((role) => role?.title?.toLowerCase().includes(valueSearch.toLowerCase())));
+	},[valueSearch]);
+
 	return (
 		<>
 			{!openEdit && (
@@ -81,6 +89,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								type="text"
 								className="rounded w-full dark:text-white text-black border dark:border-bgTertiary px-2 py-1 focus:outline-none focus:border-white-500 dark:bg-bgTertiary bg-bgLightModeThird text-base"
 								placeholder="Search Roles"
+								onChange={(e) => setValueSearch(e.target.value)}
 							/>
 						</div>
 						<button
@@ -111,7 +120,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 										scope="col"
 										className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase tracking-wider w-1/2 text-left"
 									>
-										Roles - {rolesClan.length}
+										Roles - {numRoles}
 									</th>
 									<th
 										scope="col"
@@ -126,7 +135,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-gray-200 dark:divide-gray-500">
-								{activeRoles.length === 0 ? (
+								{numRoles === 0 ? (
 									<tr className="h-14">
 										<td className="dark:text-gray-300 text-gray-600 text-[15px]">
 											<p className="inline-flex gap-x-2 mt-1.5">

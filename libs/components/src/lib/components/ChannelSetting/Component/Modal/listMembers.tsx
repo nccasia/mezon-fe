@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/components';
+import { AvatarImage, Icons } from '@mezon/components';
 import { ApiUser } from 'mezon-js/api.gen';
 
 type ListMembersProps = {
@@ -22,7 +22,13 @@ const ListMembers = (props: ListMembersProps) => {
 					/>
 					<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
 				</div>
-				<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
+				<AvatarImage 
+					alt={user?.username || ''}
+					userName={user?.username}
+					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					src={user?.avatar_url}
+					classNameText='text-[9px] pt-[3px]'
+				/>
 				<p className="text-sm">{user?.display_name}</p>
 			</label>
 		</div>

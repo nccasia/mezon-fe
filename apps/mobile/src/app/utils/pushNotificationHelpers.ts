@@ -1,19 +1,18 @@
 import {
+	ActionEmitEvent,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	getUpdateOrAddClanChannelCache,
-	load,
 	save,
-	setDefaultChannelLoader,
+	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
-import { DrawerActions } from '@react-navigation/native';
 import { delay } from 'lodash';
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, Platform } from 'react-native';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
@@ -165,7 +164,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME as never);
-				navigation.dispatch(DrawerActions.closeDrawer());
+				DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: false });
 			}
 			const clanId = linkMatch[1];
 			const channelId = linkMatch[2];

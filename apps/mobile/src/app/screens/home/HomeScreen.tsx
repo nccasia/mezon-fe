@@ -1,62 +1,20 @@
-import { load, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
-import { Metrics } from '@mezon/mobile-ui';
+import { ActionEmitEvent, load, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
 import { appActions, getStoreAsync, messagesActions, selectCurrentChannelId, selectIsFromFCMMobile } from '@mezon/store-mobile';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { delay } from 'lodash';
 import React, { useEffect, useRef } from 'react';
-import { AppState } from 'react-native';
+import { AppState, DeviceEventEmitter, Dimensions } from 'react-native';
+import { DrawerLayout, DrawerState } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 
-const Drawer = createDrawerNavigator();
-
-const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
-	const dispatch = useDispatch();
-	return (
-		<Drawer.Navigator
-			screenOptions={{
-				drawerPosition: 'left',
-				drawerType: 'slide',
-				swipeEdgeWidth: Metrics.screenWidth,
-				swipeMinDistance: 5,
-				drawerStyle: {
-					width: '100%',
-				},
-			}}
-			screenListeners={{
-				state: (e) => {
-					if (e.data.state.history?.length > 1) {
-						dispatch(appActions.setHiddenBottomTabMobile(false));
-					} else {
-						dispatch(appActions.setHiddenBottomTabMobile(true));
-					}
-				},
-			}}
-			drawerContent={(props) => <LeftDrawerContent dProps={props} />}
-		>
-			<Drawer.Screen
-				name="HomeDefault"
-				component={HomeDefault}
-				options={{
-					drawerType: 'slide',
-					swipeEdgeWidth: Metrics.screenWidth,
-					keyboardDismissMode: 'none',
-					swipeMinDistance: 5,
-					headerShown: false,
-				}}
-			/>
-		</Drawer.Navigator>
-	);
-});
-
 const HomeScreen = React.memo((props: any) => {
+	const homeDrawerRef = useRef<DrawerLayout>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -98,7 +56,53 @@ const HomeScreen = React.memo((props: any) => {
 		}
 	};
 
-	return <DrawerScreen navigation={props.navigation} />;
+	useEffect(() => {
+		dispatch(appActions.setHiddenBottomTabMobile(true))
+	}, [])
+
+	const onDrawerStateChanged = (newState: DrawerState, drawerWillShow: boolean) => {
+		if (newState === 'Dragging') {
+			dispatch(appActions.setHiddenBottomTabMobile(true))
+			return;
+		}
+
+		if ((newState === 'Settling')) {
+			dispatch(appActions.setHiddenBottomTabMobile(!drawerWillShow))
+			return;
+		}
+	}
+
+	useEffect(() => {
+		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.HOME_DRAWER, ({ isShowDrawer }) => {
+			if (isShowDrawer) {
+				homeDrawerRef.current.openDrawer();
+			} else {
+				homeDrawerRef.current.closeDrawer();
+			}
+		});
+		return () => {
+			sendMessage.remove();
+		};
+	}, []);
+
+	return (
+		<DrawerLayout
+			ref={homeDrawerRef}
+			edgeWidth={Dimensions.get('window').width}
+			drawerWidth={Dimensions.get('window').width}
+			enableContextMenu
+			drawerPosition={'left'}
+			drawerType="back"
+			overlayColor="transparent"
+			enableTrackpadTwoFingerGesture
+			keyboardDismissMode='on-drag'
+			useNativeAnimations={true}
+			onDrawerStateChanged={onDrawerStateChanged}
+			renderNavigationView={(props) => <LeftDrawerContent dProps={props} />}
+		>
+			<HomeDefault {...props} />
+		</DrawerLayout>
+	);
 });
 
 export default HomeScreen;

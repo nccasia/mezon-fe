@@ -46,6 +46,7 @@ import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const RootStack = createStackNavigator();
 
@@ -104,7 +105,7 @@ const NavigationMain = () => {
 			}
 			if (state === 'background') {
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setLoadingMainMobile(false));
+				dispatch(appActions.setIsFromFCMMobile(false));
 			}
 		});
 		return () => {
@@ -210,30 +211,32 @@ const NavigationMain = () => {
 	};
 
 	return (
-		<NavigationContainer>
-			<NetInfoComp />
-			<RootStack.Navigator screenOptions={{ headerShown: false }}>
-				{isLoggedIn ? (
-					<RootStack.Group
-						screenOptions={{
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-					</RootStack.Group>
-				) : (
-					<RootStack.Group
-						screenOptions={{
-							animationTypeForReplace: 'pop',
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-					</RootStack.Group>
-				)}
-			</RootStack.Navigator>
-			{/*{isLoadingSplashScreen && <SplashScreen />}*/}
-		</NavigationContainer>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<NavigationContainer>
+				<NetInfoComp />
+				<RootStack.Navigator screenOptions={{ headerShown: false }}>
+					{isLoggedIn ? (
+						<RootStack.Group
+							screenOptions={{
+								gestureEnabled: false,
+							}}
+						>
+							<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
+						</RootStack.Group>
+					) : (
+						<RootStack.Group
+							screenOptions={{
+								animationTypeForReplace: 'pop',
+								gestureEnabled: false,
+							}}
+						>
+							<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
+						</RootStack.Group>
+					)}
+				</RootStack.Navigator>
+				{/*{isLoadingSplashScreen && <SplashScreen />}*/}
+			</NavigationContainer>
+		</GestureHandlerRootView>
 	);
 };
 

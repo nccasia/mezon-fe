@@ -1,4 +1,4 @@
-import { Icons, ShortUserProfile } from '@mezon/components';
+import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
@@ -33,6 +33,7 @@ export type MemberProfileProps = {
 	countMember?: number;
 	dataMemberCreate?: DataMemberCreate;
 	isHiddenAvatarPanel?: boolean;
+	userNameAva?: string;
 };
 
 function MemberProfile({
@@ -57,6 +58,7 @@ function MemberProfile({
 	countMember,
 	dataMemberCreate,
 	isHiddenAvatarPanel,
+	userNameAva,
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
@@ -133,6 +135,9 @@ function MemberProfile({
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
+	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
+
+	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '',[]);
 	return (
 		<div className="relative group">
 			<div
@@ -141,13 +146,13 @@ function MemberProfile({
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${positionType === MemberProfileType.FOOTER_PROFILE ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
-					{avatar ? (
-						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
-					) : (
-						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{(isFooter ? userProfile?.user?.username || '' : name || '').charAt(0).toUpperCase()}
-						</div>
-					)}
+					<AvatarImage 
+						alt={userName}
+						userName={userNameAva ?? userName}
+						className="min-w-8 min-h-8 max-w-8 max-h-8"
+						src={avatar}
+						isAnonymous={isAnonymous}
+					/>
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
 						<span
 							className={`absolute bottom-[0px] right-[-4px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode rounded-full`}
@@ -223,6 +228,7 @@ function MemberProfile({
 					name={name}
 					isMemberDMGroup={dataMemberCreate ? true : false}
 					dataMemberCreate={dataMemberCreate}
+					isMemberChannel={positionType === MemberProfileType.MEMBER_LIST}
 				/>
 			)}
 			{isShowUserProfile && listProfile ? (

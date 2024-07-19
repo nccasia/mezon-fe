@@ -1,9 +1,11 @@
 import { OfflineStatus, OnlineStatus, OwnerIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import { style } from './style';
+import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
+import { ChannelType } from 'mezon-js';
 interface IProps {
 	user: ChannelMembersEntity;
 	status?: boolean;
@@ -31,6 +33,7 @@ export default function MemberProfile({
 }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
 		if (user) {
 			return nickName || user?.user?.display_name || user?.user?.username;
@@ -55,7 +58,7 @@ export default function MemberProfile({
 					</Text>
 				)}
 			</View>
-			{(isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />}
+			{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />}
 		</View>
 	);
 }

@@ -1,6 +1,7 @@
 import {
 	ChannelDraftMessages,
 	Direction_Mode,
+	EMessageCode,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -86,7 +87,7 @@ export interface MessagesState {
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
 	openOptionMessageState: boolean;
-	quantitiesMessageRemain: number;
+	firstMessageId: Record<string, string>;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
 	isFocused: boolean;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
@@ -173,10 +174,14 @@ export const fetchMessages = createAsyncThunk(
 			return [];
 		}
 
-		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+		const messages = response.messages.map((item) => {
+			if (item.code === EMessageCode.FIRST_MESSAGE) {
+				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: item.id }));
+			}
+			return mapMessageChannelToEntity(item, response.last_seen_message?.id);
+		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		if (messages.length > 0) {
@@ -424,7 +429,7 @@ export const initialMessagesState: MessagesState = {
 	typingUsers: {},
 	paramEntries: {},
 	openOptionMessageState: false,
-	quantitiesMessageRemain: 0,
+	firstMessageId: {},
 	dataReactionGetFromLoadMessage: [],
 	channelMessages: {},
 	channelDraftMessage: {},
@@ -449,8 +454,8 @@ export const messagesSlice = createSlice({
 		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
-		setQuatitiesMessageRemain: (state, action) => {
-			state.quantitiesMessageRemain = action.payload;
+		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
+			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
@@ -772,8 +777,6 @@ export const selectMessageByMessageId = (messageId: string) =>
 		return messageEntities[messageId];
 	});
 
-export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
-
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
 // V2
@@ -828,6 +831,16 @@ export const selectChannelDraftMessage = createCachedSelector(
 	},
 	(draftMessagesState) => {
 		return (draftMessagesState as ChannelDraftMessages) || {};
+	},
+);
+
+export const selectFirstMessageId = createCachedSelector(
+	(state, channelId) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.firstMessageId[channelId] || null;
+	},
+	(firstMessageId) => {
+		return (firstMessageId as string) || '';
 	},
 );
 

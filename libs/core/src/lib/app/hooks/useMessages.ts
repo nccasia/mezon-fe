@@ -8,9 +8,10 @@ type MessageProps = {
 	hasMoreMessage: boolean;
 	loadMoreMessage: () => void;
 	messages?: string[] | null;
+	firstMessageId?: string;
 };
 
-export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, loadMoreMessage }: MessageProps) => {
+export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, loadMoreMessage, firstMessageId }: MessageProps) => {
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
 	const dispatch = useDispatch();
@@ -38,7 +39,7 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
-			if (currentChatRef.scrollTop === 0) {
+			if (currentChatRef.scrollTop === 0 && !firstMessageId) {
 				const previousHeight = currentChatRef.scrollHeight;
 				setIsFetching(true);
 				await loadMoreMessage();

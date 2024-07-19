@@ -248,6 +248,7 @@ export const InviteToChannel = React.memo(
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
+            setSentIdList([]);
 						resetSearch();
 					}}
 					handleComponent={() => null}

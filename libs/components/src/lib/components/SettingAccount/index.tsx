@@ -1,5 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { useEffect, useState } from 'react';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 
 type SettingAccountProps = {
@@ -38,18 +39,13 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 				<div className="h-[100px] bg-black" style={{ backgroundColor: color }}></div>
 				<div className="flex justify-between relative -top-5 px-4 flex-col sbm:flex-row sbm:items-center">
 					<div className="flex items-center gap-x-4">
-						{checkUrl ? (
-							<div className="size-20 dark:bg-bgDisable bg-gray-100 rounded-full flex justify-center items-center text-contentSecondary text-[50px]">
-								{userProfile?.user?.username?.charAt(0).toUpperCase()}
-							</div>
-						) : (
-							<img
-								crossOrigin="anonymous"
-								src={urlImg}
-								alt=""
-								className="size-24 rounded-full bg-bgSecondary border-[6px] border-solid dark:border-black border-[#F0F0F0] object-cover"
-							/>
-						)}
+						<AvatarImage 
+							alt={userProfile?.user?.username || ''}
+							userName={userProfile?.user?.username}
+							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] dark:bg-bgSecondary bg-white border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
+							src={urlImg}
+							classNameText='!text-5xl'
+						/>
 						<div className="font-semibold text-lg">{userProfile?.user?.display_name}</div>
 					</div>
 					<div

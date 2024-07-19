@@ -43,6 +43,7 @@ import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessageP
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
+import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { RenderDocumentsChat } from './components/RenderDocumentsChat';
@@ -340,161 +341,161 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		// <Swipeable
-		// 	renderRightActions={renderRightActions}
-		// 	ref={swipeableRef}
-		// 	overshootRight={false}
-		// 	onSwipeableOpen={handleSwipeableOpen}
-		// 	hitSlop={{ left: -10 }}
-		// >
-		<View
-			style={[
-				styles.messageWrapper,
-				(isCombine || preventAction) && { marginTop: 0 },
-				hasIncludeMention && styles.highlightMessageMention,
-				checkMessageTargetToMoved && styles.highlightMessageReply,
-			]}
+		<Swipeable
+			renderRightActions={renderRightActions}
+			ref={swipeableRef}
+			overshootRight={false}
+			onSwipeableOpen={handleSwipeableOpen}
+			hitSlop={{ left: -10 }}
 		>
-			{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
-			{/*{lastSeen &&*/}
-			{/*	<View style={styles.newMessageLine}>*/}
-			{/*		<View style={styles.newMessageContainer}>*/}
-			{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
-			{/*		</View>*/}
-			{/*	</View>}*/}
-			{messageRefFetchFromServe ? (
-				<View style={styles.aboveMessage}>
-					<View style={styles.iconReply}>
-						<ReplyIcon width={34} height={30} />
-					</View>
-					<Pressable
-						onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)}
-						style={styles.repliedMessageWrapper}
-					>
-						{repliedSender?.user?.avatar_url ? (
-							<View style={styles.replyAvatar}>
-								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
-							</View>
-						) : (
-							<View style={[styles.replyAvatar]}>
-								<View style={styles.avatarMessageBoxDefault}>
-									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
-								</View>
-							</View>
-						)}
-						<View style={styles.replyContentWrapper}>
-							<Text style={styles.replyDisplayName}>
-								{clanProfileSender?.nick_name || repliedSender?.user?.display_name || repliedSender?.user?.username || 'Anonymous'}
-							</Text>
-							{messageRefFetchFromServe?.attachments?.length ? (
-								<>
-									<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
-									<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
-								</>
-							) : (
-								<>
-									{renderTextContent({
-										lines: messageRefFetchFromServe?.content?.t?.trim(),
-										isEdited: false,
-										translate: t,
-										channelsEntities,
-										emojiListPNG,
-										isNumberOfLine: true,
-										clansProfile,
-										currentClanId,
-										isMessageReply: true,
-										mode,
-									})}
-								</>
-							)}
+			<View
+				style={[
+					styles.messageWrapper,
+					(isCombine || preventAction) && { marginTop: 0 },
+					hasIncludeMention && styles.highlightMessageMention,
+					checkMessageTargetToMoved && styles.highlightMessageReply,
+				]}
+			>
+				{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
+				{/*{lastSeen &&*/}
+				{/*	<View style={styles.newMessageLine}>*/}
+				{/*		<View style={styles.newMessageContainer}>*/}
+				{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
+				{/*		</View>*/}
+				{/*	</View>}*/}
+				{messageRefFetchFromServe ? (
+					<View style={styles.aboveMessage}>
+						<View style={styles.iconReply}>
+							<ReplyIcon width={34} height={30} />
 						</View>
+						<Pressable
+							onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)}
+							style={styles.repliedMessageWrapper}
+						>
+							{repliedSender?.user?.avatar_url ? (
+								<View style={styles.replyAvatar}>
+									<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
+								</View>
+							) : (
+								<View style={[styles.replyAvatar]}>
+									<View style={styles.avatarMessageBoxDefault}>
+										<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
+									</View>
+								</View>
+							)}
+							<View style={styles.replyContentWrapper}>
+								<Text style={styles.replyDisplayName}>
+									{clanProfileSender?.nick_name || repliedSender?.user?.display_name || repliedSender?.user?.username || 'Anonymous'}
+								</Text>
+								{messageRefFetchFromServe?.attachments?.length ? (
+									<>
+										<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
+										<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
+									</>
+								) : (
+									<>
+										{renderTextContent({
+											lines: messageRefFetchFromServe?.content?.t?.trim(),
+											isEdited: false,
+											translate: t,
+											channelsEntities,
+											emojiListPNG,
+											isNumberOfLine: true,
+											clansProfile,
+											currentClanId,
+											isMessageReply: true,
+											mode,
+										})}
+									</>
+								)}
+							</View>
+						</Pressable>
+					</View>
+				) : null}
+				{isMessageReplyDeleted ? (
+					<View style={styles.aboveMessageDeleteReply}>
+						<View style={styles.iconReply}>
+							<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
+						</View>
+						<View style={styles.iconMessageDeleteReply}>
+							<ReplyMessageDeleted width={18} height={9} />
+						</View>
+						<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
+					</View>
+				) : null}
+				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+					<AvatarMessage onPress={onPressAvatar} channelId={props.channelId} message={message} showUserInformation={showUserInformation} />
+					<Pressable
+						style={[styles.rowMessageBox]}
+						onLongPress={() => {
+							if (preventAction) return;
+							setIsOnlyEmojiPicker(false);
+							onMessageAction({
+								type: EMessageBSToShow.MessageAction,
+								senderDisplayName,
+								message,
+							});
+							dispatch(setSelectedMessage(message));
+						}}
+					>
+						<InfoUserMessage
+							onPress={onPressInfoUser}
+							senderDisplayName={senderDisplayName}
+							showUserInformation={showUserInformation}
+							message={message}
+						/>
+						{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
+						{images?.length > 0 &&
+							images.map((image, index) => {
+								const checkImage = notImplementForGifOrStickerSendFromPanel(image);
+								return (
+									<RenderImageChat
+										disable={checkImage}
+										image={image}
+										key={`${image?.url}_${index}`}
+										onPress={onPressImage}
+										onLongPress={onLongPressImage}
+									/>
+								);
+							})}
+						{documents?.length > 0 && renderDocuments()}
+						<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
+							{renderTextContent({
+								lines,
+								isEdited,
+								translate: t,
+								channelsEntities,
+								emojiListPNG,
+								onMention,
+								onChannelMention,
+								isNumberOfLine,
+								clansProfile,
+								currentClanId,
+								isMessageReply: false,
+								mode,
+							})}
+						</Block>
+						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
+						{!preventAction ? (
+							<MessageAction
+								message={message}
+								mode={mode}
+								emojiListPNG={emojiListPNG}
+								preventAction={preventAction}
+								openEmojiPicker={() => {
+									setIsOnlyEmojiPicker(true);
+									onMessageAction({
+										type: EMessageBSToShow.MessageAction,
+										senderDisplayName,
+										message,
+									});
+								}}
+							/>
+						) : null}
 					</Pressable>
 				</View>
-			) : null}
-			{isMessageReplyDeleted ? (
-				<View style={styles.aboveMessageDeleteReply}>
-					<View style={styles.iconReply}>
-						<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
-					</View>
-					<View style={styles.iconMessageDeleteReply}>
-						<ReplyMessageDeleted width={18} height={9} />
-					</View>
-					<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
-				</View>
-			) : null}
-			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-				<AvatarMessage onPress={onPressAvatar} channelId={props.channelId} message={message} showUserInformation={showUserInformation} />
-				<Pressable
-					style={[styles.rowMessageBox]}
-					onLongPress={() => {
-						if (preventAction) return;
-						setIsOnlyEmojiPicker(false);
-						onMessageAction({
-							type: EMessageBSToShow.MessageAction,
-							senderDisplayName,
-							message,
-						});
-						dispatch(setSelectedMessage(message));
-					}}
-				>
-					<InfoUserMessage
-						onPress={onPressInfoUser}
-						senderDisplayName={senderDisplayName}
-						showUserInformation={showUserInformation}
-						message={message}
-					/>
-					{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
-					{images?.length > 0 &&
-						images.map((image, index) => {
-							const checkImage = notImplementForGifOrStickerSendFromPanel(image);
-							return (
-								<RenderImageChat
-									disable={checkImage}
-									image={image}
-									key={`${image?.url}_${index}`}
-									onPress={onPressImage}
-									onLongPress={onLongPressImage}
-								/>
-							);
-						})}
-					{documents?.length > 0 && renderDocuments()}
-					<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
-						{renderTextContent({
-							lines,
-							isEdited,
-							translate: t,
-							channelsEntities,
-							emojiListPNG,
-							onMention,
-							onChannelMention,
-							isNumberOfLine,
-							clansProfile,
-							currentClanId,
-							isMessageReply: false,
-							mode,
-						})}
-					</Block>
-					{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-					{!preventAction ? (
-						<MessageAction
-							message={message}
-							mode={mode}
-							emojiListPNG={emojiListPNG}
-							preventAction={preventAction}
-							openEmojiPicker={() => {
-								setIsOnlyEmojiPicker(true);
-								onMessageAction({
-									type: EMessageBSToShow.MessageAction,
-									senderDisplayName,
-									message,
-								});
-							}}
-						/>
-					) : null}
-				</Pressable>
 			</View>
-		</View>
-		// </Swipeable>
+		</Swipeable>
 	);
 }, arePropsEqual);
 

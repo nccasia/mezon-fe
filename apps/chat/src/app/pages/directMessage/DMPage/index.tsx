@@ -106,6 +106,8 @@ export default function DirectMessage() {
 		}
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
+	const isDmChannel = useMemo(() => currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM,[currentDmGroup.type]);
+
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
@@ -124,12 +126,13 @@ export default function DirectMessage() {
 								<ChannelMessages
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
-									type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
+									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
+									type={isDmChannel ? 'DM' : 'GROUP'}
 									mode={
-										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+										isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 									}
 									avatarDM={
-										currentDmGroup?.user_id?.length === 1
+										isDmChannel
 											? currentDmGroup.channel_avatar?.at(0)
 											: 'assets/images/avatar-group.png'
 									}

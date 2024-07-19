@@ -67,11 +67,7 @@ const ServerList = React.memo((props: any) => {
 			<SeparatorWithLine style={{ width: '60%' }} />
 
 			<UnreadDMBadgeList />
-			{isEmptyClan ? (
-				<Image style={{ width: 50, height: 50, borderRadius: 50 }} source={Images.DISCORDROUNDED} />
-			) : (
-				<ClanIcon data={currentClan} onPress={handleChangeClan} isActive={true} />
-			)}
+			{!isEmptyClan ? <ClanIcon data={currentClan} onPress={handleChangeClan} isActive={true} /> : null}
 
 			<Tooltip
 				isVisible={isVisible}

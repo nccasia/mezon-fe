@@ -1,26 +1,16 @@
 import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, PlayIcon, save, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
+import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
+import { appActions } from '@mezon/store';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {
-	Alert,
-	FlatList,
-	Image,
-	Linking,
-	PermissionsAndroid,
-	Platform,
-	Text,
-	TouchableOpacity,
-	View
-} from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import { useDispatch } from 'react-redux';
 import { styles } from './styles';
-import {appActions} from "@mezon/store";
-import {useDispatch} from "react-redux";
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 }
@@ -39,7 +29,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-	
+
 	const attachmentsFileName = useMemo(() => {
 		if (!attachmentDataRef?.length) return [];
 		return attachmentDataRef.map((attachment) => attachment.filename);
@@ -47,10 +37,10 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 	useEffect(() => {
 		checkAndRequestPermissions();
-		
+
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);
-		}
+		};
 	}, []);
 
 	const checkAndRequestPermissions = async () => {
@@ -62,9 +52,24 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		}
 	};
 
+	const getCheckPermissionPromise = () => {
+		if (Number(Platform.Version) >= 33) {
+			return Promise.all([
+				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES),
+				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO),
+			]).then(([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) => hasReadMediaImagesPermission && hasReadMediaVideoPermission);
+		} else {
+			return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+		}
+	};
+
 	const requestPermission = async () => {
 		if (Platform.OS === 'android') {
 			dispatch(appActions.setIsFromFCMMobile(true));
+			const hasPermission = await getCheckPermissionPromise();
+			if (hasPermission) {
+				return true;
+			}
 			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 			if (granted === 'never_ask_again') {
@@ -79,9 +84,9 @@ const Gallery = ({ onPickGallery }: IProps) => {
 							openAppSettings();
 						},
 					},
-				])
+				]);
 			}
-			
+
 			return granted === PermissionsAndroid.RESULTS.GRANTED;
 		} else if (Platform.OS === 'ios') {
 			dispatch(appActions.setIsFromFCMMobile(true));
@@ -95,7 +100,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		}
 		return false;
 	};
-	
+
 	const openAppSettings = () => {
 		if (Platform.OS === 'ios') {
 			Linking.openURL('app-settings:');
