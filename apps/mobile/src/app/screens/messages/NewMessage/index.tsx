@@ -17,7 +17,7 @@ import { normalizeString } from '../../../utils/helpers';
 import { style } from './styles';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -113,6 +113,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					placeholderTextColor={themeValue.textDisabled}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
+					keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 				/>
 			</View>
 

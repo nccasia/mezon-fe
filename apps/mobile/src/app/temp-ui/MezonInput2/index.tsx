@@ -14,7 +14,7 @@ interface IMezonInput2 {
 }
 
 export default function MezonInput({ label, placeHolder, value, onTextChange, errorMessage }: IMezonInput2) {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	useEffect(() => {
@@ -30,6 +30,7 @@ export default function MezonInput({ label, placeHolder, value, onTextChange, er
 				value={value}
 				onChangeText={onTextChange}
 				maxLength={64}
+				keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 			/>
 			{!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 		</View>

@@ -1,8 +1,9 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import { Image, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { styles as s } from './SuggestItem.styles';
+import { style } from './SuggestItem.styles';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
@@ -13,14 +14,16 @@ type SuggestItemProps = {
 };
 
 const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar }: SuggestItemProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const urlEmoji = getSrcEmoji(name, emojiListPNG);
 	return (
-		<View style={s.wrapperItem}>
-			<View style={s.containerItem}>
+		<View style={styles.wrapperItem}>
+			<View style={styles.containerItem}>
 				{avatarUrl ? (
 					<Image
-						style={s.image}
+						style={styles.image}
 						source={{
 							uri: avatarUrl,
 						}}
@@ -28,16 +31,16 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar 
 				) : (
 					!name.startsWith('here') &&
 					isDisplayDefaultAvatar && (
-						<View style={s.avatarMessageBoxDefault}>
-							<Text style={s.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
+						<View style={styles.avatarMessageBoxDefault}>
+							<Text style={styles.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
 						</View>
 					)
 				)}
-				{urlEmoji && <Image style={s.emojiImage} source={{ uri: urlEmoji }} />}
-				{symbol && <Text style={s.symbol}>{symbol}</Text>}
-				<Text style={s.title}>{name}</Text>
+				{urlEmoji && <Image style={styles.emojiImage} source={{ uri: urlEmoji }} />}
+				{symbol && <Text style={styles.symbol}>{symbol}</Text>}
+				<Text style={styles.title}>{name}</Text>
 			</View>
-			<Text style={s.subText}>{subText}</Text>
+			<Text style={styles.subText}>{subText}</Text>
 		</View>
 	);
 };

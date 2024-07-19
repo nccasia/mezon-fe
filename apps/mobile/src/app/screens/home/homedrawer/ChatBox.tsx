@@ -79,7 +79,7 @@ interface IChatBoxProps {
 	directMessageId?: string;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const inputRef = useRef<TextInput>();
 	const { sessionRef, clientRef } = useMezon();
@@ -738,6 +738,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						multiline={true}
 						spellCheck={false}
 						numberOfLines={3}
+						keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 						{...textInputProps}
 						style={[
 							styles.inputStyle,

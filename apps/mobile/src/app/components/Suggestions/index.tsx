@@ -1,3 +1,4 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
 import { FC, memo, useMemo } from 'react';
@@ -13,6 +14,7 @@ export interface MentionSuggestionsProps {
 }
 
 const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, suggestions = [] }) => {
+	const { themeValue } = useTheme();
 	const formattedMentionList = useMemo(() => {
 		if (keyword === null || !suggestions.length) {
 			return [];

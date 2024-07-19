@@ -10,12 +10,12 @@ interface MezonInputProps {
 }
 
 export default function MezonSearch({ onChangeText, hasBackground, size = 'medium' }: MezonInputProps) {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	return (
 		<View style={[styles.inputWrapper, { backgroundColor: hasBackground ? themeValue.primary : themeValue.secondary }]}>
 			<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />
-			<TextInput style={styles.input} onChangeText={onChangeText} placeholderTextColor={themeValue.text} placeholder="Search" />
+			<TextInput style={styles.input} onChangeText={onChangeText} placeholderTextColor={themeValue.text} placeholder="Search" keyboardAppearance={themeBasic === "dark" ? "dark" : "light"} />
 		</View>
 	);
 }

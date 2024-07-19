@@ -15,7 +15,7 @@ interface UserTextInputProps {
 	touched: boolean;
 }
 const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, placeholder, isPass, value, onChangeText, onBlur }) => {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const [showPass, setShowPass] = useState<boolean>(true);
 
@@ -35,6 +35,7 @@ const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, pl
 					secureTextEntry={isPass && showPass}
 					placeholderTextColor="#535353"
 					autoCapitalize="none"
+					keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 				/>
 				{isPass && (
 					<Pressable onPress={() => setShowPass(!showPass)}>

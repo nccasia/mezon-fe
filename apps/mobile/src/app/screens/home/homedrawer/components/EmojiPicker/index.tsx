@@ -42,7 +42,7 @@ function TextTab({ selected, title, onPress }: TextTabProps) {
 type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
 function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
@@ -144,7 +144,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 						<View style={styles.textInputWrapper}>
 							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
-							<TextInput placeholder='search' placeholderTextColor={themeValue.text} style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
+							<TextInput placeholder='search' placeholderTextColor={themeValue.text} style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} keyboardAppearance={themeBasic === "dark" ? "dark" : "light"} />
 						</View>
 					</Block>
 				)}

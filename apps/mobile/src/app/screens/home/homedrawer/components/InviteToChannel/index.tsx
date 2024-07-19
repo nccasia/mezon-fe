@@ -45,7 +45,7 @@ export const InviteToChannel = React.memo(
 
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
-		const { themeValue } = useTheme();
+		const { themeValue, themeBasic } = useTheme();
 		const styles = style(themeValue);
 		const currentClanId = useSelector(selectCurrentClanId);
 		const currentClan = useSelector(selectCurrentClan);
@@ -248,7 +248,7 @@ export const InviteToChannel = React.memo(
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
-            setSentIdList([]);
+						setSentIdList([]);
 						resetSearch();
 					}}
 					handleComponent={() => null}
@@ -278,6 +278,8 @@ export const InviteToChannel = React.memo(
 											placeholderTextColor={themeValue.text}
 											style={styles.searchFriendToInviteInput}
 											onChangeText={setSearchUserText}
+
+
 										/>
 										<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 									</View>

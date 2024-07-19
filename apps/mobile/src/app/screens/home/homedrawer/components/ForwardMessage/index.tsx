@@ -1,6 +1,6 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { getSelectedMessage, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -30,6 +30,7 @@ interface ForwardMessageModalProps {
 }
 
 const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProps) => {
+	const { themeValue, themeBasic } = useTheme();
 	const [searchText, setSearchText] = useState('');
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
@@ -46,25 +47,25 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
 			? listDM.map((itemDM: any) => {
-					return {
-						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
-						idDM: itemDM?.id ?? '',
-						typeChat: 3,
-					};
-				})
+				return {
+					id: itemDM?.user_id?.[0] ?? '',
+					name: itemDM?.channel_label ?? '',
+					avatarUser: itemDM?.channel_avatar?.[0] ?? '',
+					idDM: itemDM?.id ?? '',
+					typeChat: 3,
+				};
+			})
 			: [];
 		const listGroupSearch = listGroup?.length
 			? listGroup.map((itemGr: any) => {
-					return {
-						id: itemGr?.channel_id ?? '',
-						name: itemGr?.channel_label ?? '',
-						avatarUser: 'assets/images/avatar-group.png' ?? '',
-						idDM: itemGr?.id ?? '',
-						typeChat: 2,
-					};
-				})
+				return {
+					id: itemGr?.channel_id ?? '',
+					name: itemGr?.channel_label ?? '',
+					avatarUser: 'assets/images/avatar-group.png' ?? '',
+					idDM: itemGr?.id ?? '',
+					typeChat: 2,
+				};
+			})
 			: [];
 
 		const listSearch = [...listDMSearch, ...listGroupSearch];
@@ -220,7 +221,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 				<View style={styles.searchWrapper}>
 					<View style={styles.inputWrapper}>
-						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" />
+						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" keyboardAppearance={themeBasic === "dark" ? "dark" : "light"} />
 					</View>
 				</View>
 

@@ -1,6 +1,6 @@
 import { useCategory, useReference } from '@mezon/core';
 import { CloseIcon, PenIcon, STORAGE_CLAN_ID, SearchIcon, SendIcon, getAttachmentUnique, save } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	clansActions,
@@ -26,6 +26,7 @@ import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
+	const { themeBasic } = useTheme();
 	const listDM = useSelector(selectDirectsOpenlist);
 	const { categorizedChannels } = useCategory();
 	const currentClan = useSelector(selectCurrentClan);
@@ -320,6 +321,7 @@ export const Sharing = ({ data, onClose }) => {
 							onChangeText={(text) => setDataText(text)}
 							placeholder={'Add a Comment (Optional)'}
 							placeholderTextColor={Colors.tertiary}
+							keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 						/>
 						{!!dataText?.length && (
 							<TouchableOpacity activeOpacity={0.8} onPress={() => setDataText('')} style={styles.iconRightInput}>
@@ -348,6 +350,7 @@ export const Sharing = ({ data, onClose }) => {
 								onChangeText={debouncedSetSearchText}
 								placeholder={'Select a channel or category...'}
 								placeholderTextColor={Colors.tertiary}
+								keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 							/>
 						)}
 						{channelSelected ? (

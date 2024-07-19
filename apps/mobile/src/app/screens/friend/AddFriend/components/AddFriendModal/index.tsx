@@ -17,7 +17,7 @@ interface IAddFriendModal {
 }
 
 export const AddFriendModal = React.memo((props: IAddFriendModal) => {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const { type, onClose } = props;
 	const { userProfile } = useAuth();
@@ -145,6 +145,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								placeholderTextColor={themeValue.textDisabled}
 								style={styles.searchInput}
 								onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
+								keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 							/>
 						</View>
 						<View style={styles.byTheWayText}>

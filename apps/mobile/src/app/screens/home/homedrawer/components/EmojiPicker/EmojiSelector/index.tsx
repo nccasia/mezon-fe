@@ -84,7 +84,7 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse,
 }: EmojiSelectorProps) {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
 	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
@@ -152,6 +152,7 @@ export default function EmojiSelector({
 						style={styles.textInput}
 						placeholderTextColor={Colors.textGray}
 						onChangeText={debouncedSetSearchText}
+						keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 					/>
 				</View>
 				<ScrollView

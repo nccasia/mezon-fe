@@ -22,7 +22,7 @@ interface IMezonInputProps {
 }
 
 export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const ref = useRef<TextInput>(null);
 	const [showCount, setShowCount] = useState<boolean>(false);
@@ -74,6 +74,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
 						placeholderTextColor="gray"
 						onFocus={handleFocus}
 						onBlur={handleBlur}
+						keyboardAppearance={themeBasic === "dark" ? "dark" : "light"}
 					/>
 
 					{!textarea && value?.length > 0 && (

@@ -7,9 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, MezonMenu } from '../../temp-ui';
+import { IMezonMenuSectionProps, MezonMenu, MezonSwitch } from '../../temp-ui';
 import MezonInput from '../../temp-ui/MezonInput2';
-import MezonToggleButton from '../../temp-ui/MezonToggleButton';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 
@@ -46,8 +45,6 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 		),
 	});
 
-	const ToggleBtn = () => <MezonToggleButton onChange={() => {}} height={25} width={45} />;
-
 	const handleCreateCategory = async () => {
 		if (!validInput(categoryName)) return;
 
@@ -71,7 +68,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 			items: [
 				{
 					title: t('fields.catePrivate.title'),
-					component: <ToggleBtn />,
+					component: <MezonSwitch />,
 					icon: <Icons.LockIcon height={18} width={18} color={themeValue.text} />,
 				},
 			],
