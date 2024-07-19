@@ -20,8 +20,8 @@ const DrawerContent = React.memo((props: any) => {
 	}, [clansLoadingStatus, clans]);
 	return (
 		<View {...props.dProps} style={[styles.containerDrawerContent, { backgroundColor: themeValue.primary }]}>
-			<ServerList navigation={props.dProps.navigation} />
-			{isEmptyClan ? <UserEmptyClan /> : <ChannelList navigation={props.dProps.navigation} />}
+			<ServerList />
+			{isEmptyClan ? <UserEmptyClan /> : <ChannelList />}
 		</View>
 	);
 });
