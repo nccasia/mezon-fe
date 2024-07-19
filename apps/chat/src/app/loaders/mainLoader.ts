@@ -1,11 +1,9 @@
-import { clansActions, emojiSuggestionActions, notificationActions } from '@mezon/store';
-import { gifsActions } from '@mezon/store';
+import { clansActions, gifsActions, notificationActions } from '@mezon/store';
 import { CustomLoaderFunction } from './appLoader';
 
 export const mainLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(clansActions.fetchClans());
 	dispatch(notificationActions.fetchListNotification());
-	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: "0", noCache: true }));
 	dispatch(gifsActions.fetchGifCategories());
 	dispatch(gifsActions.fetchGifCategoryFeatured());
 	return null;
