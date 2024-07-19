@@ -61,7 +61,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 						(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
 					}
 					src={attachmentData.url?.toString()}
-					alt=""
+					alt={attachmentData.url?.toString()}
 					onClick={() => handleClick(attachmentData.url || '')}
 					style={imgStyle}
 					onError={handleError}
