@@ -14,7 +14,7 @@ type LabelDmProps = {
 const LabelDm = (props: LabelDmProps) => {
 	const { dmGroupId, currentDmGroup } = props;
 	const dispatch = useAppDispatch();
-	const [label, setLabel] = useState(currentDmGroup.channel_label);
+	const [label, setLabel] = useState(currentDmGroup?.channel_label ||'');
 	const [openEditName, setOpenEditName] = useState(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [isShowPanel, setIsShowPanel] = useState(false);
@@ -75,9 +75,9 @@ const LabelDm = (props: LabelDmProps) => {
 
 	useEffect(() => {
 		setOpenEditName(false);
-		setLabel(currentDmGroup.channel_label);
+		setLabel(currentDmGroup?.channel_label || '');
 		setIsShowPanel(false);
-	}, [currentDmGroup.channel_label]);
+	}, [currentDmGroup?.channel_label]);
 
 	useOnClickOutside(panelRef, () => setIsShowPanel(false));
 

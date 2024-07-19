@@ -13,7 +13,7 @@ import {
 	selectLoadingMainMobile,
 } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BackHandler } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
@@ -86,7 +86,6 @@ export const Authentication = () => {
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
 						await navigateToNotification(store, remoteMessage, navigation);
-						navigation.dispatch(DrawerActions.closeDrawer());
 					},
 				});
 			}

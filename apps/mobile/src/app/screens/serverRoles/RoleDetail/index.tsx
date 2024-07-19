@@ -5,7 +5,7 @@ import { rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/sto
 import { isEqual } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, TouchableOpacity } from 'react-native';
+import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
@@ -104,13 +104,13 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				onPress: async () => {
 					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
 					if (response?.payload) {
-						Toast.show({
-							type: 'success',
-							props: {
-								text2: t('roleDetail.deleteRoleSuccessfully', { roleName: clanRole?.title }),
-								leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-							},
-						});
+						// Toast.show({
+						// 	type: 'success',
+						// 	props: {
+						// 		text2: t('roleDetail.deleteRoleSuccessfully', { roleName: clanRole?.title }),
+						// 		leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
+						// 	},
+						// });
 						navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
 					} else {
 						Toast.show({
@@ -161,65 +161,67 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		];
 	}, [t]);
 	return (
-		<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14}>
-			<Block marginTop={size.s_14}>
-				<MezonInput
-					value={currentRoleName}
-					onTextChange={setCurrentRoleName}
-					placeHolder={t('roleDetail.roleName')}
-					label={t('roleDetail.roleName')}
-				/>
-			</Block>
-
-			<Block marginVertical={size.s_10} flex={1}>
-				<Block borderRadius={size.s_10} overflow="hidden">
-					<FlatList
-						data={actionList}
-						scrollEnabled
-						showsVerticalScrollIndicator={false}
-						keyExtractor={(item) => item.id.toString()}
-						ItemSeparatorComponent={SeparatorWithLine}
-						renderItem={({ item }) => {
-							return (
-								<TouchableOpacity onPress={() => handleAction(item.type)}>
-									<Block
-										flexDirection="row"
-										alignItems="center"
-										justifyContent="space-between"
-										backgroundColor={themeValue.secondary}
-										padding={size.s_12}
-										gap={size.s_10}
-									>
-										<Block flex={1}>
-											<Text color={themeValue.white}>{item.actionTitle}</Text>
-										</Block>
-										<Icons.ChevronSmallRightIcon color={themeValue.text} />
-									</Block>
-								</TouchableOpacity>
-							);
-						}}
+		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14}>
+				<Block marginTop={size.s_14}>
+					<MezonInput
+						value={currentRoleName}
+						onTextChange={setCurrentRoleName}
+						placeHolder={t('roleDetail.roleName')}
+						label={t('roleDetail.roleName')}
 					/>
 				</Block>
 
-				<Block marginVertical={size.s_10}>
-					<TouchableOpacity onPress={() => deleteRole()}>
-						<Block
-							flexDirection="row"
-							alignItems="center"
-							justifyContent="space-between"
-							backgroundColor={themeValue.secondary}
-							paddingVertical={size.s_14}
-							paddingHorizontal={size.s_12}
-							gap={size.s_10}
-							borderRadius={size.s_10}
-						>
-							<Block flex={1}>
-								<Text color={Colors.textRed}>{t('roleDetail.deleteRole')}</Text>
+				<Block marginVertical={size.s_10} flex={1}>
+					<Block borderRadius={size.s_10} overflow="hidden">
+						<FlatList
+							data={actionList}
+							scrollEnabled
+							showsVerticalScrollIndicator={false}
+							keyExtractor={(item) => item.id.toString()}
+							ItemSeparatorComponent={SeparatorWithLine}
+							renderItem={({ item }) => {
+								return (
+									<TouchableOpacity onPress={() => handleAction(item.type)}>
+										<Block
+											flexDirection="row"
+											alignItems="center"
+											justifyContent="space-between"
+											backgroundColor={themeValue.secondary}
+											padding={size.s_12}
+											gap={size.s_10}
+										>
+											<Block flex={1}>
+												<Text color={themeValue.white}>{item.actionTitle}</Text>
+											</Block>
+											<Icons.ChevronSmallRightIcon color={themeValue.text} />
+										</Block>
+									</TouchableOpacity>
+								);
+							}}
+						/>
+					</Block>
+
+					<Block marginVertical={size.s_10}>
+						<TouchableOpacity onPress={() => deleteRole()}>
+							<Block
+								flexDirection="row"
+								alignItems="center"
+								justifyContent="space-between"
+								backgroundColor={themeValue.secondary}
+								paddingVertical={size.s_14}
+								paddingHorizontal={size.s_12}
+								gap={size.s_10}
+								borderRadius={size.s_10}
+							>
+								<Block flex={1}>
+									<Text color={Colors.textRed}>{t('roleDetail.deleteRole')}</Text>
+								</Block>
 							</Block>
-						</Block>
-					</TouchableOpacity>
+						</TouchableOpacity>
+					</Block>
 				</Block>
 			</Block>
-		</Block>
+		</TouchableWithoutFeedback>
 	);
 };

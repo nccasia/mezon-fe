@@ -1,6 +1,6 @@
 {
-    "roleDescription": "Use roles to group your server members and assign permissions",
-    "defaultRole": "Default permission for all server members",
+    "roleDescription": "Use roles to group your clan members and assign permissions",
+    "defaultRole": "Default permission for all clan members",
     "roles": "Roles",
     "members": "Members",
     "noRole": "There are currently no roles",

@@ -90,7 +90,7 @@ const ModalUserProfile = ({
 
 	useEffect(() => {
 		const getColor = async () => {
-			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
+			if (isFooterProfile ? checkUrl(userProfile?.user?.avatar_url) : checkUrl(userById?.user?.avatar_url)) {
 				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
 				const colorImg = await getColorAverageFromURL(url || '');
 				if (colorImg) setColor(colorImg);
@@ -131,6 +131,7 @@ const ModalUserProfile = ({
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}
+				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">

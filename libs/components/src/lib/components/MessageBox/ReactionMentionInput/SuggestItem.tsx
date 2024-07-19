@@ -71,7 +71,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	return (
 		<div className="flex flex-row items-center justify-between h-[24px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
-				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" />}
+				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" classNameText='text-[9px] min-w-5 min-h-5 pt-[3px]'/>}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />

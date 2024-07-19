@@ -6,6 +6,7 @@ import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 interface ModalCreateDMProps {
 	onClose: () => void;
 	isOpen: boolean;
@@ -101,10 +102,12 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 											htmlFor={`checkbox-item-${index}`}
 											className="w-full ms-2 text-sm font-medium cursor-pointer text-black dark:text-white rounded flex gap-2"
 										>
-											<img
+											<AvatarImage 
+												alt={friend.user?.username || ''}
+												userName={friend.user?.username}
+												className="min-w-5 min-h-5 max-w-5 max-h-5"
+												classNameText='text-[9px] pt-[3px]'
 												src={friend.user?.avatar_url}
-												alt={friend.user?.avatar_url}
-												className="size-5 rounded-full object-cover"
 											/>
 											{friend.user?.display_name}
 											<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">
