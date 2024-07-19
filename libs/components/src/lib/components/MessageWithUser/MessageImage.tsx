@@ -1,9 +1,9 @@
 import { useAttachments } from '@mezon/core';
 import { attachmentActions } from '@mezon/store';
-import { notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
+import { checkLinkImageWork, notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
@@ -34,26 +34,28 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
 	};
 
-	const [imageError, setImageError] = useState(false);
+	const [imageWork, setImageWork] = useState(false);
 
-	const handleImageError = () => {
-		setImageError(true);
-	};
+	const handleContextMenu = useCallback(
+		(e: any) => {
+			setImageURL(attachmentData?.url ?? '');
+			setPositionShow(SHOW_POSITION.NONE);
+			if (typeof onContextMenu === 'function') {
+				onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
+			}
+		},
+		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow],
+	);
 
-	const handleContextMenu = useCallback((e: any) => {
-		setImageURL(attachmentData?.url ?? '');
-		setPositionShow(SHOW_POSITION.NONE);
-		if (typeof onContextMenu === 'function') {
-			onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
-		}
-	}, [attachmentData?.url, onContextMenu, setImageURL, setPositionShow]);
+	useMemo(() => {
+		checkLinkImageWork(attachmentData.url ?? '').then((result) => {
+			setImageWork(result);
+		});
+	}, [attachmentData.url]);
 
-	if (imageError || !attachmentData.url) {
-		return null;
-	}
 	return (
 		<div className="break-all">
-			{attachmentData.url ? (
+			{imageWork ? (
 				<img
 					onContextMenu={handleContextMenu}
 					className={
@@ -64,7 +66,6 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 					alt={attachmentData.url}
 					onClick={() => handleClick(attachmentData.url || '')}
 					style={imgStyle}
-					onError={handleImageError}
 				/>
 			) : null}
 		</div>
