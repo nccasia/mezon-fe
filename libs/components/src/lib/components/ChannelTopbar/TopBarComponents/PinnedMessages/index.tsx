@@ -1,6 +1,6 @@
 import { selectTheme } from '@mezon/store';
 import { useSelector } from 'react-redux';
-import EmptyPinMessage from './EmptyPinMessage';
+import ListPinMessage from './ListPinMessage';
 
 type PinnedMessagesProps = {
 	onClose?: () => void;
@@ -17,10 +17,9 @@ const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
 					</div>
 				</div>
 				<div
-					className={`flex flex-col bg-bgSecondary min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
+					className={`flex flex-col dark:bg-bgPrimary bg-gray-100 flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
 				>
-					{/* <ItemPinMessage /> */}
-					{<EmptyPinMessage />}
+					<ListPinMessage />
 				</div>
 			</div>
 		</div>

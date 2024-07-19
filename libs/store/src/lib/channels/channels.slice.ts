@@ -198,7 +198,7 @@ export const fetchChannelsCached = memoize(
 	},
 );
 
-export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType = 1, noCache }: fetchChannelsArgs, thunkAPI) => {
+export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 	if (noCache) {

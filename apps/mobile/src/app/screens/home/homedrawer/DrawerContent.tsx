@@ -8,7 +8,7 @@ import ServerList from './ServerList';
 import UserEmptyClan from './UserEmptyClan';
 import { style } from './styles';
 
-const DrawerContent = React.memo((props: any) => {
+const DrawerContent = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
@@ -19,9 +19,9 @@ const DrawerContent = React.memo((props: any) => {
 		setIsEmptyClan(clansLoadingStatus === 'loaded' && !clans?.length);
 	}, [clansLoadingStatus, clans]);
 	return (
-		<View {...props.dProps} style={[styles.containerDrawerContent, { backgroundColor: themeValue.primary }]}>
-			<ServerList navigation={props.dProps.navigation} />
-			{isEmptyClan ? <UserEmptyClan /> : <ChannelList navigation={props.dProps.navigation} />}
+		<View style={[styles.containerDrawerContent, { backgroundColor: themeValue.primary }]}>
+			<ServerList />
+			{isEmptyClan ? <UserEmptyClan /> : <ChannelList />}
 		</View>
 	);
 });

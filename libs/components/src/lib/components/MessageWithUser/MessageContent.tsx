@@ -1,10 +1,9 @@
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { useMemo } from 'react';
 import MessageLine from './MessageLine';
 import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {
-	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine?: boolean;
 	newMessage?: string;

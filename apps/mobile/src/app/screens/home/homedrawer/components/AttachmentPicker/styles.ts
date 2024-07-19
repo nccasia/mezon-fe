@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: size.s_10,
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
 		gap: size.s_6,
 		paddingVertical: size.s_10,
 		borderRadius: size.s_20,
-		backgroundColor: Colors.gray48,
+		backgroundColor: colors.secondary,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -25,6 +25,6 @@ export const styles = StyleSheet.create({
 	titleButtonHeader: {
 		fontSize: size.medium,
 		fontWeight: '600',
-		color: Colors.white,
+		color: colors.text,
 	},
 });

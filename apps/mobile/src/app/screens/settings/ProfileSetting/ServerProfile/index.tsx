@@ -5,7 +5,7 @@ import { Text, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { EProfileTab, IClanProfileValue } from '..';
 import { SeparatorWithLine } from '../../../../../app/components/Common';
 import { IFile, MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../../app/temp-ui';
+import { normalizeString } from '../../../../utils/helpers';
 import BannerAvatar from '../UserProfile/components/Banner';
 import { style } from './styles';
 
@@ -43,6 +44,7 @@ export default function ServerProfile({
 	const { clanProfile, updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
 	const [file, setFile] = useState<IFile>(null);
 	const navigation = useNavigation();
+	const [searchClanText, setSearchClanText] = useState('');
 
 	const openBottomSheet = () => {
 		bottomSheetDetail.current?.present();
@@ -132,11 +134,14 @@ export default function ServerProfile({
 			}
 		}
 	};
-
 	const handleAvatarChange = (data: IFile) => {
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: data?.uri }));
 		setFile(data);
 	};
+
+	const filteredClanList = useMemo(() => {
+		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));
+	}, [searchClanText, clans]);
 	return (
 		<View style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
@@ -175,10 +180,11 @@ export default function ServerProfile({
 				/>
 			</View>
 
-			<MezonBottomSheet ref={bottomSheetDetail} title="Choose a clan" heightFitContent>
+			<MezonBottomSheet ref={bottomSheetDetail} title={t('selectAClan')} heightFitContent>
 				<View style={styles.bottomSheetContainer}>
+					<MezonInput value={searchClanText} onTextChange={setSearchClanText} placeHolder={t('searchClanPlaceholder')} />
 					<FlatList
-						data={clans}
+						data={filteredClanList}
 						keyExtractor={(item) => item?.id}
 						ItemSeparatorComponent={SeparatorWithLine}
 						renderItem={({ item }) => {

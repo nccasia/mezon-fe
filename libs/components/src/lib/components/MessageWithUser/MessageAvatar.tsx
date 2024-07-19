@@ -1,10 +1,9 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
-import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
+import { IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 type IMessageAvatarProps = {
-	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isEditing?: boolean;
@@ -12,7 +11,7 @@ type IMessageAvatarProps = {
 	mode?: number;
 };
 
-const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
+const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -45,6 +44,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 			</div>
 		);
 	}
+
 	return (
 		<div className="relative group">
 			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
@@ -54,8 +54,8 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 						e.stopPropagation();
 					}}
 					alt="user avatar"
-					userName={user?.user?.username}
-					src={user?.user?.avatar_url}
+					userName={message.username}
+					src={message.avatar}
 					className="min-w-10 min-h-10"
 					isAnonymous={isAnonymous}
 				/>
@@ -66,7 +66,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode} />
+					<ShortUserProfile userID={message.sender_id || ''} message={message} mode={mode} />
 				</div>
 			) : null}
 		</div>

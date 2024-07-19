@@ -2,9 +2,9 @@ import { useFriends } from '@mezon/core';
 import { Icons, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { RootState, channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
-import Images from '../../../../../assets/Images';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
 import LogoMezon from '../../../../../assets/svg/logoMezon.svg';
@@ -15,7 +15,7 @@ import ListClanPopupProps from '../components/ListClanPopup';
 import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
 import { style } from './styles';
 
-const ServerList = React.memo((props: any) => {
+const ServerList = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -25,6 +25,7 @@ const ServerList = React.memo((props: any) => {
 	const { quantityPendingRequest } = useFriends();
 	const [isEmptyClan, setIsEmptyClan] = useState<boolean>(false);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
+	const navigation = useNavigation<any>();
 
 	const handleChangeClan = async (clanId: string) => {
 		timeoutRef.current = setTimeout(() => {
@@ -50,7 +51,7 @@ const ServerList = React.memo((props: any) => {
 	}, [clansLoadingStatus, clans]);
 
 	const navigateToDM = () => {
-		props.navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 	};
 
 	return (

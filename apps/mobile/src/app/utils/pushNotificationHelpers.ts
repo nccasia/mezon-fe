@@ -186,7 +186,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-				const type = linkDirectMessageMatch[2];
 
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {

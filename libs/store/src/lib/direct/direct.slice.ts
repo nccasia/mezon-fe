@@ -108,7 +108,7 @@ type fetchDmGroupArgs = {
 	noCache?: boolean;
 };
 
-export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2, noCache }: fetchDmGroupArgs, thunkAPI) => {
+export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
 	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {

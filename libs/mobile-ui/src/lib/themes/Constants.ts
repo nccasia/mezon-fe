@@ -27,6 +27,7 @@ export type Attributes = {
     textLink: HexColor,
     reactionBg: HexColor,
     reactionBorder: HexColor,
+    selectedOverlay: HexColor
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -71,6 +72,7 @@ export const themeColors: ThemeColor = {
         textLink: "#3297ff",
         reactionBg: "#373a54",
         reactionBorder: "#2563eb",
+        selectedOverlay: "#00000096"
     },
     light: {
         primary: "#f2f3f5",
@@ -96,6 +98,7 @@ export const themeColors: ThemeColor = {
         midnightBlue: "#d1e0ff",
         textLink: "#3297ff",
         reactionBg: "#e5e7eb",
-        reactionBorder: "#2563eb"
+        reactionBorder: "#2563eb",
+        selectedOverlay: "#FFFFFF96"
     }
 }
