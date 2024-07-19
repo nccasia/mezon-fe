@@ -14,13 +14,13 @@ const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
 	return PropsSave.flagOption || clickRole === 'New Role' ? (
-		<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-0 min-w-96 h-fit p-3 rounded transform z-10">
+		<div className="flex flex-row gap-2 dark:bg-bgProfileBody bg-white dark:text-white text-colorTextLightMode border dark:border-white border-colorTextLightMode text-sm font-medium absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-2 min-w-96 h-fit p-2.5 rounded transform z-10">
 			<div className="flex-1 flex items-center">
-				<p className="text-[15px]">Carefull - you have unsaved changes!</p>
+				<p className="text-base">Careful - you have unsaved changes!</p>
 			</div>
 			<div className="flex flex-row justify-end gap-3">
 				<button
-					className="text-[15px] bg-gray-600 rounded-[4px] p-[8px]"
+					className="rounded px-4 py-1.5 hover:underline"
 					onClick={() => {
 						PropsSave.handleClose();
 					}}
@@ -28,7 +28,7 @@ const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 					Reset
 				</button>
 				<button
-					className="text-[15px] ml-auto bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
+					className="ml-auto bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white"
 					onClick={() => {
 						PropsSave.handleSaveClose();
 						PropsSave.handleUpdateUser();

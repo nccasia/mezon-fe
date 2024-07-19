@@ -1,4 +1,5 @@
 import {
+	ActionEmitEvent,
 	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
@@ -18,10 +19,9 @@ import {
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
-import { ChannelListContext } from '../../../Reusables';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
@@ -49,7 +49,6 @@ enum StatusVoiceChannel {
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const useChannelListContentIn = React.useContext(ChannelListContext);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
@@ -69,7 +68,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				return;
 			}
 		} else {
-			useChannelListContentIn.navigation.closeDrawer();
+			DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: false });
 			const store = await getStoreAsync();
 			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;

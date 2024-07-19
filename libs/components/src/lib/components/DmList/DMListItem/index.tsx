@@ -82,7 +82,8 @@ function DMListItem({ directMessage }: DirectMessProp) {
 						? 'assets/images/avatar-group.png'
 						: directMessage?.channel_avatar?.at(0) ?? ''
 				}
-				name={directMessage?.channel_label ?? `${directMessage.creator_name}'s Group`}
+				name={directMessage?.channel_label ?? ''}
+				userNameAva={directMessage?.usernames}
 				status={userStatus}
 				isHideStatus={true}
 				isHideIconStatus={false}

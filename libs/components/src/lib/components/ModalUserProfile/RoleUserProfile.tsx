@@ -114,6 +114,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 											className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond p-2 mb-2"
 											placeholder="Role"
 											onChange={handleInputChange}
+											onClick={(e) => e.stopPropagation()}
 										/>
 										<Icons.Search className="size-5 dark:text-white text-colorTextLightMode absolute right-2 top-2" />
 									</div>

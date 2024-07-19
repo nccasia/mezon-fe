@@ -5,7 +5,7 @@ import { selectAllRolesClan } from '@mezon/store-mobile';
 import { isEqual } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, TouchableOpacity } from 'react-native';
+import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
@@ -82,17 +82,17 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		headerTitle: !isEditRoleMode
 			? t('setupPermission.title')
 			: () => {
-					return (
-						<Block>
-							<Text center bold h3 color={themeValue?.white}>
-								{clanRole?.title}
-							</Text>
-							<Text center color={themeValue?.text}>
-								{t('roleDetail.role')}
-							</Text>
-						</Block>
-					);
-				},
+				return (
+					<Block>
+						<Text center bold h3 color={themeValue?.white}>
+							{clanRole?.title}
+						</Text>
+						<Text center color={themeValue?.text}>
+							{t('roleDetail.role')}
+						</Text>
+					</Block>
+				);
+			},
 		headerLeft: () => {
 			if (isEditRoleMode) {
 				return (
@@ -136,13 +136,13 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		const response = updateRole(newRole.clan_id, newRole.id, newRole.title, [], selectedPermissions, [], []);
 		if (response) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: t('setupPermission.setupPermissionSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
-			});
+			// Toast.show({
+			// 	type: 'success',
+			// 	props: {
+			// 		text2: t('setupPermission.setupPermissionSuccessfully'),
+			// 		leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
+			// 	},
+			// });
 		} else {
 			Toast.show({
 				type: 'success',
@@ -168,69 +168,71 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	}, [searchPermissionText, permissionList]);
 
 	return (
-		<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14} justifyContent="space-between">
-			<Block flex={1}>
-				<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
-					<Text color={themeValue.white} h2 center bold>
-						{t('setupPermission.setupPermissionTitle')}
-					</Text>
-				</Block>
+		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14} justifyContent="space-between">
+				<Block flex={1}>
+					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
+						<Text color={themeValue.white} h2 center bold>
+							{t('setupPermission.setupPermissionTitle')}
+						</Text>
+					</Block>
 
-				<MezonInput value={searchPermissionText} onTextChange={setSearchPermissionText} placeHolder={t('setupPermission.searchPermission')} />
+					<MezonInput value={searchPermissionText} onTextChange={setSearchPermissionText} placeHolder={t('setupPermission.searchPermission')} />
 
-				<Block marginVertical={size.s_10} flex={1}>
-					<Block borderRadius={size.s_10} overflow="hidden">
-						<FlatList
-							data={filteredPermissionList}
-							keyExtractor={(item) => item.id}
-							ItemSeparatorComponent={SeparatorWithLine}
-							renderItem={({ item }) => {
-								return (
-									<TouchableOpacity onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)}>
-										<Block
-											flexDirection="row"
-											alignItems="center"
-											justifyContent="space-between"
-											backgroundColor={themeValue.secondary}
-											padding={size.s_12}
-											gap={size.s_10}
-										>
-											<Block flex={1}>
-												<Text color={themeValue.white}>{item.title}</Text>
+					<Block marginVertical={size.s_10} flex={1}>
+						<Block borderRadius={size.s_10} overflow="hidden">
+							<FlatList
+								data={filteredPermissionList}
+								keyExtractor={(item) => item.id}
+								ItemSeparatorComponent={SeparatorWithLine}
+								renderItem={({ item }) => {
+									return (
+										<TouchableOpacity onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)}>
+											<Block
+												flexDirection="row"
+												alignItems="center"
+												justifyContent="space-between"
+												backgroundColor={themeValue.secondary}
+												padding={size.s_12}
+												gap={size.s_10}
+											>
+												<Block flex={1}>
+													<Text color={themeValue.white}>{item.title}</Text>
+												</Block>
+
+												<MezonSwitch
+													value={selectedPermissions.includes(item?.id)}
+													onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
+												/>
 											</Block>
-
-											<MezonSwitch
-												value={selectedPermissions.includes(item?.id)}
-												onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
-											/>
-										</Block>
-									</TouchableOpacity>
-								);
-							}}
-						/>
+										</TouchableOpacity>
+									);
+								}}
+							/>
+						</Block>
 					</Block>
 				</Block>
+
+				{!isEditRoleMode ? (
+					<Block marginBottom={size.s_16} gap={size.s_10}>
+						<TouchableOpacity onPress={() => handleNextStep()}>
+							<Block backgroundColor={Colors.bgViolet} paddingVertical={size.s_14} borderRadius={size.s_8}>
+								<Text center color={Colors.white}>
+									{t('setupPermission.next')}
+								</Text>
+							</Block>
+						</TouchableOpacity>
+
+						<TouchableOpacity onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS)}>
+							<Block paddingVertical={size.s_14} borderRadius={size.s_8}>
+								<Text center color={themeValue.textStrong}>
+									{t('skipStep')}
+								</Text>
+							</Block>
+						</TouchableOpacity>
+					</Block>
+				) : null}
 			</Block>
-
-			{!isEditRoleMode ? (
-				<Block marginBottom={size.s_16} gap={size.s_10}>
-					<TouchableOpacity onPress={() => handleNextStep()}>
-						<Block backgroundColor={Colors.bgViolet} paddingVertical={size.s_14} borderRadius={size.s_8}>
-							<Text center color={Colors.white}>
-								{t('setupPermission.next')}
-							</Text>
-						</Block>
-					</TouchableOpacity>
-
-					<TouchableOpacity onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS)}>
-						<Block backgroundColor={'gray'} paddingVertical={size.s_14} borderRadius={size.s_8}>
-							<Text center color={Colors.white}>
-								{t('skipStep')}
-							</Text>
-						</Block>
-					</TouchableOpacity>
-				</Block>
-			) : null}
-		</Block>
+		</TouchableWithoutFeedback>
 	);
 };

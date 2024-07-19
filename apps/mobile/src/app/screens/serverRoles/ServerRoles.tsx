@@ -47,8 +47,8 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 					padding={size.s_12}
 					borderRadius={size.s_12}
 				>
-					<Block flexDirection="row" flex={1}>
-						<Block backgroundColor={themeValue.secondaryLight} borderRadius={50} padding={size.s_8}>
+					<Block flexDirection="row" flex={1} gap={10}>
+						<Block backgroundColor={themeValue.tertiary} borderRadius={50} padding={size.s_8}>
 							<Icons.GroupIcon color={themeValue.text} />
 						</Block>
 						<Block flex={1}>

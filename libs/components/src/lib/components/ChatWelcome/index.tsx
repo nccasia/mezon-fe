@@ -7,13 +7,14 @@ export type ChatWelComeProp = {
 	readonly type: Readonly<string>;
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
+	userName?: string
 };
 
-function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
+function ChatWelCome({ type, name, userName, avatarDM }: ChatWelComeProp) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
 	return (
-		<div className="space-y-2 px-4 mb-0 mt-[50px]">
+		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
 			{type === ETypeMessage.CHANNEL ? (
 				<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
 					<Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
@@ -26,7 +27,7 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
 			) : (
 				<div className="h-[75px] w-[75px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-4xl">
-					{name?.charAt(0).toUpperCase()}
+					{(userName ?? name)?.charAt(0).toUpperCase()}
 				</div>
 			)}
 

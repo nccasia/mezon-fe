@@ -4,7 +4,7 @@ import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId } from '@mezon/store-mobile';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, TouchableOpacity } from 'react-native';
+import { Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
@@ -54,43 +54,46 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 		}
 	};
 	return (
-		<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14} justifyContent="space-between">
-			<Block>
-				<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
-					<Text color={themeValue.white} h2 center bold>
-						{t('createNewRole.createANewRole')}
-					</Text>
-					<Text color={themeValue.text} center>
-						{t('createNewRole.description')}
-					</Text>
-				</Block>
-				<Block marginTop={size.s_18}>
-					<MezonInput
-						value={roleName}
-						onTextChange={onRoleNameChange}
-						placeHolder={t('createNewRole.newRole')}
-						label={t('createNewRole.roleName')}
-					/>
-				</Block>
-			</Block>
-			<Block marginBottom={size.s_16}>
-				<TouchableOpacity
-					onPress={() => {
-						if (roleName?.trim()?.length === 0) return;
-						createNewRole();
-					}}
-				>
-					<Block
-						backgroundColor={roleName?.trim()?.length === 0 ? Colors.bgGrayDark : Colors.bgViolet}
-						paddingVertical={size.s_14}
-						borderRadius={size.s_8}
-					>
-						<Text center color={Colors.white}>
-							{t('createNewRole.create')}
+		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14} justifyContent="space-between">
+				<Block>
+					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
+						<Text color={themeValue.white} h2 center bold>
+							{t('createNewRole.createANewRole')}
+						</Text>
+						<Text color={themeValue.text} center>
+							{t('createNewRole.description')}
 						</Text>
 					</Block>
-				</TouchableOpacity>
+					<Block marginTop={size.s_18}>
+						<MezonInput
+							value={roleName}
+							onTextChange={onRoleNameChange}
+							placeHolder={t('createNewRole.newRole')}
+							label={t('createNewRole.roleName')}
+						/>
+					</Block>
+				</Block>
+				<Block marginBottom={size.s_16}>
+					<TouchableOpacity
+						onPress={() => {
+							if (roleName?.trim()?.length === 0) return;
+							createNewRole();
+						}}
+					>
+						<Block
+							backgroundColor={roleName?.trim()?.length === 0 ? Colors.bgGrayDark : Colors.bgViolet}
+							paddingVertical={size.s_14}
+							borderRadius={size.s_8}
+						>
+							<Text center color={Colors.white}>
+								{t('createNewRole.create')}
+							</Text>
+						</Block>
+					</TouchableOpacity>
+				</Block>
 			</Block>
-		</Block>
+		</TouchableWithoutFeedback>
+
 	);
 };

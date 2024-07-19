@@ -18,7 +18,8 @@ export const styles = StyleSheet.create({
 	},
 	imageBg: {
 		width: '100%',
-		height: '60%',
+		height: '40%',
+    marginVertical: size.s_30
 	},
 	title: {
 		fontSize: size.h6,

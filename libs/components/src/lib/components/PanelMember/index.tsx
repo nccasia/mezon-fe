@@ -19,11 +19,12 @@ type PanelMemberProps = {
 	onRemoveMember?: () => void;
 	directMessageValue?: directMessageValueProps;
 	name?: string;
-	isMemberDMGroup: boolean;
+	isMemberDMGroup?: boolean;
+	isMemberChannel?: boolean;
 	dataMemberCreate?: DataMemberCreate;
 };
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, dataMemberCreate }: PanelMemberProps) => {
+const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -215,7 +216,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{(checkCreateUser && !checkUser) && (
+					{(checkCreateUser && !checkUser && isMemberChannel) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />

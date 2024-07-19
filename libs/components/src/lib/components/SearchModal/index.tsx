@@ -37,7 +37,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			? listDM.map((itemDM: any) => {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.channel_label ?? '',
+						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						displayName: '',
@@ -324,7 +324,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 												if (indexB === -1) return -1;
 												return indexA - indexB;
 											})
-											.slice(0, 25)
 											.map((item: any) => {
 												return (
 													<div
@@ -336,6 +335,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														onMouseLeave={() => setIdActive(item.id)}
 													>
 														<SuggestItem
+															displayName={item?.displayName}
 															name={item?.name}
 															avatarUrl={item.avatarUser}
 															channelId={item.channelId}
@@ -355,7 +355,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 									{listChannelSearch.length ? (
 										listChannelSearch
 											.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
-											.slice(0, 25)
 											.sort((a: any, b: any) => {
 												const indexA = a.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
 												const indexB = b.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());

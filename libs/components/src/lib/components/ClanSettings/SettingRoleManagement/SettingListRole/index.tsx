@@ -54,28 +54,27 @@ const SettingListRole = (props: closeEditRole) => {
 				</div>
 			</div>
 			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
-				{clickedRole === 'New Role' ? (
+				{clickedRole === 'New Role' && 
 					<div>
 						<button className="w-full py-1.5 px-[10px] text-[15px] dark:bg-[#4e5058] bg-bgModifierHoverLight dark:text-textDarkTheme text-textSecondary800 font-medium inline-flex gap-x-2 items-center rounded">
 							<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
 							<span className="one-line">{nameRoleNew ?? 'New Role'}</span>
 						</button>
 					</div>
-				) : (
-					activeRoles.map((role) => (
-						<div key={role.id}>
-							<button
-								onClick={() => handleRoleClick(role.id)}
-								className={`w-full py-1.5 px-[10px] rounded text-[15px] text-left font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton inline-flex gap-x-2 items-center ${
-									clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''
-								} dark:text-textDarkTheme text-textLightTheme`}
-							>
-								<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
-								<span className="one-line">{role.title}</span>
-							</button>
-						</div>
-					))
-				)}
+				}
+				{activeRoles.map((role) => (
+					<div key={role.id}>
+						<button
+							onClick={() => handleRoleClick(role.id)}
+							className={`w-full py-1.5 px-[10px] rounded text-[15px] text-left font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton inline-flex gap-x-2 items-center ${
+								clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''
+							} dark:text-textDarkTheme text-textLightTheme`}
+						>
+							<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
+							<span className="one-line">{role.title}</span>
+						</button>
+					</div>
+				))}
 			</div>
 		</div>
 	);
