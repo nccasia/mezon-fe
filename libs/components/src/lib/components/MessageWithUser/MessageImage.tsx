@@ -1,9 +1,9 @@
 import { useAttachments } from '@mezon/core';
 import { attachmentActions } from '@mezon/store';
-import { checkLinkImageWork, notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
+import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
@@ -34,7 +34,11 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
 	};
 
-	const [imageWork, setImageWork] = useState(false);
+	const [error, setError] = useState<boolean>(false);
+
+	const handleError = useCallback(() => {
+		setError(true);
+	}, []);
 
 	const handleContextMenu = useCallback(
 		(e: any) => {
@@ -47,15 +51,9 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow],
 	);
 
-	useMemo(() => {
-		checkLinkImageWork(attachmentData.url ?? '').then((result) => {
-			setImageWork(result);
-		});
-	}, [attachmentData.url]);
-
 	return (
 		<div className="break-all">
-			{imageWork ? (
+			{!error && (
 				<img
 					onContextMenu={handleContextMenu}
 					className={
@@ -63,13 +61,14 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 						(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
 					}
 					src={attachmentData.url?.toString()}
-					alt={attachmentData.url}
+					alt=""
 					onClick={() => handleClick(attachmentData.url || '')}
 					style={imgStyle}
+					onError={handleError}
 				/>
-			) : null}
+			)}
 		</div>
 	);
 }
 
-export default MessageImage;
+export default memo(MessageImage);

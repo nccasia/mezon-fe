@@ -1,5 +1,5 @@
 import { checkLinkImageWork } from '@mezon/utils';
-import { useLayoutEffect, useState } from 'react';
+import { memo, useLayoutEffect, useState } from 'react';
 import MarkdownFormatText from '../MarkdownFormatText';
 import MessageImage from './MessageImage';
 import { useMessageLine } from './useMessageLine';
@@ -45,4 +45,4 @@ const MessageLine = ({ line, messageId, mode }: MessageLineProps) => {
 	);
 };
 
-export default MessageLine;
+export default memo(MessageLine);
