@@ -108,7 +108,7 @@ const ChannelList = React.memo((props: any) => {
 		return <Block height={20} />;
 	}
 	return (
-		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
+		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 

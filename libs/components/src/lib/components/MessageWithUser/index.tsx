@@ -109,14 +109,7 @@ function MessageWithUser({
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-							<MessageAvatar
-								user={user}
-								message={message}
-								isCombine={isCombine}
-								isEditing={isEditing}
-								isShowFull={isShowFull}
-								mode={mode}
-							/>
+							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
 
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
@@ -126,7 +119,6 @@ function MessageWithUser({
 										{!isEditing && (
 											<MessageContent
 												message={message}
-												user={user}
 												isCombine={isCombine}
 												isSending={message.isSending}
 												isError={message.isError}

@@ -33,6 +33,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
+import { ModalAddPinMess } from '../PinMessModal';
 import DynamicContextMenu from './DynamicContextMenu';
 import { useMessageContextMenu } from './MessageContextMenuContext';
 
@@ -104,6 +105,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(setSelectedMessage(message));
 	};
 
+	const [openModalAddPin, setOpenModalAddPin] = useState(false);
 	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
@@ -276,7 +278,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(pinMessageStatus === true, (builder) => {
-			builder.addMenuItem('pinMessage', 'Pin Message', () => handlePinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
+			builder.addMenuItem(
+				'pinMessage', 
+				'Pin Message', 
+				() => setOpenModalAddPin(true),
+				<Icons.PinMessageRightClick defaultSize="w-4 h-4" />
+			);
 		});
 		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
@@ -447,7 +454,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		posShowMenu,
 	]);
 
-	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
+	return (
+		<>
+			<DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />
+			{openModalAddPin && <ModalAddPinMess mess={message} closeModal={() => setOpenModalAddPin(false)} handlePinMessage={handlePinMessage} mode={activeMode || 0} channelLabel={currentChannel?.channel_label || ''}/>}
+		</>
+	);
 }
 
 export default MessageContextMenu;

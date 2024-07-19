@@ -25,5 +25,7 @@
         "description": "Có những thay đổi chưa được lưu, bạn có chắc muốn loại bỏ chúng?",
         "discard": "Bỏ",
         "keepEditing": "Tiếp tục chỉnh sửa"
-    }
+    },
+    "selectAClan": "Chọn Một Máy Chủ",
+    "searchClanPlaceholder": "Tìm kiếm Máy Chủ"
 }

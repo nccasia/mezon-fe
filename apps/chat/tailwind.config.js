@@ -63,6 +63,7 @@ module.exports = {
         widthThumnailAttachment: `calc(100vw - ${clanWidth} - ${channelListWidth})`,
         widthSearchMessage: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${widthResultSearch})`,
         widthModalSearch: widthModalSearch,
+        widthPinMess: `calc(100% - 16px)`,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",

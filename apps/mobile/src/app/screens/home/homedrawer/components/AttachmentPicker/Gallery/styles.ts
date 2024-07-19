@@ -1,10 +1,10 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	cameraPicker: {
 		width: '32%',
-		backgroundColor: Colors.bgDarkSlate,
+		backgroundColor: colors.secondary,
 		borderRadius: size.s_6,
 		margin: size.s_2,
 		alignItems: 'center',
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
 		position: 'absolute',
 		top: size.s_6,
 		right: size.s_6,
-		backgroundColor: Colors.white,
+		backgroundColor: colors.secondary,
 		borderRadius: size.s_20,
 		padding: size.s_4,
 		zIndex: size.s_2,
@@ -54,6 +54,6 @@ export const styles = StyleSheet.create({
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)'
+		backgroundColor: colors.selectedOverlay
 	}
 });

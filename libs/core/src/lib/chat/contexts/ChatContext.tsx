@@ -221,7 +221,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated) {
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, channelType: 1, noCache: true }));
+					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}

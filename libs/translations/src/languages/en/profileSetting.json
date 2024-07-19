@@ -25,5 +25,7 @@
         "description": "You have unsaved changes. Are you sure you want to discard them?",
         "discard": "Discard",
         "keepEditing": "Keep Editing"
-    }
+    },
+    "selectAClan": "Select A Clan",
+    "searchClanPlaceholder": "Search Clan"
 }

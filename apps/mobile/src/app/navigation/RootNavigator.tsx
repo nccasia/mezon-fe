@@ -10,7 +10,9 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	messagesActions,
 	notificationActions,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
@@ -60,6 +62,7 @@ const NavigationMain = () => {
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 
 	useEffect(() => {
@@ -96,7 +99,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentClanId, isFromFcmMobile]);
+	}, [currentClanId, currentChannelId, isFromFcmMobile]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -126,12 +129,38 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		dispatch(appActions.setLoadingMainMobile(true));
 		if (state === 'active') {
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
+				dispatch(appActions.setLoadingMainMobile(false));
 				return;
 			}
 			const socket = await reconnect(currentClanId, true);
 			if (socket) setCallbackEventFn(socket);
+
+			timerRef.current = setTimeout(() => {
+				messageLoaderBackground();
+			}, 1500);
+		}
+	};
+
+	const messageLoaderBackground = async () => {
+		try {
+			if (!currentChannelId || !currentClanId) {
+				dispatch(appActions.setLoadingMainMobile(false));
+				return null;
+			}
+			const store = await getStoreAsync();
+			save(STORAGE_CLAN_ID, currentClanId);
+			const clanResp = await store.dispatch(clansActions.fetchClans());
+			dispatch(appActions.setLoadingMainMobile(false));
+			await setCurrentClanLoader(clanResp.payload);
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			return null;
+		} catch (error) {
+			alert('error messageLoaderBackground' + error.message);
+			dispatch(appActions.setLoadingMainMobile(false));
+			console.log('error messageLoaderBackground', error);
 		}
 	};
 

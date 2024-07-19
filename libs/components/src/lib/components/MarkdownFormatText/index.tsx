@@ -97,7 +97,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 			const result = convertMarkdown(markdown);
 
 			return (
-				<div key={index} className="lineText contents">
+				<div key={index} className="lineText contents dark:text-white text-colorTextLightMode">
 					{mentions[index - 1]?.matchedText && ''}
 					{(startsWithTripleBackticks && endsWithNoTripleBackticks && !isBetween) || onlyBackticks ? (
 						<span>{markdown}</span>

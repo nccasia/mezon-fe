@@ -29,7 +29,8 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 								key={user.id}
 								numberCharacterCollapse={30}
 								avatar={user?.user?.avatar_url ?? ''}
-								name={user?.user?.username ?? ''}
+								name={user?.user?.display_name ?? ''}
+								userNameAva={user?.user?.username}
 								status={user?.user?.online}
 								isHideStatus={true}
 								listProfile={true}

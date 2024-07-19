@@ -5,7 +5,6 @@ import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
-import { useMessageSender } from './useMessageSender';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -18,7 +17,6 @@ type IMessageHeadProps = {
 };
 
 const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
-	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
 	const currentClan = useSelector(selectCurrentClan);
@@ -108,7 +106,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode} />
+					<ShortUserProfile userID={message.sender_id || ''} message={message} mode={mode} />
 				</div>
 			)}
 		</div>
