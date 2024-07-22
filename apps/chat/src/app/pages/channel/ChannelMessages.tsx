@@ -112,7 +112,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			<div className="flex flex-col min-h-full justify-end">
-				{firstMessageId && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName} />}
+				{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName} />}
 				{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
 				<MessageContextMenuProvider>
 					{messagesView}
