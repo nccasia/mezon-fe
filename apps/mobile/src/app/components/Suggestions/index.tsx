@@ -1,20 +1,35 @@
+import { useChannels } from '@mezon/core';
 import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
-import { FC, memo, useMemo } from 'react';
+import { FC, memo, useEffect, useMemo } from 'react';
 import { Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import UseMentionList from '../../hooks/useUserMentionList';
+import { EMessageActionType } from '../../screens/home/homedrawer/enums';
+import { IMessageActionNeedToResolve } from '../../screens/home/homedrawer/types';
 import SuggestItem from './SuggestItem';
 
 export interface MentionSuggestionsProps {
-	suggestions: MentionDataProps[];
+	channelId: string;
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
+	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
+	onAddMentionMessageAction?: (mentionData: MentionDataProps[]) => void
+	mentionTextValue?: string;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, suggestions = [] }) => {
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue }) => {
+	const listMentions = UseMentionList(channelId || '');
+
+	useEffect(() => {
+		if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
+			onAddMentionMessageAction(listMentions);
+		}
+	}, [messageActionNeedToResolve])
+
 	const formattedMentionList = useMemo(() => {
-		if (keyword === null || !suggestions.length) {
+		if (keyword === null || !listMentions.length) {
 			return [];
 		}
 
@@ -40,14 +55,14 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, sugg
 			return indexA - indexB;
 		};
 
-		return suggestions
+		return listMentions
 			.filter(filterMatchedMentions)
 			.sort(sortDisplayNameFunction)
 			.map((item) => ({
 				...item,
 				name: item.display,
 			}));
-	}, [keyword, suggestions]);
+	}, [keyword, listMentions]);
 
 	if (keyword == null) {
 		return null;
@@ -80,19 +95,27 @@ export type ChannelsMention = {
 };
 
 export interface MentionHashtagSuggestionsProps {
-	readonly listChannelsMention?: ChannelsMention[];
+	// readonly listChannelsMention?: ChannelsMention[];
+	// channelId: string;
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
 }
 
-const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect, listChannelsMention }) => {
+const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect }) => {
+	const { listChannels } = useChannels();
+
+	const listChannelsMention = useMemo(() => {
+		return listChannels.map((item) => ({
+			id: item?.channel_id ?? '',
+			display: item?.channel_label ?? '',
+			subText: item?.category_name ?? '',
+			name: item?.channel_label ?? ''
+		})
+		)
+	}, [listChannels])
 	if (keyword == null) {
 		return null;
 	}
-	listChannelsMention = listChannelsMention.map((item) => ({
-		...item,
-		name: item?.display,
-	}));
 
 	const handleSuggestionPress = (channel: ChannelsMention) => {
 		onSelect(channel);
@@ -162,3 +185,4 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 };
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
+

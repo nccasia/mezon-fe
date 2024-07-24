@@ -1,6 +1,6 @@
 import { MezonContextValue } from '@mezon/transport';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { accountReducer } from './account/account.slice';
@@ -39,13 +39,13 @@ import { defaultNotificationClanReducer } from './notificationSetting/notificati
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
-import { settingClanEmojiReducer } from "./settingEmoji/settingEmoji.slice";
-import { integrationWebhookReducer } from './webhook/webhook.slice';
+import { settingClanEmojiReducer } from './settingEmoji/settingEmoji.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { integrationWebhookReducer } from './webhook/webhook.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -174,3 +174,4 @@ export const getStoreAsync = async () => {
 };
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector = useSelector.withTypes<RootState>();

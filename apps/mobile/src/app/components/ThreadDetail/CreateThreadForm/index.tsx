@@ -15,9 +15,8 @@ import {
 	createNewChannel,
 	getStoreAsync,
 	selectCurrentChannel,
-	selectCurrentChannelId,
 	selectCurrentClanId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -29,10 +28,8 @@ import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../../hooks/useUserMentionList';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import ChatBox from '../../../screens/home/homedrawer/ChatBox';
+import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
-import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
@@ -52,7 +49,7 @@ export default function CreateThreadForm() {
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
-	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '');
+	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
@@ -79,7 +76,7 @@ export default function CreateThreadForm() {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
-				parrent_id: (currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '',
+				parrent_id: (currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '',
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_TEXT,
 			};
@@ -146,8 +143,6 @@ export default function CreateThreadForm() {
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
-
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => { };
 	return (
 		<View style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
@@ -207,9 +202,7 @@ export default function CreateThreadForm() {
 							<ChatBox
 								messageAction={EMessageActionType.CreateThread}
 								channelId={currentChannel.channel_id}
-								channelLabel={currentChannel?.channel_label || ''}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 								hiddenIcon={{
 									threadIcon: true,
 								}}

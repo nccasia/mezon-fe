@@ -302,6 +302,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														subText={item.subText}
 														channelId={item.channelId}
 														valueHightLight={searchText}
+														isOpenSearchModal
 													/>
 												</div>
 											);

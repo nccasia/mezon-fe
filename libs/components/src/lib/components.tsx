@@ -20,6 +20,14 @@ export { default as ModalForward } from './components/ForwardMessage/index';
 export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis';
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
+export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMarkup';
+export { default as MarkdownContent } from './components/MarkdownFormatText/MarkdownContent';
+export { default as PlainText } from './components/MarkdownFormatText/PlainText';
+
+export { default as PreClass } from './components/MarkdownFormatText/PreClass';
+
+export { default as ChannelHashtag } from './components/MarkdownFormatText/HashTag';
+export { default as MentionUser } from './components/MarkdownFormatText/MentionUser';
 export { default as MemberList } from './components/MemberList';
 export { default as MemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
@@ -66,4 +74,3 @@ export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
 export * from './components/ThumnailAttachmentRender';
-

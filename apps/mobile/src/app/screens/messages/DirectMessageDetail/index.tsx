@@ -1,7 +1,6 @@
-import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,
 	clansActions,
@@ -12,17 +11,13 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { AppState, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
-import ChatBox from '../../home/homedrawer/ChatBox';
-import { IModeKeyboardPicker } from '../../home/homedrawer/components';
-import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
-import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
-import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
+import { ChatBox } from '../../home/homedrawer/ChatBox';
 import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
@@ -42,24 +37,10 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const styles = style(themeValue);
 	const directMessageId = route.params?.directMessageId as string;
 	const from = route.params?.from;
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(10);
-	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-	const bottomPickerRef = useRef<BottomSheet>(null);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
 	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 	const currentChannel = useSelector(selectCurrentChannel);
-
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
-		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.collapse();
-		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
-		}
-	};
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 
 	const navigateToThreadDetail = () => {
@@ -173,34 +154,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					/>
 					<ChatBox
 						channelId={currentDmGroup?.id}
-						channelLabel={currentDmGroup?.channel_label || ''}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
-						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
-					<View
-						style={{
-							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 10,
-							backgroundColor: Colors.secondary,
-						}}
-					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
-							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker
-									directMessageId={directMessageId}
-									onDone={() => {
-										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-									}}
-									bottomSheetRef={bottomPickerRef}
-								/>
-							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentDmGroup?.channel_id} currentClanId={currentDmGroup?.clan_id} />
-							) : (
-								<View />
-							)}
-						</BottomKeyboardPicker>
-					)}
 				</View>
 			) : null}
 		</SafeAreaView>

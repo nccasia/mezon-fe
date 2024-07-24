@@ -31,6 +31,7 @@ import screenStack from './screenStack.json';
 import setting from './setting.json';
 import userProfile from './userProfile.json';
 import userEmptyClan from './userEmptyClan.json';
+import customUserStatus from './customUserStatus.json'
 
 export default {
 	inviteToChannel,
@@ -65,5 +66,6 @@ export default {
 	deleteClan,
 	media,
 	clanRoles,
-  userEmptyClan
+  userEmptyClan,
+  customUserStatus
 };

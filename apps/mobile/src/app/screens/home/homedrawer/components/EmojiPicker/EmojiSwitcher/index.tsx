@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 
@@ -41,4 +41,4 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 	);
 }
 
-export default EmojiSwitcher;
+export default memo(EmojiSwitcher);

@@ -111,9 +111,9 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 							<label className="w-full h-full">
 								<div
 									style={{ backgroundImage: `url(${urlLogo})` }}
-									className={`flex items-center justify-center bg-cover bg-no-repeat bg-center w-[100px] h-[100px] bg-transparent rounded-full relative cursor-pointer`}
+									className={`flex items-center justify-start bg-cover bg-no-repeat bg-center w-[100px] h-[100px] bg-transparent rounded-full relative cursor-pointer overflow-hidden`}
 								>
-									{!urlLogo && <span>{currentClan?.clan_name}</span>}
+									{!urlLogo && <span className={'whitespace-nowrap'}>{currentClan?.clan_name}</span>}
 								</div>
 								<input ref={fileInputRef} id="upload_logo" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 							</label>
@@ -146,7 +146,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						onChange={(e) => handleChangeClanName(e.target.value)}
 						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 						placeholder="Support has arrived!"
-						maxLength={64}
+						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
 				</div>
 				{checkValidate && (

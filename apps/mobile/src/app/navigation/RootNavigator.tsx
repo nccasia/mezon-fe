@@ -21,13 +21,13 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContext, ChatContextProvider } from '@mezon/core';
+import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
@@ -58,8 +58,6 @@ SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const { reconnect } = useMezon();
-	const { setCallbackEventFn } = useContext(ChatContext);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -154,27 +152,6 @@ const NavigationMain = () => {
 			alert('error messageLoaderBackground' + error.message);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
-		}
-	};
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			onClanChangeFromFCM();
-		}, 200);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [currentClanId, isFromFcmMobile]);
-
-	const onClanChangeFromFCM = async () => {
-		if (currentClanId) {
-			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			if (isFromFCM?.toString() === 'true' && isFromFcmMobile) {
-				const socket = await reconnect(currentClanId, true);
-				if (socket) setCallbackEventFn(socket);
-				return;
-			}
 		}
 	};
 

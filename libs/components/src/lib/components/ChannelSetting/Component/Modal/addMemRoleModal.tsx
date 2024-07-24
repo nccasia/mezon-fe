@@ -182,7 +182,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 						placeholder="e.g. Moderators, @wumpus"
 						className="dark:bg-bgTertiary bg-bgLightTertiary pl-3 py-[6px] w-full border-0 outline-none rounded"
 						onChange={handleValueSearch}
-						maxLength={64}
+						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
 					<p className="text-xs pt-2">Add individual members by starting with @ or type a role name</p>
 				</div>

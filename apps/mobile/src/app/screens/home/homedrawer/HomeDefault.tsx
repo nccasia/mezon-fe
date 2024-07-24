@@ -1,6 +1,6 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RootState,
@@ -21,20 +21,18 @@ import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
-import ChatBox from './ChatBox';
-import AttachmentPicker from './components/AttachmentPicker';
-import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
-import EmojiPicker from './components/EmojiPicker';
+import { ChatBox } from './ChatBox';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
 
+//TODO: refactor later
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
-	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-	const bottomPickerRef = useRef<BottomSheet>(null);
+	// const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	// const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	// const bottomPickerRef = useRef<BottomSheet>(null);
 	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
@@ -44,17 +42,16 @@ const HomeDefault = React.memo((props: any) => {
 	const dispatch = useAppDispatch();
 
 	const prevChannelIdRef = useRef<string>();
-
-	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
-		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef.current?.collapse();
-		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef.current?.close();
-		}
-	}, []);
+	// const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+	// 	setHeightKeyboardShow(height);
+	// 	if (isShow) {
+	// 		setTypeKeyboardBottomSheet(type);
+	// 		bottomPickerRef.current?.collapse();
+	// 	} else {
+	// 		setTypeKeyboardBottomSheet('text');
+	// 		bottomPickerRef.current?.close();
+	// 	}
+	// }, []);
 
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
@@ -106,7 +103,7 @@ const HomeDefault = React.memo((props: any) => {
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'background') {
 			Keyboard.dismiss();
-			setHeightKeyboardShow(0);
+			// setHeightKeyboardShow(0);
 		}
 	};
 
@@ -124,7 +121,7 @@ const HomeDefault = React.memo((props: any) => {
 	};
 
 	const onOpenDrawer = () => {
-		onShowKeyboardBottomSheet(false, 0, 'text');
+		// onShowKeyboardBottomSheet(false, 0, 'text');
 		DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: true });
 	};
 
@@ -156,42 +153,17 @@ const HomeDefault = React.memo((props: any) => {
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+					{/* {heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
 							<TouchableOpacity style={{ flex: 1 }} onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}></TouchableOpacity>
 						</Block>
-					)}
+					)} */}
 
 					<ChatBox
 						channelId={currentChannel.channel_id}
-						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+						clanId={currentChannel?.clan_id}
 					/>
-
-					<View
-						style={{
-							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
-						}}
-					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
-							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker
-									onDone={() => {
-										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-									}}
-									bottomSheetRef={bottomPickerRef}
-								/>
-							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
-							) : (
-								<View />
-							)}
-						</BottomKeyboardPicker>
-					)}
 				</View>
 			)}
 			{isShowSettingNotifyBottomSheet && (

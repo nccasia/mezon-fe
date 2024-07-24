@@ -1,7 +1,7 @@
-import { useAuth, useDirect, useMemberStatus } from '@mezon/core';
+import { useAuth, useDirect, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { User } from 'mezon-js';
@@ -38,6 +38,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const listDM = useSelector(selectDirectsOpenlist);
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const userCustomStatus = useMemberCustomStatus(userProfile?.user?.id || '');
 
 	const isClanOwner = useMemo(() => {
 		return currentClan?.creator_id === userProfile?.user?.id
@@ -100,6 +101,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<Text style={[styles.subUserName]}>
 						{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
+          {userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null }
 					{!checkOwner(userById?.user?.google_id || '') && (
 						<View style={[styles.userAction]}>
 							<TouchableOpacity onPress={() => navigateToMessageDetail()} style={[styles.actionItem]}>

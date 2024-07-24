@@ -1,13 +1,14 @@
 import {
-    MessagesEntity,
-    messagesActions,
-    selectHasMoreMessageByChannelId,
-    selectLastMessageByChannelId,
-    selectLastMessageIdByChannelId,
-    selectMessageByChannelId,
-    selectMessageByUserId,
-    selectUnreadMessageIdByChannelId,
-    useAppDispatch,
+	MessagesEntity,
+	messagesActions,
+	selectHasMoreMessageByChannelId,
+	selectLastMessageByChannelId,
+	selectLastMessageIdByChannelId,
+	selectMessageByChannelId,
+	selectMessageByUserId,
+	selectUnreadMessageIdByChannelId,
+	useAppDispatch,
+	useAppSelector,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useMemo } from 'react';
@@ -28,7 +29,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 
 	const messages = useSelector(selectMessageByChannelId(channelId));
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const lastMessageId = useSelector((state) => selectLastMessageIdByChannelId(state, channelId));
+	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId));
 	const lastMessage = useSelector(selectLastMessageByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const messageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));

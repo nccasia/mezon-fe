@@ -53,7 +53,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         borderRadius: 50,
         flex: 1,
         paddingVertical: size.s_10,
-        
+
         flexDirection: 'row',
     },
 
@@ -153,4 +153,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
         borderWidth: 3,
         borderColor: colors.secondary
     },
+    closeBtnUserStatus: { padding: size.s_4 },
+    customUserStatusBtn: {flex: 1, paddingVertical: size.s_10}
 });

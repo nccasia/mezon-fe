@@ -4,13 +4,13 @@ import React, { ReactNode } from 'react';
 import { Modal, ModalBaseProps, Pressable, Text, View, ViewStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../../configs/toastConfig';
-import { style as _style } from "./style";
+import { style as _style } from './style';
 
 interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	visible: boolean;
 	visibleChange?: (value: boolean) => void;
 	title?: ReactNode | string;
-	titleStyle?: ViewStyle | ViewStyle[];
+	titleStyle?: ViewStyle;
 	children: JSX.Element | ReactNode;
 	confirmText?: string;
 	onConfirm?: () => void | undefined;
@@ -19,6 +19,8 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	onBack?: () => void;
 	rightClose?: boolean;
 	visibleBackButton?: boolean;
+	rightBtnText?: string;
+	onClickRightBtn?: () => void | undefined;
 }
 
 export const MezonModal = (props: IMezonModalProps) => {
@@ -38,6 +40,8 @@ export const MezonModal = (props: IMezonModalProps) => {
 		onBack,
 		rightClose = false,
 		visibleBackButton = false,
+		rightBtnText,
+		onClickRightBtn,
 	} = props;
 
 	const setVisible = (value: boolean) => {
@@ -78,6 +82,11 @@ export const MezonModal = (props: IMezonModalProps) => {
 								<Icons.CloseIcon color={themeValue.textStrong} />
 							</Pressable>
 							{isTitleString ? <Text style={[styles.textTitle, titleStyle]}>{title}</Text> : <View style={titleStyle}>{title}</View>}
+							{rightBtnText ? (
+								<Pressable onPress={() => onClickRightBtn()}>
+									<Text style={styles.confirm}>{rightBtnText}</Text>
+								</Pressable>
+							) : null}
 						</View>
 						{confirmText ? (
 							<Pressable onPress={() => pressConfirm()}>

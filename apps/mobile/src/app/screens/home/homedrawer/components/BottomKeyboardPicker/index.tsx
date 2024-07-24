@@ -1,7 +1,7 @@
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useTheme } from '@mezon/mobile-ui';
-import React, { Ref, forwardRef } from 'react';
+import React, { Ref, forwardRef, memo } from 'react';
 import { style } from './styles';
 
 export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
@@ -12,7 +12,10 @@ interface IProps {
 	isStickyHeader: boolean;
 }
 
-export default forwardRef(function BottomKeyboardPicker({ height = 1, children, isStickyHeader = false }: IProps, ref: Ref<BottomSheetMethods>) {
+const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
+	{ height = 1, children, isStickyHeader = false }: IProps,
+	ref: Ref<BottomSheetMethods>
+) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	return (
@@ -30,3 +33,5 @@ export default forwardRef(function BottomKeyboardPicker({ height = 1, children, 
 		</BottomSheet>
 	);
 });
+
+export default memo(BottomKeyboardPicker);

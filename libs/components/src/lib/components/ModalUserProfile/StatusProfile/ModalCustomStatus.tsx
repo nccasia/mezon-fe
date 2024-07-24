@@ -1,8 +1,7 @@
 import { Icons } from '@mezon/components';
-import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Button, Dropdown, Label, Modal } from 'flowbite-react';
 import { ReactNode, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 type ModalCustomStatusProps = {
 	name: string;
@@ -28,7 +27,7 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 				<div>
 					<h1 className="dark:text-textDarkTheme  text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
-				<form className="flex w-full flex-col gap-5 pt-4">
+				<div className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="mb-2 block">
 							<Label
@@ -115,7 +114,7 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 							Save
 						</Button>
 					</div>
-				</form>
+				</div>
 			</div>
 		</Modal>
 	);

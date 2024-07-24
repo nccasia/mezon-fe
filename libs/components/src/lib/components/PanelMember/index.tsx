@@ -1,6 +1,6 @@
-import { useAppParams, useAuth, useChannelMembersActions, useFriends } from '@mezon/core';
-import { selectCurrentChannel, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
-import { ChannelMembersEntity } from '@mezon/utils';
+import { useAppParams, useAuth, useChannelMembersActions, useClanRestriction, useFriends } from '@mezon/core';
+import { selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
+import { ChannelMembersEntity, EPermission } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ type PanelMemberProps = {
 const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentClan = useSelector(selectCurrentClan);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 	const { removeMemberChannel } = useChannelMembersActions();
@@ -49,9 +50,10 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 		}
 	};
 
-
+	const [hasAdministratorPermission] = useClanRestriction([EPermission.administrator]);
 	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
 	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
+	const checkOwnerClan = useMemo(() => currentClan?.creator_id === member?.user?.id, [currentClan?.creator_id, member?.user?.id]);
 	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
 	const checkDm = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM, [directMessageValue?.type]);
 	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
@@ -216,7 +218,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{(checkCreateUser && !checkUser && isMemberChannel) && (
+					{((checkCreateUser || (hasAdministratorPermission && !checkOwnerClan)) && !checkUser && isMemberChannel) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />

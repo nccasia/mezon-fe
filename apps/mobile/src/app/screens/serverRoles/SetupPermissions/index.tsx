@@ -31,7 +31,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 	//Note: edit role
 	const clanRole = useMemo(() => {
-		return RolesClan.find((role) => role?.id === roleId);
+		return RolesClan?.find((role) => role?.id === roleId);
 	}, [roleId, RolesClan]);
 
 	const permissionList = useMemo(() => {

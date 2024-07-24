@@ -161,6 +161,7 @@ export const fetchMessages = createAsyncThunk(
 
 		if (Date.now() - response.time > 1000) {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
+			//@ts-expect-error This error is expected because the type information for this line is missing.
 			const lastSeenMessageId = selectMessageIdsByChannelId(state, channelId)?.at(-1);
 
 			if (lastSeenMessageId) {
@@ -781,38 +782,28 @@ export const selectIsFocused = createSelector(getMessagesState, (state) => state
 
 // V2
 
+const emptyObject = {};
+const emptyArray: string[] = [];
+
 export const createCachedSelector = createSelectorCreator({
 	memoize: weakMapMemoize,
 	argsMemoize: weakMapMemoize,
 });
 
-export const selectMessageEntitiesByChannelId = createCachedSelector(
-	(state, channelId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelMessages[channelId]?.entities || null;
-	},
-	(channelMessageEntities) => {
-		return channelMessageEntities || {};
-	},
-);
+export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
 
-export const selectMessageIdsByChannelId = createCachedSelector(
-	(state, channelId: string) => {
-		const messagesState = getMessagesState(state);
-		return messagesState?.channelMessages[channelId]?.ids || null;
-	},
-	(messagesState: string[] | null) => {
-		return messagesState || [];
-	},
-);
+export const selectMessageEntitiesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.channelMessages[channelId]?.entities || emptyObject;
+});
+
+export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState?.channelMessages[channelId]?.ids || emptyArray;
+});
 
 export const selectMessageEntityById = createCachedSelector(
-	(state, channelId, messageId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelMessages[channelId]?.entities?.[messageId] || null;
-	},
-	(messagesState) => {
-		return messagesState || {};
+	[getMessagesState, getChannelIdAsSecondParam, (_, __, messageId) => messageId],
+	(messagesState, channelId, messageId) => {
+		return messagesState.channelMessages[channelId]?.entities?.[messageId] || emptyObject;
 	},
 );
 
@@ -824,25 +815,13 @@ export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	},
 );
 
-export const selectChannelDraftMessage = createCachedSelector(
-	(state, channelId, messageId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelDraftMessage[channelId] || null;
-	},
-	(draftMessagesState) => {
-		return (draftMessagesState as ChannelDraftMessages) || {};
-	},
-);
+export const selectChannelDraftMessage = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.channelDraftMessage[channelId] || emptyObject;
+});
 
-export const selectFirstMessageId = createCachedSelector(
-	(state, channelId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.firstMessageId[channelId] || null;
-	},
-	(firstMessageId) => {
-		return (firstMessageId as string) || '';
-	},
-);
+export const selectFirstMessageId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.firstMessageId[channelId] ?? '';
+});
 
 export const selectLastMessageIdByChannelId = createSelector(selectMessageIdsByChannelId, (ids) => {
 	return ids.at(-1);

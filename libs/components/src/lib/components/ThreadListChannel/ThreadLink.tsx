@@ -2,11 +2,10 @@ import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads 
 import {
 	referencesActions,
 	selectCloseMenu,
+	selectCountNotifyByChannelId,
 	selectCurrentChannel,
 	selectIsUnreadChannelById,
-	selectLastChannelTimestamp,
-	selectNotificationMentionCountByChannelId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { IChannel, MouseButton } from '@mezon/utils';
 import { useRef, useState } from 'react';
@@ -25,11 +24,9 @@ type ThreadLinkProps = {
 
 const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const dispatch = useAppDispatch();
-	const lastThreadTimestamp = useSelector(selectLastChannelTimestamp(thread.id));
-
 	const { toChannelPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
-	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(thread.id, lastThreadTimestamp));
+	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
 	const currentChanel = useSelector(selectCurrentChannel);
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);

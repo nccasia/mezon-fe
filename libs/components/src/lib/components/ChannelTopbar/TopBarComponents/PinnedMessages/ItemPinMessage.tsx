@@ -1,17 +1,17 @@
-import { PinMessageEntity } from "@mezon/store";
-import { useState } from "react";
-import MemberProfile from "../../../MemberProfile";
-import MessageLine from "../../../MessageWithUser/MessageLine";
-import { ModalDeletePinMess } from "./DeletePinMessPopup";
+import { PinMessageEntity } from '@mezon/store';
+import { useState } from 'react';
+import MemberProfile from '../../../MemberProfile';
+import MessageLine from '../../../MessageWithUser/MessageLine';
+import { ModalDeletePinMess } from './DeletePinMessPopup';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
 	handleUnPinMessage: (value: string) => void;
-}
+};
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
-	const {pinMessage, contentString, handleUnPinMessage} = props;
+	const { pinMessage, contentString, handleUnPinMessage } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	return (
 		<div
@@ -32,7 +32,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 					</div>
 					<span className="text-[11px]">
-						<MessageLine line={contentString as string} />
+						<MessageLine content={{t: contentString as string}} line={contentString as string}/>
 					</span>
 				</div>
 			</div>
@@ -44,7 +44,14 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			>
 				✕
 			</button>
-			{openModalDelPin && <ModalDeletePinMess pinMessage={pinMessage} contentString={contentString} handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')} closeModal={() => setOpenModalDelPin(false)}/>}
+			{openModalDelPin && (
+				<ModalDeletePinMess
+					pinMessage={pinMessage}
+					contentString={contentString}
+					handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
+					closeModal={() => setOpenModalDelPin(false)}
+				/>
+			)}
 		</div>
 	);
 };

@@ -4,8 +4,7 @@ import { checkLastChar, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
-import { EmojiMarkdown } from '../../MarkdownFormatText';
+import { EmojiMarkup, Icons } from '../../../components';
 
 interface IHashtagMentionById {
 	id: string;
@@ -23,7 +22,7 @@ const HashTagMentionById = ({ id, posMention }: IHashtagMentionById) => {
 			) : id.startsWith('<') ? (
 				<HashTagReply hashtagId={id} posMention={posMention} />
 			) : checkEmojiIsExist ? (
-				<EmojiMarkdown emojiSyntax={id} onlyEmoji={false} posReply={true} />
+				<EmojiMarkup emojiSyntax={id} onlyEmoji={false} posReply={true} />
 			) : (
 				<span>{id}</span>
 			)}

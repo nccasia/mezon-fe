@@ -56,7 +56,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const [valueSearch, setValueSearch] = useState('');
 	useEffect(() => {
 		setActiveRoles(roles.filter((role) => role?.title?.toLowerCase().includes(valueSearch.toLowerCase())));
-	},[valueSearch]);
+	},[valueSearch, roles]);
 
 	return (
 		<>

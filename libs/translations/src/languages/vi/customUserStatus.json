@@ -1,0 +1,22 @@
+{
+  "editStatus": "Chỉnh sửa trạng thái",
+  "save": "Lưu",
+  "statusDuration": {
+    "label": "Thời lượng trạng thái",
+    "today": "Hôm nay",
+    "fourHours": "4 giờ",
+    "oneHour": "1 giờ",
+    "thirtyMinutes": "30 phút",
+    "dontClear": "Không xóa"
+  },
+  "placeholder": "Bạn đang làm gì?",
+  "userStatus": {
+    "online": "Trực tuyến",
+    "idle": "Rảnh",
+    "doNotDisturb": "Không làm phiền",
+    "invisible": "Vô hình"
+  },
+  "setCustomStatus": "Đặt trạng thái tùy chỉnh",
+  "onlineStatus": "Trạng thái trực tuyến",
+  "changeOnlineStatus": "Thay đổi trạng thái trực tuyến"
+}

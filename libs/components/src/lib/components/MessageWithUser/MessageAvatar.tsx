@@ -53,7 +53,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 						e.preventDefault();
 						e.stopPropagation();
 					}}
-					alt="user avatar"
+					alt={message.username || ''}
 					userName={message.username}
 					src={message.avatar}
 					className="min-w-10 min-h-10"

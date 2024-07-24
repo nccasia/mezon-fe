@@ -17,11 +17,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		paddingHorizontal: size.s_6
-	},
-	aboveTextBoxWrapper: {
-		flexDirection: 'column',
-		backgroundColor: colors.primary,
 	},
 	btnIcon: {
 		width: size.s_40,
@@ -30,19 +25,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: colors.tertiary
-	},
-	aboveTextBoxText: {
-		color: colors.text,
-		fontSize: size.s_12,
-	},
-	aboveTextBoxItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingHorizontal: size.tiny,
-		padding: size.tiny,
-		gap: 10,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.border,
 	},
 	closeIcon: {
 		color: Colors.bgDarkSlate,

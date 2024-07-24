@@ -87,7 +87,7 @@ const LabelDm = (props: LabelDmProps) => {
 				<h2
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
-					className="shrink-1 dark:text-white text-black text-ellipsis"
+					className="shrink-1 dark:text-white text-black text-ellipsis one-line"
 					onClick={handleOpenEditName}
 				>
 					{label || `${currentDmGroup.creator_name}'s Group`}

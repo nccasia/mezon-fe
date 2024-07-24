@@ -71,6 +71,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					value={channelLabel}
 					onChange={handleDisplayChannelLabel}
 					className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
+					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 				/>
 				{checkValidate && (
 					<p className="text-[#e44141] text-xs italic font-thin">

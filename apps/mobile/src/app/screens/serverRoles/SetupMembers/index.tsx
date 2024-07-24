@@ -33,7 +33,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 
 	//Note: edit role
 	const clanRole = useMemo(() => {
-		return RolesClan.find((role) => role?.id === roleId);
+		return RolesClan?.find((role) => role?.id === roleId);
 	}, [roleId, RolesClan]);
 
 	const isEditRoleMode = useMemo(() => {
@@ -48,7 +48,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		const selectedPermissions = clanRole?.permission_list?.permissions?.filter((it) => it?.active).map((it) => it?.id);
 		const removeMemberList =
 			clanRole?.role_user_list?.role_users?.filter((member) => !selectedMembers.includes(member?.id)).map((it) => it?.id) || [];
-		const response = await updateRole(clanRole.clan_id, clanRole.id, clanRole?.title, selectedMembers, selectedPermissions, removeMemberList, []);
+		const response = await updateRole(clanRole?.clan_id, clanRole?.id, clanRole?.title, selectedMembers, selectedPermissions, removeMemberList, []);
 		if (response) {
 			Toast.show({
 				type: 'success',
@@ -146,7 +146,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	};
 
 	const filteredMemberList = useMemo(() => {
-		return usersClan.filter(
+		return usersClan?.filter(
 			(it) =>
 				normalizeString(it?.user?.display_name).includes(normalizeString(searchMemberText)) ||
 				normalizeString(it?.user?.username).includes(normalizeString(searchMemberText)),

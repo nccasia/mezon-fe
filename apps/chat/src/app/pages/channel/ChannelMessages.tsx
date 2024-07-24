@@ -10,6 +10,7 @@ import {
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
+	useAppSelector,
 } from '@mezon/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -25,7 +26,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
-	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
@@ -36,7 +37,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
-	const firstMessageId = useSelector((state) => selectFirstMessageId(state, channelId));
+	const firstMessageId = useAppSelector((state) => selectFirstMessageId(state, channelId));
 
 	const { messageId } = useAppParams();
 

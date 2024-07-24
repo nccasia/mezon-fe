@@ -21,6 +21,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: size.s_10,
     paddingHorizontal: size.s_10,
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
   labelOption: {
@@ -38,4 +39,5 @@ export const style = (colors: Attributes) => StyleSheet.create({
     width: 35,
     height: 35,
   },
+  leftIcon: {flexDirection: 'row', alignItems: 'center'}
 });

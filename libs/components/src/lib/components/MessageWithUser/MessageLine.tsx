@@ -1,54 +1,65 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
-import MarkdownFormatText from '../MarkdownFormatText';
-import MessageImage from './MessageImage';
-import { useMessageLine } from './useMessageLine';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useMemo } from 'react';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	line: string;
 	messageId?: string;
 	mode?: number;
+	content?: any;
 };
 
+interface RenderContentProps {
+	data: any;
+	mode: number;
+}
+
 // TODO: refactor component for message lines
-const MessageLine = ({ line, messageId, mode }: MessageLineProps) => {
-	const { mentions, isOnlyEmoji, links } = useMessageLine(line);
-	const [link, setLink] = useState<string | undefined>(undefined);
+const RenderContent = memo(({ data, mode }: RenderContentProps) => {
+	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
+	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+	let lastIndex = 0;
+	const content = useMemo(() => {
+		const formattedContent: React.ReactNode[] = [];
 
-	const checkLinkImageWork = useCallback((imageLink: string) => {
-		const img = new Image();
-		img.src = imageLink;
-		return new Promise<boolean>((resolve) => {
-			img.onload = () => resolve(true);
-			img.onerror = () => resolve(false);
+		elements.forEach((element, index) => {
+			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+
+			if (lastIndex < startIndex) {
+				formattedContent.push(<PlainText key={`plain-${lastIndex}`} text={t.slice(lastIndex, startIndex)} />);
+			}
+
+			if (channelId && channelLable) {
+				formattedContent.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
+			}
+			if (username) {
+				formattedContent.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
+			}
+			if (shortname) {
+				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+			}
+
+			if (markdown || link) {
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
+			}
+			lastIndex = endIndex;
 		});
-	}, []);
 
-	useLayoutEffect(() => {
-		if (
-			(links?.length === 1 && links[0].nonMatchText === '') ||
-			(links?.length === 1 && links[0].nonMatchText.startsWith('[') && links[0].nonMatchText.endsWith(']('))
-		) {
-			checkLinkImageWork(links[0].matchedText).then((result) => {
-				if (result) {
-					setLink(links[0].matchedText);
-				} else {
-					setLink(undefined);
-				}
-			});
-		} else {
-			setLink(undefined);
+		if (lastIndex < t.length) {
+			formattedContent.push(<PlainText key={`plain-${lastIndex}-end`} text={t.slice(lastIndex)} />);
 		}
-	}, [links, checkLinkImageWork]);
 
+		return formattedContent;
+	}, [elements, t, mode]);
+	return <div>{content}</div>;
+});
+
+const MessageLine = ({ mode, content }: MessageLineProps) => {
 	return (
-		<div className="pt-[0.2rem] pl-0">
-			{link === undefined && <MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} mode={mode} lengthLine={line.length} />}
-			{links.length > 0 &&
-				links?.map((item, index) => {
-					return <MessageImage key={index} attachmentData={{ url: link ? link : item.matchedText }} />;
-				})}
+		<div>
+			<RenderContent data={content} mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL} />
 		</div>
 	);
 };
 
-export default MessageLine;
+export default memo(MessageLine);

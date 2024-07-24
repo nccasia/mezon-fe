@@ -3,14 +3,19 @@ export type ItemObjProps = {
 	name: string;
 };
 
+export type ListSideBarProps = {
+	title: string;
+	listItem: ItemObjProps[];
+};
+
 export const ItemSetting = {
 	OVERVIEW: 'overview',
 	ROLES: 'roles',
 	EMOJI: 'emoji',
 	STICKERS: 'Stickers',
 	DELETE_SERVER: 'delete_server',
-	INTEGRATIONS: "integrations",
-  NOTIFICATION_SOUND: "notification-sound"
+	INTEGRATIONS: 'integrations',
+	NOTIFICATION_SOUND: 'notification-sound',
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -18,6 +23,17 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
-	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
-  { id: ItemSetting.NOTIFICATION_SOUND, name: "Notification Sound"}
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+];
+export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
+
+export const sideBarListItem: ListSideBarProps[] = [
+	{
+		title: '',
+		listItem: listItemSetting,
+	},
+	{
+		title: 'Apps',
+		listItem: listItemSettingApp,
+	},
 ];

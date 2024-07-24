@@ -9,6 +9,7 @@ import {
 	selectMessageEntityById,
 	selectOpenEditMessageState,
 	useAppDispatch,
+	useAppSelector,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -34,7 +35,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
-	const channelDraftMessage = useSelector((state) => selectChannelDraftMessage(state, channelId, messageId));
+	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	const isEditing = useMemo(() => {
 		if (channelDraftMessage.message_id === messageId) {
@@ -85,7 +86,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 					channelId,
 					channelDraftMessage: {
 						message_id: messageId,
-						draft_content: channelDraftMessage.draft_content ?? ((mess as IMessageWithUser).content?.t as string),
+						draftContent: channelDraftMessage.draftContent ?? ((mess as IMessageWithUser).content?.t as string),
 					},
 				}),
 			);

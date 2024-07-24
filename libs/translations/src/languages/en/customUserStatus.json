@@ -1,0 +1,22 @@
+{
+  "editStatus": "Edit status",
+  "save": "Save",
+  "statusDuration": {
+    "label": "Status Duration",
+    "today": "Today",
+    "fourHours": "4 hours",
+    "oneHour": "1 hour",
+    "thirtyMinutes": "30 minutes",
+    "dontClear": "Don't clear"
+  },
+  "placeholder": "What're you up to?",
+  "userStatus": {
+    "online": "Online",
+    "idle":"Idle",
+    "doNotDisturb": "Do Not Disturb",
+    "invisible": "Invisible"
+  },
+  "setCustomStatus":"Set a custom status",
+  "onlineStatus": "Online Status",
+  "changeOnlineStatus":"Change Online Status"
+}

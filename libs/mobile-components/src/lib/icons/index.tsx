@@ -1161,75 +1161,103 @@ export function AttachmentImageIcon({ width = 10, height = 10, color = 'white', 
 
 export function EmptySearchIcon({ width = 50, height = 50, color = 'white', ...props }: SvgProps) {
 	return (
-	  <Svg
-      height={height}
-      viewBox="0 0 160 160"
-      width={width}
-      {...props}
-    >
-      <G fill="none">
-        <Path
-          d="M42.126 100.76c-16.988-16.988-16.988-44.531 0-61.52 16.988-16.986 44.531-16.986 61.52 0 16.986 16.989 16.986 44.532 0 61.52-16.989 16.988-44.532 16.988-61.52 0"
-          fill="#4a4d51"
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M121.894 119.498c-27.336 27.337-71.658 27.337-98.995 0-27.337-27.336-27.337-71.658 0-98.995 27.337-27.336 71.659-27.337 98.995 0 27.337 27.337 27.337 71.659 0 98.995z"
-          stroke="#1e2126"
-          strokeDasharray="4 5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M1.831 140.566a6.252 6.252 0 010-8.841l36.771-36.771 8.841 8.841-36.77 36.771a6.252 6.252 0 01-8.842 0"
-          fill="#c9d2f0"
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M1.831 140.566a6.252 6.252 0 010-8.841l36.771-36.771 8.841 8.841-36.77 36.771a6.252 6.252 0 01-8.842 0z"
-          stroke="#1e2126"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M12.146 139.092l-8.841-8.84a4.167 4.167 0 010-5.895l17.437-17.437a4.167 4.167 0 015.894 0l8.84 8.841a4.169 4.169 0 010 5.894L18.04 139.092a4.169 4.169 0 01-5.894 0"
-          fill="#9f7373"
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M12.146 139.092l-8.841-8.84a4.167 4.167 0 010-5.895l17.437-17.437a4.167 4.167 0 015.894 0l8.84 8.841a4.169 4.169 0 010 5.894L18.04 139.092a4.169 4.169 0 01-5.894 0z"
-          stroke="#1e2126"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          transform="translate(9 9)"
-        />
-        <Path
-          d="M44.112 98.285c-15.621-15.621-15.621-40.947 0-56.568s40.948-15.621 56.569-.001c15.621 15.62 15.621 40.948 0 56.569s-40.948 15.62-56.569 0m63.895-63.895c-19.667-19.667-51.554-19.667-71.221 0s-19.667 51.554 0 71.22 51.554 19.668 71.221 0 19.667-51.553 0-71.22"
-          fill="#f3f9ff"
-          transform="translate(9 9)"
-        />
-        <G
-          stroke="#1e2126"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-        >
-          <Path
-            d="M116.386 94.545a50.453 50.453 0 01-1.698 2.817m-6.68 8.249c-19.668 19.667-51.555 19.667-71.222 0s-19.667-51.554 0-71.221 51.554-19.667 71.221 0c14.763 14.763 18.444 36.41 11.044 54.607"
-            transform="translate(9 9)"
-          />
-          <Path
-            d="M44.112 98.285c-15.621-15.621-15.621-40.947 0-56.568s40.948-15.621 56.569-.001c15.621 15.62 15.621 40.948 0 56.569s-40.948 15.62-56.569 0z"
-            transform="translate(9 9)"
-          />
-        </G>
-        <Path d="M0-1h160v160H0z" />
-      </G>
-    </Svg>
-	)
+		<Svg height={height} viewBox="0 0 160 160" width={width} {...props}>
+			<G fill="none">
+				<Path
+					d="M42.126 100.76c-16.988-16.988-16.988-44.531 0-61.52 16.988-16.986 44.531-16.986 61.52 0 16.986 16.989 16.986 44.532 0 61.52-16.989 16.988-44.532 16.988-61.52 0"
+					fill="#4a4d51"
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M121.894 119.498c-27.336 27.337-71.658 27.337-98.995 0-27.337-27.336-27.337-71.658 0-98.995 27.337-27.336 71.659-27.337 98.995 0 27.337 27.337 27.337 71.659 0 98.995z"
+					stroke="#1e2126"
+					strokeDasharray="4 5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M1.831 140.566a6.252 6.252 0 010-8.841l36.771-36.771 8.841 8.841-36.77 36.771a6.252 6.252 0 01-8.842 0"
+					fill="#c9d2f0"
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M1.831 140.566a6.252 6.252 0 010-8.841l36.771-36.771 8.841 8.841-36.77 36.771a6.252 6.252 0 01-8.842 0z"
+					stroke="#1e2126"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M12.146 139.092l-8.841-8.84a4.167 4.167 0 010-5.895l17.437-17.437a4.167 4.167 0 015.894 0l8.84 8.841a4.169 4.169 0 010 5.894L18.04 139.092a4.169 4.169 0 01-5.894 0"
+					fill="#9f7373"
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M12.146 139.092l-8.841-8.84a4.167 4.167 0 010-5.895l17.437-17.437a4.167 4.167 0 015.894 0l8.84 8.841a4.169 4.169 0 010 5.894L18.04 139.092a4.169 4.169 0 01-5.894 0z"
+					stroke="#1e2126"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					transform="translate(9 9)"
+				/>
+				<Path
+					d="M44.112 98.285c-15.621-15.621-15.621-40.947 0-56.568s40.948-15.621 56.569-.001c15.621 15.62 15.621 40.948 0 56.569s-40.948 15.62-56.569 0m63.895-63.895c-19.667-19.667-51.554-19.667-71.221 0s-19.667 51.554 0 71.22 51.554 19.668 71.221 0 19.667-51.553 0-71.22"
+					fill="#f3f9ff"
+					transform="translate(9 9)"
+				/>
+				<G stroke="#1e2126" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
+					<Path
+						d="M116.386 94.545a50.453 50.453 0 01-1.698 2.817m-6.68 8.249c-19.668 19.667-51.555 19.667-71.222 0s-19.667-51.554 0-71.221 51.554-19.667 71.221 0c14.763 14.763 18.444 36.41 11.044 54.607"
+						transform="translate(9 9)"
+					/>
+					<Path
+						d="M44.112 98.285c-15.621-15.621-15.621-40.947 0-56.568s40.948-15.621 56.569-.001c15.621 15.62 15.621 40.948 0 56.569s-40.948 15.62-56.569 0z"
+						transform="translate(9 9)"
+					/>
+				</G>
+				<Path d="M0-1h160v160H0z" />
+			</G>
+		</Svg>
+	);
+}
+
+export function IdleStatusIcon({ width = 20, height = 20, ...props }: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 33 33"
+    fill="none"
+    {...props}
+  >
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M16.117 26.287a9.61 9.61 0 009.61-9.609c0-4.693-3.364-8.6-7.812-9.441-.427-.081-.69.435-.45.797a7.207 7.207 0 01-9.992 9.992c-.361-.24-.878.022-.797.45.842 4.447 4.749 7.811 9.441 7.811z"
+      fill="#F0B232"
+    />
+  </Svg>
+	);
+}
+
+export function DisturbStatusIcon({ width = 20, height = 20, ...props }: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 32 33"
+    fill="none"
+    {...props}
+  >
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15.793 26.428a9.6 9.6 0 009.6-9.6 9.6 9.6 0 00-19.2 0 9.6 9.6 0 009.6 9.6zm-3.692-11.815a2.215 2.215 0 000 4.43h7.384a2.215 2.215 0 100-4.43h-7.384z"
+      fill="#F23F43"
+    />
+  </Svg>
+	);
 }

@@ -70,7 +70,7 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
 							onChange={handleInputChange}
 							placeholder="Enter the channel's name"
-							maxLength={64}
+							maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 						/>
 					</div>
 				</div>

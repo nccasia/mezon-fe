@@ -125,7 +125,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 						type="text"
 						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
 						placeholder={`Enter the clan name`}
-						maxLength={64}
+						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
 					{checkvalidate && (
 						<p className="text-[#e44141] text-xs italic font-thin">

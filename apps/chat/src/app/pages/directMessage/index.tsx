@@ -1,20 +1,23 @@
 import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
 import { useAuth, useEscapeKey } from '@mezon/core';
-import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
+import { AppDispatch, channelsActions, selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
 
 export default function Direct() {
+	const dispatch = useDispatch<AppDispatch>();
 	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
+	const initClan = localStorage.getItem('initClan');
 
 	useEscapeKey(() => setOpenSetting(false));
 
 	useEffect(() => {
+		if(initClan) dispatch(channelsActions.fetchChannels({clanId: initClan}));
 		localStorage.setItem('recentEmojis', JSON.stringify([]));
 	}, []);
 

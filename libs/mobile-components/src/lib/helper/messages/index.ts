@@ -36,3 +36,12 @@ export const getChannelById = (channelHashtagId: string, channelsEntities?: Reco
 	if (!channelsEntities) return;
 	return channelsEntities[channelHashtagId];
 };
+
+export const convertToPlainTextHashtag = (text: string) => {
+	const hashtagPattern = /\{\#\}\[(.*?)\]\(\d+\)/g;
+	text = text.replace(hashtagPattern, (match, p1) => `#${p1}`);
+	const mentionPattern = /\{\@\}\[(.*?)\]\(\d+\)/g;
+	text = text.replace(mentionPattern, (match, p1) => `@${p1}`);
+	
+	return text;
+};

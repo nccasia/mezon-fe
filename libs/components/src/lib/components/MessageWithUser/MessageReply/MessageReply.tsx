@@ -36,7 +36,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 
 	const messageContentReplied = useMemo(() => {
 		if (message.references) {
-			return JSON.parse(message?.references[0]?.content ?? '');
+			return JSON.parse(message?.references[0]?.content ?? '{}');
 		}
 	}, [message.references]);
 

@@ -63,11 +63,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
-	const EditSendMessage = React.useCallback(
-		async (content: string, messageId: string) => {
-			const editMessage: IMessageSendPayload = {
-				t: content,
-			};
+	const editSendMessage = React.useCallback(
+		async (content: IMessageSendPayload, messageId: string) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -76,7 +73,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, editMessage);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
@@ -85,8 +82,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		() => ({
 			sendMessage,
 			sendMessageTyping,
-			EditSendMessage,
+			editSendMessage,
 		}),
-		[sendMessage, sendMessageTyping, EditSendMessage],
+		[sendMessage, sendMessageTyping, editSendMessage],
 	);
 }

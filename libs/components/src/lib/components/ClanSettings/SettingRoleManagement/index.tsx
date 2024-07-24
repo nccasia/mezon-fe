@@ -52,9 +52,9 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	};
 	const handleSaveClose = () => {};
 
-	const handleUpdateUser = async () => {
+	const handleUpdateUser = async (hasCloseModal?: boolean) => {
 		if (clickRole === 'New Role') {
-			props.handleClose();
+			if(!hasCloseModal) props.handleClose();
 			await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
 		} else {
 			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);
@@ -70,7 +70,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	return flagOption ? (
 		<>
 			<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
-				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} />
+				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() =>handleUpdateUser(true)}/>
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
 						{clickRole === 'New Role' ? (

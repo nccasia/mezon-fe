@@ -1,16 +1,26 @@
-import { useAuth, useFriends } from '@mezon/core';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useAuth, useFriends, useMemberCustomStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { FriendsEntity } from '@mezon/store-mobile';
+import { FriendsEntity, channelMembersActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
+import AddStatusUserModal from '../../components/AddStatusUserModal';
+import CustomStatusUser from '../../components/CustomStatusUser';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonButton } from '../../temp-ui';
 import { style } from './styles';
+
+export enum ETypeCustomUserStatus {
+	Save = 'Save',
+	Close = 'Close',
+}
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const user = useAuth();
@@ -19,6 +29,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const { friends: allUser } = useFriends();
 	const { color } = useMixImageColor(user?.userProfile?.user?.avatar_url);
 	const { t } = useTranslation('profile');
+	const [isVisibleAddStatusUserModal, setIsVisibleAddStatusUserModal] = useState<boolean>(false);
+	const userStatusBottomSheetRef = useRef<BottomSheetModal>(null);
+	const userCustomStatus = useMemberCustomStatus(user?.userProfile?.user?.id || '');
+	const currentClanId = useSelector(selectCurrentClanId);
+	const dispatch = useAppDispatch();
+	const { dismiss } = useBottomSheetModal();
 
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
@@ -43,6 +59,16 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		return moment(user?.userProfile?.user?.create_time).format('MMM DD, YYYY');
 	}, [user]);
 
+	const handlePressSetCustomStatus = () => {
+		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
+	};
+
+	const handleCustomUserStatus = (customStatus: string = '', type: ETypeCustomUserStatus) => {
+		userStatusBottomSheetRef?.current?.dismiss();
+		setIsVisibleAddStatusUserModal(false);
+		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
@@ -52,7 +78,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					</TouchableOpacity>
 				</View>
 
-				<View style={styles.viewImageProfile}>
+				<TouchableOpacity
+					onPress={() => {
+						userStatusBottomSheetRef?.current?.present();
+					}}
+					style={styles.viewImageProfile}
+				>
 					{user?.userProfile?.user?.avatar_url ? (
 						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
 					) : (
@@ -61,7 +92,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						</Block>
 					)}
 					<View style={styles.dotOnline} />
-				</View>
+				</TouchableOpacity>
 			</View>
 
 			<ScrollView style={styles.contentWrapper}>
@@ -70,11 +101,22 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
 						<Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
 					</TouchableOpacity>
-
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
-
+					{userCustomStatus ? (
+						<Block flexDirection="row" alignItems="center" justifyContent="space-between">
+							<TouchableOpacity
+								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								style={styles.customUserStatusBtn}
+							>
+								<Text style={styles.text}>{userCustomStatus}</Text>
+							</TouchableOpacity>
+							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
+								<CircleXIcon height={18} width={18} color={themeValue.text} />
+							</Pressable>
+						</Block>
+					) : null}
 					<View style={styles.buttonList}>
-						<MezonButton viewContainerStyle={styles.button} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+						<MezonButton viewContainerStyle={styles.button} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
 							<Icons.ChatIcon height={20} width={20} color={'white'} />
 							<Text style={styles.whiteText}>{t('addStatus')}</Text>
 						</MezonButton>
@@ -116,6 +158,20 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</ScrollView>
+			<AddStatusUserModal
+				userCustomStatus={userCustomStatus}
+				isVisible={isVisibleAddStatusUserModal}
+				setIsVisible={(value) => {
+					setIsVisibleAddStatusUserModal(value);
+				}}
+				handleCustomUserStatus={handleCustomUserStatus}
+			/>
+			<CustomStatusUser
+				userCustomStatus={userCustomStatus}
+				onPressSetCustomStatus={handlePressSetCustomStatus}
+				ref={userStatusBottomSheetRef}
+				handleCustomUserStatus={handleCustomUserStatus}
+			/>
 		</View>
 	);
 };

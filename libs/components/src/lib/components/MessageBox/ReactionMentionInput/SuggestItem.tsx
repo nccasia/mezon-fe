@@ -18,9 +18,10 @@ type SuggestItemProps = {
 	subTextStyle?: string;
 	showAvatar?: boolean;
 	channelId?: string | number;
+	isOpenSearchModal?: boolean;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText, subTextStyle, valueHightLight, showAvatar }: SuggestItemProps) => {
+const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, channelId, subText, subTextStyle, valueHightLight, showAvatar }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
@@ -36,12 +37,12 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	}, [channelId, membersVoice, specificChannel?.type]);
 
 	useEffect(() => {
-		if (directId) {
+		if (directId && !isOpenSearchModal) {
 			commonChannelVoids.map((channel) => {
 				if (channel.channel_id === channelId) {
 					setSpecificChannel(channel);
 				}
-			})
+			});
 		} else {
 			allChannels.map((channel) => {
 				if (channel.channel_id === channelId) {
@@ -69,9 +70,17 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between h-[24px]">
+		<div className="flex flex-row items-center justify-between h-[24px]" >
 			<div className="flex flex-row items-center gap-2 py-[3px]">
-				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" classNameText='text-[9px] min-w-5 min-h-5 pt-[3px]'/>}
+				{showAvatar && (
+					<AvatarImage
+						alt="user avatar"
+						userName={name}
+						src={avatarUrl}
+						className="size-4"
+						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
+					/>
+				)}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />
@@ -79,7 +88,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.HashtagLocked defaultSize="w-5 h-5 " />
 				)}
-				{(!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE)&& (
+				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.Speaker defaultSize="w-5 5-5" />
 				)}
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (

@@ -89,4 +89,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontWeight: '600',
 		marginBottom: size.s_10,
 	},
+  customStatusText: {
+		color: colors.text,
+		fontSize: size.medium,
+		fontWeight: '400',
+	},
 });

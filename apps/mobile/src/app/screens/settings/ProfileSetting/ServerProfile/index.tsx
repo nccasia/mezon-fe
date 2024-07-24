@@ -7,7 +7,7 @@ import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, FlatList, Keyboard, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { EProfileTab, IClanProfileValue } from '..';
@@ -138,6 +138,19 @@ export default function ServerProfile({
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: data?.uri }));
 		setFile(data);
 	};
+	
+	useEffect(() => {
+		const keyboardListener = Keyboard.addListener('keyboardDidShow', () => {
+			bottomSheetDetail?.current?.snapToIndex(1);
+		});
+		const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+			bottomSheetDetail?.current?.snapToIndex(0);
+		});
+		return () => {
+			keyboardListener.remove();
+			keyboardDidHideListener.remove();
+		};
+	}, []);
 
 	const filteredClanList = useMemo(() => {
 		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));

@@ -34,8 +34,8 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
-	const [customStatus, setCustomStatus] = useState<string>('');
 	const userCustomStatus = useMemberCustomStatus(userId || '')
+	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 
 
 	const profileRef = useRef<HTMLDivElement | null>(null);

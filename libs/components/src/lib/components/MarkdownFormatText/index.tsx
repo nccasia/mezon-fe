@@ -1,15 +1,15 @@
 import { useAppNavigation, useEmojiSuggestion, useInvite } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
-import { ILineMention, MentionTypeEnum, SHOW_POSITION, convertMarkdown, getSrcEmoji } from '@mezon/utils';
+import { ILineMention, MentionTypeEnum, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import clx from 'classnames';
 import isElectron from 'is-electron';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import remarkGFM from 'remark-gfm';
-import { useMessageContextMenu } from '../ContextMenu';
 import ExpiryTimeModal from '../ExpiryTime';
+import EmojiMarkdown from './EmojiMarkup';
 import ChannelHashtag from './HashTag';
 import MentionUser from './MentionUser';
 import PreClass from './PreClass';
@@ -180,36 +180,3 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 };
 
 export default MarkdownFormatText;
-
-type EmojiMarkdownOpt = {
-	emojiSyntax: string;
-	onlyEmoji: boolean;
-	posReply?: boolean;
-};
-
-export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmoji, posReply }) => {
-	const { emojis } = useEmojiSuggestion();
-	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
-
-	useEffect(() => {
-		if (posReply) {
-			setClassName(`w-4 h-auto inline-block relative -top-0.5 m-0`);
-		}
-	}, [posReply]);
-
-	const srcEmoji = useMemo(() => {
-		return getSrcEmoji(emojiSyntax.trim(), emojis);
-	}, [emojiSyntax.trim()]);
-	const { setImageURL, setPositionShow } = useMessageContextMenu();
-
-	const handleContextMenu = useCallback(() => {
-		setImageURL(srcEmoji);
-		setPositionShow(SHOW_POSITION.IN_EMOJI);
-	}, [srcEmoji]);
-
-	return (
-		<span onContextMenu={handleContextMenu} style={{ userSelect: 'none' }}>
-			<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
-		</span>
-	);
-};

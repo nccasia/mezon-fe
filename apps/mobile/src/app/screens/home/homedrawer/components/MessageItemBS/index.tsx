@@ -339,7 +339,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				(action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type),
 			);
 		}
-		const mediaList = message?.attachments.length > 0 ? [] : [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+		const mediaList = message?.attachments?.length > 0 ? [] : [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];

@@ -15,9 +15,10 @@ import * as Icons from '../../../../../../../ui/src/lib/Icons';
 type closeEditRole = {
 	RolesClan: RolesClanEntity[];
 	handleClose: () => void;
+	handleUpdateUser: () => Promise<void>;
 };
 const SettingListRole = (props: closeEditRole) => {
-	const { RolesClan, handleClose } = props;
+	const { RolesClan, handleClose, handleUpdateUser } = props;
 	const appearanceTheme = useSelector(selectTheme);
 	const isChange = useSelector(getIsShow);
 
@@ -27,7 +28,8 @@ const SettingListRole = (props: closeEditRole) => {
 
 	const dispatch = useDispatch();
 	const handleRoleClick = (roleId: string) => {
-		if (!isChange) {
+		handleUpdateUser();
+		if (!isChange || clickedRole === 'New Role') {
 			const activeRole = RolesClan.find((role) => role.id === roleId);
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 

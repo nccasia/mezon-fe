@@ -47,7 +47,7 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 				placeholder={placeholder}
 				className={className}
 				onKeyDown={handleKeyDown}
-				maxLength={64}
+				maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 			/>
 			{nameThreadError && <span className="text-[#e44141] text-xs italic font-thin">{nameThreadError}</span>}
 			{checkValidate && (
