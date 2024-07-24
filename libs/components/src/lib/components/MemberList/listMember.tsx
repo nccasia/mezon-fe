@@ -1,4 +1,5 @@
 import { ChannelMembersEntity } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import MemberItem from './MemberItem';
 
 type ListMemberProps = {
@@ -8,7 +9,7 @@ type ListMemberProps = {
 
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, isOffline } = props;
-	return lisMembers.map((user) => <MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={isOffline} />);
+	return lisMembers.map((user) => <MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={isOffline} positionType={MemberProfileType.MEMBER_LIST} />);
 };
 
 export default ListMember;

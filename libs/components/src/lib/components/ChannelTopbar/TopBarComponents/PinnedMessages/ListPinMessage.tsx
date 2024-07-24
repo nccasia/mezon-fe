@@ -12,11 +12,7 @@ import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
-type ListPinMessageProps = {
-	onClick?: () => void;
-};
-
-const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
+const ListPinMessage = () => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -36,7 +32,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId || '', message_id: messageId }));
 	};
 
-	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0,[listPinMessages.length]);
+	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0, [listPinMessages.length]);
 
 	useEffect(() => {
 		if (!checkListPinMessages) {
@@ -48,33 +44,33 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 				}),
 			);
 		}
-	}, []);
+	}, [listPinMessages]);
 
 	return (
 		<div className='min-h-36'>
 			{checkListPinMessages ? (
 				<EmptyPinMess />
-			) : 
-			(
-				<div className="flex flex-col items-center justify-center space-y-2 py-2">
-					{listPinMessages.slice().reverse().map((pinMessage, index) => {
-						// Parse content if it's a JSON string
-						let contentString = pinMessage.content;
-						if (typeof contentString === 'string') {
-							try {
-								const contentObject = JSON.parse(contentString);
-								contentString = contentObject.t;
-							} catch (e) {
-								console.error('Failed to parse content JSON:', e);
+			) :
+				(
+					<div className="flex flex-col items-center justify-center space-y-2 py-2">
+						{listPinMessages.slice().reverse().map((pinMessage) => {
+							// Parse content if it's a JSON string
+							let contentString = pinMessage.content;
+							if (typeof contentString === 'string') {
+								try {
+									const contentObject = JSON.parse(contentString);
+									contentString = contentObject.t;
+								} catch (e) {
+									console.error('Failed to parse content JSON:', e);
+								}
 							}
-						}
 
-						return (
-							<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} key={index}/>
-						);
-					})}
-				</div>
-			)}
+							return (
+								<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} key={pinMessage.id} />
+							);
+						})}
+					</div>
+				)}
 		</div>
 	);
 };

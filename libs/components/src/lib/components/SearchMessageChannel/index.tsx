@@ -112,9 +112,8 @@ const SearchMessageChannel = () => {
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
-				className={`transition-all duration-300 ${
-					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
+				className={`transition-all duration-300 ${expanded ? 'w-80' : 'w-40'
+					} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<MentionsInput
 					inputRef={searchRef}

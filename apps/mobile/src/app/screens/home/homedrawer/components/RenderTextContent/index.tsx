@@ -6,7 +6,7 @@ import { Text } from 'react-native';
 import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
 
-export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channelsEntities?: Record<string, ChannelsEntity>) => {
+export const renderTextContent = (text: string, channelsEntities?: Record<string, ChannelsEntity>) => {
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = channelsEntities?.[channelHashtagId];
 		if (channel) {
@@ -64,7 +64,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 		));
 	};
 
-	const renderTextWithEmoji = (text: string, emojiListPNG?: IEmoji[]) => {
+	const renderTextWithEmoji = (text: string) => {
 		const parts = text?.split?.(highlightEmojiRegex);
 		return parts?.map?.((part, index) => {
 			const isHighlighted = highlightEmojiRegex.test(part);

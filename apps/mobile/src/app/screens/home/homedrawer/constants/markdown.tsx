@@ -356,13 +356,13 @@ const RenderTextContent = React.memo(
 		const usersInChannel = useSelector(selectAllChannelMembers);
 		if (!lines) return null;
 
-		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
-		const matchesUrls = lines.match(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
+		const matchesMentions = lines?.match?.(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
+		const matchesUrls = lines?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
 		const isExistEmoji = emojiRegex.test(lines);
 		const isExistBlockCode = codeBlockRegex.test(lines);
 
 		let customStyle = {};
-		let content: string = lines?.trim();
+		let content: string = lines?.trim?.();
 
 		if (matchesMentions) {
 			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClanId, usersInChannel, usersClan, mode);

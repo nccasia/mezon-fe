@@ -34,7 +34,7 @@ export const ChatMessageLeftArea = memo(({
   const styles = style(themeValue);
   const navigation = useNavigation<any>();
   return (
-    <Block flexDirection="row" gap={size.s_10}>
+    <Block flexDirection="row" gap={size.s_6}>
       {text?.length > 0 && !isShowAttachControl ? (
         <TouchableOpacity style={[styles.btnIcon]} onPress={() => setIsShowAttachControl(!isShowAttachControl)}>
           <Icons.ChevronSmallLeftIcon width={22} height={22} color={themeValue.textStrong} />

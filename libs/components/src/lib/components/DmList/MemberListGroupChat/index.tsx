@@ -1,8 +1,8 @@
-import { MemberProfile } from '@mezon/components';
 import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useSelector } from 'react-redux';
+import MemberItem from '../../MemberList/MemberItem';
 
 export type MemberListProps = {
 	className?: string;
@@ -25,19 +25,14 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 				{
 					<div className="flex flex-col gap-4 text-[#AEAEAE]">
 						{rawMembers.map((user: ChannelMembersEntity) => (
-							<MemberProfile
-								key={user.id}
-								numberCharacterCollapse={30}
-								avatar={user?.user?.avatar_url ?? ''}
-								name={user?.user?.display_name ?? ''}
-								userNameAva={user?.user?.username}
-								status={user?.user?.online}
-								isHideStatus={true}
-								listProfile={true}
-								user={user}
-								positionType={MemberProfileType.DM_MEMBER_GROUP}
-								dataMemberCreate={dataMemberCreate}
-							/>
+							<div key={user.id}>
+								<MemberItem
+									user={user}
+									positionType={MemberProfileType.DM_MEMBER_GROUP}
+									listProfile={true}
+									dataMemberCreate={dataMemberCreate}
+								/>
+							</div>
 						))}
 					</div>
 				}

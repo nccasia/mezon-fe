@@ -2,7 +2,13 @@ import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } f
 import { ActionEmitEvent, getAttachmentUnique, Icons } from "@mezon/mobile-components";
 import { baseColor, Block, size, useTheme } from "@mezon/mobile-ui";
 import { selectAllEmojiSuggestion, selectChannelsEntities } from "@mezon/store-mobile";
-import { IMessageSendPayload } from "@mezon/utils";
+import {
+  IEmojiOnMessage, IHashtagOnMessage,
+  ILinkOnMessage,
+  ImarkdownOnMessage,
+  IMentionOnMessage,
+  IMessageSendPayload
+} from "@mezon/utils";
 import { ChannelStreamMode } from "mezon-js";
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from "mezon-js/api.gen";
 import { Dispatch, forwardRef, memo, MutableRefObject, SetStateAction, useCallback, useMemo, useState } from "react";
@@ -28,13 +34,18 @@ interface IChatMessageInputProps {
   messageActionNeedToResolve: IMessageActionNeedToResolve | null;
   messageAction?: EMessageActionType;
   onSendSuccess?: () => void;
-  mentionData?: ApiMessageMention[];
   modeKeyBoardBottomSheet: IModeKeyboardPicker;
   handleKeyboardBottomSheetMode: (mode: IModeKeyboardPicker) => void;
   setModeKeyBoardBottomSheet: Dispatch<SetStateAction<IModeKeyboardPicker>>;
   setIsShowAttachControl: Dispatch<SetStateAction<boolean>>;
   onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
   keyboardHeight?: number;
+  mentionsOnMessage?: IMentionOnMessage[];
+  hashtagsOnMessage?: IHashtagOnMessage[];
+  emojisOnMessage?: IEmojiOnMessage[];
+  linksOnMessage?: ILinkOnMessage[];
+  markdownsOnMessage?: ImarkdownOnMessage[];
+  plainTextMessage?: string;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.73;
 
@@ -49,21 +60,25 @@ export const ChatMessageInput = memo(forwardRef(({
   messageAction,
   onSendSuccess,
   handleKeyboardBottomSheetMode,
-  mentionData = [],
   modeKeyBoardBottomSheet,
   setModeKeyBoardBottomSheet,
   setIsShowAttachControl,
   onShowKeyboardBottomSheet,
-  keyboardHeight
+  keyboardHeight,
+  mentionsOnMessage = [],
+  hashtagsOnMessage = [],
+  emojisOnMessage,
+  linksOnMessage,
+  markdownsOnMessage,
+  plainTextMessage,
 }: IChatMessageInputProps, ref: MutableRefObject<TextInput>) => {
   const [heightInput, setHeightInput] = useState(size.s_40);
-  const emojiListPNG = useSelector(selectAllEmojiSuggestion);
   const channelsEntities = useSelector(selectChannelsEntities);
   const { themeValue } = useTheme();
   const styles = style(themeValue);
   const { attachmentDataRef, setAttachmentData } = useReference();
   const { t } = useTranslation(['message']);
-  const { sendMessage, sendMessageTyping: channelMessageTyping, EditSendMessage } = useChatSending({
+  const { sendMessage, sendMessageTyping: channelMessageTyping, editSendMessage } = useChatSending({
     channelId,
     mode,
     directMessageId: channelId || '',
@@ -125,11 +140,11 @@ export const ChatMessageInput = memo(forwardRef(({
     }
   }
 
-  const editMessage = useCallback(
-    (editMessage: string, messageId: string) => {
-      EditSendMessage(editMessage?.trim(), messageId);
+  const onEditMessage = useCallback(
+    (editMessage: IMessageSendPayload, messageId: string) => {
+      editSendMessage(editMessage, messageId);
     },
-    [EditSendMessage],
+    [editSendMessage],
   );
 
   const isCanSendMessage = useMemo(() => {
@@ -140,12 +155,29 @@ export const ChatMessageInput = memo(forwardRef(({
     if (!isCanSendMessage) {
       return;
     }
+
+    const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => ({
+      user_id: mention.userId,
+      username: mention.username,
+    }));
+
+    const payloadSendMessage: IMessageSendPayload = {
+      t: text,
+      mentions: mentionsOnMessage,
+      hashtags: hashtagsOnMessage,
+      emojis: emojisOnMessage,
+      links: linksOnMessage,
+      markdowns: markdownsOnMessage,
+      plainText: plainTextMessage,
+    }
+
     const payloadThreadSendMessage: IPayloadThreadSendMessage = {
-      content: { t: text },
-      mentions: mentionData,
+      content: payloadSendMessage,
+      mentions: simplifiedMentionList,
       attachments: [],
       references: [],
     };
+
     const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
     const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
     if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
@@ -157,7 +189,7 @@ export const ChatMessageInput = memo(forwardRef(({
     }
     const { targetMessage, type } = messageActionNeedToResolve || {};
     if (type === EMessageActionType.EditMessage) {
-      editMessage(text, messageActionNeedToResolve?.targetMessage?.id);
+      onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
     } else {
       const reference = targetMessage
         ? [
@@ -173,13 +205,14 @@ export const ChatMessageInput = memo(forwardRef(({
         : undefined;
       setEmojiSuggestion('');
       if (![EMessageActionType.CreateThread].includes(messageAction)) {
+        const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here')
         switch (mode) {
           case ChannelStreamMode.STREAM_MODE_CHANNEL:
-            sendMessage({ t: text }, mentionData, attachmentDataUnique || [], reference, false, false);
+            sendMessage(payloadSendMessage, simplifiedMentionList || [], attachmentDataUnique || [], reference, false, isMentionEveryOne);
             break;
           case ChannelStreamMode.STREAM_MODE_DM:
           case ChannelStreamMode.STREAM_MODE_GROUP:
-            handleSendDM({ t: text }, mentionData, attachmentDataUnique || [], reference);
+            handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
             break;
           default:
             break;
@@ -215,7 +248,7 @@ export const ChatMessageInput = memo(forwardRef(({
             text?.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput },
             { height: Math.max(size.s_40, heightInput) },
           ]}
-          children={renderTextContent(text, emojiListPNG, channelsEntities)}
+          children={renderTextContent(text, channelsEntities)}
           onContentSizeChange={(e) => {
             if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
           }}

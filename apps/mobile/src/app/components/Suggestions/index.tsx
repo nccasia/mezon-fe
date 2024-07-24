@@ -17,10 +17,9 @@ export interface MentionSuggestionsProps {
 	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
 	onAddMentionMessageAction?: (mentionData: MentionDataProps[]) => void
 	mentionTextValue?: string;
-	onSelectMention: (mentionData: MentionDataProps[]) => void
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, onSelectMention, mentionTextValue }) => {
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue }) => {
 	const listMentions = UseMentionList(channelId || '');
 
 	useEffect(() => {
@@ -28,12 +27,6 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, chan
 			onAddMentionMessageAction(listMentions);
 		}
 	}, [messageActionNeedToResolve])
-
-	useEffect(() => {
-		if (typeof mentionTextValue === 'string') {
-			onSelectMention(listMentions)
-		}
-	}, [mentionTextValue])
 
 	const formattedMentionList = useMemo(() => {
 		if (keyword === null || !listMentions.length) {

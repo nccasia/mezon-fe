@@ -1,6 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
-import { STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
+import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
 import { load, save } from '../storage';
 
 type ClanChannelPair = {
@@ -62,6 +62,10 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string) 
 export const jumpToChannel = async (channelId: string, clanId: string) => {
 	if (channelId && clanId) {
 		const store = await getStoreAsync();
+		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		if (!channelsCache?.includes(channelId)) {
+			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		}
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	}
 };
