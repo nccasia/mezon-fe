@@ -42,7 +42,7 @@ const codeBlockRegex = /```([\s\S]*?)```/;
 const inlineCodeRegex = /`([^`]*)`/;
 const hyperLink = /\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)/;
 const imageRegex = /!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)/;
-const unorderedListRegex = /(?:^|\s)([\-\*]\s+.*?)(?:\n|$)/;
+const unorderedListRegex = /(?:\*.*\s)+/gm;
 const orderedListRegex = /(?:^|\s)(\d+\.\s+.*?)(?:\n|$)/;
 const blockquoteRegex = /(?:^|\s)>(.*?)(?:\n|$)/;
 

@@ -95,6 +95,9 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
+
 interface PositionTracker {
 	[key: string]: number;
 }
@@ -446,6 +449,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			});
 		}
 		setLinksOnMessage(linkList);
+
+		const tree = unified().use(remarkParse).parse(convertedHashtag).children;
+
+		console.log('tree', tree);
+
+		const mapListMarkdown = tree.map((item) => {
+			console.log(item);
+		});
+
+		console.log('mapListMarkdown', mapListMarkdown);
 
 		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
 			const startsWithTripleBackticks = match[0].startsWith('```');
