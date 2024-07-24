@@ -1,11 +1,31 @@
-import { IMessageLine } from '@mezon/utils';
-import { useMemo } from 'react';
+import {IMessageLine} from '@mezon/utils';
+import {useMemo} from 'react';
+import {useSelector} from "react-redux";
+import {selectChannelsEntities} from "@mezon/store";
 
 export function useMessageLine(line: string): IMessageLine {
 	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
 	const emojiRegex = /^:\w+:$/;
 	const extensionsRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
+  const googleMeetLinkRegex = /https:\/\/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})/g;
+  const extensionsNotGoogleMeetRegex = /https?:\/\/(?!meet\.google\.com)[^\s/$.?#].[^\s]*/gi;
+  const channels = useSelector(selectChannelsEntities);
 
+  const extractMeetingCodes = (input: string): string[] => {
+    const matches = [...input.matchAll(googleMeetLinkRegex)];
+    return matches.map(match => match[1]);
+  }
+
+  const transformGoogleMeetLinks = (input: string): string => {
+    return input.replace(googleMeetLinkRegex, (match) => {
+      const meetingCode = extractMeetingCodes(match)[0];
+      if (!meetingCode) return match;
+
+      const foundMeeting = Object.values(channels).find(channel => channel?.meeting_code === meetingCode);
+      return foundMeeting ? `<#${foundMeeting.id}>` : match;
+    });
+  }
+  
 	const isOnlyEmoji = useMemo(() => {
 		if (!line?.trim()) {
 			return false;
@@ -56,8 +76,8 @@ export function useMessageLine(line: string): IMessageLine {
 	};
 
 	const links = useMemo(() => {
-		return processMatches(extensionsRegex, line);
-	}, [line, extensionsRegex]);
+		return processMatches(extensionsNotGoogleMeetRegex, line);
+	}, [line, extensionsNotGoogleMeetRegex]);
 
 	const mentions = useMemo(() => {
 		const trimmedLine = line.trim();
@@ -71,7 +91,10 @@ export function useMessageLine(line: string): IMessageLine {
 				},
 			];
 		}
-
+    
+    if(extractMeetingCodes(line).length) {
+      return processMatches(combinedRegex, transformGoogleMeetLinks(line));
+    }
 		return processMatches(combinedRegex, line);
 	}, [line, combinedRegex]);
 
