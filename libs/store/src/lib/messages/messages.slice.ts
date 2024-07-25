@@ -891,7 +891,9 @@ const handleSetManyMessages = ({
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 
 	const channelEntity = state.channelMessages[channelId];
-	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(0, adapterPayload.length + 1));
+
+	// handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(0, adapterPayload.length + 1));
+	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids);
 };
 
 const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
