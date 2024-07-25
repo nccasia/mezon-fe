@@ -5,7 +5,7 @@ import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
 	ILinkOnMessage,
-	ImarkdownOnMessage,
+	IMarkdownOnMessage,
 	IMentionOnMessage,
 	linkRegex,
 	markdownRegex,
@@ -20,7 +20,7 @@ export const useConvertedContent = (plainText: string) => {
 		hashtags: [] as IHashtagOnMessage[],
 		emojis: [] as IEmojiOnMessage[],
 		links: [] as ILinkOnMessage[],
-		markdowns: [] as ImarkdownOnMessage[],
+		markdowns: [] as IMarkdownOnMessage[],
 	});
 
 	useEffect(() => {
@@ -28,7 +28,7 @@ export const useConvertedContent = (plainText: string) => {
 		const hashtagArr: IHashtagOnMessage[] = [];
 		const emojiArr: IEmojiOnMessage[] = [];
 		const linkArr: ILinkOnMessage[] = [];
-		const markdownArr: ImarkdownOnMessage[] = [];
+		const markdownArr: IMarkdownOnMessage[] = [];
 
 		let match;
 

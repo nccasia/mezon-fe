@@ -47,19 +47,17 @@ import {
 	IHashtagOnMessage,
 	ILineMention,
 	ILinkOnMessage,
+	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
-	ImarkdownOnMessage,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
 	ThreadValue,
 	UsersClanEntity,
-	convertMarkdown,
 	emojiRegex,
 	focusToElement,
 	linkRegex,
-	markdownRegex,
 	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
@@ -97,7 +95,7 @@ import SuggestItem from './SuggestItem';
 
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
-
+import { Node, Parent } from 'unist';
 interface PositionTracker {
 	[key: string]: number;
 }
@@ -151,14 +149,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
 	const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
 	const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
-	const [markdownsOnMessage, setMarkdownsOnMessage] = useState<ImarkdownOnMessage[]>([]);
+	const [markdownsOnMessage, setMarkdownsOnMessage] = useState<IMarkdownOnMessage[]>([]);
 	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const mentionList: IMentionOnMessage[] = [];
 	const hashtagList: IHashtagOnMessage[] = [];
 	const emojiList: IEmojiOnMessage[] = [];
 	const linkList: ILinkOnMessage[] = [];
-	const markdownList: ImarkdownOnMessage[] = [];
+	const markdownList: IMarkdownOnMessage[] = [];
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -450,27 +448,58 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		setLinksOnMessage(linkList);
 
-		const tree = unified().use(remarkParse).parse(convertedHashtag).children;
-
+		// Phân tích cú pháp Markdown thành AST
+		const tree = unified().use(remarkParse).parse(convertedHashtag);
 		console.log('tree', tree);
+		// Định nghĩa kiểu cho phần tử trong mảng indices
 
-		const mapListMarkdown = tree.map((item) => {
-			console.log(item);
-		});
-
-		console.log('mapListMarkdown', mapListMarkdown);
-
-		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
-			const startsWithTripleBackticks = match[0].startsWith('```');
-			const endsWithNoTripleBackticks = match[0].endsWith('```');
-			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
-			markdownList.push({
-				markdown: convertedMarkdown,
-				startIndex: match.index,
-				endIndex: match.index + match[0].length,
-			});
+		// Kiểm tra nếu một nút có thuộc tính children
+		function isParent(node: Node): node is Parent {
+			return (node as Parent).children !== undefined;
 		}
-		setMarkdownsOnMessage(markdownList);
+
+		// Kiểm tra nếu một nút là loại `root`, `paragraph`, hoặc `text`
+		function isExcludedNode(node: Node): boolean {
+			return ['root', 'paragraph', 'text', 'listItem'].includes(node.type);
+		}
+
+		// Hàm tính toán chỉ số startIndex và endIndex cho các phần tử trong AST
+		// Hàm tính toán chỉ số startIndex và endIndex cho các phần tử trong AST
+		function calculateIndices(node: Node, text: string, indices: IMarkdownOnMessage[] = []): IMarkdownOnMessage[] {
+			if (node.position && !isExcludedNode(node)) {
+				const { start, end } = node.position;
+				indices.push({
+					type: node.type,
+					markdown: text.slice(start.offset, end.offset),
+					startIndex: start.offset,
+					endIndex: end.offset,
+				});
+			}
+
+			if (isParent(node)) {
+				node.children.forEach((child: Node) => calculateIndices(child, text, indices));
+			}
+
+			return indices;
+		}
+
+		const indices = calculateIndices(tree, convertedHashtag);
+
+		console.log(indices);
+
+		setMarkdownsOnMessage(indices);
+
+		// while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
+		// 	const startsWithTripleBackticks = match[0].startsWith('```');
+		// 	const endsWithNoTripleBackticks = match[0].endsWith('```');
+		// 	const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
+		// 	markdownList.push({
+		// 		markdown: convertedMarkdown,
+		// 		startIndex: match.index,
+		// 		endIndex: match.index + match[0].length,
+		// 	});
+		// }
+		// setMarkdownsOnMessage(markdownList);
 
 		if (mentions.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {

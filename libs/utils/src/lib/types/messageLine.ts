@@ -19,6 +19,7 @@ export interface ILink {
 	link: string | undefined;
 }
 export interface Imarkdown {
+	type?: string | undefined;
 	markdown: string | undefined;
 }
 
@@ -26,4 +27,4 @@ export interface IMentionOnMessage extends IMention, IStartEndIndex {}
 export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
 export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export interface ILinkOnMessage extends ILink, IStartEndIndex {}
-export interface ImarkdownOnMessage extends Imarkdown, IStartEndIndex {}
+export interface IMarkdownOnMessage extends Imarkdown, IStartEndIndex {}
