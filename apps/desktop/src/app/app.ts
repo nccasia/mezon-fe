@@ -1,4 +1,5 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, nativeImage, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, nativeImage, screen, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -45,6 +46,7 @@ export default class App {
 		}
 
 		setup(App.mainWindow.webContents);
+		autoUpdater.checkForUpdates();
 	}
 
 	private static onActivate() {

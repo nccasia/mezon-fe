@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
 import { format } from 'url';
@@ -58,6 +59,50 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 		}
 		App.mainWindow.focus();
 	}
+});
+
+// Tạo file để xem log
+// log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
+autoUpdater.autoDownload = false;
+
+autoUpdater.on('checking-for-update', () => {
+	dialog.showMessageBox({
+		message: `CHECKING FOR UPDATES ${app.getVersion()}!!`,
+	});
+});
+
+autoUpdater.on('update-available', () => {
+	dialog.showMessageBox({
+		message: ' update-available !!',
+	});
+	autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on('update-not-available', () => {
+	dialog.showMessageBox({
+		message: 'update-not-available !!',
+	});
+});
+
+autoUpdater.on('update-downloaded', () => {
+	dialog.showMessageBox({
+		message: 'update Downloaded !!',
+	});
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
+	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+	dialog.showMessageBox({
+		message: `update Downloaded: ${log_message} !!`,
+	});
+});
+
+autoUpdater.on('error', (error) => {
+	dialog.showMessageBox({
+		message: `err: ${error.message} !!`,
+	});
 });
 
 // handle setup events as quickly as possible

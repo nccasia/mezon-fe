@@ -12,7 +12,14 @@
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
-        "appId": "Mezon"
+        "appId": "Mezon",
+        "publish": [
+          {
+            "provider": "s3",
+            "bucket": "mezon-release-asia",
+            "region": "ap-southeast-1"
+          }
+        ]
       },
       "linux": {
         "category": "Utility",
