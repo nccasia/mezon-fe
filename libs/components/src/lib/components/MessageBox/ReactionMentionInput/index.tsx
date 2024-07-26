@@ -450,7 +450,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		// Phân tích cú pháp Markdown thành AST
 		const tree = unified().use(remarkParse).parse(convertedHashtag);
-		console.log('tree', tree);
 		// Định nghĩa kiểu cho phần tử trong mảng indices
 
 		// Kiểm tra nếu một nút có thuộc tính children
@@ -463,7 +462,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return ['root', 'paragraph', 'text', 'listItem'].includes(node.type);
 		}
 
-		// Hàm tính toán chỉ số startIndex và endIndex cho các phần tử trong AST
 		// Hàm tính toán chỉ số startIndex và endIndex cho các phần tử trong AST
 		function calculateIndices(node: Node, text: string, indices: IMarkdownOnMessage[] = []): IMarkdownOnMessage[] {
 			if (node.position && !isExcludedNode(node)) {
@@ -484,8 +482,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		const indices = calculateIndices(tree, convertedHashtag);
-
-		console.log(indices);
 
 		setMarkdownsOnMessage(indices);
 

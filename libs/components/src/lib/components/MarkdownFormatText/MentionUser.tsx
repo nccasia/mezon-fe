@@ -22,6 +22,8 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 		e.preventDefault();
 	};
 
+	console.log(tagName);
+
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
 	useEffect(() => {
