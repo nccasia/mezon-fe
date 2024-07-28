@@ -42,6 +42,11 @@ export function useMessageParser(message: IMessageWithUser) {
 	const userClanNickname = useMemo(() => {
 		return message?.clan_nick;
 	}, [message?.clan_nick]);
+
+	const userClanAvatar = useMemo(() => {
+		return message?.clan_avatar;
+	}, [message?.clan_avatar]);
+
 	const userDisplayName = useMemo(() => {
 		return message?.display_name;
 	}, [message?.display_name]);
@@ -117,6 +122,7 @@ export function useMessageParser(message: IMessageWithUser) {
 		hasAttachments,
 		isEdited,
 		userClanNickname,
+		userClanAvatar,
 		userDisplayName,
 		username,
 		senderId,

@@ -3,6 +3,7 @@ import { useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
+import useShowAvatar from './useShowAvatar';
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
@@ -12,8 +13,7 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
-	const { senderId, username, avatarSender } = useMessageParser(message);
-
+	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -37,6 +37,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 		e.stopPropagation();
 	};
 
+	const avatarShowed = useShowAvatar(avatarSender ?? '', userClanAvatar ?? '');
 	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
@@ -57,7 +58,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					}}
 					alt={username ?? ''}
 					userName={username}
-					src={avatarSender}
+					src={avatarShowed ?? ''}
 					className="min-w-10 min-h-10"
 					isAnonymous={isAnonymous}
 				/>

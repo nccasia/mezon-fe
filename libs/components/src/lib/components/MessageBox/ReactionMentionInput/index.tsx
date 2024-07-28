@@ -74,6 +74,7 @@ import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
+import useShowAvatar from '../../MessageWithUser/useShowAvatar';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
 import {
@@ -592,6 +593,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked, addEmojiState]);
+	const showedAvatar = useShowAvatar(getRefMessageReply?.avatar ?? '', getRefMessageReply?.clan_avatar ?? '');
 
 	useEffect(() => {
 		if (getRefMessageReply && getRefMessageReply.attachments) {
@@ -604,7 +606,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						message_sender_id: getRefMessageReply.sender_id,
 						content: JSON.stringify(getRefMessageReply.content),
 						message_sender_username: getRefMessageReply.username,
-						mesages_sender_avatar: getRefMessageReply.avatar,
+						mesages_sender_avatar: showedAvatar,
 						message_sender_clan_nick: getRefMessageReply.clan_nick,
 						message_sender_display_name: getRefMessageReply.display_name,
 						has_attachment: getRefMessageReply.attachments?.length > 0,
