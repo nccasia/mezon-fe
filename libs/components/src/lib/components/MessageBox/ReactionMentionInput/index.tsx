@@ -453,9 +453,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
     }
     
     replacements.forEach(({ original, mention, replacedValue, foundMatchedChannel }) => {
-      const regex = new RegExp(original, 'g');
-      newPlainTextValue = newPlainTextValue.replace(regex, mention);
-      newValue = newValue.replace(regex, replacedValue);
+      const matchGoogleLinkMeetRegex = new RegExp(original, 'g');
+      newPlainTextValue = newPlainTextValue.replace(matchGoogleLinkMeetRegex, mention);
+      newValue = newValue.replace(matchGoogleLinkMeetRegex, replacedValue);
     });
     
     replacements.forEach(({ mention, replacedValue, foundMatchedChannel }) => {
