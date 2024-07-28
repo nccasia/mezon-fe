@@ -5,7 +5,7 @@ import SettingRightClanEdit from './settingUserClanProfileEdit';
 const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileClick?: () => void; menuIsOpen: boolean }) => {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
-	const [flagOption, setFlagOption] = useState(false);
+	const [flagOption, setFlagOption] = useState<boolean>(false);
 	const [selectedClanId, setSelectedClanId] = useState<string | undefined>(currentClan ? currentClan.id : undefined);
 	const handleUserProfileButtonClick = () => {
 		if (onUserProfileClick) {
@@ -50,8 +50,7 @@ const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileCli
 			</div>
 			<SettingRightClanEdit
 				flagOption={flagOption}
-				setFlagOptionsTrue={() => setFlagOption(true)}
-				setFlagOptionsfalse={() => setFlagOption(false)}
+				setFlagOption={setFlagOption}
 				clanId={selectedClanId || ''}
 			/>
 		</div>

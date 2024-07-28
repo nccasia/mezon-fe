@@ -115,7 +115,7 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	settingEmoji: settingClanEmojiReducer,
-	webhook: integrationWebhookReducer,
+	integrationWebhook: integrationWebhookReducer,
 };
 
 let storeInstance = configureStore({

@@ -1,4 +1,4 @@
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -11,15 +11,16 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
-import { useFocusEffect } from '@react-navigation/native';
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessages from './ChannelMessages';
 import { ChatBox } from './ChatBox';
 import { IModeKeyboardPicker } from './components';
@@ -40,7 +41,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
-
+	const navigation = useNavigation<any>();
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
@@ -61,23 +62,17 @@ const HomeDefault = React.memo((props: any) => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
 	}, [clans, clansLoadingStatus]);
 
-	const bottomSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ['15%', '40%'], []);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const snapPoints = ['50%'];
 	const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
 	const openBottomSheet = () => {
 		Keyboard.dismiss();
 		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
 		timeoutRef.current = setTimeout(() => {
-			bottomSheetRef.current?.snapToIndex(1);
+			bottomSheetRef.current?.present();
 		}, 200);
 	};
-
-	const closeBottomSheet = () => {
-		bottomSheetRef.current?.close();
-		setIsShowSettingNotifyBottomSheet(false);
-	};
-	const renderBackdrop = useCallback((props) => <BottomSheetBackdrop {...props} opacity={0.5} onPress={closeBottomSheet} appearsOnIndex={1} />, []);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -126,7 +121,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	const onOpenDrawer = () => {
 		onShowKeyboardBottomSheet(false, 0, 'text');
-		DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: true });
+		navigation.dispatch(DrawerActions.openDrawer());
 		Keyboard.dismiss();
 	};
 
@@ -154,7 +149,7 @@ const HomeDefault = React.memo((props: any) => {
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
 					<ChannelMessages
-						channelId={currentChannel.channel_id}
+						channelId={currentChannel?.channel_id}
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
@@ -165,7 +160,7 @@ const HomeDefault = React.memo((props: any) => {
 					)} */}
 
 					<ChatBox
-						channelId={currentChannel.channel_id}
+						channelId={currentChannel?.channel_id}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
@@ -195,19 +190,10 @@ const HomeDefault = React.memo((props: any) => {
 					)}
 				</View>
 			)}
-			{isShowSettingNotifyBottomSheet && (
-				<BottomSheet
-					ref={bottomSheetRef}
-					animateOnMount
-					enablePanDownToClose={true}
-					backdropComponent={renderBackdrop}
-					index={-1}
-					snapPoints={snapPoints}
-					backgroundStyle={{ backgroundColor: themeValue.secondary }}
-				>
-					<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
-				</BottomSheet>
-			)}
+
+			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
+				<NotificationSetting />
+			</MezonBottomSheet>
 		</View>
 	);
 });
@@ -248,7 +234,7 @@ const HomeDefaultHeader = React.memo(
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-									currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
 								) : (
 									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />

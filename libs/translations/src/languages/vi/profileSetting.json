@@ -27,5 +27,7 @@
         "keepEditing": "Tiếp tục chỉnh sửa"
     },
     "selectAClan": "Chọn Một Máy Chủ",
-    "searchClanPlaceholder": "Tìm kiếm Máy Chủ"
+    "searchClanPlaceholder": "Tìm kiếm Máy Chủ",
+    "updateProfileSuccess": "Cập nhật hồ sơ thành công",
+    "updateClanProfileSuccess": "Cập nhật hồ sơ máy chủ thành công"
 }

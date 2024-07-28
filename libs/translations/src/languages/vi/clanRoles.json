@@ -39,6 +39,10 @@
         "deleteRole": "Xóa vai trò",
         "deleteRoleSuccessfully": "Đã xóa vai trò {{roleName}} thành công",
         "changesSaved": "Đã lưu thay đổi",
-        "save": "Lưu"
+        "save": "Lưu",
+        "confirmSaveTitle": "Lưu thay đổi?",
+        "confirmSaveContent": "Bạn đã thực hiện các thay đổi. Bạn có muốn lưu chúng không?",
+        "yes": "Có",
+        "doNotSave": "Không lưu"
     }
 }

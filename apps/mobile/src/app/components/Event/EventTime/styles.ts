@@ -6,7 +6,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         justifyContent: "flex-start",
-        alignContent: "center",
+        alignItems: "center",
         gap: Metrics.size.s
     },
 

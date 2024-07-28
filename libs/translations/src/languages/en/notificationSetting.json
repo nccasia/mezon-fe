@@ -4,14 +4,15 @@
     "labelOptions": {
       "reactionMessage": "Reaction Message",
       "categoryDefault": "Use Category Default",
-      "allMessage": "ALL",
-      "notThingMessage": "NOTHING",
-      "mentionMessage": "MENTION"
+      "allMessage": "All",
+      "notThingMessage": "Nothing",
+      "mentionMessage": "Only @mention"
     }
   },
   "notifySettingThreadModal": {
     "headerTitleMuteThread": "Mute this thread",
     "headerTitleMuteChannel": "Mute this channel",
+    "muteThisConversation": "Mute this conversation",
     "muteDuration": {
       "forFifteenMinutes": "For 15 Minutes",
       "forOneHour": "For 1 Hour",

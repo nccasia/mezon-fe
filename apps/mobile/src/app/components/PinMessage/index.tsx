@@ -20,8 +20,6 @@ const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
 
 	const dispatch = useDispatch<AppDispatch>();
-	const channelsEntities = useSelector(selectChannelsEntities);
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	const handleUnpinMessage = (message: PinMessageEntity) => {
 		const channelId = currentChannelId;
@@ -40,8 +38,7 @@ const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
 						let contentString = pinMessage?.content;
 						if (typeof contentString === 'string') {
 							try {
-								const contentObject = JSON.parse(contentString);
-								contentString = contentObject.t;
+								contentString = JSON.parse(contentString);
 							} catch (e) {
 								console.error('Failed to parse content JSON:', e);
 							}
@@ -52,8 +49,6 @@ const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
 								pinMessageItem={pinMessage}
 								contentMessage={contentString}
 								handleUnpinMessage={handleUnpinMessage}
-								channelsEntities={channelsEntities}
-								emojiListPNG={emojiListPNG}
 							/>
 						);
 					})

@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { selectIdMessageRefReaction } from '@mezon/store';
+import { selectIdMessageRefReaction, selectIdMessageRefReply } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -19,6 +19,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 
 	const messageBox = useRef<HTMLDivElement>(null);
 	const setMarginleft = useMemo(() => {
@@ -93,7 +94,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					<GifStickerEmojiPopup />
 				</div>
 			)}
-			<ReplyMessageBox />
+			{idMessageRefReply && <ReplyMessageBox idMessage={idMessageRefReply} />}
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId })}
 				onSend={handleSend}

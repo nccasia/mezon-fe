@@ -1,10 +1,22 @@
-import { useAuth } from '@mezon/core';
+import { useAccount, useAuth, useClanProfileSetting } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import {
+	ClansEntity,
+	channelMembersActions,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectUserClanProfileByClanID,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { isEqual } from 'lodash';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ChannelType } from 'mezon-js';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import MezonTabHeader from '../../../temp-ui/MezonTabHeader';
 import MezonTabView from '../../../temp-ui/MezonTabView';
 import ServerProfile from './ServerProfile';
@@ -32,10 +44,17 @@ export interface IClanProfileValue {
 export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const user = useAuth();
+	const { userProfile } = useAuth();
 	const [tab, setTab] = useState<number>(0);
-	const [triggerToSaveTab, setTriggerToSaveTab] = useState<EProfileTab | null>(null);
+	const currentClan = useSelector(selectCurrentClan);
+	const [selectedClan, setSelectedClan] = useState<ClansEntity>(currentClan);
 	const { t } = useTranslation(['profileSetting']);
+	const { updateUser } = useAccount();
+	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
+	const { updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
+	const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.id, userProfile?.user?.id ?? ''));
 
 	const [originUserProfileValue, setOriginUserProfileValue] = useState<IUserProfileValue>({
 		username: '',
@@ -61,6 +80,31 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		displayName: '',
 	});
 
+  useEffect(() => {
+		const { display_name, avatar_url, username, about_me } = userProfile?.user || {};
+		const initialValue = {
+			username,
+			imgUrl: avatar_url,
+			displayName: display_name,
+			aboutMe: about_me,
+		};
+		setOriginUserProfileValue(initialValue);
+		setCurrentUserProfileValue(initialValue);
+	}, [userProfile, tab]);
+
+	useEffect(() => {
+		const { username, about_me } = userProfile?.user || {};
+		const { nick_name, avartar } = userClansProfile || {};
+		const initialValue = {
+			username,
+			imgUrl: avartar,
+			displayName: nick_name,
+			aboutMe: about_me,
+		};
+		setOriginClanProfileValue(initialValue);
+		setCurrentClanProfileValue(initialValue);
+	}, [userClansProfile, tab, userProfile, selectedClan ]);
+
 	const isUserProfileNotChanged = useMemo(() => {
 		return isEqual(originUserProfileValue, currentUserProfileValue);
 	}, [originUserProfileValue, currentUserProfileValue]);
@@ -69,24 +113,45 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		return isEqual(originClanProfileValue, currentClanProfileValue);
 	}, [originClanProfileValue, currentClanProfileValue]);
 
-	useEffect(() => {
-		if (user?.userId) {
-			const { display_name, avatar_url, username, about_me } = user?.userProfile?.user || {};
-			const initialValue = {
-				username,
-				imgUrl: avatar_url,
-				displayName: display_name,
-				aboutMe: about_me,
-			};
-			setOriginUserProfileValue(initialValue);
-			setCurrentUserProfileValue(initialValue);
-		}
-	}, [user]);
+	const updateUserProfile = async () => {
+		const { username, imgUrl, displayName, aboutMe } = currentUserProfileValue;
+		const response = await updateUser(username, imgUrl, displayName || username, aboutMe, true);
 
-	const setDefaultValueClanProfile = useCallback((clanProfileValue: IClanProfileValue) => {
-		setOriginClanProfileValue(clanProfileValue);
-		setCurrentClanProfileValue(clanProfileValue);
-	}, []);
+		if (response) {
+			if (currentChannelId && currentClanId) {
+				await dispatch(
+					channelMembersActions.fetchChannelMembers({
+						clanId: currentClanId || '',
+						channelId: currentChannelId || '',
+						channelType: ChannelType.CHANNEL_TYPE_TEXT,
+						noCache: true,
+						repace: true,
+					}),
+				);
+			}
+			Toast.show({
+				type: 'info',
+				text1: t('updateProfileSuccess'),
+			});
+			navigation.goBack();
+		}
+	};
+
+	const updateClanProfile = async () => {
+		const { username = '', displayName, imgUrl } = currentClanProfileValue;
+
+		if (currentClanProfileValue?.imgUrl || currentClanProfileValue?.displayName) {
+			const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName || username, imgUrl || '');
+			if (response) {
+				Toast.show({
+					type: 'info',
+					text1: t('updateClanProfileSuccess'),
+				});
+				navigation.goBack();
+			}
+		}
+	};
+
 
 	navigation.setOptions({
 		headerRight: () => (
@@ -134,13 +199,14 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		if (isUserProfileNotChanged && isClanProfileNotChanged) {
 			return;
 		}
+
 		if (tab === EProfileTab.UserProfile) {
-			setTriggerToSaveTab(EProfileTab.UserProfile);
+			updateUserProfile();
 			return;
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
-			setTriggerToSaveTab(EProfileTab.ClanProfile);
+			updateClanProfile();
 			return;
 		}
 	};
@@ -193,16 +259,14 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 				onChange={handleTabChange}
 				views={[
 					<UserProfile
-						triggerToSave={triggerToSaveTab}
 						userProfileValue={currentUserProfileValue}
 						setCurrentUserProfileValue={setCurrentUserProfileValue}
 					/>,
 					<ServerProfile
-						triggerToSave={triggerToSaveTab}
 						clanProfileValue={currentClanProfileValue}
 						isClanProfileNotChanged={isClanProfileNotChanged}
-						setDefaultValue={setDefaultValueClanProfile}
 						setCurrentClanProfileValue={setCurrentClanProfileValue}
+						onSelectedClan={(clan) => setSelectedClan(clan)}
 					/>,
 				]}
 			/>

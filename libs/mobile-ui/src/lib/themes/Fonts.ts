@@ -41,11 +41,13 @@ export const size = {
   s_20: verticalScale(20),
   s_24: verticalScale(24),
 
+  s_15: verticalScale(15),
   s_16: verticalScale(16),
   s_22: verticalScale(22),
   s_28: verticalScale(28),
   s_30: verticalScale(30),
   s_34: verticalScale(34),
+  s_36: verticalScale(36),
   s_32: verticalScale(32),
   s_40: verticalScale(40),
   s_50: verticalScale(50),

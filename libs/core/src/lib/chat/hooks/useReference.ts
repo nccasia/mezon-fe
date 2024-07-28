@@ -1,14 +1,14 @@
 import {
-    messagesActions,
-    referencesActions,
-    selectAttachmentData,
-    selectDataReferences,
-    selectIdMessageToJump,
-    selectOpenOptionMessageState,
-    selectOpenThreadMessageState,
-    selectStatusLoadingAttachment,
-    threadsActions,
-    useAppDispatch,
+	messagesActions,
+	referencesActions,
+	selectAttachmentData,
+	selectDataReferences,
+	selectIdMessageToJump,
+	selectOpenOptionMessageState,
+	selectOpenThreadMessageState,
+	selectStatusLoadingAttachment,
+	threadsActions,
+	useAppDispatch,
 } from '@mezon/store';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';

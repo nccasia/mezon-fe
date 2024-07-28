@@ -45,3 +45,9 @@ export const convertToPlainTextHashtag = (text: string) => {
 	
 	return text;
 };
+
+export const codeBlockRegex = /^```[\s\S]*```$/;
+export const codeBlockRegexGlobal = /```[\s\S]*?```/g;
+export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
+export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
+export const urlRegex = /(https?:\/\/[^\s]+)/g;

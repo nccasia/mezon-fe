@@ -1,4 +1,5 @@
-import { OptionEvent } from "@mezon/utils";
+import { DirectEntity } from "@mezon/store-mobile";
+import { IChannel, OptionEvent } from "@mezon/utils";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -119,7 +120,7 @@ type MenuThreadStackParamList = {
   [APP_SCREEN.MENU_THREAD.BOTTOM_SHEET]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
-  [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: undefined;
+  [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity};
 }
 
 type MenuChannelStackParamList = {

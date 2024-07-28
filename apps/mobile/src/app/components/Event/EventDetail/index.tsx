@@ -1,5 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { BellIcon, CheckIcon, ShareIcon, ThreeDotIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectClanById, selectMemberByUserId } from '@mezon/store-mobile';
 import { useRef } from 'react';
 import { Text, View } from 'react-native';
@@ -10,13 +11,15 @@ import MezonButton from '../../../temp-ui/MezonButton2';
 import EventLocation from '../EventLocation';
 import EventMenu from '../EventMenu';
 import EventTime from '../EventTime';
-import styles from './styles';
+import { style } from './styles';
 
 interface IEventDetailProps {
 	event: EventManagementEntity;
 }
 
 export default function EventDetail({ event }: IEventDetailProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
 	const clans = useSelector(selectClanById(event?.clan_id || ''));
 	const menuBottomSheet = useRef<BottomSheetModal>(null);
@@ -33,17 +36,22 @@ export default function EventDetail({ event }: IEventDetailProps) {
 			<View>
 				<View style={styles.mainSection}>
 					{/* TODO: Fix this */}
-					<MezonAvatar avatarUrl={clans?.logo} userName={clans?.clan_name} height={20} width={20} />
+					<MezonAvatar avatarUrl={clans?.logo} username={clans?.clan_name} height={20} width={20} />
 
 					<EventLocation event={event} />
 
 					<View style={styles.inline}>
-						<BellIcon height={16} width={16} />
+						<Icons.BellIcon height={16} width={16} color={themeValue.text} />
 						<Text style={styles.smallText}>{event?.user_ids?.length}</Text>
 					</View>
 
 					{/* TODO: Fix this */}
-					<MezonAvatar avatarUrl={userCreate?.user?.avatar_url} userName={userCreate?.user?.username} height={20} width={20} />
+					<MezonAvatar
+						avatarUrl={userCreate?.user?.avatar_url}
+						username={userCreate?.user?.username}
+						height={20}
+						width={20}
+					/>
 				</View>
 			</View>
 
@@ -51,10 +59,10 @@ export default function EventDetail({ event }: IEventDetailProps) {
 
 			<View style={styles.inline}>
 				{/* <MezonButton title="End event" fluid /> */}
-				<MezonButton icon={<CheckIcon height={16} width={16} />} title="Interested" fluid border />
+				<MezonButton icon={<Icons.CheckmarkLargeIcon height={16} width={16} color={themeValue.text} />} title="Interested" fluid border titleStyle={{ color: themeValue.text }} />
 				{/* <MezonButton title="Start event" fluid type="success" /> */}
-				<MezonButton icon={<ShareIcon height={20} width={20} />} />
-				<MezonButton icon={<ThreeDotIcon height={20} width={20} />} onPress={handlePress} />
+				<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
+				<MezonButton icon={<Icons.MoreVerticalIcon height={20} width={20} color={themeValue.text} />} onPress={handlePress} />
 			</View>
 
 			<MezonBottomSheet ref={menuBottomSheet}>

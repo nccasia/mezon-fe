@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonInput } from '../../../temp-ui';
+import { MezonConfirm, MezonInput } from '../../../temp-ui';
 
 enum EActionType {
 	permissions,
@@ -24,6 +24,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const RolesClan = useSelector(selectAllRolesClan);
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
+	const [showModalConfirmSave, setShowModalConfirmSave] = useState(false);
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
@@ -51,39 +52,9 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			if (isNotChange) return null;
 			return (
 				<TouchableOpacity
-					onPress={async () => {
-						const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
-						const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
-						const response = await updateRole(
-							clanRole.clan_id,
-							clanRole.id,
-							currentRoleName,
-							selectedMembers,
-							selectedPermissions,
-							[],
-							[],
-						);
-						if (response) {
-							Toast.show({
-								type: 'success',
-								props: {
-									text2: t('roleDetail.changesSaved'),
-									leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-								},
-							});
-							navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
-						} else {
-							Toast.show({
-								type: 'success',
-								props: {
-									text2: t('failed'),
-									leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-								},
-							});
-						}
-					}}
+					onPress={async () => handleSave()}
 				>
-					<Block marginRight={size.s_14}>
+					<Block marginRight={size.s_20}>
 						<Text h4 color={Colors.textViolet}>
 							{t('roleDetail.save')}
 						</Text>
@@ -91,7 +62,55 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				</TouchableOpacity>
 			);
 		},
+		headerLeft: () => {
+			return (
+				<TouchableOpacity onPress={() => {
+					if (isNotChange) {
+						navigation?.goBack();
+						return;
+					}
+					setShowModalConfirmSave(true);
+				}}>
+					<Block marginLeft={size.s_16}>
+						<Icons.ArrowLargeLeftIcon color={themeValue.white} height={size.s_22} width={size.s_22} />
+					</Block>
+				</TouchableOpacity>
+			)
+		}
 	});
+
+	const handleSave = async () => {
+		setShowModalConfirmSave(false);
+		const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
+		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
+		const response = await updateRole(
+			clanRole.clan_id,
+			clanRole.id,
+			currentRoleName,
+			selectedMembers,
+			selectedPermissions,
+			[],
+			[],
+		);
+		if (response) {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('roleDetail.changesSaved'),
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
+				},
+			});
+			navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+		} else {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('failed'),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
+				},
+			});
+		}
+	}
 
 	const deleteRole = () => {
 		Alert.alert('Delete Role', 'Are you sure you want to delete this role?', [
@@ -145,6 +164,13 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				break;
 		}
 	};
+
+	const onConfirmModalChange = (value: boolean) => {
+		Keyboard.dismiss();
+		if (!value && !isNotChange) {
+			navigation?.goBack();
+		}
+	}
 
 	const actionList = useMemo(() => {
 		return [
@@ -221,6 +247,15 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 						</TouchableOpacity>
 					</Block>
 				</Block>
+
+				<MezonConfirm
+					visible={showModalConfirmSave}
+					onVisibleChange={onConfirmModalChange}
+					onConfirm={() => handleSave()}
+					title={t('roleDetail.confirmSaveTitle')}
+					confirmText={t('roleDetail.yes')}
+					content={t('roleDetail.confirmSaveContent')}
+				/>
 			</Block>
 		</TouchableWithoutFeedback>
 	);

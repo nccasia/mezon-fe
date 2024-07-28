@@ -112,7 +112,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 									<span
 										onClick={() => getLinkinvites(props.href)}
 										rel="noopener noreferrer"
-										style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+										style={{ color: 'rgb(59,130,246)', cursor: 'pointer', wordBreak:'break-word' }}
 										className="tagLink"
 									>
 										{props.children}

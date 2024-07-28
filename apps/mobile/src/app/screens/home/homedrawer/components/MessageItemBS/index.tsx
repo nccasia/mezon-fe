@@ -2,9 +2,9 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { useAppDispatch } from '@mezon/store';
+import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -34,6 +34,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile } = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useAnimatedState(false);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const handleActionEditMessage = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
@@ -359,7 +360,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			message?.clan_id ?? props?.clanId ?? '',
+			message?.clan_id ?? currentClanId ?? '',
 			message.channel_id ?? '',
 			messageId ?? '',
 			emoji?.trim(),
@@ -511,9 +512,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				);
 			}}
 		>
-			<View style={styles.bottomSheetWrapper}>
-				{content}
-			</View>
+			<View style={styles.bottomSheetWrapper}>{content}</View>
 		</MezonBottomSheet>
 	);
 });

@@ -1,12 +1,14 @@
 import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
 
+import { useTheme } from '@mezon/mobile-ui';
 import UpdateGateScreen from '../../../screens/updateGate/UpdateGateScreen';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const ServersStacks = ({}: any) => {
+export const ServersStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
+	const { themeValue } = useTheme();
 
 	return (
 		<Stack.Navigator
@@ -19,7 +21,7 @@ export const ServersStacks = ({}: any) => {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
 				},
-				cardStyle: { backgroundColor: 'white' },
+				cardStyle: { backgroundColor: "transparent" },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 			initialRouteName={APP_SCREEN.SERVERS.HOME}

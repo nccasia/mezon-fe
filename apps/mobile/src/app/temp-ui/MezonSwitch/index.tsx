@@ -42,3 +42,6 @@ export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff }
 		</TouchableOpacity>
 	);
 };
+
+
+export default MezonSwitch;

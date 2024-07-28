@@ -1,18 +1,19 @@
-import { channelsActions, selectAllTextInput, selectCurrentChannelId, selectDmGroupCurrentId, selectMode, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectAllTextInput, selectCurrentChannelId, selectDmGroupCurrentId, selectModeResponsive, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
+import { ModeResponsive } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useMessageValue(channelId?: string) {
 	const dispatch = useAppDispatch();
-	const mode = useSelector(selectMode);
+	const mode = useSelector(selectModeResponsive);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-	const valueTextInput = useSelector(selectValueTextInputByChannelId(mode === 'clan' ? (channelId || '') : (currentDmGroupId || '')));
+	const valueTextInput = useSelector(selectValueTextInputByChannelId(mode === ModeResponsive.MODE_CLAN ? (channelId || '') : (currentDmGroupId || '')));
 	const allTextInput = useSelector(selectAllTextInput);
 
 	const setValueTextInput = useCallback(
 		(value: string, isThread?: boolean) => {
-			if(mode === 'clan'){
+			if(mode === ModeResponsive.MODE_CLAN){
 				dispatch(
 					channelsActions.setValueTextInput({
 						channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
@@ -32,10 +33,10 @@ export function useMessageValue(channelId?: string) {
 		[currentChannelId, currentDmGroupId, mode, dispatch],
 	);
 
-	const setMode = useCallback(
+	const setModeResponsive = useCallback(
 		(value: string) => {
 			dispatch(
-				channelsActions.setMode(value)
+				channelsActions.setModeResponsive(value)
 			);
 		},
 		[dispatch],
@@ -49,9 +50,9 @@ export function useMessageValue(channelId?: string) {
 			allTextInput,
 			valueTextInput,
 			setValueTextInput,
-			setMode,
+			setModeResponsive,
 		}),
-		[setValueTextInput, setMode, valueTextInput, allTextInput, currentDmGroupId, mode, currentChannelId],
+		[setValueTextInput, setModeResponsive, valueTextInput, allTextInput, currentDmGroupId, mode, currentChannelId],
 	);
 }
 

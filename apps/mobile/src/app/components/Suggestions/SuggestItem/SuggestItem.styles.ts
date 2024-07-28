@@ -1,13 +1,13 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperItem: {
 		flexDirection: 'row',
-		borderBottomColor: Colors.gray48,
+		borderBottomColor: colors.border,
 		borderBottomWidth: 0.5,
 		paddingHorizontal: 10,
 		paddingVertical: 10,
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
 	title: {
 		fontSize: size.label,
 		fontWeight: '600',
-		color: Colors.white,
+		color: colors.text,
 	},
 	image: {
 		width: 40,
@@ -29,12 +29,12 @@ export const styles = StyleSheet.create({
 	symbol: {
 		fontSize: size.label,
 		fontWeight: '600',
-		color: Colors.gray48,
+		color: colors.text,
 	},
 	subText: {
 		fontSize: size.medium,
 		fontWeight: '500',
-		color: Colors.gray72,
+		color: colors.textDisabled,
 	},
 	avatarMessageBoxDefault: {
 		width: 40,
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
 	},
 	textAvatarMessageBoxDefault: {
 		fontSize: size.s_22,
-		color: Colors.white,
+		color: colors.text,
 	},
 	emojiImage: { width: size.s_20, height: size.s_20 },
 });

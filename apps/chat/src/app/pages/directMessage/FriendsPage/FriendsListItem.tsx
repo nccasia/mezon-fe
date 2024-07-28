@@ -38,7 +38,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	};
 
 	return (
-		<div className="border-t-[1px] dark:border-borderDefault border-gray-300">
+		<div className="border-t-[1px] dark:border-borderDefault border-gray-300 group/list_friends">
 			<div
 				key={friend.user?.id}
 				onClick={() => directMessageWithUser(friend.user?.id ?? '')}
@@ -47,7 +47,8 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				<div key={friend.user?.id}>
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
-						name={friend?.user?.username ?? ''}
+						name={friend?.user?.display_name ?? ''}
+						userNameAva={friend?.user?.username ?? ''}
 						status={userStatus}
 						isHideStatus={friend.state !== 0 ? true : false}
 						isHideIconStatus={friend.state !== 0 ? true : false}

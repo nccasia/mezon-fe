@@ -53,7 +53,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 					style={[styles.friendItemWrapper, isSent && styles.friendItemWrapperInvited]}
 				>
 					<View style={styles.friendItemContent}>
-						{Number(dmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP? (
+						{Number(dmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP ? (
 							<Image source={Images.AVATAR_GROUP} style={{ width: 40, height: 40, borderRadius: 50 }} />
 						) : (
 							<FastImage
@@ -89,7 +89,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 					style={[styles.friendItemWrapper, isSent && styles.friendItemWrapperInvited]}
 				>
 					<View style={styles.friendItemContent}>
-						<MezonAvatar userName={user?.user?.display_name} avatarUrl={user?.user?.avatar_url} />
+						<MezonAvatar username={user?.user?.display_name} avatarUrl={user?.user?.avatar_url} />
 						<Text style={styles.friendItemName} numberOfLines={1} ellipsizeMode="tail">
 							{user?.user?.display_name}
 						</Text>

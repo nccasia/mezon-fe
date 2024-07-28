@@ -31,7 +31,7 @@ const MessageText = ({
 		{lines?.length > 0 ? (
 			<div className="flex w-full">
 				<div className="w-full">
-					<MessageLine content={content} line={lines} messageId={message.id} mode={mode} />
+					<MessageLine showOnchannelLayout={true} content={content} mode={mode} />
 				</div>
 				{isEdited && (
 					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">

@@ -16,9 +16,9 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	return (
 		<div
 			key={pinMessage.id}
-			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgSecondary hover:bg-bgLightModeThird bg-bgLightMode dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden"
+			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-gray-700 border-gray-300 group/item-pinMess"
 		>
-			<div className="flex items-center gap-2">
+			<div className="flex items-start gap-2">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={pinMessage.avatar || ''}
@@ -31,13 +31,13 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 					</div>
-					<span className="text-[11px]">
-						<MessageLine content={{t: contentString as string}} line={contentString as string}/>
-					</span>
+					<div>
+						<MessageLine content={JSON.parse(pinMessage.content || '')} showOnchannelLayout={true} />
+					</div>
 				</div>
 			</div>
 			<button
-				className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px] px-3 py-2"
+				className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex opacity-0 group-hover/item-pinMess:opacity-100"
 				onClick={() => {
 					setOpenModalDelPin(true);
 				}}

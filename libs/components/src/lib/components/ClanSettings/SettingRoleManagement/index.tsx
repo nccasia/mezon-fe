@@ -76,7 +76,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 						{clickRole === 'New Role' ? (
 							<div className="tracking-wide text-base mb-4">NEW ROLE</div>
 						) : (
-							<div className="tracking-wide mb-4 text-base">EDIT ROLE</div>
+							<div className="tracking-wide mb-4 text-base uppercase">EDIT ROLE - {nameRole}</div>
 						)}
 						<SettingValueDisplayRole RolesClan={rolesClan} />
 					</div>

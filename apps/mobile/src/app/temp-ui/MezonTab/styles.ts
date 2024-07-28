@@ -1,12 +1,10 @@
-import { Colors, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.primary,
         flex: 1,
         paddingBottom: Metrics.size.xl
     }
 })
-
-export default styles;

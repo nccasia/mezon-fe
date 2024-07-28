@@ -15,7 +15,7 @@ import { SetupMembers } from '../../../screens/serverRoles/SetupMembers';
 import { SetupPermissions } from '../../../screens/serverRoles/SetupPermissions';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuClanStacks = ({}: any) => {
+export const MenuClanStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
@@ -38,6 +38,9 @@ export const MenuClanStacks = ({}: any) => {
 					fontWeight: 'bold',
 					color: themeValue.textStrong,
 				},
+				cardStyle: {
+					backgroundColor: "transparent",
+				}
 			}}
 		>
 			<Stack.Screen

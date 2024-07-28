@@ -1,38 +1,26 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
-import { useAccount, useAuth } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
-import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
 import { KeyboardAvoidingView, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
-import { EProfileTab, IUserProfileValue } from '..';
-import BannerAvatar, { IFile } from './components/Banner';
+import { IUserProfileValue } from '..';
+import BannerAvatar from './components/Banner';
 import DetailInfo from './components/Info';
 import { style } from './styles';
 
 interface IUserProfile {
-	triggerToSave: EProfileTab;
 	userProfileValue: IUserProfileValue;
 	setCurrentUserProfileValue: (updateFn: (prevValue: IUserProfileValue) => IUserProfileValue) => void;
 }
 
-export default function UserProfile({ triggerToSave, userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
+export default function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const auth = useAuth();
-	const { updateUser } = useAccount();
-	const { sessionRef, clientRef } = useMezon();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const [file, setFile] = useState<IFile>(null);
-	const navigation = useNavigation();
-
-	const handleAvatarChange = (data: IFile) => {
-		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, imgUrl: data?.uri }));
-		setFile(data);
+	const handleAvatarChange = async (imgUrl: string) => {
+		const { username, displayName, aboutMe } = userProfileValue;
+		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, imgUrl: imgUrl, username, aboutMe, displayName }));
 	};
 
 	const handleDetailChange = (newValue: Partial<IUserProfileValue>) => {
@@ -46,48 +34,9 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 		});
 	}
 
-	const getImageUrlToSave = useCallback(async () => {
-		if (!file) {
-			return userProfileValue?.imgUrl;
-		}
-		const session = sessionRef.current;
-		const client = clientRef.current;
-
-		if (!file || !client || !session) {
-			throw new Error('Client is not initialized');
-		}
-		const ms = new Date().getTime();
-		const fullFilename = `${currentChannel?.clan_id}/${currentChannel?.channel_id}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-		const res = await handleUploadFileMobile(client, session, fullFilename, file);
-
-		return res.url;
-	}, [clientRef, sessionRef, currentChannel, file, userProfileValue]);
-
-	const updateUserProfile = async () => {
-		const imgUrl = await getImageUrlToSave();
-		const { username, displayName, aboutMe } = userProfileValue;
-
-		const response = await updateUser(username, imgUrl, displayName || username, aboutMe);
-		if (response) {
-			Toast.show({
-				type: 'info',
-				text1: 'Update profile success',
-			});
-			setFile(null);
-			navigation.goBack();
-		}
-	};
-
-	useEffect(() => {
-		if (triggerToSave === EProfileTab.UserProfile) {
-			updateUserProfile();
-		}
-	}, [triggerToSave]);
-
 	return (
 		<KeyboardAvoidingView behavior="position" style={styles.container}>
-			<BannerAvatar avatar={userProfileValue?.imgUrl} onChange={handleAvatarChange} />
-
+			<BannerAvatar avatar={userProfileValue?.imgUrl} onLoad={handleAvatarChange} />
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
 					<Icons.TextIcon width={16} height={16} />

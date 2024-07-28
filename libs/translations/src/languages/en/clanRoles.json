@@ -39,6 +39,10 @@
         "deleteRole": "Delete Role",
         "deleteRoleSuccessfully": "Deleted {{roleName}} Role Successfully",
         "changesSaved": "Changes Saved",
-        "save": "Save"
+        "save": "Save",
+        "confirmSaveTitle": "Save changes?",
+        "confirmSaveContent": "You've made changes. Do you want to save them?",
+        "yes": "Yes",
+        "doNotSave": "Don't Save"
     }
 }

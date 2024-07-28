@@ -582,3 +582,8 @@ export enum ChannelIsNotThread {
 export enum EMessageCode {
 	FIRST_MESSAGE = 11,
 }
+
+export enum ModeResponsive {
+	MODE_CLAN = 'clan',
+	MODE_DM = 'dm',
+}

@@ -15,7 +15,6 @@ export default function EventTime({ event }: IEventTimeProps) {
 	return (
 		<View style={styles.inline}>
 			{
-				// @ts-ignore
 				isSameDay(event.create_time as string) && <MezonBadge title="new" type="success" />
 			}
 			<Icons.CalendarIcon height={20} width={20} color={themeValue.textStrong} />

@@ -46,8 +46,9 @@ interface IChatMessageInputProps {
   linksOnMessage?: ILinkOnMessage[];
   markdownsOnMessage?: ImarkdownOnMessage[];
   plainTextMessage?: string;
+  isShowCreateThread?: boolean;
 }
-const inputWidthWhenHasInput = Dimensions.get('window').width * 0.73;
+const inputWidthWhenHasInput = Dimensions.get('window').width * 0.72;
 
 export const ChatMessageInput = memo(forwardRef(({
   textInputProps,
@@ -71,6 +72,7 @@ export const ChatMessageInput = memo(forwardRef(({
   linksOnMessage,
   markdownsOnMessage,
   plainTextMessage,
+  isShowCreateThread,
 }: IChatMessageInputProps, ref: MutableRefObject<TextInput>) => {
   const [heightInput, setHeightInput] = useState(size.s_40);
   const channelsEntities = useSelector(selectChannelsEntities);
@@ -197,7 +199,11 @@ export const ChatMessageInput = memo(forwardRef(({
             message_id: '',
             message_ref_id: targetMessage.id,
             ref_type: 0,
-            message_sender_id: targetMessage?.user?.id,
+            message_sender_id: targetMessage?.sender_id,
+            message_sender_username: targetMessage?.username,
+            mesages_sender_avatar: targetMessage?.avatar,
+            message_sender_clan_nick: targetMessage?.clan_nick,
+            message_sender_display_name: targetMessage?.display_name,
             content: JSON.stringify(targetMessage.content),
             has_attachment: Boolean(targetMessage?.attachments?.length),
           },
@@ -245,7 +251,7 @@ export const ChatMessageInput = memo(forwardRef(({
           {...textInputProps}
           style={[
             styles.inputStyle,
-            text?.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput },
+            (text?.length > 0 || !isShowCreateThread) && { width: (isShowAttachControl && isShowCreateThread) ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput },
             { height: Math.max(size.s_40, heightInput) },
           ]}
           children={renderTextContent(text, channelsEntities)}

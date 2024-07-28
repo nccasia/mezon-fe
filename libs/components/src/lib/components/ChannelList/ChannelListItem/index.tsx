@@ -1,7 +1,6 @@
 import {
 	selectCountNotifyByChannelId,
 	selectIsUnreadChannelById,
-	selectTotalQuantityNotify,
 } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import { Fragment } from 'react';
@@ -26,7 +25,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	const handleOpenInvite = () => {
 		openInviteChannelModal();
 	};
-	
+
 	return (
 		<Fragment>
 			<ChannelLink

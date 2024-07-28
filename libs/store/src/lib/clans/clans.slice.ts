@@ -17,7 +17,6 @@ import { voiceActions } from '../voice/voice.slice';
 
 import { directActions } from '../direct/direct.slice';
 
-
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -60,28 +59,31 @@ export type ChangeCurrentClanArgs = {
 	noCache?: boolean;
 };
 
-export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('clans/changeCurrentClan', async ({ clanId, noCache = false }: ChangeCurrentClanArgs, thunkAPI) => {
-	thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
-	thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
-	thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
-	thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
-	thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
-	thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
-	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
-	thunkAPI.dispatch(policiesActions.fetchPermission());
-	thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
-	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
-	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
-	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
-	thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
-	thunkAPI.dispatch(
-		voiceActions.fetchVoiceChannelMembers({
-			clanId: clanId ?? '',
-			channelId: '',
-			channelType: ChannelType.CHANNEL_TYPE_VOICE,
-		}),
-	);
-});
+export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
+	'clans/changeCurrentClan',
+	async ({ clanId, noCache = false }: ChangeCurrentClanArgs, thunkAPI) => {
+		thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+		thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
+		thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
+		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
+		thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
+		thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
+		thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
+		thunkAPI.dispatch(policiesActions.fetchPermission());
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
+		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
+		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
+		thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
+		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
+		thunkAPI.dispatch(
+			voiceActions.fetchVoiceChannelMembers({
+				clanId: clanId ?? '',
+				channelId: '',
+				channelType: ChannelType.CHANNEL_TYPE_VOICE,
+			}),
+		);
+	},
+);
 
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
 	try {
@@ -127,37 +129,33 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
-export const deleteClan = createAsyncThunk(
-	"clans/deleteClans",
-	async (body: ChangeCurrentClanArgs, thunkAPI) =>{
-		try{
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
-			if(response){
-				thunkAPI.dispatch(fetchClans());
-			}
+export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: ChangeCurrentClanArgs, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
+		if (response) {
+			thunkAPI.dispatch(fetchClans());
 		}
-		catch (error) {
-			return thunkAPI.rejectWithValue([]);
-		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
 	}
-)
+});
 
 type removeClanUsersPayload = {
 	clanId: string;
-    userIds: string[];
+	userIds: string[];
 };
 
-export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userIds} : removeClanUsersPayload, thunkAPI) => {
+export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ({ clanId, userIds }: removeClanUsersPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.removeClanUsers(mezon.session, clanId, userIds);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchClans())
+		thunkAPI.dispatch(fetchClans());
 		return response;
-	} catch(error : any) {
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
@@ -197,11 +195,12 @@ type UpdateLinkUser = {
 	avatar_url: string;
 	display_name: string;
 	about_me: string;
+	noCache?: boolean;
 };
 
 export const updateUser = createAsyncThunk(
 	'clans/updateUser',
-	async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
+	async ({ user_name, avatar_url, display_name, about_me, noCache = false }: UpdateLinkUser, thunkAPI) => {
 		try {
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
 			const body = {
@@ -218,7 +217,7 @@ export const updateUser = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			if (response) {
-				thunkAPI.dispatch(getUserProfile());
+				thunkAPI.dispatch(getUserProfile({ noCache }));
 			}
 			return response as true;
 		} catch (error: any) {
@@ -230,17 +229,14 @@ export const updateUser = createAsyncThunk(
 interface JoinClanPayload {
 	clanId: string;
 }
-export const joinClan = createAsyncThunk<void, JoinClanPayload>(
-	'direct/joinClan',
-	async ({ clanId }, thunkAPI) => {
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.socketRef.current?.joinClanChat(clanId);
-		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
-		}
-	},
-);
+export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		await mezon.socketRef.current?.joinClanChat(clanId);
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
@@ -294,19 +290,16 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		builder
-			.addCase(deleteClan.pending, (state: ClansState) => {
-				state.loadingStatus = 'loading';
-			})
-		builder
-			.addCase(deleteClan.fulfilled, (state: ClansState) => {
-				state.loadingStatus = 'loaded';
-			})
-		builder
-			.addCase(deleteClan.rejected, (state: ClansState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
+		builder.addCase(deleteClan.pending, (state: ClansState) => {
+			state.loadingStatus = 'loading';
+		});
+		builder.addCase(deleteClan.fulfilled, (state: ClansState) => {
+			state.loadingStatus = 'loaded';
+		});
+		builder.addCase(deleteClan.rejected, (state: ClansState, action) => {
+			state.loadingStatus = 'error';
+			state.error = action.error.message;
+		});
 	},
 });
 

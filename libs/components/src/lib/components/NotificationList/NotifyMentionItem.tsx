@@ -1,5 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { INotification, notificationActions, referencesActions, selectClanById, selectMemberByUserId } from '@mezon/store';
+import { INotification, notificationActions, referencesActions, selectClanById } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import MessageHead from '../MessageWithUser/MessageHead';
 import MarkUpOnReply from '../MessageWithUser/MessageReply/MarkUpOnReply';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageLine } from '../MessageWithUser/useMessageLine';
+import { useMessageParser } from '../MessageWithUser/useMessageParser';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
 	readonly isUnreadTab?: boolean;
@@ -178,11 +179,13 @@ function MentionTabContent({ message }: IMentionTabContent) {
 		},
 		[dispatch],
 	);
-	const senderMessage = useSelector(selectMemberByUserId(message?.sender_id));
 
 	const checkMessageHasReply = useMemo(() => {
 		return message.references && message.references?.length > 0;
 	}, [message.references]);
+
+	const { username } = useMessageParser(message);
+
 	return (
 		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
 			{checkMessageHasReply && (
@@ -192,10 +195,10 @@ function MentionTabContent({ message }: IMentionTabContent) {
 			)}
 
 			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
-				<AvatarImage alt="user avatar" className="w-15 h-15" userName={senderMessage?.user?.username} src={message.avatar} />
+				<AvatarImage alt="user avatar" className="w-15 h-15" userName={username} src={message.avatar} />
 
 				<div className="h-full ">
-					<MessageHead message={message} user={senderMessage} isCombine={true} isShowFull={true} />
+					<MessageHead message={message} isCombine={true} isShowFull={true} />
 					<MarkUpOnReply posMention={true} onClickToMove={(e) => getIdMessageToJump(message?.id, e)} mention={mentions} />
 				</div>
 			</div>

@@ -1,59 +1,36 @@
 import {
-    searchMessagesActions,
-    selectCurrentClan,
-    selectCurrentPage,
-    selectIsSearchMessage,
-    selectSearchMessagesChannel,
-    useAppDispatch,
+	searchMessagesActions,
+	selectAllMessageSearch,
+	selectCurrentPage,
+	selectIsSearchMessage,
+	selectTotalResultSearchMessage,
+	useAppDispatch,
 } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useSearchMessages() {
-	const dispatch = useAppDispatch();
-	const isSearchMessage = useSelector(selectIsSearchMessage);
-	const searchMessagesChannelRaw = useSelector(selectSearchMessagesChannel);
-	const currentClan = useSelector(selectCurrentClan);
-	const currentPage = useSelector(selectCurrentPage);
+	const dispatch = useAppDispatch()
+	const isSearchMessage = useSelector(selectIsSearchMessage)
+	const searchMessages = useSelector(selectAllMessageSearch)
+	const totalResult = useSelector(selectTotalResultSearchMessage)
+	const currentPage =  useSelector(selectCurrentPage)
 
-	const searchMessages = useCallback(
+	const fetchSearchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
-			await dispatch(searchMessagesActions.searchChannelMessages({ filters, from, size, sorts }));
+			await dispatch(searchMessagesActions.fetchListSearchMessage({ filters, from, size, sorts }));
 		},
 		[dispatch],
 	);
-
-	const searchMessagesChannel = useMemo(() => {
-		const searchChannelMessages = searchMessagesChannelRaw?.messages?.filter((message) => message.clan_id === currentClan?.clan_id);
-
-		const channelLabels = [...new Set(searchChannelMessages?.map((message) => message.channel_label) ?? [])];
-
-		const data = channelLabels.map((channelLabel) => {
-			const messagesByChannelLabel = searchChannelMessages?.filter((message) => message.channel_label === channelLabel);
-
-			return {
-				channel_label: channelLabel,
-				messages: messagesByChannelLabel?.map((message) => ({
-					...message,
-					id: message.message_id?.toString(),
-				})),
-			};
-		});
-
-		return {
-			messageChannels: data.length > 0 ? data : [],
-			total: searchMessagesChannelRaw?.total ?? 0,
-		};
-	}, [currentClan?.clan_id, searchMessagesChannelRaw?.messages, searchMessagesChannelRaw?.total]);
-
 	return useMemo(
 		() => ({
 			isSearchMessage,
-			searchMessagesChannel,
-			currentPage,
+			fetchSearchMessages,
 			searchMessages,
+			totalResult,
+			currentPage
 		}),
-		[isSearchMessage, searchMessagesChannel, currentPage, searchMessages],
+		[isSearchMessage, fetchSearchMessages, searchMessages,totalResult,currentPage],
 	);
 }

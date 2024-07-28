@@ -24,7 +24,7 @@ export const MessagesStacks = ({ }: any) => {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
 				},
-				cardStyle: { backgroundColor: 'white' },
+				cardStyle: { backgroundColor: themeValue.secondary },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 				headerTitleAlign: 'center',
 				headerTintColor: themeValue.text,

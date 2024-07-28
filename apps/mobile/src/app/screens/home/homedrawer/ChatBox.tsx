@@ -54,6 +54,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 				onDeleteMessageActionNeedToResolve={() => deleteMessageActionNeedToResolve()}
 				channelId={props?.channelId}
 				mode={props?.mode}
+				hiddenIcon={props?.hiddenIcon}
 				messageAction={props?.messageAction}
 				onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
 			/>

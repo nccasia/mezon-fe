@@ -1,12 +1,14 @@
 import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
 
+import { useTheme } from '@mezon/mobile-ui';
 import Notifications from '../../../screens/Notifications';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const NotificationStacks = ({}: any) => {
+export const NotificationStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
+	const { themeValue } = useTheme();
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -18,7 +20,7 @@ export const NotificationStacks = ({}: any) => {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
 				},
-				cardStyle: { backgroundColor: 'white' },
+				cardStyle: { backgroundColor: themeValue.secondary },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 			initialRouteName={APP_SCREEN.NOTIFICATION.HOME}

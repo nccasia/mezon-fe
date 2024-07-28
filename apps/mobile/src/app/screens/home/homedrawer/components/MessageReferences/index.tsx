@@ -1,91 +1,82 @@
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, UserClanProfileEntity, referencesActions, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
+import { referencesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, View } from 'react-native';
-import { useSelector } from 'react-redux';
-import { renderTextContent } from '../../constants';
+import { RenderTextMarkdownContent } from '../../constants';
 import { style } from './styles';
 
 interface IProps {
 	messageReferences?: ApiMessageRef;
 	preventAction: boolean;
-	currentClanId: string;
 	jumpToRepliedMessage?: (messageId: string) => void;
-	channelsEntities?: Record<string, ChannelsEntity>;
-	emojiListPNG?: IEmoji[];
-	clansProfile?: UserClanProfileEntity[];
 	isMessageReply?: boolean;
 	mode?: number;
 }
 
-export const MessageReferences = React.memo(
-	({ messageReferences, preventAction, currentClanId, jumpToRepliedMessage, channelsEntities, emojiListPNG, clansProfile, mode }: IProps) => {
-		const { themeValue } = useTheme();
-		const styles = style(themeValue);
-		const dispatch = useAppDispatch();
-		const { t } = useTranslation('message');
+export const MessageReferences = React.memo(({ messageReferences, preventAction, jumpToRepliedMessage, mode }: IProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const dispatch = useAppDispatch();
+	const { t } = useTranslation('message');
 
-		const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClanId as string, messageReferences?.message_sender_id as string));
-		const repliedSender = useSelector(selectMemberByUserId(messageReferences?.message_sender_id || ''));
+	const handleJumpToMessage = (messageId: string) => {
+		dispatch(referencesActions.setIdMessageToJump(messageId));
+		jumpToRepliedMessage(messageReferences?.message_ref_id);
+	};
 
-		const handleJumpToMessage = (messageId: string) => {
-			dispatch(referencesActions.setIdMessageToJump(messageId));
-			jumpToRepliedMessage(messageReferences?.message_ref_id);
-		};
+	const onPressAvatar = () => {
+		if (!preventAction) {
+			handleJumpToMessage(messageReferences?.message_ref_id);
+		}
+	};
 
-		return (
-			<View style={styles.aboveMessage}>
-				<View style={styles.iconReply}>
-					<ReplyIcon width={34} height={30} />
-				</View>
-				<Pressable
-					onPress={() => !preventAction && handleJumpToMessage(messageReferences?.message_ref_id)}
-					style={styles.repliedMessageWrapper}
-				>
-					{repliedSender?.user?.avatar_url ? (
-						<View style={styles.replyAvatar}>
-							<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
-						</View>
-					) : (
-						<View style={[styles.replyAvatar]}>
-							<View style={styles.avatarMessageBoxDefault}>
-								<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
-							</View>
-						</View>
-					)}
-					<View style={styles.replyContentWrapper}>
-						<Text style={styles.replyDisplayName}>
-							{clanProfileSender?.nick_name || repliedSender?.user?.display_name || repliedSender?.user?.username || 'Anonymous'}
-						</Text>
-						{messageReferences?.has_attachment ? (
-							<>
-								<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
-								<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
-							</>
-						) : (
-							<>
-								{renderTextContent({
-									lines: messageReferences?.content ? JSON.parse(messageReferences?.content)?.t : '',
-									isEdited: false,
-									translate: t,
-									channelsEntities,
-									emojiListPNG,
-									isNumberOfLine: true,
-									clansProfile,
-									currentClanId,
-									isMessageReply: true,
-									mode,
-								})}
-							</>
-						)}
-					</View>
-				</Pressable>
+	return (
+		<View style={styles.aboveMessage}>
+			<View style={styles.iconReply}>
+				<ReplyIcon width={34} height={30} />
 			</View>
-		);
-	},
-);
+			<Pressable onPress={onPressAvatar} style={styles.repliedMessageWrapper}>
+				{messageReferences?.mesages_sender_avatar ? (
+					<View style={styles.replyAvatar}>
+						<Image source={{ uri: messageReferences?.mesages_sender_avatar }} style={styles.replyAvatar} />
+					</View>
+				) : (
+					<View style={[styles.replyAvatar]}>
+						<View style={styles.avatarMessageBoxDefault}>
+							<Text style={styles.repliedTextAvatar}>
+								{messageReferences?.message_sender_username?.charAt(0)?.toUpperCase() || 'A'}
+							</Text>
+						</View>
+					</View>
+				)}
+				<View style={styles.replyContentWrapper}>
+					<Text style={styles.replyDisplayName}>
+						{messageReferences?.message_sender_clan_nick ||
+							messageReferences?.message_sender_display_name ||
+							messageReferences?.message_sender_username ||
+							'Anonymous'}
+					</Text>
+					{messageReferences?.has_attachment ? (
+						<>
+							<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
+							<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
+						</>
+					) : (
+						<RenderTextMarkdownContent
+							content={messageReferences?.content ? JSON.parse(messageReferences?.content) : {}}
+							isEdited={false}
+							translate={t}
+							isMessageReply
+							isNumberOfLine
+							mode={mode}
+						/>
+					)}
+				</View>
+			</Pressable>
+		</View>
+	);
+});

@@ -1,66 +1,41 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useClanProfileSetting } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Text, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
-import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Dimensions, FlatList, Keyboard, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, FlatList, Keyboard, KeyboardAvoidingView, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { EProfileTab, IClanProfileValue } from '..';
+import { IClanProfileValue } from '..';
 import { SeparatorWithLine } from '../../../../../app/components/Common';
-import { IFile, MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../../app/temp-ui';
+import { MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../../app/temp-ui';
 import { normalizeString } from '../../../../utils/helpers';
 import BannerAvatar from '../UserProfile/components/Banner';
 import { style } from './styles';
 
 interface IServerProfile {
-	triggerToSave: EProfileTab;
 	clanProfileValue: IClanProfileValue;
 	isClanProfileNotChanged?: boolean;
-	setDefaultValue: (clanProfileValue: IClanProfileValue) => void;
 	setCurrentClanProfileValue: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
+	onSelectedClan: (clan: ClansEntity) => void;
 }
 
-export default function ServerProfile({
-	triggerToSave,
-	clanProfileValue,
-	isClanProfileNotChanged,
-	setDefaultValue,
-	setCurrentClanProfileValue,
-}: IServerProfile) {
+export default function ServerProfile({ clanProfileValue, isClanProfileNotChanged, setCurrentClanProfileValue, onSelectedClan }: IServerProfile) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile, userId } = useAuth();
-	const { sessionRef, clientRef } = useMezon();
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
 	const { t } = useTranslation(['profileSetting']);
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [selectedClan, setSelectedClan] = useState<ClansEntity>(currentClan);
-	const { clanProfile, updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
-	const [file, setFile] = useState<IFile>(null);
-	const navigation = useNavigation();
 	const [searchClanText, setSearchClanText] = useState('');
 
 	const openBottomSheet = () => {
 		bottomSheetDetail.current?.present();
 	};
-
-	useEffect(() => {
-		if (clanProfile?.id) {
-			const defaultValue: IClanProfileValue = {
-				username: userProfile?.user?.username,
-				displayName: clanProfile?.nick_name,
-				imgUrl: clanProfile?.avartar,
-			};
-
-			setDefaultValue(defaultValue);
-		}
-	}, [clanProfile, setDefaultValue, userProfile?.user?.username]);
 
 	const onPressHashtag = () => {
 		Toast.show({
@@ -76,6 +51,7 @@ export default function ServerProfile({
 	const switchClan = (clan: ClansEntity) => {
 		if (isClanProfileNotChanged) {
 			setSelectedClan(clan);
+			onSelectedClan(clan);
 			return;
 		}
 
@@ -96,49 +72,10 @@ export default function ServerProfile({
 		);
 	};
 
-	useEffect(() => {
-		if (triggerToSave === EProfileTab.ClanProfile) {
-			handleUpdateClanProfile();
-		}
-	}, [triggerToSave]);
-
-	const getImageUrlToSave = useCallback(async () => {
-		if (!file) {
-			return clanProfileValue?.imgUrl;
-		}
-		const session = sessionRef.current;
-		const client = clientRef.current;
-
-		if (!file || !client || !session) {
-			throw new Error('Client is not initialized');
-		}
-		const ms = new Date().getTime();
-		const fullFilename = `${selectedClan?.clan_id}/${clanProfileValue?.username}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-		const res = await handleUploadFileMobile(client, session, fullFilename, file);
-
-		return res.url;
-	}, [clientRef, sessionRef, file, clanProfileValue, selectedClan?.clan_id]);
-
-	const handleUpdateClanProfile = async () => {
-		const imgUrl = await getImageUrlToSave();
-		const { username = '', displayName } = clanProfileValue;
-		if (clanProfileValue?.imgUrl || clanProfileValue?.displayName) {
-			const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName || username, imgUrl || '');
-			if (response) {
-				Toast.show({
-					type: 'info',
-					text1: 'Update clan profile success',
-				});
-				setFile(null);
-				navigation.goBack();
-			}
-		}
+	const handleAvatarChange = (url: string) => {
+		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: url }));
 	};
-	const handleAvatarChange = (data: IFile) => {
-		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: data?.uri }));
-		setFile(data);
-	};
-	
+
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', () => {
 			bottomSheetDetail?.current?.snapToIndex(1);
@@ -156,13 +93,10 @@ export default function ServerProfile({
 		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));
 	}, [searchClanText, clans]);
 	return (
-		<View style={{ width: Dimensions.get('screen').width }}>
+		<KeyboardAvoidingView behavior={'position'} style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
 				<View style={[styles.clanAvatarWrapper]}>
-					<MezonClanAvatar
-						image={selectedClan?.logo}
-						alt={selectedClan?.clan_name}
-					/>
+					<MezonClanAvatar image={selectedClan?.logo} alt={selectedClan?.clan_name} />
 				</View>
 				<View style={{ flex: 1 }}>
 					<Text style={styles.clanName}>{selectedClan?.clan_name}</Text>
@@ -170,7 +104,7 @@ export default function ServerProfile({
 				<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
 			</TouchableOpacity>
 
-			<BannerAvatar avatar={clanProfileValue?.imgUrl} onChange={handleAvatarChange} />
+			<BannerAvatar avatar={clanProfileValue?.imgUrl} onLoad={handleAvatarChange} />
 
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>
@@ -205,10 +139,7 @@ export default function ServerProfile({
 								<TouchableOpacity style={styles.clanItem} onPress={() => switchClan(item)}>
 									<View style={styles.optionTitle}>
 										<View style={[styles.clanAvatarWrapper]}>
-											<MezonClanAvatar
-												alt={item?.clan_name}
-												image={item?.logo}
-											/>
+											<MezonClanAvatar alt={item?.clan_name} image={item?.logo} />
 										</View>
 
 										<Text style={styles.clanName}>{item?.clan_name}</Text>
@@ -220,6 +151,7 @@ export default function ServerProfile({
 					/>
 				</View>
 			</MezonBottomSheet>
-		</View>
+			<View style={{ height: 250 }} />
+		</KeyboardAvoidingView>
 	);
 }

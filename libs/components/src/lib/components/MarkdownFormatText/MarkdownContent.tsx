@@ -25,7 +25,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content }) => {
 	);
 
 	return (
-		<>
 			<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 				<div className="lineText contents dark:text-white text-colorTextLightMode">
 					<Markdown
@@ -38,7 +37,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content }) => {
 								<span
 									onClick={() => onClickLink(props.href ?? '')}
 									rel="noopener noreferrer"
-									style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+									style={{ color: 'rgb(59,130,246)', cursor: 'pointer', wordBreak:'break-word' }}
 									className="tagLink"
 								>
 									{props.children}
@@ -48,7 +47,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content }) => {
 					/>
 				</div>
 			</article>
-		</>
 	);
 };
 export default memo(MarkdownContent);

@@ -52,7 +52,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				headerStyle: {
 					backgroundColor: themeValue.secondary,
 				},
-				cardStyle: { backgroundColor: Colors.secondary },
+				cardStyle: { backgroundColor: "transparent" },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 		>
@@ -123,21 +123,6 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 			<Stack.Screen
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
-				options={{
-					headerShown: true,
-					headerTitle: () => (
-						<View>
-							<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
-								{isChannel
-									? t('notifySettingThreadModal.headerTitleMuteChannel')
-									: t('notifySettingThreadModal.headerTitleMuteThread')}
-							</Text>
-							<Text style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400' }}>
-								{isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`}
-							</Text>
-						</View>
-					)
-				}}
 			/>
 		</Stack.Navigator>
 	);

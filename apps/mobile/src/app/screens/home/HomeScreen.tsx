@@ -1,60 +1,53 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { Metrics } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store-mobile';
-import React, { useEffect, useRef } from 'react';
-import { DeviceEventEmitter, Dimensions, Keyboard } from 'react-native';
-import { DrawerLayout, DrawerState } from 'react-native-gesture-handler';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import React from 'react';
+import { Keyboard } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 
+const Drawer = createDrawerNavigator();
+
 const HomeScreen = React.memo((props: any) => {
-	const homeDrawerRef = useRef<DrawerLayout>(null);
 	const dispatch = useDispatch();
 	useCheckUpdatedVersion();
-
-	useEffect(() => {
-		dispatch(appActions.setHiddenBottomTabMobile(true));
-	}, []);
-
-	const onDrawerStateChanged = (newState: DrawerState, drawerWillShow: boolean) => {
-		if (newState === 'Settling') {
-			dispatch(appActions.setHiddenBottomTabMobile(!drawerWillShow));
-			Keyboard.dismiss();
-			return;
-		}
-	};
-
-	useEffect(() => {
-		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.HOME_DRAWER, ({ isShowDrawer }) => {
-			if (isShowDrawer) {
-				homeDrawerRef.current.openDrawer();
-			} else {
-				homeDrawerRef.current.closeDrawer();
-			}
-		});
-		return () => {
-			sendMessage.remove();
-		};
-	}, []);
-
 	return (
-		<DrawerLayout
-			ref={homeDrawerRef}
-			edgeWidth={Dimensions.get('window').width}
-			drawerWidth={Dimensions.get('window').width}
-			enableContextMenu
-			drawerPosition={'left'}
-			drawerType="slide"
-			overlayColor="transparent"
-			enableTrackpadTwoFingerGesture
-			keyboardDismissMode="on-drag"
-			useNativeAnimations={true}
-			onDrawerStateChanged={onDrawerStateChanged}
-			renderNavigationView={() => <LeftDrawerContent />}
+		<Drawer.Navigator
+			screenOptions={{
+				drawerPosition: 'left',
+				drawerType: 'slide',
+				swipeEdgeWidth: Metrics.screenWidth,
+				swipeMinDistance: 5,
+				drawerStyle: {
+					width: '100%',
+				},
+			}}
+			screenListeners={{
+				state: (e) => {
+					Keyboard.dismiss();
+					if (e.data.state.history?.length > 1) {
+						dispatch(appActions.setHiddenBottomTabMobile(false));
+					} else {
+						dispatch(appActions.setHiddenBottomTabMobile(true));
+					}
+				},
+			}}
+			drawerContent={() => <LeftDrawerContent />}
 		>
-			<HomeDefault {...props} />
-		</DrawerLayout>
+			<Drawer.Screen
+				name="HomeDefault"
+				component={HomeDefault}
+				options={{
+					drawerType: 'slide',
+					swipeEdgeWidth: Metrics.screenWidth,
+					keyboardDismissMode: 'none',
+					swipeMinDistance: 5,
+					headerShown: false,
+				}}
+			/>
+		</Drawer.Navigator>
 	);
 });
 

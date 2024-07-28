@@ -26,6 +26,9 @@ export function MenuChannelStacks({ }: any) {
 					fontSize: Fonts.size.h6,
 					fontWeight: 'bold',
 				},
+				cardStyle: {
+					backgroundColor: "transparent",
+				}
 			}}
 		>
 			<Stack.Screen

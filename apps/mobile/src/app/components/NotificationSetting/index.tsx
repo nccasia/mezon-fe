@@ -21,39 +21,41 @@ import { style } from './NotificationSetting.styles';
 
 export const enum ENotificationType {
 	CATEGORY_DEFAULT = 'Use Category Default',
-	ALL_MESSAGE = 'All',
-	NOTHING_MESSAGE = 'Nothing',
-	MENTION_MESSAGE = 'Mention',
+	ALL_MESSAGE = 'ALL',
+	NOTHING_MESSAGE = 'NOTHING',
+	MENTION_MESSAGE = 'MENTION',
 }
 
 export default function NotificationSetting() {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation(['notificationSetting']);
 	const styles = style(themeValue);
 	const optionNotifySetting = [
 		{
 			id: 0,
-			label: ENotificationType.CATEGORY_DEFAULT,
+			label: t('bottomSheet.labelOptions.categoryDefault'),
 			isChecked: false,
 			value: undefined,
 		},
 		{
 			id: 1,
-			label: ENotificationType.ALL_MESSAGE,
+			label: t('bottomSheet.labelOptions.allMessage'),
 			isChecked: false,
 			value: ENotificationType.ALL_MESSAGE,
 		},
-		{
+    {
 			id: 2,
-			label: ENotificationType.NOTHING_MESSAGE,
-			isChecked: false,
-			value: ENotificationType.NOTHING_MESSAGE,
-		},
-		{
-			id: 3,
-			label: ENotificationType.MENTION_MESSAGE,
+			label: t('bottomSheet.labelOptions.mentionMessage'),
 			isChecked: false,
 			value: ENotificationType.MENTION_MESSAGE,
 		},
+		{
+			id: 3,
+			label: t('bottomSheet.labelOptions.notThingMessage'),
+			isChecked: false,
+			value: ENotificationType.NOTHING_MESSAGE,
+		},
+
 	];
 	const [radioBox, setRadioBox] = useState(optionNotifySetting);
 	const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -65,7 +67,6 @@ export default function NotificationSetting() {
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [defaultNotifyName, setDefaultNotifyName] = useState('');
 	const dispatch = useAppDispatch();
-	const { t } = useTranslation(['notificationSetting']);
 
 	useEffect(() => {
 		setIsChecked(notifyReactMessage?.id !== '0');

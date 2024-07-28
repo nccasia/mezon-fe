@@ -34,7 +34,7 @@ export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, c
 		setIsError(false);
 	}, [src]);
 
-	if (!src && !userName && isAnonymous) return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
+	if ((!src && !userName) || isAnonymous) return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
 
 	if (!src || isError) {
 		const avatarChar = userName?.charAt(0)?.toUpperCase() || '';

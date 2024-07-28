@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
-import { Modal, ModalBaseProps, Pressable, Text, View, ViewStyle } from 'react-native';
+import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../../configs/toastConfig';
 import { style as _style } from './style';
@@ -61,7 +61,8 @@ export const MezonModal = (props: IMezonModalProps) => {
 
 	return (
 		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
-			<View style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
 				{rightClose ? (
 					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 						{visibleBackButton ? (
@@ -99,6 +100,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 				)}
 				<View style={[styles.fill, style]}>{children}</View>
 			</View>
+      </TouchableWithoutFeedback>
 			<Toast config={toastConfig} />
 		</Modal>
 	);

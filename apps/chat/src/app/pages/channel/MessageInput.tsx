@@ -78,6 +78,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const { listChannels } = useChannels();
 
+	const [initialDraftContent, setInitialDraftContent] = useState<string>(message.content);
+
 	const listChannelsMention = useMemo(() => {
 		if (mode !== 3 && mode !== 4) {
 			return listChannels.map((item) => {
@@ -130,15 +132,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (channelDraftMessage.draftContent?.trim() === '') {
-				if (channelDraftMessage.draftContent.length !== 0) {
-					handleCancelEdit();
-				} else {
-					setOpenModalDelMess(true);
-				}
-				return;
-			}
-			if (contentConverted) {
+			if (channelDraftMessage.draftContent === '') {
+				setOpenModalDelMess(true);
+			} else {
 				handleSend(contentConverted, message.id);
 				handleCancelEdit();
 			}
@@ -150,12 +146,36 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const handleSave = () => {
-		if (contentConverted) {
-			handleSend(contentConverted, message.id);
-			handleCancelEdit();
+	const sortObjectKeys = (obj: any): any => {
+		if (obj === null || typeof obj !== 'object') {
+			return obj;
 		}
+		if (Array.isArray(obj)) {
+			return obj.map(sortObjectKeys);
+		}
+		return Object.keys(obj)
+			.sort()
+			.reduce((accumulator, key) => {
+				accumulator[key] = sortObjectKeys(obj[key]);
+				return accumulator;
+			}, {} as any);
 	};
+
+	const sortedContentConverted = sortObjectKeys(contentConverted);
+	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
+
+	const handleSave = () => {
+		delete sortedInitialDraftContent.plainText;
+		if (channelDraftMessage.draftContent === '') {
+			return setOpenModalDelMess(true);
+		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
+			return handleCancelEdit();
+		} else {
+			handleSend(contentConverted, message.id);
+		}
+		handleCancelEdit();
+	};
+
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
@@ -257,7 +277,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					</p>
 				</div>
 			</div>
-			{openModalDelMess && <ModalDeleteMess mess={message} closeModal={() => setOpenModalDelMess(false)} mode={mode} />}
+			{openModalDelMess && (
+				<ModalDeleteMess
+					channelId={channelId}
+					channelLable={channelLabel}
+					mess={message}
+					closeModal={() => setOpenModalDelMess(false)}
+					mode={mode}
+				/>
+			)}
 		</div>
 	);
 };

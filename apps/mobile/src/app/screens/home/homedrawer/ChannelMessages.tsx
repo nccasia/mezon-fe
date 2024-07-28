@@ -1,16 +1,13 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
 import {
 	messagesActions,
 	RootState,
-	selectAllUserClanProfile,
 	selectAttachmentPhoto,
-	selectChannelMemberByUserIds,
-	selectCurrentClanId,
 	selectHasMoreMessageByChannelId,
 	selectMessageIdsByChannelId,
-	selectTypingUserIdsByChannelId,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
@@ -19,7 +16,7 @@ import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
@@ -27,12 +24,12 @@ import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkelet
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
+import { MessageUserTyping } from './components/MessageUserTyping';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import WelcomeMessage from './WelcomeMessage';
 
 const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -48,13 +45,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
-	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
-	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
+	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const isLoading = useAppSelector((state: RootState) => state?.messages?.loadingStatus);
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
@@ -66,7 +60,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const currentClanId = useSelector(selectCurrentClanId);
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
@@ -113,7 +106,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});
-		
+
 		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
 			setIsShowSkeleton(isShow);
 		});
@@ -142,16 +135,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		},
 		[deleteSendMessage],
 	);
-
-	const typingLabel = useMemo(() => {
-		if (typingUsers?.length === 1) {
-			return `${typingUsers?.[0]?.user?.username} is typing...`;
-		}
-		if (typingUsers?.length > 1) {
-			return 'Several people are typing...';
-		}
-		return '';
-	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
@@ -237,18 +220,17 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				<MessageItem
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
-					clansProfile={clansProfile}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
+					channelName={channelLabel}
 					onOpenImage={onOpenImage}
-					currentClanId={currentClanId}
 					onMessageAction={onMessageAction}
 					setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClanId, onMessageAction],
+		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(
@@ -281,7 +263,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	return (
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
-				{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
 				<FlashList
 					ref={flatListRef}
@@ -294,13 +275,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					removeClippedSubviews={true}
 					keyExtractor={(item) => `${item}`}
 					estimatedItemSize={ITEM_HEIGHT}
-					onEndReached={
-						messages?.length
-							? onLoadMore
-							: () => {
-									// 	empty
-								}
-					}
+					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
 					ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
@@ -312,7 +287,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					</TouchableOpacity>
 				)}
 
-				{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
+				<MessageUserTyping channelId={channelId} />
 			</View>
 
 			<View>
@@ -333,20 +308,21 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					/>
 				) : null}
 
-				<MessageItemBS
-					mode={mode}
-					clanId={currentClanId}
-					message={messageSelected}
-					onConfirmAction={onConfirmAction}
-					type={openBottomSheet}
-					isOnlyEmojiPicker={isOnlyEmojiPicker}
-					onClose={() => {
-						setOpenBottomSheet(null);
-					}}
-					user={userSelected}
-					checkAnonymous={checkAnonymous}
-					senderDisplayName={senderDisplayName}
-				/>
+				{openBottomSheet !== null && (
+					<MessageItemBS
+						mode={mode}
+						message={messageSelected}
+						onConfirmAction={onConfirmAction}
+						type={openBottomSheet}
+						isOnlyEmojiPicker={isOnlyEmojiPicker}
+						onClose={() => {
+							setOpenBottomSheet(null);
+						}}
+						user={userSelected}
+						checkAnonymous={checkAnonymous}
+						senderDisplayName={senderDisplayName}
+					/>
+				)}
 
 				{currentMessageActionType === EMessageActionType.ForwardMessage && (
 					<ForwardMessageModal

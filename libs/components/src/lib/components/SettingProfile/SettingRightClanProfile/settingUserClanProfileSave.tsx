@@ -14,7 +14,7 @@ const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
 	return PropsSave.flagOption || clickRole === 'New Role' ? (
-		<div className="flex flex-row gap-2 dark:bg-bgProfileBody bg-white dark:text-white text-colorTextLightMode border dark:border-white border-colorTextLightMode text-sm font-medium absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-2 min-w-96 h-fit p-2.5 rounded transform z-10">
+		<div className="flex flex-row gap-2 dark:bg-bgProfileBody bg-bgLightSecondary dark:text-white text-colorTextLightMode text-sm font-medium absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-2 min-w-96 h-fit p-2.5 rounded transform z-10 shadow-sm dark:shadow-gray-400 shadow-gray-600">
 			<div className="flex-1 flex items-center">
 				<p className="text-base">Careful - you have unsaved changes!</p>
 			</div>

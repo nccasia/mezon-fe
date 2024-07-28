@@ -23,6 +23,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	isMessageRead: boolean;
 	newNotificationStatus: boolean;
 	quantityNotifyChannels: Record<string, number>;
+	quantityNotifyClans: Record<string, number>;
 	lastSeenTimeStampChannels: Record<string, number>;
 }
 
@@ -33,6 +34,7 @@ export type QuantityNotifyChannelArgs = {
 export type LastSeenTimeStampChannelArgs = {
 	channelId: string;
 	lastSeenTimeStamp: number;
+	clanId: string
 };
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -80,6 +82,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	newNotificationStatus: false,
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
+	quantityNotifyClans: {}
 });
 
 export const notificationSlice = createSlice({
@@ -88,13 +91,18 @@ export const notificationSlice = createSlice({
 	reducers: {
 		add(state, action) {
 			const newState = notificationAdapter.addOne(state, action.payload);
-			const quantityNotify = countNotifyByChannelId(
-				newState,
-				action.payload.channel_id,
-				newState.lastSeenTimeStampChannels[action.payload.channel_id],
-			);
 			if (newState.lastSeenTimeStampChannels[action.payload.channel_id]) {
+				const quantityNotify = countNotifyByChannelId(
+					newState,
+					action.payload.channel_id,
+					newState.lastSeenTimeStampChannels[action.payload.channel_id],
+				);
+				const quantityNotifyClan = countNotifyByClanId(
+					newState,
+					action.payload.clan_id,
+				);
 				state.quantityNotifyChannels[action.payload.channel_id] = quantityNotify;
+				state.quantityNotifyClans[action.payload.clan_id] = quantityNotifyClan
 			}
 		},
 		remove: notificationAdapter.removeOne,
@@ -117,20 +125,21 @@ export const notificationSlice = createSlice({
 			state.newNotificationStatus = !state.newNotificationStatus;
 		},
 		setAllLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs[]>) => {
-			const newQuantityNotifyChannels: Record<string, number> = {};
-			const newLastSeenTimeStampChannels: Record<string, number> = {};
 			for (const i of action.payload) {
-				newLastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
+				state.lastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
 				const countBadgeNotifyChannel = countNotifyByChannelId(state, i.channelId, i.lastSeenTimeStamp);
-				newQuantityNotifyChannels[i.channelId] = countBadgeNotifyChannel;
+				state.quantityNotifyChannels[i.channelId] = countBadgeNotifyChannel;
+				const quantityNotifyClan = countNotifyByClanId(state,i.clanId)
+				state.quantityNotifyClans[i.clanId] = quantityNotifyClan;
 			}
-			state.lastSeenTimeStampChannels = newLastSeenTimeStampChannels;
-			state.quantityNotifyChannels = newQuantityNotifyChannels;
+
 		},
 		setLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs>) => {
 			state.lastSeenTimeStampChannels[action.payload.channelId] = action.payload.lastSeenTimeStamp;
 			const quantityNotify = countNotifyByChannelId(state, action.payload.channelId, action.payload.lastSeenTimeStamp);
 			state.quantityNotifyChannels[action.payload.channelId] = quantityNotify;
+			const quantityNotifyClan = countNotifyByClanId(state,action.payload.clanId)
+			state.quantityNotifyClans[action.payload.clanId] = quantityNotifyClan;
 		},
 		setReadNotiStatus(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
@@ -160,6 +169,31 @@ export const notificationSlice = createSlice({
 			});
 	},
 });
+
+ const countNotifyByChannelId = (state: NotificationState, channelId: string, after = 0) => {
+	const listNotifies = Object.values(state.entities);
+	const listNotifiesMention = listNotifies.filter(
+		(notify: INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED,
+	);
+	const quantityNotify = listNotifiesMention.filter(
+		(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+	).length;
+	return quantityNotify;
+};
+ const countNotifyByClanId = (state: NotificationState, clanId: string) => {
+	const listNotifies = Object.values(state.entities);
+	let countClanNotify = 0
+	listNotifies.forEach(notify => {
+		if((notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED) && notify.content.clan_id === clanId) {
+			const lastTimeStamp = state.lastSeenTimeStampChannels[notify.content.channel_id]
+			 if(lastTimeStamp) {
+				const quantityNotify = notify?.content?.update_time?.seconds > lastTimeStamp ? 1 : 0
+				countClanNotify = countClanNotify + quantityNotify
+			 }
+		}
+	})
+	return countClanNotify
+};
 
 export const notificationReducer = notificationSlice.reducer;
 
@@ -202,27 +236,11 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 			).length,
 	);
 
-export const countNotifyByChannelId = (state: NotificationState, channelId: string, after = 0) => {
-	const listNotifies = Object.values(state.entities);
-	const listNotifiesMention = listNotifies.filter(
-		(notify: INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED,
-	);
-	const quantityNotify = listNotifiesMention.filter(
-		(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-	).length;
-	return quantityNotify;
-};
+
 
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) => {
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
 });
-
-export const selectNotificationMessageCountByChannelId = (channelId: string, after = 0) =>
-	createSelector(selectNotificationMessages, (notifications) => {
-		return notifications.filter(
-			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-		).length;
-	});
 
 export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);
 
@@ -234,8 +252,7 @@ export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {
 		return state.quantityNotifyChannels[channelId] || 0;
 	});
-export const selectTotalQuantityNotify = () =>
-	createSelector(getNotificationState, (state: NotificationState) => {
-		const quantityNotifyChannels = state.quantityNotifyChannels;
-		return Object.values(quantityNotifyChannels).reduce((total, quantity) => total + quantity, 0);
-	});
+	export const selectCountNotifyByClanId = (clanId: string) =>
+		createSelector(getNotificationState, (state) => {
+			return state.quantityNotifyClans[clanId] || 0;
+		});

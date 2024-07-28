@@ -1,27 +1,21 @@
 import { AttachmentImageIcon } from '@mezon/mobile-components';
-import { Block, Colors } from '@mezon/mobile-ui';
-import { selectAllEmojiSuggestion, selectAllUserClanProfile, selectChannelsEntities, selectCurrentClan } from '@mezon/store-mobile';
+import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text } from 'react-native';
-import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { renderTextContent } from '../../home/homedrawer/constants';
+import { RenderTextMarkdownContent } from '../../home/homedrawer/constants';
 import { styles } from './MessageNotification.styles';
 
 interface IMessageNotificationProps {
 	message: IMessageWithUser;
-	channelId: string;
 }
-const MessageNotification = React.memo(({ message, channelId }: IMessageNotificationProps) => {
-	const { attachments, lines } = useMessageParser(message);
+const MessageNotification = React.memo(({ message }: IMessageNotificationProps) => {
+	const { attachments } = useMessageParser(message);
 	const { t } = useTranslation('message');
-	const channelsEntities = useSelector(selectChannelsEntities);
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
-	const clansProfile = useSelector(selectAllUserClanProfile);
-	const currentClan = useSelector(selectCurrentClan);
+	const { themeValue } = useTheme();
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -31,6 +25,7 @@ const MessageNotification = React.memo(({ message, channelId }: IMessageNotifica
 		}
 		return false;
 	}, [message?.update_time, message?.create_time]);
+
 	return (
 		<Block>
 			{attachments?.length ? (
@@ -40,18 +35,15 @@ const MessageNotification = React.memo(({ message, channelId }: IMessageNotifica
 				</Block>
 			) : null}
 			<Block>
-				{renderTextContent({
-					lines,
-					isEdited,
-					translate: t,
-					channelsEntities,
-					emojiListPNG,
-					isNumberOfLine: true,
-					clansProfile,
-					currentClan,
-					isMessageReply: false,
-					mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
-				})}
+				<RenderTextMarkdownContent
+					themeValue={themeValue}
+					content={message}
+					isEdited={isEdited}
+					isNumberOfLine
+					translate={t}
+					isMessageReply={false}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+				/>
 			</Block>
 		</Block>
 	);

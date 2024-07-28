@@ -18,22 +18,24 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 						<h3 className="font-semibold pb-4 text-xl">Unpin Message</h3>
 						<p>You sure you want to remove this pinned message?</p>
 					</div>
-					<div className="p-4 flex">
-						<MemberProfile
-							isHideUserName={true}
-							avatar={pinMessage.avatar || ''}
-							name={pinMessage.username ?? ''}
-							isHideStatus={true}
-							isHideIconStatus={true}
-							textColor="#fff"
-						/>
-						<div className="flex flex-col gap-1 text-left">
-							<div>
-								<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
+					<div className="p-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
+						<div className='flex items-start p-4 pr-6 shadow-md shadow-black rounded'>
+							<MemberProfile
+								isHideUserName={true}
+								avatar={pinMessage.avatar || ''}
+								name={pinMessage.username ?? ''}
+								isHideStatus={true}
+								isHideIconStatus={true}
+								textColor="#fff"
+							/>
+							<div className="flex flex-col gap-1 text-left">
+								<div>
+									<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
+								</div>
+								<span>
+									<MessageLine content={JSON.parse(pinMessage.content || '')} />
+								</span>
 							</div>
-							<span className="text-[11px]">
-								<MessageLine line={contentString as string} />
-							</span>
 						</div>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
@@ -45,9 +47,9 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 								handlePinMessage();
 								closeModal();
 							}}
-							className="px-4 py-2 hover:bg-opacity-85 rounded bg-[#DA363C]"
+							className="px-4 py-2 hover:bg-opacity-85 rounded bg-[#DA363C] text-white font-medium"
 						>
-							Oh yeah. Pin it
+							Remove it please!
 						</button>
 					</div>
 				</div>

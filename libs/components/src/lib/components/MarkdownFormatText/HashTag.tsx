@@ -9,9 +9,10 @@ import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {
 	channelHastagId: string;
+	showOnchannelLayout?: boolean;
 };
 
-const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId, showOnchannelLayout }: ChannelHashtagProps) => {
 	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
@@ -56,10 +57,10 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) &&
 		getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
-			onClick={handleClick}
+			onClick={showOnchannelLayout ? handleClick : () => {}}
 			style={{ textDecoration: 'none' }}
 			to={channelPath ?? ''}
-			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+			className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${showOnchannelLayout ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer' : `hover:none`} `}
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channelHastagId && directId) ? (
 				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill="#3297FF" />

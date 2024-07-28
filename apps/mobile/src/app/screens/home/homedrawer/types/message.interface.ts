@@ -45,7 +45,6 @@ export interface IMessageActionNeedToResolve {
 export interface IMessageReactionProps {
 	message: IMessageWithUser;
 	mode: number;
-	emojiListPNG?: IEmoji[];
 	openEmojiPicker?: () => void;
 	preventAction?: boolean;
 	userProfile?: IUserAccount;

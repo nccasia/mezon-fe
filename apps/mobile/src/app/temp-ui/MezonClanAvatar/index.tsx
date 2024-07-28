@@ -25,7 +25,10 @@ export default function MezonClanAvatar({ image, alt = "anonymous", defaultColor
                 : <View style={[styles.fakeBox, { backgroundColor: defaultColor || baseColor.blurple }]}>
                     {!noDefaultText
                         ? (
-                            <Text style={[styles.altText, textStyle]}>
+                            <Text
+                                adjustsFontSizeToFit
+                                numberOfLines={1}
+                                style={[styles.altText, textStyle]}>
                                 {alt?.charAt(0).toUpperCase()}
                             </Text>
                         ) : null

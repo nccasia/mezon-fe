@@ -1,10 +1,19 @@
-import { Metrics } from "@mezon/mobile-ui";
+import { Attributes, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
         padding: Metrics.size.xl
     },
-})
 
-export default styles;
+    item: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+
+    text: {
+        color: colors.text,
+        marginLeft: Metrics.size.l,
+        fontWeight: "500"
+    },
+})

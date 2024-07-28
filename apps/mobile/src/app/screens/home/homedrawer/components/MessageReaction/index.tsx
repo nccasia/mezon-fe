@@ -1,7 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectAllAccount, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllEmojiSuggestion, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -18,11 +18,12 @@ import { style } from './styles';
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { message, emojiListPNG, openEmojiPicker, mode, preventAction = false, userProfile } = props || {};
+	const { message, openEmojiPicker, mode, preventAction = false, userProfile } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
 

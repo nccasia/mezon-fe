@@ -12,7 +12,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'center',
 		gap: 10,
 		padding: 6,
-		backgroundColor: colors.secondary,
+		backgroundColor: colors.primary,
 		borderRadius: 50,
 	},
 	selected: {
@@ -39,6 +39,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingHorizontal: 10,
 		borderRadius: 10,
 		gap: 10,
-		backgroundColor: colors.secondary
+		backgroundColor: colors.primary
 	},
 });

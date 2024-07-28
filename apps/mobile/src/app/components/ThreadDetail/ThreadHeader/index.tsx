@@ -5,7 +5,8 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { MezonAvatar } from '../../../temp-ui';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './styles';
 
@@ -32,11 +33,11 @@ export const ThreadHeader = memo(() => {
 								<Icons.GroupIcon color={baseColor.white} />
 							</View>
 						) : (
-							// TODO: change to MezonAvatar
-							<View style={styles.avatarSize}>
-								<Image source={{ uri: currentChannel.channel_avatar?.[0] }} style={[styles.friendAvatar, styles.avatarSize]} />
-								<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
-							</View>
+							<MezonAvatar
+								avatarUrl={currentChannel.channel_avatar?.[0]}
+								username={currentChannel?.channel_label}
+								userStatus={userStatus}
+							/>
 						)}
 					</View>
 					<Text numberOfLines={5} style={styles.dmLabel}>

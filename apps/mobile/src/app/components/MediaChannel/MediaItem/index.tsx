@@ -1,29 +1,29 @@
 import { Block } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectMemberByUserId } from '@mezon/store-mobile';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
-import { TouchableOpacity, Text } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
 import { isImage, isVideo } from '../../../utils/helpers';
 import styles from './MediaItem.styles';
-import React, { useCallback, useMemo } from 'react';
 
 interface IMediaItemProps {
 	data: AttachmentEntity;
 	onPress: (item: AttachmentEntity) => void;
 }
 const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
-  const checkIsVideo = useMemo(() => isVideo(data?.url), [data?.url]);
-  const checkIsImage = useMemo(() => isImage(data?.url), [data?.url]);
+	const checkIsVideo = useMemo(() => isVideo(data?.url), [data?.url]);
+	const checkIsImage = useMemo(() => isImage(data?.url), [data?.url]);
 	const uploader = useSelector(selectMemberByUserId(data?.uploader || ''));
-  const handlePress = useCallback(() => {
-    onPress(data);
-  }, [onPress, data]);
+	const handlePress = useCallback(() => {
+		onPress(data);
+	}, [onPress, data]);
 	return (
 		<TouchableOpacity onPress={handlePress} style={styles.containerItem}>
 			<Block style={styles.boxAvatar}>
-				<MezonAvatar  height={25} width={25} userName={uploader?.user?.username} avatarUrl={uploader?.user?.avatar_url}></MezonAvatar>
+				<MezonAvatar height={25} width={25} username={uploader?.user?.username} avatarUrl={uploader?.user?.avatar_url}></MezonAvatar>
 			</Block>
 			{checkIsImage ? <FastImage style={styles.image} source={{ uri: data?.url }} resizeMode="cover" /> : null}
 			{checkIsVideo ? (

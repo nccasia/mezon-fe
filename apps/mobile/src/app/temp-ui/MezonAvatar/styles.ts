@@ -1,7 +1,7 @@
 import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes, height: number, width: number) => StyleSheet.create({
 	containerItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -27,11 +27,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	statusCircle: {
 		position: 'absolute',
-		width: size.s_18,
-		height: size.s_18,
+		width: height / 3,
+		height: width / 3,
 		borderRadius: 10,
-		bottom: 1,
-		right: 5,
+		bottom: 0,
+		right: -width / 20,
 		borderWidth: 2,
 		borderColor: colors.secondary,
 	},
@@ -41,6 +41,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	offline: {
 		backgroundColor: baseColor.gray,
 	},
+
 	avatarMessageBoxDefault: {
 		width: '100%',
 		height: '100%',

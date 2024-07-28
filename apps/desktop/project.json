@@ -9,10 +9,24 @@
       "outputs": [
         "{options.outputPath}"
       ],
+      "appId": "mezon.ai",
+      "productName": "Mezon",
+      "publish": [
+        {
+          "provider": "generic",
+          "url": "https://cdn.mezon.vn/release/"
+        }
+      ],
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
-        "appId": "Mezon"
+        "appId": "mezon.ai",
+        "publish": [
+          {
+            "provider": "generic",
+            "url": "https://cdn.mezon.vn/release/"
+          }
+        ]
       },
       "linux": {
         "category": "Utility",
@@ -88,7 +102,14 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "mezon.ai",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",
@@ -99,7 +120,8 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "Mezon"
+          "appId": "mezon.ai",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         }
       }
     },
@@ -113,7 +135,14 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "mezon.ai",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",
@@ -124,7 +153,8 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "Mezon"
+          "appId": "Mezon",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         }
       }
     },

@@ -1,4 +1,4 @@
-import { Attributes, Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -8,7 +8,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: colors.primary,
-    paddingHorizontal: size.s_20,
+		paddingHorizontal: size.s_20,
 	},
 	bgDefault: {
 		backgroundColor: colors.primary,
@@ -19,15 +19,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	headerWrapper: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingTop: size.s_40,
-		paddingBottom: 15,
+		paddingVertical: Metrics.size.l,
+		paddingHorizontal: size.s_10,
 		backgroundColor: colors.secondary,
 	},
 	headerContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+		justifyContent: 'space-between',
+		width: '100%',
 	},
 	textTitle: {
 		color: colors.textStrong,

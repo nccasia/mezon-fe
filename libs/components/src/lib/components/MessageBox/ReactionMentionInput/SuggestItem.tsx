@@ -74,8 +74,8 @@ const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, 
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && (
 					<AvatarImage
-						alt="user avatar"
-						userName={name}
+						alt={subText || ''}
+						userName={subText}
 						src={avatarUrl}
 						className="size-4"
 						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"

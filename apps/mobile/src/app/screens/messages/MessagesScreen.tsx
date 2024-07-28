@@ -13,8 +13,8 @@ import { useThrottledCallback } from 'use-debounce';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { emojiRegex, normalizeString } from '../../utils/helpers';
 import { removeBlockCode } from '../home/homedrawer/constants';
-import { style } from './styles';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
+import { style } from './styles';
 
 const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
@@ -36,7 +36,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.channel_label?.split?.(',');
+		const usernameList = directMessage?.channel_label?.split?.(',') || [];
 
 		return usernameList.map((username, index) => ({
 			userId: userIdList[index],
@@ -122,7 +122,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { t } = useTranslation(['dmMessage', 'common']);
-  const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
+	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 
 	const sortDM = (a, b) => {
@@ -177,20 +177,20 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
 			</View>
-      {
-        clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ?
-        <UserEmptyMessage onPress={()=>{navigateToAddFriendScreen()}}/> :
-        (
-          <FlatList
-				data={filteredDataDM}
-				style={styles.dmMessageListContainer}
-				showsVerticalScrollIndicator={false}
-				keyExtractor={(dm) => dm.id.toString()}
-				ItemSeparatorComponent={SeparatorListFriend}
-				renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
-			/>
-        )
-      }
+			{
+				clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ?
+					<UserEmptyMessage onPress={() => { navigateToAddFriendScreen() }} /> :
+					(
+						<FlatList
+							data={filteredDataDM}
+							style={styles.dmMessageListContainer}
+							showsVerticalScrollIndicator={false}
+							keyExtractor={(dm) => dm.id.toString()}
+							ItemSeparatorComponent={SeparatorListFriend}
+							renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
+						/>
+					)
+			}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
 				<Icons.MessagePlusIcon width={22} height={22} />

@@ -68,6 +68,10 @@ export default memo(function MezonImagePicker({
 	const { sessionRef, clientRef } = useMezon();
 	const timerRef = useRef<any>(null);
 
+  useEffect(()=>{
+    setImage(defaultValue)
+  },[defaultValue])
+
 	useEffect(() => {
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);

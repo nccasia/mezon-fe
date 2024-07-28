@@ -3,14 +3,17 @@ import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/
 import {
 	channelsActions,
 	notificationActions,
+	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectIsMessageRead,
+	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectShowScreen,
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
+import { TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,16 +24,21 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const isMessageRead = useSelector(selectIsMessageRead);
-	const currentChannel = useSelector(selectCurrentChannel);
-
+	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + 3 }));
-		dispatch(notificationActions.setLastSeenTimeStampChannel({ channelId, lastSeenTimeStamp: timestamp + 3 }));
+		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(
+			notificationActions.setLastSeenTimeStampChannel({
+				channelId,
+				lastSeenTimeStamp: timestamp + TIME_OFFSET,
+				clanId: currentChannel?.clan_id ?? '',
+			}),
+		);
 		if (isMessageRead && channelId === currentChannel?.channel_id) {
 			dispatch(notificationActions.setIsMessageRead(false));
 		}
-	}, [channelId, currentChannel?.channel_id, dispatch, isMessageRead]);
+	}, [channelId, currentChannel, dispatch, isMessageRead]);
 }
 
 export default function ChannelMain() {
@@ -38,12 +46,11 @@ export default function ChannelMain() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const isSearchMessage = useSelector(selectIsSearchMessage);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
-	const { isSearchMessage } = useSearchMessages();
-
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
 	const { statusCall } = useVoice();
@@ -137,13 +144,17 @@ export default function ChannelMain() {
 							<MemberList />
 						</div>
 					)}
-
-					{isSearchMessage && <SearchMessageChannelRender />}
+					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
 		</>
 	);
 }
+
+const SearchMessageChannel = () => {
+	const { searchMessages, totalResult, currentPage } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
+};
 
 export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (

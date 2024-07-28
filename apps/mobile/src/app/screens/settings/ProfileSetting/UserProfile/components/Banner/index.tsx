@@ -1,29 +1,30 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { IFile, MezonImagePicker } from 'apps/mobile/src/app/temp-ui';
+import { MezonImagePicker } from 'apps/mobile/src/app/temp-ui';
 import { View } from 'react-native';
 import { useMixImageColor } from '../../../../../../../app/hooks/useMixImageColor';
 import { style } from './styles';
 
 interface IBannerAvatarProps {
 	avatar: string;
-	onChange?: (url: IFile) => void;
+	onLoad?: (url: string) => void;
 }
 
-export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
+export default function BannerAvatar({ avatar, onLoad }: IBannerAvatarProps) {
 	const { themeValue } = useTheme();
 	const { color } = useMixImageColor(avatar);
+
 	const styles = style(themeValue);
 
-	async function selectImage(file: IFile) {
-		onChange && onChange(file);
-	}
+	const handleOnload = async (url) => {
+		onLoad && onLoad(url);
+	};
 
 	return (
 		<View>
 			<View style={[styles.bannerContainer, { backgroundColor: color }]}>
 				<MezonImagePicker
-					width={"100%"}
-					height={"100%"}
+					width={'100%'}
+					height={'100%'}
 					defaultValue={''}
 					defaultColor={color}
 					noDefaultText
@@ -39,7 +40,8 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
 					defaultValue={avatar || ''}
 					rounded
 					style={{ borderWidth: 5, borderColor: themeValue.primary }}
-					onChange={selectImage}
+					onLoad={handleOnload}
+					autoUpload
 					penPosition={{ right: 5, top: 5 }}
 				/>
 

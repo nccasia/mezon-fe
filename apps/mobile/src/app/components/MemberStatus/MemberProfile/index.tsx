@@ -1,11 +1,12 @@
-import { OfflineStatus, OnlineStatus, OwnerIcon } from '@mezon/mobile-components';
+import { OwnerIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/utils';
-import { useContext, useMemo } from 'react';
-import { Image, Text, View } from 'react-native';
-import { style } from './style';
-import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
 import { ChannelType } from 'mezon-js';
+import { useContext, useMemo } from 'react';
+import { Text, View } from 'react-native';
+import { MezonAvatar } from '../../../temp-ui';
+import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
+import { style } from './style';
 interface IProps {
 	user: ChannelMembersEntity;
 	status?: boolean;
@@ -42,13 +43,11 @@ export default function MemberProfile({
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
-			<View style={{ padding: 0 }}>
-				<View style={styles.avatarContainer}>
-					<Image style={styles.avatar} source={{ uri: user?.user?.avatar_url }} />
-
-					{!isHideIconStatus && <View style={styles.statusWrapper}>{status ? <OnlineStatus /> : <OfflineStatus />}</View>}
-				</View>
-			</View>
+			<MezonAvatar
+				avatarUrl={user?.user?.avatar_url}
+				username={user?.user?.username}
+				userStatus={status}
+			/>
 
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>

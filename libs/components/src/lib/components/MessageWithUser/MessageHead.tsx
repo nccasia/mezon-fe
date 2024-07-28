@@ -1,26 +1,19 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
-import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { IMessageWithUser, MouseButton } from '@mezon/utils';
+import { useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
-
-const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+import useShowName from './useShowName';
 
 type IMessageHeadProps = {
-	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isShowFull?: boolean;
 	mode?: number;
 };
 
-const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
+const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
 	const { messageTime } = useMessageParser(message);
-
-	const currentClan = useSelector(selectCurrentClan);
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -28,6 +21,8 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 	const [positionLeft, setPositionLeft] = useState(0);
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionBottom, setPositionBottom] = useState(false);
+
+	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(message);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
@@ -74,7 +69,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 		};
 	}, [positionLeft]);
 
-	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
 
 	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
@@ -90,7 +85,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 					role="button"
 					style={{ letterSpacing: '-0.01rem' }}
 				>
-					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+					{nameShowed}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -106,7 +101,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={message.sender_id || ''} message={message} mode={mode} />
+					<ShortUserProfile userID={senderId} message={message} mode={mode} />
 				</div>
 			)}
 		</div>

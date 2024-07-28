@@ -11,7 +11,7 @@ import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const SettingStacks = ({}: any) => {
+export const SettingStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
 	const { themeValue } = useTheme();
@@ -32,6 +32,9 @@ export const SettingStacks = ({}: any) => {
 				headerTitleStyle: {
 					fontWeight: 'bold',
 					fontSize: Fonts.size.h7,
+				},
+				cardStyle: {
+					backgroundColor: "transparent",
 				},
 			}}
 		>

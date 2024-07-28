@@ -255,6 +255,7 @@ input:-webkit-autofill:active {
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 	max-width: 100%;
+	word-break: break-all;
 }
 
 // css inBox dropdrow nocation

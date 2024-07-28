@@ -15,9 +15,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	buttonHeader: {
 		flex: 1,
 		gap: size.s_6,
-		paddingVertical: size.s_10,
+		paddingVertical: size.s_14,
 		borderRadius: size.s_20,
-		backgroundColor: colors.secondary,
+		backgroundColor: colors.secondaryLight,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',

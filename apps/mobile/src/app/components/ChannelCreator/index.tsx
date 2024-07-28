@@ -93,7 +93,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 					items: [
 						{
 							title: t('fields.channelPrivate.title'),
-							component: <MezonSwitch />,
+							component: <MezonSwitch onValueChange={setChannelPrivate} />,
 							icon: <Icons.LockIcon color={themeValue.text} height={20} width={20} />,
 						},
 					],

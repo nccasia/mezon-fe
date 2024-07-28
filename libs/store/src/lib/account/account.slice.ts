@@ -30,8 +30,12 @@ const fetchUserProfileCached = memoize((mezon: MezonValueContext) => mezon.clien
 	},
 });
 
-export const getUserProfile = createAsyncThunk<IUserAccount>('account/user', async (_, thunkAPI) => {
+export const getUserProfile = createAsyncThunk<IUserAccount, { noCache: boolean } | void>('account/user', async (arg, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const noCache = arg?.noCache ?? false;
+	if (noCache) {
+		fetchUserProfileCached.clear(mezon);
+	}
 	const response = await fetchUserProfileCached(mezon);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');

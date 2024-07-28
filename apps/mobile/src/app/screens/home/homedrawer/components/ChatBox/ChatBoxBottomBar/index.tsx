@@ -25,7 +25,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Platform, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
@@ -97,6 +97,7 @@ export const ChatBoxBottomBar = memo(
     const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
     const { attachmentDataRef, setAttachmentData } = useReference();
     const currentChannel = useSelector(selectCurrentChannel);
+    const channelsEntities = useSelector(selectChannelsEntities);
     const navigation = useNavigation<any>();
     const inputRef = useRef<TextInput>();
     const cursorPositionRef = useRef(0);
@@ -107,7 +108,6 @@ export const ChatBoxBottomBar = memo(
     const { setOpenThreadMessageState } = useReference();
     const { setValueThread } = useThreads();
     const { sessionRef, clientRef } = useMezon();
-    const channelsEntities = useSelector(selectChannelsEntities);
     const listMentions = UseMentionList(channelId || '');
     const { textInputProps, triggers } = useMentions({
       value: mentionTextValue,
@@ -131,6 +131,10 @@ export const ChatBoxBottomBar = memo(
     const emojiList: IEmojiOnMessage[] = [];
     const linkList: ILinkOnMessage[] = [];
     const markdownList: ImarkdownOnMessage[] = [];
+    
+    const isShowCreateThread = useMemo(() => {
+      return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
+    }, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon])
 
     const saveMessageToCache = (text: string) => {
       const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
@@ -465,7 +469,7 @@ export const ChatBoxBottomBar = memo(
             isShowAttachControl={isShowAttachControl}
             setIsShowAttachControl={setIsShowAttachControl}
             text={text}
-            hiddenIcon={hiddenIcon}
+            isShowCreateThread={isShowCreateThread}
             modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
             handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
           />
@@ -493,6 +497,7 @@ export const ChatBoxBottomBar = memo(
             linksOnMessage={linksOnMessage}
             markdownsOnMessage={markdownsOnMessage}
             plainTextMessage={plainTextMessage}
+            isShowCreateThread={isShowCreateThread}
           />
         </Block>
       </Block>

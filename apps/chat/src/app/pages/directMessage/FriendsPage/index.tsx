@@ -92,7 +92,13 @@ export default function FriendsPage() {
 		}
 	};
 
-	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
+	const listFriendFilter = filterStatus(friends)
+		.filter((obj) => obj.user?.username?.includes(textSearch))
+		.sort((start, next) => {
+			const usernameStart = start.user?.display_name ?? '';
+			const usernameNext = next.user?.display_name ?? '';
+			return usernameStart.localeCompare(usernameNext);
+		});
 
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);

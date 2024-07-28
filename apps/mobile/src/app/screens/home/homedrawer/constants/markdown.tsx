@@ -1,31 +1,23 @@
-import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
+import { Attributes, Colors, baseColor, size } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
 import {
-	ChannelMembersEntity,
 	ChannelsEntity,
-	UserClanProfileEntity,
-	UsersClanEntity,
 	selectAllChannelMembers,
+	selectAllEmojiSuggestion,
+	selectAllUserClanProfile,
 	selectAllUsesClan,
+	selectChannelsEntities,
 } from '@mezon/store-mobile';
-import { IEmoji, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
-import { ChannelType } from 'mezon-js';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
-import { useSelector } from 'react-redux';
-import {
-	channelIdRegex,
-	codeBlockRegex,
-	codeBlockRegexGlobal,
-	emojiRegex,
-	markdownDefaultUrlRegex,
-	mentionRegex,
-	splitBlockCodeRegex,
-	urlRegex,
-} from '../../../../../app/utils/helpers';
+import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
+import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
+import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -51,84 +43,103 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes) => StyleSheet.create({
-	body: {
-		color: colors.textStrong,
-		fontSize: size.medium,
-	},
-	paragraph: {
-		marginTop: 0,
-		marginBottom: 0,
-		paddingTop: 0,
-		paddingBottom: 0,
-	},
-	code_block: {
-		color: colors.text,
-		backgroundColor: colors.primary,
-		paddingVertical: 1,
-		borderColor: colors.text,
-		borderRadius: 5,
-		lineHeight: size.s_20,
-	},
-	code_inline: {
-		color: colors.text,
-		backgroundColor: colors.primary,
-		fontSize: size.small,
-		lineHeight: size.s_20,
-	},
-	fence: {
-		color: colors.text,
-		backgroundColor: colors.primary,
-		paddingVertical: 5,
-		borderColor: colors.borderHighlight,
-		borderRadius: 5,
-		fontSize: size.small,
-		lineHeight: size.s_20,
-	},
-	link: {
-		color: Colors.textLink,
-		textDecorationLine: 'none',
-		lineHeight: size.s_20,
-	},
-	iconEmojiInMessage: {
-		width: size.s_20,
-		height: size.s_20,
-	},
-	editedText: {
-		fontSize: size.small,
-		color: Colors.gray72,
-	},
-	mention: {
-		fontSize: size.medium,
-		color: colors.textLink,
-		backgroundColor: colors.midnightBlue,
-		lineHeight: size.s_20,
-	},
-	blockquote: {
-		backgroundColor: Colors.tertiaryWeight,
-		borderColor: Colors.textGray,
-	},
-	tr: {
-		borderColor: Colors.textGray,
-	},
-	hr: {
-		backgroundColor: Colors.white,
-		height: 2,
-	},
-	voiceChannel: {
-		backgroundColor: colors.midnightBlue,
-		flexDirection: 'row',
-		gap: size.s_2,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	textVoiceChannel: {
-		fontSize: size.medium,
-		color: colors.textLink,
-		lineHeight: size.s_20,
-	},
-	unknownChannel: { fontStyle: 'italic' },
-});
+export const markdownStyles = (colors: Attributes) =>
+	StyleSheet.create({
+		heading1: {
+			fontWeight: 'bold',
+		},
+		heading2: {
+			fontWeight: 'bold',
+		},
+		heading3: {
+			fontWeight: 'bold',
+		},
+		heading4: {
+			fontWeight: 'bold',
+		},
+		heading5: {
+			fontWeight: 'bold',
+		},
+		heading6: {
+			fontWeight: 'bold',
+		},
+		body: {
+			color: colors.textStrong,
+			fontSize: size.medium,
+		},
+		paragraph: {
+			marginTop: 0,
+			marginBottom: 0,
+			paddingTop: 0,
+			paddingBottom: 0,
+		},
+		code_block: {
+			color: colors.text,
+			backgroundColor: colors.primary,
+			paddingVertical: 1,
+			borderColor: colors.text,
+			borderRadius: 5,
+			lineHeight: size.s_20,
+		},
+		code_inline: {
+			color: colors.text,
+			backgroundColor: colors.primary,
+			fontSize: size.small,
+			lineHeight: size.s_20,
+		},
+		fence: {
+			color: colors.text,
+			backgroundColor: colors.primary,
+			paddingVertical: 5,
+			borderColor: colors.borderHighlight,
+			borderRadius: 5,
+			fontSize: size.small,
+			lineHeight: size.s_20,
+		},
+		link: {
+			color: Colors.textLink,
+			textDecorationLine: 'none',
+			lineHeight: size.s_20,
+		},
+		iconEmojiInMessage: {
+			width: size.s_20,
+			height: size.s_20,
+		},
+		editedText: {
+			fontSize: size.small,
+			color: Colors.gray72,
+		},
+		mention: {
+			fontSize: size.medium,
+			color: colors.textLink,
+			backgroundColor: colors.midnightBlue,
+			lineHeight: size.s_20,
+		},
+		blockquote: {
+			backgroundColor: Colors.tertiaryWeight,
+			borderColor: Colors.textGray,
+		},
+		tr: {
+			borderColor: Colors.textGray,
+		},
+		hr: {
+			backgroundColor: Colors.white,
+			height: 2,
+		},
+		voiceChannel: {
+			backgroundColor: colors.midnightBlue,
+			flexDirection: 'row',
+			gap: size.s_2,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		textVoiceChannel: {
+			fontSize: size.medium,
+			color: colors.textLink,
+			lineHeight: size.s_20,
+		},
+		unknownChannel: { fontStyle: 'italic' },
+	});
 
 const styleMessageReply = {
 	body: {
@@ -149,33 +160,15 @@ const styleMessageReply = {
 };
 
 export type IMarkdownProps = {
-	lines: string;
-	isEdited?: boolean;
-	t?: TFunction;
-	channelsEntities?: Record<string, ChannelsEntity>;
-	emojiListPNG?: IEmoji[];
-	onMention?: (url: string) => void;
-	onChannelMention?: (channel: ChannelsEntity) => void;
-	isNumberOfLine?: boolean;
-	clansProfile?: UserClanProfileEntity[];
-	currentClanId?: string;
-	isMessageReply?: boolean;
-	mode?: number;
-};
-
-type TRenderTextContentProps = {
-	lines: string;
+	content: any;
 	isEdited?: boolean;
 	translate?: TFunction;
-	channelsEntities?: Record<string, ChannelsEntity>;
-	emojiListPNG?: IEmoji[];
 	onMention?: (url: string) => void;
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
-	clansProfile?: UserClanProfileEntity[];
-	currentClanId?: string;
 	isMessageReply?: boolean;
 	mode?: number;
+	themeValue?: any;
 };
 
 /**
@@ -209,13 +202,12 @@ export const renderRulesCustom = {
 		if (content?.startsWith('::')) {
 			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />;
 		}
-
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<Text>
-							<FontAwesome name="volume-2" size={14} color={baseColor.gray} /> {' '}
+							<FontAwesome name="volume-2" size={14} color={baseColor.gray} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
@@ -300,25 +292,13 @@ export const formatUrls = (text: string) => {
 		.join('');
 };
 
-export const formatEmoji = (text: string, emojiImages: IEmoji[] = [], isMessageReply: boolean) => {
-	const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
-	const parts = modifiedString?.split?.('\0')?.filter?.(Boolean);
-	return parts
-		?.map((part) => {
-			if (codeBlockRegex.test(part)) {
-				return part;
-			} else {
-				if (part.match(emojiRegex)) {
-					const srcEmoji = getSrcEmoji(part, emojiImages);
-					return isMessageReply ? `![${part}](${srcEmoji})` : `[:${part}](${srcEmoji})`;
-				}
-				return part;
-			}
-		})
-		.join('');
-};
-
 export const formatBlockCode = (text: string) => {
+	const matchesUrls = text?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
+
+	if (matchesUrls) {
+		return formatUrls(text);
+	}
+
 	const addNewlinesToCodeBlock = (block) => {
 		if (!block.startsWith('```\n')) {
 			block = block.replace(/^```/, '```\n');
@@ -328,7 +308,7 @@ export const formatBlockCode = (text: string) => {
 		}
 		return '\n' + block + '\n';
 	};
-	return text.replace(codeBlockRegexGlobal, addNewlinesToCodeBlock);
+	return text?.replace?.(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 };
 
 export const removeBlockCode = (text: string) => {
@@ -336,67 +316,99 @@ export const removeBlockCode = (text: string) => {
 	return text?.replace?.(regex, '$2');
 };
 
-const RenderTextContent = React.memo(
-	({
-		lines,
-		isEdited,
-		t,
-		channelsEntities,
-		emojiListPNG,
-		onMention,
-		onChannelMention,
-		isNumberOfLine,
-		clansProfile,
-		currentClanId,
-		isMessageReply,
-		mode,
-	}: IMarkdownProps) => {
-		const { themeValue } = useTheme();
-		const usersClan = useSelector(selectAllUsesClan);
-		const usersInChannel = useSelector(selectAllChannelMembers);
-		if (!lines) return null;
-
-		const matchesMentions = lines?.match?.(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
-		const matchesUrls = lines?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
-		const isExistEmoji = emojiRegex.test(lines);
-		const isExistBlockCode = codeBlockRegex.test(lines);
-
+export const RenderTextMarkdownContent = React.memo(
+	({ content, isEdited, translate, onMention, onChannelMention, isNumberOfLine, isMessageReply, mode, themeValue }: IMarkdownProps) => {
 		let customStyle = {};
-		let content: string = lines?.trim?.();
-
-		if (matchesMentions) {
-			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClanId, usersInChannel, usersClan, mode);
-		}
-
-		if (matchesUrls) {
-			content = formatUrls(content);
-		}
-
-		if (isExistEmoji) {
-			content = formatEmoji(content, emojiListPNG, isMessageReply);
-		}
-
-		if (isExistBlockCode && !isMessageReply) {
-			content = formatBlockCode(content);
-		}
-
-		if (isEdited) {
-			content = content + ` [${t('edited')}](${EDITED_FLAG})`;
-		}
+		const usersClan = useAppSelector(selectAllUsesClan);
+		const usersInChannel = useAppSelector(selectAllChannelMembers);
+		const clansProfile = useAppSelector(selectAllUserClanProfile);
+		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
+		const channelsEntities = useAppSelector(selectChannelsEntities);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply };
 		}
 
+		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content;
+		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+		let lastIndex = 0;
+
+		const contentRender = useMemo(() => {
+			let formattedContent = '';
+
+			elements.forEach((element) => {
+				const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+
+				if (lastIndex < startIndex) {
+					formattedContent += t?.slice?.(lastIndex, startIndex)?.toString();
+				}
+
+				if (channelId && channelLable) {
+					formattedContent += ChannelHashtag({ channelHashtagId: channelId, channelsEntities });
+				}
+				if (username) {
+					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile });
+				}
+				if (shortname) {
+					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });
+				}
+
+				if (markdown) {
+					formattedContent += formatBlockCode(markdown);
+				}
+				lastIndex = endIndex;
+			});
+
+			if (lastIndex < t?.length) {
+				formattedContent += t?.slice?.(lastIndex)?.toString();
+			}
+
+			if (isEdited) {
+				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
+			}
+			return formattedContent;
+		}, [elements, t, mode]);
+
+		const renderMarkdown = () => (
+			<Markdown
+				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				rules={renderRulesCustom}
+				onLinkPress={(url) => {
+					if (url.startsWith(TYPE_MENTION.userMention)) {
+						onMention && onMention(url);
+						return false;
+					}
+					if (url.startsWith(TYPE_MENTION.hashtag)) {
+						const urlFormat = url.replace(/##voice%22|#%22|%22/g, '');
+						const dataChannel = urlFormat.split('_');
+						const payloadChannel = {
+							type: Number(dataChannel?.[0] || 1),
+							id: dataChannel?.[1],
+							channel_id: dataChannel?.[1],
+							clan_id: dataChannel?.[2],
+							status: Number(dataChannel?.[3] || 1),
+							meeting_code: dataChannel?.[4] || '',
+						};
+						onChannelMention && onChannelMention(payloadChannel);
+						return false;
+					}
+					// Note: return false to prevent default
+					return true;
+				}}
+			>
+				{contentRender}
+			</Markdown>
+		);
+
 		return isNumberOfLine ? (
 			<View
 				style={{
 					flex: 1,
-					maxHeight: isMessageReply ? size.s_18 : size.s_20 * 10 - size.s_10,
+					maxHeight: isMessageReply ? size.s_36 : size.s_20 * 10 - size.s_10,
 					overflow: 'hidden',
 				}}
 			>
-				{isMessageReply ? (
+				{isMessageReply && (
 					<View
 						style={{
 							position: 'absolute',
@@ -407,167 +419,11 @@ const RenderTextContent = React.memo(
 							zIndex: 1,
 						}}
 					/>
-				) : null}
-				<Markdown
-					style={{ ...(markdownStyles(themeValue) as StyleSheet.NamedStyles<any>), ...customStyle }}
-					rules={renderRulesCustom}
-					onLinkPress={(url) => {
-						if (url.startsWith('@')) {
-							onMention && onMention(url);
-							return false;
-						}
-
-						if (url.startsWith('#')) {
-							const channelId = url.slice(1);
-							const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
-							onChannelMention && onChannelMention(channel);
-							return false;
-						}
-						//Note: return false to prevent default
-						return true;
-					}}
-				>
-					{content}
-				</Markdown>
+				)}
+				{renderMarkdown()}
 			</View>
 		) : (
-			<Markdown
-				style={markdownStyles(themeValue) as StyleSheet.NamedStyles<any>}
-				rules={renderRulesCustom}
-				onLinkPress={(url) => {
-					if (url.startsWith(TYPE_MENTION.userMention)) {
-						onMention && onMention(url);
-						return false;
-					}
-					if (url.startsWith(TYPE_MENTION.hashtag)) {
-						let channelId = url.slice(1);
-						if (url.includes(TYPE_MENTION.voiceChannel)) {
-							channelId = url.replace(`${TYPE_MENTION.voiceChannel}`, '');
-						}
-						const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
-						onChannelMention && onChannelMention(channel);
-						return false;
-					}
-					//Note: return false to prevent default
-					return true;
-				}}
-			>
-				{content}
-			</Markdown>
+			renderMarkdown()
 		);
 	},
 );
-
-const formatMention = (
-	text: string,
-	matchesMention: RegExpMatchArray,
-	channelsEntities: Record<string, ChannelsEntity>,
-	clansProfile: UserClanProfileEntity[],
-	currentClanId?: string,
-	usersInChannel?: ChannelMembersEntity[],
-	usersClan?: UsersClanEntity[],
-	mode?: number,
-) => {
-	const parts = text?.split?.(splitBlockCodeRegex);
-	return parts
-		?.map((part) => {
-			if (codeBlockRegex.test(part)) {
-				return part;
-			} else {
-				if (matchesMention.includes(part)) {
-					if (part.startsWith('@')) {
-						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClanId);
-					}
-					if (part.startsWith('<#')) {
-						const channelId = part.match(channelIdRegex)[1];
-						const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
-						if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
-							return `[${channel.channel_label}](##voice${channelId})`;
-						}
-						return channel['channel_id'] ? `[#${channel.channel_label}](#${channelId})` : `[\\# ${channel.channel_label}](#${channelId})`;
-					}
-				}
-			}
-			return part;
-		})
-		.join('');
-};
-
-const getChannelById = (channelHashtagId: string, channelsEntities: Record<string, ChannelsEntity>) => {
-	const channel = channelsEntities?.[channelHashtagId];
-	if (channel) {
-		return channel;
-	} else {
-		return {
-			channel_label: 'unknown',
-		};
-	}
-};
-
-export const renderTextContent = ({
-	lines,
-	isEdited = false,
-	translate,
-	channelsEntities,
-	emojiListPNG,
-	onMention,
-	onChannelMention,
-	isNumberOfLine = false,
-	clansProfile,
-	currentClanId,
-	isMessageReply = false,
-	mode,
-}: TRenderTextContentProps) => {
-	return (
-		<RenderTextContent
-			lines={lines}
-			isEdited={isEdited}
-			t={translate}
-			channelsEntities={channelsEntities}
-			emojiListPNG={emojiListPNG}
-			onMention={onMention}
-			onChannelMention={onChannelMention}
-			isNumberOfLine={isNumberOfLine}
-			clansProfile={clansProfile}
-			currentClanId={currentClanId}
-			isMessageReply={isMessageReply}
-			mode={mode}
-		/>
-	);
-};
-
-const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
-	if (mode === 4 || mode === 3) {
-		return usersInChannel?.find((channelUser) => channelUser?.user?.username === nameMention);
-	} else {
-		return usersClan?.find((userClan) => userClan?.user?.username === nameMention);
-	}
-};
-
-const renderMention = (
-	part: string,
-	mode: number,
-	usersInChannel: ChannelMembersEntity[],
-	usersClan: UsersClanEntity[],
-	clansProfile: UserClanProfileEntity[],
-	currentClanId: string,
-) => {
-	const nameMention = part?.slice(1);
-
-	if (nameMention === 'here') {
-		return `[@here](@here)`;
-	}
-
-	const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
-	const { user } = userMention || {};
-
-	const clanProfileByIdUser = clansProfile?.find((clanProfile) => clanProfile?.clan_id === currentClanId && clanProfile?.user_id === user?.id);
-
-	if (clanProfileByIdUser) {
-		return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
-	}
-
-	if (userMention) {
-		return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
-	}
-};

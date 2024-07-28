@@ -12,6 +12,8 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
+	const { senderId, username, avatarSender } = useMessageParser(message);
+
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +37,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 		e.stopPropagation();
 	};
 
-	const isAnonymous = useMemo(() => message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
 		return (
@@ -53,9 +55,9 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 						e.preventDefault();
 						e.stopPropagation();
 					}}
-					alt={message.username || ''}
-					userName={message.username}
-					src={message.avatar}
+					alt={username ?? ''}
+					userName={username}
+					src={avatarSender}
 					className="min-w-10 min-h-10"
 					isAnonymous={isAnonymous}
 				/>
@@ -66,7 +68,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={message.sender_id || ''} message={message} mode={mode} />
+					<ShortUserProfile userID={senderId} message={message} mode={mode} />
 				</div>
 			) : null}
 		</div>

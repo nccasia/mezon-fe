@@ -1,19 +1,14 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AngleRight, Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import {
-	notificationSettingActions,
-	selectCurrentChannel,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectnotificatonSelected,
-	useAppDispatch,
-} from '@mezon/store-mobile';
-import { useNavigation } from '@react-navigation/native';
+import { AngleRight, ArrowLeftIcon, Icons } from '@mezon/mobile-components';
+import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, notificationSettingActions, selectCurrentClanId, selectnotificatonSelected, useAppDispatch } from '@mezon/store-mobile';
+import { IChannel } from '@mezon/utils';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -21,46 +16,110 @@ import { IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../temp-
 import NotificationSetting from '../NotificationSetting';
 import { style } from './MuteThreadDetailModal.styles';
 
-const MuteThreadDetailModal = () => {
+type RootStackParamList = {
+	MuteThreadDetail: {
+		currentChannel: IChannel | DirectEntity;
+	};
+};
+
+type MuteThreadDetailRouteProp = RouteProp<RootStackParamList, 'MuteThreadDetail'>;
+
+type MuteThreadDetailModalProps = {
+	route: MuteThreadDetailRouteProp;
+};
+
+const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['notificationSetting']);
-	const menu = useMemo(() => ([
-		{
-			items: [
+	const menu = useMemo(
+		() =>
+			[
 				{
-					title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
-					onPress: () => { handleScheduleMute(15 * 60 * 1000); },
+					items: [
+						{
+							title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
+							onPress: () => {
+								handleScheduleMute(15 * 60 * 1000);
+							},
+						},
+						{
+							title: t('notifySettingThreadModal.muteDuration.forOneHour'),
+							onPress: () => {
+								handleScheduleMute(60 * 60 * 1000);
+							},
+						},
+						{
+							title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
+							onPress: () => {
+								handleScheduleMute(3 * 60 * 60 * 1000);
+							},
+						},
+						{
+							title: t('notifySettingThreadModal.muteDuration.forEightHours'),
+							onPress: () => {
+								handleScheduleMute(8 * 60 * 60 * 1000);
+							},
+						},
+						{
+							title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
+							onPress: () => {
+								handleScheduleMute(24 * 60 * 60 * 1000);
+							},
+						},
+						{
+							title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
+							onPress: () => {
+								handleScheduleMute(Infinity);
+							},
+						},
+					],
 				},
-				{
-					title: t('notifySettingThreadModal.muteDuration.forOneHour'),
-					onPress: () => { handleScheduleMute(60 * 60 * 1000); },
-				},
-				{
-					title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
-					onPress: () => { handleScheduleMute(3 * 60 * 60 * 1000); },
-				},
-				{
-					title: t('notifySettingThreadModal.muteDuration.forEightHours'),
-					onPress: () => { handleScheduleMute(8 * 60 * 60 * 1000); },
-				},
-				{
-					title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
-					onPress: () => { handleScheduleMute(24 * 60 * 60 * 1000); },
-				},
-				{
-					title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
-					onPress: () => { handleScheduleMute(Infinity); },
-				},
-			],
-		}
-	]) as IMezonMenuSectionProps[], [])
+			] as IMezonMenuSectionProps[],
+		[],
+	);
 
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
 	const [mutedUntil, setMutedUntil] = useState('');
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentChannel = useSelector(selectCurrentChannel);
+	const [isChannel, setIsChannel] = useState<boolean>();
+	const { currentChannel } = route?.params || {};
+	const isDMThread = useMemo(() => {
+		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
+	}, [currentChannel]);
+
+	useEffect(() => {
+		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
+	}, [currentChannel]);
+
+	navigation.setOptions({
+		headerShown: true,
+		headerTintColor: Colors.white,
+		headerLeft: () => (
+			<Pressable style={{ marginLeft: size.s_10 }} onPress={() => navigateToThreadDetail()}>
+				<ArrowLeftIcon />
+			</Pressable>
+		),
+		headerTitle: () => (
+			<View>
+				<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
+					{isDMThread
+						? t('notifySettingThreadModal.muteThisConversation')
+						: isChannel
+							? t('notifySettingThreadModal.headerTitleMuteChannel')
+							: t('notifySettingThreadModal.headerTitleMuteThread')}
+				</Text>
+				<Text numberOfLines={1} style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400', width: '100%' }}>
+					{isDMThread
+						? currentChannel?.channel_label
+						: isChannel
+							? `#${currentChannel?.channel_label}`
+							: `"${currentChannel?.channel_label}"`}
+				</Text>
+			</View>
+		),
+	});
+
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
@@ -83,32 +142,32 @@ const MuteThreadDetailModal = () => {
 					setMutedUntil(`Muted until ${formattedDate}`);
 					idTimeOut = setTimeout(() => {
 						const body = {
-							channel_id: currentChannelId || '',
+							channel_id: currentChannel?.channel_id || '',
 							notification_type: getNotificationChannelSelected?.notification_setting_type || '',
 							clan_id: currentClanId || '',
 							active: 1,
 						};
 						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+						clearTimeout(idTimeOut);
 					}, timeDifference);
 				}
 			}
 		}
-		return () => {
-			clearTimeout(idTimeOut);
-		};
-	}, [getNotificationChannelSelected, dispatch, currentChannelId, currentClanId]);
+	}, [getNotificationChannelSelected, dispatch, currentChannel?.channel_id, currentClanId]);
 
 	const muteOrUnMuteChannel = (active: number) => {
 		const body = {
-			channel_id: currentChannelId || '',
+			channel_id: currentChannel?.channel_id || '',
 			notification_type: getNotificationChannelSelected?.notification_setting_type || '',
 			clan_id: currentClanId || '',
 			active: active,
 		};
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
+		navigateToThreadDetail();
+	};
+
+	const navigateToThreadDetail = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentChannel } });
 	};
 
 	const handleScheduleMute = (duration: number) => {
@@ -118,7 +177,7 @@ const MuteThreadDetailModal = () => {
 			const unmuteTimeISO = unmuteTime.toISOString();
 
 			const body = {
-				channel_id: currentChannelId || '',
+				channel_id: currentChannel?.channel_id || '',
 				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
 				clan_id: currentClanId || '',
 				time_mute: unmuteTimeISO,
@@ -126,16 +185,14 @@ const MuteThreadDetailModal = () => {
 			dispatch(notificationSettingActions.setNotificationSetting(body));
 		} else {
 			const body = {
-				channel_id: currentChannelId || '',
+				channel_id: currentChannel?.channel_id || '',
 				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
 				clan_id: currentClanId || '',
 				active: 0,
 			};
 			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		}
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
+		navigateToThreadDetail();
 	};
 
 	return (
@@ -151,24 +208,27 @@ const MuteThreadDetailModal = () => {
 						style={styles.wrapperUnmuteBox}
 					>
 						<Icons.BellSlashIcon width={20} height={20} style={{ marginRight: 20 }} color={themeValue.text} />
-						<Text style={styles.option}>{`Unmute #${currentChannel?.channel_label}`}</Text>
+						<Text
+							style={styles.option}
+						>{`Unmute ${isDMThread ? currentChannel?.channel_label : isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`} `}</Text>
 					</TouchableOpacity>
 				</View>
 			)}
+			{mutedUntil ? <Text style={styles.InfoTitle}>{mutedUntil}</Text> : null}
+			{!isDMThread ? (
+				<Block>
+					<TouchableOpacity onPress={() => openBottomSheet()} style={styles.wrapperItemNotification}>
+						<Text style={styles.option}>{t('bottomSheet.title')}</Text>
+						<AngleRight width={20} height={20} color={themeValue.text} />
+					</TouchableOpacity>
+					<Text style={styles.InfoTitle}>{t('notifySettingThreadModal.description')}</Text>
+				</Block>
+			) : null}
 
-			<Text style={styles.InfoTitle}>{mutedUntil}</Text>
-			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.wrapperItemNotification}>
-				<Text style={styles.option}>Notification Settings</Text>
-				<AngleRight width={20} height={20} color={themeValue.text} />
-			</TouchableOpacity>
-			<Text style={styles.InfoTitle}>{t('notifySettingThreadModal.description')}</Text>
-
-			<MezonBottomSheet
-				heightFitContent
-				ref={bottomSheetRef} >
+			<MezonBottomSheet heightFitContent ref={bottomSheetRef}>
 				<NotificationSetting />
 			</MezonBottomSheet>
-		</View >
+		</View>
 	);
 };
 

@@ -1,12 +1,20 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
 import {
+	ActionEmitEvent,
+	Icons,
+	STORAGE_CLAN_ID,
+	save,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND
+} from '@mezon/mobile-components';
+import { Block, useTheme } from '@mezon/mobile-ui';
+import {
+	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	useAppDispatch,
@@ -14,6 +22,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -117,8 +126,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await fetchMemberChannel();
-			await directMessageLoader();
+			const store = await getStoreAsync();
+			store.dispatch(appActions.setIsFromFCMMobile(true));
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+			await store.dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: currentDmGroup.id,
+					channelName: currentDmGroup.channel_label,
+					type: currentDmGroup.type,
+					noCache: true,
+				}),
+			);
+			await store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }))
+			
+			store.dispatch(appActions.setIsFromFCMMobile(false));
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}
 	};
 
@@ -135,6 +157,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		}
 		dispatch(directActions.setDmGroupCurrentId(''));
 		navigation.goBack();
+	};
+
+	const onHandlerStateChange = (event) => {
+		const { translationX, velocityX } = event.nativeEvent;
+		if (translationX > 5 && velocityX > 120) {
+			handleBack()
+		}
 	};
 	return (
 		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
@@ -166,17 +195,27 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 			{currentDmGroup?.id ? (
 				<View style={styles.content}>
-					<ChannelMessages
-						channelId={currentDmGroup.id}
-						channelLabel={currentDmGroup?.channel_label}
-						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
-					/>
+					<PanGestureHandler
+						failOffsetY={[-5, 5]}
+						onHandlerStateChange={onHandlerStateChange}
+					>
+						<View style={{ flex: 1 }}>
+							<ChannelMessages
+								channelId={currentDmGroup.id}
+								channelLabel={currentDmGroup?.channel_label}
+								mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
+							/>
+						</View>
+					</PanGestureHandler>
 					<ChatBox
 						channelId={currentDmGroup?.id}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+						hiddenIcon={{
+							threadIcon: true,
+						}}
 					/>
-
+					<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
@@ -194,7 +233,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}

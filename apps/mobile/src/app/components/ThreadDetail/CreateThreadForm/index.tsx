@@ -6,7 +6,7 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
-	save
+	save,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -17,7 +17,7 @@ import {
 	getStoreAsync,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -28,6 +28,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
@@ -48,7 +49,7 @@ export default function CreateThreadForm() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
@@ -140,7 +141,7 @@ export default function CreateThreadForm() {
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate('HomeDefault' as never);
+		navigation.navigate(APP_SCREEN.HOME);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -156,7 +157,7 @@ export default function CreateThreadForm() {
 					}}
 					innerRef={formikRef}
 					initialValues={{ nameValueThread: null, isPrivate: false }}
-					onSubmit={() => { }}
+					onSubmit={() => {}}
 				>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
@@ -175,10 +176,9 @@ export default function CreateThreadForm() {
 										}}
 										// onBlur={handleBlur('nameValueThread')}
 										value={values.nameValueThread}
-										placeHolder='New Thread'
+										placeHolder="New Thread"
 										maxCharacter={64}
 										errorMessage={t('errorMessage')}
-
 									/>
 								</SafeAreaView>
 							</View>
@@ -201,7 +201,7 @@ export default function CreateThreadForm() {
 									<MessageItem
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-										channelId={currentChannel.channel_id}
+										channelId={currentChannel?.channel_id}
 										isNumberOfLine={true}
 										preventAction
 									/>
@@ -209,7 +209,7 @@ export default function CreateThreadForm() {
 							)}
 							<ChatBox
 								messageAction={EMessageActionType.CreateThread}
-								channelId={currentChannel.channel_id}
+								channelId={currentChannel?.channel_id}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								hiddenIcon={{
 									threadIcon: true,
@@ -223,7 +223,11 @@ export default function CreateThreadForm() {
 								}}
 							/>
 							{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-								<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+								<BottomKeyboardPicker
+									height={heightKeyboardShow}
+									ref={bottomPickerRef}
+									isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+								>
 									{typeKeyboardBottomSheet === 'emoji' ? (
 										<EmojiPicker
 											onDone={() => {
@@ -233,7 +237,7 @@ export default function CreateThreadForm() {
 											bottomSheetRef={bottomPickerRef}
 										/>
 									) : typeKeyboardBottomSheet === 'attachment' ? (
-										<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+										<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 									) : (
 										<View />
 									)}

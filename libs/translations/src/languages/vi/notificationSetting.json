@@ -1,25 +1,26 @@
 {
   "bottomSheet": {
-    "title": "Cài đặt thông báo",
+    "title": "Cài Đặt Thông Báo",
     "labelOptions": {
-      "reactionMessage": "Tin nhắn phản ứng",
-      "categoryDefault": "Sử dụng mặc định của danh mục",
-      "allMessage": "TẤT CẢ",
-      "notThingMessage": "KHÔNG CÓ GÌ",
-      "mentionMessage": "NHẮC ĐẾN"
+      "reactionMessage": "Phản Hồi Tin Nhắn",
+      "categoryDefault": "Sử Dụng Mặc Định Danh Mục",
+      "allMessage": "Tất Cả",
+      "notThingMessage": "Không Có Gì",
+      "mentionMessage": "Chỉ @nhắc đến"
     }
   },
   "notifySettingThreadModal": {
-    "headerTitleMuteThread": "Tắt thông báo chủ đề này",
-    "headerTitleMuteChannel": "Tắt thông báo channel này",
+    "headerTitleMuteThread": "Tắt Thông Báo Chủ Đề Này",
+    "headerTitleMuteChannel": "Tắt Thông Báo Kênh Này",
+    "muteThisConversation": "Tắt Thông Báo Cuộc Trò Chuyện Này",
     "muteDuration": {
-      "forFifteenMinutes": "Trong 15 phút",
-      "forOneHour": "Trong 1 giờ",
-      "forThreeHours": "Trong 3 giờ",
-      "forEightHours": "Trong 8 giờ",
-      "forTwentyFourHours": "Trong 24 giờ",
+      "forFifteenMinutes": "Trong 15 Phút",
+      "forOneHour": "Trong 1 Giờ",
+      "forThreeHours": "Trong 3 Giờ",
+      "forEightHours": "Trong 8 Giờ",
+      "forTwentyFourHours": "Trong 24 Giờ",
       "untilTurnItBackOn": "Cho đến khi bật lại"
     },
-    "description": "Bạn đang nhận được thông báo từ tất cả thư trong máy chủ này, nhưng bạn có thể ghi đè thông báo đó tại đây"
+    "description": "Bạn đang nhận thông báo từ tất cả tin nhắn trong clan này, nhưng bạn có thể ghi đè nó tại đây"
   }
 }

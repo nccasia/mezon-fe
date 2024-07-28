@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, selectIdMessageRefReaction, selectIsShowMemberList } from '@mezon/store';
+import { RootState, selectIdMessageRefReaction, selectIdMessageRefReply, selectIsShowMemberList } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,6 +21,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const messageBox = useRef<HTMLDivElement>(null);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 
 	const setMarginleft = useMemo(() => {
 		if (messageBox?.current?.getBoundingClientRect()) {
@@ -95,7 +96,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					<GifStickerEmojiPopup />
 				</div>
 			)}
-			<ReplyMessageBox />
+			{idMessageRefReply && <ReplyMessageBox idMessage={idMessageRefReply} />}
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}

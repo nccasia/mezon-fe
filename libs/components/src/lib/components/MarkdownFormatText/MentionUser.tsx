@@ -9,9 +9,10 @@ import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 type ChannelHashtagProps = {
 	tagName: string;
 	mode?: number;
+	showOnchannelLayout?: boolean;
 };
 
-const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
 	const usersInChannel = useSelector(selectAllChannelMembers);
@@ -95,14 +96,15 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
-						onMouseDown={(event) => handleMouseClick(event)}
+						onMouseDown={showOnchannelLayout ? (event) => handleMouseClick(event) : () => {}}
 						ref={panelRef}
-						onClick={(e) => dispatchUserIdToShowProfile(e)}
+						onClick={showOnchannelLayout ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm 
-				${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
-				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
+				${tagName === '@here' ? 'cursor-text' : showOnchannelLayout ? 'cursor-pointer hover:!text-white' : 'hover:none'}
+
+				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${showOnchannelLayout ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
 						@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
 					</Link>
