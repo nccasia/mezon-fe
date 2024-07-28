@@ -46,6 +46,8 @@ const unorderedListRegex = /(?:^|\s)([\-\*]\s+.*?)(?:\n|$)/;
 const orderedListRegex = /(?:^|\s)(\d+\.\s+.*?)(?:\n|$)/;
 const blockquoteRegex = /(?:^|\s)>(.*?)(?:\n|$)/;
 
+export const googleMeetLinkRegex = /https:\/\/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})/g;
+
 export const markdownRegex = new RegExp(
 	[
 		headerRegex.source,

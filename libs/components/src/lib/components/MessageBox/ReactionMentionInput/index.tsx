@@ -10,65 +10,65 @@ import {
 	useThreads,
 } from '@mezon/core';
 import {
-	ChannelsEntity,
-	channelUsersActions,
-	messagesActions,
-	reactionActions,
-	referencesActions,
-	selectAllAccount,
-	selectAllDirectChannelVoids,
-	selectAllUsesClan,
-	selectAttachmentData,
-	selectCloseMenu,
-	selectCurrentChannel,
-	selectCurrentChannelId,
-	selectDataReferences,
-	selectDmGroupCurrentId,
-	selectIdMessageRefReply,
-	selectIsFocused,
-	selectIsShowMemberList,
-	selectIsShowMemberListDM,
-	selectIsUseProfileDM,
-	selectLassSendMessageEntityBySenderId,
-	selectMessageByMessageId,
-	selectOpenEditMessageState,
-	selectOpenReplyMessageState,
-	selectOpenThreadMessageState,
-	selectReactionRightState,
-	selectStatusMenu,
-	selectTheme,
-	threadsActions,
-	useAppDispatch,
+  ChannelsEntity,
+  channelUsersActions,
+  messagesActions,
+  reactionActions,
+  referencesActions,
+  selectAllAccount,
+  selectAllDirectChannelVoids,
+  selectAllUsesClan,
+  selectAttachmentData, selectChannelsEntities,
+  selectCloseMenu,
+  selectCurrentChannel,
+  selectCurrentChannelId,
+  selectDataReferences,
+  selectDmGroupCurrentId,
+  selectIdMessageRefReply,
+  selectIsFocused,
+  selectIsShowMemberList,
+  selectIsShowMemberListDM,
+  selectIsUseProfileDM,
+  selectLassSendMessageEntityBySenderId,
+  selectMessageByMessageId,
+  selectOpenEditMessageState,
+  selectOpenReplyMessageState,
+  selectOpenThreadMessageState,
+  selectReactionRightState,
+  selectStatusMenu,
+  selectTheme,
+  threadsActions,
+  useAppDispatch,
 } from '@mezon/store';
 import {
-	ChannelMembersEntity,
-	EmojiPlaces,
-	IEmojiOnMessage,
-	IHashtagOnMessage,
-	ILineMention,
-	ILinkOnMessage,
-	IMentionOnMessage,
-	IMessageSendPayload,
-	ImarkdownOnMessage,
-	MIN_THRESHOLD_CHARS,
-	MentionDataProps,
-	SubPanelName,
-	ThreadValue,
-	UsersClanEntity,
-	convertMarkdown,
-	emojiRegex,
-	focusToElement,
-	linkRegex,
-	markdownRegex,
-	neverMatchingRegex,
-	searchMentionsHashtag,
-	threadError,
-	uniqueUsers,
+  ChannelMembersEntity,
+  EmojiPlaces,
+  IEmojiOnMessage,
+  IHashtagOnMessage,
+  ILineMention,
+  ILinkOnMessage,
+  IMentionOnMessage,
+  IMessageSendPayload,
+  ImarkdownOnMessage,
+  MIN_THRESHOLD_CHARS,
+  MentionDataProps,
+  SubPanelName,
+  ThreadValue,
+  UsersClanEntity,
+  convertMarkdown,
+  emojiRegex,
+  focusToElement,
+  linkRegex,
+  markdownRegex,
+  neverMatchingRegex,
+  searchMentionsHashtag,
+  threadError,
+  uniqueUsers, googleMeetLinkRegex,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import {Mention, MentionItem, MentionsInput, OnChangeHandlerFunc} from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
@@ -174,6 +174,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+  const allChannels = useSelector(selectChannelsEntities);
 
 	const userProfile = useSelector(selectAllAccount);
 	const lastMessageByUserId = useSelector((state) =>
@@ -416,118 +417,168 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		return [];
 	}, [props.mode, commonChannelVoids]);
-
-	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		dispatch(threadsActions.setMessageThreadError(''));
-		setValueTextInput(newValue, props.isThread);
-
-		if (typeof props.onTyping === 'function') {
-			props.onTyping();
-		}
-
-		const convertedHashtag = convertToPlainTextHashtag(newValue);
-		setContent(convertedHashtag);
-		setPlainTextMessage(newPlainTextValue);
-		let match;
-		while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
-			emojiList.push({
-				shortname: match[0],
-				startIndex: match.index,
-				endIndex: match.index + match[0].length,
-			});
-		}
-		setEmojisOnMessage(emojiList);
-
-		while ((match = linkRegex.exec(convertedHashtag)) !== null) {
-			linkList.push({
-				link: match[0],
-				startIndex: match.index,
-				endIndex: match.index + match[0].length,
-			});
-		}
-		setLinksOnMessage(linkList);
-
-		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
-			const startsWithTripleBackticks = match[0].startsWith('```');
-			const endsWithNoTripleBackticks = match[0].endsWith('```');
-			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
-			markdownList.push({
-				markdown: convertedMarkdown,
-				startIndex: match.index,
-				endIndex: match.index + match[0].length,
-			});
-		}
-		setMarkdownsOnMessage(markdownList);
-
-		if (mentions.length > 0) {
-			if (mentions.some((mention) => mention.display === '@here')) {
-				setMentionEveryone(true);
-			}
-			let positionTracker: PositionTracker = {};
-
-			for (const mention of mentions) {
-				let startIndex = -1;
-				let endIndex = -1;
-				if (mention.display.startsWith('@')) {
-					if (!positionTracker[mention.display]) {
-						positionTracker[mention.display] = 0;
-					}
-					startIndex = convertedHashtag.indexOf(mention.display, positionTracker[mention.display]);
-					endIndex = startIndex + mention.display.length;
-					positionTracker[mention.display] = endIndex;
-					mentionList.push({
-						userId: mention.id.toString() ?? '',
-						username: mention.display ?? '',
-						startIndex: startIndex,
-						endIndex: endIndex,
-					});
-				}
-
-				if (mention.display.startsWith('#')) {
-					const hashtagPattern = `<#${mention.id.toString()}>`;
-
-					if (positionTracker[hashtagPattern] === undefined) {
-						positionTracker[hashtagPattern] = 0;
-					}
-					startIndex = convertedHashtag.indexOf(hashtagPattern, positionTracker[hashtagPattern]);
-					endIndex = startIndex + hashtagPattern.length;
-
-					positionTracker[hashtagPattern] = endIndex;
-
-					hashtagList.push({
-						channelId: mention.id.toString() ?? '',
-						channelLable: mention.display ?? '',
-						startIndex: startIndex,
-						endIndex: endIndex,
-					});
-				}
-			}
-
-			setMentionsOnMessage(mentionList);
-			setHashtagsOnMessage(hashtagList);
-			const simplifiedMentionList = mentionList.map((mention) => ({
-				user_id: mention.userId,
-				username: mention.username,
-			}));
-			setMentionData(simplifiedMentionList);
-		}
-
-		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(convertedHashtag);
-			setContent('');
-			setValueTextInput('');
-		}
-
-		if (newPlainTextValue.endsWith('@')) {
-			setTitleModalMention('Members');
-		} else if (newPlainTextValue.endsWith('#')) {
-			setTitleModalMention('Text channels');
-		} else if (newPlainTextValue.endsWith(':')) {
-			setTitleModalMention('Emoji matching');
-		}
-	};
-
-	const handleChangeNameThread = (nameThread: string) => {
+  
+  const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+    dispatch(threadsActions.setMessageThreadError(''));
+    setValueTextInput(newValue, props.isThread);
+    
+    if (typeof props.onTyping === 'function') {
+      props.onTyping();
+    }
+    
+    const googleMeetLinks: Set<string> = new Set();
+    let match: any;
+    const replacements = [];
+    
+    while ((match = googleMeetLinkRegex.exec(newPlainTextValue)) !== null) {
+      const foundMatchedChannel = Object.values(allChannels).find(channel => channel.meeting_code === match[1]);
+      if (foundMatchedChannel) {
+        const channelMention = `#${foundMatchedChannel.channel_label}`;
+        const replacedValue = `#[${foundMatchedChannel.channel_label}](${foundMatchedChannel.channel_id})`;
+        
+        replacements.push({
+          original: match[0],
+          mention: channelMention,
+          replacedValue: replacedValue,
+          matchIndex: match.index,
+          foundMatchedChannel: foundMatchedChannel,
+        });
+        
+        googleMeetLinks.add(match[0]);
+      }
+    }
+    
+    replacements.forEach(({ original, mention, replacedValue, foundMatchedChannel }) => {
+      const regex = new RegExp(original, 'g');
+      newPlainTextValue = newPlainTextValue.replace(regex, mention);
+      newValue = newValue.replace(regex, replacedValue);
+    });
+    
+    replacements.forEach(({ mention, replacedValue, foundMatchedChannel }) => {
+      let pos = 0;
+      while ((pos = newValue.indexOf(replacedValue, pos)) !== -1) {
+        const plainTextPos = newPlainTextValue.indexOf(mention, pos);
+        const isDuplicate = mentions.some(mentionItem => mentionItem.index === pos && mentionItem.plainTextIndex === plainTextPos);
+        
+        if (!isDuplicate) {
+          mentions.push({
+            id: foundMatchedChannel.channel_id || '',
+            display: mention,
+            childIndex: 0,
+            index: pos,
+            plainTextIndex: plainTextPos
+          });
+        }
+        
+        pos += replacedValue.length;
+      }
+    });
+    
+    const convertedHashtag = convertToPlainTextHashtag(newValue);
+    setContent(convertedHashtag);
+    setPlainTextMessage(newPlainTextValue);
+    
+    while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
+      emojiList.push({
+        shortname: match[0],
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+      });
+    }
+    setEmojisOnMessage(emojiList);
+    
+    while ((match = linkRegex.exec(convertedHashtag)) !== null) {
+      if (!googleMeetLinks.has(match[0])) {
+        linkList.push({
+          link: match[0],
+          startIndex: match.index,
+          endIndex: match.index + match[0].length,
+        });
+      }
+    }
+    setLinksOnMessage(linkList);
+    
+    while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
+      const startsWithTripleBackticks = match[0].startsWith('```');
+      const endsWithNoTripleBackticks = match[0].endsWith('```');
+      const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
+      markdownList.push({
+        markdown: convertedMarkdown,
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+      });
+    }
+    setMarkdownsOnMessage(markdownList);
+    
+    if (mentions.length > 0) {
+      if (mentions.some(mention => mention.display === '@here')) {
+        setMentionEveryone(true);
+      }
+      let positionTracker: { [key: string]: number } = {};
+      for (const mention of mentions) {
+        let startIndex = -1;
+        let endIndex = -1;
+        
+        if (mention.display.startsWith('@')) {
+          if (!positionTracker[mention.display]) {
+            positionTracker[mention.display] = 0;
+          }
+          startIndex = convertedHashtag.indexOf(mention.display, positionTracker[mention.display]);
+          endIndex = startIndex + mention.display.length;
+          positionTracker[mention.display] = endIndex;
+          mentionList.push({
+            userId: mention.id,
+            username: mention.display,
+            startIndex: startIndex,
+            endIndex: endIndex,
+          });
+        }
+        
+        if (mention.display.startsWith('#')) {
+          const hashtagPattern = `<#${mention.id}>`;
+          
+          if (positionTracker[hashtagPattern] === undefined) {
+            positionTracker[hashtagPattern] = 0;
+          }
+          startIndex = convertedHashtag.indexOf(hashtagPattern, positionTracker[hashtagPattern]);
+          endIndex = startIndex + hashtagPattern.length;
+          
+          positionTracker[hashtagPattern] = endIndex;
+          
+          hashtagList.push({
+            channelId: mention.id.toString() ?? '',
+            channelLable: mention.display ?? '',
+            startIndex: startIndex,
+            endIndex: endIndex,
+          });
+        }
+      }
+      
+      setMentionsOnMessage(mentionList);
+      setHashtagsOnMessage(hashtagList);
+      const simplifiedMentionList = mentionList.map(mention => ({
+        user_id: mention.userId,
+        username: mention.username,
+      }));
+      setMentionData(simplifiedMentionList);
+    }
+    
+    if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
+      props.handleConvertToFile(convertedHashtag);
+      setContent('');
+      setValueTextInput('');
+    }
+    
+    if (newPlainTextValue.endsWith('@')) {
+      setTitleModalMention('Members');
+    } else if (newPlainTextValue.endsWith('#')) {
+      setTitleModalMention('Text channels');
+    } else if (newPlainTextValue.endsWith(':')) {
+      setTitleModalMention('Emoji matching');
+    }
+  };
+  
+  const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
 
@@ -609,8 +660,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
 		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
-			setContent(convertedHashtag);
+      let modifiedTextInput = valueTextInput;
+      let googleMeetLinkMatch: any;
+      while ((googleMeetLinkMatch = googleMeetLinkRegex.exec (valueTextInput)) !== null) {
+        const foundMatchedChannel = Object.values (allChannels).find (channel => channel.meeting_code === googleMeetLinkMatch[1]);
+        if (foundMatchedChannel) {
+          const replacedValue = `#[${foundMatchedChannel.channel_label}](${foundMatchedChannel.channel_id})`
+          const matchedChannelRegex = new RegExp (googleMeetLinkMatch[0], 'g');
+          modifiedTextInput = convertToPlainTextHashtag (modifiedTextInput.replace (matchedChannelRegex, replacedValue));
+        }
+      }
+      setContent(convertToPlainTextHashtag(modifiedTextInput));
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId, valueTextInput]);
