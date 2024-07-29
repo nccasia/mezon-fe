@@ -11,7 +11,6 @@ export default {
 			outline: 'none',
 		},
 		highlighter: {
-			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
 		},
 		input: {
