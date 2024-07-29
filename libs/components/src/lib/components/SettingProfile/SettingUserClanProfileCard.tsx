@@ -28,7 +28,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 	}, [checkUrl, profiles.urlImage]);
 
 	return (
-		<div className="dark:bg-bgSecondary600 bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative">
+		<div className="dark:bg-black bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative">
 			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]" style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={profiles.urlImage}
@@ -37,7 +37,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 				customStatus={userCustomStatus}
 			/>
 			<div className="px-[16px]">
-				<div className="dark:bg-bgTertiary bg-[#e2e2e2] dark:text-white text-black w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
+				<div className="dark:bg-bgPrimary bg-[#e2e2e2] dark:text-white text-black w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
 					<div className="w-[300px]">
 						<p className="font-bold tracking-wider text-xl one-line">{profiles.displayName}</p>
 						<p className="font-medium tracking-wide text-sm">{userProfile?.user?.username}</p>

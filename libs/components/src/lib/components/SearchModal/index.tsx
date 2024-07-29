@@ -98,9 +98,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				icon: '#',
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
+				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
 			};
 		});
-		return list;
+		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		return sortedList;
 	}, [listChannels]);
 
 	const handleSelectMem = useCallback(

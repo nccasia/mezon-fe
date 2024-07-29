@@ -1,24 +1,22 @@
 import { useAuth, useClanProfileSetting } from '@mezon/core';
 import { selectUserClanProfileByClanID } from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
+import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
 import SettingUserClanProfileSave, { ModalSettingSave } from './settingUserClanProfileSave';
 
-const SettingRightClanEdit = ({
-	flagOption,
-	setFlagOptionsTrue,
-	setFlagOptionsfalse,
-	clanId,
-}: {
+interface SettingRightClanEditProps {
 	flagOption: boolean;
-	setFlagOptionsTrue?: () => void;
-	setFlagOptionsfalse?: () => void;
+	setFlagOption: (flagOption: boolean) => void;
 	clanId: string;
-}) => {
-	const { userProfile } = useAuth();
+}
 
+const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption, setFlagOption, clanId }) => {
+	const { userProfile } = useAuth();
+	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
@@ -27,26 +25,10 @@ const SettingRightClanEdit = ({
 	}, [userClansProfile]);
 
 	const setUrlImage = (url_image: string) => {
-		setDraftProfile((prevState) => {
-			if (!prevState) {
-				return prevState;
-			}
-			return {
-				...prevState,
-				avartar: url_image,
-			};
-		});
+		setDraftProfile((prevState) => (prevState ? { ...prevState, avartar: url_image } : prevState));
 	};
 	const setDisplayName = (nick_name: string) => {
-		setDraftProfile((prevState) => {
-			if (!prevState) {
-				return prevState;
-			}
-			return {
-				...prevState,
-				nick_name,
-			};
-		});
+		setDraftProfile((prevState) => (prevState ? { ...prevState, nick_name } : prevState));
 	};
 
 	const editProfile = useMemo<Profilesform>(() => {
@@ -67,27 +49,27 @@ const SettingRightClanEdit = ({
 
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
-	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		const newUrl = URL.createObjectURL(fileToStore);
-		setUrlImage(newUrl);
-		if (newUrl !== userProfile?.user?.avatar_url) {
-			setFlagOptionsTrue?.();
-		} else {
-			setFlagOptionsfalse?.();
+	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		if (!clientRef.current || !sessionRef.current) throw new Error('Client or session is not initialized');
+		if (!fileTypeImage.includes(file.type) || file.size > 1000000) {
+			e.target.value = '';
+			return;
 		}
+		const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
+		handleUploadFile(clientRef.current, sessionRef.current, '0', '0', imageAvatarResize.name, imageAvatarResize).then((attachment) => {
+			setUrlImage(attachment.url || '');
+			setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
+		});
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value);
-		if (e.target.value !== userClansProfile?.nick_name) {
-			setFlagOptionsTrue?.();
-		} else {
-			setFlagOptionsfalse?.();
-		}
+		setFlagOption(e.target.value !== userClansProfile?.nick_name);
 	};
 
 	const handleRemoveButtonClick = () => {
-		setFlagOptionsTrue?.();
+		setFlagOption(true);
 		setUrlImage(userProfile?.user?.avatar_url || '');
 	};
 
@@ -99,10 +81,10 @@ const SettingRightClanEdit = ({
 			setDisplayName(userProfile?.user?.username || '');
 			setUrlImage(userProfile?.user?.avatar_url || '');
 		}
-		setFlagOptionsfalse?.();
+		setFlagOption(false);
 	};
 	const handleSaveClose = () => {
-		setFlagOptionsfalse?.();
+		setFlagOption(false);
 	};
 	const handleUpdateUser = async () => {
 		if (urlImage || displayName) {
@@ -138,13 +120,10 @@ const SettingRightClanEdit = ({
 						<p className="dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
-								<div
-									className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-white"
-									onChange={(e) => handleFile(e)}
-								>
+								<div className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-white">
 									Change avatar
 								</div>
-								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
+								<input type="file" onChange={handleFile} className="hidden" />
 							</label>
 							<button
 								className="bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px] font-medium text-white"

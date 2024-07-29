@@ -33,34 +33,12 @@ export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/web
 
 export const neverMatchingRegex = /($a)/;
 export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
-export const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
+export const linkRegex = /(?<![`]|```)\bhttps?:\/\/[^\s/$.?#].[^\s]*\b(?![`]|```)/gi;
 export const mentionRegex = /@\[(.*?)\]/g;
 export const hashtagRegex = /#\[(.*?)\]\((.*?)\)/g;
 
-const headerRegex = /(?:^|\s)(#{1,6}\s.*)/;
-const boldRegex = /\*\*(.*?)\*\*/;
-const strikethroughRegex = /~~(.*?)~~/;
 const codeBlockRegex = /```([\s\S]*?)```/;
 const inlineCodeRegex = /`([^`]*)`/;
 const hyperLink = /\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)/;
-const imageRegex = /!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)/;
-const unorderedListRegex = /(?:^|\s)([\-\*]\s+.*?)(?:\n|$)/;
-const orderedListRegex = /(?:^|\s)(\d+\.\s+.*?)(?:\n|$)/;
-const blockquoteRegex = /(?:^|\s)>(.*?)(?:\n|$)/;
 
-export const markdownRegex = new RegExp(
-	[
-		headerRegex.source,
-		boldRegex.source,
-		strikethroughRegex.source,
-		codeBlockRegex.source,
-		inlineCodeRegex.source,
-		hyperLink.source,
-		imageRegex.source,
-		unorderedListRegex.source,
-		orderedListRegex.source,
-		blockquoteRegex.source,
-		linkRegex.source,
-	].join('|'),
-	'g',
-);
+export const markdownRegex = new RegExp([codeBlockRegex.source, inlineCodeRegex.source, hyperLink.source, linkRegex.source].join('|'), 'g');

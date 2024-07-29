@@ -20,11 +20,13 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
 	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
+	const maxEndIndex = elements.reduce((max, element) => (element.endIndex > max ? element.endIndex : max), 0);
+
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+			const { startIndex, endIndex, channelId, channelLable, username, shortname, link, markdown } = element;
 
 			if (lastIndex < startIndex) {
 				formattedContent.push(
@@ -53,7 +55,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 			if (markdown || link) {
 				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
 			}
-			lastIndex = endIndex;
+			lastIndex = maxEndIndex;
 		});
 
 		if (lastIndex < t?.length) {

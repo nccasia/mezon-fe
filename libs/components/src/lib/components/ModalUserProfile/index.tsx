@@ -113,7 +113,7 @@ const ModalUserProfile = ({
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
@@ -134,7 +134,7 @@ const ModalUserProfile = ({
 				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">
-				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
+				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{isFooterProfile
@@ -169,7 +169,7 @@ const ModalUserProfile = ({
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
-								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgDisable bg-bgLightModeSecond p-[5px] "
+								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
 								placeholder={`Message @${message?.username || userById?.user?.username}`}
 								value={content}
 								onKeyPress={(e) => {

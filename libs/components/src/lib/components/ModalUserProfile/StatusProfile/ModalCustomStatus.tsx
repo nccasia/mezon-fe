@@ -21,6 +21,10 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 		}
 	}, [dispatch, openModal]);
 
+	const handleChangeCustomStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setCustomStatus(e.target.value.slice(0, 128));
+	};
+
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
 			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded">
@@ -40,7 +44,8 @@ const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomSt
 							value={customStatus}
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 							placeholder="Support has arrived!"
-							onChange={e => { setCustomStatus(e.target.value) }}
+							maxLength={128}
+							onChange={handleChangeCustomStatus}
 						/>
 					</div>
 					<div className="px-4">
