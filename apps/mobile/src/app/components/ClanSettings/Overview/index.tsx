@@ -2,7 +2,7 @@ import { useClans } from '@mezon/core';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import {
@@ -18,6 +18,7 @@ import {
 import DeleteClanModal from '../../DeleteClanModal';
 import { style } from './styles';
 
+export const { width } = Dimensions.get('window');
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
 	const { themeValue } = useTheme();
@@ -160,7 +161,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	return (
 		<Block>
 			<ScrollView contentContainerStyle={styles.container}>
-				<MezonImagePicker defaultValue={banner} height={200} width={'100%'} onLoad={handleLoad} showHelpText autoUpload />
+				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 
 				<View style={{ marginVertical: 10 }}>
 					<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} />

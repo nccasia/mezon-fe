@@ -1,5 +1,5 @@
 import { AttachmentImageIcon } from '@mezon/mobile-components';
-import { Block, Colors, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors } from '@mezon/mobile-ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
@@ -15,7 +15,6 @@ interface IMessageNotificationProps {
 const MessageNotification = React.memo(({ message }: IMessageNotificationProps) => {
 	const { attachments } = useMessageParser(message);
 	const { t } = useTranslation('message');
-	const { themeValue } = useTheme();
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -36,7 +35,6 @@ const MessageNotification = React.memo(({ message }: IMessageNotificationProps) 
 			) : null}
 			<Block>
 				<RenderTextMarkdownContent
-					themeValue={themeValue}
 					content={message}
 					isEdited={isEdited}
 					isNumberOfLine

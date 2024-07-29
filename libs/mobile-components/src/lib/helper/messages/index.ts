@@ -1,5 +1,7 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
+import { STORAGE_KEY_TEMPORARY_ATTACHMENT } from '../../constant';
+import { load, save } from '../storage';
 
 export function abbreviateText(filename: string) {
 	// Split the filename and extension
@@ -42,12 +44,32 @@ export const convertToPlainTextHashtag = (text: string) => {
 	text = text.replace(hashtagPattern, (match, p1) => `#${p1}`);
 	const mentionPattern = /\{\@\}\[(.*?)\]\(\d+\)/g;
 	text = text.replace(mentionPattern, (match, p1) => `@${p1}`);
-	
+
 	return text;
 };
 
 export const codeBlockRegex = /^```[\s\S]*```$/;
 export const codeBlockRegexGlobal = /```[\s\S]*?```/g;
 export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
-export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
+export const splitBlockCodeRegex =
+	/(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+export const pushAttachmentToCache = (attachment: any, channelId: string | number) => {
+	const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
+
+	if (Array.isArray(attachment)) {
+		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+			...allCachedAttachment,
+			[channelId]: attachment,
+		});
+	} else {
+		const currentAttachment = allCachedAttachment[channelId] || [];
+		currentAttachment.push(attachment);
+
+		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+			...allCachedAttachment,
+			[channelId]: currentAttachment,
+		});
+	}
+};

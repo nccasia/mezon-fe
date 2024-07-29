@@ -1,12 +1,12 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, size, useTheme } from '@mezon/mobile-ui';
 import { StyleSheet, View } from 'react-native';
 import { BaseToast, ToastConfig } from 'react-native-toast-message';
 
-const styles = StyleSheet.create({
+const style = (colors: Attributes) => StyleSheet.create({
 	container: {
 		height: size.s_50,
 		width: '80%',
-		backgroundColor: Colors.surface,
+		backgroundColor: colors.tertiary,
 		borderRadius: size.s_40,
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -20,16 +20,20 @@ const styles = StyleSheet.create({
 });
 
 const WrapperIcon = ({ children }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return <View style={styles.iconWrapper}>{children}</View>;
 };
 
 export const toastConfig: ToastConfig = {
 	/*
-        Custom toast:
-        They will be passed when calling the `show` method
-    */
+		Custom toast:
+		They will be passed when calling the `show` method
+	*/
 
 	success: (props) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
 		return (
 			<BaseToast
 				style={styles.container}
@@ -37,14 +41,14 @@ export const toastConfig: ToastConfig = {
 				text1Style={[
 					{
 						fontSize: size.label,
-						color: Colors.white,
+						color: themeValue.text,
 					},
 					props.text1Style,
 				]}
 				text2Style={[
 					{
 						fontSize: size.medium,
-						color: Colors.white,
+						color: themeValue.text,
 					},
 					props.text2Style,
 				]}

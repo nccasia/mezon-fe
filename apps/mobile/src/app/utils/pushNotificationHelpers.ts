@@ -171,11 +171,13 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			save(STORAGE_CLAN_ID, clanId);
-			store.dispatch(clansActions.joinClan({ clanId: clanId }));
-			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
+			await store.dispatch(clansActions.joinClan({ clanId: clanId }));
+			await store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			await setDefaultChannelLoader(respChannel, clanId);
-			delay(jumpChannelOnNotification, 500, store, channelId, clanId);
+			await setDefaultChannelLoader(respChannel, clanId, dataSave);
+			delay(() => {
+				store.dispatch(appActions.setLoadingMainMobile(false));
+			}, 700);
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -186,7 +188,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-
+				await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));

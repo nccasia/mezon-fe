@@ -49,6 +49,8 @@ import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../configs/toastConfig';
 
 const RootStack = createStackNavigator();
 
@@ -259,6 +261,7 @@ const RootNavigation = () => {
 			<ChatContextProvider>
 				<NavigationMain />
 			</ChatContextProvider>
+			<Toast config={toastConfig} />
 		</MezonStoreProvider>
 	);
 };

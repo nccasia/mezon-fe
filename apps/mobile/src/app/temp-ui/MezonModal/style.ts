@@ -1,5 +1,5 @@
 import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) => StyleSheet.create({
 	closeIcon: {
@@ -9,6 +9,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.primary,
 		paddingHorizontal: size.s_20,
+		paddingTop: Platform.OS === 'ios' ? size.s_40 : 0,
 	},
 	bgDefault: {
 		backgroundColor: colors.primary,

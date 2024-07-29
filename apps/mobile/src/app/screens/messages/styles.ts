@@ -132,5 +132,20 @@ export const style = (colors: Attributes) => StyleSheet.create({
     channelLabel: {
         fontSize: size.s_14,
         flex: 1
-    }
+    },
+    avatarWrapper: {
+        borderRadius: 50,
+        backgroundColor: Colors.bgGrayDark,
+        height: size.s_40,
+        width: size.s_40,
+    },
+    textAvatar: {
+        width: size.s_40,
+        height: size.s_40,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        borderRadius: 50,
+        fontSize: size.h6,
+        color: Colors.white
+    },
 })

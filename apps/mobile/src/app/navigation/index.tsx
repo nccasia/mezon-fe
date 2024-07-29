@@ -9,8 +9,6 @@ import i18n from '@mezon/translations';
 import * as Sentry from '@sentry/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-svg';
-import Toast from 'react-native-toast-message';
-import { toastConfig } from '../configs/toastConfig';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -38,7 +36,6 @@ const App = () => {
 			<I18nextProvider i18n={i18n}>
 				<MezonContextProvider mezon={mezon} connect={true}>
 					<RootNavigation />
-					<Toast config={toastConfig} />
 				</MezonContextProvider>
 			</I18nextProvider>
 		</SafeAreaProvider>

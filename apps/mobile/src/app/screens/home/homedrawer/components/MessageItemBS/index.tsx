@@ -360,7 +360,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			message?.clan_id ?? currentClanId ?? '',
+			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : message?.clan_id ?? currentClanId,
 			message.channel_id ?? '',
 			messageId ?? '',
 			emoji?.trim(),

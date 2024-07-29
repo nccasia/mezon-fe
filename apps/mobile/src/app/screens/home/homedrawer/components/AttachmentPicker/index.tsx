@@ -1,5 +1,5 @@
 import { useReference } from '@mezon/core';
-import { Icons, load, save, STORAGE_KEY_TEMPORARY_ATTACHMENT } from '@mezon/mobile-components';
+import { Icons, pushAttachmentToCache } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -36,22 +36,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			timeRef?.current && clearTimeout(timeRef.current);
 		};
 	}, []);
-	
-	const getAllCachedAttachment = async () => {
-		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		return allCachedMessage;
-	};
-
-	const pushAttachmentToCache = async (attachment: any) => {
-		const allCachedAttachment = (await getAllCachedAttachment()) || {};
-		const currentAttachment = allCachedAttachment[currentChannelId] || [];
-		currentAttachment.push(attachment);
-
-		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-			...allCachedAttachment,
-			[currentChannelId]: currentAttachment,
-		});
-	};
 
 	const onPickFiles = async () => {
 		try {
@@ -116,9 +100,9 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
 			setAttachmentData(attachment);
-			pushAttachmentToCache(attachment);
+			pushAttachmentToCache(attachment, currentChannelId);
 		},
-		[setAttachmentData],
+		[currentChannelId, setAttachmentData],
 	);
 
 	return (

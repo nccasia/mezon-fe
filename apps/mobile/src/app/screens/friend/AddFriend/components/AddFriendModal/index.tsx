@@ -190,7 +190,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	}, [type, requestAddFriend, isKeyBoardShow]);
 
 	return (
-		<MezonModal visible={visibleModal} visibleChange={onVisibleChange}>
+		<MezonModal visible={visibleModal} visibleChange={onVisibleChange} containerStyle={{ paddingHorizontal: 0 }}>
 			<View style={styles.addFriendModalContainer}>{content}</View>
 		</MezonModal>
 	);

@@ -39,5 +39,20 @@ export const styles = StyleSheet.create({
     },
     mb10: {
         marginBottom: size.s_10,
-    }
+    },
+    avatarWrapper: {
+        borderRadius: 50,
+        backgroundColor: Colors.bgGrayDark,
+        height: size.s_50,
+        width: size.s_50,
+    },
+    textAvatar: {
+        width: size.s_50,
+        height: size.s_50,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        borderRadius: 50,
+        fontSize: size.h5,
+        color: Colors.white
+    },
 })

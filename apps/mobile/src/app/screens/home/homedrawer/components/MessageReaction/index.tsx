@@ -25,7 +25,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
-	const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
+	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
 
 	const reactOnExistEmoji = async (
 		id: string,

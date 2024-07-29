@@ -72,6 +72,7 @@
     },
     "notify": {
         "locationBlank": "A location is required",
-        "titleBlank": "An event topic is required"
+        "titleBlank": "An event topic is required",
+        "time": "Invalid start time or end time"
     }
 }

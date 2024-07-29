@@ -15,6 +15,7 @@ export const useCheckUpdatedVersion = () => {
 				version: VersionInfo.appVersion,
 				iosStoreURL: process.env.NX_APP_STORE_URL,
 				androidStoreURL: process.env.NX_GOOGLE_PLAY_URL,
+				country: 'vn',
 			});
 
 			console.log('*** check', check);

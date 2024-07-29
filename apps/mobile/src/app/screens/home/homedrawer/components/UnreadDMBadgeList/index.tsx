@@ -17,8 +17,12 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
         switch (dm.type) {
             case ChannelType.CHANNEL_TYPE_DM:
                 return (
-                    <View>
-                        <Image source={{ uri: dm?.channel_avatar?.[0] }} resizeMode='cover' style={styles.groupAvatar} />
+                    <View style={styles.avatarWrapper}>
+                        {dm?.channel_avatar?.[0] ? (
+                            <Image source={{ uri: dm?.channel_avatar?.[0] }} resizeMode='cover' style={styles.groupAvatar} />
+                        ) : (
+                            <Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>
+                        )}
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>{currentDirect?.count_mess_unread}</Text>
                         </View>

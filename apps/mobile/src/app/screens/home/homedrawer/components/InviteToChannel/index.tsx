@@ -8,15 +8,14 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useReducedMotion } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../../../components/Common';
 import { threadDetailContext } from '../../../../../components/ThreadDetail/MenuThreadDetail';
-import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
+import { MezonInput, MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
 import { FriendListItem } from '../../Reusables';
@@ -248,7 +247,7 @@ export const InviteToChannel = React.memo(
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
-            setSentIdList([]);
+						setSentIdList([]);
 						resetSearch();
 					}}
 					handleComponent={() => null}
@@ -272,15 +271,14 @@ export const InviteToChannel = React.memo(
 								)}
 
 								<View style={styles.searchInviteFriendWrapper}>
-									<View style={styles.searchFriendToInviteWrapper}>
-										<TextInput
-											placeholder={'Invite friend to channel'}
-											placeholderTextColor={themeValue.text}
-											style={styles.searchFriendToInviteInput}
-											onChangeText={setSearchUserText}
-										/>
-										<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
-									</View>
+									<MezonInput
+										placeHolder={'Invite friend to channel'}
+										onTextChange={setSearchUserText}
+										value={searchUserText}
+										prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+
+									/>
+
 									<View style={styles.editInviteLinkWrapper}>
 										<Text style={styles.defaultText}>
 											{t('yourLinkInvite')} {expiredTimeSelected}{' '}

@@ -7,9 +7,10 @@ import { style } from './styles';
 interface IBannerAvatarProps {
 	avatar: string;
 	onLoad?: (url: string) => void;
+	alt?: string;
 }
 
-export default function BannerAvatar({ avatar, onLoad }: IBannerAvatarProps) {
+export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps) {
 	const { themeValue } = useTheme();
 	const { color } = useMixImageColor(avatar);
 
@@ -38,6 +39,7 @@ export default function BannerAvatar({ avatar, onLoad }: IBannerAvatarProps) {
 					width={100}
 					height={100}
 					defaultValue={avatar || ''}
+					alt={alt}
 					rounded
 					style={{ borderWidth: 5, borderColor: themeValue.primary }}
 					onLoad={handleOnload}

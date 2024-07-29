@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -34,10 +34,10 @@ const ChannelList = React.memo((props: any) => {
 	const styles = style(themeValue);
 	const currentClan = useSelector(selectCurrentClan);
 	const { categorizedChannels } = useCategory();
+	const [dataCategoryChannel, setDataCategoryChannel] = useState<ICategoryChannel[]>(categorizedChannels || []);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const prevFilteredChannelsRef = useRef<any>();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
@@ -53,10 +53,16 @@ const ChannelList = React.memo((props: any) => {
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	useEffect(() => {
-		return () => {
-			prevFilteredChannelsRef.current = {};
-		};
-	}, []);
+		try {
+			const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
+			setDataCategoryChannel(categoryChannel);
+			if (categorizedChannels) {
+				save(STORAGE_DATA_CATEGORY_CHANNEL, JSON.stringify(categorizedChannels));
+			}
+		} catch (error) {
+			console.error('Error loading category channels:', error);
+		}
+	}, [categorizedChannels]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -139,7 +145,7 @@ const ChannelList = React.memo((props: any) => {
 				</View>
 				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlatList
-					data={categorizedChannels || []}
+					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}
 					renderItem={({ item, index }) => (
 						<ChannelListSection

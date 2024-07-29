@@ -72,6 +72,7 @@
     },
     "notify": {
         "locationBlank": "Cần nhập vị trí",
-        "titleBlank": "Cần một chủ đề cho sự kiện"
+        "titleBlank": "Cần một chủ đề cho sự kiện",
+        "time": "Thời gian bắt đầu hoặc kết thúc không hợp lệ"
     }
 }

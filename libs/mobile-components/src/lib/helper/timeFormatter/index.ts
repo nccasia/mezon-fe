@@ -2,12 +2,12 @@ export const timeFormat = (start: string) => {
     const date = new Date(start);
 
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const dayName = daysOfWeek[date.getUTCDay()];
+    const dayName = daysOfWeek[date.getDay()];
 
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthName = months[date.getUTCMonth()];
+    const monthName = months[date.getMonth()];
 
-    const day = date.getUTCDate();
+    const day = date.getDate();
     const suffix = (day: number) => {
         if (day > 3 && day < 21) return 'th'; // 4 - 20 là 'th'
         switch (day % 10) {
@@ -18,8 +18,8 @@ export const timeFormat = (start: string) => {
         }
     };
     const dayWithSuffix = `${day}${suffix(day)}`;
-    const hours = date.getUTCHours().toString().padStart(2, '0');
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
 
     return `${dayName} ${monthName} ${dayWithSuffix} - ${hours}:${minutes}`;
 };

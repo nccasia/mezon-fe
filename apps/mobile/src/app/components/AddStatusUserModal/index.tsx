@@ -1,10 +1,8 @@
-import { Block, size } from '@mezon/mobile-ui';
-import { useEffect, useState } from 'react';
+import { Block } from '@mezon/mobile-ui';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text } from 'react-native';
 import { ETypeCustomUserStatus } from '../../screens/profile/ProfileScreen';
-import { MezonInput, MezonModal } from '../../temp-ui';
-import FilterCheckbox from '../NotificationSetting/FilterCheckbox/FilterCheckbox';
+import { IMezonOptionData, MezonInput, MezonModal, MezonOption } from '../../temp-ui';
 import { styles } from './AddStatusUserModal.styles';
 
 export interface IAddStatusUserModalProps {
@@ -17,47 +15,37 @@ export interface IAddStatusUserModalProps {
 const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, handleCustomUserStatus }: IAddStatusUserModalProps) => {
 	const [lineStatus, setLineStatus] = useState<string>('');
 	const { t } = useTranslation(['customUserStatus']);
-
-	const [statusDurationOption, setStatusDurationOption] = useState([
+	const [statusDuration, setStatusDuration] = useState<string>('');
+	const timeOptions = useMemo(() => ([
 		{
-			id: 1,
-			label: t('statusDuration.today'),
+			title: t('statusDuration.today'),
 			value: t('statusDuration.today'),
-			isChecked: true,
 		},
 		{
-			id: 2,
-			label: t('statusDuration.fourHours'),
-			value: t('statusDuration.fourHours'),
-			isChecked: false,
+			title: t('statusDuration.fourHours'),
+			value: t('statusDuration.fourHours')
 		},
 		{
-			id: 3,
-			label: t('statusDuration.oneHour'),
+			title: t('statusDuration.oneHour'),
 			value: t('statusDuration.oneHour'),
-			isChecked: false,
 		},
 		{
-			id: 4,
-			label: t('statusDuration.thirtyMinutes'),
+			title: t('statusDuration.thirtyMinutes'),
 			value: t('statusDuration.thirtyMinutes'),
-			isChecked: false,
 		},
 		{
-			id: 5,
-			label: t('statusDuration.dontClear'),
+			title: t('statusDuration.dontClear'),
 			value: t('statusDuration.dontClear'),
-			isChecked: false,
 		},
-	]);
+	]) as IMezonOptionData, [])
 
 	useEffect(() => {
 		setLineStatus(userCustomStatus);
 	}, [userCustomStatus]);
 
-	const handleRadioBoxPress = (checked: boolean, id: number | string) => {
-		setStatusDurationOption(statusDurationOption.map((item) => item && { ...item, isChecked: item.id === id }));
-	};
+	function handleTimeOptionChange(value: string) {
+		setStatusDuration(value);
+	}
 
 	return (
 		<MezonModal
@@ -71,20 +59,20 @@ const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, handleC
 			}}
 		>
 			<Block>
-				<MezonInput value={lineStatus} onTextChange={setLineStatus} placeHolder={t('placeholder')} textarea={true} maxCharacter={128} />
-				<Text style={styles.durationText}>{t('statusDuration.label')}</Text>
-				<Block borderRadius={size.s_10} overflow={'hidden'}>
-					{statusDurationOption?.map((option, index) => (
-						<FilterCheckbox
-							id={option.id}
-							label={option.label}
-							key={`${index}_${option.value}`}
-							isChecked={option.isChecked}
-							onCheckboxPress={handleRadioBoxPress}
-							customStyles={styles.option}
-						/>
-					))}
-				</Block>
+				<MezonInput
+					value={lineStatus}
+					onTextChange={setLineStatus}
+					placeHolder={t('placeholder')}
+					textarea={true}
+					maxCharacter={128}
+				/>
+
+				<MezonOption
+					title={t('statusDuration.label')}
+					value={statusDuration}
+					data={timeOptions}
+					onChange={handleTimeOptionChange}
+				/>
 			</Block>
 		</MezonModal>
 	);

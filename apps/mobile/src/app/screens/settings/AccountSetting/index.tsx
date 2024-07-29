@@ -3,12 +3,12 @@ import {
 	ChevronIcon,
 	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
+import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
@@ -37,17 +37,18 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const { t } = useTranslation('accountSetting');
-	const dispatch = useAppDispatch();
 
 	const logout = async () => {
-		dispatch(authActions.logOut());
-		dispatch(channelsActions.removeAll());
-		dispatch(messagesActions.removeAll());
-		dispatch(clansActions.removeAll());
+		const store = await getStoreAsync();
+		store.dispatch(channelsActions.removeAll());
+		store.dispatch(messagesActions.removeAll());
+		store.dispatch(clansActions.setCurrentClanId(''));
+		store.dispatch(clansActions.removeAll());
 		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
-		await remove(STORAGE_CLAN_ID);
+		await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		store.dispatch(authActions.logOut());
 	};
 
 	//TODO: delete

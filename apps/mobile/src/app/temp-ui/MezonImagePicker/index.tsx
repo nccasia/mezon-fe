@@ -123,6 +123,8 @@ export default memo(function MezonImagePicker({
 						mediaType: 'photo',
 						includeBase64: true,
 						compressImageQuality: 1,
+						...(typeof width === 'number' && { width: width }),
+						...(typeof height === 'number' && { height: height }),
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);

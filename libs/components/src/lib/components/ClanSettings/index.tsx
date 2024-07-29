@@ -11,6 +11,7 @@ import NotificationSoundSetting from './NotificationSoundSetting';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
+import SettingSticker from './SettingSticker';
 
 export type ModalSettingProps = {
 	onClose: () => void;
@@ -74,6 +75,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								{currentSetting.id === ItemSetting.INTEGRATIONS && <Integrations />}
 								{currentSetting.id === ItemSetting.EMOJI && <SettingEmoji />}
 								{currentSetting.id === ItemSetting.NOTIFICATION_SOUND && <NotificationSoundSetting />}
+								{currentSetting.id === ItemSetting.STICKERS && <SettingSticker />}
 							</div>
 						</div>
 						{isShowDeletePopup && <DeleteClanModal onClose={() => setIsShowDeletePopup(false)} />}

@@ -38,6 +38,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     input: {
         paddingVertical: 0,
+        paddingHorizontal: 10,
         color: colors.textStrong,
         flexGrow: 1,
     },

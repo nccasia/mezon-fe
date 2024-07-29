@@ -7,10 +7,10 @@ import { style } from './styles';
 interface IProps {
 	onPress: () => void;
 	avatar: string;
-	username: string;
+	textAvatar: string;
 	isShow: boolean;
 }
-export const AvatarMessage = React.memo(({ isShow, onPress, avatar, username }: IProps) => {
+export const AvatarMessage = React.memo(({ isShow, onPress, avatar, textAvatar }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -21,7 +21,7 @@ export const AvatarMessage = React.memo(({ isShow, onPress, avatar, username }: 
 					<FastImage source={{ uri: avatar }} style={styles.logoUser} />
 				) : (
 					<View style={styles.avatarMessageBoxDefault}>
-						<Text style={styles.textAvatarMessageBoxDefault}>{username?.charAt(0)?.toUpperCase() || 'A'}</Text>
+						<Text style={styles.textAvatarMessageBoxDefault}>{textAvatar?.charAt(0)?.toUpperCase() || 'A'}</Text>
 					</View>
 				)}
 			</Pressable>

@@ -36,7 +36,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 
 	return (
 		<KeyboardAvoidingView behavior="position" style={styles.container}>
-			<BannerAvatar avatar={userProfileValue?.imgUrl} onLoad={handleAvatarChange} />
+			<BannerAvatar avatar={userProfileValue?.imgUrl} alt={userProfileValue?.username} onLoad={handleAvatarChange} />
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
 					<Icons.TextIcon width={16} height={16} />

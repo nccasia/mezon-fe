@@ -1,6 +1,6 @@
 import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { StyleProp, Text, TextInput, TextStyle, View, ViewStyle } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ErrorInput } from "../../components/ErrorInput";
@@ -20,9 +20,11 @@ interface IMezonInputProps {
 	showBorderOnFocus?: boolean,
 	errorMessage?: string;
 	onFocus?: () => void;
+	prefixIcon?: ReactNode;
+	postfixIcon?: ReactNode;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onFocus, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea, value, onFocus, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle, postfixIcon, prefixIcon }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const ref = useRef<TextInput>(null);
@@ -60,9 +62,12 @@ export default function MezonInput({ placeHolder, label, textarea, value, onFocu
 
 	return (
 		<View style={styles.container}>
-			<Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
+			{label &&
+				<Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
+			}
 			<View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
 				<View style={styles.inputBox}>
+					{prefixIcon}
 					<TextInput
 						ref={ref}
 						value={value}
@@ -77,6 +82,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onFocu
 						onFocus={handleFocus}
 						onBlur={handleBlur}
 					/>
+					{postfixIcon}
 
 					{!textarea && value?.length > 0 && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>

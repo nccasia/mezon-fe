@@ -1,14 +1,14 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     buttonWrapper: {
-        backgroundColor: Colors.bgPrimary,
+        backgroundColor: colors.primary,
         borderRadius: 3,
         elevation: 1
     },
     text: {
-        color: Colors.white,
+        color: colors.text,
         textAlign: 'center',
     },
     disable: {

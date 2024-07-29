@@ -35,23 +35,33 @@ export default function EventDetail({ event }: IEventDetailProps) {
 
 			<View>
 				<View style={styles.mainSection}>
-					{/* TODO: Fix this */}
-					<MezonAvatar avatarUrl={clans?.logo} username={clans?.clan_name} height={20} width={20} />
+					<View style={styles.inline}>
+						<MezonAvatar avatarUrl={clans?.logo} username={clans?.clan_name} height={20} width={20} />
+						<Text style={styles.smallText}>{clans?.clan_name}</Text>
+					</View>
 
 					<EventLocation event={event} />
 
 					<View style={styles.inline}>
 						<Icons.BellIcon height={16} width={16} color={themeValue.text} />
 						<Text style={styles.smallText}>{event?.user_ids?.length}</Text>
+						<Text style={styles.smallText}>{
+							event?.user_ids?.length > 1
+								? "people are interested"
+								: "person is interested"}
+						</Text>
 					</View>
 
-					{/* TODO: Fix this */}
-					<MezonAvatar
-						avatarUrl={userCreate?.user?.avatar_url}
-						username={userCreate?.user?.username}
-						height={20}
-						width={20}
-					/>
+					<View style={styles.inline}>
+						<MezonAvatar
+							avatarUrl={userCreate?.user?.avatar_url}
+							username={userCreate?.user?.username}
+							height={20}
+							width={20}
+						/>
+						<Text style={styles.smallText}>Created by</Text>
+						<Text style={[styles.smallText, styles.highlight]}>{userCreate?.user?.username}</Text>
+					</View>
 				</View>
 			</View>
 

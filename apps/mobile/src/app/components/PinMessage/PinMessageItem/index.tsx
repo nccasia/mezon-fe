@@ -20,7 +20,7 @@ const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage }: 
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>
 			<View style={styles.pinMessageItemBox}>
 				<Text style={styles.pinMessageItemName}>{pinMessageItem?.username}</Text>
-				<RenderTextMarkdownContent themeValue={themeValue} content={contentMessage} isEdited={false} />
+				<RenderTextMarkdownContent content={contentMessage} isEdited={false} />
 			</View>
 			<View>
 				<TouchableOpacity

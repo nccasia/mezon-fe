@@ -1,5 +1,14 @@
 import { useCategory, useReference } from '@mezon/core';
-import { CloseIcon, PenIcon, STORAGE_CLAN_ID, SearchIcon, SendIcon, getAttachmentUnique, save } from '@mezon/mobile-components';
+import {
+	CloseIcon,
+	PenIcon,
+	STORAGE_CLAN_ID,
+	SearchIcon,
+	SendIcon,
+	getAttachmentUnique,
+	save,
+	load, STORAGE_DATA_CATEGORY_CHANNEL
+} from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	channelsActions,
@@ -72,7 +81,9 @@ export const Sharing = ({ data, onClose }) => {
 	}, [dataMedia]);
 
 	function flattenData(categorizedChannels: any) {
-		return categorizedChannels.reduce((result: any, category: any) => {
+		const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
+
+		return categoryChannel.reduce((result: any, category: any) => {
 			const { category_id, category_name } = category;
 
 			category.channels.forEach((channel: any) => {

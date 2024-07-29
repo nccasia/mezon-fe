@@ -70,14 +70,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     textAvatar: {
-        backgroundColor: colors.primary,
+        backgroundColor: baseColor.blurple,
         width: '100%',
         height: '100%',
         textAlign: 'center',
         textAlignVertical: 'center',
         borderRadius: 50,
-        fontSize: size.h5,
-        color: colors.text
+        fontSize: size.h4,
+        color: baseColor.white,
+        fontWeight: 'bold'
     },
 
     dotOnline: {

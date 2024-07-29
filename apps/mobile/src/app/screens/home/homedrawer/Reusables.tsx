@@ -56,12 +56,10 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 						{Number(dmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP ? (
 							<Image source={Images.AVATAR_GROUP} style={{ width: 40, height: 40, borderRadius: 50 }} />
 						) : (
-							<FastImage
-								style={{ width: 40, height: 40, borderRadius: 50 }}
-								source={{
-									uri: dmGroup.channel_avatar?.at(0),
-								}}
-								resizeMode={FastImage.resizeMode.cover}
+							<MezonAvatar
+								avatarUrl={dmGroup.channel_avatar?.at(0)}
+								username={dmGroup?.channel_label}
+								height={40} width={40}
 							/>
 						)}
 						<Text style={styles.friendItemName} numberOfLines={1} ellipsizeMode="tail">
@@ -70,7 +68,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 					</View>
 					<View>
 						<MezonButton
-							viewContainerStyle={[styles.inviteButton, isSent && styles.invitedButton]}
+							viewContainerStyle={[styles.inviteButton]}
 							disabled={isSent}
 							onPress={() => {
 								onPress(dmGroup.channel_id || '', dmGroup.type || 0, '', dmGroup);
@@ -96,7 +94,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 					</View>
 					<View>
 						<MezonButton
-							viewContainerStyle={[styles.inviteButton, isSent && styles.invitedButton]}
+							viewContainerStyle={[styles.inviteButton]}
 							disabled={isSent}
 							onPress={() => {
 								onPress('', 0, user?.id);

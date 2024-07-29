@@ -83,6 +83,17 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 	}
 
 	function handlePressNext() {
+		const now = new Date();
+
+		if (startTime.getTime() <= now.getTime() ||
+			(type == OptionEvent.OPTION_LOCATION && startTime.getTime() >= endTime.getTime())) {
+			Toast.show({
+				type: 'error',
+				text1: t('notify.time'),
+			});
+			return;
+		}
+
 		if (eventTitle?.trim()?.length === 0) {
 			Toast.show({
 				type: 'error',

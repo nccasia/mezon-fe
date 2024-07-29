@@ -1,5 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
 import { load, save } from '../storage';
 
@@ -43,18 +44,28 @@ export const setCurrentClanLoader = async (clans: any) => {
 	return null;
 };
 
-export const setDefaultChannelLoader = async (dataChannel: any, clanId: string) => {
+export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, dataSave?: any) => {
+	if (dataSave) {
+		const infoChannelCache = getInfoChannelByClanId(dataSave || [], clanId);
+		if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
+			await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
+		}
+		return;
+	}
 	const data = load(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 	const infoChannelCache = getInfoChannelByClanId(data || [], clanId);
 	if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
 		await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
 	} else {
-		const firstChannelId = dataChannel?.[0]?.channel_id;
-		const firstClanId = dataChannel?.[0]?.clan_id;
-		if (firstChannelId && firstClanId) {
-			const dataSave = getUpdateOrAddClanChannelCache(firstClanId, firstChannelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			await jumpToChannel(firstChannelId, firstClanId);
+		const firstChannelText = dataChannel?.find?.((channel: { type: ChannelType }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT);
+		if (firstChannelText) {
+			const firstChannelId = firstChannelText?.channel_id;
+			const firstClanId = firstChannelText?.clan_id;
+			if (firstChannelId && firstClanId) {
+				const dataSave = getUpdateOrAddClanChannelCache(firstClanId, firstChannelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				await jumpToChannel(firstChannelId, firstClanId);
+			}
 		}
 	}
 };
@@ -62,10 +73,10 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string) 
 export const jumpToChannel = async (channelId: string, clanId: string) => {
 	if (channelId && clanId) {
 		const store = await getStoreAsync();
-		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-		if (!channelsCache?.includes(channelId)) {
-			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-		}
+		// const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		// if (!channelsCache?.includes(channelId)) {
+		// 	save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		// }
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	}
 };
