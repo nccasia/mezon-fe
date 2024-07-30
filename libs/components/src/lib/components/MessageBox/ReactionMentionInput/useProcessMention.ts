@@ -4,7 +4,7 @@ interface PositionTracker {
 	[key: string]: number;
 }
 
-export const useProcessMention = (mentions: MentionItem[], convertedHashtag: string) => {
+const useProcessMention = (mentions: MentionItem[], convertedHashtag: string) => {
 	const mentionList = [];
 	const hashtagList = [];
 	let positionTracker: PositionTracker = {};
@@ -53,7 +53,6 @@ export const useProcessMention = (mentions: MentionItem[], convertedHashtag: str
 			}
 		}
 	}
-
 	const simplifiedMentionList = mentionList.map((mention) => ({
 		user_id: mention.userId,
 		username: mention.username,
@@ -61,3 +60,5 @@ export const useProcessMention = (mentions: MentionItem[], convertedHashtag: str
 
 	return { mentionList, simplifiedMentionList, hashtagList };
 };
+
+export default useProcessMention;

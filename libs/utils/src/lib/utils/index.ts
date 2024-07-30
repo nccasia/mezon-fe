@@ -1,18 +1,18 @@
 import {
-    differenceInDays,
-    differenceInHours,
-    differenceInMonths,
-    differenceInSeconds,
-    format,
-    formatDistanceToNowStrict,
-    fromUnixTime,
-    isSameDay,
-    startOfDay,
-    subDays,
+	differenceInDays,
+	differenceInHours,
+	differenceInMonths,
+	differenceInSeconds,
+	format,
+	formatDistanceToNowStrict,
+	fromUnixTime,
+	isSameDay,
+	startOfDay,
+	subDays,
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
-import Resizer from "react-image-file-resizer";
+import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, IMessageWithUser, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
@@ -162,7 +162,6 @@ export const convertMarkdown = (markdown: string): string => {
 };
 
 export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
-
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
 	return emoji ? emoji.src : undefined;
 };
@@ -291,9 +290,9 @@ export const checkSameDayByCreateTime = (createTime1: string | Date, createTime2
 };
 
 export const formatTimeToMMSS = (duration: number): string => {
-  const minutes = Math.floor(duration / 60);
-  const seconds = Math.floor(duration % 60);
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+	const minutes = Math.floor(duration / 60);
+	const seconds = Math.floor(duration % 60);
+	return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
 export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type: string, minWidth?: number, minHeight?: number) =>
@@ -310,6 +309,59 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			},
 			type,
 			minWidth,
-			minHeight
+			minHeight,
 		);
 	});
+
+export const convertToPlainTextHashtag = (text: string): string => {
+	let result = '';
+	let i = 0;
+	const length = text.length;
+
+	while (i < length) {
+		if (text[i] === '#') {
+			// Handle hashtags
+			let endIndex = text.indexOf(']', i);
+			if (endIndex === -1) {
+				// No closing bracket found, append the rest of the text
+				result += text.substring(i);
+				break;
+			}
+
+			// Extract the hashtag part
+			const hashtagPart = text.substring(i, endIndex + 1);
+
+			// Find the start and end of the ID
+			const idStart = text.indexOf('(', endIndex);
+			const idEnd = text.indexOf(')', idStart);
+			if (idStart !== -1 && idEnd !== -1) {
+				const id = text.substring(idStart + 1, idEnd); // Extract ID
+				result += `<#${id}>`;
+				i = idEnd + 1;
+			} else {
+				result += hashtagPart; // No ID found, append the hashtag part as-is
+				i = endIndex + 1;
+			}
+		} else if (text[i] === '@') {
+			// Handle mentions
+			let endIndex = text.indexOf(']', i);
+			if (endIndex === -1) {
+				// No closing bracket found, append the rest of the text
+				result += text.substring(i);
+				break;
+			}
+
+			// Extract the mention part
+			const mentionPart = text.substring(i, endIndex + 1);
+			const username = mentionPart.substring(2, mentionPart.length - 1); // Extract username
+			result += `@${username}`;
+			i = endIndex + 1;
+		} else {
+			// Copy other characters as-is
+			result += text[i];
+			i++;
+		}
+	}
+
+	return result;
+};
