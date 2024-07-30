@@ -95,12 +95,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [mode, listChannels]);
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
-	const handleSearchUserMention = (search: any, callback: any) => {
+	const handleSearchUserMention = (search: string, callback: (result: any) => void) => {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, mentionList ?? []));
 	};
 
-	const handleSearchHashtag = (search: any, callback: any) => {
+	const handleSearchHashtag = (search: string, callback: (result: any) => void) => {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
