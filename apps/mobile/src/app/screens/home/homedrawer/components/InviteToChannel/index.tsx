@@ -117,7 +117,17 @@ export const InviteToChannel = React.memo(
 				'DM',
 				channelSelected.id,
 				Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-				{ t: dataSend.text },
+				{
+					t: dataSend.text,
+					links: [
+						{
+							endIndex: dataSend.text.length,
+							link: dataSend.text,
+							startIndex: 0,
+						},
+					],
+					plainText: dataSend.text,
+				},
 				[],
 				[],
 				[],
@@ -157,7 +167,7 @@ export const InviteToChannel = React.memo(
 			if (!response) {
 				return;
 			}
-			setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
+			setCurrentInviteLink(process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/' + response.invite_link);
 		};
 
 		useEffect(() => {
@@ -276,7 +286,6 @@ export const InviteToChannel = React.memo(
 										onTextChange={setSearchUserText}
 										value={searchUserText}
 										prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
-
 									/>
 
 									<View style={styles.editInviteLinkWrapper}>

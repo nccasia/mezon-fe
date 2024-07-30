@@ -9,13 +9,13 @@ import {
 } from '@mezon/mobile-components';
 import { Block, size } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { ErrorInput } from '../../../../../components/ErrorInput';
 import { MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validLinkInviteRegex } from '../../../../../utils/helpers';
-import { useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { styles } from './JoinClanModal.styles';
-import { useTranslation } from 'react-i18next';
 
 type JoinClanModalProps = {
 	visible: boolean;
@@ -25,7 +25,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 	const [inviteLink, setInviteLink] = useState<string>('');
 	const { inviteUser } = useInvite();
 	const [isValidInvite, setIsValidInvite] = useState<boolean>(true);
-  const { t } = useTranslation(['userEmptyClan']);
+	const { t } = useTranslation(['userEmptyClan']);
 
 	const joinChannel = async () => {
 		setIsValidInvite(validLinkInviteRegex.test(inviteLink));
@@ -71,7 +71,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 							<MezonInput
 								label={t('joinClan.labelInput')}
 								onTextChange={setInviteLink}
-								placeHolder={`https://mezon.vn/invite/1813407038846046912`}
+								placeHolder={`https://mezon.ai/invite/1813407038846046912`}
 								value={inviteLink}
 							/>
 							{!isValidInvite && <ErrorInput errorMessage={t('joinClan.errorMessage')} />}

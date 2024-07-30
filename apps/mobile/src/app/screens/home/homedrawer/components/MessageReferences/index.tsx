@@ -73,6 +73,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 							isMessageReply
 							isNumberOfLine
 							mode={mode}
+							themeValue={themeValue}
 						/>
 					)}
 				</View>

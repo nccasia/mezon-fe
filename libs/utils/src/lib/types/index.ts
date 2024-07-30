@@ -26,7 +26,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -194,6 +194,7 @@ export type IMessageSendPayload = {
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
+	voiceLinks?: ILinkVoiceRoomOnMessage[];
 	plainText?: string;
 };
 

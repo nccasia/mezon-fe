@@ -47,9 +47,9 @@ const LicenseAgreement = ({ show, onClose }: ForwardMessageModalProps) => {
 					</Text>
 
 					<Text style={styles.header}>5. Contact Information</Text>
-					<TouchableOpacity onPress={() => Linking.openURL('https://mezon.vn')}>
+					<TouchableOpacity onPress={() => Linking.openURL('https://mezon.ai')}>
 						<Text style={styles.text}>
-							If you have any questions about this Agreement, please contact us at <Text style={styles.link}>https://mezon.vn</Text>
+							If you have any questions about this Agreement, please contact us at <Text style={styles.link}>https://mezon.ai</Text>
 						</Text>
 					</TouchableOpacity>
 				</ScrollView>

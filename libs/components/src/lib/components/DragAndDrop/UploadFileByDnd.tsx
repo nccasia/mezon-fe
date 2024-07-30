@@ -1,4 +1,4 @@
-import { useAppParams, useDragAndDrop, useReference } from '@mezon/core';
+import { useDragAndDrop, useReference } from '@mezon/core';
 import { selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { DragEvent } from 'react';
@@ -13,7 +13,6 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const { setDraggingState } = useDragAndDrop();
 	const { setAttachmentData, setStatusLoadingAttachment } = useReference();
 	const { sessionRef, clientRef } = useMezon();
-	const { clanId, directId, type } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {

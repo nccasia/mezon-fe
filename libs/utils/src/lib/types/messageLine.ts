@@ -23,8 +23,13 @@ export interface IMarkdown {
 	markdown: string | undefined;
 }
 
+export interface ILinkVoiceRoom {
+	voiceLink: string | undefined;
+}
+
 export interface IMentionOnMessage extends IMention, IStartEndIndex {}
 export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
 export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export interface ILinkOnMessage extends ILink, IStartEndIndex {}
 export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {}
+export interface ILinkVoiceRoomOnMessage extends ILinkVoiceRoom, IStartEndIndex {}

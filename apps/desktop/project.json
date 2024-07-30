@@ -19,8 +19,7 @@
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": [
-          "nsis",
-          "msi"
+          "nsis"
         ],
         "appId": "mezon.ai",
         "publish": [
@@ -117,8 +116,7 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": [
-            "nsis",
-            "msi"
+            "nsis"
           ],
           "appId": "mezon.ai",
           "publish": [
@@ -165,8 +163,7 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": [
-            "nsis",
-            "msi"
+            "nsis"
           ],
           "appId": "mezon.ai",
           "publish": [

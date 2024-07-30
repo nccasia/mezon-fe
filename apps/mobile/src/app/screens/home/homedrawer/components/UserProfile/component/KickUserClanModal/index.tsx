@@ -1,11 +1,12 @@
 import { UserMinus } from '@mezon/mobile-components';
-import { Block, Colors, Text } from '@mezon/mobile-ui';
+import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ClansEntity } from '@mezon/store-mobile';
+import { MezonInput } from 'apps/mobile/src/app/temp-ui';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from 'apps/mobile/src/app/temp-ui/MezonButton2';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { styles } from './KickUserClanModal.style';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { style } from './KickUserClanModal.style';
 
 const KickUserClanModal = ({
 	user,
@@ -16,6 +17,8 @@ const KickUserClanModal = ({
 	clan: ClansEntity;
 	onRemoveUserClan: (value: string) => void;
 }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
 	const [reason, setReason] = useState<string>('');
 	const [isFocusInput, setIsFocusInput] = useState<boolean>(false);
@@ -35,25 +38,24 @@ const KickUserClanModal = ({
 						{t('kickUserClanModal.description', { userName: user?.user?.username || user?.['username'] })}
 					</Text>
 					<Block style={styles.textAreaBox}>
-						<Text style={styles.textReason}>
-							{t('kickUserClanModal.reasonKick', { userName: user?.user?.username || user?.['username'] })}
-						</Text>
-						<TextInput
-							multiline={true}
-							numberOfLines={5}
-							onChangeText={(text) => setReason(text)}
+						<MezonInput
+							label={t('kickUserClanModal.reasonKick', { userName: user?.user?.username || user?.['username'] })}
+							titleUppercase
+							textarea
+							onTextChange={setReason}
 							value={reason}
-							onFocus={() => setIsFocusInput(true)}
-							onBlur={() => setIsFocusInput(false)}
-							style={[styles.input, !isFocusInput && { borderBottomColor: Colors.textGray, borderBottomWidth: 1.5 }]}
-						></TextInput>
+							showBorderOnFocus
+						/>
 					</Block>
 				</Block>
-				<TouchableOpacity style={styles.button} onPress={() => onRemoveUserClan(reason)}>
-					<Text style={styles.textButton}>
-						{t('kickUserClanModal.buttonName', { userName: user?.user?.username || user?.['username'] })}
-					</Text>
-				</TouchableOpacity>
+
+				<MezonButton
+					onPress={() => onRemoveUserClan(reason)}
+					title={t('kickUserClanModal.buttonName', { userName: user?.user?.username || user?.['username'] })}
+					type={EMezonButtonTheme.THEME}
+					size={EMezonButtonSize.LG}
+					titleStyle={styles.textButton}
+				/>
 			</KeyboardAvoidingView>
 		</Block>
 	);

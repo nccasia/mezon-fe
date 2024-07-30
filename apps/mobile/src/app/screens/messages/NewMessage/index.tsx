@@ -3,7 +3,7 @@ import { ChevronIcon, UserGroupIcon, UserIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -30,20 +30,6 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	}, [allUser]);
 
 	const inputRef = useRef(null);
-
-	useEffect(() => {
-		const timeoutId = setTimeout(() => {
-			if (inputRef?.current) {
-				inputRef.current.focus();
-			}
-		}, 300);
-
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-		};
-	}, []);
 
 	const navigateToAddFriendScreen = () => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
@@ -113,6 +99,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					placeholderTextColor={themeValue.textDisabled}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
+					autoFocus
 				/>
 			</View>
 

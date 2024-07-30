@@ -1,5 +1,5 @@
 import { Buffer as BufferMobile } from 'buffer';
-import { ChannelStreamMode, Client, Session } from 'mezon-js';
+import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export const isValidUrl = (urlString: string) => {
@@ -23,19 +23,22 @@ export async function handleUploadFile(
 	currentChannelId: string,
 	filename: string,
 	file: File,
-	mode?: number | null,
 	path?: string,
-	directId?: string,
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
 			const ms = new Date().getTime();
-			let fullfilename;
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				fullfilename = (path ? path + '/' : '') + currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g, '_');
-			} else {
-				fullfilename = currentChannelId + '/' + (directId ? directId + '/' : '') + ms + filename.replace(/-|\(|\)| /g, '_');
+			if (filename.trim() === "") {
+				filename = ms + '.' + file.type;
+			}
+			filename = filename.replace(/-|\(|\)| /g, '_')
+			if (!currentClanId) {
+				currentClanId = "0";
+			}
+			let fullfilename = currentClanId + '/' + currentChannelId + '/' + filename;
+			if (path) {
+				fullfilename = (path + '/') + currentClanId + '/' + currentChannelId + '/' + filename;
 			}
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {

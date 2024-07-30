@@ -2,7 +2,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Keyboard, Text, View } from 'react-native';
 import { SeparatorWithLine, SeparatorWithSpace } from '../Common';
 import { FriendItem } from '../FriendItem';
 import { style } from './styles';
@@ -74,6 +74,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 						style={styles.groupByAlphabetWrapper}
 						ItemSeparatorComponent={SeparatorWithLine}
 						keyExtractor={(friend) => friend.id.toString()}
+						scrollEventThrottle={100}
+						keyboardShouldPersistTaps='handled'
+						onScrollBeginDrag={() => Keyboard.dismiss()}
 						renderItem={({ item }) => (
 							<FriendItem
 								friend={item}
@@ -100,6 +103,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 							data={friendList}
 							keyExtractor={(friend) => friend.id.toString()}
 							ItemSeparatorComponent={SeparatorWithLine}
+							scrollEventThrottle={100}
+							keyboardShouldPersistTaps='handled'
+							onScrollBeginDrag={() => Keyboard.dismiss()}
 							renderItem={({ item }) => (
 								<FriendItem
 									friend={item}

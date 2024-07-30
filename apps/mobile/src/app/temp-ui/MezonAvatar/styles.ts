@@ -15,7 +15,7 @@ export const style = (colors: Attributes, height: number, width: number) => Styl
 	},
 	borderBoxImage: {
 		borderColor: colors.secondary,
-		borderWidth: 5,
+		borderWidth: height / 10,
 	},
 	image: {
 		width: '100%',
@@ -29,7 +29,7 @@ export const style = (colors: Attributes, height: number, width: number) => Styl
 		position: 'absolute',
 		width: height / 3,
 		height: width / 3,
-		borderRadius: 10,
+		borderRadius: height / 6,
 		bottom: 0,
 		right: -width / 20,
 		borderWidth: 2,
@@ -49,5 +49,19 @@ export const style = (colors: Attributes, height: number, width: number) => Styl
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center'
-	}
+	},
+
+	listImageFriend: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		width: '100%',
+		flex: 1,
+		justifyContent: 'flex-end'
+	},
+
+	imageContainer: {
+		position: 'absolute',
+		borderRadius: 50,
+		overflow: 'hidden',
+	},
 });

@@ -330,7 +330,7 @@ export const RenderTextMarkdownContent = React.memo(
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
 
-		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content;
+		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content || {};
 		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 		let lastIndex = 0;
 
@@ -338,13 +338,13 @@ export const RenderTextMarkdownContent = React.memo(
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+				const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link } = element;
 
 				if (lastIndex < startIndex) {
 					formattedContent += t?.slice?.(lastIndex, startIndex)?.toString();
 				}
 
-				if (channelId && channelLable) {
+				if (channelId && channelLabel) {
 					formattedContent += ChannelHashtag({ channelHashtagId: channelId, channelsEntities });
 				}
 				if (username) {
@@ -354,8 +354,8 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });
 				}
 
-				if (markdown) {
-					formattedContent += formatBlockCode(markdown);
+				if (markdown || link) {
+					formattedContent += formatBlockCode(markdown || link);
 				}
 				lastIndex = endIndex;
 			});

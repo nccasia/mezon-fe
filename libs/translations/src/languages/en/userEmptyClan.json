@@ -3,7 +3,7 @@
     "joinExistClan":"Join an existing clan",
     "enterInvite":"Enter an invite below to join an existing clan.",
     "labelInput": "Invite link",
-    "linkInviteEx":"Invites should look like https://mezon.vn/invite/1813407038846046912",
+    "linkInviteEx":"Invites should look like https://mezon.ai/invite/1813407038846046912",
     "joinInviteLink":"Join with invite Link",
     "errorMessage": "Please enter a valid invite link or invite code."
   },

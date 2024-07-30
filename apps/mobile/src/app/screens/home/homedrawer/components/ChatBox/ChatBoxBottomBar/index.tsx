@@ -13,18 +13,7 @@ import {
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import {
-	IEmojiOnMessage,
-	IHashtagOnMessage,
-	ILinkOnMessage,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
-	MIN_THRESHOLD_CHARS,
-	MentionDataProps,
-	convertMarkdown,
-	markdownRegex,
-	typeConverts,
-} from '@mezon/utils';
+import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -43,9 +32,8 @@ import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { ChatMessageInput } from '../ChatMessageInput';
 import { ChatMessageLeftArea } from '../ChatMessageLeftArea';
+import useProcessedContent from './useProcessedContent';
 
-const emojiRegex = /:[a-zA-Z0-9_]+:/g;
-const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
 const channelRegex = /<#[0-9]{19}\b>/g;
 
@@ -120,20 +108,15 @@ export const ChatBoxBottomBar = memo(
 			},
 			triggersConfig,
 		});
+		const { emojiList, linkList, markdownList } = useProcessedContent(text);
 
 		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
 		const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
-		const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
-		const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
-		const [markdownsOnMessage, setMarkdownsOnMessage] = useState<IMarkdownOnMessage[]>([]);
 		const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 		const mentionList: IMentionOnMessage[] = [];
 		const hashtagList: IHashtagOnMessage[] = [];
-		const emojiList: IEmojiOnMessage[] = [];
-		const linkList: ILinkOnMessage[] = [];
-		const markdownList: IMarkdownOnMessage[] = [];
 
 		const isShowCreateThread = useMemo(() => {
 			return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
@@ -218,9 +201,6 @@ export const ChatBoxBottomBar = memo(
 			setText('');
 			setMentionsOnMessage([]);
 			setHashtagsOnMessage([]);
-			setEmojisOnMessage([]);
-			setLinksOnMessage([]);
-			setMarkdownsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
 			resetCachedAttachment();
@@ -258,34 +238,6 @@ export const ChatBoxBottomBar = memo(
 				const convertedHashtag = convertMentionsToText(text);
 
 				let match;
-				while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
-					emojiList.push({
-						shortname: match[0],
-						startIndex: match.index,
-						endIndex: match.index + match[0].length,
-					});
-				}
-				setEmojisOnMessage(emojiList);
-
-				while ((match = linkRegex.exec(convertedHashtag)) !== null) {
-					linkList.push({
-						link: match[0],
-						startIndex: match.index,
-						endIndex: match.index + match[0].length,
-					});
-				}
-				setLinksOnMessage(linkList);
-
-				while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
-					const startsWithTripleBackticks = match[0].startsWith('```');
-					const endsWithNoTripleBackticks = match[0].endsWith('```');
-					const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
-					markdownList.push({
-						markdown: convertedMarkdown,
-						startIndex: match.index,
-						endIndex: match.index + match[0].length,
-					});
-				}
 				while ((match = mentionRegex.exec(convertedHashtag)) !== null) {
 					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
 					if (mention) {
@@ -312,7 +264,6 @@ export const ChatBoxBottomBar = memo(
 					}
 				}
 
-				setMarkdownsOnMessage(markdownList);
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
@@ -526,9 +477,9 @@ export const ChatBoxBottomBar = memo(
 						keyboardHeight={keyboardHeight}
 						mentionsOnMessage={mentionsOnMessage}
 						hashtagsOnMessage={hashtagsOnMessage}
-						emojisOnMessage={emojisOnMessage}
-						linksOnMessage={linksOnMessage}
-						markdownsOnMessage={markdownsOnMessage}
+						emojisOnMessage={emojiList}
+						linksOnMessage={linkList}
+						markdownsOnMessage={markdownList}
 						plainTextMessage={plainTextMessage}
 						isShowCreateThread={isShowCreateThread}
 					/>

@@ -2,11 +2,11 @@ import { onMessageListener, requestForToken, ToastController } from '@mezon/comp
 import { useAuth } from '@mezon/core';
 import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
+import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { IAppLoaderData } from '../loaders/appLoader';
-import isElectron from 'is-electron';
 const theme = 'dark';
 
 const AppLayout = () => {
@@ -42,7 +42,7 @@ const AppLayout = () => {
 				{
 					onClick: () => {
 						const fullLink = payload.data.link;
-						const baseUrl = 'https://mezon.vn';
+						const baseUrl = 'https://mezon.ai';
 						const relativeLink = fullLink.replace(baseUrl, '');
 						navigate(relativeLink);
 					},
@@ -64,7 +64,7 @@ const AppLayout = () => {
 				.catch((error: Error) => {
 					console.error('Error listening for messages:', error);
 				});
-	
+
 			if (fcmTokenObject?.token) {
 				dispatch(
 					fcmActions.registFcmDeviceToken({

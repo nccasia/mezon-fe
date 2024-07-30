@@ -41,6 +41,8 @@ interface IMezonImagePickerProps {
 	noDefaultText?: boolean;
 }
 
+const scale = 5;
+
 export default memo(function MezonImagePicker({
 	onChange,
 	onLoad,
@@ -68,9 +70,9 @@ export default memo(function MezonImagePicker({
 	const { sessionRef, clientRef } = useMezon();
 	const timerRef = useRef<any>(null);
 
-  useEffect(()=>{
-    setImage(defaultValue)
-  },[defaultValue])
+	useEffect(() => {
+		setImage(defaultValue)
+	}, [defaultValue])
 
 	useEffect(() => {
 		return () => {
@@ -82,6 +84,7 @@ export default memo(function MezonImagePicker({
 		const response = await launchImageLibrary({
 			mediaType: 'photo',
 			includeBase64: true,
+			quality: 1
 		});
 
 		if (response.didCancel) {
@@ -123,8 +126,8 @@ export default memo(function MezonImagePicker({
 						mediaType: 'photo',
 						includeBase64: true,
 						compressImageQuality: 1,
-						...(typeof width === 'number' && { width: width }),
-						...(typeof height === 'number' && { height: height }),
+						...(typeof width === 'number' && { width: width * scale }),
+						...(typeof height === 'number' && { height: height * scale }),
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);

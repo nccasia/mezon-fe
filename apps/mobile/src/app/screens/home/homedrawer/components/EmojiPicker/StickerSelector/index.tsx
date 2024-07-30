@@ -64,7 +64,7 @@ const images = [
 
 const _stickers = [...new Set(images.map((item) => item.type))].map((item) => ({
 	title: item,
-	data: images.filter((_item) => _item.type == item).map((_item) => _item.url),
+	data: images.filter((_item) => _item.type === item).map((_item) => _item.url),
 }));
 
 export default function StickerSelector({ onSelected, searchText, onScroll }: StickerSelectorProps) {

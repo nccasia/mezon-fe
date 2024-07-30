@@ -1,21 +1,19 @@
 import { useMemo } from 'react';
 
 const useIsWithinBackticks = (text: string) => {
-	const singleBacktickPattern = /`/g;
-	const tripleBacktickPattern = /```/g;
-
 	const backticksPositions = useMemo(() => {
 		const positions = {
 			single: [] as number[],
 			triple: [] as number[],
 		};
 
-		let match: RegExpExecArray | null;
-		while ((match = singleBacktickPattern.exec(text)) !== null) {
-			positions.single.push(match.index);
-		}
-		while ((match = tripleBacktickPattern.exec(text)) !== null) {
-			positions.triple.push(match.index);
+		for (let i = 0; i < text.length; i++) {
+			if (text.slice(i, i + 3) === '```') {
+				positions.triple.push(i);
+				i += 2; // Skip the next two characters since they are part of this triple backtick
+			} else if (text[i] === '`') {
+				positions.single.push(i);
+			}
 		}
 
 		return positions;
