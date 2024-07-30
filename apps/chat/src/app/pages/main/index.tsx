@@ -9,7 +9,7 @@ import {
 	selectCurrentClan,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
-	selectListDMUnread,
+	selectDirectsUnreadlist,
 	selectStatusMenu,
 	selectTheme,
 	toggleIsShowPopupForwardFalse
@@ -37,7 +37,7 @@ function MyApp() {
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-	const listUnreadDM = useSelector(selectListDMUnread);
+	const listUnreadDM = useSelector(selectDirectsUnreadlist);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
