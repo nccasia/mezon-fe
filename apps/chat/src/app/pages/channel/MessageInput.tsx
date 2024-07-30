@@ -11,7 +11,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
-import { useConvertedContent } from './useConvertedContent';
 import { useEditMessage } from './useEditMessage';
 
 type MessageInputProps = {
@@ -78,10 +77,27 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const convertedText = convertToPlainTextHashtag(channelDraftMessage.draftContent ?? '');
 	const [mentionRawInMessage, setMentionRawInMessage] = useState<MentionItem[]>([]);
 
-	console.log(convertedText);
 	const { emojiList, linkList, markdownList } = useProcessedContent(convertedText);
 	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRawInMessage ?? '', convertedText);
-	const contentConverted = useConvertedContent(convertedText, mentionList, hashtagList, emojiList, linkList, markdownList);
+	// const contentConverted = useConvertedContent(convertedText, mentionList, hashtagList, emojiList, linkList, markdownList);
+
+	const contentA = useMemo(() => {
+		return {
+			t: convertedText,
+			mentions: mentionList,
+			hashtags: hashtagList,
+			emojis: emojiList,
+			links: linkList,
+			markdowns: markdownList,
+		};
+	}, [convertedText, mentionList, hashtagList, emojiList, linkList, markdownList]);
+
+	const [convertedContent, setConvertedContent] = useState(contentA);
+
+	useEffect(() => {
+		setConvertedContent(contentA);
+	}, [content]);
+
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
@@ -143,7 +159,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			if (channelDraftMessage.draftContent === '') {
 				setOpenModalDelMess(true);
 			} else {
-				handleSend(contentConverted as any, message.id);
+				handleSend(convertedContent, message.id);
 				handleCancelEdit();
 			}
 		}
@@ -169,7 +185,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			}, {} as any);
 	};
 
-	const sortedContentConverted = sortObjectKeys(contentConverted);
+	const sortedContentConverted = sortObjectKeys(convertedContent);
 	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
 
 	const handleSave = () => {
@@ -179,7 +195,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
 			return handleCancelEdit();
 		} else {
-			handleSend(contentConverted as any, message.id);
+			handleSend(convertedContent, message.id);
 		}
 		handleCancelEdit();
 	};
@@ -227,12 +243,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
 								<SuggestItem
-									name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
+									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 									avatarUrl={suggestion.avatarUrl ?? ''}
 									subText={
 										suggestion.display === 'here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.display ?? '')
+											: suggestion.display ?? ''
 									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}
