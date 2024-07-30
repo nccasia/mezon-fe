@@ -1,7 +1,7 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps, searchMentionsHashtag } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -36,7 +36,7 @@ const convertToPlainTextHashtag = (text: string) => {
 	const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
 	const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
 		if (atSymbol) {
-			return `@${atUsername}`;
+			return `@[${atUsername}]`;
 		} else {
 			return `<#${hashId}>`;
 		}
@@ -52,7 +52,7 @@ const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionPr
 		return channel ? `#[${channel.display}](${channelId})` : match;
 	});
 
-	const usernameRegex = /@([\w.]+)/g;
+	const usernameRegex = /@\[(.*?)\]/g;
 	const finalText = replacedText.replace(usernameRegex, (match, p1) => {
 		return `@[${p1}]`;
 	});
@@ -93,6 +93,17 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			return [];
 		}
 	}, [mode, listChannels]);
+
+	const [valueHighlight, setValueHightlight] = useState<string>('');
+	const handleSearchUserMention = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, mentionList ?? []));
+	};
+
+	const handleSearchHashtag = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+	};
 
 	useEffect(() => {
 		if (channelDraftMessage.draftContent) {
@@ -210,7 +221,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					<Mention
 						markup="@[__display__]"
 						appendSpaceOnAdd={true}
-						data={mentionList ?? []}
+						data={handleSearchUserMention}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
 							return `@${display}`;
@@ -218,12 +229,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
 								<SuggestItem
-									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
+									valueHightLight={valueHighlight}
+									name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
 									avatarUrl={suggestion.avatarUrl ?? ''}
 									subText={
 										suggestion.display === 'here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.display ?? ''
+											: (suggestion.display ?? '')
 									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}
@@ -236,12 +248,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					<Mention
 						markup="#[__display__](__id__)"
 						appendSpaceOnAdd={true}
-						data={listChannelsMention}
+						data={handleSearchHashtag}
 						trigger="#"
 						displayTransform={(id: any, display: any) => `#${display}`}
 						style={mentionStyle}
 						renderSuggestion={(suggestion) => (
 							<SuggestItem
+								valueHightLight={valueHighlight}
 								name={suggestion.display ?? ''}
 								symbol="#"
 								channelId={suggestion.id}
