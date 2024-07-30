@@ -32,33 +32,6 @@ type EmojiData = {
 	display: string;
 };
 
-const convertToPlainTextHashtag = (text: string) => {
-	const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
-	const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
-		if (atSymbol) {
-			return `@[${atUsername}]`;
-		} else {
-			return `<#${hashId}>`;
-		}
-	});
-	return result;
-};
-
-const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
-	const channelRegex = /<#[0-9]{19}\b>/g;
-	const replacedText = text.replace(channelRegex, (match) => {
-		const channelId = match.substring(2, match.length - 1);
-		const channel = listInput.find((item) => item.id === channelId);
-		return channel ? `#[${channel.display}](${channelId})` : match;
-	});
-
-	const usernameRegex = /@\[(.*?)\]/g;
-	const finalText = replacedText.replace(usernameRegex, (match, p1) => {
-		return `@[${p1}]`;
-	});
-	return finalText;
-};
-
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
 	const { openEditMessageState, idMessageRefEdit, content, setContent, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
@@ -104,15 +77,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
-
-	useEffect(() => {
-		if (channelDraftMessage.draftContent) {
-			const convertedHashtag = convertToPlainTextHashtag(channelDraftMessage.draftContent);
-			const replacedText = replaceChannelIdsWithDisplay(convertedHashtag, listChannelsMention);
-			setChannelDraftMessage(channelId, messageId, replacedText);
-			setContent(convertedHashtag);
-		}
-	}, [channelDraftMessage.draftContent, listChannelsMention]);
 
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
