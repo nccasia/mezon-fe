@@ -1,15 +1,16 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps, convertToPlainTextHashtag } from '@mezon/utils';
+import { useProcessMention } from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
+import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
-import { useConvertedContent } from './useConvertedContent';
 import { useEditMessage } from './useEditMessage';
 
 type MessageInputProps = {
@@ -30,18 +31,6 @@ type EmojiData = {
 	id: string;
 	emoji: string;
 	display: string;
-};
-
-const convertToPlainTextHashtag = (text: string) => {
-	const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
-	const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
-		if (atSymbol) {
-			return `@${atUsername}`;
-		} else {
-			return `<#${hashId}>`;
-		}
-	});
-	return result;
 };
 
 const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
@@ -69,10 +58,30 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
-	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
+	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const contentConverted = useConvertedContent(channelDraftMessage.draftContent);
+	const convertedText = convertToPlainTextHashtag(channelDraftMessage.draftContent ?? '');
+	const [mentionRawInMessage, setMentionRawInMessage] = useState<MentionItem[]>([]);
+	const { emojiList, linkList, markdownList } = useProcessedContent(convertedText);
+	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRawInMessage ?? '', convertedText);
+
+	const combinedContent = useMemo(() => {
+		return {
+			t: convertedText,
+			mentions: mentionList,
+			hashtags: hashtagList,
+			emojis: emojiList,
+			links: linkList,
+			markdowns: markdownList,
+		};
+	}, [convertedText, mentionList, hashtagList, emojiList, linkList, markdownList]);
+
+	const [contentConverted, setConvertedContent] = useState(combinedContent);
+
+	useEffect(() => {
+		setConvertedContent(combinedContent);
+	}, [content]);
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
@@ -179,6 +188,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		setMentionRawInMessage(mentions);
 		const value = event.target.value;
 		setChannelDraftMessage(channelId, messageId, value);
 		if (newPlainTextValue.endsWith('@')) {
@@ -210,7 +220,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					<Mention
 						markup="@[__display__]"
 						appendSpaceOnAdd={true}
-						data={mentionList ?? []}
+						data={mentionListData ?? []}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
 							return `@${display}`;
