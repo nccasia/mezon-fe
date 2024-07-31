@@ -2,7 +2,6 @@ import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/compon
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
 import { IMessageWithUser, MentionDataProps, convertToPlainTextHashtag } from '@mezon/utils';
-import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -74,23 +73,25 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
+	console.log(channelDraftMessage.draftContent);
+
 	const convertedText = convertToPlainTextHashtag(channelDraftMessage.draftContent ?? '');
 	const [mentionRawInMessage, setMentionRawInMessage] = useState<MentionItem[]>([]);
 
 	const { emojiList, linkList, markdownList } = useProcessedContent(convertedText);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRawInMessage ?? '', convertedText);
+	// const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRawInMessage ?? '', convertedText);
 	// const contentConverted = useConvertedContent(convertedText, mentionList, hashtagList, emojiList, linkList, markdownList);
 
 	const contentA = useMemo(() => {
 		return {
 			t: convertedText,
-			mentions: mentionList,
-			hashtags: hashtagList,
+			mentions: [],
+			hashtags: [],
 			emojis: emojiList,
 			links: linkList,
 			markdowns: markdownList,
 		};
-	}, [convertedText, mentionList, hashtagList, emojiList, linkList, markdownList]);
+	}, [convertedText, [], [], emojiList, linkList, markdownList]);
 
 	const [convertedContent, setConvertedContent] = useState(contentA);
 
@@ -233,7 +234,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					}}
 				>
 					<Mention
-						markup="@[__display__]"
+						markup="@[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={mentionListData ?? []}
 						trigger="@"
@@ -243,12 +244,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
 								<SuggestItem
-									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
+									name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
 									avatarUrl={suggestion.avatarUrl ?? ''}
 									subText={
 										suggestion.display === 'here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.display ?? ''
+											: (suggestion.display ?? '')
 									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}

@@ -51,6 +51,7 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
+	formatText,
 	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
@@ -233,7 +234,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 
 	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRaw, content);
+	const { mentionList, hashtagList } = useProcessMention(content);
+
+	console.log(mentionList, hashtagList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -276,7 +279,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						plainText: plainTextMessage,
 					},
 
-					simplifiedMentionList,
+					[],
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -318,7 +321,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							voiceLinks: voiceLinkRoomList,
 							plainText: plainTextMessage,
 						},
-						simplifiedMentionList,
+						[],
 						attachmentDataRef,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -408,12 +411,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (mentions.length > 0) {
 			setMentionRaw(mentions);
 		}
-		const convertedHashtag = convertToPlainTextHashtag(newValue);
-		setContent(convertedHashtag);
+		// const convertedHashtag = convertToPlainTextHashtag(newValue);
+		const a = formatText(newValue, mentionData, listChannelsMention);
+		console.log(a);
+		setContent(newValue);
 		setPlainTextMessage(newPlainTextValue);
 
-		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(convertedHashtag);
+		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
+			props.handleConvertToFile(newValue);
 			setContent('');
 			setValueTextInput('');
 		}
@@ -431,13 +436,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
 
-	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
-		});
-		return result;
-	};
+	// const convertToPlainTextHashtag = (text: string) => {
+	// 	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
+	// 	const result = text.replace(regex, (match, symbol, p1, p2) => {
+	// 		return symbol === '#' ? `<#${p2}>` : `@${p1}`;
+	// 	});
+	// 	return result;
+	// };
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
@@ -513,8 +518,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
 		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
-			setContent(convertedHashtag);
+			// const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
+			setContent(valueTextInput);
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId, valueTextInput]);
@@ -620,6 +625,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}}
 			>
 				<Mention
+					markup="@[__display__](__id__)"
 					appendSpaceOnAdd={true}
 					data={handleSearchUserMention}
 					trigger="@"

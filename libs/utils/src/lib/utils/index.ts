@@ -365,3 +365,23 @@ export const convertToPlainTextHashtag = (text: string): string => {
 
 	return result;
 };
+
+export function formatText(inputText: any, mentionList: any, hashtagList: any) {
+	let formattedText = inputText;
+
+	// Replace mentions
+	mentionList.forEach((mention: any) => {
+		const mentionTag = `@[${mention.display}](${mention.id})`;
+		const formattedMention = `@${mention.display}`;
+		formattedText = formattedText.split(mentionTag).join(formattedMention);
+	});
+
+	// Replace hashtags
+	hashtagList.forEach((hashtag: any) => {
+		const hashtagTag = `#[${hashtag.display}](${hashtag.id})`;
+		const formattedHashtag = `<#${hashtag.id}>`;
+		formattedText = formattedText.split(hashtagTag).join(formattedHashtag);
+	});
+
+	return formattedText;
+}
