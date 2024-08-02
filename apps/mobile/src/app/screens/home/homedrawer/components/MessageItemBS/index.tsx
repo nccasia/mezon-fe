@@ -352,9 +352,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			);
 		}
 		const mediaList = message?.attachments?.length > 0 &&
-			message.attachments.every(
-				att => att.filetype.includes("image") ||
-					att.filetype.includes("video"))
+			message?.attachments?.every(
+				att => att?.filetype?.includes("image") ||
+					att?.filetype?.includes("video"))
 			? []
 			: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
