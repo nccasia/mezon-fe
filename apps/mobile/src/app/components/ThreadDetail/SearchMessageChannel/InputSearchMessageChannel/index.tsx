@@ -28,12 +28,10 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 	const handleTextChange = (e) => {
 		onChangeText(e);
 		setTextInput(e);
-		setIsIconClear(true);
 	};
 	const clearTextInput = () => {
 		setTextInput('');
 		onChangeText('');
-		setIsIconClear(false);
 	};
 	return (
 		<View style={styles.wrapper}>
@@ -57,7 +55,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 					placeholder={t('search')}
 					autoFocus
 				></TextInput>
-				{isIconClear ? (
+				{!!textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
 						<CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>

@@ -27,6 +27,7 @@ export async function handleUploadFile(
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
+		console.log("err", filename);
 		try {
 			let fileType = file.type;
 			if (!fileType) {
@@ -35,18 +36,19 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			
-			const ms = new Date().getTime();
-			if (filename.trim() === "") {
-				filename = ms + '.' + file.type;
-			}
+			const ms = new Date().getMinutes();			
+			filename = ms + filename;
 			filename = filename.replace(/-|\(|\)| /g, '_')
 			if (!currentClanId) {
 				currentClanId = "0";
 			}
-			let fullfilename = currentClanId + '/' + currentChannelId + '/' + filename;
+			let fullfilename = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 			if (path) {
-				fullfilename = (path + '/') + currentClanId + '/' + currentChannelId + '/' + filename;
+				fullfilename = (path + '/') + fullfilename;
 			}
+
+			console.log("fullfilename", fullfilename, fileType);
+
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
 				filename: fullfilename,
@@ -71,6 +73,7 @@ export async function handleUploadFile(
 				height: 0,
 			});
 		} catch (error) {
+			console.log("err", error);
 			reject(new Error(`${error}`));
 		}
 	});

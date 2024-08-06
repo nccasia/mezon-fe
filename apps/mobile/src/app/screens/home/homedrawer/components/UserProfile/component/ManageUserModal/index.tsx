@@ -1,7 +1,7 @@
 import { useRoles } from "@mezon/core";
 import { Icons } from "@mezon/mobile-components";
 import { baseColor, Block, Colors, size, Text, useTheme } from "@mezon/mobile-ui";
-import { ChannelMembersEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan } from "@mezon/store-mobile";
+import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, Modal, ScrollView, TouchableOpacity } from "react-native";
@@ -19,29 +19,30 @@ interface IManageUserModalProp {
 export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }: IManageUserModalProp) => {
     const { themeValue } = useTheme();
     const [editMode, setEditMode] = useState(false);
-    const RolesClan = useSelector(selectAllRolesClan);
+    const rolesClan = useSelector(selectAllRolesClan);
     const currentClan = useSelector(selectCurrentClan);
-    const currentChannelId = useSelector(selectCurrentChannelId);
-    const { updateRole } = useRoles(currentChannelId || '');
+    const { updateRole } = useRoles();
     const [selectedRole, setSelectedRole] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation('message');
     const activeRoleOfUser = useMemo(() => {
-        return RolesClan.filter(role => user?.role_id?.includes(role?.id)) || [];
-    }, [RolesClan, user?.role_id])
+        return rolesClan?.filter(role => user?.role_id?.includes(role?.id)) || [];
+    }, [rolesClan, user?.role_id])
 
     const isClanOwner = useMemo(() => {
         return currentClan?.creator_id === user?.user?.id
     }, [currentClan?.creator_id, user?.user?.id])
 
     const addRole = async (roleId: string) => {
-        const activeRole = RolesClan.find((role) => role.id === roleId);
+        const activeRole = rolesClan?.find((role) => role.id === roleId);
         await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
+        setIsLoading(false)
     };
 
     const deleteRole = async (roleId: string) => {
-        const activeRole = RolesClan.find((role) => role.id === roleId);
+        const activeRole = rolesClan?.find((role) => role.id === roleId);
         await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
+        setIsLoading(false)
     };
 
     const onSelectedRoleChange = async (value: boolean, roleId) => {
@@ -66,8 +67,8 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
     }, [user?.role_id])
 
     const roleList = useMemo(() => {
-        return !editMode ? activeRoleOfUser : RolesClan
-    }, [editMode, activeRoleOfUser, RolesClan])
+        return !editMode ? activeRoleOfUser : rolesClan
+    }, [editMode, activeRoleOfUser, rolesClan])
 
     return (
         <Modal visible={visible} animationType={'slide'} statusBarTranslucent={true}>
@@ -198,7 +199,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                     {!isClanOwner && (
                         <Block marginTop={size.s_16}>
                             {profileSetting?.map(item => {
-                                if (item?.isShow && !(EActionSettingUserProfile.Manage === item?.value)) {
+                                if (item?.isShow && (EActionSettingUserProfile.Manage !== item?.value)) {
                                     return (
                                         <TouchableOpacity
                                             key={item?.value}

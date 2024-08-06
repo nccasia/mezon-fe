@@ -35,7 +35,7 @@ const MessageNotification = React.memo(({ message }: IMessageNotificationProps) 
 			) : null}
 			<Block>
 				<RenderTextMarkdownContent
-					content={message}
+					content={message?.content}
 					isEdited={isEdited}
 					isNumberOfLine
 					translate={t}

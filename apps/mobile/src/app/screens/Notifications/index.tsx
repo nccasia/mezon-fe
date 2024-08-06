@@ -1,16 +1,17 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannels, useNotification } from '@mezon/core';
+import { useNotification } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { INotification, NotificationEntity, channelsActions, getStoreAsync } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
+import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../temp-ui';
-import NotificationIndividualItem from './NotificationIndividualItem';
+import EmptyNotification from './EmptyNotification';
 import NotificationItem from './NotificationItem';
 import NotificationItemOption from './NotificationItemOption';
 import NotificationOption from './NotificationOption';
@@ -22,41 +23,64 @@ const Notifications = () => {
 	const styles = style(themeValue);
 	const { notification, deleteNotify } = useNotification();
 	const [notify, setNotify] = useState<INotification>();
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const { t } = useTranslation(['notification']);
-	const { channels } = useChannels();
 	const navigation = useNavigation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const bottomSheetOptionsRef = useRef<BottomSheetModal>(null);
 
-	const [sortedNotifications, setSortedNotifications] = useState<NotificationEntity[]>([]);
+	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
+	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
+
+	useEffect(() => {
+		handleFilterNotify(EActionDataNotify.All);
+	}, [notification]);
 
 	const handleFilterNotify = (tabNotify) => {
-		const dataSort = notification.sort((a, b) => moment(b.create_time).valueOf() - moment(a.create_time).valueOf());
+		const sortNotifications = notification.sort((a, b) => {
+			const dateA = new Date(a.create_time || '').getTime();
+			const dateB = new Date(b.create_time || '').getTime();
+			return dateB - dateA;
+		});
 
 		switch (tabNotify) {
 			case EActionDataNotify.Individual:
-				setSortedNotifications(
-					dataSort.filter((item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
+				setNotificationsFilter(
+					sortNotifications.filter((item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED),
 				);
 				break;
 			case EActionDataNotify.Mention:
-				setSortedNotifications(
-					dataSort.filter((item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
+				setNotificationsFilter(
+					sortNotifications.filter((item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED),
 				);
 				break;
 			case EActionDataNotify.All:
-				setSortedNotifications(dataSort.filter((item) => channels.some((channel) => channel.channel_id === item.content.channel_id)));
+				setNotificationsFilter(sortNotifications);
 				break;
 			default:
-				setSortedNotifications([]);
+				setNotificationsFilter([]);
 				break;
 		}
 	};
 
+	const handleTabChange = (value, isSelected) => {
+		setSelectedTabs((prevState) => ({
+			...prevState,
+			[value]: isSelected,
+		}));
+	};
+
 	useEffect(() => {
-		handleFilterNotify(EActionDataNotify.All);
-	}, [notification, channels]);
+		setSelectedTabs({ individual: true, mention: true });
+	}, [currentClanId]);
+
+	useEffect(() => {
+		const { individual, mention } = selectedTabs;
+		handleFilterNotify(
+			individual && mention ? EActionDataNotify.All : individual ? EActionDataNotify.Individual : mention ? EActionDataNotify.Mention : null,
+		);
+	}, [selectedTabs.individual, selectedTabs.mention]);
 
 	const openBottomSheet = (type: ENotifyBsToShow, notify?: INotification) => {
 		switch (type) {
@@ -74,7 +98,7 @@ const Notifications = () => {
 	};
 
 	const handleDeleteNotify = (notify?: INotification) => {
-		notify && deleteNotify(notify.id);
+		notify && deleteNotify(notify.id, currentClanId || '0');
 		closeBottomSheet();
 	};
 
@@ -95,6 +119,7 @@ const Notifications = () => {
 
 	const closeBottomSheet = () => {
 		bottomSheetRef.current?.dismiss();
+		bottomSheetOptionsRef.current?.dismiss();
 	};
 
 	return (
@@ -109,26 +134,27 @@ const Notifications = () => {
 			</View>
 
 			<View style={styles.notificationsList}>
-				<FlatList
-					data={sortedNotifications}
-					renderItem={({ item }) => {
-						return item.code === -9 ? (
-							<NotificationItem onPressNotify={handleOnPressNotify} notify={item} onLongPressNotify={openBottomSheet} />
-						) : (
-							<NotificationIndividualItem onPressNotify={handleOnPressNotify} notify={item} onLongPressNotify={openBottomSheet} />
-						);
-					}}
-					keyExtractor={(item) => item.id}
-				/>
+				{notificationsFilter?.length > 0 ? (
+					<FlatList
+						data={notificationsFilter}
+						renderItem={({ item }) => {
+							return (
+								<NotificationItem
+									notify={item}
+									onLongPressNotify={openBottomSheet}
+									onPressNotify={handleOnPressNotify}
+								></NotificationItem>
+							);
+						}}
+						keyExtractor={(item) => item.id}
+					/>
+				) : (
+					<EmptyNotification />
+				)}
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize="md">
-				<NotificationOption
-					channels={channels}
-					onChange={(value) => {
-						handleFilterNotify(value);
-					}}
-				/>
+				<NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabs} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetOptionsRef} heightFitContent>

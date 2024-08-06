@@ -4,10 +4,10 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) => StyleSheet.create({
   wrapper: {
     borderColor: colors.border,
-    marginTop: size.s_10,
     borderWidth: 0.8,
     borderRadius: size.s_10,
-    paddingHorizontal: size.s_10
+    paddingHorizontal: size.s_10,
+    margin: size.s_16
   },
   option: {
     flexDirection: 'row',

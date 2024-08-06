@@ -217,7 +217,6 @@ const SettingRightUser = ({
 			) : null}
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
-
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</div>
 	);

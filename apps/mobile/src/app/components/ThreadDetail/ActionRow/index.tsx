@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
+import { useUserPermission } from '@mezon/core';
 import { EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectnotificatonSelected } from '@mezon/store-mobile';
@@ -8,7 +9,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
-import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
@@ -27,7 +27,7 @@ export const ActionRow = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -78,7 +78,7 @@ export const ActionRow = React.memo(() => {
 				});
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
-			isShow: userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner,
+			isShow: isCanManageThread || isCanManageChannel,
 			type: EActionRow.Settings,
 		},
 	];

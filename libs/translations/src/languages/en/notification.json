@@ -5,5 +5,7 @@
     "mention": "Mention",
     "notificationSettings": "Notification Settings"
   },
-  "removeNotification": "Remove Notification"
+  "removeNotification": "Remove Notification",
+  "nothingHere":"Nothing here yet",
+  "comeBackNotify":"Come back for notifications on events , streams and more"
 }

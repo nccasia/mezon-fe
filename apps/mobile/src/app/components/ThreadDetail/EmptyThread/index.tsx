@@ -1,11 +1,9 @@
-import { useReference, useThreads } from '@mezon/core';
+import { useReference, useThreads, useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './EmptyThread.style';
 
@@ -16,11 +14,7 @@ const EmptyThread = () => {
 	const { setOpenThreadMessageState } = useReference();
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation(['createThread']);
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
-
-	const showCreateThreadButton = useMemo(() => {
-		return userPermissionsStatus['manage-thread'] || isClanOwner;
-	}, [userPermissionsStatus, isClanOwner])
+	const { isCanManageThread } = useUserPermission();
 
 	const handleNavigateCreateForm = () => {
 		setOpenThreadMessageState(false);
@@ -35,7 +29,7 @@ const EmptyThread = () => {
 				</View>
 				<Text style={styles.textNoThread}>{t('emptyThread.textNoThread')}</Text>
 				<Text style={styles.textNotify}>{t('emptyThread.textNotify')}</Text>
-				{showCreateThreadButton ? (
+				{isCanManageThread ? (
 					<TouchableOpacity onPress={handleNavigateCreateForm} style={[styles.button]}>
 						<Text style={[styles.buttonText]}>{t('emptyThread.createThreads')}</Text>
 					</TouchableOpacity>

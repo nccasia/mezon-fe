@@ -72,5 +72,6 @@
         "editRoles": "Chỉnh sửa vai trò",
         "cancel": "Đóng"
     },
-    "newMessages": "Các tin nhắn mới"
+    "newMessages": "Các tin nhắn mới",
+    "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn"
 }

@@ -26,6 +26,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		padding: size.s_16,
 		borderRadius: 8,
 	},
+	roleGroup: {
+		backgroundColor: colors.secondary,
+		marginBottom: size.s_20,
+		borderRadius: 8,
+	},
 	userName: {
 		color: colors.textStrong,
 		fontSize: size.h6,

@@ -338,7 +338,7 @@ export const RenderTextMarkdownContent = React.memo(
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
+				const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
 
 				if (lastIndex < startindex) {
 					formattedContent += t?.slice?.(lastIndex, startindex)?.toString();
@@ -348,7 +348,7 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile });
+					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, clansProfile });
 				}
 				if (shortname) {
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });

@@ -21,7 +21,7 @@ const MediaChannel = () => {
 	const timeOutRef = useRef(null);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
-		return (widthScreen - (size.s_10 * 2 + size.s_6 * 2)) / 3;
+		return (widthScreen - (size.s_10 * 2 + size.s_6 * 2)) / 3.45;
 	}, [widthScreen]);
 
 	const openImage = useCallback(

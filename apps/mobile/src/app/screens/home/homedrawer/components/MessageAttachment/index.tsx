@@ -54,7 +54,7 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 				create_time: message.create_time,
 			});
 		},
-		[message.create_time, message.sender_id],
+		[message.create_time, message.sender_id, onOpenImage],
 	);
 
 	const renderDocuments = () => {

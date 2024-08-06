@@ -5,6 +5,7 @@ import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
 import SettingUserClanProfileSave, { ModalSettingSave } from './settingUserClanProfileSave';
 
@@ -19,6 +20,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
+	const [openModal, setOpenModal] = useState(false);
+	const [openModalType, setOpenModalType] = useState(false);
 
 	useEffect(() => {
 		setDraftProfile(userClansProfile);
@@ -53,15 +56,24 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 		const file = e.target.files?.[0];
 		if (!file) return;
 		if (!clientRef.current || !sessionRef.current) throw new Error('Client or session is not initialized');
-		if (!fileTypeImage.includes(file.type) || file.size > 1000000) {
+		if (!fileTypeImage.includes(file.type)) {
+			setOpenModalType(true);
+			e.target.value = '';
+			return;
+		}
+		if (file.size > 1000000) {
+			setOpenModal(true);
 			e.target.value = '';
 			return;
 		}
 		const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
-		handleUploadFile(clientRef.current, sessionRef.current, '0', '0', imageAvatarResize.name, imageAvatarResize).then((attachment) => {
-			setUrlImage(attachment.url || '');
-			setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
-		});
+
+		handleUploadFile(clientRef.current, sessionRef.current, clanId, userProfile?.user?.id || '0', imageAvatarResize.name, imageAvatarResize).then(
+			(attachment) => {
+				setUrlImage(attachment.url || '');
+				setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
+			},
+		);
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value);
@@ -140,6 +152,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 				</div>
 			</div>
 			<SettingUserClanProfileSave PropsSave={saveProfile} />
+			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
+			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</>
 	);
 };

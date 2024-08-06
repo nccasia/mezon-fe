@@ -1,15 +1,27 @@
-import { Metrics, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Metrics, useTheme } from '@mezon/mobile-ui';
+import React, {useEffect, useRef, useState} from 'react';
+import { Image, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
 
 const widthMedia = Metrics.screenWidth - 150;
+
 export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(0);
-
+	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
+	const prevImageUrl = useRef<string | null>(null);
+	
+	useEffect(() => {
+		if (image?.url && image.url !== prevImageUrl.current) {
+			prevImageUrl.current = image.url;
+			Image.getSize(image.url, (width, height) => {
+				const newHeight = (height / width) * widthMedia;
+				setCalcImgHeight(newHeight);
+			});
+		}
+	}, [image.url, setCalcImgHeight]);
+	
 	return (
 		<TouchableOpacity disabled={disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
 			<FastImage
@@ -22,9 +34,6 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 				]}
 				source={{ uri: image?.url }}
 				resizeMode="contain"
-				onLoad={(evt) => {
-					setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
-				}}
 			/>
 		</TouchableOpacity>
 	);

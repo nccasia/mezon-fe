@@ -11,7 +11,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: size.s_6,
-    justifyContent: 'center'
   },
   overlay: {
     position: 'absolute',

@@ -1,15 +1,15 @@
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 export default function ThreadAddButton() {
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
-	if (!(userPermissionsStatus['manage-thread'] || isClanOwner)) {
+	const { isCanManageThread } = useUserPermission();
+	if (!isCanManageThread) {
 		return <View />;
 	}
 	return (

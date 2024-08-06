@@ -1,8 +1,7 @@
-import { useChannelMembersActions } from '@mezon/core';
+import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, ChannelsEntity, ClansEntity, selectCurrentClanId } from '@mezon/store-mobile';
-import { ApiAccount } from 'mezon-js/api.gen';
+import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store-mobile';
 import React, { useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -20,10 +19,6 @@ export enum EActionSettingUserProfile {
 
 interface IUserSettingProfileProps {
 	user: ChannelMembersEntity;
-	clan: ClansEntity;
-	currentChannel: ChannelsEntity;
-	userProfile: ApiAccount;
-	isClanOwner?: boolean;
 }
 
 export interface IProfileSetting {
@@ -36,19 +31,16 @@ export interface IProfileSetting {
 
 const UserSettingProfile = ({
 	user,
-	clan,
-	currentChannel,
-	userProfile,
-	isClanOwner
 }: IUserSettingProfileProps) => {
 	const { themeValue } = useTheme();
+	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(false);
 	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(false);
 	const { removeMemberClan } = useChannelMembersActions();
-	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
-	const checkUser = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
+	const isItMe = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 	const handleSettingUserProfile = (action?: EActionSettingUserProfile) => {
 		switch (action) {
 			case EActionSettingUserProfile.Manage:
@@ -72,32 +64,32 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.Manage,
 				icon: <Icons.SettingsIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner,
+				isShow: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus['manage-clan'],
 			},
 			{
 				label: `${EActionSettingUserProfile.TimeOut}`,
 				value: EActionSettingUserProfile.TimeOut,
 				icon: <Icons.ClockWarningIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: checkCreateUser && !checkUser,
+				isShow: isClanOwner && !isItMe,
 			},
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
 				icon: <Icons.UserMinusIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: checkCreateUser && !checkUser,
+				isShow: isClanOwner && !isItMe,
 			},
 			{
 				label: `${EActionSettingUserProfile.Ban}`,
 				value: EActionSettingUserProfile.Ban,
 				icon: <Icons.HammerIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: checkCreateUser && !checkUser,
+				isShow: isClanOwner && !isItMe,
 			},
 		]
 		return settingList
-	}, [checkCreateUser, checkUser, isClanOwner]);
+	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus]);
 
 	const handleRemoveUserClans = async (value: string) => {
 		if (user) {
@@ -134,12 +126,13 @@ const UserSettingProfile = ({
 					setVisibleKickUserModal(visible);
 				}}
 			>
-				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} clan={clan} />
+				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} />
 			</MezonModal>
 
 			<ManageUserModal
 				visible={visibleManageUserModal}
-				user={user} onclose={() => setVisibleManageUserModal(false)}
+				user={user}
+				onclose={() => setVisibleManageUserModal(false)}
 				profileSetting={profileSetting}
 			/>
 		</Block>

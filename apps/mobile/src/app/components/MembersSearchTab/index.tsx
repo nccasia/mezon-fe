@@ -2,7 +2,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import EmptySearchPage from '../EmptySearchPage';
 import MemberItem from '../MemberStatus/MemberItem';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
@@ -26,10 +26,11 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const handleCloseUserInfoBS = () => {
 		setSelectedUser(null);
 	};
+
 	return (
 		<View style={styles.container}>
 			{listMemberSearch?.length > 0 ? (
-				<ScrollView contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+				<ScrollView keyboardDismissMode={'on-drag'}  contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					{
 						<View style={styles.boxMembers}>
 							{listMemberSearch?.map((user) => (
