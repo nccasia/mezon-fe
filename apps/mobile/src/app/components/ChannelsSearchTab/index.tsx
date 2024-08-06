@@ -59,14 +59,11 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 		}
 	};
 
-	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
-		Keyboard.dismiss();
-	}
 
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<ScrollView onScroll={handleScroll} contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+				<ScrollView keyboardDismissMode={'on-drag'} contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					<>
 						<Block>
 							{listTextChannelAndThreads?.length > 0 ? (

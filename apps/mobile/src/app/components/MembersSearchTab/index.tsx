@@ -27,13 +27,10 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 		setSelectedUser(null);
 	};
 
-	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
-		Keyboard.dismiss();
-	}
 	return (
 		<View style={styles.container}>
 			{listMemberSearch?.length > 0 ? (
-				<ScrollView onScroll={handleScroll} contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+				<ScrollView keyboardDismissMode={'on-drag'}  contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					{
 						<View style={styles.boxMembers}>
 							{listMemberSearch?.map((user) => (
