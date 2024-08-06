@@ -208,12 +208,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		if (isDM) {
 			return message?.display_name || message?.username || '';
 		}
-		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
+		
+		return message?.clan_nick || message?.display_name || message?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+	}, [checkAnonymous, message?.clan_nick, message?.username, message?.display_name, isDM]);
 
 	const usernameMessage = useMemo(() => {
 		return isDM ? message?.display_name || message?.user?.username : message?.user?.username
-	}, [isDM, isDM, message?.display_name, message?.user?.username]);
+	}, [isDM, message?.display_name, message?.user?.username]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
