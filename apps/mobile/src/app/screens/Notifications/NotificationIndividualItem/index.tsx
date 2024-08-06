@@ -10,9 +10,10 @@ import { styles as s } from './NotificationIndividualItem.styles';
 
 function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
-	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
+	const { avatarImg } = useMessageSender(user as any);
 	const userName = notify?.content?.username;
 	const messageTimeDifference = getTimeDifferenceDate(notify.create_time);
+
 
 	let notice = notify?.subject;
 

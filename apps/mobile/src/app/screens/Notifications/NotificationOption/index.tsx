@@ -1,50 +1,23 @@
 import { Icons } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../temp-ui';
 import MezonToggleButton from '../../../temp-ui/MezonToggleButton';
-import { EActionDataNotify } from '../types';
 import { style } from './NotificationOption.styles';
 interface INotificationOptionProps {
-	onChange: (value: EActionDataNotify) => void;
-	channels: ChannelsEntity[];
+	selectedTabs: { mention: boolean; individual: boolean };
+	onChangeTab: (value: string, isSelected: true) => void;
 }
-const NotificationOption = memo(({ onChange, channels }: INotificationOptionProps) => {
+const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOptionProps) => {
 	const { t } = useTranslation(['notification']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
-	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
-
 	const handleTabChange = (value, isSelected) => {
-		setSelectedTabs((prevState) => ({
-			...prevState,
-			[value]: isSelected,
-		}));
+		onChangeTab(value, isSelected);
 	};
-
-	useEffect(() => {
-		setSelectedTabs({ individual: true, mention: true });
-	}, [channels]);
-
-	const calculateValue = () => {
-		return selectedTabs.individual && selectedTabs.mention
-			? EActionDataNotify.All
-			: selectedTabs.individual
-				? EActionDataNotify.Individual
-				: selectedTabs.mention
-					? EActionDataNotify.Mention
-					: null;
-	};
-
-	useEffect(() => {
-		const value = calculateValue();
-		onChange(value);
-	}, [selectedTabs]);
-
 	const Btn = useCallback(
 		({ val }: { val: 'individual' | 'mention' }) => (
 			<MezonToggleButton

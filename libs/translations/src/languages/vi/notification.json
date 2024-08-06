@@ -5,5 +5,7 @@
     "mention": "Nhắc đến",
     "notificationSettings": "Cài đặt thông báo"
   },
-  "removeNotification": "Xóa Thông Báo"
+  "removeNotification": "Xóa thông báo",
+  "nothingHere": "Chưa có gì ở đây",
+  "comeBackNotify": "Quay lại để nhận thông báo về sự kiện, luồng và nhiều hơn nữa"
 }
