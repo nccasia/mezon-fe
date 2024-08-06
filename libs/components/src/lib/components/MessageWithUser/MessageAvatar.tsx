@@ -1,9 +1,10 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
-import { useOnClickOutside } from '@mezon/core';
+import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
+import usePendingNames from './usePendingNames';
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
@@ -14,6 +15,21 @@ type IMessageAvatarProps = {
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
 	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
+	const { clanAvatar, generalAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
+	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
+		message,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		avatarSender,
+		generalAvatar,
+		clanAvatar,
+		userClanAvatar,
+	);
+
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -57,9 +73,15 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					}}
 					alt={username ?? ''}
 					userName={username}
-					src={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (userClanAvatar ? userClanAvatar : avatarSender) : avatarSender}
+					src={
+						mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+							? pendingClanAvatar
+								? pendingClanAvatar
+								: pendingUserAvatar
+							: pendingUserAvatar
+					}
 					className="min-w-10 min-h-10"
-					classNameText='font-semibold'
+					classNameText="font-semibold"
 					isAnonymous={isAnonymous}
 				/>
 			</div>
