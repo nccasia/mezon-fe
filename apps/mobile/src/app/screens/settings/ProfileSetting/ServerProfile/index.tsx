@@ -104,7 +104,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 				<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
 			</TouchableOpacity>
 
-			<BannerAvatar avatar={clanProfileValue?.imgUrl} onLoad={handleAvatarChange} />
+			<BannerAvatar avatar={clanProfileValue?.imgUrl} alt={clanProfileValue?.username} onLoad={handleAvatarChange} />
 
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>

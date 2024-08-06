@@ -1,7 +1,7 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -40,13 +40,11 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const { t } = useTranslation(['userProfile']);
 	const userById = useSelector(selectMemberByUserId(userId || user?.id || ''));
 	const userStatus = useMemberStatus(userId || user?.id);
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const { color } = useMixImageColor(userById?.user?.avatar_url || user?.avatarSm || userProfile?.user?.avatar_url);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const listDM = useSelector(selectDirectsOpenlist);
-	const currentClan = useSelector(selectCurrentClan);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
@@ -54,16 +52,13 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		return allUser.find(targetUser => [user?.id, userId].includes(targetUser?.user?.id))
 	}, [user?.id, userId, allUser])
 
-	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id
-	}, [currentClan?.creator_id, userProfile?.user?.id]);
-
 	const userRolesClan = useMemo(() => {
-		return userById?.role_id ? RolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
-	}, [userById?.role_id, RolesClan]);
+		return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
+	}, [userById?.role_id, rolesClan]);
 
 	const checkOwner = (userId: string) => {
-		return userId === userProfile?.user?.google_id;
+		const id = userProfile?.user?.google_id || userProfile?.user?.id;
+		return userId === id;
 	};
 
 	const directMessageWithUser = useCallback(
@@ -163,8 +158,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	}
 
 	const isShowUserContent = useMemo(() => {
-		return !!userById?.user?.about_me || showRole || showAction
-	}, [userById?.user?.about_me, showAction, showRole])
+		return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction
+	}, [userById?.user?.about_me, showAction, showRole, userRolesClan])
 
 	if (isShowPendingContent) {
 		return (
@@ -200,7 +195,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
-					{!checkOwner(userById?.user?.google_id || '') && (
+					{!checkOwner(userById?.user?.google_id || userById?.user?.id) && (
 						<View style={[styles.userAction]}>
 							{actionList.map(actionItem => {
 								const { action, icon, id, isShow, text, textStyles } = actionItem;
@@ -231,16 +226,16 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 				</View>
 
 				{isShowUserContent && (
-					<View style={[styles.userInfo]}>
+					<View style={[styles.roleGroup]}>
 						{userById?.user?.about_me && (
-							<View>
+							<Block padding={size.s_16}>
 								<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
 								<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
-							</View>
+							</Block>
 						)}
 
 						{userRolesClan?.length && showRole ? (
-							<View>
+							<Block padding={size.s_16}>
 								<Text style={[styles.title]}>{t('aboutMe.roles.headerTitle')}</Text>
 								<View style={[styles.roles]}>
 									{userRolesClan?.map((role, index) => (
@@ -250,16 +245,12 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 										</View>
 									))}
 								</View>
-							</View>
+							</Block>
 						) : null}
 
 						{showAction && (
 							<UserSettingProfile
-								userProfile={userProfile}
-								currentChannel={currentChannel}
 								user={userById || (user as any)}
-								clan={currentClan}
-								isClanOwner={isClanOwner}
 							/>
 						)}
 					</View>

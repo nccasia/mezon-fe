@@ -1,27 +1,26 @@
 import { UserMinus } from '@mezon/mobile-components';
 import { Block, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, ClansEntity } from '@mezon/store-mobile';
-import { MezonInput } from 'apps/mobile/src/app/temp-ui';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from 'apps/mobile/src/app/temp-ui/MezonButton2';
+import { ChannelMembersEntity, selectCurrentClan } from '@mezon/store-mobile';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { useSelector } from 'react-redux';
+import { MezonInput } from '../../../../../../../../app/temp-ui';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../../app/temp-ui/MezonButton2';
 import { style } from './KickUserClanModal.style';
 
 const KickUserClanModal = ({
 	user,
-	clan,
 	onRemoveUserClan,
 }: {
 	user: ChannelMembersEntity;
-	clan: ClansEntity;
 	onRemoveUserClan: (value: string) => void;
 }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
 	const [reason, setReason] = useState<string>('');
-	const [isFocusInput, setIsFocusInput] = useState<boolean>(false);
+	const currentClan = useSelector(selectCurrentClan);
 
 	return (
 		<Block height={'100%'} overflow="hidden">
@@ -30,7 +29,7 @@ const KickUserClanModal = ({
 					<Block style={styles.userMinusIcon}>
 						<UserMinus width={60} height={60} />
 					</Block>
-					<Text style={styles.clanName}>{clan?.clan_name}</Text>
+					<Text style={styles.clanName}>{currentClan?.clan_name}</Text>
 					<Text style={styles.textError}>
 						{t('kickUserClanModal.kickFromServer', { userName: user?.user?.username || user?.['username'] })}
 					</Text>

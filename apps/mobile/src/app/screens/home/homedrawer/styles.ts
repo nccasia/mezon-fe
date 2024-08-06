@@ -10,14 +10,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-
-	wrapperChatBox: {
-		backgroundColor: colors.secondary,
-		borderTopWidth: 1,
-		borderTopColor: colors.border,
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-	},
 	btnIcon: {
 		width: size.s_40,
 		height: size.s_40,

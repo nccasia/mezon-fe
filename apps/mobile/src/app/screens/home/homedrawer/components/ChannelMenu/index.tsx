@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useReference } from '@mezon/core';
+import { useReference, useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
@@ -14,7 +14,6 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
-import { useUserPermission } from '../../../../../hooks/useUserPermission';
 import { style } from './styles';
 
 interface IChannelMenuProps {
@@ -31,7 +30,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);
@@ -114,13 +113,13 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				});
 			},
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
-			isShow: userPermissionsStatus['manage-channel'] || isClanOwner
+			isShow: isCanManageChannel
 		},
 		{
 			title: t('menu.organizationMenu.duplicateChannel'),
 			onPress: () => reserve(),
 			icon: <Icons.CopyIcon color={themeValue.textStrong} />,
-			isShow: userPermissionsStatus['manage-channel'] || isClanOwner
+			isShow: isCanManageChannel
 		},
 		{
 			title: t('menu.organizationMenu.deleteChannel'),
@@ -131,7 +130,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 			textStyle: {
 				color: Colors.textRed
 			},
-			isShow: userPermissionsStatus['manage-channel'] || isClanOwner
+			isShow: isCanManageChannel
 		},
 	];
 
@@ -148,7 +147,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 					},
 				});
 			},
-			isShow: userPermissionsStatus['manage-thread'] || isClanOwner
+			isShow: isCanManageThread
 		},
 		{
 			title: t('menu.manageThreadMenu.deleteThread'),
@@ -159,7 +158,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 			textStyle: {
 				color: Colors.textRed
 			},
-			isShow: userPermissionsStatus['manage-thread'] || isClanOwner
+			isShow: isCanManageThread
 		},
 	];
 

@@ -1,34 +1,34 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth } from '@mezon/core';
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { ClansEntity } from '@mezon/store-mobile';
+import { selectCurrentClan } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import { APP_SCREEN, AppStackScreenProps } from 'apps/mobile/src/app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonSwitch, reserve } from 'apps/mobile/src/app/temp-ui';
-import MezonButtonIcon from 'apps/mobile/src/app/temp-ui/MezonButtonIcon';
-import { MutableRefObject, useMemo, useState } from 'react';
+import { MutableRefObject, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonSwitch, reserve } from '../../../../../../../app/temp-ui';
 import DeleteClanModal from '../../../../../../components/DeleteClanModal';
+import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
+import MezonButtonIcon from '../../../../../../temp-ui/MezonButtonIcon';
 import ClanMenuInfo from '../ClanMenuInfo';
 import { style } from './styles';
 
 interface IServerMenuProps {
-	clan: ClansEntity;
 	inviteRef: MutableRefObject<any>;
 }
 
-export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
+export default function ClanMenu({ inviteRef }: IServerMenuProps) {
+	const currentClan = useSelector(selectCurrentClan);
 	const { t } = useTranslation(['clanMenu']);
 	const { themeValue } = useTheme();
 	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const styles = style(themeValue);
 
-	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const { dismiss } = useBottomSheetModal();
 
@@ -36,7 +36,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 		inviteRef?.current.present();
 		dismiss();
 	};
-	const isOwner = useMemo(() => user?.userId === clan?.creator_id, [user, clan]);
+	const { isClanOwner } = useUserPermission();
 
 	const handleOpenSettings = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
@@ -106,7 +106,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 		},
 		{
 			onPress: () => reserve(),
-			isShow: !isOwner,
+			isShow: !isClanOwner,
 			title: t('menu.optionsMenu.leaveServer'),
 			textStyle: { color: 'red' },
 		},
@@ -114,7 +114,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 			onPress: () => {
 				setIsVisibleDeleteModal(true);
 			},
-			isShow: isOwner,
+			isShow: isClanOwner,
 			title: t('menu.optionsMenu.deleteClan'),
 			textStyle: { color: 'red' },
 		},
@@ -123,7 +123,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 	const devMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => {
-				Clipboard.setString(clan?.clan_id);
+				Clipboard.setString(currentClan?.clan_id);
 				Toast.show({
 					type: 'info',
 					text1: t('menu.devMode.serverIDCopied'),
@@ -153,10 +153,10 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<MezonClanAvatar image={clan?.logo} alt={clan?.clan_name} />
+					<MezonClanAvatar image={currentClan?.logo} alt={currentClan?.clan_name} />
 				</View>
-				<Text style={styles.serverName}>{clan?.clan_name}</Text>
-				<ClanMenuInfo clan={clan} />
+				<Text style={styles.serverName}>{currentClan?.clan_name}</Text>
+				<ClanMenuInfo clan={currentClan} />
 
 				<ScrollView contentContainerStyle={styles.actionWrapper} horizontal>
 					<MezonButtonIcon
@@ -175,7 +175,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 						onPress={() => reserve()}
 					/>
 
-					{isOwner && (
+					{isClanOwner && (
 						<MezonButtonIcon
 							title={t('actions.settings')}
 							icon={<Icons.SettingsIcon color={themeValue.textStrong} />}

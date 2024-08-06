@@ -73,5 +73,6 @@
         "editRoles": "Edit Roles",
         "cancel": "Cancel"
     },
-    "newMessages": "NEW MESSAGES"
+    "newMessages": "NEW MESSAGES",
+    "noSendMessagePermission": "You don't have permission to send message"
 }

@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useCategory } from '@mezon/core';
+import { useCategory, useUserPermission } from '@mezon/core';
 import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -50,10 +50,10 @@ const ChannelList = React.memo((props: any) => {
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
-	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const { isCanManageEvent } = useUserPermission();
 
 	useEffect(() => {
 		try {
@@ -125,9 +125,9 @@ const ChannelList = React.memo((props: any) => {
 	const navigateToSearchPage = () => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
-      params: {
-        openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
-      }
+			params: {
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+			}
 		});
 	};
 	return (
@@ -184,7 +184,7 @@ const ChannelList = React.memo((props: any) => {
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
-				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
+				<ClanMenu inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
@@ -200,7 +200,7 @@ const ChannelList = React.memo((props: any) => {
 				ref={bottomSheetEventRef}
 				heightFitContent={allEventManagement?.length === 0}
 				headerRight={
-					currentClan?.creator_id === user?.userId && (
+					isCanManageEvent && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
 							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
 						</TouchableOpacity>
