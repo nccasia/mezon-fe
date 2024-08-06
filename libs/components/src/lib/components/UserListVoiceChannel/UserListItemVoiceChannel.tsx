@@ -32,7 +32,7 @@ function UserListItem({ user, channelID }: { user: IChannelMember; channelID: st
 			</div>
 			<div>
 				{member ? (
-					<NameComponent id="" name={member?.user?.username || ''} />
+					<NameComponent name={member?.user?.username || ''} />
 				) : (
 					<p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant} (guest)</p>
 				)}

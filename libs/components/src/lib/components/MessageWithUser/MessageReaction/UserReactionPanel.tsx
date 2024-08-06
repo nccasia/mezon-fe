@@ -1,11 +1,12 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberById } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import useShowName from '../useShowName';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
@@ -123,7 +124,6 @@ type SenderItemProps = {
 };
 
 const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId, removeEmojiSender, hideSenderOnPanel }) => {
-	const dispatch = useDispatch();
 	const handleRemoveEmojiSender = async (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
 		await removeEmojiSender(
@@ -136,15 +136,31 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
-	const user = useSelector(selectMemberByUserId(sender.sender_id));
+	const user = useSelector(selectMemberById(sender.sender_id));
+	const usernameSender = useMemo(() => {
+		return user?.user?.username;
+	}, [user?.user?.username]);
+	const clanNick = useMemo(() => {
+		return user?.clan_nick;
+	}, [user?.clan_nick]);
+	const displayName = useMemo(() => {
+		return user?.user?.display_name;
+	}, [user?.user?.display_name]);
+	const clanAvatar = useMemo(() => {
+		return user?.clan_avatar;
+	}, [user?.clan_avatar]);
+	const generalAvatar = useMemo(() => {
+		return user?.user?.avatar_url;
+	}, [user?.user?.avatar_url]);
+	const namePriority = useShowName(clanNick ?? '', displayName ?? '', usernameSender ?? '', sender.sender_id);
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
 			<div className="w-8 h-8">
-				<AvatarImage className="w-8 h-8" alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
+				<AvatarImage className="w-8 h-8" alt="user avatar" userName={user?.user?.username} src={clanAvatar ? clanAvatar : generalAvatar} />
 			</div>
 
-			<NameComponent id={sender.sender_id ?? ''} />
+			<NameComponent name={namePriority} />
 			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">

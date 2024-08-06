@@ -1,11 +1,10 @@
 import { referencesActions, selectIsUseProfileDM } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
-import { useMessageLine } from '../useMessageLine';
 import { useMessageParser } from '../useMessageParser';
 import useShowName from '../useShowName';
 type MessageReplyProps = {
@@ -25,6 +24,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageDisplayNameSenderRef,
 		messageIdRef,
 		hasAttachmentInMessageRef,
+		userClanAvatar,
 	} = useMessageParser(message);
 
 	const dispatch = useDispatch();
@@ -40,18 +40,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		[dispatch],
 	);
 
-	const { mentions } = useMessageLine(messageContentRef.t);
-	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
-
-	const [parentWidth, setParentWidth] = useState<number>();
-	const getWidthParent = useMemo(() => {
-		return markUpOnReplyParent.current?.getBoundingClientRect().width;
-	}, [isUseProfileDM, window.innerWidth, markUpOnReplyParent]);
-
-	useLayoutEffect(() => {
-		setParentWidth(getWidthParent);
-	}, [getWidthParent, isUseProfileDM]);
-
 	const nameShowed = useShowName(
 		messageClanNicknameSenderRef ?? '',
 		messageDisplayNameSenderRef ?? '',
@@ -60,12 +48,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	);
 
 	return (
-		<div className="overflow-hidden " ref={markUpOnReplyParent}>
+		<div className="overflow-hidden ">
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 				<Icons.ReplyCorner />
 				<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
 					<div className="w-5 h-5">
-						<AvatarImage className="w-5 h-5" alt="user avatar" userName={messageUsernameSenderRef} src={messageAvatarSenderRef} />
+						<AvatarImage
+							className="w-5 h-5"
+							alt="user avatar"
+							userName={messageUsernameSenderRef}
+							src={userClanAvatar ? userClanAvatar : messageAvatarSenderRef}
+						/>
 					</div>
 
 					<div className="gap-1 flex flex-row items-center w-full">
