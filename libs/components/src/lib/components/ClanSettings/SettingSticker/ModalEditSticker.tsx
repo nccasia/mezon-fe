@@ -1,7 +1,8 @@
 import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -81,16 +82,18 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 			return;
 		}
 		const category = 'Among Us';
-		const path = 'stickers/' + "Custom";
-		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, path).then(async (attachment: ApiMessageAttachment) => {
-			const request: ApiClanStickerAddRequest = {
-				category: category,
-				clan_id: currentClanId,
-				shortname: editingSticker.shortname,
-				source: attachment.url,
-			};
-			dispatch(createSticker({ request: request, clanId: currentClanId }));
-		});
+		const path = 'stickers/' + Snowflake.generate();
+		handleUploadEmoticon(client, session, path, file).then(
+			async (attachment: ApiMessageAttachment) => {
+				const request: ApiClanStickerAddRequest = {
+					category: category,
+					clan_id: currentClanId,
+					shortname: editingSticker.shortname,
+					source: attachment.url,
+				};
+				dispatch(createSticker({ request: request, clanId: currentClanId }));
+			},
+		);
 
 		handleCloseModal();
 	};
@@ -102,7 +105,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 		setOpenModal(false);
 	};
 	const validateSaveChange = useMemo(() => {
-		return editingSticker?.fileName && editingSticker.shortname && editingSticker.shortname !== editSticker?.shortname ? false : true
+		return editingSticker?.fileName && editingSticker.shortname && editingSticker.shortname !== editSticker?.shortname ? false : true;
 	}, [editingSticker?.fileName, editingSticker.shortname]);
 
 	return (
@@ -115,7 +118,11 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 					</div>
 					<div className={'flex flex-col select-none dark:text-textPrimary text-textPrimaryLight'}>
 						<p className="text-xs font-bold h-6 uppercase">PREVIEW</p>
-						<div className={'flex items-center justify-center rounded-lg border-[0.08px] dark:border-borderDivider border-borderLightTabs overflow-hidden'}>
+						<div
+							className={
+								'flex items-center justify-center rounded-lg border-[0.08px] dark:border-borderDivider border-borderLightTabs overflow-hidden'
+							}
+						>
 							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-bgPrimary'}>
 								{editingSticker.source ? (
 									<PreviewStickerBox preview={editingSticker.source} />
@@ -179,7 +186,12 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
 						onClick={handleCloseModal}
 					/>
-					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} disable={validateSaveChange} onClick={onSaveChange} />
+					<Button
+						label="Save Changes"
+						className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`}
+						disable={validateSaveChange}
+						onClick={onSaveChange}
+					/>
 				</div>
 			</div>
 

@@ -1,11 +1,12 @@
 import { createEmojiSetting, selectAllEmojiSuggestion, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
-import {EEmojiCategory, LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI} from '@mezon/utils';
+import { handleUploadEmoticon, useMezon } from '@mezon/transport';
+import { EEmojiCategory, LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingEmojiList from './SettingEmojiList';
+import { Snowflake } from '@theinternetfolks/snowflake';
 
 const SettingEmoji = () => {
 	const [openModal, setOpenModal] = useState(false);
@@ -14,7 +15,7 @@ const SettingEmoji = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
-	const emojiList = useSelector(selectAllEmojiSuggestion).filter(emoji => emoji.category === EEmojiCategory.CUSTOM);
+	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM);
 	const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) {
 			return;
@@ -35,20 +36,18 @@ const SettingEmoji = () => {
 			return;
 		}
 		const fileNameParts = file.name.split('.');
-		const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
+		const shortname = fileNameParts.slice(0, -1).join('.').slice(0, 62);
 		const category = 'Custom';
-		const path = 'emojis/' + category;
-		handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file, path).then(
-			async (attachment: ApiMessageAttachment) => {
-				const request: ApiClanEmojiCreateRequest = {
-					category: category,
-					clan_id: currentClanId,
-					shortname: ':' + fileName + ':',
-					source: attachment.url,
-				};
-				dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
-			},
-		);
+		const path = 'emojis/' + Snowflake.generate();
+		handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
+			const request: ApiClanEmojiCreateRequest = {
+				category: category,
+				clan_id: currentClanId,
+				shortname: ':' + shortname + ':',
+				source: attachment.url,
+			};
+			dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
+		});
 	};
 	return (
 		<>
