@@ -68,7 +68,7 @@ interface IChatInputProps {
 
 export const ChatBoxBottomBar = memo(
 	({
-		mode = 2,
+		mode = ChannelStreamMode.STREAM_MODE_CHANNEL,
 		channelId = '',
 		hiddenIcon,
 		messageActionNeedToResolve,
@@ -308,7 +308,7 @@ export const ChatBoxBottomBar = memo(
 					if (!client || !session || !currentChannel.channel_id) {
 						console.log('Client is not initialized');
 					}
-					handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
+					handleUploadFileMobile(client, session, currentChannel.clan_id, currentChannel.id, fileTxtSaved.name, fileTxtSaved)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
 							return 'handled';

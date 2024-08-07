@@ -15,13 +15,12 @@ import Gallery, { IFile } from './Gallery';
 import { style } from './styles';
 
 export type AttachmentPickerProps = {
-	mode?: number;
 	currentChannelId?: string;
 	currentClanId?: string;
 	onCancel?: () => void;
 };
 
-function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: AttachmentPickerProps) {
+function AttachmentPicker({ currentChannelId, currentClanId, onCancel }: AttachmentPickerProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
@@ -89,9 +88,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const ms = new Date().getTime();
-			const fullFilename = `${currentClanId}/${currentChannelId}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFileMobile(client, session, fullFilename, file);
+			return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {
