@@ -73,7 +73,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
-		thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
 		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
@@ -128,6 +127,7 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
+
 export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -138,6 +138,7 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
+
 export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: ChangeCurrentClanArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));

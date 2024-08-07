@@ -13,7 +13,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 				Customize your server with integrations. Manage webhooks, followed channels and apps, as well as Twitch and YouTube settings for
 				creators. <b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer">Learn more about managing integrations.</b>
 			</div>
-			<div className="border-b-[1px] border-[#616161] my-[32px]"></div>
+			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
 			<div
 				onClick={() => {
 					if (allWebhooks && allWebhooks?.length !== 0) {

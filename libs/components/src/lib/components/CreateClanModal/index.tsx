@@ -3,7 +3,7 @@ import { useAppNavigation, useClans } from '@mezon/core';
 import { checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
-import { ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
+import { DEBOUNCE_TYPING_TIME, LIMIT_SIZE_UPLOAD_IMG, ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -61,7 +61,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       return;
     }
     setCheckValidate(EValidateListMessage.INVALID_NAME);
-  }, 700);
+  }, DEBOUNCE_TYPING_TIME);
 
   const [openModalError, seOpenModalError] = useState<openModalErrorProps>({
     errorType: false,
@@ -82,7 +82,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       e.target.value = null;
       return;
     }
-    if (sizeImage > 1000000) {
+    if (sizeImage > LIMIT_SIZE_UPLOAD_IMG) {
       seOpenModalError((prev) => ({ ...prev, errorSize: true }));
       e.target.value = null;
       return;
@@ -95,14 +95,11 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 
 
   const handleCreateClan = () => {
-    // TODO: validate
-    if (nameClan) {
-      createClans(nameClan, urlImage).then((res) => {
-        if (res && res.clan_id) {
-          navigate(toClanPage(res.clan_id || ''));
-        }
-      });
-    }
+    createClans(nameClan, urlImage).then((res) => {
+      if (res && res.clan_id) {
+        navigate(toClanPage(res.clan_id || ''));
+      }
+    });
   };
   const handleClose = () => {
     onClose();

@@ -46,6 +46,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 
 	return memberList?.map((user) => ( 
 		<ItemMemberPermission 
+			key={user.id}	
 			id={user.id}
 			userName={user.username}
 			displayName={user.display_name}

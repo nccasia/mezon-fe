@@ -1,7 +1,8 @@
 import {
 	ChannelsEntity,
+	selectAllChannels,
 	selectChannelById,
-	selectCurrentChannelId,
+	selectCurrentChannel,
 	selectCurrentClanId,
 	selectMemberById,
 	selectTheme,
@@ -16,10 +17,10 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
+import { ChannelIsNotThread } from '@mezon/utils';
 
 interface IWebhookItemModalProps {
 	webhookItem: ApiWebhook;
-	parentChannelsInClan: ChannelsEntity[];
 }
 
 const convertDate = (isoDateString: string): string => {
@@ -32,7 +33,7 @@ const convertDate = (isoDateString: string): string => {
 	return date.toLocaleDateString('en-GB', options);
 };
 
-const WebhookItemModal = ({ parentChannelsInClan, webhookItem }: IWebhookItemModalProps) => {
+const WebhookItemModal = ({ webhookItem }: IWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberById(webhookItem.creator_id as string));
 	return (
@@ -57,14 +58,13 @@ const WebhookItemModal = ({ parentChannelsInClan, webhookItem }: IWebhookItemMod
 					</div>
 				</div>
 			</div>
-			{isExpand && <ExpendedWebhookModal parentChannelsInClan={parentChannelsInClan} webhookItem={webhookItem} />}
+			{isExpand && <ExpendedWebhookModal webhookItem={webhookItem} />}
 		</div>
 	);
 };
 
 interface IExpendedWebhookModal {
 	webhookItem: ApiWebhook;
-	parentChannelsInClan: ChannelsEntity[];
 }
 
 interface IDataForUpdate {
@@ -73,7 +73,7 @@ interface IDataForUpdate {
 	webhookAvatarUrl: string | undefined;
 }
 
-const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWebhookModal) => {
+const ExpendedWebhookModal = ({ webhookItem }: IExpendedWebhookModal) => {
 	const dispatch = useAppDispatch();
 	const [isShowPopup, setIsShowPopup] = useState(false);
 	const toggleShowPopup = () => {
@@ -84,7 +84,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 	};
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const avatarRef = useRef<HTMLInputElement>(null);
 
 	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
@@ -122,7 +122,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 			if (!client || !session) {
 				throw new Error('Client or file is not initialized');
 			}
-			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', e.target.files[0].name, e.target.files[0]).then(
+			handleUploadFile(client, session, currentClanId || '', currentChannel?.channel_id || '', e.target.files[0].name, e.target.files[0]).then(
 				(attachment: ApiMessageAttachment) => {
 					setDataForUpdate({
 						...dataForUpdate,
@@ -139,7 +139,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 			channel_id: dataForUpdate.channelIdForUpdate,
 			webhook_name: dataForUpdate.webhookNameInput,
 		};
-		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannelId || '' }));
+		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '' }));
 		setHasChange(false);
 	};
 
@@ -149,12 +149,13 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 			webhookAvatarUrl: webhookItem.avatar,
 			webhookNameInput: webhookItem.webhook_name,
 		});
+		setDropdownValue(webhookChannel.channel_label);
 		setHasChange(false);
 	};
 	return (
 		<>
 			<div className="pt-[20px] mt-[12px] border-t dark:border-[#3b3d44]">
-				<div className="flex">
+				<div className="flex gap-2">
 					<div className="w-3/12 dark:text-[#b5bac1] text-textLightTheme">
 						<input onChange={handleChooseFile} ref={avatarRef} type="file" hidden />
 						<div className="relative w-fit">
@@ -168,7 +169,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 								onClick={() => avatarRef.current?.click()}
 							/>
 						</div>
-						<div className="text-[10px] mt-[10px]">
+						<div className="text-[10px] mt-[10px] text-center">
 							Minimum Size: <b>128x128</b>
 						</div>
 					</div>
@@ -195,7 +196,6 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 									<b>CHANNEL</b>
 								</div>
 								<WebhookItemChannelDropdown
-									parentChannelsInClan={parentChannelsInClan}
 									webhookItem={webhookItem}
 									setDataForUpdate={setDataForUpdate}
 									hasChange={hasChange}
@@ -205,17 +205,33 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 								/>
 							</div>
 						</div>
-						<div className="border-t dark:border-[#3b3d44] my-[24px]" />
-						<div className="flex items-center gap-[20px]">
-							<div
-								onClick={() => handleCopyUrl(webhookItem.url as string)}
-								className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
-							>
-								Copy Webhook URL
+						<div className='max-sm:hidden block'>
+							<div className="border-t dark:border-[#3b3d44] my-[24px]" />
+							<div className="flex items-center gap-[20px]">
+								<div
+									onClick={() => handleCopyUrl(webhookItem.url as string)}
+									className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+								>
+									Copy Webhook URL
+								</div>
+								<div onClick={() => toggleShowPopup()} className="font-medium text-red-500 hover:underline cursor-pointer">
+									Delete Webhook
+								</div>
 							</div>
-							<div onClick={() => toggleShowPopup()} className="text-red-400 hover:underline cursor-pointer">
-								Delete Webhook
-							</div>
+						</div>
+					</div>
+				</div>
+				<div className='max-sm:block hidden'>
+					<div className="border-t dark:border-[#3b3d44] my-[24px]" />
+					<div className="flex items-center gap-[20px]">
+						<div
+							onClick={() => handleCopyUrl(webhookItem.url as string)}
+							className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+						>
+							Copy Webhook URL
+						</div>
+						<div onClick={() => toggleShowPopup()} className="font-medium text-red-500 hover:underline cursor-pointer">
+							Delete Webhook
 						</div>
 					</div>
 				</div>
@@ -227,7 +243,6 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 };
 
 interface IWebhookItemChannelDropdown {
-	parentChannelsInClan: ChannelsEntity[];
 	webhookItem: ApiWebhook;
 	dataForUpdate: IDataForUpdate;
 	setDataForUpdate: (dataForUpdate: IDataForUpdate) => void;
@@ -238,14 +253,20 @@ interface IWebhookItemChannelDropdown {
 
 const WebhookItemChannelDropdown = ({
 	webhookItem,
-	parentChannelsInClan,
 	setDataForUpdate,
 	hasChange,
 	dataForUpdate,
 	dropdownValue,
 	setDropdownValue,
 }: IWebhookItemChannelDropdown) => {
-	
+
+	const allChannel = useSelector(selectAllChannels);
+	const [parentChannelsInClan, setParentChannelsInClan] = useState<ChannelsEntity[]>([]);
+	useEffect(() => {
+		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
+		setParentChannelsInClan(normalChannels);
+	}, [allChannel]);
+
 	const appearanceTheme = useSelector(selectTheme);
 
 	useEffect(() => {
@@ -262,7 +283,7 @@ const WebhookItemChannelDropdown = ({
 			trigger="click"
 			renderTrigger={() => (
 				<div className="w-full h-[50px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
-					<p>{dropdownValue}</p>
+					<p className='truncate max-w-[90%]'>{dropdownValue}</p>
 					<div>
 						<Icons.ArrowDownFill />
 					</div>
@@ -270,7 +291,7 @@ const WebhookItemChannelDropdown = ({
 			)}
 			label=""
 			placement="bottom-end"
-			className={`dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === "light" ? "customSmallScrollLightMode" : "thread-scroll"} z-20`}
+			className={`dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 		>
 			{parentChannelsInClan.map((channel) => {
 				if (webhookItem.channel_id !== channel.channel_id) {

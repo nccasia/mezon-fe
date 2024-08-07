@@ -157,7 +157,7 @@ export const Sharing = ({ data, onClose }) => {
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
-			'DM',
+			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{

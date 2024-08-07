@@ -25,7 +25,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
@@ -79,7 +79,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const isShow = hasAdminPermission || isClanCreator || hasClanPermission;
+	const isShow = hasAdminPermission || isClanOwner || hasClanPermission;
 
 	return (
 		<>

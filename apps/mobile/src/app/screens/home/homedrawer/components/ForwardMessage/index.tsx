@@ -1,27 +1,28 @@
-import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
-import { CheckIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
-import { getSelectedMessage, selectDirectsOpenlist } from '@mezon/store-mobile';
-import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
+import { useChannels, useSendForwardMessage } from '@mezon/core';
+import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
+import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
+import { MezonInput } from 'apps/mobile/src/app/temp-ui';
+import { normalizeString } from 'apps/mobile/src/app/utils/helpers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { default as CheckBox } from 'react-native-bouncy-checkbox';
-import { TextInput } from 'react-native-gesture-handler';
+import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import UseMentionList from '../../../../../../app/hooks/useUserMentionList';
-import MessageItem from '../../MessageItem';
 import { styles } from './styles';
 
-type OpjectSend = {
-	id: string;
+interface IForwardIObject {
+	channelId: string;
 	type: number;
 	clanId?: string;
-	channel_label?: string;
-};
+	name?: string;
+	avatar?: string;
+}
 
 interface ForwardMessageModalProps {
 	show?: boolean;
@@ -29,92 +30,77 @@ interface ForwardMessageModalProps {
 	message: IMessageWithUser;
 }
 
-const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProps) => {
+const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProps) => {
 	const [searchText, setSearchText] = useState('');
-	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
+	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
+
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { listChannels } = useChannels();
-	const { userProfile } = useAuth();
+
 	const { sendForwardMessage } = useSendForwardMessage();
-	const selectedMessage = useSelector(getSelectedMessage);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
-	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
-	const accountId = userProfile?.user?.id ?? '';
 	const { t } = useTranslation('message');
-	const listMentions = UseMentionList(message?.channel_id || '');
+	const { themeValue } = useTheme();
 
-	const listMemSearch = useMemo(() => {
-		const listDMSearch = listDM?.length
-			? listDM.map((itemDM: any) => {
-					return {
-						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
-						idDM: itemDM?.id ?? '',
-						typeChat: 3,
-					};
-				})
-			: [];
-		const listGroupSearch = listGroup?.length
-			? listGroup.map((itemGr: any) => {
-					return {
-						id: itemGr?.channel_id ?? '',
-						name: itemGr?.channel_label ?? '',
-						avatarUser: 'assets/images/avatar-group.png' ?? '',
-						idDM: itemGr?.id ?? '',
-						typeChat: 2,
-					};
-				})
-			: [];
-
-		const listSearch = [...listDMSearch, ...listGroupSearch];
-
-		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
-	}, [accountId, listDM, listGroup]);
-
-	const listChannelSearch = useMemo(() => {
-		const list = listChannels.map((item) => {
-			return {
-				id: item?.id ?? '',
-				name: item?.channel_label ?? '',
-				subText: item?.category_name ?? '',
-				icon: '#',
-				type: item?.type ?? '',
-				clanId: item?.clan_id ?? '',
-				channel_label: item?.channel_label ?? '',
-			};
-		});
-		return list;
-	}, [listChannels]);
-
-	const handleToggle = (id: string, type: number, clanId?: string, channel_label?: string) => {
-		const existingIndex = selectedObjectIdSends.findIndex((item) => item.id === id && item.type === type);
-		if (existingIndex !== -1) {
-			setSelectedObjectIdSends((prevItems) => [...prevItems.slice(0, existingIndex), ...prevItems.slice(existingIndex + 1)]);
-		} else {
-			setSelectedObjectIdSends((prevItems) => [...prevItems, { id, type, clanId, channel_label }]);
+	const mapDirectMessageToForwardObject = (dm: DirectEntity): IForwardIObject => {
+		return {
+			channelId: dm?.id,
+			type: dm?.type,
+			avatar: dm?.type === ChannelType.CHANNEL_TYPE_DM ? dm?.channel_avatar?.[0] : 'assets/images/avatar-group.png',
+			name: dm?.channel_label,
+			clanId: ''
 		}
-	};
+	}
 
-	const isChecked = (id: string, type: number) => {
-		const existingIndex = selectedObjectIdSends.findIndex((item) => item.id === id && item.type === type);
+	const mapChannelToForwardObject = (channel: ChannelThreads): IForwardIObject => {
+		return {
+			channelId: channel?.id,
+			type: channel?.type,
+			avatar: '#',
+			name: channel?.channel_label,
+			clanId: channel?.clan_id
+		}
+	}
+
+	const allForwardObject = useMemo(() => {
+		const listDMForward = dmGroupChatList?.filter(dm => dm?.type === ChannelType.CHANNEL_TYPE_DM && dm?.channel_label)
+			.map(mapDirectMessageToForwardObject);
+
+		const listGroupForward = dmGroupChatList?.filter(groupChat => groupChat?.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat?.channel_label)
+			.map(mapDirectMessageToForwardObject);
+
+		const listTextChannel = listChannels?.filter(channel => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
+			.map(mapChannelToForwardObject);
+
+		return [...listDMForward, ...listGroupForward, ...listTextChannel]
+	}, [dmGroupChatList, listChannels])
+
+	const filteredForwardObjects = useMemo(() => {
+		return allForwardObject.filter(ob => normalizeString(ob?.name).includes(normalizeString(searchText)));
+	}, [searchText, allForwardObject])
+
+	const isChecked = (forwardObject: IForwardIObject) => {
+		const { channelId, type } = forwardObject;
+		const existingIndex = selectedForwardObjects.findIndex((item) => item.channelId === channelId && item.type === type);
 		return existingIndex !== -1;
 	};
 
 	const sentToMessage = async () => {
+		if (!selectedForwardObjects.length) return;
 		try {
-			for (const selectedObjectIdSend of selectedObjectIdSends) {
-				if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
-				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
-				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-					sendForwardMessage(
-						selectedObjectIdSend.clanId || '',
-						selectedObjectIdSend.id,
-						ChannelStreamMode.STREAM_MODE_CHANNEL,
-						selectedMessage,
-					);
+			for (const selectedObjectSend of selectedForwardObjects) {
+				const { type, channelId, clanId = '' } = selectedObjectSend;
+				switch (type) {
+					case ChannelType.CHANNEL_TYPE_DM:
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+						break;
+					case ChannelType.CHANNEL_TYPE_GROUP:
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+						break;
+					case ChannelType.CHANNEL_TYPE_TEXT:
+						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+						break;
+					default:
+						break;
 				}
 			}
 			Toast.show({
@@ -127,136 +113,124 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		} catch (error) {
 			console.log('Tom log  => error', error);
 		}
-
 		onClose && onClose();
 	};
 
-	const renderMember = () => {
-		return listMemSearch
-			.filter((item: any) => item.name?.toLowerCase()?.indexOf(searchText?.toLowerCase().substring(1)) > -1)
-			.slice(0, 25)
-			.map((item: any, index: number) => {
+	const onSelectChange = (value: boolean, item: IForwardIObject) => {
+		if (value) {
+			setSelectedForwardObjects(prevValue => [...prevValue, item])
+			return;
+		}
+		const newValue = selectedForwardObjects.filter(ob => ob.channelId !== item.channelId)
+		setSelectedForwardObjects(newValue);
+	}
+
+	const renderAvatar = (item: IForwardIObject) => {
+		const { type } = item;
+		switch (type) {
+			case ChannelType.CHANNEL_TYPE_DM:
+				if (item?.avatar) {
+					return (
+						<Image source={{ uri: item?.avatar || '' }} style={styles.memberAvatar} />
+					)
+				}
 				return (
-					<View style={styles.item} key={index.toString()}>
-						<View style={styles.memberContent} key={index.toString()}>
-							{item?.typeChat === 2 ? (
-								<View style={styles.groupAvatar}>
-									<UserGroupIcon />
-								</View>
-							) : (
-								<Image source={{ uri: item.avatarUser }} style={styles.memberAvatar} />
-							)}
-							<Text style={styles.memberName} numberOfLines={1}>
-								{item.name}
-							</Text>
-						</View>
-
-						<View>
-							<CheckBox
-								isChecked={isChecked(item.idDM, item.typeChat || 0)}
-								size={24}
-								fillColor={Colors.textViolet}
-								unFillColor={Colors.bgGrayLight}
-								innerIconStyle={{ borderWidth: 2 }}
-								onPress={() => {
-									handleToggle(item.idDM, item.typeChat || 0);
-								}}
-							/>
-						</View>
-					</View>
-				);
-			});
-	};
-
-	const renderChannel = () => {
-		return listChannelSearch
-			.filter((item) => item.name?.toLowerCase().indexOf(searchText?.toLowerCase()?.substring(1)) > -1)
-			.slice(0, 25)
-			.map((channel: any, index: number) => {
+					<Block height={size.s_34} width={size.s_34} justifyContent='center' borderRadius={50} backgroundColor={themeValue.colorAvatarDefault}>
+						<Text center>{item?.name?.charAt(0)?.toUpperCase()}</Text>
+					</Block>
+				)
+			case ChannelType.CHANNEL_TYPE_GROUP:
 				return (
-					<View style={styles.item} key={index.toString()}>
-						<View style={styles.channelItem}>
-							{channel.channel_private === ChannelStatusEnum.isPrivate ? (
-								<HashSignLockIcon height={24} width={24} />
-							) : (
-								<HashSignIcon height={24} width={24} />
-							)}
-							<Text style={styles.channelName}>{channel.name}</Text>
-						</View>
-
-						<View>
-							<CheckBox
-								isChecked={isChecked(channel.id, channel.type || 0)}
-								size={24}
-								fillColor={Colors.textViolet}
-								unFillColor={Colors.bgGrayLight}
-								innerIconStyle={{ borderWidth: 2 }}
-								onPress={() => {
-									handleToggle(channel.id, channel.type || 0, channel.clanId, channel.channel_label || '');
-								}}
-							/>
-						</View>
+					<View style={styles.groupAvatar}>
+						<UserGroupIcon />
 					</View>
-				);
-			});
-	};
+				)
+			case ChannelType.CHANNEL_TYPE_TEXT:
+				return (
+					<Block width={size.s_34} height={size.s_34}>
+						<Text center h2 color={themeValue.white}>#</Text>
+					</Block>
+				)
+			default:
+				break;
+		}
+	}
+
+	const renderForwardObject = ({ item }: { item: IForwardIObject }) => {
+		return (
+			<TouchableOpacity onPress={() => onSelectChange(!isChecked(item), item)}>
+				<Block flexDirection='row' padding={size.s_10} gap={size.s_6} justifyContent='center'>
+					<Block>
+						{renderAvatar(item)}
+					</Block>
+					<Block flex={1} justifyContent='center'>
+						<Text color={themeValue.textStrong} numberOfLines={1}>{item.name}</Text>
+					</Block>
+					<Block justifyContent='center'>
+						<BouncyCheckbox
+							size={20}
+							isChecked={isChecked(item)}
+							onPress={(value) => onSelectChange(value, item)}
+							fillColor={Colors.bgButton}
+							iconStyle={{ borderRadius: 5 }}
+							innerIconStyle={{
+								borderWidth: 1.5,
+								borderColor: isChecked ? Colors.bgButton : Colors.white,
+								borderRadius: 5,
+								opacity: 1,
+							}}
+							textStyle={{ fontFamily: 'JosefinSans-Regular' }}
+						/>
+					</Block>
+				</Block>
+			</TouchableOpacity>
+		)
+	}
+
+	const count = useMemo(() => {
+		if (selectedForwardObjects.length) return ` (${selectedForwardObjects.length})`
+	}, [selectedForwardObjects])
 
 	return (
 		<Modal
 			isVisible={show}
-			animationIn={'fadeIn'}
-			hasBackdrop={true}
-			coverScreen={true}
-			avoidKeyboard={false}
-			onBackdropPress={onClose}
-			onSwipeComplete={onClose}
-			backdropColor={'rgba(0,0,0, 0.7)'}
+			hasBackdrop={false}
+			style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}
 		>
-			<View style={styles.sheetContainer}>
-				<View style={styles.headerModal}>
-					<Text style={styles.headerText}>Forward Message</Text>
-					<View style={{ width: 16 }}></View>
-				</View>
+			<Block flex={1}>
+				<Block flexDirection='row' justifyContent='center' marginBottom={size.s_18}>
+					<Block position='absolute' left={0}>
+						<TouchableOpacity onPress={() => onClose()}>
+							<Icons.CloseLargeIcon color={themeValue.textStrong} />
+						</TouchableOpacity>
+					</Block>
+					<Text h3 color={themeValue.white}>{'Forward To'}</Text>
+				</Block>
 
-				<View style={styles.searchWrapper}>
-					<View style={styles.inputWrapper}>
-						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" />
-					</View>
-				</View>
+				<MezonInput
+					placeHolder={'Search'}
+					onTextChange={setSearchText}
+					value={searchText}
+					prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+					inputWrapperStyle={{ backgroundColor: themeValue.primary }}
+				/>
 
-				<ScrollView>
-					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
-						<>
-							{renderMember()}
-							{renderChannel()}
-						</>
-					) : (
-						<>
-							{searchText.startsWith('@') && (
-								<>
-									<Text style={styles.typeSearch}>Search friend and users</Text>
-									{renderMember()}
-								</>
-							)}
+				<Block flex={1}>
+					<FlatList
+						keyboardShouldPersistTaps="handled"
+						data={filteredForwardObjects}
+						ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
+						keyExtractor={(item) => item?.channelId?.toString()}
+						renderItem={renderForwardObject}
+					/>
+				</Block>
 
-							{searchText.startsWith('#') && (
-								<>
-									<Text style={styles.typeSearch}>Searching channel</Text>
-									{renderChannel()}
-								</>
-							)}
-						</>
-					)}
-				</ScrollView>
-				<View style={styles.messageWrapper}>
-					<ScrollView>
-						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
-					</ScrollView>
-				</View>
-				<TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>
-					<Text style={styles.btnText}>Send</Text>
-				</TouchableOpacity>
-			</View>
+				<Block paddingTop={size.s_10}>
+					<TouchableOpacity style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} onPress={() => sentToMessage()}>
+						<Text style={styles.btnText}>{'Send'}{count}</Text>
+					</TouchableOpacity>
+				</Block>
+			</Block>
 		</Modal>
 	);
 };

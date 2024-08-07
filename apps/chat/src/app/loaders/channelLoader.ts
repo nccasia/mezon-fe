@@ -1,4 +1,3 @@
-import { setJumpToMessageId } from '@mezon/core';
 import { channelsActions, messagesActions } from '@mezon/store';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
@@ -12,10 +11,8 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	}
 
 	if (messageId) {
-		setJumpToMessageId(messageId);
 		dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	}
-
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	return null;
 };

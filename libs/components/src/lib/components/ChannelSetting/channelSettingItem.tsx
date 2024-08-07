@@ -49,7 +49,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				<ChannelSettingItemButton tabName={EChannelSettingTab.CATEGORY} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
 				<ChannelSettingItemButton tabName={EChannelSettingTab.PREMISSIONS} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
 				<ChannelSettingItemButton tabName={EChannelSettingTab.INVITES} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
-				<ChannelSettingItemButton tabName={EChannelSettingTab.INTERGRATIONS} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
+				<ChannelSettingItemButton tabName={EChannelSettingTab.INTEGRATIONS} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
 				<hr className="border-t border-solid dark:border-borderDefault my-4" />
 				<button
 					className={`p-2 dark:text-red-600 text-red-600 text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgLightModeButton  ' : ''} w-[170px] text-left rounded-[5px]`}

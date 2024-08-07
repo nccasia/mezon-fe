@@ -6,5 +6,8 @@
   "byCreatingClan":"Bằng cách tạo clan, bạn đồng ý với Mezon",
   "upload": "TẢI LÊN",
   "addClan": "Tạo clan",
-  "errorMessage": "Vui lòng nhập tên ban hội hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
+  "errorMessage": "Vui lòng nhập tên ban hội hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -).",
+  "duplicateNameMessage" : "Tên Clan đã tồn tại. Vui lòng chọn tên khác.",
+  "commutityGuide" : "Quy tắc cộng đồng."
+
 }

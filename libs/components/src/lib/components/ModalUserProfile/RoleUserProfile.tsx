@@ -29,7 +29,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
-	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
 		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
 		return !isRoleInUserRoles;
@@ -84,7 +84,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
 						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-							{ isClanCreator || (hasAdminPermission && !checkAdminPermission(role, userProfile?.user?.id || '')) ? 
+							{ isClanOwner || (hasAdminPermission && !checkAdminPermission(role, userProfile?.user?.id || '')) ? 
 							<Tooltip
 								content="Remove role"
 								trigger="hover"
@@ -102,7 +102,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						</span>
 					</span>
 				)}
-				<UserRestrictionZone policy={isClanCreator || hasAdminPermission}>
+				<UserRestrictionZone policy={isClanOwner || hasAdminPermission}>
 					<div className="relative" onClick={handModalAddRole}>
 						<Tooltip
 							content="Add roles"

@@ -159,13 +159,13 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
     }
   }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
   
-  const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+  const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
   const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
   const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
   const [hasManageChannelPermission] = useClanRestriction([EPermission.manageThread]);
 
-  const isShowManageChannel = isClanCreator || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
-  const isShowManageThread = isClanCreator || hasAdminPermission || hasThreadPermission;
+  const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
+  const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
 
   return (
 		<div

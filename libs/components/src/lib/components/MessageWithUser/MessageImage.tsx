@@ -1,10 +1,10 @@
-import { useAttachments } from '@mezon/core';
-import { attachmentActions } from '@mezon/store';
-import { notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
+import { useAppParams, useAttachments } from '@mezon/core';
+import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { memo, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
 export type MessageImage = {
@@ -14,20 +14,31 @@ export type MessageImage = {
 	messageId?: string;
 };
 
-function MessageImage({ attachmentData, onContextMenu, mode, messageId }: MessageImage) {
-	const dispatch = useDispatch();
+const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
+	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const { setImageURL, setPositionShow } = useMessageContextMenu();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const { directId: currentDmGroupId } = useAppParams();
 
 	const handleClick = (url: string) => {
-		if (!isDimensionsValid && !checkImage) {
-			setOpenModalAttachment(true);
-			setAttachment(url);
-			dispatch(attachmentActions.setMode(mode));
-			dispatch(attachmentActions.setMessageId(messageId));
+		if (isDimensionsValid || checkImage) return;
+
+		dispatch(attachmentActions.setMode(mode));
+		setOpenModalAttachment(true);
+		setAttachment(url);
+
+		// if there is currentDmGroupId is fetch for DM
+		if ((currentClanId && currentChannelId) || currentDmGroupId) {
+			const clanId = currentDmGroupId ? '0' : (currentClanId as string);
+			const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+			dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 		}
+
+		dispatch(attachmentActions.setMessageId(messageId));
 	};
 	const imgStyle = {
 		width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
@@ -40,13 +51,16 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		setImageError(true);
 	};
 
-	const handleContextMenu = useCallback((e: any) => {
-		setImageURL(attachmentData?.url ?? '');
-		setPositionShow(SHOW_POSITION.NONE);
-		if (typeof onContextMenu === 'function') {
-			onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
-		}
-	}, [attachmentData?.url, onContextMenu, setImageURL, setPositionShow]);
+	const handleContextMenu = useCallback(
+		(e: any) => {
+			setImageURL(attachmentData?.url ?? '');
+			setPositionShow(SHOW_POSITION.NONE);
+			if (typeof onContextMenu === 'function') {
+				onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
+			}
+		},
+		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow],
+	);
 
 	if (imageError || !attachmentData.url) {
 		return null;
@@ -69,6 +83,6 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 			) : null}
 		</div>
 	);
-}
+});
 
 export default MessageImage;

@@ -1,6 +1,6 @@
-import { selectCloseMenu } from '@mezon/store';
+import { fetchWebhooksByChannelId, selectCloseMenu, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import SettingCategoryChannel from './Component/CategoryChannel';
@@ -19,7 +19,7 @@ export enum EChannelSettingTab {
 	OVERVIEW = "Overview",
 	PREMISSIONS = "Permissions",
 	INVITES = "Invites",
-	INTERGRATIONS = "Integrations",
+	INTEGRATIONS = "Integrations",
 	CATEGORY = "Category"
 }
 const SettingChannel = (props: ModalSettingProps) => {
@@ -33,6 +33,11 @@ const SettingChannel = (props: ModalSettingProps) => {
 			setMenu(false);
 		}
 	};
+
+	const dispatch = useAppDispatch();
+	useEffect(()=>{
+		dispatch(fetchWebhooksByChannelId({channelId: channel.channel_id as string}));
+	}, [channel.channel_id, dispatch])
 
 	const closeMenu = useSelector(selectCloseMenu);
 
@@ -65,7 +70,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 				{currentSetting === EChannelSettingTab.OVERVIEW && <OverviewChannel channel={channel} />}
 				{currentSetting === EChannelSettingTab.PREMISSIONS && <PermissionsChannel channel={channel} />}
 				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
-				{currentSetting === EChannelSettingTab.INTERGRATIONS && <IntegrationsChannel />}
+				{currentSetting === EChannelSettingTab.INTEGRATIONS && <IntegrationsChannel currentChannel={channel}/>}
 				{currentSetting === EChannelSettingTab.CATEGORY && <SettingCategoryChannel channel={channel} />}
 
 				<ExitSetting onClose={onClose} />

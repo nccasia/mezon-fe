@@ -1,12 +1,19 @@
 import { INotification, LoadingStatus, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import memoizee from 'memoizee';
 import { Notification } from 'mezon-js';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
+const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
 
 export const mapNotificationToEntity = (notifyRes: Notification): INotification => {
 	return { ...notifyRes, id: notifyRes.id || '', content: notifyRes.content ? { ...notifyRes.content, create_time: notifyRes.create_time } : null };
 };
+
+export interface FetchNotificationArgs {
+	clanId: string;
+	noCache?: boolean;
+}
 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
@@ -32,15 +39,32 @@ export type LastSeenTimeStampChannelArgs = {
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
-export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (clanId: string, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listNotifications(mezon.session, clanId, 50);
-	if (!response.notifications) {
-		return [];
-	}
-	const notifications = response.notifications.map(mapNotificationToEntity);
-	return notifications;
-});
+const fetchListNotificationCached = memoizee(
+	(mezon: MezonValueContext, clanId: string) => mezon.client.listNotifications(mezon.session, clanId, 50),
+	{
+		promise: true,
+		maxAge: LIST_STICKER_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[0].session.username;
+		},
+	},
+);
+
+export const fetchListNotification = createAsyncThunk(
+	'notification/fetchListNotification',
+	async ({ clanId, noCache }: FetchNotificationArgs, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchListNotificationCached.clear(mezon, clanId);
+		}
+		const response = await fetchListNotificationCached(mezon, clanId);
+		if (!response.notifications) {
+			return [];
+		}
+		const notifications = response.notifications.map(mapNotificationToEntity);
+		return notifications;
+	},
+);
 
 export const deleteNotify = createAsyncThunk('notification/deleteNotify', async ({ ids, clanId }: { ids: string[]; clanId: string }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -48,7 +72,7 @@ export const deleteNotify = createAsyncThunk('notification/deleteNotify', async 
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	thunkAPI.dispatch(notificationActions.fetchListNotification(clanId));
+	thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId, noCache: true }));
 	return response;
 });
 

@@ -27,7 +27,6 @@ export async function handleUploadFile(
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
-		console.log("err", filename);
 		try {
 			let fileType = file.type;
 			if (!fileType) {
@@ -46,8 +45,6 @@ export async function handleUploadFile(
 			if (path) {
 				fullfilename = (path + '/') + fullfilename;
 			}
-
-			console.log("fullfilename", fullfilename, fileType);
 
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
@@ -73,7 +70,6 @@ export async function handleUploadFile(
 				height: 0,
 			});
 		} catch (error) {
-			console.log("err", error);
 			reject(new Error(`${error}`));
 		}
 	});

@@ -101,6 +101,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					channelId: channel.id,
 					channelType: channel.type,
 					userIds: selectedUserIds,
+					clanId: currentClanId || "",
 				};
 				await dispatch(channelUsersActions.addChannelUsers(body));
 			}

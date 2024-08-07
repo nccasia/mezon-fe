@@ -14,9 +14,9 @@ type PanelEventItemProps = {
 function PanelEventItem(props: PanelEventItemProps) {
 	const { coords, checkUserCreate, onHandle, setOpenModalDelEvent, onClose } = props;
 
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.manageClan]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.manageClan]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const isShow = checkUserCreate || hasAdminPermission || isClanCreator || hasClanPermission;
+	const isShow = checkUserCreate || hasAdminPermission || isClanOwner || hasClanPermission;
 
 
 	const handleDeleteEvent = async () => {

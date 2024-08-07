@@ -93,6 +93,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);
+	const backgroundColor = React.useRef(new Animated.Value(0)).current;
+
 	const checkMessageTargetToMoved = useMemo(() => {
 		return idMessageToJump === message?.id;
 	}, [idMessageToJump, message?.id]);
@@ -104,6 +106,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
+
+	const messageAvatar = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return message?.clan_avatar || message?.avatar;
+		}
+		return message?.avatar;
+	}, [message?.clan_avatar, message?.avatar, mode]);
 
 	useEffect(() => {
 		if (props?.messageId) {
@@ -165,7 +174,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
-
+		// TODO: do we need to jump to message here?
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
 		store.dispatch(
 			channelsActions.joinChannel({
@@ -208,12 +217,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		if (isDM) {
 			return message?.display_name || message?.username || '';
 		}
-		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+		return message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
 
 	const usernameMessage = useMemo(() => {
-		return isDM ? message?.display_name || message?.user?.username : message?.user?.username
-	}, [isDM, isDM, message?.display_name, message?.user?.username]);
+		return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
+	}, [isDM, message?.display_name, message?.user?.username]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
@@ -247,14 +256,35 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
 
+	const handlePressIn = () => {
+		Animated.timing(backgroundColor, {
+			toValue: 1,
+			duration: 500,
+			useNativeDriver: false,
+		}).start();
+	};
+
+	const handlePressOut = () => {
+		Animated.timing(backgroundColor, {
+			toValue: 0,
+			duration: 500,
+			useNativeDriver: false,
+		}).start();
+	};
+
+	const bgColor = backgroundColor.interpolate({
+		inputRange: [0, 1],
+		outputRange: ['transparent', themeValue.secondaryWeight],
+	});
+
 	return (
-		<View>
+		<Animated.View style={[{ backgroundColor: bgColor }]}>
 			{/* <Swipeable
 			renderRightActions={renderRightActions}
 			ref={swipeableRef}
 			overshootRight={false}
 			onSwipeableOpen={handleSwipeableOpen}
-			hitSlop={{ left: -10 }}
+			hitSlop={{ left: -10 }
 		> */}
 			<View
 				style={[
@@ -288,13 +318,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<AvatarMessage
 						onPress={onPressAvatar}
 						id={message?.user?.id}
-						avatar={message?.avatar}
+						avatar={messageAvatar}
 						username={usernameMessage}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable
 						style={[styles.rowMessageBox]}
 						delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+						onPressIn={handlePressIn}
+						onPressOut={handlePressOut}
 						onLongPress={() => {
 							if (preventAction) return;
 							setIsOnlyEmojiPicker(false);
@@ -347,7 +379,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			</View>
 			{/* </Swipeable> */}
 			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} />
-		</View>
+		</Animated.View>
 	);
 });
 

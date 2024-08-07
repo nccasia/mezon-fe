@@ -7,7 +7,7 @@ import {
 	setAddMemberRoles,
 	setNameRoleNew,
 	setSelectedPermissions,
-	setSelectedRoleId,
+	setSelectedRoleId
 } from '@mezon/store';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ const SettingListRole = (props: closeEditRole) => {
 
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
-		handleUpdateUser();
+		if(isNewRole) handleUpdateUser();
 		if (!isChange || isNewRole) {
 			const activeRole = RolesClan.find((role) => role.id === roleId);
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
@@ -50,11 +50,16 @@ const SettingListRole = (props: closeEditRole) => {
 	const containerRef = useRef<HTMLDivElement>(null);
     const newRoleRef = useRef<HTMLDivElement>(null);
 
+	useEffect(() => {
+		setClickedRole(clickRole);
+	}, [clickRole])
+
     useEffect(() => {
         if (isNewRole && newRoleRef.current) {
+			dispatch(setSelectedPermissions([]));
             newRoleRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
         }
-    }, [clickedRole, isNewRole]);
+    }, [clickedRole, dispatch, isNewRole]);
 	
 	return (
 		<div className="w-1/3 pr-3 flex flex-col mb-20">

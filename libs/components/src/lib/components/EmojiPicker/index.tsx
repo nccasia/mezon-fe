@@ -330,9 +330,9 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
 	const appearanceTheme = useSelector(selectTheme);
-	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
+	const hasClanManagementPermission = hasAdminPermission || isClanOwner || hasClanPermission;
 	const isShowAddButton = useMemo(() => {
 		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
 	}, [hasClanManagementPermission, categoryName, showAddButton]);
@@ -345,7 +345,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
@@ -354,7 +354,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 			))}
 			{isShowAddButton && (
 				<button
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
 					onMouseEnter={() =>
 						onEmojiHover({
 							shortname: 'Upload a custom emoji',

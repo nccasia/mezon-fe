@@ -3,7 +3,7 @@ import React from 'react';
 import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 interface ChannelTypeProps {
-	type: number;
+	type: ChannelType;
 	onChange: (value: number) => void;
 	error?: string;
 	disable?: boolean;
@@ -17,6 +17,7 @@ const iconMap = {
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
 };
 
 const labelMap = {
@@ -24,6 +25,7 @@ const labelMap = {
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
+	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: '',
@@ -34,6 +36,7 @@ const descriptionMap = {
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the clan',
+	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: '',
@@ -49,13 +52,13 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
 			htmlFor={type.toString()}
 		>
-			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelType]}</div>
+			<div className="ChannelChat w-6 h-6 relative">{iconMap[type]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
 				<div className="Text self-stretch text-stone-300 text-sm font-bold leading-normal text-[10px]">
-					<p className="dark:text-white text-black">{labelMap[type as ChannelType]}</p>
+					<p className="dark:text-white text-black">{labelMap[type]}</p>
 				</div>
 				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal leading-[18.20px] text-[10px] w-widthChannelTypeText">
-					<p className="one-line dark:text-white text-black">{descriptionMap[type as ChannelType]}</p>
+					<p className="one-line dark:text-white text-black">{descriptionMap[type]}</p>
 				</div>
 			</div>
 			<div className={`RadioButton p-0.5 justify-start items-start flex `}>

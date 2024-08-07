@@ -71,7 +71,7 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 
 	useOnClickOutside(userProfileRef, () => onClose?.());
 	return (
-		<div className="w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+		<div className="w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black">
 			<div
 				ref={userProfileRef}
 				className="w-[600px] h-[90vh] dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start items-start inline-flex"

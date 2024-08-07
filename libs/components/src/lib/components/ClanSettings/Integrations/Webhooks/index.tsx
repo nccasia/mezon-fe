@@ -1,14 +1,17 @@
-import { ChannelsEntity, generateWebhook, useAppDispatch } from '@mezon/store';
+import { useAuth, useClanOwner } from '@mezon/core';
+import { generateWebhook, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
+import { useSelector } from 'react-redux';
 import WebhookItemModal from './WebhookItemModal';
+import { IChannel } from '@mezon/utils';
 
 interface IWebhooksProps {
 	allWebhooks?: ApiWebhook[] | undefined;
-	parentChannelsInClan: ChannelsEntity[];
+	currentChannel?: IChannel;
 }
 
-const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
+const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 	const dispatch = useAppDispatch();
 	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight'];
 	const getRandomWebhookName = (): string => {
@@ -30,11 +33,11 @@ const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
 
 	const handleAddWebhook = () => {
 		const newWebhookReq: ApiWebhookCreateRequest = {
-			channel_id: parentChannelsInClan[0].channel_id,
+			channel_id: currentChannel?.channel_id as string,
 			webhook_name: getRandomWebhookName(),
 			avatar: getRandomAvatar(),
 		};
-		dispatch(generateWebhook({ request: newWebhookReq, channelId: parentChannelsInClan[0].channel_id as string }));
+		dispatch(generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string }));
 	};
 
 	return (
@@ -55,7 +58,7 @@ const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
 					</div>
 					{allWebhooks &&
 						allWebhooks.map((webhook) => (
-							<WebhookItemModal parentChannelsInClan={parentChannelsInClan} webhookItem={webhook} key={webhook.id} />
+							<WebhookItemModal webhookItem={webhook} key={webhook.id} />
 						))}
 				</>
 			) : (

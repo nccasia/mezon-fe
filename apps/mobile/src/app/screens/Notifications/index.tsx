@@ -106,7 +106,6 @@ const Notifications = () => {
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME as never);
 
-		// store.dispatch(messagesActions.jumpToMessage({ messageId: notify.content.message_id, channelId: notify.content.channel_id }));
 		store.dispatch(
 			channelsActions.joinChannel({
 				clanId: notify?.content?.clan_id ?? '',

@@ -7,7 +7,7 @@ type ModalSaveChangesProps = {
 const ModalSaveChanges = ({ onSave, onReset }: ModalSaveChangesProps) => {
 	return (
 		<div
-			className="w-fit min-w-[700px] fixed bottom-[20px] left-[50%] translate-x-[-50%] py-[10px] pl-4 pr-[10px] rounded-[5px] dark:bg-bgProfileBody bg-white dark:text-white text-colorTextLightMode border-0 text-sm font-medium z-10"
+			className="w-fit min-w-[700px] max-md:min-w-[90%] fixed bottom-[20px] left-[50%] translate-x-[-50%] py-[10px] pl-4 pr-[10px] rounded-[5px] dark:bg-bgProfileBody bg-white dark:text-white text-colorTextLightMode border-0 text-sm font-medium z-10"
 			style={{ boxShadow: '0 2px 10px 0 hsl(0 calc( 1 * 0%) 0% / 0.1)' }}
 		>
 			<div className="flex flex-row justify-between items-center">

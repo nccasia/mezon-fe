@@ -1,6 +1,6 @@
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { referencesActions } from '@mezon/store';
+import { messagesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
 import { ApiMessageRef } from 'mezon-js/api.gen';
@@ -25,7 +25,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 	const { t } = useTranslation('message');
 
 	const handleJumpToMessage = (messageId: string) => {
-		dispatch(referencesActions.setIdMessageToJump(messageId));
+		dispatch(messagesActions.setIdMessageToJump(messageId));
 		jumpToRepliedMessage(messageReferences?.message_ref_id);
 	};
 

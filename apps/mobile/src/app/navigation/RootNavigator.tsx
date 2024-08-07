@@ -45,6 +45,7 @@ import {
 	setCurrentClanLoader,
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
+import { settingClanStickerActions } from '@mezon/store';
 import { gifsActions } from '@mezon/store-mobile';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -192,6 +193,7 @@ const NavigationMain = () => {
 		const promises = [];
 		const store = await getStoreAsync();
 		promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true })));
+		promises.push(store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId || '0', noCache: true })))
 		promises.push(store.dispatch(notificationActions.fetchListNotification(currentClanId)));
 		await Promise.all(promises);
 	};

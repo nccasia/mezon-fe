@@ -39,7 +39,7 @@ export function useReference(channelId?: string) {
 
 	const setIdMessageToJump = useCallback(
 		(idMessageToJump: string) => {
-			dispatch(referencesActions.setIdMessageToJump(idMessageToJump));
+			dispatch(messagesActions.setIdMessageToJump(idMessageToJump));
 		},
 		[dispatch],
 	);

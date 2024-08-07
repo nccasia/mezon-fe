@@ -1,4 +1,4 @@
-import { selectCloseMenu } from '@mezon/store';
+import { selectCloseMenu, selectCurrentChannel } from '@mezon/store';
 import {useEffect, useMemo, useState} from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -32,6 +32,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const [menu, setMenu] = useState(true);
 	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
+	const currentChannel = useSelector(selectCurrentChannel) || undefined;
   
   const currentSettingPage = () => {
     switch (currentSettingId) {
@@ -40,7 +41,7 @@ const ClanSetting = (props: ModalSettingProps) => {
       case ItemSetting.ROLES:
         return <ServerSettingMainRoles />;
       case ItemSetting.INTEGRATIONS:
-        return <Integrations />;
+        return <Integrations currentChannel={currentChannel}/>;
       case ItemSetting.EMOJI:
         return <SettingEmoji />;
       case ItemSetting.NOTIFICATION_SOUND:
@@ -58,7 +59,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	return (
 		<div className="  flex fixed inset-0  w-screen z-10">
 			<div className="flex flex-row w-screen">
-				<div className="h-fit absolute top-5 right-5 block sbm:hidden">
+				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
 					<button
 						className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"
 						onClick={onClose}
@@ -66,7 +67,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 						X
 					</button>
 				</div>
-				<div className="h-fit absolute top-5 left-5 block sbm:hidden">
+				<div className="z-50 h-fit absolute top-5 left-5 block sbm:hidden">
 					<button
 						className={`bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out flex justify-center items-center ${menu ? 'rotate-90' : '-rotate-90'}`}
 						onClick={() => setMenu(!menu)}

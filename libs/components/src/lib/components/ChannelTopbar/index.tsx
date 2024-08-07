@@ -1,10 +1,11 @@
-import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectIsShowInbox,
@@ -15,6 +16,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	selectnotificatonSelected,
+	useAppDispatch,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
@@ -227,10 +229,12 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const { directId: currentDmGroupId } = useAppParams();
 
 	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
 
@@ -256,6 +260,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
+		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 

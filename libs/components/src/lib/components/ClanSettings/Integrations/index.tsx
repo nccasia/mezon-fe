@@ -1,31 +1,20 @@
-import { useEffect, useState } from 'react';
+import { selectAllWebhooks } from '@mezon/store';
+import { IChannel } from '@mezon/utils';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
 import MainIntegrations from './MainIntegrations';
 import Webhooks from './Webhooks';
-import { ChannelsEntity, fetchWebhooksByChannelId, selectAllChannels, selectAllWebhooks, useAppDispatch } from '@mezon/store';
-import { useSelector } from 'react-redux';
-import { ChannelIsNotThread } from '@mezon/utils';
 
-const Integrations = () => {
-	const dispatch = useAppDispatch();
+interface IIntegrationsProps {
+	currentChannel?: IChannel;
+}
+
+const Integrations = ({ currentChannel }: IIntegrationsProps) => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
 	const allWebhooks = useSelector(selectAllWebhooks);
-	const allChannel = useSelector(selectAllChannels);
-	const [parentChannelsInClan, setParentChannelsInClan] = useState<ChannelsEntity[]>([]);
-
-	useEffect(() => {
-		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
-		setParentChannelsInClan(normalChannels);
-	}, [allChannel]);
-
-	useEffect(() => {
-		if (allChannel[0]) {
-			dispatch(fetchWebhooksByChannelId({ channelId: allChannel[0].channel_id as string, noCache: true }));
-		}
-	}, [allChannel[0]]);
-
 	return (
-		<div className="sbm:mt-[60px] mt-[10px]">
+		<div className="max-sm:px-[30px] mt-[60px]">
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
 				<div
 					onClick={() => setIsOpenWebhooks(false)}
@@ -43,7 +32,11 @@ const Integrations = () => {
 				)}
 			</h2>
 
-			{isOpenWebhooks ? <Webhooks allWebhooks={allWebhooks} parentChannelsInClan={parentChannelsInClan}/> : <MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />}
+			{isOpenWebhooks ? (
+				<Webhooks allWebhooks={allWebhooks} currentChannel={currentChannel} />
+			) : (
+				<MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />
+			)}
 		</div>
 	);
 };

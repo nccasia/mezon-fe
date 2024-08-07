@@ -192,7 +192,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							mode={props.mode}
 						/>
 					</div>
-					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
+					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={currentClanId} />
 				</div>
 			</div>
 		</div>

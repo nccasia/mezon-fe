@@ -35,12 +35,12 @@ const ModalDelEvent = (props: ModalDelEventProps) => {
 						<h3 className="font-bold pb-4 text-xl">Cancel Event?</h3>
 						<p className="pb-4">Are you sure you want to cancel this event?</p>
 					</div>
-					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
+					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4 font-medium">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
-							Cancel
+							Never Mind
 						</button>
 						<button onClick={handleDeleteEvent} className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white">
-							Delete
+							Cancel Event
 						</button>
 					</div>
 				</div>

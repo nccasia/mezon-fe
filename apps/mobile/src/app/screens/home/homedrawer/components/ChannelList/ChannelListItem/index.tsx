@@ -78,7 +78,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 				if (!channelsCache?.includes(channelId)) {
 					save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);

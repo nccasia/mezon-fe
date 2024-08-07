@@ -1,4 +1,11 @@
-import { useAppParams, useAuth, useChannelMembersActions, useClanRestriction, useFriends } from '@mezon/core';
+import {
+	useAppNavigation,
+	useAppParams,
+	useAuth,
+	useChannelMembersActions,
+	useClanRestriction, useDirect,
+	useFriends, useMessageValue
+} from '@mezon/core';
 import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
 import { ChannelMembersEntity, EPermission } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -11,6 +18,7 @@ import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
 import PanelGroupDM from './PanelGroupDm';
+import {useNavigate} from "react-router-dom";
 
 type PanelMemberProps = {
 	coords: Coords;
@@ -22,6 +30,7 @@ type PanelMemberProps = {
 	isMemberDMGroup?: boolean;
 	isMemberChannel?: boolean;
 	dataMemberCreate?: DataMemberCreate;
+	onOpenProfile?: () => void;
 };
 
 const useCheckRoleAdminMember = (userId: string) => {
@@ -41,7 +50,7 @@ const useCheckRoleAdminMember = (userId: string) => {
 	return hasAdminRole;
 }
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate }: PanelMemberProps) => {
+const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate, onOpenProfile }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClan = useSelector(selectCurrentClan);
@@ -50,6 +59,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const { removeMemberChannel } = useChannelMembersActions();
 	const hasAdminRole = useCheckRoleAdminMember(member?.user?.id || '');
 	const { directId } = useAppParams();
+	
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -78,8 +88,36 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
 	const { deleteFriend, addFriend } = useFriends();
 	const [isDmGroupOwner, setIsDmGroupOwner] = useState(false);
+	const { toDmGroupPageFromMainApp } = useAppNavigation();
+	const navigate = useNavigate();
+	const { createDirectMessageWithUser } = useDirect();
+	const { setValueTextInput, valueTextInput } = useMessageValue(currentChannel?.channel_id);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.dmID ?? ''));
+	
+	const handleOpenProfile = () => {
+		if (onOpenProfile) {
+			onOpenProfile();
+		}
+		onClose();
+	}
+	
+	const handleDirectMessageWithUser = async() => {
+		const response = await createDirectMessageWithUser(member?.user?.id || '');
+		if(response?.channel_id) {
+			const directDM = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
+			navigate('/' + directDM);
+		}
+	}
+	
+	const handleClickMention = () => {
+		const mention = `@[${member?.user?.display_name}](${member?.user?.id})`
+		if(valueTextInput) {
+			setValueTextInput(valueTextInput + mention);
+		} else {
+			setValueTextInput(mention);
+		}
+	}
 
 	useEffect(() => {
 		if (userProfile?.user?.id === currentDmGroup?.creator_id) {
@@ -111,14 +149,14 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 			) : (
 				<>
 					<GroupPanelMember>
-						<ItemPanelMember children="Profile" />
-						{directMessageValue ? checkDm && <ItemPanelMember children="Call" /> : <ItemPanelMember children="Mention" />}
+						<ItemPanelMember children="Profile" onClick={handleOpenProfile}/>
+						{directMessageValue ? checkDm && <ItemPanelMember children="Call" /> : <ItemPanelMember children="Mention" onClick={handleClickMention}/>}
 
 						{!isSelf && (
 							<>
 								{!checkDm && (
 									<>
-										<ItemPanelMember children="Message" />
+										<ItemPanelMember children="Message" onClick={handleDirectMessageWithUser}/>
 										<ItemPanelMember children="Call" />
 									</>
 								)}
@@ -141,7 +179,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							{isSelf && (
 								<>
 									<ItemPanelMember children="Deafen" type="checkbox" />
-									<ItemPanelMember children="Edit Serve Profile" />
+									<ItemPanelMember children="Edit Clan Profile" />
 									<ItemPanelMember children="Apps" />
 								</>
 							)}
@@ -179,7 +217,6 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 										<ItemPanelMember
 											children="Add Friend"
 											onClick={() => {
-												console.log(1);
 												addFriend({ usernames: [directMessageValue ? name || '' : member?.user?.username || ''], ids: [] });
 											}}
 										/>

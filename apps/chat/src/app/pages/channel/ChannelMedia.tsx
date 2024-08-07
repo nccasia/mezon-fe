@@ -14,7 +14,7 @@ export const ChannelMedia = ({ currentChannel, statusCall }: ChannelMediaProps) 
 			<ChannelMessages
 				channelId={currentChannel?.id}
 				channelLabel={currentChannel.channel_label}
-				type="CHANNEL"
+				type={ChannelType.CHANNEL_TYPE_TEXT}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 			/>
 		);

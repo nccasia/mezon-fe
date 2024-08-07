@@ -1,9 +1,9 @@
 import { MezonContextValue } from '@mezon/transport';
-import { AsyncThunkConfig, GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { GetThunkAPI } from '@reduxjs/toolkit';
 import { Client, Session } from 'mezon-js';
 import { GetThunkAPIWithMezon } from './typings';
 
-export const getMezonCtx = (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => {
+export const getMezonCtx = (thunkAPI: GetThunkAPI<any>) => {
 	if (!isMezonThunk(thunkAPI)) {
 		throw new Error('Not Mezon Thunk');
 	}
@@ -61,7 +61,7 @@ export function ensureClient(mezon: MezonContextValue): MezonValueContext {
 	} as MezonValueContext;
 }
 
-export function isMezonThunk(thunkAPI: GetThunkAPI<AsyncThunkConfig>): thunkAPI is GetThunkAPIWithMezon {
+export function isMezonThunk(thunkAPI: GetThunkAPI<any>): thunkAPI is GetThunkAPIWithMezon {
 	if (thunkAPI === undefined || thunkAPI.extra === undefined) {
 		return false;
 	}

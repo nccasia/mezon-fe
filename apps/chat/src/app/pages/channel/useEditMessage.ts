@@ -14,7 +14,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	const handleCancelEdit = useCallback(() => {
 		dispatch(referencesActions.setIdReferenceMessageEdit(''));
 		dispatch(messagesActions.deleteChannelDraftMessage({ channelId }));
-	}, [dispatch]);
+	}, [channelId, dispatch]);
 
 	const setChannelDraftMessage = useCallback(
 		(channelId: string, message_id: string, draftContent: string) => {

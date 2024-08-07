@@ -1,8 +1,7 @@
-import { referencesActions, selectIsUseProfileDM } from '@mezon/store';
+import { messagesActions, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
@@ -13,8 +12,6 @@ type MessageReplyProps = {
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
-	const isUseProfileDM = useSelector(selectIsUseProfileDM);
-
 	const {
 		senderIdMessageRef,
 		messageContentRef,
@@ -27,17 +24,16 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		userClanAvatar,
 	} = useMessageParser(message);
 
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const getIdMessageToJump = useCallback(
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (idRefMessage) {
-				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
-				dispatch(referencesActions.setIdReferenceMessageReply(''));
+				dispatch(messagesActions.jumpToMessage({ messageId: idRefMessage, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch],
+		[dispatch, message],
 	);
 
 	const nameShowed = useShowName(

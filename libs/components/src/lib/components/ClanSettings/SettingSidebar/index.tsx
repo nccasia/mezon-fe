@@ -18,7 +18,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
 	const itemsToRender = !hasAdminPermission && hasClanPermission ? sideBarListItemClanPermission : sideBarListItem;
 
 	const [openModal, setOpenModal] = useState<boolean>(false);
@@ -56,7 +56,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 						}
 					</div>
 				))}
-				{isClanCreator &&
+				{isClanOwner &&
 				<button
 					className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight`}
 					onClick={setIsShowDeletePopup}

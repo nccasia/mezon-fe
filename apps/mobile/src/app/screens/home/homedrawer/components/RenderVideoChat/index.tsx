@@ -24,6 +24,8 @@ export const RenderVideoChat = React.memo(
 					useNativeControls
 					resizeMode={ResizeMode.CONTAIN}
 					rate={1.0}
+					removeClippedSubviews
+					shouldRasterizeIOS
 					style={{
 						width: widthMedia + size.s_50,
 						height: 160,

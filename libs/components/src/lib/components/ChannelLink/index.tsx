@@ -40,8 +40,7 @@ export const classes = {
 };
 
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
-	const currentClan = useSelector(selectCurrentClan);
-	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 
@@ -119,7 +118,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		},
 		[channel.status],
 	);
-	const isShowSettingChannel = isClanCreator || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
+	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (

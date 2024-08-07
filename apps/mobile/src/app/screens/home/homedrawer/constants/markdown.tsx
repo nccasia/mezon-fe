@@ -1,14 +1,7 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import {
-	ChannelsEntity,
-	selectAllChannelMembers,
-	selectAllEmojiSuggestion,
-	selectAllUserClanProfile,
-	selectAllUsesClan,
-	selectChannelsEntities,
-} from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllChannelMembers, selectAllEmojiSuggestion, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -322,7 +315,6 @@ export const RenderTextMarkdownContent = React.memo(
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUsesClan);
 		const usersInChannel = useAppSelector(selectAllChannelMembers);
-		const clansProfile = useAppSelector(selectAllUserClanProfile);
 		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 
@@ -348,7 +340,7 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, clansProfile });
+					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel });
 				}
 				if (shortname) {
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });

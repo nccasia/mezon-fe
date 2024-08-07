@@ -22,12 +22,12 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const dispatch = useAppDispatch()
 
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan])
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		if(hasAdminPermission || isClanCreator) return true;
-		return currentUserId === emoji.creator_id
-	}, [hasAdminPermission, currentUserId]) ;
+		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id
+	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]) ;
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value.split(':').join(''));

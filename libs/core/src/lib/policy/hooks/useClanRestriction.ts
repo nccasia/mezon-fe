@@ -5,16 +5,16 @@ import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useUserRestriction } from './useUserRestriction';
 
-export type ClanRestrictionReturnType = [boolean, { isClanCreator: boolean }];
+export type ClanRestrictionReturnType = [boolean, { isClanOwner: boolean }];
 
 export function useClanRestriction(restrictions: EPermission[]) :ClanRestrictionReturnType {
 	const currentClan = useSelector(selectCurrentClan);
 	const { userProfile } = useAuth();
 	const isAllowed = useUserRestriction(restrictions)
 	
-	const isClanCreator = useMemo(() => {
+	const isClanOwner = useMemo(() => {
 		return currentClan?.creator_id === userProfile?.user?.id 
 	}, [currentClan, userProfile]);
 	
-	return [isAllowed, {isClanCreator}] as ClanRestrictionReturnType;
+	return [isAllowed, {isClanOwner}] as ClanRestrictionReturnType;
 }

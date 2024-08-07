@@ -18,9 +18,9 @@ interface IPanelCategoryProps {
 const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDeleteCategory, setIsShowPanelChannel, setOpenSetting}) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [positionTop, setPositionTop] = useState(false);
-  const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
+  const [hasManageChannelPermission, { isClanOwner }] = useClanRestriction([EPermission.manageChannel]);
   const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
-  const hasManageCategoryPermission = isClanCreator || hasAdminPermission || hasManageChannelPermission;
+  const hasManageCategoryPermission = isClanOwner || hasAdminPermission || hasManageChannelPermission;
   
   useEffect(() => {
     const heightPanel = panelRef.current?.clientHeight;

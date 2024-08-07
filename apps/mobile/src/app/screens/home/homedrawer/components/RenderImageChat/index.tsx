@@ -1,5 +1,5 @@
-import { Metrics, useTheme } from '@mezon/mobile-ui';
-import React, {useEffect, useRef, useState} from 'react';
+import { Metrics, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import React, { useEffect, useRef } from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
@@ -9,9 +9,9 @@ const widthMedia = Metrics.screenWidth - 150;
 export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
+	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
 	const prevImageUrl = useRef<string | null>(null);
-	
+
 	useEffect(() => {
 		if (image?.url && image.url !== prevImageUrl.current) {
 			prevImageUrl.current = image.url;

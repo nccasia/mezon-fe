@@ -1,6 +1,6 @@
 import { createEmojiSetting, selectAllEmojiSuggestion, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import {EEmojiCategory, LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI} from '@mezon/utils';
+import { EEmojiCategory, LIMIT_SIZE_UPLOAD_IMG, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -25,7 +25,7 @@ const SettingEmoji = () => {
 			throw new Error('Client or file is not initialized');
 		}
 		const file = e.target.files[0];
-		if (file.size > LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI) {
+		if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
 			setOpenModal(true);
 			return;
 		}
@@ -35,7 +35,7 @@ const SettingEmoji = () => {
 			return;
 		}
 		const fileNameParts = file.name.split('.');
-		const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
+		const fileName = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
 		const category = 'Custom';
 		const path = 'emojis/' + category;
 		handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file, path).then(

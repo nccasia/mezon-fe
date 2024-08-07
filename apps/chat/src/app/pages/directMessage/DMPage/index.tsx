@@ -129,7 +129,7 @@ export default function DirectMessage() {
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
 									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
-									type={isDmChannel ? 'DM' : 'GROUP'}
+									type={isDmChannel ? ChannelType.CHANNEL_TYPE_DM : ChannelType.CHANNEL_TYPE_GROUP}
 									mode={isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 									avatarDM={isDmChannel ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 								/>

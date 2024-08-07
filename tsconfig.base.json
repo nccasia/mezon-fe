@@ -17,7 +17,6 @@
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
-			"@mezon/translations": ["libs/translations/src/i18n.config.ts"],
 			"@mezon/assets": ["libs/assets/src/index.ts"],
 			"@mezon/components": ["libs/components/src/index.ts"],
 			"@mezon/core": ["libs/core/src/index.ts"],
@@ -27,9 +26,11 @@
 			"@mezon/mobile-ui": ["libs/mobile-ui/src/index.ts"],
 			"@mezon/store": ["libs/store/src/index.ts"],
 			"@mezon/store-mobile": ["libs/store/src/index-mobile.ts"],
+			"@mezon/translations": ["libs/translations/src/i18n.config.ts"],
 			"@mezon/transport": ["libs/transport/src/index.ts"],
 			"@mezon/ui": ["libs/ui/src/index.ts"],
 			"@mezon/utils": ["libs/utils/src/index.ts"],
+			"@mezon/chat-scroll": ["libs/chat-scroll/src/index.ts"],
 			"react": ["./node_modules/@types/react"]
 		}
 	},

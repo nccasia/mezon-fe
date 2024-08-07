@@ -13,7 +13,8 @@ import {
 	selectDmGroupCurrentType,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	usersClanActions
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ModeResponsive } from '@mezon/utils';
@@ -153,7 +154,10 @@ function MyApp() {
 	const dispatchApp = useAppDispatch();
 	useEffect(() => {
 		const initClanId = localStorage.getItem('initClan');
-		if(initClanId) dispatchApp(channelsActions.fetchChannels({clanId: initClanId}));
+		if(initClanId) {
+			dispatchApp(channelsActions.fetchChannels({clanId: initClanId}));
+			dispatchApp(usersClanActions.fetchUsersClan({clanId: initClanId}));
+		}
 	},[]);
 
 	return (

@@ -61,7 +61,7 @@ export default function InvitePage() {
 				{/* <Modal.Header></Modal.Header> */}
 				<Modal.Body className="bg-bgDisable rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="flex flex-col justify-center items-center pb-24">
-						<div className="w-[70px] h-[70px] bg-bgDisable rounded-lg flex justify-center items-center text-contentSecondary text-[25px] bg-zinc-900 ">
+						<div className="w-[70px] h-[70px] rounded-lg flex justify-center items-center text-contentSecondary text-[25px] bg-zinc-900 ">
 							{clanName.charAt(0).toUpperCase()}
 						</div>
 						<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invite to join</p>

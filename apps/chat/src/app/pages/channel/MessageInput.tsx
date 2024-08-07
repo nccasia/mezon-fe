@@ -1,7 +1,7 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectAllDirectChannelVoids, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps, searchMentionsHashtag, ThemeApp } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps, ThemeApp, searchMentionsHashtag } from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import { ChannelStreamMode } from 'mezon-js';
@@ -41,7 +41,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(channelDraftMessage.draftContent ?? '');
+	const { mentionList, hashtagList, emojiList } = useProcessMention(channelDraftMessage.draftContent ?? '');
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
 
 	const combinedContent = useMemo(() => {
@@ -100,7 +100,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const neverMatchingRegex = /($a)/;
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojis
@@ -118,7 +117,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			e.stopPropagation();
 			if (channelDraftMessage.draftContent === '') {
 				setOpenModalDelMess(true);
-			} else {
+			} else {				
 				handleSend(convertedContent, message.id);
 				handleCancelEdit();
 			}
@@ -235,7 +234,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.username ?? '')
+											: suggestion.username ?? ''
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}

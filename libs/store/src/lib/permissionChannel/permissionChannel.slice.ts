@@ -7,8 +7,9 @@ type addChannelUsersPayload = {
 	channelId: string;
 	channelType?: number;
     userIds: string[];
+	clanId: string
 };
-export const addChannelUsers = createAsyncThunk('channelUsers/addChannelUsers', async ( {channelId, channelType, userIds} : addChannelUsersPayload, thunkAPI) => {
+export const addChannelUsers = createAsyncThunk('channelUsers/addChannelUsers', async ( {channelId, channelType, userIds, clanId} : addChannelUsersPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.addChannelUsers(mezon.session, channelId, userIds);
@@ -16,7 +17,7 @@ export const addChannelUsers = createAsyncThunk('channelUsers/addChannelUsers', 
 			return thunkAPI.rejectWithValue([]);
 		}
 		const body ={
-			clanId: '', 
+			clanId: clanId, 
 			channelId: channelId, 
 			noCache: true, 
 			channelType: channelType ?? 0,
@@ -65,7 +66,7 @@ export const addChannelRoles = createAsyncThunk('channelUsers/addChannelRoles', 
 			return thunkAPI.rejectWithValue([]);
 		}
 		const bodyFetchUsers ={
-			clanId: '', 
+			clanId: clanId, 
 			channelId: channelId, 
 			noCache: true, 
 			channelType: channelType ?? 0,

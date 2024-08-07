@@ -11,6 +11,7 @@ import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+import UserProfileModalInner from "../UserProfileModalInner";
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -70,6 +71,7 @@ function MemberProfile({
 		distanceToBottom: 0,
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
+	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean> (false);
 
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -77,18 +79,23 @@ function MemberProfile({
 	const userProfile = useSelector(selectAllAccount);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
-
+	
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
 		};
+		
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
+		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
-
+		
 		const distanceToBottom = windowHeight - mouseY;
-
+		
+		// adjust mouseX if it is less than 200px(panel width) from the right edge of the browser
+		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
+		
 		if (event.button === MouseButton.LEFT) {
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
@@ -97,12 +104,14 @@ function MemberProfile({
 				setPositionTop(true);
 			}
 		}
+		
 		if (event.button === MouseButton.RIGHT) {
-			setCoords({ mouseX, mouseY, distanceToBottom });
+			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
 			setIsShowPanel(!isShowPanel);
 		}
 	};
-
+	
+	
 	const handleDefault = (e: any) => {
 		e.stopPropagation();
 	};
@@ -147,6 +156,15 @@ function MemberProfile({
 
 	const subNameRef = useRef<HTMLInputElement>(null);
 	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth,[subNameRef?.current]);
+	
+	const handleOpenProfileModal = () => {
+		setIsOpenProfileModal(true);
+	}
+	
+	const handleCloseProfileModal = () => {
+		setIsOpenProfileModal(false);
+	}
+	
 	return (
 		<div className="relative group">
 			<div
@@ -247,6 +265,7 @@ function MemberProfile({
 					isMemberDMGroup={dataMemberCreate ? true : false}
 					dataMemberCreate={dataMemberCreate}
 					isMemberChannel={isMemberChannel}
+					onOpenProfile={handleOpenProfileModal}
 				/>
 			)}
 			{isShowUserProfile && listProfile ? (
@@ -267,6 +286,10 @@ function MemberProfile({
 					onClose={() => setOpenModalRemoveMember(false)}
 					onRemoveMember={handleRemoveMember}
 				/>
+			)}
+			
+			{isOpenProfileModal && (
+				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal}/>
 			)}
 		</div>
 	);

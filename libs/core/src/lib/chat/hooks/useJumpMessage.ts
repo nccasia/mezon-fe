@@ -24,7 +24,7 @@ export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMess
 
 	const directToMessageById = useCallback(async () => {
 		await navigate(toMessageChannel(channelId, clanId ?? '', messageID ?? ''));
-	}, [navigate, channelId, clanId, messageID]);
+	}, [navigate, toMessageChannel, channelId, clanId, messageID]);
 
 	return useMemo(
 		() => ({

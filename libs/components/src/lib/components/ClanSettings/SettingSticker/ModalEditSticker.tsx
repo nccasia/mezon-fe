@@ -1,7 +1,7 @@
 import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
-import { LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
+import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -76,7 +76,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 			setOpenModalType(true);
 			return;
 		}
-		if (file.size > LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI) {
+		if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
 			setOpenModal(true);
 			return;
 		}

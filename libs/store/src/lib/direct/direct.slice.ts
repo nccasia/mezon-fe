@@ -120,7 +120,6 @@ type fetchDmGroupArgs = {
 export const fetchDirectMessage = createAsyncThunk(
 	'direct/fetchDirectMessage',
 	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
-		thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
 			fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
@@ -207,7 +206,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 		} catch (error) {
 			console.log(error);

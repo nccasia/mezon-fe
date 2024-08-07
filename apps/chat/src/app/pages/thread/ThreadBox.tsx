@@ -9,7 +9,7 @@ import {
 	selectCurrentClanId,
 	useAppDispatch,
 } from '@mezon/store';
-import { ETypeMessage, IMessageSendPayload, ThreadValue } from '@mezon/utils';
+import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
@@ -90,7 +90,7 @@ const ThreadBox = () => {
 						<ChannelMessages
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}
-							type={ETypeMessage.THREAD}
+							type={ChannelType.CHANNEL_TYPE_THREAD}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						/>
 					</div>

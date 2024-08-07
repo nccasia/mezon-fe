@@ -1,19 +1,21 @@
 import { Icons } from '@mezon/components';
-import { useGifs, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions } from '@mezon/store';
+import { useAppParams, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { reactionActions, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
-import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { memo, useCallback } from 'react';
 
 export type GifStickerEmojiButtonsProps = {
 	activeTab: SubPanelName;
+	currentClanId?: string;
 };
 
-function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
-	const dispatch = useDispatch();
+const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmojiButtonsProps) => {
+	const dispatch = useAppDispatch();
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setShowCategories } = useGifs();
 	const { setValueInputSearch } = useGifsStickersEmoji();
+	const { directId: currentDmGroupId } = useAppParams();
+
 	const handleOpenGifs = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
@@ -37,6 +39,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setSubPanelActive(SubPanelName.STICKERS);
 			setShowCategories(true);
 			setValueInputSearch('');
+			// if there is currentDmGroupId is fetch for DM
+			dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
 			dispatch(reactionActions.setReactionRightState(false));
 			dispatch(reactionActions.setReactionBottomState(false));
 			if (subPanelActive === SubPanelName.STICKERS) {
@@ -79,6 +83,6 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			</div>
 		</div>
 	);
-}
+});
 
 export default GifStickerEmojiButtons;

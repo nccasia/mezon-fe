@@ -9,7 +9,7 @@ interface IMezonMenu {
 
 export default function MezonMenu({ menu }: IMezonMenu) {
 	return (
-		<Block gap={size.s_12} paddingBottom={size.s_18} marginBottom={size.s_18}>
+		<Block gap={size.s_12} paddingBottom={size.s_18} marginVertical={size.s_18}>
 			{menu.map((item, index) => <MezonMenuSection key={index.toString()} {...item} />)}
 		</Block>
 	);

@@ -12,7 +12,7 @@ const ExitSetting = (props: ModalExitProps) => {
 	useEscapeKey(handleClose);
 
 	return (
-		<div className="dark:bg-bgSecondary bg-white w-1/12 xl:w-1/5 flex-grow">
+		<div className="dark:bg-bgSecondary bg-white w-1/12 xl:w-1/5 flex-grow hidden sbm:block">
 			<div className="w-1/4 text-black ml-5 pt-[94px]">
 				<button
 					className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"

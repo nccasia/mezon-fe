@@ -115,22 +115,6 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 							<EmojiPickerComp onClickAddButton={handleOpenSetting} />
 						</div>
 					)}
-					{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth <= 640 && (
-						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} onClickAddButton={handleOpenSetting} />{' '}
-						</div>
-					)}
-					{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth <= 640 && (
-						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} onClickAddButton={handleOpenSetting} />{' '}
-						</div>
-					)}
-
-					{emojiAction === EmojiPlaces.EMOJI_REACTION && window.innerWidth > 640 && (
-						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} onClickAddButton={handleOpenSetting} />
-						</div>
-					)}
 					{isShowEmojiPicker() && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
 							<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} onClickAddButton={handleOpenSetting} />
