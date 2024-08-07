@@ -81,19 +81,20 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 			setOpenModal(true);
 			return;
 		}
+		// TODO: check category
 		const category = 'Among Us';
-		const path = 'stickers/' + Snowflake.generate();
-		handleUploadEmoticon(client, session, path, file).then(
-			async (attachment: ApiMessageAttachment) => {
-				const request: ApiClanStickerAddRequest = {
-					category: category,
-					clan_id: currentClanId,
-					shortname: editingSticker.shortname,
-					source: attachment.url,
-				};
-				dispatch(createSticker({ request: request, clanId: currentClanId }));
-			},
-		);
+		const id = Snowflake.generate();
+		const path = 'stickers/' + id;
+		handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
+			const request: ApiClanStickerAddRequest = {
+				id: id,
+				category: category,
+				clan_id: currentClanId,
+				shortname: editingSticker.shortname,
+				source: attachment.url,
+			};
+			dispatch(createSticker({ request: request, clanId: currentClanId }));
+		});
 
 		handleCloseModal();
 	};
