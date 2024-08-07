@@ -22,6 +22,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageIdRef,
 		hasAttachmentInMessageRef,
 		userClanAvatar,
+		messageClanAvatarSenderRef,
 	} = useMessageParser(message);
 
 	const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							className="w-5 h-5"
 							alt="user avatar"
 							userName={messageUsernameSenderRef}
-							src={userClanAvatar ? userClanAvatar : messageAvatarSenderRef}
+							src={messageClanAvatarSenderRef ? messageClanAvatarSenderRef : messageAvatarSenderRef}
 						/>
 					</div>
 

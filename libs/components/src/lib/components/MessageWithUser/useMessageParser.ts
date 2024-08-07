@@ -104,7 +104,11 @@ export function useMessageParser(message: IMessageWithUser) {
 			return message?.references[0]?.message_sender_clan_nick ?? '';
 		}
 	}, [message.references]);
-
+	const messageClanAvatarSenderRef = useMemo(() => {
+		if (message.references) {
+			return message?.references[0]?.mesages_sender_avatar ?? '';
+		}
+	}, [message.references]);
 	const messageDisplayNameSenderRef = useMemo(() => {
 		if (message.references) {
 			return message?.references[0]?.message_sender_display_name ?? '';
@@ -135,5 +139,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		messageAvatarSenderRef,
 		messageClanNicknameSenderRef,
 		messageDisplayNameSenderRef,
+		messageClanAvatarSenderRef,
 	};
 }
