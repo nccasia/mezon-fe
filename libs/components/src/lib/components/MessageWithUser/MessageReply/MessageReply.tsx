@@ -5,14 +5,13 @@ import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
-import useShowName from '../useShowName';
+import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 };
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
-
 	const {
 		senderIdMessageRef,
 		messageContentRef,

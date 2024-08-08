@@ -5,7 +5,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
-import useShowName from './useShowName';
+import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 
 type IMessageHeadProps = {
 	message: IMessageWithUser;

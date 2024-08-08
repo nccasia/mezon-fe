@@ -23,7 +23,6 @@ export const useStickyScroll = (
 	useEffect(() => {
 		stickyRef.current = sticky;
 		if (sticky) {
-			console.log('scrolling to bottom');
 			moveScrollToBottom();
 		}
 	}, [data.data.length, targetRef, sticky, moveScrollToBottom]);
@@ -33,23 +32,19 @@ export const useStickyScroll = (
 		const currentlyAtBottom = scrollHeight === scrollTop + clientHeight;
 
 		if (stickyRef.current && !currentlyAtBottom) {
-			console.log('not at bottom');
 			setSticky(false);
 		} else if (!stickyRef.current && currentlyAtBottom) {
-			console.log('at bottom');
 			setSticky(true);
 		}
 	}, [targetRef]);
 
 	const handleScroll = useCallback(() => {
-		console.log('scrolling');
 		updateStuckToBottom();
 	}, [updateStuckToBottom]);
 
 	const { setScrollEventHandler } = useScroll(targetRef);
 
 	useEffect(() => {
-		console.log('enabled', enabled);
 		if (enabled) {
 			setScrollEventHandler(handleScroll);
 		} else {

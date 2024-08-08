@@ -2,7 +2,7 @@ import { referencesActions, selectMessageByMessageId, selectOpenReplyMessageStat
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons/index';
 import { useMessageParser } from '../MessageWithUser/useMessageParser';
-import useShowName from '../MessageWithUser/useShowName';
+import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 
 type MessageReplyProps = {
 	idMessage: string;

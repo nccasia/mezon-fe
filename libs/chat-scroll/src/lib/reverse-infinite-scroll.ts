@@ -41,7 +41,6 @@ export const useReverseInfiniteScroll = (
 	// when user scrolls to the top of the container
 	// check if we need to load more data
 	const needMore = useCallback(() => {
-		console.log('needMore', data.hasPreviousPage);
 		if (!data.hasPreviousPage) {
 			return false;
 		}
@@ -57,7 +56,6 @@ export const useReverseInfiniteScroll = (
 	// when user scrolls to the bottom of the container
 	// check if we need to load more data
 	const needMoreBottom = useCallback(() => {
-		console.log('needMoreBottom', data.hasNextPage);
 		if (!data.hasNextPage) {
 			return false;
 		}

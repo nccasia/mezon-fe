@@ -1,7 +1,7 @@
 import { selectMemberById } from '@mezon/store';
-import useShowName from 'libs/components/src/lib/components/MessageWithUser/useShowName';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import useShowName from './useShowName';
 
 export const useGetPriorityNameFromUserClan = (senderId: string) => {
 	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);

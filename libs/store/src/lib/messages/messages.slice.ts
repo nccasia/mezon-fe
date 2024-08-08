@@ -169,8 +169,6 @@ export const fetchMessages = createAsyncThunk(
 			fetchMessagesCached.clear(mezon, channelId, messageId, direction);
 		}
 
-		console.log('fetchMessages', channelId, messageId, direction);
-
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 
 		if (!response.messages) {
@@ -197,12 +195,27 @@ export const fetchMessages = createAsyncThunk(
 			};
 		}
 
-		console.log('fetchMessages', response);
-
 		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
 
 		if (firstMessage) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
+		}
+
+		let lastSentMessage = response.last_sent_message;
+
+		// no message id and direction is before timestamp means load latest messages
+		// then the last sent message will be the last message of response
+		if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
+			lastSentMessage = response.messages[response.messages.length - 1];
+		}
+
+		if (lastSentMessage && lastSentMessage.id) {
+			thunkAPI.dispatch(
+				messagesActions.setLastMessage({
+					...lastSentMessage,
+					channel_id: channelId,
+				}),
+			);
 		}
 
 		const messages = response.messages.map((item) => {
@@ -281,8 +294,6 @@ export const loadMoreMessage = createAsyncThunk(
 					return;
 				}
 
-				console.log('lastScrollMessageId', lastScrollMessageId, 'firstChannelMessageId', firstChannelMessageId, 'direction', 'up');
-
 				return thunkAPI.dispatch(
 					fetchMessages({
 						channelId: channelId,
@@ -299,8 +310,6 @@ export const loadMoreMessage = createAsyncThunk(
 				if (!lastChannelMessageId || !firstScrollMessageId || lastChannelMessageId === firstScrollMessageId) {
 					return;
 				}
-
-				console.log('lastChannelMessageId', lastChannelMessageId, 'firstScrollMessageId', firstScrollMessageId, 'direction', 'down');
 
 				return thunkAPI.dispatch(
 					fetchMessages({
@@ -337,7 +346,6 @@ export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
 	async ({ messageId, channelId, noCache = true, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
 		try {
-			console.log('jump to message', channelId, messageId);
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const isMessageExist = channelMessages.includes(messageId);
 			if (!isMessageExist) {
@@ -1062,8 +1070,6 @@ export const selectIsJumpingToPresent = createSelector(getMessagesState, (state)
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
-	console.log('clearChannelMessages', channelId);
-
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId]) return state;
 	state.channelMessages[channelId] = channelMessagesAdapter.removeAll(state.channelMessages[channelId]);
