@@ -110,9 +110,7 @@ export default memo(function MezonImagePicker({
 		if (!file || !client || !session) {
 			throw new Error('Client is not initialized');
 		}
-		const clan_id = currentChannel ? currentChannel.clan_id : '0';
-		const channel_id = currentChannel ? currentChannel.channel_id : '0';
-		const res = await handleUploadFileMobile(client, session, clan_id, channel_id, file.name, file);
+		const res = await handleUploadFileMobile(client, session, currentChannel?.clan_id, currentChannel?.channel_id, file.name, file);
 		return res.url;
 	}
 

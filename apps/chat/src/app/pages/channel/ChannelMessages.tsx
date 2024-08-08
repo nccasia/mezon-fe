@@ -49,14 +49,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 
-	console.log('hasMoreTop', hasMoreTop, 'hasMoreBottom', hasMoreBottom);
-
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const loadMoreMessage = useCallback(async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
-		console.log('loadMoreMessage', direction === 1 ? 'bottom' : 'top', isFetching, hasMoreTop, hasMoreBottom);
-
 		if (isFetching) {
 			return;
 		}
@@ -116,7 +112,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	useEffect(() => {
 		if (idMessageToJump && isMessageExist) {
-			console.log('scrollToMessage', idMessageToJump);
 			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`)
 				.then((res) => {
 					if (res) {
@@ -128,7 +123,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	useEffect(() => {
 		if (isJumpingToPresent) {
-			console.log('scrollToBottom');
 			chatScrollRef.scrollToBottom().then(() => {
 				dispatch(messagesActions.setIsJumpingToPresent(false));
 			});
