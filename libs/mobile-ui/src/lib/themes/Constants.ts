@@ -30,7 +30,9 @@ export type Attributes = {
     selectedOverlay: HexColor
     bgViolet: HexColor
     colorAvatarDefault: HexColor,
-    colorActiveClan: HexColor
+    colorActiveClan: HexColor,
+    textRoleLink: HexColor,
+    darkMossGreen: HexColor
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -78,7 +80,9 @@ export const themeColors: ThemeColor = {
         selectedOverlay: "#00000096",
         bgViolet: "#5a62f4",
         colorAvatarDefault: "#334155FF",
-        colorActiveClan: "#141c2a"
+        colorActiveClan: "#141c2a",
+        textRoleLink: "#009c67",
+        darkMossGreen: "#3c4c43"
     },
     light: {
         primary: "#f2f3f5",
@@ -108,6 +112,8 @@ export const themeColors: ThemeColor = {
         selectedOverlay: "#FFFFFF96",
         bgViolet: "#5a62f4",
         colorAvatarDefault: "#334155FF",
-        colorActiveClan: "#d8e2f0"
+        colorActiveClan: "#d8e2f0",
+        textRoleLink: "#00b098",
+        darkMossGreen: "#e2f1e5"
     }
 }

@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -34,8 +34,17 @@ const Notifications = () => {
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
 	useEffect(() => {
+		initLoader();
+	}, [currentClanId]);
+
+	useEffect(() => {
 		handleFilterNotify(EActionDataNotify.All);
 	}, [notification]);
+
+	const initLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(notificationActions.fetchListNotification({ clanId: currentClanId }));
+	};
 
 	const handleFilterNotify = (tabNotify) => {
 		const sortNotifications = notification.sort((a, b) => {
@@ -106,7 +115,6 @@ const Notifications = () => {
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME as never);
 
-		// store.dispatch(messagesActions.jumpToMessage({ messageId: notify.content.message_id, channelId: notify.content.channel_id }));
 		store.dispatch(
 			channelsActions.joinChannel({
 				clanId: notify?.content?.clan_id ?? '',

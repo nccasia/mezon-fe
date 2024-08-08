@@ -17,7 +17,14 @@ import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EmojiDataOptionals,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
 	ILineMention,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
 	IMessageWithUser,
 	MentionDataProps,
 	SearchItemProps,
@@ -170,45 +177,13 @@ export const convertMarkdown = (markdown: string): string => {
 		.join('');
 };
 
-export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
+export const getEmojiId = (shortname: string, emojiListPNG: any[]) => {
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-	return emoji ? emoji.src : undefined;
+	return emoji ? emoji.id : undefined;
 };
 
-export const updateEmojiReactionData = (data: any[]) => {
-	const dataItemReaction: Record<string, EmojiDataOptionals> = {};
-
-	data &&
-		data.forEach((item) => {
-			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
-			if (!dataItemReaction[key]) {
-				dataItemReaction[key] = {
-					id: item.id,
-					emoji: item.emoji,
-					senders: [
-						{
-							sender_id: item.senders[0]?.sender_id ?? '',
-							count: item.senders[0]?.count ?? 0,
-						},
-					],
-					channel_id: item.channel_id,
-					message_id: item.message_id,
-				};
-			} else {
-				const existingItem = dataItemReaction[key];
-				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
-
-				if (senderIndex !== -1) {
-					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
-				} else {
-					existingItem.senders.push({
-						sender_id: item.senders[0]?.sender_id ?? '',
-						count: item.senders[0]?.count ?? 0,
-					});
-				}
-			}
-		});
-	return Object.values(dataItemReaction);
+export const getSrcEmoji = (id: string) => {
+	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
 };
 
 export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
@@ -220,6 +195,7 @@ export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
 			emojiDataItems[key] = {
 				id: reaction.id,
 				emoji: reaction.emoji,
+				emojiId: reaction.emoji_id,
 				senders: [
 					{
 						sender_id: reaction.sender_id,
@@ -392,7 +368,7 @@ export function findDisplayNameByUserId(userId: string, data: ChannelUserListCha
 export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
 	return data.map((item) => {
 		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
-		const clanNickFinding = findClanNickByUserId(item.id ?? '', dataUserClan);
+		const clanNickFinding = item?.clanNick;
 		const prioritizeName = getNameForPrioritize(clanNickFinding ?? '', item.displayName ?? '', item.name ?? '');
 		return {
 			...item,
@@ -437,4 +413,148 @@ export const getRoleList = (rolesInClan: ApiRole[]) => {
 		roleId: item.id ?? '',
 		roleName: item.title ?? '',
 	}));
+};
+
+type ElementToken =
+	| (IMentionOnMessage & { type: 'mentions' })
+	| (IHashtagOnMessage & { type: 'hashtags' })
+	| (IEmojiOnMessage & { type: 'emojis' })
+	| (ILinkOnMessage & { type: 'links' })
+	| (IMarkdownOnMessage & { type: 'markdowns' })
+	| (ILinkVoiceRoomOnMessage & { type: 'voicelinks' });
+
+export const createFormattedString = (data: IMessageSendPayload): string => {
+	let { t = '' } = data;
+	const elements: ElementToken[] = [];
+
+	(Object.keys(data) as (keyof IMessageSendPayload)[]).forEach((key) => {
+		const itemArray = data[key];
+
+		if (Array.isArray(itemArray)) {
+			itemArray.forEach((item) => {
+				if (item) {
+					const typedItem: ElementToken = { ...item, type: key as any }; // Casting key as any
+					elements.push(typedItem);
+				}
+			});
+		}
+	});
+
+	elements.sort((a, b) => {
+		const startA = a.startindex ?? 0;
+		const startB = b.startindex ?? 0;
+		return startA - startB;
+	});
+	let result = '';
+	let lastIndex: number = 0;
+
+	elements.forEach((element) => {
+		const startindex = element.startindex ?? lastIndex;
+		const endindex = element.endindex ?? startindex;
+
+		result += t.slice(lastIndex, startindex);
+
+		switch (element.type) {
+			case 'mentions':
+				result += `@[${element.username?.slice(1)}](${element.userid})`;
+				break;
+			case 'hashtags':
+				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
+				break;
+			case 'emojis':
+				result += `[:${element.shortname}]`;
+				break;
+			case 'links':
+				result += `${element.link}`;
+				break;
+			case 'markdowns':
+				result += `${element.markdown}`;
+				break;
+			case 'voicelinks':
+				result += `${element.voicelink}`;
+				break;
+			default:
+				break;
+		}
+		lastIndex = endindex;
+	});
+
+	result += t.slice(lastIndex);
+
+	return result;
+};
+
+export const processText = (inputString: string) => {
+	const links: ILinkOnMessage[] = [];
+	const markdowns: IMarkdownOnMessage[] = [];
+	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
+
+	const singleBacktick: string = '`';
+	const tripleBacktick: string = '```';
+	const httpPrefix: string = 'http';
+	const googleMeetPrefix: string = 'https://meet.google.com/';
+
+	let i = 0;
+	while (i < inputString.length) {
+		if (inputString.startsWith(httpPrefix, i)) {
+			// Link processing
+			const startindex = i;
+			i += httpPrefix.length;
+			while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
+				i++;
+			}
+			const endindex = i;
+			const link = inputString.substring(startindex, endindex);
+
+			if (link.startsWith(googleMeetPrefix)) {
+				voiceRooms.push({
+					voicelink: link,
+					startindex,
+					endindex,
+				});
+			} else {
+				links.push({
+					link,
+					startindex,
+					endindex,
+				});
+			}
+		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
+			// Triple backtick markdown processing
+			const startindex = i;
+			i += tripleBacktick.length;
+			let markdown = '';
+			while (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) !== tripleBacktick) {
+				markdown += inputString[i];
+				i++;
+			}
+			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
+				i += tripleBacktick.length;
+				const endindex = i;
+				if (markdown.trim().length > 0) {
+					markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startindex, endindex });
+				}
+			}
+		} else if (inputString[i] === singleBacktick) {
+			// Single backtick markdown processing
+			const startindex = i;
+			i++;
+			let markdown = '';
+			while (i < inputString.length && inputString[i] !== singleBacktick) {
+				markdown += inputString[i];
+				i++;
+			}
+			if (i < inputString.length && inputString[i] === singleBacktick) {
+				const endindex = i + 1;
+				const nextChar = inputString[endindex];
+				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
+					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startindex, endindex });
+				}
+				i++;
+			}
+		} else {
+			i++;
+		}
+	}
+	return { links, markdowns, voiceRooms };
 };

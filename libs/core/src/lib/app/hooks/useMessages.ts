@@ -28,9 +28,9 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
-		if (!currentChatRef || isFetching) return;
+		if (!currentChatRef) return;
 		currentChatRef.scrollTop = currentChatRef.scrollHeight;
-	}, [channelId, messages?.length]);
+	}, [channelId, chatRef, messages]);
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
@@ -39,7 +39,7 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
-			if (currentChatRef.scrollTop === 0 && !firstMessageId) {
+			if (currentChatRef.scrollTop < 100 && !firstMessageId && hasMoreMessage && !isFetching) {
 				const previousHeight = currentChatRef.scrollHeight;
 				setIsFetching(true);
 				await loadMoreMessage();
@@ -53,7 +53,7 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 		return () => {
 			currentChatRef?.removeEventListener('wheel', handleWheel);
 		};
-	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching]);
+	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, dispatch, firstMessageId]);
 
 	return { isFetching };
 };

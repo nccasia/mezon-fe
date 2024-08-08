@@ -1,8 +1,7 @@
 import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { StyleProp, Text, TextInput, TextStyle, View, ViewStyle } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 import { ErrorInput } from "../../components/ErrorInput";
 import { validInput } from "../../utils/validate";
 import { style } from "./styles";

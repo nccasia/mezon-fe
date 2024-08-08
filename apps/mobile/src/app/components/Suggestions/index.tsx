@@ -2,8 +2,7 @@ import { useChannels } from '@mezon/core';
 import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
 import { FC, memo, useEffect, useMemo } from 'react';
-import { Pressable } from 'react-native';
-import { FlatList } from 'react-native';
+import { FlatList, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
 import { EMessageActionType } from '../../screens/home/homedrawer/enums';
@@ -15,77 +14,67 @@ export interface MentionSuggestionsProps {
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
 	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
-	onAddMentionMessageAction?: (mentionData: MentionDataProps[]) => void
+	onAddMentionMessageAction?: (mentionData: MentionDataProps[]) => void;
 	mentionTextValue?: string;
+	channelMode?: number;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue }) => {
-	const listMentions = UseMentionList(channelId || '');
+const Suggestions: FC<MentionSuggestionsProps> = memo(
+	({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue, channelMode }) => {
+		const listMentions = UseMentionList(channelId || '', channelMode);
 
-	useEffect(() => {
-		if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
-			onAddMentionMessageAction(listMentions);
-		}
-	}, [messageActionNeedToResolve])
-
-	const formattedMentionList = useMemo(() => {
-		if (keyword === null || !listMentions.length) {
-			return [];
-		}
-
-		const mentionSearchText = keyword?.toLocaleLowerCase();
-
-		const filterMatchedMentions = (mentionData: MentionDataProps) => {
-			return mentionData?.display?.toLocaleLowerCase()?.includes(mentionSearchText);
-		};
-
-		const sortDisplayNameFunction = (a, b) => {
-			const indexA = a.display.indexOf(mentionSearchText);
-			const indexB = b.display.indexOf(mentionSearchText);
-
-			if (indexA === -1 && indexB === -1) {
-				return a.display.localeCompare(b.display);
+		useEffect(() => {
+			if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
+				onAddMentionMessageAction(listMentions);
 			}
-			if (indexA === -1) return 1;
-			if (indexB === -1) return -1;
-			if (indexA === indexB) {
-				return a.display.localeCompare(b.display);
+		}, [messageActionNeedToResolve]);
+
+		const formattedMentionList = useMemo(() => {
+			if (keyword === null || !listMentions.length) {
+				return [];
 			}
 
-			return indexA - indexB;
-		};
+			const mentionSearchText = keyword?.toLocaleLowerCase();
 
-		return listMentions
-			.filter(filterMatchedMentions)
-			.sort(sortDisplayNameFunction)
-			.map((item) => ({
+			const filterMatchedMentions = (mentionData: MentionDataProps) => {
+				return mentionData?.display?.toLocaleLowerCase()?.includes(mentionSearchText);
+			};
+
+			return listMentions.filter(filterMatchedMentions).map((item) => ({
 				...item,
-				name: item.display,
+				name: item?.display,
 			}));
-	}, [keyword, listMentions]);
+		}, [keyword, listMentions]);
 
-	if (keyword == null) {
-		return null;
-	}
+		if (keyword == null) {
+			return null;
+		}
 
-	const handleSuggestionPress = (user: MentionDataProps) => {
-		onSelect(user as MentionDataProps);
-	};
-	return (
-		<FlatList
-			style={{ maxHeight: 200 }}
-			data={formattedMentionList}
-			renderItem={({ item }) => (
-				<Pressable onPress={() => handleSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={true} name={item.display ?? ''} avatarUrl={item.avatarUrl} subText="" />
-				</Pressable>
-			)}
-			keyExtractor={(_, index) => index.toString()}
-			onEndReachedThreshold={0.1}
-			keyboardShouldPersistTaps="handled"
-		/>
-	);
-});
+		const handleSuggestionPress = (user: MentionDataProps) => {
+			onSelect(user as MentionDataProps);
+		};
+		return (
+			<FlatList
+				style={{ maxHeight: 200 }}
+				data={formattedMentionList}
+				renderItem={({ item }) => (
+					<Pressable onPress={() => handleSuggestionPress(item)}>
+						<SuggestItem
+							isRoleUser={item?.isRoleUser}
+							isDisplayDefaultAvatar={true}
+							name={item?.display ?? ''}
+							avatarUrl={item.avatarUrl}
+							subText={item?.username}
+						/>
+					</Pressable>
+				)}
+				keyExtractor={(_, index) => index.toString()}
+				onEndReachedThreshold={0.1}
+				keyboardShouldPersistTaps="handled"
+			/>
+		);
+	},
+);
 
 export type ChannelsMention = {
 	id: string;
@@ -109,10 +98,9 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			id: item?.channel_id ?? '',
 			display: item?.channel_label ?? '',
 			subText: item?.category_name ?? '',
-			name: item?.channel_label ?? ''
-		})
-		)
-	}, [listChannels])
+			name: item?.channel_label ?? '',
+		}));
+	}, [listChannels]);
 	if (keyword == null) {
 		return null;
 	}
@@ -185,4 +173,3 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 };
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
-

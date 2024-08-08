@@ -1,11 +1,9 @@
-import { referencesActions, selectIsUseProfileDM } from '@mezon/store';
+import { messagesActions, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
-import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../../ui/src/lib/Icons/index';
+import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
-import { useMessageLine } from '../useMessageLine';
 import { useMessageParser } from '../useMessageParser';
 import useShowName from '../useShowName';
 type MessageReplyProps = {
@@ -14,7 +12,6 @@ type MessageReplyProps = {
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
-	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 
 	const {
 		senderIdMessageRef,
@@ -27,30 +24,19 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		hasAttachmentInMessageRef,
 	} = useMessageParser(message);
 
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const getIdMessageToJump = useCallback(
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (idRefMessage) {
-				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
-				dispatch(referencesActions.setIdReferenceMessageReply(''));
+				dispatch(messagesActions.jumpToMessage({ messageId: idRefMessage, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch],
+		[dispatch, message],
 	);
 
-	const { mentions } = useMessageLine(messageContentRef.t);
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
-
-	const [parentWidth, setParentWidth] = useState<number>();
-	const getWidthParent = useMemo(() => {
-		return markUpOnReplyParent.current?.getBoundingClientRect().width;
-	}, [isUseProfileDM, window.innerWidth, markUpOnReplyParent]);
-
-	useLayoutEffect(() => {
-		setParentWidth(getWidthParent);
-	}, [getWidthParent, isUseProfileDM]);
 
 	const nameShowed = useShowName(
 		messageClanNicknameSenderRef ?? '',

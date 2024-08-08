@@ -1,8 +1,8 @@
 import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/core';
-import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { referencesActions, selectAttachmentData } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { messagesActions, referencesActions, selectAttachmentData, selectCurrentClanId } from '@mezon/store';
+import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -16,7 +16,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, TextInput, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, InteractionManager, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -91,16 +91,20 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
+			const currentClanId = useSelector(selectCurrentClanId);
 			const { t } = useTranslation(['message']);
-			const {
-				sendMessage,
-				sendMessageTyping: channelMessageTyping,
-				editSendMessage,
-			} = useChatSending({
+			const { sendMessage, editSendMessage } = useChatSending({
 				channelId,
 				mode,
 				directMessageId: channelId || '',
 			});
+			const rolesInClan = useSelector(selectAllRolesClan);
+			const roleList = useMemo(() => {
+				return rolesInClan?.map((item) => ({
+					roleId: item.id ?? '',
+					roleName: item.title ?? '',
+				}));
+			}, [rolesInClan]);
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();
@@ -108,14 +112,14 @@ export const ChatMessageInput = memo(
 			}, [onSendSuccess, ref]);
 
 			const handleTyping = useCallback(async () => {
-				await channelMessageTyping();
-			}, [channelMessageTyping]);
+				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
+			}, [channelId, currentClanId, dispatch, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 			const { setEmojiSuggestion } = useEmojiSuggestion();
 
 			//start: DM stuff
-			const { sendDirectMessage, sendMessageTyping: directMessageTyping } = useDirectMessages({
+			const { sendDirectMessage } = useDirectMessages({
 				channelId,
 				mode,
 			});
@@ -132,8 +136,8 @@ export const ChatMessageInput = memo(
 			);
 
 			const handleDirectMessageTyping = useCallback(async () => {
-				await directMessageTyping();
-			}, [directMessageTyping]);
+				dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }));
+			}, [channelId, dispatch, mode]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
 			//end: DM stuff
@@ -176,16 +180,30 @@ export const ChatMessageInput = memo(
 				return !!attachmentDataRef?.length || text?.length > 0;
 			}, [attachmentDataRef?.length, text?.length]);
 
+			const doesIdRoleExist = (id: string, roles: IRoleMention[]): boolean => {
+				return roles?.some((role) => role?.roleId === id);
+			};
+
 			const handleSendMessage = async () => {
 				if (!isCanSendMessage) {
 					return;
 				}
 				clearInputAfterSendMessage();
-
-				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => ({
-					user_id: mention.userid,
-					username: mention.username,
-				}));
+				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => {
+					const isRole = doesIdRoleExist(mention?.userid ?? '', roleList ?? []);
+					if (isRole) {
+						const role = roleList?.find((role) => role.roleId === mention.userid);
+						return {
+							role_id: role?.roleId,
+							rolename: role?.roleName,
+						};
+					} else {
+						return {
+							user_id: mention.userid,
+							username: mention.username,
+						};
+					}
+				});
 
 				const payloadSendMessage: IMessageSendPayload = {
 					t: text,
@@ -271,7 +289,13 @@ export const ChatMessageInput = memo(
 					}
 				};
 
-				requestAnimationFrame(sendMessageAsync);
+				InteractionManager.runAfterInteractions(() => {
+					setTimeout(() => {
+						sendMessageAsync().catch((error) => {
+							console.error('Error sending message:', error);
+						});
+					}, 0);
+				});
 			};
 
 			return (

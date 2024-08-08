@@ -1,12 +1,12 @@
 import {
-    emojiSuggestionActions,
-    selectAddEmojiState,
-    selectAllEmojiSuggestion,
-    selectEmojiListStatus,
-    selectEmojiSuggestion,
-    selectShiftPressedStatus,
-    selectTextToSearchEmojiSuggestion,
-    useAppDispatch,
+	emojiSuggestionActions,
+	selectAddEmojiState,
+	selectAllEmojiSuggestion,
+	selectEmojiListStatus,
+	selectEmojiSuggestion,
+	selectShiftPressedStatus,
+	selectTextToSearchEmojiSuggestion,
+	useAppDispatch,
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
@@ -16,7 +16,8 @@ import { useAuth } from '../../auth/hooks/useAuth';
 const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
-	return emojis.map(({ src, shortname, category }) => ({
+	return emojis.map(({ id, src, shortname, category }) => ({
+		id,
 		src,
 		category,
 		shortname,
@@ -33,6 +34,7 @@ export function useEmojiSuggestion() {
 		return emojiArr.map((item: any) => {
 			const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
 			return {
+				id: emojiFound?.id,
 				src: emojiFound?.src,
 				category: 'Recent',
 				shortname: emojiFound?.shortname,

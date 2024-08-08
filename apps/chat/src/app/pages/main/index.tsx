@@ -14,7 +14,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch,
-	usersClanActions
+	usersClanActions,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ModeResponsive } from '@mezon/utils';
@@ -154,11 +154,11 @@ function MyApp() {
 	const dispatchApp = useAppDispatch();
 	useEffect(() => {
 		const initClanId = localStorage.getItem('initClan');
-		if(initClanId) {
-			dispatchApp(channelsActions.fetchChannels({clanId: initClanId}));
-			dispatchApp(usersClanActions.fetchUsersClan({clanId: initClanId}));
+		if (initClanId) {
+			dispatchApp(channelsActions.fetchChannels({ clanId: initClanId }));
+			dispatchApp(usersClanActions.fetchUsersClan({ clanId: initClanId }));
 		}
-	},[]);
+	}, []);
 
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>

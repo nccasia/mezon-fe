@@ -171,7 +171,7 @@ export const InviteToChannel = React.memo(
 		};
 
 		useEffect(() => {
-			if (currentClanId && currentChannelId) {
+			if (currentClanId && currentChannelId && currentClanId !== '0') {
 				fetchInviteLink();
 			}
 		}, [currentClanId, currentChannelId]);

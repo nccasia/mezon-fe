@@ -103,6 +103,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
 						displayName: itemUserClan?.user?.display_name ?? '',
+						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
 						type: TypeSearch.Dm_Type,
@@ -110,20 +111,20 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				})
 			: [];
 
-		const friendsMap = new Map(listFriendsSearch.map((friend) => [friend.id, friend]));
+		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
-				const friend = friendsMap.get(itemDM.id);
-				return friend ? { ...itemDM, displayName: friend.displayName || itemDM?.displayName } : itemDM;
+				const user = usersClanMap.get(itemDM.id);
+				return user ? { ...itemDM, clanNick: user.clanNick || '' } : itemDM;
 			}),
 			...listGroupSearch,
-			...listUserClanSearch,
+			...listFriendsSearch,
 		];
 		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
 		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, membersInClan);
 
 		return addPropsIntoSearchList;
-	}, [accountId, friends, listDM, listGroup, membersInClan]);
+	}, [accountId, friends, listDM, listGroup, membersInClan, usersClan]);
 
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
@@ -146,7 +147,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
-				dispatch(directActions.openDirectMessage({ channel_id: user.idDM || '' }));
+				dispatch(directActions.openDirectMessage({ channelId: user.idDM || '', clanId: '0' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: user.idDM,

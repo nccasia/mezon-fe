@@ -10,6 +10,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { ChannelIsNotThread } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { Icons } from 'libs/components/src/lib/components';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
@@ -17,7 +18,6 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
-import { ChannelIsNotThread } from '@mezon/utils';
 
 interface IWebhookItemModalProps {
 	webhookItem: ApiWebhook;
@@ -132,14 +132,14 @@ const ExpendedWebhookModal = ({ webhookItem }: IExpendedWebhookModal) => {
 			);
 		}
 	};
-
+	const clanId = useSelector(selectCurrentClanId) as string;
 	const handleEditWebhook = async () => {
 		const request: MezonUpdateWebhookByIdBody = {
 			avatar: dataForUpdate.webhookAvatarUrl,
 			channel_id: dataForUpdate.channelIdForUpdate,
 			webhook_name: dataForUpdate.webhookNameInput,
 		};
-		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '' }));
+		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '', clanId: clanId }));
 		setHasChange(false);
 	};
 

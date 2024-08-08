@@ -89,21 +89,25 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			]);
 		});
 	}, [currentChannel]);
-
+	
 	const directMessageLoader = useCallback(async () => {
-		const store = await getStoreAsync();
-		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		await store.dispatch(clansActions.setCurrentClanId('0'));
-		await store.dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: currentDmGroup?.id,
-				channelName: currentDmGroup?.channel_label,
-				type: currentDmGroup?.type,
-				noCache: true,
-				isFetchingLatestMessages: true,
-			}),
-		);
-		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
+		requestAnimationFrame(async () => {
+			const store = await getStoreAsync();
+			await Promise.all([
+				store.dispatch(clansActions.joinClan({ clanId: '0' })),
+				store.dispatch(clansActions.setCurrentClanId('0')),
+				store.dispatch(
+					directActions.joinDirectMessage({
+						directMessageId: currentDmGroup?.id,
+						channelName: currentDmGroup?.channel_label,
+						type: currentDmGroup?.type,
+						noCache: true,
+						isFetchingLatestMessages: true,
+					})
+				),
+			]);
+			save(STORAGE_CLAN_ID, currentChannel?.clan_id);
+		});
 		return null;
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type]);
 

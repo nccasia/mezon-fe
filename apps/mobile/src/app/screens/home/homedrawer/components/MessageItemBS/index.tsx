@@ -169,7 +169,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionMarkUnRead = () => {
-		Toast.show({ type: 'info', text1: 'Updating...' })
+		Toast.show({ type: 'info', text1: 'Updating...' });
 	};
 
 	const handleActionMention = () => {
@@ -182,7 +182,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionCopyMessageLink = () => {
-		Toast.show({ type: 'info', text1: 'Updating...' })
+		Toast.show({ type: 'info', text1: 'Updating...' });
 	};
 
 	const handleActionCopyMediaLink = () => {
@@ -330,7 +330,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 			isHideCreateThread && EMessageActionType.CreateThread,
-			isHideDeleteMessage && EMessageActionType.DeleteMessage
+			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
@@ -343,12 +343,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				(action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type),
 			);
 		}
-		const mediaList = message?.attachments?.length > 0 &&
-			message.attachments?.every(
-				att => att?.filetype?.includes("image") ||
-					att?.filetype?.includes("video"))
-			? []
-			: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+		const mediaList =
+			message?.attachments?.length > 0 &&
+			message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))
+				? []
+				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
@@ -361,22 +360,17 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages]);
 
 	const renderUserInformation = () => {
-		return <UserProfile
-			userId={user?.id}
-			user={user}
-			message={message}
-			checkAnonymous={checkAnonymous}
-			showAction={!isDM}
-		/>
+		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous} showAction={!isDM} />;
 	};
 
-	const handleReact = async (mode, messageId, emoji: string, senderId) => {
+	const handleReact = async (mode, messageId, emoji_id: string, emoji: string, senderId) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : message?.clan_id ?? currentClanId,
 			message.channel_id ?? '',
 			messageId ?? '',
+			emoji_id,
 			emoji?.trim(),
 			1,
 			senderId ?? '',
@@ -395,7 +389,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 								key={index}
 								style={styles.favouriteIconItem}
 								onPress={() =>
-									handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile?.user?.id)
+									handleReact(
+										mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+										message.id,
+										item.id,
+										item.shortname,
+										userProfile?.user?.id,
+									)
 								}
 							>
 								<FastImage
@@ -450,8 +450,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
-	const onSelectEmoji = async (emoij: string) => {
-		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoij, userProfile?.user?.id);
+	const onSelectEmoji = async (emoji_id: string, emoij: string) => {
+		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoji_id, emoij, userProfile?.user?.id);
 	};
 
 	const renderEmojiSelector = () => {

@@ -31,6 +31,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		id: string,
 		mode: number,
 		messageId: string,
+		emoji_id: string,
 		emoji: string,
 		count: number,
 		message_sender_id: string,
@@ -42,6 +43,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			currentChannel?.clan_id ?? '',
 			currentChannel?.id ?? '',
 			messageId ?? '',
+			emoji_id,
 			emoji?.trim() ?? '',
 			1,
 			message_sender_id ?? '',
@@ -260,8 +262,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	}, [emojiSelectedId]);
 
 	const onCloseUserInformationBottomSheet = useCallback(() => {
-		setSelectedUserId(null)
-	}, [])
+		setSelectedUserId(null);
+	}, []);
 
 	return (
 		<View>

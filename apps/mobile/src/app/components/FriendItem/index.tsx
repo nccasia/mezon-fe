@@ -68,7 +68,7 @@ export const FriendItem = React.memo(
 						/>
 					) : (
 						<View style={styles.wrapperTextAvatar}>
-							<Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)}</Text>
+							<Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</View>
 					)}
 					{!isPendingFriendRequest ? <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} /> : null}

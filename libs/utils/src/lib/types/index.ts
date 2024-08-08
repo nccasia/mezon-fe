@@ -4,6 +4,7 @@ import {
 	ApiCategoryDesc,
 	ApiChannelAttachment,
 	ApiChannelDescription,
+	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiDirectChannelVoice,
@@ -111,6 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
+  isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -164,9 +166,7 @@ export type IMessageMeta = {
 
 export type IMessage = ChannelMessage & {
 	id: string;
-	content: {
-		t?: string;
-	};
+	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
 	creationTimeMs?: number;
@@ -176,6 +176,7 @@ export type IMessage = ChannelMessage & {
 	isMe?: boolean;
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
+	isFirst?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -187,7 +188,7 @@ export type IMessageWithUser = IMessage & {
 };
 
 export type IMessageSendPayload = {
-	t: string;
+	t?: string;
 	contentThread?: string;
 	mentions?: IMentionOnMessage[];
 	hashtags?: IHashtagOnMessage[];
@@ -195,7 +196,6 @@ export type IMessageSendPayload = {
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
 	voicelinks?: ILinkVoiceRoomOnMessage[];
-	plaintext?: string;
 };
 
 export type IUser = {
@@ -347,6 +347,7 @@ export type IReaction = ApiMessageReaction & {
 };
 
 export type IEmoji = {
+	id: string;
 	src: string;
 	category: string;
 	shortname: string;
@@ -386,6 +387,7 @@ export type IMetaDataEmojis = {
 export type EmojiDataOptionals = {
 	action?: boolean;
 	id: string | undefined;
+	emojiId: string | undefined;
 	emoji: string | undefined;
 	senders: SenderInfoOptionals[];
 	channel_id?: string;
@@ -399,7 +401,7 @@ export type SenderInfoOptionals = {
 
 export type ChannelDraftMessages = {
 	message_id: string;
-	draftContent: string;
+	draftContent: IMessageSendPayload;
 };
 
 export interface IGifCategory {
@@ -430,6 +432,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
+  isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {
@@ -484,6 +487,7 @@ export interface UsersClanEntity extends IUsersClan {
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
+	clanNick?: string;
 }
 
 export type SortChannel = {
@@ -549,6 +553,7 @@ export enum SHOW_POSITION {
 }
 
 export type EmojiStorage = {
+	emojiId: string;
 	emoji: string;
 	messageId: string;
 	senderId: string;
@@ -593,6 +598,10 @@ export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
 }
+
+export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
+	channel_id: string;
+};
 
 export enum ThemeApp {
 	Light = 'light',
@@ -643,6 +652,22 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 };
+
 export enum EEmojiCategory {
 	CUSTOM = 'Custom',
+}
+
+export enum ActiveDm {
+	OPEN_DM = 1,
+}
+
+export enum ETypeMEntion {
+	MENTION = 0,
+	HASHTAG = 1,
+	EMOJI = 2,
+}
+
+export interface IRoleMention {
+	roleId: string;
+	roleName: string;
 }

@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
-import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
+import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUsesClan, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { ThemeApp, UsersClanEntity } from '@mezon/utils';
+import { getNameForPrioritize, ThemeApp, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -33,8 +33,9 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 		setSearchResults(results || []);
 	}, [searchTerm, addUsers, clickRole]);
 
+	const isNewRole = clickRole === 'New Role';
 	useEffect(() => {
-		if (clickRole !== 'New Role') {
+		if (!isNewRole) {
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 			dispatchRole(setAddMemberRoles(memberIDRoles));
 		}
@@ -68,29 +69,16 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 			<div className={appearanceTheme === ThemeApp.Light ? 'lightModeScrollBarMention' : ''}>
 				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
 					{searchResults.map((member: UsersClanEntity) => (
-						<li key={member?.user?.id} className="flex justify-between items-center group">
-							<div className="flex gap-x-2">
-								<AvatarImage 
-									alt={member?.user?.username || ''}
-									userName={member?.user?.username}
-									className="min-w-6 min-h-6 max-w-6 max-h-6"
-									src={member?.user?.avatar_url}
-								/>
-								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
-								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
-							</div>
-							{clickRole !== 'New Role' ? (
-								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
-									<span
-										onClick={() => handleRemoveMember(member?.user?.id || '')}
-										className="text-white cursor-pointer"
-										role="button"
-									>
-										x
-									</span>
-								</div>
-							) : null}
-						</li>
+						<ItemMember
+							key={member?.user?.id}
+							id={member?.user?.id}
+							userName={member?.user?.username}
+							displayName={member?.user?.display_name}
+							clanName={member?.clan_nick}
+							avatar={member?.user?.avatar_url}
+							isNewRole={isNewRole}
+							onRemove={() => handleRemoveMember(member?.user?.id || '')}
+						/>
 					))}
 				</ul>
 			</div>
@@ -100,3 +88,43 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 };
 
 export default SettingManageMembers;
+
+type ItemMemberProps = {
+	id?: string;
+	userName?: string;
+	displayName?: string;
+	clanName?: string;
+	avatar?: string;
+	isNewRole: boolean;
+	onRemove: () => void;
+}
+
+const ItemMember = (props: ItemMemberProps) => {
+	const {id='', userName='', displayName='', clanName='', avatar='', isNewRole, onRemove} = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	return (
+		<li key={id} className="flex justify-between items-center group">
+			<div className="flex gap-x-2">
+				<AvatarImage 
+					alt={userName}
+					userName={userName}
+					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					src={avatar}
+				/>
+				<span className="dark:text-white text-black font-medium">{namePrioritize}</span>
+				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{userName}</span>
+			</div>
+			{!isNewRole ? (
+				<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+					<span
+						onClick={onRemove}
+						className="text-white cursor-pointer"
+						role="button"
+					>
+						x
+					</span>
+				</div>
+			) : null}
+		</li>
+	)
+}

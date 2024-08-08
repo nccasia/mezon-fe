@@ -78,8 +78,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderBottomColor: Colors.bgGrayDark,
 		borderTopWidth: 0.5,
 		borderBottomWidth: 0.5,
-		paddingTop: 10,
-		paddingBottom: 0,
+		paddingTop: size.s_20,
+		paddingBottom: size.s_20,
 	},
 	errorMessage: { paddingRight: size.s_20 }
 });

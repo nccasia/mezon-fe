@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useThreads } from '@mezon/core';
-import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import { gifsStickerEmojiActions, messagesActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import { Snowflake } from "@theinternetfolks/snowflake";
 import clx from 'classnames';
@@ -56,7 +56,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
   const handleItemClick = useCallback(() => {
     dispatch(referencesActions.setOpenReplyMessageState(true));
     dispatch(referencesActions.setIdReferenceMessageReply(message.id));
-    dispatch(referencesActions.setIdMessageToJump(''));
+    dispatch(messagesActions.setIdMessageToJump(''));
     dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
   }, [dispatch, messageId]);
 
@@ -77,12 +77,13 @@ function useEditMenuBuilder(message: IMessageWithUser) {
     dispatch(reactionActions.setReactionRightState(false));
     dispatch(referencesActions.setOpenEditMessageState(true));
     dispatch(referencesActions.setIdReferenceMessageEdit(messageId));
-    dispatch(referencesActions.setIdMessageToJump(''));
-  }, [dispatch, messageId]);
+    dispatch(messagesActions.setChannelDraftMessage({ channelId: message.channel_id, channelDraftMessage: { message_id: messageId, draftContent: message.content } }));
+    dispatch(messagesActions.setIdMessageToJump(''));
+  }, [dispatch, message, messageId]);
 
   return useMenuBuilderPlugin((builder) => {
     builder.when(userId === message.sender_id, (builder) => {
-      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`}/>);
+      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />);
     });
   });
 }
@@ -132,7 +133,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
   });
 }
 
-function useOptionMenuBuilder(handleContextMenu: Function) {
+function useOptionMenuBuilder(handleContextMenu: any) {
   const useHandleClickOption = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const target = event.target as HTMLElement;

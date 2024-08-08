@@ -1,7 +1,9 @@
 {
-    "addStatus": "Thêm Trạng Thái",
-    "editStatus": "Chỉnh Sửa Hồ Sơ",
-    "mezonMemberSince": "Thành Viên Mezon Kể Từ",
-    "yourFriend": "Bạn Bè",
-    "aboutMe": "Giới thiệu về tôi"
+  "addStatus": "Thêm trạng thái",
+  "editStatus": "Chỉnh sửa hồ sơ",
+  "mezonMemberSince": "Thành viên Mezon từ",
+  "yourFriend": "Bạn bè của bạn",
+  "aboutMe": "Về tôi",
+  "editServer": "Chỉnh sửa hồ sơ máy chủ",
+  "editUser": "Chỉnh sửa hồ sơ người dùng"
 }

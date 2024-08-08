@@ -1,3 +1,4 @@
+import { useFilteredContent } from '@mezon/core';
 import { messagesActions, selectChannelById, selectCurrentClanId, selectCurrentUserId, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
@@ -39,12 +40,14 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
 		) => {
+			const filteredContent = useFilteredContent(content);
+
 			return dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
-					content,
+					content: filteredContent ?? {},
 					mentions,
 					attachments,
 					references,
@@ -73,7 +76,9 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content);
+			const filteredContent = useFilteredContent(content);
+
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);

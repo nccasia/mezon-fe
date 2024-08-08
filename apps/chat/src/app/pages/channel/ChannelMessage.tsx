@@ -1,13 +1,11 @@
 import { ChannelMessageOpt, MessageContextMenuProps, MessageWithUser, UnreadMessageBreak, useMessageContextMenu } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
-	messagesActions,
 	selectChannelDraftMessage,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
-	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
@@ -26,7 +24,6 @@ type MessageProps = {
 };
 
 export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight }: Readonly<MessageProps>) {
-	const dispatch = useAppDispatch();
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
@@ -76,20 +73,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	useEffect(() => {
 		preloadMessageContextMenu(messageId);
 	}, [preloadMessageContextMenu, messageId]);
-
-	useEffect(() => {
-		if (isEditing) {
-			dispatch(
-				messagesActions.setChannelDraftMessage({
-					channelId,
-					channelDraftMessage: {
-						message_id: messageId,
-						draftContent: channelDraftMessage.draftContent ?? ((mess as IMessageWithUser).content?.t as string),
-					},
-				}),
-			);
-		}
-	}, [isEditing]);
 
 	return (
 		<>

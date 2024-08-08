@@ -5,6 +5,7 @@ import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage,
 import {
 	directActions,
 	gifsStickerEmojiActions,
+	messagesActions,
 	pinMessageActions,
 	reactionActions,
 	referencesActions,
@@ -87,7 +88,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const handleReplyMessage = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
-		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	};
 
@@ -96,7 +97,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
-		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(
+			messagesActions.setChannelDraftMessage({
+				channelId: message.channel_id,
+				channelDraftMessage: { message_id: message.id, draftContent: message.content },
+			}),
+		);
+		dispatch(messagesActions.setIdMessageToJump(''));
 	};
 
 	const handleForwardMessage = () => {
@@ -280,18 +287,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(pinMessageStatus === true, (builder) => {
-			builder.addMenuItem(
-				'pinMessage', 
-				'Pin Message', 
-				() => setOpenModalAddPin(true),
-				<Icons.PinMessageRightClick defaultSize="w-4 h-4" />
-			);
+			builder.addMenuItem('pinMessage', 'Pin Message', () => setOpenModalAddPin(true), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when((checkPos && !(hasViewChannelPermission && isAlone)), (builder) => {
+		builder.when(checkPos && !(hasViewChannelPermission && isAlone), (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',
@@ -459,7 +461,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	return (
 		<>
 			<DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />
-			{openModalAddPin && <ModalAddPinMess mess={message} closeModal={() => setOpenModalAddPin(false)} handlePinMessage={handlePinMessage} mode={activeMode || 0} channelLabel={currentChannel?.channel_label || ''}/>}
+			{openModalAddPin && (
+				<ModalAddPinMess
+					mess={message}
+					closeModal={() => setOpenModalAddPin(false)}
+					handlePinMessage={handlePinMessage}
+					mode={activeMode || 0}
+					channelLabel={currentChannel?.channel_label || ''}
+				/>
+			)}
 		</>
 	);
 }

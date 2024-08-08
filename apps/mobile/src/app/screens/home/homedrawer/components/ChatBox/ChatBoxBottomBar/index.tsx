@@ -6,6 +6,8 @@ import {
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
+	mentionHashtagPattern,
+	mentionUserPattern,
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
@@ -95,14 +97,15 @@ export const ChatBoxBottomBar = memo(
 		const { setOpenThreadMessageState } = useReference();
 		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
-		const listMentions = UseMentionList(channelId || '');
+		const listMentions = UseMentionList(channelId || '', mode);
+		const [inputTriggersConfig, setInputTriggersConfig] = useState(triggersConfig);
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
 			onChange: (newValue) => handleTextInputChange(newValue),
 			onSelectionChange: (position) => {
 				handleSelectionChange(position);
 			},
-			triggersConfig,
+			triggersConfig: inputTriggersConfig,
 		});
 		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
@@ -192,6 +195,21 @@ export const ChatBoxBottomBar = memo(
 			}
 		};
 
+		const findMentionMarkers = (text) => {
+			const getMatches = (pattern) => {
+				let match;
+				const matches = [];
+				while ((match = pattern.exec(text)) !== null) {
+					matches.push({ start: match?.index, end: pattern?.lastIndex, content: match[0]?.slice(2, -1) });
+				}
+				return matches;
+			};
+
+			const mentionUsers = getMatches(mentionUserPattern);
+			const mentionHashtags = getMatches(mentionHashtagPattern);
+			return { mentionUsers, mentionHashtags };
+		};
+
 		const handleTextInputChange = async (text: string) => {
 			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
 			if (isConvertToFileTxt) {
@@ -201,40 +219,35 @@ export const ChatBoxBottomBar = memo(
 			} else {
 				const convertedHashtag = convertMentionsToText(text);
 
-				const mentionList = [];
-				const hashtagList = [];
+				const { mentionUsers, mentionHashtags } = findMentionMarkers(convertedHashtag);
+				let mentionList = [];
+				let hashtagList = [];
 
-				const words = convertedHashtag.split(' ');
+				if (mentionUsers?.length) {
+					mentionList = mentionUsers.map((m) => {
+						const mention = listMentions.find((item) => `${item?.display}` === m?.content);
 
-				words.forEach((word) => {
-					if (word.startsWith('@')) {
-						const mention = listMentions.find((m) => `@${m.display}` === word);
-						if (mention) {
-							const startindex = convertedHashtag.indexOf(word);
-							mentionList.push({
-								userid: mention.id?.toString() ?? '',
-								username: `@${mention.display}`,
-								startindex,
-								endindex: startindex + word.length,
-							});
-						}
-					}
+						return {
+							userid: mention.id?.toString() ?? '',
+							username: `@${mention?.display}`,
+							startindex: m?.start,
+							endindex: m?.end,
+						};
+					});
+				}
 
-					if (word.startsWith('<#') && word.endsWith('>')) {
-						const channelId = word.slice(2, -1);
-						const channelInfo = getChannelById(channelId);
-						if (channelInfo) {
-							const startindex = convertedHashtag.indexOf(word);
-							hashtagList.push({
-								channelid: channelInfo.id.toString() ?? '',
-								channellabel: channelInfo.channel_label ?? '',
-								startindex,
-								endindex: startindex + word.length,
-							});
-						}
-					}
-				});
+				if (mentionHashtags?.length) {
+					hashtagList = mentionHashtags.map((m) => {
+						const channelInfo = getChannelById(m?.content);
 
+						return {
+							channelid: channelInfo.id.toString() ?? '',
+							channellabel: channelInfo.channel_label ?? '',
+							startindex: m.start,
+							endindex: m.end,
+						};
+					});
+				}
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
@@ -411,6 +424,17 @@ export const ChatBoxBottomBar = memo(
 			};
 		}, []);
 
+		useEffect(() => {
+			if (mode) {
+				const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+				const newTriggersConfig = { ...triggersConfig };
+				if (isDM) {
+					delete newTriggersConfig.hashtag;
+					setInputTriggersConfig(newTriggersConfig);
+				}
+			}
+		}, [mode]);
+
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
 				<Suggestions
@@ -419,6 +443,7 @@ export const ChatBoxBottomBar = memo(
 					messageActionNeedToResolve={messageActionNeedToResolve}
 					onAddMentionMessageAction={onAddMentionMessageAction}
 					mentionTextValue={mentionTextValue}
+					channelMode={mode}
 				/>
 				<HashtagSuggestions {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />

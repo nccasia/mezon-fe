@@ -3,5 +3,7 @@
     "editStatus": "Edit Profile",
     "mezonMemberSince": "Mezon Member Since",
     "yourFriend": "Your Friends",
-    "aboutMe": "About Me"
+    "aboutMe": "About Me",
+    "editServer":"Edit Server Profile",
+    "editUser":"Edit User Profile"
 }

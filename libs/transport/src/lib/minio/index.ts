@@ -16,12 +16,7 @@ export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
-export async function handleUploadEmoticon(
-	client: Client,
-	session: Session,
-	filename: string,
-	file: File,
-): Promise<ApiMessageAttachment> {
+export async function handleUploadEmoticon(client: Client, session: Session, filename: string, file: File): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
@@ -31,10 +26,10 @@ export async function handleUploadEmoticon(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			
+
 			const buf = await file?.arrayBuffer();
 
-			return uploadFile(client, session, filename, fileType, file.size, Buffer.from(buf));			
+			resolve(uploadFile(client, session, filename, fileType, file.size, Buffer.from(buf)));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -61,7 +56,7 @@ export async function handleUploadFile(
 			const fullfilename = createUploadFilePath(session, currentChannelId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
-			return uploadFile(client, session, fullfilename, fileType, file.size, Buffer.from(buf));			
+			resolve(uploadFile(client, session, fullfilename, fileType, file.size, Buffer.from(buf)));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -69,7 +64,7 @@ export async function handleUploadFile(
 }
 
 export async function handleUploadFileMobile(
-	client: Client, 
+	client: Client,
 	session: Session,
 	currentClanId: string,
 	currentChannelId: string,
@@ -85,14 +80,14 @@ export async function handleUploadFileMobile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			if (file?.uri) {			
+			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
 					console.log('Failed to read file data.');
 					return;
 				}
 				const fullfilename = createUploadFilePath(session, currentChannelId, currentChannelId, filename);
-				return uploadFile(client, session, fullfilename, fileType, file.size, arrayBuffer);				
+				return uploadFile(client, session, fullfilename, fileType, file.size, arrayBuffer);
 			}
 		} catch (error) {
 			reject(new Error(`${error}`));
@@ -100,17 +95,12 @@ export async function handleUploadFileMobile(
 	});
 }
 
-export function createUploadFilePath(
-	session: Session,
-	currentClanId: string,
-	currentChannelId: string,
-	filename: string,
-): string {
-	const ms = new Date().getMinutes();			
+export function createUploadFilePath(session: Session, currentClanId: string, currentChannelId: string, filename: string): string {
+	const ms = new Date().getMinutes();
 	filename = ms + filename;
-	filename = filename.replace(/-|\(|\)| /g, '_')
+	filename = filename.replace(/-|\(|\)| /g, '_');
 	if (!currentClanId) {
-		currentClanId = "0";
+		currentClanId = '0';
 	}
 	return currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 }
@@ -121,12 +111,11 @@ export async function uploadFile(
 	filename: string,
 	type: string,
 	size: number,
-	buf: Buffer
-
+	buf: Buffer,
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
-		try {			
+		try {
 			const data = await client.uploadAttachmentFile(session, {
 				filename: filename,
 				filetype: type,

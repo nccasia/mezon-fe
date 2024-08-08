@@ -5,10 +5,11 @@ import {
 	channelsActions,
 	selectAllChannelMembers,
 	selectAllDirectMessages,
+	selectAllUsesClan,
 	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
-import { ChannelThreads, TypeSearch, addAttributesSearchList, findDisplayNameByUserId, normalizeString, removeDuplicatesById } from '@mezon/utils';
+import { ChannelThreads, TypeSearch, UsersClanEntity, addAttributesSearchList, findDisplayNameByUserId, normalizeString, removeDuplicatesById } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -78,6 +79,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
+	const usersClan = useSelector(selectAllUsesClan);
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: DirectEntity) => {
@@ -109,10 +111,32 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					};
 				})
 			: [];
+		
+		const listUserClanSearch = usersClan.length
+			? usersClan.map((itemUserClan: UsersClanEntity) => {
+					return {
+						id: itemUserClan?.id ?? '',
+						name: itemUserClan?.user?.username ?? '',
+						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						displayName: itemUserClan?.user?.display_name ?? '',
+						clanNick: itemUserClan?.clan_nick ?? '',
+						lastSentTimeStamp: '0',
+						idDM: '',
+						type: TypeSearch.Dm_Type,
+					};
+				})
+			: [];
 
-		const listSearch = [...listDMSearch, ...listGroupSearch];
+		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
+		const listSearch = [
+			...listDMSearch.map((itemDM) => {
+				const user = usersClanMap.get(itemDM.id);
+				return user ? { ...itemDM, clanNick: user.clanNick || '' } : itemDM;
+			}),
+			...listGroupSearch
+		];
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
-	}, [accountId, listDM, listGroup]);
+	}, [accountId, listDM, listGroup, membersInClan, usersClan]);
 
 	const listChannelSearch = useMemo(() => {
 		const listChannelForward = listChannels.filter((channel) => channel.type !== ChannelType.CHANNEL_TYPE_VOICE);

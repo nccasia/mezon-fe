@@ -177,7 +177,7 @@ type MenuClanStackParamList = {
 type SettingStackParamList = {
   [APP_SCREEN.SETTINGS.HOME]: undefined;
   [APP_SCREEN.SETTINGS.LANGUAGE]: undefined;
-  [APP_SCREEN.SETTINGS.PROFILE]: undefined;
+  [APP_SCREEN.SETTINGS.PROFILE]: { profileTab?: number };
   [APP_SCREEN.SETTINGS.APPEARANCE]: undefined;
   [APP_SCREEN.SETTINGS.APP_THEME]: undefined;
   [APP_SCREEN.SETTINGS.ACCOUNT]: undefined;

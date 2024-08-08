@@ -1,4 +1,4 @@
-import { useAppParams, useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
 import { selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -7,16 +7,16 @@ import { useSelector } from 'react-redux';
 
 interface IReactionItem {
 	emojiShortCode: string;
+	emojiId: string;
 	activeMode: number | undefined;
 	messageId: string;
 }
 
-const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, messageId }) => {
+const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, activeMode, messageId }) => {
 	const { directId } = useAppParams();
-	const { emojiConverted } = useEmojiSuggestion();
 
 	const { reactionMessageDispatch } = useChatReaction();
-	const getUrl = getSrcEmoji(emojiShortCode, emojiConverted ?? []);
+	const getUrl = getSrcEmoji(emojiId);
 	const userId = useAuth();
 
 	const [channelID, setChannelID] = useState('');
@@ -38,12 +38,13 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, mes
 			currentChannel?.clan_id || '',
 			channelID && channelID,
 			messageId,
+			emojiId,
 			emojiShortCode,
 			1,
 			userId.userId ?? '',
 			false,
 		);
-	}, [emojiShortCode, activeMode, messageId, channelID, currentChannel]);
+	}, [emojiId, emojiShortCode, activeMode, messageId, channelID, currentChannel]);
 
 	return (
 		<div

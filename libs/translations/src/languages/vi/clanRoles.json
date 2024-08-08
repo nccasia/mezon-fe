@@ -44,5 +44,6 @@
         "confirmSaveContent": "Bạn đã thực hiện các thay đổi. Bạn có muốn lưu chúng không?",
         "yes": "Có",
         "doNotSave": "Không lưu"
-    }
+    },
+    "notifyEveryone":"Thông báo cho tất cả những người có quyền xem kênh này."
 }

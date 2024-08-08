@@ -174,7 +174,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
-
+		// TODO: do we need to jump to message here?
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
 		store.dispatch(
 			channelsActions.joinChannel({
@@ -378,7 +378,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				</View>
 			</View>
 			{/* </Swipeable> */}
-			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} />
+			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={isEdited} />
 		</Animated.View>
 	);
 });

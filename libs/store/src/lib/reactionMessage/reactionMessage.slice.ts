@@ -19,7 +19,8 @@ export type UpdateReactionMessageArgs = {
 	id: string;
 	channel_id?: string;
 	message_id?: string;
-	emoji?: string;
+	emoji_id: string;
+	emoji: string;
 	count?: number;
 	sender_id?: string;
 	action?: boolean;
@@ -59,9 +60,9 @@ export const reactionAdapter = createEntityAdapter({
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
 
-	async ({ id, channel_id, message_id, sender_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
+	async ({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji, count, action }));
+			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -75,6 +76,7 @@ export type WriteMessageReactionArgs = {
 	channelId: string;
 	mode: number;
 	messageId: string;
+	emoji_id: string;
 	emoji: string;
 	count: number;
 	messageSenderId: string;
@@ -83,7 +85,7 @@ export type WriteMessageReactionArgs = {
 
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
-	async ({ id, clanId, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
+	async ({ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const session = mezon.sessionRef.current;
@@ -94,7 +96,7 @@ export const writeMessageReaction = createAsyncThunk(
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
+			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
 			return thunkAPI.rejectWithValue('Error while writing message reaction');
 		}
@@ -155,6 +157,7 @@ export const reactionSlice = createSlice({
 			};
 
 			const emojiLastest: EmojiStorage = {
+				emojiId: reactionDataSocket.emoji_id ?? '',
 				emoji: reactionDataSocket.emoji ?? '',
 				messageId: reactionDataSocket.message_id ?? '',
 				senderId: reactionDataSocket.sender_id ?? '',
@@ -253,6 +256,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
 	for (const reaction of reactions) {
+		const emojiId = reaction.emoji_id || ('' as string);
 		const emoji = reaction.emoji || ('' as string);
 
 		if (reaction.count < 1) {
@@ -261,6 +265,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 
 		if (!dataCombined[emoji]) {
 			dataCombined[emoji] = {
+				emojiId,
 				emoji,
 				senders: [],
 				action: false,

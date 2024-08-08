@@ -3,7 +3,7 @@ export const convertMentionsToText = (text: string) => {
 
 	return text.replace(mentionPattern, (match, userMention, hashtagMention, hashtagId, tagValue) => {
 		if (userMention) {
-			return `@${userMention}`;
+			return `@[${userMention}]`;
 		} else if (hashtagMention && hashtagId) {
 			return `<#${hashtagId}>`;
 		} else if (tagValue) {

@@ -10,6 +10,7 @@ import {
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store-mobile';
+import { RouteProp } from '@react-navigation/native';
 import { isEqual } from 'lodash';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -41,10 +42,19 @@ export interface IClanProfileValue {
 	imgUrl: string;
 }
 
-export const ProfileSetting = ({ navigation }: { navigation: any }) => {
+type RootStackParamList = {
+	ProfileSetting: {
+		profileTab: EProfileTab;
+	};
+};
+
+type routeProfileSetting = RouteProp<RootStackParamList, 'ProfileSetting'>;
+
+export const ProfileSetting = ({ navigation, route }: { navigation: any; route: routeProfileSetting }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
+	const { profileTab } = route.params || {};
 	const [tab, setTab] = useState<number>(0);
 	const currentClan = useSelector(selectCurrentClan);
 	const [selectedClan, setSelectedClan] = useState<ClansEntity>(currentClan);
@@ -55,6 +65,8 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.id, userProfile?.user?.id ?? ''));
+  console.log('fasdf');
+
 
 	const [originUserProfileValue, setOriginUserProfileValue] = useState<IUserProfileValue>({
 		username: '',
@@ -80,7 +92,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		displayName: '',
 	});
 
-  useEffect(() => {
+	useEffect(() => {
 		const { display_name, avatar_url, username, about_me } = userProfile?.user || {};
 		const initialValue = {
 			username,
@@ -93,6 +105,10 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 	}, [userProfile, tab]);
 
 	useEffect(() => {
+		if (profileTab) setTab(profileTab);
+	}, [profileTab]);
+
+	useEffect(() => {
 		const { username, about_me } = userProfile?.user || {};
 		const { nick_name, avartar } = userClansProfile || {};
 		const initialValue = {
@@ -103,7 +119,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		};
 		setOriginClanProfileValue(initialValue);
 		setCurrentClanProfileValue(initialValue);
-	}, [userClansProfile, tab, userProfile, selectedClan ]);
+	}, [userClansProfile, tab, userProfile, selectedClan]);
 
 	const isUserProfileNotChanged = useMemo(() => {
 		return isEqual(originUserProfileValue, currentUserProfileValue);
@@ -151,7 +167,6 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 			}
 		}
 	};
-
 
 	navigation.setOptions({
 		headerRight: () => (
@@ -258,10 +273,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 				pageIndex={tab}
 				onChange={handleTabChange}
 				views={[
-					<UserProfile
-						userProfileValue={currentUserProfileValue}
-						setCurrentUserProfileValue={setCurrentUserProfileValue}
-					/>,
+					<UserProfile userProfileValue={currentUserProfileValue} setCurrentUserProfileValue={setCurrentUserProfileValue} />,
 					<ServerProfile
 						clanProfileValue={currentClanProfileValue}
 						isClanProfileNotChanged={isClanProfileNotChanged}

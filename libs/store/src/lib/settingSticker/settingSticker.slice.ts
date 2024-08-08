@@ -82,12 +82,12 @@ export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker'
 		return thunkAPI.rejectWithValue({});
 	}
 });
-export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (stickerId: string, thunkAPI) => {
+export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const res = await mezon.client.deleteClanStickerById(mezon.session, stickerId);
+		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
 		if (res) {
-			return stickerId;
+			return data.stickerId;
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({});

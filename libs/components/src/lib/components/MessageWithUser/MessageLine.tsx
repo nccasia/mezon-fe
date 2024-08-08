@@ -27,7 +27,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
+			const { startindex, endindex, channelid, channellabel, username, userid, emojiid, shortname, markdown, link, voicelink } = element;
 
 			if (lastindex < startindex) {
 				formattedContent.push(
@@ -62,6 +62,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 						key={`${index}${startindex}${shortname}`}
 						emojiSyntax={shortname}
 						onlyEmoji={false}
+						emojiId={emojiid}
 					/>,
 				);
 			}

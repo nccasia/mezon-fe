@@ -15,6 +15,7 @@ import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
 import { style } from './UserProfile.styles';
 import { PendingContent } from './component/PendingContent';
 import UserSettingProfile from './component/UserSettingProfile';
+import EditUserProfileBtn from './component/EditUserProfileBtn';
 
 interface userProfileProps {
 	userId?: string;
@@ -195,6 +196,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
+          {checkOwner(userById?.user?.google_id || userById?.user?.id) && <EditUserProfileBtn user={userById || (user as any)}/>}
 					{!checkOwner(userById?.user?.google_id || userById?.user?.id) && (
 						<View style={[styles.userAction]}>
 							{actionList.map(actionItem => {
@@ -209,7 +211,6 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 							})}
 						</View>
 					)}
-
 					{EFriendState.ReceivedRequestFriend === targetUser?.state && (
 						<Block marginTop={size.s_16}>
 							<Text style={styles.receivedFriendRequestTitle}>{t('incomingFriendRequest')}</Text>

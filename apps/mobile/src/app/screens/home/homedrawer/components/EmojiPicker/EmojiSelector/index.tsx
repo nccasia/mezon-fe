@@ -9,9 +9,9 @@ import {
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	SmilingFaceIcon
+	SmilingFaceIcon,
 } from '@mezon/mobile-components';
-import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Colors, Metrics, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { debounce } from 'lodash';
@@ -24,7 +24,7 @@ import { useSelector } from 'react-redux';
 import { style } from './styles';
 
 type EmojiSelectorProps = {
-	onSelected: (url: string) => void;
+	onSelected: (emojiId: string, shortname: string) => void;
 	searchText?: string;
 	isReactMessage?: boolean;
 	onScroll?: (e: any) => void;
@@ -32,10 +32,9 @@ type EmojiSelectorProps = {
 	handleBottomSheetCollapse?: () => void;
 };
 
-
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
-	readonly onEmojiSelect: (emoji: string) => void;
+	readonly onEmojiSelect: (emojiId: string, emoji: string) => void;
 	readonly onEmojiHover?: (item: any) => void;
 	readonly emojisData: any[];
 };
@@ -68,7 +67,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {
 				return (
-					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.shortname)}>
+					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.id, item.shortname)}>
 						<FastImage source={{ uri: item.src }} style={styles.iconEmoji} resizeMode={'contain'} />
 					</TouchableOpacity>
 				);
@@ -93,17 +92,20 @@ export default function EmojiSelector({
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
 	const { t } = useTranslation('message');
-	const cateIcon = useMemo(() => ([
-		<PenIcon color={themeValue.textStrong} />,
-		<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
-		<LeafIcon color={themeValue.textStrong} />,
-		<BowlIcon color={themeValue.textStrong} />,
-		<GameControllerIcon color={themeValue.textStrong} />,
-		<BicycleIcon color={themeValue.textStrong} />,
-		<ObjectIcon color={themeValue.textStrong} />,
-		<HeartIcon color={themeValue.textStrong} />,
-		<RibbonIcon color={themeValue.textStrong} />,
-	]), [themeValue]);
+	const cateIcon = useMemo(
+		() => [
+			<PenIcon color={themeValue.textStrong} />,
+			<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
+			<LeafIcon color={themeValue.textStrong} />,
+			<BowlIcon color={themeValue.textStrong} />,
+			<GameControllerIcon color={themeValue.textStrong} />,
+			<BicycleIcon color={themeValue.textStrong} />,
+			<ObjectIcon color={themeValue.textStrong} />,
+			<HeartIcon color={themeValue.textStrong} />,
+			<RibbonIcon color={themeValue.textStrong} />,
+		],
+		[themeValue],
+	);
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
@@ -112,8 +114,8 @@ export default function EmojiSelector({
 		}, {}),
 	);
 
-	const handleEmojiSelect = useCallback(async (emojiPicked: string) => {
-		onSelected(emojiPicked);
+	const handleEmojiSelect = useCallback(async (emojiId: string, emojiPicked: string) => {
+		onSelected(emojiId, emojiPicked);
 		handleBottomSheetCollapse?.();
 		if (!isReactMessage) setEmojiSuggestion(emojiPicked);
 	}, []);

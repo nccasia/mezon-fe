@@ -75,6 +75,7 @@ const ItemDm = (props: ItemDmProps) => {
 					subText={userName}
 					wrapSuggestItemStyle="gap-x-1"
 					subTextStyle="text-[13px]"
+					emojiId="" // TODO:
 				/>
 			</div>
 			<Checkbox className="w-4 h-4 focus:ring-transparent" id={`checkbox-item-${id}`} checked={checked} onChange={handleToggle} />
@@ -103,6 +104,7 @@ const ItemChannel = (props: ItemChannelProps) => {
 					valueHightLight={searchText}
 					subTextStyle="uppercase"
 					isOpenSearchModal
+					emojiId="" //TODO:
 				/>
 			</div>
 			<Checkbox className="w-4 h-4 focus:ring-transparent" id={`checkbox-item-${id}`} checked={checked} onChange={handleToggle} />

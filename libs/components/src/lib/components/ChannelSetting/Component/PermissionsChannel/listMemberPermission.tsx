@@ -1,8 +1,8 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useCheckOwnerForUser } from '@mezon/core';
 import { channelUsersActions, selectAllAccount, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { getNameForPrioritize, IChannel } from '@mezon/utils';
+import { useLayoutEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 type ListMemberPermissionProps = {
 	channel: IChannel;
@@ -15,8 +15,6 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
 	const [memberList, setMemberList] = useState<any[]>();
-
-	const checkOwner = useCallback((userId: string) => userId === userProfile?.user?.google_id, [userProfile?.user?.google_id]);
 
 	const deleteMember = async (userId: string) => {
 		if (userId !== userProfile?.user?.id) {
@@ -31,10 +29,10 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const listMembersInChannel = () => {
 		if (channel.channel_private === 0 || channel.channel_private === undefined) {
 			const filteredMembers = rawMembers.filter((member) => member.user && member.user.id && props.selectedUserIds.includes(member.user.id));
-			return filteredMembers.map((member) => member.user);
+			return filteredMembers.map((member) => ({...member.user, clanNick: member.clan_nick}));
 		}
 		const filteredMembers = rawMembers.filter((member) => member.userChannelId !== '0');
-		return filteredMembers.map((member) => member.user);
+		return filteredMembers.map((member) => ({...member.user, clanNick: member.clan_nick}));
 	};
 
 	useLayoutEffect(() => {
@@ -50,6 +48,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 			id={user.id}
 			userName={user.username}
 			displayName={user.display_name}
+			clanName={user.clanNick}
 			avatar={user.avatar_url}
 			onDelete={() => deleteMember(user.id)}
 		/>
@@ -63,13 +62,15 @@ type ItemMemberPermissionProps =  {
 	userName?: string;
 	avatar?: string;
 	displayName?: string;
+	clanName?: string;
 	onDelete: () => void;
 }
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
-	const {id='', userName='', displayName='', avatar='', onDelete} = props;
+	const {id='', userName='', displayName='', clanName='', avatar='', onDelete} = props;
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const isClanOwner = checkClanOwner(id);
+	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	return(
 		<div className={`flex justify-between py-2 rounded`} key={id}>
 			<div className="flex gap-x-2 items-center">
@@ -80,7 +81,8 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 					src={avatar}
 					classNameText='text-[9px] pt-[3px]'
 				/>
-				<p className="text-sm">{displayName || userName}</p>
+				<p className="text-sm font-semibold">{namePrioritize}</p>
+				<p className='text-contentTertiary font-light'>{userName}</p>
 			</div>
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs text-[#AEAEAE]">

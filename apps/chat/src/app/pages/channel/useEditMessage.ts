@@ -14,16 +14,16 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	const handleCancelEdit = useCallback(() => {
 		dispatch(referencesActions.setIdReferenceMessageEdit(''));
 		dispatch(messagesActions.deleteChannelDraftMessage({ channelId }));
-	}, [dispatch]);
+	}, [channelId, dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draftContent: string) => {
+		(channelId: string, message_id: string, draftContent: IMessageSendPayload) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
 					channelDraftMessage: {
-						message_id,
-						draftContent,
+						message_id: message_id,
+						draftContent: draftContent,
 					},
 				}),
 			);
@@ -34,7 +34,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string) => {
 			editSendMessage(editMessage, messageId);
-			setChannelDraftMessage(channelId, messageId, editMessage.t);
+			setChannelDraftMessage(channelId, messageId, editMessage);
 		},
 		[editSendMessage],
 	);

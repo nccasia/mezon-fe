@@ -1,4 +1,3 @@
-import { useEmojiSuggestion } from '@mezon/core';
 import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
 import { getSrcEmoji, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -18,6 +17,7 @@ type SuggestItemProps = {
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
 	wrapSuggestItemStyle?: string;
+	emojiId: string;
 	display?: string;
 	isHightLight?: boolean;
 };
@@ -31,11 +31,11 @@ const SuggestItem = ({
 	valueHightLight,
 	showAvatar,
 	wrapSuggestItemStyle,
+	emojiId,
 	display,
 	isHightLight = true,
 }: SuggestItemProps) => {
-	const { emojis } = useEmojiSuggestion();
-	const urlEmoji = getSrcEmoji(display ?? '', emojis);
+	const urlEmoji = getSrcEmoji(emojiId);
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);

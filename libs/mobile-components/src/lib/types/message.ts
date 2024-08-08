@@ -3,3 +3,8 @@ export enum EOpenSearchChannelFrom {
 	HeaderDefault,
 	ActionMenu,
 }
+
+export interface IRoleMention {
+	roleId: string;
+	roleName: string;
+}

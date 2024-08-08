@@ -10,7 +10,6 @@ import {
 	getStoreAsync,
 	initStore,
 	messagesActions,
-	notificationActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
@@ -20,7 +19,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -45,8 +44,6 @@ import {
 	setCurrentClanLoader,
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
-import { settingClanStickerActions } from '@mezon/store';
-import { gifsActions } from '@mezon/store-mobile';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { delay } from 'lodash';
@@ -65,12 +62,11 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-	const previousClanIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsReadyForUse(true);
-		}, 900);
+		}, 800);
 		return () => clearTimeout(timer);
 	}, []);
 
@@ -87,7 +83,7 @@ const NavigationMain = () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 1000);
+		}, 800);
 
 		return () => {
 			clearTimeout(timer);
@@ -122,7 +118,6 @@ const NavigationMain = () => {
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
-			refreshMessageInitApp();
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
@@ -132,19 +127,6 @@ const NavigationMain = () => {
 			switchClanLoader();
 		}
 	}, [currentClanId]);
-
-	const refreshMessageInitApp = useCallback(async () => {
-		const store = await getStoreAsync();
-		if (currentChannelId) {
-			store.dispatch(
-				messagesActions.fetchMessages({
-					channelId: currentChannelId,
-					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			);
-		}
-	}, [currentChannelId]);
 
 	const initAppLoading = useCallback(async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
@@ -190,12 +172,8 @@ const NavigationMain = () => {
 	}, [currentChannelId]);
 
 	const switchClanLoader = async () => {
-		const promises = [];
 		const store = await getStoreAsync();
-		promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true })));
-		promises.push(store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId || '0', noCache: true })))
-		promises.push(store.dispatch(notificationActions.fetchListNotification(currentClanId)));
-		await Promise.all(promises);
+		await Promise.all([store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }))]);
 	};
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
@@ -234,8 +212,6 @@ const NavigationMain = () => {
 				}
 
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
-				promises.push(store.dispatch(gifsActions.fetchGifCategories()));
-				promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 
 				const results = await Promise.all(promises);

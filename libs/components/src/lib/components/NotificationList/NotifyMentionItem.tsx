@@ -1,5 +1,5 @@
 import { useJumpToMessage } from '@mezon/core';
-import { notificationActions, referencesActions } from '@mezon/store';
+import { messagesActions, notificationActions } from '@mezon/store';
 import { IMessageWithUser, INotification } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
@@ -62,7 +62,7 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const handleClickJump = useCallback(() => {
 		dispatch(notificationActions.setReadNotiStatus([notify.id]));
 		dispatch(notificationActions.setStatusNoti());
-		dispatch(referencesActions.setIdMessageToJump(messageId));
+		dispatch(messagesActions.setIdMessageToJump(messageId));
 		directToMessageById();
 		dispatch(notificationActions.setIsShowInbox(false));
 	}, [directToMessageById, dispatch, messageId, notify.id]);

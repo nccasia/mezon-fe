@@ -12,7 +12,7 @@ const ReactionPart: React.FC<IReactionPart> = ({ emojiList, activeMode, messageI
 	return (
 		<div className="flex justify-start gap-x-1 mb-1">
 			{emojiList.map((item, index) => {
-				return <ReactionItem key={index} emojiShortCode={item.shortname} activeMode={activeMode} messageId={messageId} />;
+				return <ReactionItem key={index} emojiShortCode={item.shortname} emojiId={item.id} activeMode={activeMode} messageId={messageId} />;
 			})}
 		</div>
 	);

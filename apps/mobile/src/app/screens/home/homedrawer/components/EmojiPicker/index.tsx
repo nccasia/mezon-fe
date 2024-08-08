@@ -3,7 +3,8 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
+import { settingClanStickerActions } from '@mezon/store';
+import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
@@ -59,10 +60,25 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		setChannelMode(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	}, []);
 
+	useEffect(() => {
+		initLoader();
+	}, []);
+
+	const initLoader = async () => {
+		const promises = [];
+		const store = await getStoreAsync();
+		promises.push(store.dispatch(gifsActions.fetchGifCategories()));
+		promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
+		promises.push(
+			store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDirectMessage?.channel_id || currentChannel?.id || '0' })),
+		);
+		await Promise.all(promises);
+	};
+
 	const { sendMessage } = useChatSending({
 		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
 		mode: dmMode || channelMode,
-		directMessageId: currentDirectMessage?.channel_id || ''
+		directMessageId: currentDirectMessage?.channel_id || '',
 	});
 
 	const handleSend = useCallback(
@@ -145,7 +161,13 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 						<View style={styles.textInputWrapper}>
 							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
-							<TextInput placeholder='search' placeholderTextColor={themeValue.text} style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
+							<TextInput
+								placeholder="search"
+								placeholderTextColor={themeValue.text}
+								style={styles.textInput}
+								onFocus={handleInputSearchFocus}
+								onChangeText={debouncedSetSearchText}
+							/>
 						</View>
 					</Block>
 				)}

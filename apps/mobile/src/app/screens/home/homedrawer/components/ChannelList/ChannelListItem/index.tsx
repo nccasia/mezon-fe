@@ -71,19 +71,20 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			}
 		} else {
 			navigation.dispatch(DrawerActions.closeDrawer());
-			const store = await getStoreAsync();
 			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-			timeoutRef.current = setTimeout(() => {
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-				if (!channelsCache?.includes(channelId)) {
-					save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-				}
-			}, 0);
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			const store = await getStoreAsync();
+			
+			await Promise.all([
+				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+			]);
+			
+			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+			if (!channelsCache?.includes(channelId)) {
+				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+			}
 		}
 	};
 

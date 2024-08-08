@@ -39,7 +39,7 @@ const SettingEmoji = () => {
     const shortname = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
     const category = 'Custom';
     const id = Snowflake.generate()
-    const path = 'emojis/' + id;
+    const path = 'emojis/' + id + '.webp';
     handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
       const request: ApiClanEmojiCreateRequest = {
         id: id,

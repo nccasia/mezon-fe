@@ -9,7 +9,7 @@ export const useEscapeKey = (handler: () => void) => {
 			if (event.key === 'Escape') {
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 				dispatch(referencesActions.setIdReferenceMessageReply(''));
-				dispatch(referencesActions.setIdMessageToJump(''));
+				dispatch(messagesActions.setIdMessageToJump(''));
 				dispatch(messagesActions.setOpenOptionMessageState(false));
 				dispatch(referencesActions.setDataReferences(null));
 				dispatch(reactionActions.setMessageMatchWithRef(false));

@@ -10,8 +10,8 @@ import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
-import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 import UserProfileModalInner from "../UserProfileModalInner";
+import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -223,7 +223,7 @@ function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}

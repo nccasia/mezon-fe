@@ -1,9 +1,17 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllDirectChannelVoids, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps, ThemeApp, searchMentionsHashtag } from '@mezon/utils';
+import { selectAllDirectChannelVoids, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import {
+	IMessageSendPayload,
+	IMessageWithUser,
+	MentionDataProps,
+	ThemeApp,
+	createFormattedString,
+	getRoleList,
+	processText,
+	searchMentionsHashtag,
+} from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
-import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -39,30 +47,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
-	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const { mentionList, hashtagList, emojiList } = useProcessMention(channelDraftMessage.draftContent ?? '');
-	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
-
-	const combinedContent = useMemo(() => {
-		return {
-			t: channelDraftMessage.draftContent,
-			mentions: mentionList,
-			hashtags: hashtagList,
-			emojis: emojiList,
-			links: linkList,
-			markdowns: markdownList,
-			voicelinks: voiceLinkRoomList,
-		};
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
-
-	const [convertedContent, setConvertedContent] = useState(combinedContent);
-
-	useEffect(() => {
-		setConvertedContent(combinedContent);
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
-
-	const [initialDraftContent, setInitialDraftContent] = useState<string>(message.content);
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
@@ -80,18 +65,28 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			return [];
 		}
 	}, [mode, listChannels]);
-
-	useEffect(() => {
-		if (channelDraftMessage.draftContent) {
-			setChannelDraftMessage(channelId, messageId, channelDraftMessage.draftContent);
-		}
-	}, [channelDraftMessage.draftContent, listChannelsMention]);
-
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
 			textareaRef.current?.focus();
 		}
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
+
+	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
+	const processedContentDraft: IMessageSendPayload = useMemo(() => {
+		return {
+			t: channelDraftMessage.draftContent?.t,
+			mentions: channelDraftMessage.draftContent?.mentions,
+			hashtags: channelDraftMessage.draftContent?.hashtags,
+			emojis: channelDraftMessage.draftContent?.emojis,
+			links: channelDraftMessage.draftContent?.links,
+			markdowns: channelDraftMessage.draftContent?.markdowns,
+			voicelinks: channelDraftMessage.draftContent?.voicelinks,
+		};
+	}, [channelDraftMessage.draftContent, messageId]);
+
+	const formatContentDraft = createFormattedString(processedContentDraft);
 
 	const handleFocus = () => {
 		if (textareaRef.current) {
@@ -111,14 +106,25 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	useEscapeKey(handleCancelEdit);
 
+	const draftContent = useMemo(() => {
+		return channelDraftMessage.draftContent?.t;
+	}, [channelDraftMessage.draftContent?.t]);
+
+	const originalContent = useMemo(() => {
+		return message.content.t;
+	}, [message.content.t]);
+
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (channelDraftMessage.draftContent === '') {
+
+			if (draftContent === '') {
 				setOpenModalDelMess(true);
-			} else {				
-				handleSend(convertedContent, message.id);
+			} else if (draftContent === originalContent) {
+				handleCancelEdit();
+			} else {
+				handleSend(processedContentDraft, message.id);
 				handleCancelEdit();
 			}
 		}
@@ -129,32 +135,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const sortObjectKeys = (obj: any): any => {
-		if (obj === null || typeof obj !== 'object') {
-			return obj;
-		}
-		if (Array.isArray(obj)) {
-			return obj.map(sortObjectKeys);
-		}
-		return Object.keys(obj)
-			.sort()
-			.reduce((accumulator, key) => {
-				accumulator[key] = sortObjectKeys(obj[key]);
-				return accumulator;
-			}, {} as any);
-	};
-
-	const sortedContentConverted = sortObjectKeys(convertedContent);
-	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
-
 	const handleSave = () => {
-		delete sortedInitialDraftContent.plaintext;
-		if (channelDraftMessage.draftContent === '') {
+		if (draftContent === '') {
 			return setOpenModalDelMess(true);
-		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
+		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			handleSend(convertedContent, message.id);
+			handleSend(processedContentDraft, message.id);
 		}
 		handleCancelEdit();
 	};
@@ -162,8 +149,19 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const value = event.target.value;
-		setChannelDraftMessage(channelId, messageId, value);
+		const { mentionList, hashtagList, emojiList } = useProcessMention(newPlainTextValue, mentions, roleList);
+		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
+
+		setChannelDraftMessage(channelId, messageId, {
+			t: newPlainTextValue,
+			mentions: mentionList,
+			hashtags: hashtagList,
+			emojis: emojiList,
+			links: links,
+			markdowns: markdowns,
+			voicelinks: voiceRooms,
+		});
+
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {
@@ -172,6 +170,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			setTitleMention('Emoji matching');
 		}
 	};
+
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
@@ -208,11 +207,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				<MentionsInput
 					onFocus={handleFocus}
 					inputRef={textareaRef}
-					value={channelDraftMessage.draftContent ?? '{}'}
+					value={formatContentDraft ?? '{}'}
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
-					rows={channelDraftMessage.draftContent?.split('\n').length}
+					rows={channelDraftMessage.draftContent?.t?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === ThemeApp.Light ? lightMentionsInputStyle : darkMentionsInputStyle}
 					customSuggestionsContainer={(children: React.ReactNode) => {
@@ -238,6 +237,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
+									emojiId={suggestion.id as string}
 									display={suggestion.display}
 								/>
 							);
@@ -261,6 +261,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								symbol="#"
 								subText={(suggestion as ChannelsMentionProps).subText}
 								channelId={suggestion.id}
+								emojiId=""
 							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -272,7 +273,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
+						renderSuggestion={(suggestion) => (
+							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
+						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

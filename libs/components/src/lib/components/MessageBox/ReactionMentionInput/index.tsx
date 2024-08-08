@@ -17,6 +17,7 @@ import {
 	referencesActions,
 	selectAllAccount,
 	selectAllDirectChannelVoids,
+	selectAllRolesClan,
 	selectAllUsesClan,
 	selectAttachmentData,
 	selectCloseMenu,
@@ -52,6 +53,7 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
+	getRoleList,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -59,7 +61,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
@@ -94,12 +96,6 @@ type ChannelsMentionProps = {
 	subText: string;
 };
 
-type EmojiData = {
-	id: string;
-	emoji: string;
-	display: string;
-};
-
 export type MentionReactInputProps = {
 	readonly onSend: (
 		content: IMessageSendPayload,
@@ -123,6 +119,8 @@ export type MentionReactInputProps = {
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
@@ -134,7 +132,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -180,7 +177,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
 
@@ -221,7 +218,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
 				userIds: userIds,
-				clanId: currentClanId || "",
+				clanId: currentClanId || '',
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
@@ -237,7 +234,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content);
+	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -276,7 +275,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						links: linkList,
 						markdowns: markdownList,
 						voicelinks: voiceLinkRoomList,
-						plaintext: plainTextMessage,
 					},
 
 					simplifiedMentionList,
@@ -319,7 +317,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							links: linkList,
 							markdowns: markdownList,
 							voicelinks: voiceLinkRoomList,
-							plaintext: plainTextMessage,
 						},
 						simplifiedMentionList,
 						attachmentDataRef,
@@ -402,6 +399,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [props.mode, commonChannelVoids]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		setMentionRaw(mentions);
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
 
@@ -409,8 +407,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		setContent(newValue);
-		setPlainTextMessage(newPlainTextValue);
+		setContent(newPlainTextValue);
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newValue);
@@ -442,22 +439,28 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !valueTextInput) {
-			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
+			dispatch(
+				messagesActions.setChannelDraftMessage({
+					channelId: currentChannelId as string,
+					channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content },
+				}),
+			);
 		}
 	};
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const handleSearchUserMention = (search: any, callback: any) => {
+	const handleSearchUserMention = (search: string, callback: any) => {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, props.listMentions ?? []));
 	};
 
-	const handleSearchHashtag = (search: any, callback: any) => {
+	const handleSearchHashtag = (search: string, callback: any) => {
 		setValueHightlight(search);
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
 			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
@@ -504,11 +507,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			setContent(valueTextInput);
+		if (currentChannelId !== undefined || currentDmGroupId !== undefined) {
 			focusToElement(editorRef);
 		}
-	}, [currentChannelId, currentDmGroupId, valueTextInput]);
+	}, [currentChannelId, currentDmGroupId]);
 
 	useEffect(() => {
 		if (isFocused) {
@@ -630,6 +632,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
+								emojiId={suggestion.id as string}
 							/>
 						);
 					}}
@@ -652,6 +655,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
+							emojiId="" //TODO:
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -663,7 +667,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
 					}}
-					renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId={suggestion.id as string} />
+					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>

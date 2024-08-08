@@ -1,4 +1,5 @@
 import { AvatarImage, Icons } from '@mezon/components';
+import { getNameForPrioritize } from '@mezon/utils';
 import { ApiUser } from 'mezon-js/api.gen';
 
 type ListMembersProps = {
@@ -9,30 +10,58 @@ type ListMembersProps = {
 
 const ListMembers = (props: ListMembersProps) => {
 	const { listItem, selectedUserIds, handleCheckboxUserChange } = props;
-	return listItem.map((user) => (
-		<div className={`flex justify-between py-2 rounded hover:bg-[#E1E2E4] dark:hover:bg-[#43444B] px-[6px]`} key={user?.id}>
+	return listItem.map((user: any) => (
+		<ItemMember 
+			key={user?.id}
+			userName={user?.username}
+			displayName={user?.display_name}
+			avatar={user?.avatar_url}
+			clanName={user.clanNick}
+			checked={selectedUserIds.includes(user?.id || '')}
+			onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
+				handleCheckboxUserChange(event, user?.id || '')
+			}
+		/>
+	));
+};
+
+export default ListMembers;
+
+type ItemMemberProps = {
+	userName?: string;
+	displayName?: string;
+	clanName?: string;
+	avatar?: string;
+	checked: boolean;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const ItemMember = (props: ItemMemberProps) => {
+	const {userName='', displayName='', clanName='', avatar='', checked, onChange} = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	return(
+		<div className={`flex justify-between py-2 rounded hover:bg-[#E1E2E4] dark:hover:bg-[#43444B] px-[6px]`}>
 			<label className="flex gap-x-2 items-center w-full">
 				<div className="relative flex flex-row justify-center">
 					<input
 						type="checkbox"
-						value={user?.display_name}
-						checked={selectedUserIds.includes(user?.id || '')}
-						onChange={(event) => handleCheckboxUserChange(event, user?.id || '')}
+						value={displayName}
+						checked={checked}
+						onChange={onChange}
 						className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
 					/>
 					<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
 				</div>
 				<AvatarImage 
-					alt={user?.username || ''}
-					userName={user?.username}
+					alt={userName}
+					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					src={user?.avatar_url}
+					src={avatar}
 					classNameText='text-[9px] pt-[3px]'
 				/>
-				<p className="text-sm">{user?.display_name}</p>
+				<p className="text-sm">{namePrioritize}</p>
+				<p className="text-contentTertiary font-light">{userName}</p>
 			</label>
 		</div>
-	));
-};
-
-export default ListMembers;
+	)
+}

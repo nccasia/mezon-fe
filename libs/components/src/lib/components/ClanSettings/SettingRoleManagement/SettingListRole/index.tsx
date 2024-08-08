@@ -29,8 +29,8 @@ const SettingListRole = (props: closeEditRole) => {
 
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
-		if(isNewRole) handleUpdateUser();
 		if (!isChange || isNewRole) {
+			if(isNewRole) handleUpdateUser();
 			const activeRole = RolesClan.find((role) => role.id === roleId);
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 

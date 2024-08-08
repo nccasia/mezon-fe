@@ -13,6 +13,7 @@ export interface IHashtag {
 	channellabel: string | undefined;
 }
 export interface IEmoji {
+	emojiid: string | undefined;
 	shortname: string | undefined;
 }
 export interface ILink {

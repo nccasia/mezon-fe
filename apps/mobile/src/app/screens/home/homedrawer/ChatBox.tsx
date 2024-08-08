@@ -2,7 +2,7 @@ import { useUserPermission } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter } from 'react-native';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
@@ -46,9 +46,9 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 		};
 	}, []);
 
-	const deleteMessageActionNeedToResolve = () => {
+	const deleteMessageActionNeedToResolve = useCallback(() => {
 		setMessageActionNeedToResolve(null);
-	};
+	}, []);
 
 	return (
 		<Block>
@@ -59,7 +59,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 					)}
 					<ChatBoxBottomBar
 						messageActionNeedToResolve={messageActionNeedToResolve}
-						onDeleteMessageActionNeedToResolve={() => deleteMessageActionNeedToResolve()}
+						onDeleteMessageActionNeedToResolve={deleteMessageActionNeedToResolve}
 						channelId={props?.channelId}
 						mode={props?.mode}
 						hiddenIcon={props?.hiddenIcon}
