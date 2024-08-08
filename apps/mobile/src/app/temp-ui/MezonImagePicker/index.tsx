@@ -13,161 +13,161 @@ import MezonClanAvatar from '../MezonClanAvatar';
 import { style as _style } from './styles';
 
 export interface IFile {
-	uri: string;
-	name: string;
-	type: string;
-	size: string;
-	fileData: any;
+  uri: string;
+  name: string;
+  type: string;
+  size: string;
+  fileData: any;
 }
 
 interface IMezonImagePickerProps {
-	onChange?: (file: any) => void;
-	onLoad?: (url: string) => void;
-	defaultValue: string;
-	height?: DimensionValue;
-	width?: DimensionValue;
-	rounded?: boolean;
-	showHelpText?: boolean;
-	autoUpload?: boolean;
-	alt?: string;
-	style?: StyleProp<ViewStyle>;
-	defaultColor?: string;
-	penPosition?: {
-		top?: number;
-		left?: number;
-		right?: number;
-		bottom?: number;
-	};
-	noDefaultText?: boolean;
+  onChange?: (file: any) => void;
+  onLoad?: (url: string) => void;
+  defaultValue: string;
+  height?: DimensionValue;
+  width?: DimensionValue;
+  rounded?: boolean;
+  showHelpText?: boolean;
+  autoUpload?: boolean;
+  alt?: string;
+  style?: StyleProp<ViewStyle>;
+  defaultColor?: string;
+  penPosition?: {
+    top?: number;
+    left?: number;
+    right?: number;
+    bottom?: number;
+  };
+  noDefaultText?: boolean;
 }
 
 const scale = 5;
 
 export default memo(function MezonImagePicker({
-	onChange,
-	onLoad,
-	defaultValue,
-	height = 60,
-	width = 60,
-	showHelpText,
-	autoUpload = false,
-	rounded = false,
-	alt,
-	style,
-	defaultColor,
-	penPosition = {
-		bottom: undefined,
-		top: -7,
-		left: undefined,
-		right: -7,
-	},
-	noDefaultText,
+  onChange,
+  onLoad,
+  defaultValue,
+  height = 60,
+  width = 60,
+  showHelpText,
+  autoUpload = false,
+  rounded = false,
+  alt,
+  style,
+  defaultColor,
+  penPosition = {
+    bottom: undefined,
+    top: -7,
+    left: undefined,
+    right: -7,
+  },
+  noDefaultText,
 }: IMezonImagePickerProps) {
-	const { themeValue } = useTheme();
-	const styles = _style(themeValue);
-	const [image, setImage] = useState<string>(defaultValue);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const { sessionRef, clientRef } = useMezon();
-	const timerRef = useRef<any>(null);
+  const { themeValue } = useTheme();
+  const styles = _style(themeValue);
+  const [image, setImage] = useState<string>(defaultValue);
+  const currentChannel = useSelector(selectCurrentChannel);
+  const { sessionRef, clientRef } = useMezon();
+  const timerRef = useRef<any>(null);
 
-	useEffect(() => {
-		setImage(defaultValue);
-	}, [defaultValue]);
+  useEffect(() => {
+    setImage(defaultValue);
+  }, [defaultValue]);
 
-	useEffect(() => {
-		return () => {
-			timerRef?.current && clearTimeout(timerRef.current);
-		};
-	}, []);
+  useEffect(() => {
+    return () => {
+      timerRef?.current && clearTimeout(timerRef.current);
+    };
+  }, []);
 
-	async function handleSelectImage() {
-		const response = await launchImageLibrary({
-			mediaType: 'photo',
-			includeBase64: true,
-			quality: 1,
-		});
+  async function handleSelectImage() {
+    const response = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: true,
+      quality: 1,
+    });
 
-		if (response.didCancel) {
-			console.log('User cancelled camera');
-		} else if (response.errorCode) {
-			console.log('Camera Error: ', response.errorMessage);
-		} else {
-			const file = response.assets[0];
-			return {
-				uri: file?.uri,
-				name: file?.fileName,
-				type: file?.type,
-				size: file?.fileSize?.toString(),
-				fileData: file?.base64,
-			} as IFile;
-		}
-	}
+    if (response.didCancel) {
+      console.log('User cancelled camera');
+    } else if (response.errorCode) {
+      console.log('Camera Error: ', response.errorMessage);
+    } else {
+      const file = response.assets[0];
+      return {
+        uri: file?.uri,
+        name: file?.fileName,
+        type: file?.type,
+        size: file?.fileSize?.toString(),
+        fileData: file?.base64,
+      } as IFile;
+    }
+  }
 
-	async function handleUploadImage(file: IFile) {
-		const session = sessionRef.current;
-		const client = clientRef.current;
+  async function handleUploadImage(file: IFile) {
+    const session = sessionRef.current;
+    const client = clientRef.current;
 
-		if (!file || !client || !session) {
-			throw new Error('Client is not initialized');
-		}
-		const res = await handleUploadFileMobile(client, session, currentChannel?.clan_id, currentChannel?.channel_id, file.name, file);
-		return res.url;
-	}
+    if (!file || !client || !session) {
+      throw new Error('Client is not initialized');
+    }
+    const res = await handleUploadFileMobile(client, session, currentChannel?.clan_id, currentChannel?.channel_id, file.name, file);
+    return res.url;
+  }
 
-	async function handleImage() {
-		const file = await handleSelectImage();
-		if (file) {
-			timerRef.current = setTimeout(
-				async () => {
-					const croppedFile = await openCropper({
-						path: file.uri,
-						mediaType: 'photo',
-						includeBase64: true,
-						compressImageQuality: 1,
-						...(typeof width === 'number' && { width: width * scale }),
-						...(typeof height === 'number' && { height: height * scale }),
-					});
-					setImage(croppedFile.path);
-					onChange && onChange(croppedFile);
-					if (autoUpload) {
-						const uploadImagePayload = {
-							fileData: croppedFile?.data,
-							name: file.name,
-							uri: croppedFile.path,
-							size: croppedFile.size.toString(),
-							type: croppedFile.mime,
-						} as IFile;
-						const url = await handleUploadImage(uploadImagePayload);
-						if (url) {
-							onLoad && onLoad(url);
-						}
-					}
-				},
-				Platform.OS === 'ios' ? 500 : 0,
-			);
-		}
-	}
+  async function handleImage() {
+    const file = await handleSelectImage();
+    if (file) {
+      timerRef.current = setTimeout(
+        async () => {
+          const croppedFile = await openCropper({
+            path: file.uri,
+            mediaType: 'photo',
+            includeBase64: true,
+            compressImageQuality: 1,
+            ...(typeof width === 'number' && { width: width * scale }),
+            ...(typeof height === 'number' && { height: height * scale }),
+          });
+          setImage(croppedFile.path);
+          onChange && onChange(croppedFile);
+          if (autoUpload) {
+            const uploadImagePayload = {
+              fileData: croppedFile?.data,
+              name: file.name,
+              uri: croppedFile.path,
+              size: croppedFile.size.toString(),
+              type: croppedFile.mime,
+            } as IFile;
+            const url = await handleUploadImage(uploadImagePayload);
+            if (url) {
+              onLoad && onLoad(url);
+            }
+          }
+        },
+        Platform.OS === 'ios' ? 500 : 0,
+      );
+    }
+  }
 
-	return (
-		<TouchableOpacity onPress={() => handleImage()}>
-			<View style={styles.bannerContainer}>
-				<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
-					{image || !showHelpText ? (
-						<MezonClanAvatar image={image} alt={alt} defaultColor={defaultColor} noDefaultText={noDefaultText} />
-					) : (
-						<Text style={styles.textPlaceholder}>Choose an image</Text>
-					)}
-				</View>
+  return (
+    <TouchableOpacity onPress={() => handleImage()}>
+      <View style={styles.bannerContainer}>
+        <View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
+          {image || !showHelpText ? (
+            <MezonClanAvatar image={image} alt={alt} defaultColor={defaultColor} noDefaultText={noDefaultText} />
+          ) : (
+            <Text style={styles.textPlaceholder}>Choose an image</Text>
+          )}
+        </View>
 
-				<View
-					style={[
-						styles.btnWrapper,
-						penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
-					]}
-				>
-					<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
-				</View>
-			</View>
-		</TouchableOpacity>
-	);
+        <View
+          style={[
+            styles.btnWrapper,
+            penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
+          ]}
+        >
+          <Icons.PencilIcon height={12} width={12} color={themeValue.text} />
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 });
