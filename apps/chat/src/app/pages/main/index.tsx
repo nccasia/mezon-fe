@@ -1,11 +1,10 @@
-import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { ForwardMessageModal, ModalCreateClan, NavLinkComponent, SearchModal, SidebarClanItem } from '@mezon/components';
+import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	channelsActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
-	selectCountNotifyByClanId,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDirectsUnreadlist,
@@ -14,13 +13,13 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch,
-	usersClanActions,
+	usersClanActions
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { ModeResponsive } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IClan, ModeResponsive } from '@mezon/utils';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
@@ -30,20 +29,13 @@ function MyApp() {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const { userId } = useAuth();
-	const [openListClans, setOpenListClans] = useState(false);
-	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-	const numberOfNotifyClan = useSelector(selectCountNotifyByClanId(currentClan?.clan_id ?? ''));
-	const handleChangeClan = (clanId: string) => {
-		navigate(toClanPage(clanId));
-	};
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
-	const dispatch = useDispatch();
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -196,57 +188,23 @@ function MyApp() {
 						),
 				)}
 				<div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
-				<div className="relative">
-					{Boolean(initClan) && (
-						<NavLink to={initClan}>
-							<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}>
-								{currentClan?.logo || clans[0]?.logo ? (
-									<Image
-										src={currentClan?.logo || clans[0]?.logo || ''}
-										alt={currentClan?.clan_name || clans[0]?.clan_name || ''}
-										placeholder="blur"
-										width={48}
-										blurdataurl={currentClan?.logo || clans[0]?.logo}
-										className="min-w-12 min-h-12 object-cover clan"
-									/>
-								) : (
-									(currentClan?.clan_name || clans[0]?.clan_name) && (
-										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
-											{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
-										</div>
-									)
-								)}
-							</NavLinkComponent>
-						</NavLink>
-					)}
-					{numberOfNotifyClan ? (
-						<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
-							{numberOfNotifyClan}
-						</div>
-					) : (
-						<></>
-					)}
+				<div className="relative flex flex-col gap-3">
+					{clans.map((clan: IClan) => {
+						return (
+							<SidebarClanItem key={clan.clan_id} linkClan={`/chat/clans/${clan.id}`} option={clan} />
+						)
+					})}
+
 				</div>
-				<div
-					className="relative py-2"
-					onClick={() => {
-						setOpenListClans(!openListClans);
-					}}
-				>
-					<div className="size-12 dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl dark:hover:bg-slate-800 hover:bg-bgLightModeButton  transition-all duration-200 ">
-						<p className="text-2xl font-bold text-[#155EEF]">+</p>
+				<NavLinkComponent clanName={"Add Clan"}>
+					<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group">
+						<button className="flex items-center" onClick={openCreateClanModal}>
+							<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+								<p className="text-2xl font-bold text-[#155EEF]">+</p>
+							</div>
+						</button>
 					</div>
-					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
-						<ModalListClans
-							options={clans}
-							showModal={openListClans}
-							idSelectedClan={currentClan?.clan_id}
-							onChangeClan={handleChangeClan}
-							createClan={openCreateClanModal}
-							onClose={() => setOpenListClans(false)}
-						/>
-					</div>
-				</div>
+				</NavLinkComponent>
 			</div>
 			<MainContent />
 		</div>

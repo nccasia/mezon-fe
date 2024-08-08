@@ -55,7 +55,6 @@ export { default as ForwardMessageModal } from './components/ForwardMessage';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
-export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 
@@ -70,6 +69,7 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+export  { default as SidebarClanItem } from './components/ModalListClans/SidebarClanItem';
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
