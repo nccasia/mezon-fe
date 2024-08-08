@@ -1,14 +1,10 @@
-import { selectAllEmojiSuggestion } from '@mezon/store';
-import { ETypeMEntion, getEmojiId, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, IRoleMention } from '@mezon/utils';
+import { ETypeMEntion, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, IRoleMention } from '@mezon/utils';
 import { MentionItem } from 'react-mentions';
-import { useSelector } from 'react-redux';
 
 const useProcessMention = (text: string, mentionsRaw: MentionItem[], roleList: IRoleMention[]) => {
 	const mentions: IMentionOnMessage[] = [];
 	const hashtags: IHashtagOnMessage[] = [];
 	const emojis: IEmojiOnMessage[] = [];
-
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	mentionsRaw.forEach((item) => {
 		const { id, display, plainTextIndex, childIndex } = item;
@@ -31,14 +27,13 @@ const useProcessMention = (text: string, mentionsRaw: MentionItem[], roleList: I
 			});
 		} else if (childIndex === ETypeMEntion.EMOJI) {
 			emojis.push({
-				emojiid: getEmojiId(display, emojiListPNG),
+				emojiid: id,
 				shortname: display,
 				startindex,
 				endindex,
 			});
 		}
 	});
-
 	const simplifiedList = mentions.map((mention) => {
 		const isRole = roleList.some((role) => role.roleId === mention.userid);
 		if (isRole) {
@@ -54,7 +49,6 @@ const useProcessMention = (text: string, mentionsRaw: MentionItem[], roleList: I
 			};
 		}
 	});
-
 	return {
 		mentionList: mentions,
 		hashtagList: hashtags,
