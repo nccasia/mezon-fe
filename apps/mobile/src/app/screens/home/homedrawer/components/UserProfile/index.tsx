@@ -1,18 +1,22 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { Icons, MenuHorizontalIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { useAppDispatch } from '@mezon/store';
+import { friendsActions, selectAllRolesClan, selectCurrentUserId, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
 import { style } from './UserProfile.styles';
+import ListOptionProfile from './component/ListOptionProfile';
 import { PendingContent } from './component/PendingContent';
 import UserSettingProfile from './component/UserSettingProfile';
 
@@ -35,6 +39,7 @@ export enum EFriendState {
 
 const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true }: userProfileProps) => {
 	const { themeValue } = useTheme();
+	const dispatch = useAppDispatch();
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
@@ -48,9 +53,19 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
+	const [isVisible, setIsVisible] = useState<boolean>(false);
+	const currentUserId = useSelector(selectCurrentUserId);
 	const targetUser = useMemo(() => {
 		return allUser.find(targetUser => [user?.id, userId].includes(targetUser?.user?.id))
 	}, [user?.id, userId, allUser])
+
+	const isPending = useMemo(() => {
+		return !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state);
+	}, [targetUser]);
+
+	const isCurrentUser = useMemo(() => {
+		return currentUserId === user.id;
+	}, [currentUserId, user.id]);
 
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
@@ -157,6 +172,39 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
 	}
 
+	const handleAddFriend = useCallback(() => {
+		const userIdToAddFriend = userId || user?.id;
+		if (userIdToAddFriend) {
+			dispatch(
+				friendsActions.sendRequestAddFriend({
+					usernames: [],
+					ids: [userIdToAddFriend],
+				}),
+			);
+		}
+	}, [dispatch, user?.id, userId]);
+
+	const handleCloseTooltip = useCallback(() => {
+		setIsVisible(false);
+	}, []);
+
+	const handleCopyUsername = useCallback(() => {
+		const username = userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+		Clipboard.setString(username);
+		Toast.show({
+			type: 'info',
+			text1: t('pendingContent.copiedUserName', { username }),
+		});
+	}, [checkAnonymous, message?.username, t, user?.username, userById]);
+
+	const handleCancelFriendRequest = useCallback(() => {
+		setIsShowPendingContent(true);
+	}, []);
+
+	const toggleTooltip = () => {
+		setIsVisible(!isVisible);
+	};
+
 	const isShowUserContent = useMemo(() => {
 		return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction
 	}, [userById?.user?.about_me, showAction, showRole, userRolesClan])
@@ -171,10 +219,34 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	return (
 		<View style={[styles.wrapper]}>
-			<View style={[
-				styles.backdrop,
-				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
-			]}>
+			<View style={[styles.backdrop, { backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }]}>
+				<View style={styles.tooltipContainer}>
+					<Tooltip
+						isVisible={isVisible}
+						placement="bottom"
+						closeOnBackgroundInteraction={true}
+						disableShadow={true}
+						closeOnContentInteraction={true}
+						arrowSize={{ width: 0, height: 0 }}
+						contentStyle={[{ backgroundColor: themeValue.primary }, styles.tooltipStyle]}
+						onClose={handleCloseTooltip}
+						content={
+							<ListOptionProfile
+								onClose={handleCloseTooltip}
+								isCurrentUser={isCurrentUser}
+								pending={isPending}
+								onFriendAction={handleAddFriend}
+								onCancelAction={handleCancelFriendRequest}
+								onCopyAction={handleCopyUsername}
+							/>
+						}
+					>
+						<View style={styles.tooltipContainer} />
+					</Tooltip>
+					<TouchableOpacity style={[styles.meatballButton]} onPress={toggleTooltip}>
+						<MenuHorizontalIcon width={size.s_22} height={size.s_22} color={themeValue.white} />
+					</TouchableOpacity>
+				</View>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
 						width={80}
@@ -197,7 +269,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
 					{!checkOwner(userById?.user?.google_id || userById?.user?.id) && (
 						<View style={[styles.userAction]}>
-							{actionList.map(actionItem => {
+							{actionList.map((actionItem) => {
 								const { action, icon, id, isShow, text, textStyles } = actionItem;
 								if (!isShow) return null;
 								return (
@@ -205,7 +277,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 										{icon}
 										<Text style={[styles.actionText, textStyles && textStyles]}>{text}</Text>
 									</TouchableOpacity>
-								)
+								);
 							})}
 						</View>
 					)}
@@ -213,11 +285,14 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					{EFriendState.ReceivedRequestFriend === targetUser?.state && (
 						<Block marginTop={size.s_16}>
 							<Text style={styles.receivedFriendRequestTitle}>{t('incomingFriendRequest')}</Text>
-							<Block flexDirection='row' gap={size.s_10} marginTop={size.s_10}>
+							<Block flexDirection="row" gap={size.s_10} marginTop={size.s_10}>
 								<TouchableOpacity onPress={() => handleAcceptFriend()} style={[styles.button, { backgroundColor: Colors.green }]}>
 									<Text style={styles.defaultText}>{t('accept')}</Text>
-								</TouchableOpacity >
-								<TouchableOpacity onPress={() => handleIgnoreFriend()} style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() => handleIgnoreFriend()}
+									style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}
+								>
 									<Text style={styles.defaultText}>{t('ignore')}</Text>
 								</TouchableOpacity>
 							</Block>
@@ -248,14 +323,9 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 							</Block>
 						) : null}
 
-						{showAction && (
-							<UserSettingProfile
-								user={userById || (user as any)}
-							/>
-						)}
+						{showAction && <UserSettingProfile user={userById || (user as any)} />}
 					</View>
 				)}
-
 			</View>
 		</View>
 	);

@@ -1,4 +1,4 @@
-import { Attributes, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -112,5 +112,29 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		color: colors.text,
 		fontSize: size.h7,
 		fontWeight: 'bold'
-	}
+	},
+	meatballButton: {
+		alignSelf: 'flex-end',
+		alignItems: 'center',
+		justifyContent: 'center',
+		width: size.s_40,
+		height: size.s_40,
+		borderRadius: size.s_40,
+		backgroundColor: Colors.charcoalBlack,
+		opacity: 0.6,
+		marginHorizontal: size.s_15,
+		marginVertical: size.s_15,
+	},
+	tooltipContainer: {
+		alignSelf: 'flex-end',
+	},
+	tooltipStyle: { 
+		padding: 0, 
+		alignSelf: 'flex-end',
+		borderRadius: size.s_16, 
+		width: 'auto',
+		minWidth: 2*size.s_100,
+		left: size.s_10, 
+		top: size.s_60,
+	} 
 });
