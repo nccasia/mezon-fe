@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
@@ -14,7 +14,7 @@ type Option = {
 };
 
 interface ListOptionProps {
-	isCurrentUser: boolean;
+	isMe: boolean;
 	onClose: () => void;
 	onFriendAction: () => void;
 	onCancelAction: () => void;
@@ -22,7 +22,7 @@ interface ListOptionProps {
 	pending: boolean;
 }
 
-const ListOptionProfile: React.FC<ListOptionProps> = memo(({ isCurrentUser, onClose, onFriendAction, onCancelAction, onCopyAction, pending }) => {
+const ListOptionProfile: React.FC<ListOptionProps> = memo(({ isMe, onClose, onFriendAction, onCancelAction, onCopyAction, pending }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
@@ -31,38 +31,58 @@ const ListOptionProfile: React.FC<ListOptionProps> = memo(({ isCurrentUser, onCl
 		return [
 			{
 				title: t('pendingContent.block'),
-				color: 'red',
+				color: baseColor.red,
+				isShown: true,
+				action: () => {
+					Toast.show({ type: 'info', text1: 'Updating...' });
+					onClose();
+				},
+			},
+			{
+				title: t('pendingContent.reportUserProfile'),
+				color: baseColor.red,
 				isShown: true,
 				action: () => {
 					Toast.show({ type: 'info', text1: 'Updating...' });
 				},
 			},
 			{
-				title: t('pendingContent.reportUserProfile'),
-				color: 'red',
-				isShown: true,
+				title: t('pendingContent.cancelFriendRequest'),
+				color: themeValue.channelNormal,
+				isShown: pending,
 				action: () => {
-					Toast.show({ type: 'info', text1: 'Updating...' });
+					onCancelAction();
+					onClose();
 				},
 			},
-			{ title: t('pendingContent.cancelFriendRequest'), color: '', isShown: pending, action: onCancelAction },
-			{ title: t('userAction.addFriend'), color: '', isShown: !pending, action: onFriendAction },
-			{ title: t('pendingContent.copyUsername'), color: '', isShown: true, action: onCopyAction },
+			{
+				title: t('userAction.addFriend'),
+				color: themeValue.channelNormal,
+				isShown: !pending,
+				action: () => {
+					onFriendAction();
+					onClose();
+				},
+			},
+			{
+				title: t('pendingContent.copyUsername'),
+				color: themeValue.channelNormal,
+				isShown: true,
+				action: () => {
+					onCopyAction();
+					onClose();
+				},
+			},
 		];
-	}, [onCancelAction, onCopyAction, onFriendAction, pending, t]);
-
-	const handleItemAction = (option: Option) => {
-		option.action();
-		onClose();
-	};
+	}, [onCancelAction, onClose, onCopyAction, onFriendAction, pending, t, themeValue.channelNormal]);
 
 	return (
 		<View style={styles.optionContainer}>
-			{!isCurrentUser ? (
+			{!isMe ? (
 				profileOptions.map(
 					(option, index) =>
 						option.isShown && (
-							<Pressable key={`${option.title}_${index}`} onPress={() => handleItemAction(option)}>
+							<Pressable key={`${option.title}_${index}`} onPress={option.action}>
 								<OptionProfile option={option}></OptionProfile>
 								{index < profileOptions.length - 1 && <View style={styles.separatedItem} />}
 							</Pressable>

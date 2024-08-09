@@ -2,7 +2,7 @@ import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus 
 import { Icons, MenuHorizontalIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch } from '@mezon/store';
-import { friendsActions, selectAllRolesClan, selectCurrentUserId, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { friendsActions, selectAllRolesClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -54,7 +54,6 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 	const [isVisible, setIsVisible] = useState<boolean>(false);
-	const currentUserId = useSelector(selectCurrentUserId);
 	const targetUser = useMemo(() => {
 		return allUser.find(targetUser => [user?.id, userId].includes(targetUser?.user?.id))
 	}, [user?.id, userId, allUser])
@@ -63,9 +62,9 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		return !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state);
 	}, [targetUser]);
 
-	const isCurrentUser = useMemo(() => {
-		return currentUserId === user.id;
-	}, [currentUserId, user.id]);
+	const isMe = useMemo(() => {
+		return userProfile?.user?.id === userId;
+	}, [userId, userProfile?.user?.id]);
 
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
@@ -219,7 +218,10 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	return (
 		<View style={[styles.wrapper]}>
-			<View style={[styles.backdrop, { backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }]}>
+			<View style={[
+				styles.backdrop,
+				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
+			]}>
 				<View style={styles.tooltipContainer}>
 					<Tooltip
 						isVisible={isVisible}
@@ -233,7 +235,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						content={
 							<ListOptionProfile
 								onClose={handleCloseTooltip}
-								isCurrentUser={isCurrentUser}
+								isMe={isMe}
 								pending={isPending}
 								onFriendAction={handleAddFriend}
 								onCancelAction={handleCancelFriendRequest}
@@ -285,14 +287,11 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					{EFriendState.ReceivedRequestFriend === targetUser?.state && (
 						<Block marginTop={size.s_16}>
 							<Text style={styles.receivedFriendRequestTitle}>{t('incomingFriendRequest')}</Text>
-							<Block flexDirection="row" gap={size.s_10} marginTop={size.s_10}>
+							<Block flexDirection='row' gap={size.s_10} marginTop={size.s_10}>
 								<TouchableOpacity onPress={() => handleAcceptFriend()} style={[styles.button, { backgroundColor: Colors.green }]}>
 									<Text style={styles.defaultText}>{t('accept')}</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									onPress={() => handleIgnoreFriend()}
-									style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}
-								>
+									</TouchableOpacity >
+									<TouchableOpacity onPress={() => handleIgnoreFriend()} style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}>
 									<Text style={styles.defaultText}>{t('ignore')}</Text>
 								</TouchableOpacity>
 							</Block>
@@ -323,7 +322,11 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 							</Block>
 						) : null}
 
-						{showAction && <UserSettingProfile user={userById || (user as any)} />}
+						{showAction && (
+							<UserSettingProfile
+								user={userById || (user as any)}
+							/>
+						)}
 					</View>
 				)}
 			</View>

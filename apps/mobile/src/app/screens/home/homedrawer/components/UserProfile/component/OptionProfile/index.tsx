@@ -1,4 +1,4 @@
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 import { style } from './OptionProfile.styles';
@@ -10,7 +10,7 @@ const OptionProfile = memo(({ option }: Option) => {
 
 	return (
 		<View style={styles.wrapperOption}>
-			<Text numberOfLines={1} style={[styles.textOption, option.color === 'red' && { color: baseColor.red }]}>
+			<Text numberOfLines={1} style={[styles.textOption, { color: option.color }]}>
 				{option?.title}
 			</Text>
 		</View>
