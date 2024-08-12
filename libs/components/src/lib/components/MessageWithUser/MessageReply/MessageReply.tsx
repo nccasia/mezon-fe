@@ -1,11 +1,11 @@
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
+import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
-import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 };
@@ -66,11 +66,16 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<Icons.ImageThumbnail />
 							</div>
 						) : (
-							<MessageLine
-								showOnchannelLayout={false}
-								onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
-								content={messageContentRef}
-							/>
+							<div>
+								{' '}
+								<MessageLine
+									isTokenClickAble={false}
+									isJumMessageEnabled={true}
+									isSingleLine={true}
+									onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+									content={messageContentRef}
+								/>
+							</div>
 						)}
 					</div>
 				</div>

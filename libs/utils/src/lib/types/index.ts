@@ -25,7 +25,7 @@ import {
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
-	RoleUserListRoleUser
+	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 

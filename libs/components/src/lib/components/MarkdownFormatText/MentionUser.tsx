@@ -10,10 +10,11 @@ type ChannelHashtagProps = {
 	tagName: string;
 	tagUserId: string;
 	mode?: number;
-	showOnchannelLayout?: boolean;
+	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 };
 
-const MentionUser = ({ tagName, mode, showOnchannelLayout, tagUserId }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode, isSingleLine, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
 	const usersInChannel = useSelector(selectAllChannelMembers);
@@ -104,15 +105,15 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout, tagUserId }: ChannelH
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
-						onMouseDown={showOnchannelLayout ? (event) => handleMouseClick(event) : () => {}}
+						onMouseDown={!isSingleLine || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
 						ref={panelRef}
-						onClick={showOnchannelLayout ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+						onClick={!isSingleLine || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm 
-				${tagName === '@here' ? 'cursor-text' : showOnchannelLayout ? 'cursor-pointer hover:!text-white' : 'hover:none'}
+				${tagName === '@here' ? 'cursor-text' : isSingleLine ? 'cursor-pointer hover:!text-white' : 'hover:none'}
 
-				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${showOnchannelLayout ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isSingleLine ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
 						{foundUser?.user?.username ? tagName : '@here'}
 					</Link>

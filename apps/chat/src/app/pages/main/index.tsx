@@ -170,7 +170,7 @@ function MyApp() {
 					{listUnreadDM.map(
 						(dmGroupChatUnread) =>
 							dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-								<SidebarTooltip titleTooltip={dmGroupChatUnread.channel_label}>
+								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
 									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 								</SidebarTooltip>
 							),

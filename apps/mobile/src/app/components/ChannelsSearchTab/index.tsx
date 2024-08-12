@@ -6,7 +6,7 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Linking, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
+import { Linking, ScrollView, Text, View } from 'react-native';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
 import ChannelItem from '../ChannelItem';
@@ -59,11 +59,15 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 		}
 	};
 
-
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<ScrollView keyboardDismissMode={'on-drag'} contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+				<ScrollView
+					keyboardDismissMode={'interactive'}
+					keyboardShouldPersistTaps={'handled'}
+					contentContainerStyle={{ paddingBottom: size.s_50 }}
+					showsVerticalScrollIndicator={false}
+				>
 					<>
 						<Block>
 							{listTextChannelAndThreads?.length > 0 ? (

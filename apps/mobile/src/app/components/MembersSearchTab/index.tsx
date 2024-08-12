@@ -30,7 +30,12 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	return (
 		<View style={styles.container}>
 			{listMemberSearch?.length > 0 ? (
-				<ScrollView keyboardDismissMode={'on-drag'}  contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+				<ScrollView
+					keyboardDismissMode={'interactive'}
+					keyboardShouldPersistTaps={'handled'}
+					contentContainerStyle={{ paddingBottom: size.s_50 }}
+					showsVerticalScrollIndicator={false}
+				>
 					{
 						<View style={styles.boxMembers}>
 							{listMemberSearch?.map((user) => (
