@@ -242,19 +242,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? [
-							{
-								message_id: '',
-								message_ref_id: targetMessage.id,
-								ref_type: 0,
-								message_sender_id: targetMessage?.sender_id,
-								message_sender_username: targetMessage?.username,
-								mesages_sender_avatar: targetMessage?.avatar,
-								message_sender_clan_nick: targetMessage?.clan_nick,
-								message_sender_display_name: targetMessage?.display_name,
-								content: JSON.stringify(targetMessage.content),
-								has_attachment: Boolean(targetMessage?.attachments?.length),
-							},
-						]
+						{
+							message_id: '',
+							message_ref_id: targetMessage.id,
+							ref_type: 0,
+							message_sender_id: targetMessage?.sender_id,
+							message_sender_username: targetMessage?.username,
+							mesages_sender_avatar: targetMessage?.avatar,
+							message_sender_clan_nick: targetMessage?.clan_nick,
+							message_sender_display_name: targetMessage?.display_name,
+							content: JSON.stringify(targetMessage.content),
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+						},
+					]
 					: undefined;
 
 				setEmojiSuggestion('');
@@ -300,6 +300,8 @@ export const ChatMessageInput = memo(
 				});
 			};
 
+			const throttleSendMessage = useThrottledCallback(handleSendMessage, 1000);
+
 			return (
 				<Block flex={1} flexDirection="row" justifyContent="flex-end" gap={size.s_10}>
 					<Block alignItems="center">
@@ -336,7 +338,7 @@ export const ChatMessageInput = memo(
 
 					<Block>
 						{text?.length > 0 || !!attachmentDataRef?.length ? (
-							<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
+							<View onTouchEnd={throttleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 								<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
 							</View>
 						) : (
