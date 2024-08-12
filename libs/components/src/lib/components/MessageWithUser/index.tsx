@@ -60,11 +60,12 @@ function MessageWithUser({
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 
 	const hasIncludeMention = useMemo(() => {
-		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
-		const includesHere = message.content.t?.includes('@[here]');
-		const includesUser = message.content.t?.includes(userMention);
+		const userIdMention = userLogin.userProfile?.user?.id;
+		const mentionOnMessage = message.mentions;
+		const includesHere = message.content.t?.includes('@here');
+		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
 		return includesHere || includesUser;
-	}, [message.content.t, userLogin.userProfile?.user?.username]);
+	}, [message.content.t, userLogin.userProfile?.user?.id, message.mentions]);
 
 	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {

@@ -1,9 +1,9 @@
-import { useRoles } from '@mezon/core';
+import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
-import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectAllUsesClan } from '@mezon/store-mobile';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { selectAllRolesClan, selectAllUsesClan, UsersClanEntity } from '@mezon/store-mobile';
 import { isEqual } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Image, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
@@ -13,6 +13,7 @@ import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonInput } from '../../../temp-ui';
 import { normalizeString } from '../../../utils/helpers';
+import { checkCanEditPermission } from '../helper';
 
 type SetupMembersScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS;
 export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMembersScreen>) => {
@@ -25,6 +26,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const [searchMemberText, setSearchMemberText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	//Note: create new role
 	const newRole = useMemo(() => {
@@ -39,6 +41,10 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
 	}, [roleId]);
+
+	const isCanEditRole = useMemo(() => {
+		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
+	}, [isClanOwner, clanRole, userPermissionsStatus])
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedMembers, selectedMembers);
@@ -81,17 +87,17 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		headerTitle: !isEditRoleMode
 			? t('setupMember.title')
 			: () => {
-					return (
-						<Block>
-							<Text center bold h3 color={themeValue?.white}>
-								{clanRole?.title}
-							</Text>
-							<Text center color={themeValue?.text}>
-								{t('roleDetail.role')}
-							</Text>
-						</Block>
-					);
-				},
+				return (
+					<Block>
+						<Text center bold h3 color={themeValue?.white}>
+							{clanRole?.title}
+						</Text>
+						<Text center color={themeValue?.text}>
+							{t('roleDetail.role')}
+						</Text>
+					</Block>
+				);
+			},
 		headerLeft: () => (
 			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
 				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
@@ -153,19 +159,23 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		}
 	};
 
+	const mapUserPermission = useCallback((clanUser: UsersClanEntity) => {
+		return { ...clanUser, disabled: !isCanEditRole }
+	}, [isCanEditRole])
+
 	const filteredMemberList = useMemo(() => {
 		return usersClan?.filter(
 			(it) =>
 				normalizeString(it?.user?.display_name).includes(normalizeString(searchMemberText)) ||
 				normalizeString(it?.user?.username).includes(normalizeString(searchMemberText)),
-		);
-	}, [searchMemberText, usersClan]);
+		).map(mapUserPermission);
+	}, [searchMemberText, usersClan, mapUserPermission]);
 
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14}>
 				<Block flex={1}>
-					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
+					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim} marginBottom={size.s_20}>
 						<Text color={themeValue.white} h2 center bold>
 							{t('setupMember.addMember')}
 						</Text>
@@ -184,7 +194,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 								ItemSeparatorComponent={SeparatorWithLine}
 								renderItem={({ item }) => {
 									return (
-										<TouchableOpacity onPress={() => onSelectMemberChange(!selectedMembers?.includes(item?.id), item?.id)}>
+										<TouchableOpacity disabled={item?.disabled} onPress={() => onSelectMemberChange(!selectedMembers?.includes(item?.id), item?.id)}>
 											<Block
 												flexDirection="row"
 												alignItems="center"
@@ -238,7 +248,9 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 															borderWidth: 1.5,
 															borderColor: selectedMembers?.includes(item?.id) ? Colors.bgButton : Colors.tertiary,
 															borderRadius: 5,
+															opacity: item?.disabled ? .4 : 1
 														}}
+														disabled={item?.disabled}
 														textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 													/>
 												</Block>

@@ -7,11 +7,11 @@ type EmojiMarkupOpt = {
 	emojiId: string;
 	emojiSyntax: string;
 	onlyEmoji: boolean;
-	showOnChannelLayOut?: boolean;
+	isSingleLine: boolean;
 };
 
-export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, showOnChannelLayOut }) => {
-	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
+export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, isSingleLine }) => {
+	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}   inline-block relative -top-0.4 m-0`);
 
 	const srcEmoji = useMemo(() => {
 		return getSrcEmoji(emojiId);
@@ -35,7 +35,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 					onDragStart={(e) => e.preventDefault()}
 				/>
 			) : (
-				<PlainText showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
+				<PlainText isHover={false} isSingleLine={false} isJumMessageEnabled={false} text={emojiSyntax} />
 			)}
 		</span>
 	);

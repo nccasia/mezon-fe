@@ -63,7 +63,7 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 						<FastImage
 							resizeMode={FastImage.resizeMode.cover}
 							source={{
-								uri: item.url || currentClan.logo,
+								uri: item?.url || currentClan?.logo || '',
 								cache: FastImage.cacheControl.immutable,
 								priority: FastImage.priority.high,
 							}}

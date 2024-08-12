@@ -1,7 +1,7 @@
 import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store-mobile';
+import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
 import React, { useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -38,7 +38,9 @@ const UserSettingProfile = ({
 	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(false);
 	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(false);
 	const { removeMemberClan } = useChannelMembersActions();
+	const currentClan = useSelector(selectCurrentClan);
 	const isItMe = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
+	const isThatClanOwner = useMemo(() => currentClan?.creator_id === user?.user?.id, [user?.user?.id, currentClan?.creator_id]);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 	const handleSettingUserProfile = (action?: EActionSettingUserProfile) => {
@@ -78,7 +80,7 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.Kick,
 				icon: <Icons.UserMinusIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner && !isItMe,
+				isShow: (isClanOwner || userPermissionsStatus.administrator) && !isItMe && !isThatClanOwner,
 			},
 			{
 				label: `${EActionSettingUserProfile.Ban}`,
@@ -89,7 +91,7 @@ const UserSettingProfile = ({
 			},
 		]
 		return settingList
-	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus]);
+	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus, isThatClanOwner]);
 
 	const handleRemoveUserClans = async (value: string) => {
 		if (user) {

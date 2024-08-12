@@ -39,6 +39,7 @@ interface IMezonImagePickerProps {
 		bottom?: number;
 	};
 	noDefaultText?: boolean;
+	disabled?: boolean;
 }
 
 const scale = 5;
@@ -62,6 +63,7 @@ export default memo(function MezonImagePicker({
 		right: -7,
 	},
 	noDefaultText,
+	disabled
 }: IMezonImagePickerProps) {
 	const { themeValue } = useTheme();
 	const styles = _style(themeValue);
@@ -149,7 +151,7 @@ export default memo(function MezonImagePicker({
 	}
 
 	return (
-		<TouchableOpacity onPress={() => handleImage()}>
+		<TouchableOpacity onPress={() => handleImage()} disabled={disabled}>
 			<View style={styles.bannerContainer}>
 				<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
 					{image || !showHelpText ? (
@@ -159,14 +161,16 @@ export default memo(function MezonImagePicker({
 					)}
 				</View>
 
-				<View
-					style={[
-						styles.btnWrapper,
-						penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
-					]}
-				>
-					<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
-				</View>
+				{!disabled && (
+					<View
+						style={[
+							styles.btnWrapper,
+							penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
+						]}
+					>
+						<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
+					</View>
+				)}
 			</View>
 		</TouchableOpacity>
 	);

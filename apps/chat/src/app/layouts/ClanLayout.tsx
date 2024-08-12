@@ -36,7 +36,7 @@ const ClanLayout = () => {
 	}, [isShowCreateThread]);
 
 	return (
-		<div className="flex flex-row flex-1 bg-transparent">
+		
 			<MezonPolicyProvider clanId={clanId}>
 				<div
 					className={` flex-col flex max-w-[272px] dark:bg-bgSecondary bg-bgLightSecondary relative overflow-hidden min-w-widthMenuMobile sbm:min-w-[272px] ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
@@ -67,7 +67,7 @@ const ClanLayout = () => {
 				)}
 				<Setting />
 			</MezonPolicyProvider>
-		</div>
+		
 	);
 };
 

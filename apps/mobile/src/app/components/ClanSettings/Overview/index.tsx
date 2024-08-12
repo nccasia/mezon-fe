@@ -1,6 +1,6 @@
-import { useClans } from '@mezon/core';
+import { useClans, useUserPermission } from '@mezon/core';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -29,14 +29,23 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
+	const { isClanOwner } = useUserPermission();
+
+	const disabled = useMemo(() => {
+		return !isClanOwner;
+	}, [isClanOwner])
+
 
 	navigation.setOptions({
 		headerBackTitleVisible: false,
-		headerRight: () => (
-			<Pressable onPress={handleSave} disabled={loading}>
-				<Text style={{ ...styles.headerActionTitle, opacity: loading ? 0.5 : 1 }}>{t('header.save')}</Text>
-			</Pressable>
-		),
+		headerRight: () => {
+			if (disabled) return <View />
+			return (
+				<Pressable onPress={handleSave} disabled={loading}>
+					<Text style={{ ...styles.headerActionTitle, opacity: loading ? 0.5 : 1 }}>{t('header.save')}</Text>
+				</Pressable>
+			)
+		},
 	});
 
 	async function handleSave() {
@@ -80,12 +89,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			expandable: true,
 			previewValue: 'No Active channel',
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 		{
 			title: t('menu.inactive.inactiveTimeout'),
 			expandable: true,
 			previewValue: '5 mins',
-			disabled: true,
+			disabled: disabled,
+			onPress: () => reserve(),
 		},
 	];
 
@@ -95,26 +106,31 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			expandable: true,
 			component: <Text style={{ color: 'white', fontSize: 11 }}>general</Text>,
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 		{
 			title: t('menu.systemMessage.sendRandomWelcome'),
-			component: <MezonSwitch />,
+			component: <MezonSwitch disabled={disabled} />,
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 		{
 			title: t('menu.systemMessage.promptMembersReply'),
-			component: <MezonSwitch />,
+			component: <MezonSwitch disabled={disabled} />,
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 		{
 			title: t('menu.systemMessage.sendMessageBoost'),
-			component: <MezonSwitch />,
+			component: <MezonSwitch disabled={disabled} />,
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 		{
 			title: t('menu.systemMessage.sendHelpfulTips'),
-			component: <MezonSwitch />,
+			component: <MezonSwitch disabled={disabled} />,
 			onPress: () => reserve(),
+			disabled: disabled
 		},
 	];
 
@@ -151,10 +167,12 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		{
 			title: t('fields.defaultNotification.allMessages'),
 			value: 0,
+			disabled: disabled
 		},
 		{
 			title: t('fields.defaultNotification.onlyMentions'),
 			value: 1,
+			disabled: disabled
 		},
 	];
 
@@ -164,7 +182,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 
 				<View style={{ marginVertical: 10 }}>
-					<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} />
+					<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} disabled={disabled} />
 				</View>
 
 				<MezonMenu menu={generalMenu} />
@@ -174,14 +192,18 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 					bottomDescription={t('fields.defaultNotification.description')}
 					data={optionData}
 				/>
-				<MezonMenu menu={dangerMenu} />
+				{isClanOwner && (
+					<MezonMenu menu={dangerMenu} />
+				)}
 			</ScrollView>
-			<DeleteClanModal
-				isVisibleModal={isVisibleDeleteModal}
-				visibleChange={(isVisible) => {
-					setIsVisibleDeleteModal(isVisible);
-				}}
-			></DeleteClanModal>
+			{isClanOwner && (
+				<DeleteClanModal
+					isVisibleModal={isVisibleDeleteModal}
+					visibleChange={(isVisible) => {
+						setIsVisibleDeleteModal(isVisible);
+					}}
+				></DeleteClanModal>
+			)}
 		</Block>
 	);
 }

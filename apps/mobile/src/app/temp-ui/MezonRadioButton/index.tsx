@@ -8,9 +8,10 @@ interface IMezonRadioButton {
 	onChange?: (isCheck: boolean) => void;
 	checked?: boolean;
 	noSwitchFalse?: boolean;
+	disabled?: boolean;
 }
 
-export default function MezonRadioButton({ onChange, checked, noSwitchFalse }: IMezonRadioButton) {
+export default function MezonRadioButton({ onChange, checked, noSwitchFalse, disabled = false }: IMezonRadioButton) {
 	const styles = style(useTheme().themeValue);
 	const [isChecked, setChecked] = useState<boolean>(checked);
 
@@ -29,7 +30,7 @@ export default function MezonRadioButton({ onChange, checked, noSwitchFalse }: I
 	}
 
 	return (
-		<TouchableOpacity onPress={handleToggle} style={styles.container}>
+		<TouchableOpacity onPress={handleToggle} style={styles.container} disabled={disabled}>
 			<View style={[styles.outer, isChecked && styles.outerChecked]}>
 				<View style={[styles.inner, isChecked && styles.innerChecked]} />
 			</View>

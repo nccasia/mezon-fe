@@ -1,7 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	ChevronSmallRightIcon,
-	// @ts-ignore
 } from 'libs/mobile-components/src/lib/icons2';
 import { ReactNode } from 'react';
 import { StyleProp, Text, TextStyle, TouchableOpacity, View } from 'react-native';
@@ -28,7 +27,7 @@ export default function MezonMenuItem({
 	onPress,
 	component,
 	textStyle,
-	disabled,
+	disabled = false,
 	description,
 	isShow = true,
 	previewValue,

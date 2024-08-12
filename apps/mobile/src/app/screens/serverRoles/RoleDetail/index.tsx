@@ -1,4 +1,4 @@
-import { useRoles } from '@mezon/core';
+import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonConfirm, MezonInput } from '../../../temp-ui';
+import { checkCanEditPermission } from '../helper';
 
 enum EActionType {
 	permissions,
@@ -28,6 +29,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
+	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 
 	const clanRole = useMemo(() => {
 		return RolesClan.find((role) => role?.id === roleId);
@@ -36,6 +38,10 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
 	}, [originRoleName, currentRoleName]);
+
+	const isCanEditRole = useMemo(() => {
+		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
+	}, [isClanOwner, clanRole, userPermissionsStatus])
 
 	navigation.setOptions({
 		headerTitle: () => (
@@ -178,14 +184,16 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				id: 1,
 				actionTitle: t('roleDetail.permissions'),
 				type: EActionType.permissions,
+				isView: !isCanEditRole,
 			},
 			{
 				id: 2,
 				actionTitle: t('roleDetail.members'),
 				type: EActionType.members,
+				isView: !isCanEditRole,
 			},
 		];
-	}, [t]);
+	}, [t, isCanEditRole]);
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14}>
@@ -195,6 +203,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 						onTextChange={setCurrentRoleName}
 						placeHolder={t('roleDetail.roleName')}
 						label={t('roleDetail.roleName')}
+						disabled={!isCanEditRole}
 					/>
 				</Block>
 
@@ -220,7 +229,12 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 											<Block flex={1}>
 												<Text color={themeValue.white}>{item.actionTitle}</Text>
 											</Block>
-											<Icons.ChevronSmallRightIcon color={themeValue.text} />
+											<Block flexDirection='row'>
+												{item?.isView && (
+													<Icons.EyeIcon color={themeValue.text} />
+												)}
+												<Icons.ChevronSmallRightIcon color={themeValue.text} />
+											</Block>
 										</Block>
 									</TouchableOpacity>
 								);
@@ -228,24 +242,25 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 						/>
 					</Block>
 
-					<Block marginVertical={size.s_10}>
-						<TouchableOpacity onPress={() => deleteRole()}>
-							<Block
-								flexDirection="row"
-								alignItems="center"
-								justifyContent="space-between"
-								backgroundColor={themeValue.secondary}
-								paddingVertical={size.s_14}
-								paddingHorizontal={size.s_12}
-								gap={size.s_10}
-								borderRadius={size.s_10}
-							>
-								<Block flex={1}>
-									<Text color={Colors.textRed}>{t('roleDetail.deleteRole')}</Text>
+					{isCanEditRole && (
+						<Block marginVertical={size.s_10}>
+							<TouchableOpacity onPress={() => deleteRole()}>
+								<Block
+									flexDirection="row"
+									alignItems="center"
+									justifyContent="space-between"
+									backgroundColor={themeValue.secondary}
+									paddingVertical={size.s_14}
+									paddingHorizontal={size.s_12}
+									borderRadius={size.s_10}
+								>
+									<Block flex={1}>
+										<Text color={Colors.textRed}>{t('roleDetail.deleteRole')}</Text>
+									</Block>
 								</Block>
-							</Block>
-						</TouchableOpacity>
-					</Block>
+							</TouchableOpacity>
+						</Block>
+					)}
 				</Block>
 
 				<MezonConfirm

@@ -1,3 +1,4 @@
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['clanSetting']);
+	const { isCanEditRole } = useUserPermission();
 
 	navigation.setOptions({
 		headerLeft: () => (
@@ -111,6 +113,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			},
 			expandable: true,
 			icon: <Icons.ShieldUserIcon color={themeValue.text} />,
+			isShow: isCanEditRole
 		},
 		{
 			title: t('menu.userManagement.invite'),

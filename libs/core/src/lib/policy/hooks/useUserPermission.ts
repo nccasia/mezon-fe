@@ -54,7 +54,9 @@ export function useUserPermission() {
     isCanManageChannel: userPermissionsStatus["manage-channel"] || userPermissionsStatus.administrator || isClanOwner,
     isCanManageClan: userPermissionsStatus["manage-clan"] || userPermissionsStatus.administrator || isClanOwner,
     isCanDeleteMessage: userPermissionsStatus["delete-message"] || userPermissionsStatus.administrator || isClanOwner,
-    isCanSendMessage: userPermissionsStatus["send-message"] || userPermissionsStatus.administrator || isClanOwner,
-    isCanManageEvent: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"]
+    isCanSendMessage: userPermissionsStatus["send-message"] ||userPermissionsStatus.administrator || isClanOwner || userPermissionsStatus["manage-channel"] || userPermissionsStatus["manage-clan"] || userPermissionsStatus["manage-thread"],
+    isCanViewChannel: userPermissionsStatus["send-message"]|| userPermissionsStatus["view-channel"]||userPermissionsStatus.administrator || isClanOwner || userPermissionsStatus["manage-channel"] || userPermissionsStatus["manage-clan"] || userPermissionsStatus["manage-thread"],
+    isCanManageEvent: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"],
+    isCanEditRole: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"],
   }
 }

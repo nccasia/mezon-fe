@@ -1,9 +1,10 @@
-import { useRoles } from '@mezon/core';
+import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { isEqual } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -12,6 +13,7 @@ import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { normalizeString } from '../../../utils/helpers';
+import { checkCanEditPermission } from '../helper';
 
 type SetupPermissionsScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS;
 export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<SetupPermissionsScreen>) => {
@@ -23,6 +25,11 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const [searchPermissionText, setSearchPermissionText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
+	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+
+	const isEditRoleMode = useMemo(() => {
+		return Boolean(roleId);
+	}, [roleId]);
 
 	//Note: create new role
 	const newRole = useMemo(() => {
@@ -34,13 +41,26 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		return RolesClan?.find((role) => role?.id === roleId);
 	}, [roleId, RolesClan]);
 
-	const permissionList = useMemo(() => {
-		return newRole?.permission_list?.permissions || [];
-	}, [newRole?.permission_list?.permissions]);
+	const isCanEditRole = useMemo(() => {
+		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
+	}, [isClanOwner, clanRole, userPermissionsStatus])
 
-	const isEditRoleMode = useMemo(() => {
-		return Boolean(roleId);
-	}, [roleId]);
+	const getDisablePermission = useCallback((slug: string) => {
+		switch (slug) {
+			case EPermission.administrator:
+				return !isClanOwner;
+			case EPermission.manageClan:
+				return !isClanOwner && !userPermissionsStatus.administrator;
+			default:
+				return !isCanEditRole;
+		}
+	}, [userPermissionsStatus, isClanOwner, isCanEditRole])
+
+	const permissionList = useMemo(() => {
+		const allPermission = newRole?.permission_list?.permissions || [];
+		return allPermission.map((p) => ({ ...p, disabled: getDisablePermission(p?.slug) }));
+	}, [newRole?.permission_list?.permissions, getDisablePermission]);
+
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedPermissions, selectedPermissions);
@@ -171,7 +191,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14} justifyContent="space-between">
 				<Block flex={1}>
-					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim}>
+					<Block paddingVertical={size.s_10} borderBottomWidth={1} borderBottomColor={themeValue.borderDim} marginBottom={size.s_20}>
 						<Text color={themeValue.white} h2 center bold>
 							{t('setupPermission.setupPermissionTitle')}
 						</Text>
@@ -187,7 +207,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 								ItemSeparatorComponent={SeparatorWithLine}
 								renderItem={({ item }) => {
 									return (
-										<TouchableOpacity onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)}>
+										<TouchableOpacity onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)} disabled={item?.disabled}>
 											<Block
 												flexDirection="row"
 												alignItems="center"
@@ -197,12 +217,13 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 												gap={size.s_10}
 											>
 												<Block flex={1}>
-													<Text color={themeValue.white}>{item.title}</Text>
+													<Text color={item?.disabled ? themeValue.textDisabled : themeValue.white}>{item.title}</Text>
 												</Block>
 
 												<MezonSwitch
 													value={selectedPermissions.includes(item?.id)}
 													onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
+													disabled={item?.disabled}
 												/>
 											</Block>
 										</TouchableOpacity>

@@ -28,7 +28,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		width: '100%',
 	},
 	textTitle: {
 		color: colors.textStrong,

@@ -14,46 +14,6 @@ type IMessageContentProps = {
 	isSearchMessage?: boolean;
 };
 
-const MessageText = ({
-	message,
-	lines,
-	isEdited,
-	mode,
-	content,
-	isOnlyContainEmoji,
-	isSearchMessage,
-}: {
-	message: IMessageWithUser;
-	lines: string;
-	isEdited?: boolean;
-	mode?: number;
-	content?: IExtendedMessage;
-	isOnlyContainEmoji?: boolean;
-	isSearchMessage?: boolean;
-}) => (
-	<>
-		{' '}
-		{lines?.length > 0 ? (
-			<div className="flex w-full">
-				<div className="w-full">
-					<MessageLine
-						isSearchMessage={isSearchMessage}
-						isOnlyContainEmoji={isOnlyContainEmoji}
-						showOnchannelLayout={true}
-						content={content}
-						mode={mode}
-					/>
-				</div>
-				{isEdited && (
-					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-						(edited)
-					</p>
-				)}
-			</div>
-		) : null}
-	</>
-);
-
 const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
 	const { lines, isEdited, contentUpdatedMention } = useMessageParser(message);
 
@@ -82,3 +42,45 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 };
 
 export default MessageContent;
+
+const MessageText = ({
+	message,
+	lines,
+	isEdited,
+	mode,
+	content,
+	isOnlyContainEmoji,
+	isSearchMessage,
+}: {
+	message: IMessageWithUser;
+	lines: string;
+	isEdited?: boolean;
+	mode?: number;
+	content?: IExtendedMessage;
+	isSearchMessage?: boolean;
+	isOnlyContainEmoji?: boolean;
+}) => (
+	<>
+		{' '}
+		{lines?.length > 0 ? (
+			<div className="flex w-full">
+				<div className="w-full">
+					<MessageLine
+						isTokenClickAble={true}
+						isSearchMessage={isSearchMessage}
+						isOnlyContainEmoji={isOnlyContainEmoji}
+						isJumMessageEnabled={false}
+						isSingleLine={false}
+						content={content}
+						mode={mode}
+					/>
+				</div>
+				{isEdited && (
+					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
+						(edited)
+					</p>
+				)}
+			</div>
+		) : null}
+	</>
+);

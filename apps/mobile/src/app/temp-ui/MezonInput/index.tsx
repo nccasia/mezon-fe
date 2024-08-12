@@ -21,9 +21,24 @@ interface IMezonInputProps {
 	onFocus?: () => void;
 	prefixIcon?: ReactNode;
 	postfixIcon?: ReactNode;
+	disabled?: boolean;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onFocus, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle, postfixIcon, prefixIcon }: IMezonInputProps) {
+export default function MezonInput({ placeHolder,
+	label,
+	textarea,
+	value,
+	onFocus,
+	onTextChange,
+	maxCharacter = 60,
+	inputWrapperStyle,
+	showBorderOnFocus,
+	errorMessage,
+	titleUppercase,
+	titleStyle,
+	postfixIcon,
+	prefixIcon,
+	disabled = false }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const ref = useRef<TextInput>(null);
@@ -80,10 +95,11 @@ export default function MezonInput({ placeHolder, label, textarea, value, onFocu
 						placeholderTextColor="gray"
 						onFocus={handleFocus}
 						onBlur={handleBlur}
+						editable={!disabled}
 					/>
 					{postfixIcon}
 
-					{!textarea && value?.length > 0 && (
+					{!textarea && value?.length > 0 && !disabled && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
 							<CircleXIcon height={18} width={18} color={themeValue.text} />
 						</TouchableOpacity>
