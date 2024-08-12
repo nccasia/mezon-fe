@@ -24,10 +24,10 @@ export default function MezonOption({ data, onChange, value, ...menuProps }: IMe
 		() =>
 			[
 				{
-					items: data.map(({ value, ...props }) => ({
+					items: data.map(({ value, disabled, ...props }) => ({
 						...props,
-						component: <MezonRadioButton checked={value === currentValue} onChange={() => handleChange(value)} noSwitchFalse />,
-						onPress: () => handleChange(value),
+						component: <MezonRadioButton checked={value === currentValue} onChange={() => handleChange(value)} noSwitchFalse disabled={disabled} />,
+						onPress: () => !disabled && handleChange(value),
 					})),
 					...menuProps,
 				},

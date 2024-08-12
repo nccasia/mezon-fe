@@ -9,10 +9,11 @@ import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {
 	channelHastagId: string;
-	showOnchannelLayout?: boolean;
+	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 };
 
-const ChannelHashtag = ({ channelHastagId, showOnchannelLayout }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId, isSingleLine, isTokenClickAble }: ChannelHashtagProps) => {
 	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
@@ -57,15 +58,15 @@ const ChannelHashtag = ({ channelHastagId, showOnchannelLayout }: ChannelHashtag
 	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) &&
 		getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
-			onClick={showOnchannelLayout ? handleClick : () => {}}
+			onClick={!isSingleLine || isTokenClickAble ? handleClick : () => {}}
 			style={{ textDecoration: 'none' }}
-			to={channelPath ?? ''}
-			className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${showOnchannelLayout ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer' : `hover:none`} `}
+			to={!isSingleLine || isTokenClickAble ? channelPath ?? '' : ''}
+			className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isSingleLine ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text ml-[0.2rem]`} `}
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channelHastagId && directId) ? (
-				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill="#3297FF" />
+				<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isSingleLine ? 'mx-[-0.4rem]' : 'mr-0.5'} `} defaultFill="#3297FF" />
 			) : (
-				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill="#3297FF" />
+				<Icons.Hashtag defaultSize={`inline-block mt-[-0.5rem] w-4 h-4 ${isSingleLine ? 'mx-[-0.5rem]' : ''}`} defaultFill="#3297FF" />
 			)}
 			{channel.channel_label}
 		</Link>

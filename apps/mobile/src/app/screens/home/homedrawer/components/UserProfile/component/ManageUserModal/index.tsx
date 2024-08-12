@@ -1,11 +1,13 @@
 import { useRoles } from "@mezon/core";
-import { Icons } from "@mezon/mobile-components";
+import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { baseColor, Block, Colors, size, Text, useTheme } from "@mezon/mobile-ui";
 import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
+import { toastConfig } from "apps/mobile/src/app/configs/toastConfig";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, Modal, ScrollView, TouchableOpacity } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 import { EActionSettingUserProfile, IProfileSetting } from "../UserSettingProfile";
 
@@ -33,15 +35,37 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
         return currentClan?.creator_id === user?.user?.id
     }, [currentClan?.creator_id, user?.user?.id])
 
+    const handleAfterUpdate = (isSuccess: boolean) => {
+        if (isSuccess) {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: 'Changes Saved',
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
+                },
+            });
+        } else {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: 'Failed',
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
+                },
+            });
+        }
+    }
+
     const addRole = async (roleId: string) => {
         const activeRole = rolesClan?.find((role) => role.id === roleId);
-        await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
+        const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
+        handleAfterUpdate(Boolean(response));
         setIsLoading(false)
     };
 
     const deleteRole = async (roleId: string) => {
         const activeRole = rolesClan?.find((role) => role.id === roleId);
-        await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
+        const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
+        handleAfterUpdate(Boolean(response));
         setIsLoading(false)
     };
 
@@ -224,6 +248,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                     )}
                 </ScrollView>
             </Block>
+            <Toast config={toastConfig} />
         </Modal>
     )
 })

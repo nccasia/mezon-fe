@@ -8,9 +8,10 @@ interface IMezonSwitch extends SwitchProps {
 	iconOn?: ReactNode;
 	iconOff?: ReactNode;
 	iconYesNo?: boolean;
+	disabled?: boolean;
 }
 
-export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff }: IMezonSwitch) => {
+export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff, disabled = false }: IMezonSwitch) => {
 	const [isEnabled, setIsEnabled] = useState(value);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -25,7 +26,7 @@ export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff }
 	};
 
 	return (
-		<TouchableOpacity style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]} onPress={toggleSwitch}>
+		<TouchableOpacity style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]} onPress={toggleSwitch} disabled={disabled}>
 			<View style={[styles.circle, isEnabled ? styles.circleEnabled : {}]}>
 				{iconYesNo ? (
 					isEnabled ? (

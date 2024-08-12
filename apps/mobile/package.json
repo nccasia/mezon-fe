@@ -18,7 +18,7 @@
 		"@react-native-community/netinfo": "^11.3.2",
 		"@react-native-firebase/app": "^19.2.2",
 		"@react-native-firebase/messaging": "^19.2.2",
-		"@react-native-google-signin/google-signin": "^16.0.0",
+		"@react-native-google-signin/google-signin": "^12.2.1",
 		"@react-native/metro-config": "*",
 		"@react-navigation/bottom-tabs": "^6.5.20",
 		"@react-navigation/drawer": "^6.6.15",

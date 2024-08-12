@@ -1,4 +1,4 @@
-import { useClans } from '@mezon/core';
+import { useClans, useUserPermission } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { Text, View } from 'react-native';
 import { MezonImagePicker } from '../../../temp-ui';
@@ -12,12 +12,13 @@ export interface IFile {
 	fileData: any;
 }
 
-interface ILogoClanSelector {}
+interface ILogoClanSelector { }
 
-export default function LogoClanSelector({}: ILogoClanSelector) {
+export default function LogoClanSelector({ }: ILogoClanSelector) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
+	const { isClanOwner } = useUserPermission();
 
 	function handleLoad(url?: string) {
 		if (url) {
@@ -34,7 +35,7 @@ export default function LogoClanSelector({}: ILogoClanSelector) {
 	return (
 		<View style={styles.logoSection}>
 			<View style={styles.logoContainer}>
-				<MezonImagePicker defaultValue={currentClan?.logo} onLoad={handleLoad} autoUpload={true} alt={currentClan?.clan_name} />
+				<MezonImagePicker defaultValue={currentClan?.logo} onLoad={handleLoad} autoUpload={true} alt={currentClan?.clan_name} disabled={!isClanOwner} />
 			</View>
 
 			<Text style={styles.clanName}>{currentClan?.clan_name}</Text>

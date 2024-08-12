@@ -1,7 +1,7 @@
-import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/core';
+import { useChatSending, useDirectMessages } from '@mezon/core';
 import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, referencesActions, selectAttachmentData, selectCurrentClanId } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, referencesActions, selectAttachmentData, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -116,7 +116,6 @@ export const ChatMessageInput = memo(
 			}, [channelId, currentClanId, dispatch, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-			const { setEmojiSuggestion } = useEmojiSuggestion();
 
 			//start: DM stuff
 			const { sendDirectMessage } = useDirectMessages({
@@ -256,12 +255,11 @@ export const ChatMessageInput = memo(
 						},
 					]
 					: undefined;
-
-				setEmojiSuggestion('');
+				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 
 				const sendMessageAsync = async () => {
 					if (type === EMessageActionType.EditMessage) {
-						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id, simplifiedMentionList || [],);
+						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id, simplifiedMentionList || []);
 					} else {
 						if (![EMessageActionType.CreateThread].includes(messageAction)) {
 							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');

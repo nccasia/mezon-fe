@@ -3,13 +3,11 @@ import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClan } from '@mezon/store-mobile';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { MutableRefObject, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonSwitch, reserve } from '../../../../../../../app/temp-ui';
 import DeleteClanModal from '../../../../../../components/DeleteClanModal';
@@ -120,19 +118,6 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		},
 	];
 
-	const devMenu: IMezonMenuItemProps[] = [
-		{
-			onPress: () => {
-				Clipboard.setString(currentClan?.clan_id);
-				Toast.show({
-					type: 'info',
-					text1: t('menu.devMode.serverIDCopied'),
-				});
-			},
-			title: t('menu.devMode.copyServerID'),
-		},
-	];
-
 	const menu: IMezonMenuSectionProps[] = [
 		{
 			items: watchMenu,
@@ -142,10 +127,6 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		},
 		{
 			items: optionsMenu,
-		},
-		{
-			title: t('menu.devMode.title'),
-			items: devMenu,
 		},
 	];
 
@@ -175,13 +156,11 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 						onPress={() => reserve()}
 					/>
 
-					{isClanOwner && (
-						<MezonButtonIcon
-							title={t('actions.settings')}
-							icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
-							onPress={handleOpenSettings}
-						/>
-					)}
+					<MezonButtonIcon
+						title={t('actions.settings')}
+						icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
+						onPress={handleOpenSettings}
+					/>
 				</ScrollView>
 				<View>
 					<MezonMenu menu={menu} />

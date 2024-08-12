@@ -170,7 +170,7 @@ function MyApp() {
 					{listUnreadDM.map(
 						(dmGroupChatUnread) =>
 							dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-								<SidebarTooltip titleTooltip={dmGroupChatUnread.channel_label}>
+								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
 									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 								</SidebarTooltip>
 							),
@@ -181,7 +181,7 @@ function MyApp() {
 					{clans.map((clan: IClan) => {
 						return (
 							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
-								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} />
+								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} active={!pathName.includes('direct') && currentClanId === clan.clan_id} />
 							</SidebarTooltip>
 						)
 					})}

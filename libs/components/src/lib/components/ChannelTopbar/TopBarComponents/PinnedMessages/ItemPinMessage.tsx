@@ -31,8 +31,13 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 					</div>
-					<div className='leading-6'>
-						<MessageLine content={JSON.parse(pinMessage.content || '')} showOnchannelLayout={true} />
+					<div className="leading-6">
+						<MessageLine
+							content={JSON.parse(pinMessage.content || '')}
+							isJumMessageEnabled={false}
+							isSingleLine={false}
+							isTokenClickAble={false}
+						/>
 					</div>
 				</div>
 			</div>

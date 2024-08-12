@@ -1,18 +1,26 @@
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, selectAllRolesClan } from '@mezon/store-mobile';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
+import { checkCanEditPermission } from './helper';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_SETTING;
 export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) => {
 	const { t } = useTranslation('clanRoles');
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const { themeValue } = useTheme();
+	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+
+	const allClanRoles = useMemo(() => {
+		return (rolesClan || []).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
+	}, [rolesClan, isClanOwner, userPermissionsStatus])
 
 	navigation.setOptions({
 		headerRight: () => (
@@ -64,13 +72,13 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 
 			<Block marginTop={size.s_10} flex={1}>
 				<Text color={themeValue.text}>
-					{t('roles')} - {RolesClan?.length || '0'}
+					{t('roles')} - {allClanRoles?.length || '0'}
 				</Text>
-				{RolesClan.length ? (
+				{allClanRoles.length ? (
 					<Block marginVertical={size.s_10} flex={1}>
 						<Block borderRadius={size.s_10} overflow="hidden">
 							<FlatList
-								data={RolesClan}
+								data={allClanRoles}
 								scrollEnabled
 								showsVerticalScrollIndicator={false}
 								keyExtractor={(item) => item.id}
@@ -93,7 +101,12 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 														{item?.role_user_list?.role_users?.length || '0'} - {t('members')}
 													</Text>
 												</Block>
-												<Icons.ChevronSmallRightIcon color={themeValue.text} />
+												<Block flexDirection='row'>
+													{item?.isView && (
+														<Icons.EyeIcon color={themeValue.text} />
+													)}
+													<Icons.ChevronSmallRightIcon color={themeValue.text} />
+												</Block>
 											</Block>
 										</TouchableOpacity>
 									);

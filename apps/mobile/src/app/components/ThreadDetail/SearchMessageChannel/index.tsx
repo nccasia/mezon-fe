@@ -91,7 +91,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 							username: itemDM?.usernames ?? '',
 							avatar_url: itemDM?.channel_avatar?.[0] ?? '',
 							id: itemDM?.user_id?.[0] ?? '',
-              avatarSm: itemDM?.channel_avatar?.[0] ?? '',
+							avatarSm: itemDM?.channel_avatar?.[0] ?? '',
 						},
 					};
 				})
@@ -108,7 +108,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 							username: itemFriend?.user.username ?? '',
 							avatar_url: itemFriend?.user?.avatar_url ?? '',
 							id: itemFriend?.id ?? '',
-              avatarSm: itemFriend?.user?.avatar_url ?? ''
+							avatarSm: itemFriend?.user?.avatar_url ?? '',
 						},
 					};
 				})
@@ -124,7 +124,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 							username: itemUserClan?.user?.username ?? '',
 							avatar_url: itemUserClan?.user?.avatar_url ?? '',
 							id: itemUserClan?.id ?? '',
-              avatarSm: itemUserClan?.user?.avatar_url ?? ''
+							avatarSm: itemUserClan?.user?.avatar_url ?? '',
 						},
 					};
 				})
@@ -170,7 +170,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
 				<InputSearchMessageChannel openSearchChannelFrom={openSearchChannelFrom} onChangeText={handleSearchText} />
 				<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
-				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref} scrollEventThrottle={100}>
+				<ScrollView bounces={false} horizontal pagingEnabled onScroll={handleScroll} ref={ref} scrollEventThrottle={100}>
 					<MembersSearchTab listMemberSearch={listMemberSearch} />
 					<ChannelsSearchTab listChannelSearch={listChannelSearch} />
 				</ScrollView>
