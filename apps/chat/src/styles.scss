@@ -513,6 +513,19 @@ input:-webkit-autofill:active {
 	background: #151515;
 }
 
+// editor-scroll
+#editorReactMention::-webkit-scrollbar {
+	width: 4px;
+}
+
+#editorReactMention::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+#editorReactMention::-webkit-scrollbar-thumb {
+	background: #151515;
+}
+
 // attachment-scroll-dark
 .attachment-scroll::-webkit-scrollbar {
 	height: 8px;

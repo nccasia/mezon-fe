@@ -241,7 +241,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					ref={flatListRef}
 					inverted
 					data={dataReverse || []}
-					// onScroll={handleScroll}
+					onScroll={handleScroll}
 					keyboardShouldPersistTaps={'handled'}
 					contentContainerStyle={styles.listChannels}
 					renderItem={renderItem}

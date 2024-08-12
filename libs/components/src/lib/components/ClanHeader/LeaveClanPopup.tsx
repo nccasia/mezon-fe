@@ -1,6 +1,7 @@
 import { useAuth, useChannelMembersActions } from '@mezon/core';
 import { selectCurrentClan, selectCurrentVoiceChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 interface ILeaveClanPopupProps {
 	toggleShowPopup: () => void;
@@ -11,8 +12,11 @@ const LeaveClanPopup = ({ toggleShowPopup }: ILeaveClanPopupProps) => {
 	const { userProfile } = useAuth();
 	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentClan = useSelector(selectCurrentClan);
+	const navigate = useNavigate();
 	const handleLeaveClan = async () => {
-		removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
+		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
+		toggleShowPopup();
+		navigate("/mezon");
 	};
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50">

@@ -7,12 +7,11 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_4,
 			flex: 1,
 			backgroundColor: colors.textDisabled,
-			paddingHorizontal: size.s_10,
 			paddingVertical: size.s_8,
 		},
 		textBtn: {
 			color: colors.white,
-			fontSize: size.label,
+			fontSize: size.medium,
 			fontWeight: '600',
 			textAlign: 'center',
 		},

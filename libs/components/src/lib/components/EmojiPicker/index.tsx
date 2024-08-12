@@ -341,18 +341,20 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-			{emojisData.map((item, index) => (
-				<button
-					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
-					onClick={() => {
-						onEmojiSelect(item.id, item.shortname);
-					}}
-					onMouseEnter={() => onEmojiHover(item)}
-				>
-					<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} />
-				</button>
-			))}
+			{emojisData
+				.filter((item) => !!item.id)
+				.map((item, index) => (
+					<button
+						key={index}
+						className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
+						onClick={() => {
+							onEmojiSelect(item.id, item.shortname);
+						}}
+						onMouseEnter={() => onEmojiHover(item)}
+					>
+						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} />
+					</button>
+				))}
 			{isShowAddButton && (
 				<button
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}

@@ -124,15 +124,18 @@ export const Authentication = () => {
 			console.log('Error while receiving files:', error);
 		}
 	};
-
+	
 	const loadFRMConfig = async () => {
-		const fcmtoken = await handleFCMToken();
-		if (fcmtoken) {
-			const deviceId = getAppInfo().app_device_id;
-			const platform = getAppInfo().app_platform;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: deviceId, platform: platform }));
+		try {
+			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
+			if (fcmtoken) {
+				const { app_device_id: deviceId, app_platform: platform } = appInfo;
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId, platform }));
+			}
+		} catch (error) {
+			console.error('Error loading FCM config:', error);
 		}
 	};
 

@@ -1,5 +1,10 @@
 
-import { RolesClanEntity, selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store";
+import {
+  RolesClanEntity,
+  selectAllRolesClan,
+  selectCurrentClan,
+  selectMemberById,
+} from '@mezon/store';
 import { EPermission } from "@mezon/utils";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -35,10 +40,9 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
 
 export function useUserPermission() {
   const { userId, userProfile } = useAuth();
-  const userById = useSelector(selectMemberByUserId(userId || ''));
+  const userById = useSelector(selectMemberById(userId || ''));
   const currentClan = useSelector(selectCurrentClan);
 	const rolesClan = useSelector(selectAllRolesClan);
-
 	const userPermissionsStatus = useMemo(() => {
 		return getUserPermissionsStatus(userById?.role_id, rolesClan)
 	}, [userById?.role_id, rolesClan])

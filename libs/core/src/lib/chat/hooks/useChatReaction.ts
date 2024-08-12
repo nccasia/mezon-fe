@@ -1,6 +1,6 @@
 import { reactionActions, useAppDispatch } from '@mezon/store';
+import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
-
 
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
@@ -25,7 +25,7 @@ export function useChatReaction() {
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
-					clanId,
+					clanId: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanId : '',
 					channelId,
 					mode,
 					messageId,
@@ -34,7 +34,7 @@ export function useChatReaction() {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-				})
+				}),
 			);
 		},
 		[dispatch],

@@ -34,7 +34,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	};
 
 	return (
-		<label className="pl-2">
+		<label className="pl-2 flex items-center h-11">
 			<input
 				id="preview_img"
 				type="file"

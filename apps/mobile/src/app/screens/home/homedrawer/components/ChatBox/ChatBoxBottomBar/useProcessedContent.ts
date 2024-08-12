@@ -56,8 +56,8 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 					emojis.push({
 						emojiid: emojiObjPicked?.[`:${shortname}:`],
 						shortname: `:${shortname}:`,
-						startindex,
-						endindex,
+						s: startindex,
+						e: endindex,
 					});
 				}
 				i++;
@@ -74,15 +74,15 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					voicelink: link,
-					startindex,
-					endindex,
+					vk: link,
+					s: startindex,
+					e: endindex,
 				});
 			} else {
 				links.push({
-					link,
-					startindex,
-					endindex,
+					lk: link,
+					s: startindex,
+					e: endindex,
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
@@ -98,7 +98,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startindex, endindex });
+					markdowns.push({ type: 'triple', mk: `\`\`\`${markdown}\`\`\``, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -114,7 +114,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startindex, endindex });
+					markdowns.push({ type: 'single', mk: `\`${markdown}\``, s: startindex, e: endindex });
 				}
 				i++;
 			}

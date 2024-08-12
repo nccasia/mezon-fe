@@ -5,6 +5,7 @@ import {
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
@@ -15,7 +16,6 @@ import {
 	selectNewNotificationStatus,
 	selectStatusMenu,
 	selectTheme,
-	selectCurrentChannelNotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -260,7 +260,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
+		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 

@@ -1,22 +1,24 @@
 {
-    "menuClanStack": {
-        "categoryCreator": "Tạo Category",
-        "channelCreator": "Tạo Channel",
-        "clanSetting": "Cài đặt Clan",
-        "clanOverviewSetting": "Tổng quan",
-        "eventCreator": "Tạo Sự Kiện",
-        "serverRoles": "Vai Trò Clan"
-    },
-    "menuChannelStack": {
-        "channelSetting": "Cài đặt Channel"
-    },
-    "settingStack": {
-        "settings": "Cài đặt",
-        "appearance": "Giao diện",
-        "appTheme": "Giao diện ứng dụng",
-        "language": "Ngôn ngữ",
-        "profile": "Hồ sơ",
-        "account": "Tài khoản",
-        "blockedUsers": "người dùng bị chặn"
-    }
+  "menuClanStack": {
+      "categoryCreator": "Tạo Danh Mục",
+      "clanSetting": "Cài Đặt Clan",
+      "channelCreator": "Tạo Kênh",
+      "clanOverviewSetting": "Cài Đặt Tổng Quan",
+      "eventCreator": "Tạo Sự Kiện",
+      "serverRoles": "Vai Trò Clan",
+      "notificationSetting": "Cài Đặt Thông Báo",
+      "newOverride": "Ghi Đè Mới"
+  },
+  "menuChannelStack": {
+      "channelSetting": "Cài Đặt Kênh"
+  },
+  "settingStack": {
+      "settings": "Cài Đặt",
+      "appearance": "Cài Đặt Giao Diện",
+      "appTheme": "Chủ Đề Ứng Dụng",
+      "language": "Cài Đặt Ngôn Ngữ",
+      "profile": "Cài Đặt Hồ Sơ",
+      "account": "Tài Khoản",
+      "blockedUsers": "Người Dùng Bị Chặn"
+  }
 }

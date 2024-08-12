@@ -15,10 +15,11 @@ export default {
 			border: '1px solid transparent',
 		},
 		input: {
-			padding: '9px 10px',
+			padding: '9px 100px 9px 10px',
 			border: 'none',
 			outline: 'none',
 			whiteSpace: 'pre-wrap',
+			overflow: 'hidden auto',
 		},
 	},
 

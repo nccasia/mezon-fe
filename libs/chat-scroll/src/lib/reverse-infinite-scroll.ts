@@ -18,7 +18,15 @@ export const useReverseInfiniteScroll = (
 ): IUseReverseInfiniteScrollResponse => {
 	const loadMoreRef = useRef<ILoadMoreCb>(loadMoreCb);
 
-	const { scrollThresholdType, scrollThresholdValue, enabled: initialEnabled } = useReverseInfiniteScrollOptions(options || {});
+	const {
+		scrollThresholdType,
+		scrollThresholdValue,
+		enabled: initialEnabled,
+		onReachTop,
+		onReachBottom,
+	} = useReverseInfiniteScrollOptions(options || {});
+
+	const { hasPreviousPage, hasNextPage } = data;
 
 	const [enabled, setEnabled] = useState(initialEnabled);
 
@@ -41,7 +49,7 @@ export const useReverseInfiniteScroll = (
 	// when user scrolls to the top of the container
 	// check if we need to load more data
 	const needMore = useCallback(() => {
-		if (!data.hasPreviousPage) {
+		if (!hasPreviousPage) {
 			return false;
 		}
 		const checkMap = {
@@ -50,31 +58,66 @@ export const useReverseInfiniteScroll = (
 		};
 
 		return checkMap[scrollThresholdType]?.() ?? false;
-	}, [data.hasPreviousPage, getScrollTop, getCurrentScrollHeight, scrollThresholdType, scrollThresholdValue]);
+	}, [hasPreviousPage, getScrollTop, getCurrentScrollHeight, scrollThresholdType, scrollThresholdValue]);
 
 	// need more data at the bottom
 	// when user scrolls to the bottom of the container
 	// check if we need to load more data
 	const needMoreBottom = useCallback(() => {
-		if (!data.hasNextPage) {
+		if (!hasNextPage) {
 			return false;
 		}
 
 		// is scroll reached bottom
 		// concept: Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < 1
 		return Math.abs(getCurrentScrollHeight() - getScrollTop() - getClientHeight()) < 1;
-	}, [data.hasNextPage, getClientHeight, getCurrentScrollHeight, getScrollTop]);
+	}, [hasNextPage, getClientHeight, getCurrentScrollHeight, getScrollTop]);
+
+	const isReachTop = useCallback(() => getScrollTop() === 0, [getScrollTop]);
+
+	const isReachBottom = useCallback(() => {
+		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
+		return scrollHeight === scrollTop + clientHeight;
+	}, [targetRef]);
 
 	const handleScroll = useCallback(async () => {
+		if (isReachTop()) {
+			onReachTop();
+		}
+
+		if (isReachBottom()) {
+			onReachBottom();
+		}
+
 		if (!isFetching() && needMore()) {
 			setFetching();
+			const itemsHeightCache = new Map<string, number>();
 
 			await loadMoreRef.current(ELoadMoreDirection.top, () => {
 				storeCurrentScrollHeight();
 				storeCurrentScrollTop();
+
+				// store height of each item
+				const items = targetRef.current.querySelectorAll('.message-container');
+
+				items.forEach((item) => {
+					const id = item.getAttribute('id');
+					if (id) {
+						itemsHeightCache.set(id, item.clientHeight);
+					}
+				});
 			});
 
-			const diff = getCurrentScrollHeight() - getStoredScrollHeight();
+			const cachedItems = itemsHeightCache.entries();
+
+			let removedHeight = 0;
+			for (const [id, height] of cachedItems) {
+				const item = targetRef.current.querySelector(`#${id}`);
+				if (!item) {
+					removedHeight += height;
+				}
+			}
+			const diff = getCurrentScrollHeight() - getStoredScrollHeight() + removedHeight;
 			setScrollTop(getStoredScrollTop() + diff);
 
 			setFetched();
@@ -89,18 +132,22 @@ export const useReverseInfiniteScroll = (
 			setFetched();
 		}
 	}, [
+		isReachTop,
+		isReachBottom,
 		isFetching,
 		needMore,
 		needMoreBottom,
-		loadMoreRef,
-		storeCurrentScrollHeight,
-		storeCurrentScrollTop,
+		onReachTop,
+		onReachBottom,
+		setFetching,
 		getCurrentScrollHeight,
 		getStoredScrollHeight,
-		getStoredScrollTop,
-		setFetching,
-		setFetched,
 		setScrollTop,
+		getStoredScrollTop,
+		setFetched,
+		storeCurrentScrollHeight,
+		storeCurrentScrollTop,
+		targetRef,
 	]);
 
 	useEffect(() => {
@@ -124,6 +171,9 @@ export const useReverseInfiniteScroll = (
 	return { enable, disable, updateLoadMoreCb, enabled };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const DUMMY_FN = () => {};
+
 /**
  * Handles default values for useReverseInfiniteScroll hook options.
  * @private
@@ -136,7 +186,11 @@ const useReverseInfiniteScrollOptions = (options: IUseReverseInfiniteScrollOptio
 
 	const enabled = options?.enabled ?? true;
 
-	return { scrollThresholdType, scrollThresholdValue, enabled };
+	const onReachTop = options?.onReachTop || DUMMY_FN;
+
+	const onReachBottom = options?.onReachBottom || DUMMY_FN;
+
+	return { scrollThresholdType, scrollThresholdValue, enabled, onReachTop, onReachBottom };
 };
 
 /**
@@ -179,6 +233,16 @@ export interface IUseReverseInfiniteScrollOptions {
 	 * Defines whether infinite scroll behavior is enabled initially.
 	 */
 	enabled?: boolean;
+
+	/**
+	 * Callback when scroll reaches top.
+	 */
+	onReachTop?: () => void;
+
+	/**
+	 * Callback when scroll reaches bottom.
+	 */
+	onReachBottom?: () => void;
 }
 
 /**

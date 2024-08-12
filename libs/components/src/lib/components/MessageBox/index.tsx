@@ -10,13 +10,12 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
+import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
-import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 
 export type MessageBoxProps = {
 	readonly onSend: (
@@ -166,7 +165,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 max-sm:mb-0
+				className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
 				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${attachmentDataRef.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
 				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
@@ -178,7 +177,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
 					<div
-						className={`w-[96%] dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
+						className={`w-full rounded-r-lg dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
 						onContextMenu={handleChildContextMenu}
 					>
 						<MentionReactInput
@@ -192,7 +191,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							mode={props.mode}
 						/>
 					</div>
-					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={currentClanId} />
 				</div>
 			</div>
 		</div>

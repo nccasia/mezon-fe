@@ -3,6 +3,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import CategoryCreator from '../../../components/Category';
 import ChannelCreator from '../../../components/ChannelCreator';
+import ClanNotificationSetting from '../../../components/ClanNotificationSetting';
+import NotificationOverrides from '../../../components/ClanNotificationSetting/NotificationOverrides';
+import NotificationSettingDetail from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
 import ClanSetting from '../../../components/ClanSettings';
 import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
 import EventCreatorDetails from '../../../components/EventCreator/EventCreatorDetails';
@@ -39,8 +42,8 @@ export const MenuClanStacks = ({ }: any) => {
 					color: themeValue.textStrong,
 				},
 				cardStyle: {
-					backgroundColor: "transparent",
-				}
+					backgroundColor: 'transparent',
+				},
 			}}
 		>
 			<Stack.Screen
@@ -139,6 +142,29 @@ export const MenuClanStacks = ({ }: any) => {
 				component={RoleDetail}
 				options={{
 					headerLeftLabelVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING}
+				component={ClanNotificationSetting}
+				options={{
+					headerTitle: t('menuClanStack.notificationSetting'),
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES}
+				component={NotificationOverrides}
+				options={{
+					headerTitle: t('menuClanStack.newOverride'),
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL}
+				component={NotificationSettingDetail}
+				options={{
+					headerTitle: t('menuClanStack.notificationSetting'),
 				}}
 			/>
 		</Stack.Navigator>

@@ -1,4 +1,4 @@
-import { channelsActions, messagesActions } from '@mezon/store';
+import { channelsActions } from '@mezon/store';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -10,17 +10,18 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 		throw new Error('Channel ID null');
 	}
 
-	if (messageId) {
-		dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
-	}
-	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, messageId: messageId || '' }));
 	return null;
 };
 
 export const shouldRevalidateChannel: ShouldRevalidateFunction = (ctx) => {
-	const { currentParams, nextParams } = ctx;
+	const { currentParams, nextParams, currentUrl, nextUrl } = ctx;
+
+	const currentMessageId = new URL(currentUrl).searchParams.get('messageId');
+	const nextMessageId = new URL(nextUrl).searchParams.get('messageId');
+
 	const { channelId: currentChannelId } = currentParams;
 	const { channelId: nextChannelId } = nextParams;
 
-	return currentChannelId !== nextChannelId;
+	return currentChannelId !== nextChannelId || currentMessageId !== nextMessageId;
 };

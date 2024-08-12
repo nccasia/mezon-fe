@@ -33,6 +33,7 @@ import userProfile from './userProfile.json';
 import userEmptyClan from './userEmptyClan.json';
 import customUserStatus from './customUserStatus.json';
 import searchMessageChannel from './searchMessageChannel.json';
+import clanNotificationsSetting from './clanNotificationsSetting.json';
 
 export default {
 	inviteToChannel,
@@ -69,5 +70,6 @@ export default {
 	clanRoles,
   userEmptyClan,
   customUserStatus,
-  searchMessageChannel
+  searchMessageChannel,
+  clanNotificationsSetting,
 };

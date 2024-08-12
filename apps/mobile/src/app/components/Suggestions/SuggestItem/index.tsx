@@ -39,7 +39,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar,
 				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{symbol && <Text style={styles.symbol}>{symbol}</Text>}
 				{isRoleUser || name.startsWith('here') ? (
-					<Text style={[styles.roleText, name.startsWith('here') && styles.title]}>{`@${name}`}</Text>
+					<Text style={[styles.roleText, name.startsWith('here') && styles.textHere]}>{`@${name}`}</Text>
 				) : (
 					<Text style={styles.title}>{name}</Text>
 				)}

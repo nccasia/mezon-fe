@@ -14,6 +14,7 @@ import {
 	messagesActions,
 	MessagesEntity,
 	selectAllAccount,
+	selectAllRolesClan,
 	selectAllUsesClan,
 	selectIdMessageToJump,
 	selectMessageEntityById,
@@ -82,6 +83,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
+  const rolesInClan = useSelector(selectAllRolesClan);
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -159,8 +161,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
-
-				if (!mentionedUser || tagName === 'here') return;
+        const isRoleMention = rolesInClan?.some((role) => tagName === role?.id)
+				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
 					user: clanUser?.user,

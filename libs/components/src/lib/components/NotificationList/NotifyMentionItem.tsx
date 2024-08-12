@@ -18,11 +18,11 @@ function convertContentToObject(notify: any) {
 		try {
 			const parsedContent = {
 				...notify.content,
-				content: JSON.parse(notify.content.content),
-				mentions: JSON.parse(notify.content.mentions),
-				reactions: JSON.parse(notify.content.reactions),
-				references: JSON.parse(notify.content.references),
-				attachments: JSON.parse(notify.content.attachments),
+				content: notify.content.content ? JSON.parse(notify.content.content) : null,
+				mentions: notify.content.mentions ? JSON.parse(notify.content.mentions) : null,
+				reactions: notify.content.reactions ? JSON.parse(notify.content.reactions) : null,
+				references: notify.content.references ? JSON.parse(notify.content.references) : null,
+				attachments: notify.content.attachments ? JSON.parse(notify.content.attachments) : null,
 			};
 
 			return {

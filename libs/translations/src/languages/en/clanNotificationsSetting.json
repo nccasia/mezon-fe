@@ -1,0 +1,31 @@
+{
+    "muteClan": "Muting a server prevents unread indicators and notifications from appearing unless you are mentioned",
+    "notifySettingOption": {
+      "title": "Clan Notifications Setting",
+      "allMessage": "All Message",
+      "onlyMentions": "Only @Mentions",
+      "nothing": "Nothing"
+    },
+    "suppressOption": {
+      "suppressEveryone": "Suppress @everyone and @here",
+      "suppressAllRole": "Suppress All Role @mention",
+      "suppressHighlights": "Suppress Highlights",
+      "subText": "Highlights provide occasional updates when your friends are chatting in buy clan, and more."
+    },
+    "muteEventOptions": {
+      "muteNewEvents": "Mute New Events",
+      "mobilePushNotifications": "Mobile Push Notifications"
+    },
+    "notificationOverrides": {
+      "title": "Notification Overrides",
+      "addChannelsAllCategory": "Add a Channels All Category"
+    },
+    "clanNotificationSettingDetail": {
+      "muteChannelSubText": "You won't receive notifications from mute channels, and they will appearing out in your channel list. This setting applies across all your devices.",
+      "youHaveMuted": "You have muted this channel until"
+    },
+    "clanNotificationBS": {
+      "title": "Mute This Clan"
+    },
+    "resetOverrides": "Reset Override"
+}

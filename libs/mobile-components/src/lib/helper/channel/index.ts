@@ -79,3 +79,7 @@ export const jumpToChannel = async (channelId: string, clanId: string) => {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	}
 };
+
+export const hasNonEmptyChannels = (data: any) => {
+	return data.some((item: any) => item?.channels && item?.channels?.length > 0);
+};

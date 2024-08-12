@@ -1,7 +1,7 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, IRoleMention, Icons, filterContent, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, referencesActions, selectAttachmentData, selectCurrentClanId } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId, selectCurrentUserId, selectMemberById } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -49,9 +49,9 @@ interface IChatMessageInputProps {
 	linksOnMessage?: ILinkOnMessage[];
 	markdownsOnMessage?: IMarkdownOnMessage[];
 	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
-	plainTextMessage?: string;
 	isShowCreateThread?: boolean;
 	channelsEntities?: any;
+	attachmentDataRef?: ApiMessageAttachment[];
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.72;
 
@@ -80,20 +80,20 @@ export const ChatMessageInput = memo(
 				linksOnMessage,
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
-				plainTextMessage,
 				isShowCreateThread,
 				channelsEntities,
+				attachmentDataRef,
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
+			const currentUserId = useSelector(selectCurrentUserId);
 			const [heightInput, setHeightInput] = useState(size.s_40);
 			const { themeValue } = useTheme();
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
-			const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 			const currentClanId = useSelector(selectCurrentClanId);
 			const { t } = useTranslation(['message']);
-			const { sendMessage, editSendMessage } = useChatSending({
+			const { editSendMessage } = useChatSending({
 				channelId,
 				mode,
 				directMessageId: channelId || '',
@@ -154,7 +154,7 @@ export const ChatMessageInput = memo(
 				}
 			};
 
-			const handleTypingMessage = async () => {
+			const handleTypingMessage = useCallback(async () => {
 				switch (mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:
 						await handleTypingDebounced();
@@ -166,7 +166,7 @@ export const ChatMessageInput = memo(
 					default:
 						break;
 				}
-			};
+			}, [handleDirectMessageTypingDebounced, handleTypingDebounced, mode]);
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
@@ -265,14 +265,22 @@ export const ChatMessageInput = memo(
 							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
 							switch (mode) {
 								case ChannelStreamMode.STREAM_MODE_CHANNEL:
-									await sendMessage(
-										payloadSendMessage,
-										simplifiedMentionList || [],
-										attachmentDataUnique || [],
-										reference,
-										false,
-										isMentionEveryOne,
-									);
+									await Promise.all([
+										dispatch(
+											messagesActions.sendMessage({
+												channelId: channelId,
+												clanId: currentClanId || '',
+												mode,
+												content: filterContent(payloadSendMessage) ?? {},
+												mentions: simplifiedMentionList || [],
+												attachments: attachmentDataUnique || [],
+												references: reference,
+												anonymous: false,
+												mentionEveryone: isMentionEveryOne,
+												senderId: currentUserId,
+											}),
+										),
+									]);
 									break;
 								case ChannelStreamMode.STREAM_MODE_DM:
 								case ChannelStreamMode.STREAM_MODE_GROUP:

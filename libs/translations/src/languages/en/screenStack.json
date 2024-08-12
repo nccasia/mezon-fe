@@ -5,7 +5,9 @@
         "channelCreator": "Create Channel",
         "clanOverviewSetting": "Overview Settings",
         "eventCreator": "Create Event",
-        "serverRoles": "Clan Roles"
+        "serverRoles": "Clan Roles",
+        "notificationSetting": "Notification settings",
+        "newOverride": "New Override"
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings"

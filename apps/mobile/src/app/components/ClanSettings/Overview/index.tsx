@@ -177,7 +177,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	];
 
 	return (
-		<Block>
+		<Block flex={1} backgroundColor={themeValue.secondary}>
 			<ScrollView contentContainerStyle={styles.container}>
 				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 

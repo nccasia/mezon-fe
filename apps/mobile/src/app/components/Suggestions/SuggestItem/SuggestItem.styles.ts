@@ -17,13 +17,14 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		gap: 8,
 	},
 	title: {
-		fontSize: size.label,
+		fontSize: size.medium,
 		fontWeight: '600',
-		color: colors.text,
+		color: colors.white,
+    flexBasis: '50%',
 	},
 	image: {
-		width: 40,
-		height: 40,
+		width: size.s_30,
+		height: size.s_30,
 		borderRadius: 50,
 	},
 	symbol: {
@@ -35,7 +36,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.s_12,
 		fontWeight: '500',
 		color: colors.textDisabled,
-    marginLeft: size.s_20
+    marginLeft: size.s_20,
+    flex: 1,
+    textAlign: 'right'
 	},
 	avatarMessageBoxDefault: {
 		width: 40,
@@ -51,6 +54,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	emojiImage: { width: size.s_20, height: size.s_20 },
   roleText: {
-    color: colors.textRoleLink
+    color: colors.textRoleLink,
+    fontSize: size.medium,
+		fontWeight: '600',
+  },
+  textHere: {
+    fontSize: size.medium,
+		fontWeight: '600',
+		color: colors.white,
+    flexBasis: '15%',
   }
+
 });

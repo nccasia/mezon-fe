@@ -92,6 +92,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
+					className="z-20"
 				>
 					<GifStickerEmojiPopup />
 				</div>

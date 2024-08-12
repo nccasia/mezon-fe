@@ -68,6 +68,7 @@ type fetchChannelMembersPayload = {
 	clanId: string;
 	channelId: string;
 	noFetchMembers?: boolean;
+	messageId?: string;
 };
 
 type JoinChatPayload = {
@@ -88,13 +89,19 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
-	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noFetchMembers, messageId }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+
+			if (messageId) {
+				thunkAPI.dispatch(messagesActions.jumpToMessage({ channelId, messageId }));
+			} else {
+				thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+			}
+
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
@@ -487,6 +494,7 @@ export const channelsActions = {
  * ```
  * import { useSelector } from 'react-redux';
 import { channel } from 'process';
+import { mess } from '@mezon/store';
  *
  * // ...
  *

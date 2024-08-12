@@ -3,7 +3,6 @@ import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
-	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
 	mentionUserPattern,
@@ -119,7 +118,6 @@ export const ChatBoxBottomBar = memo(
 		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
 		const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
-		const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 		const isShowCreateThread = useMemo(() => {
 			return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
@@ -270,7 +268,6 @@ export const ChatBoxBottomBar = memo(
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
 				setText(convertedHashtag);
-				setPlainTextMessage(convertToPlainTextHashtag(text));
 			}
 			setIsShowAttachControl(false);
 			saveMessageToCache(text);
@@ -503,9 +500,9 @@ export const ChatBoxBottomBar = memo(
 						linksOnMessage={linkList}
 						markdownsOnMessage={markdownList}
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
-						plainTextMessage={plainTextMessage}
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
+						attachmentDataRef={attachmentDataRef}
 					/>
 				</Block>
 			</Block>

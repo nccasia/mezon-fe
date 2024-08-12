@@ -15,6 +15,10 @@ export const useStickyScroll = (
 	const [sticky, setSticky] = useState<boolean>(true);
 	const stickyRef = useRef(sticky);
 
+	const { data: items } = data;
+
+	const totalItems = items?.length || 0;
+
 	const moveScrollToBottom = useCallback(async () => {
 		targetRef.current.scrollTop = targetRef.current.scrollHeight;
 		return true;
@@ -25,7 +29,7 @@ export const useStickyScroll = (
 		if (sticky) {
 			moveScrollToBottom();
 		}
-	}, [data.data.length, targetRef, sticky, moveScrollToBottom]);
+	}, [totalItems, targetRef, sticky, moveScrollToBottom]);
 
 	const updateStuckToBottom = useCallback(() => {
 		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;

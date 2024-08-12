@@ -1,6 +1,6 @@
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -113,7 +113,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			},
 			expandable: true,
 			icon: <Icons.ShieldUserIcon color={themeValue.text} />,
-			isShow: isCanEditRole
+			isShow: isCanEditRole,
 		},
 		{
 			title: t('menu.userManagement.invite'),
@@ -149,9 +149,11 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	];
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			<LogoClanSelector />
-			<MezonMenu menu={menu} />
-		</ScrollView>
+		<Block flex={1} backgroundColor={themeValue.secondary}>
+			<ScrollView contentContainerStyle={styles.container}>
+				<LogoClanSelector />
+				<MezonMenu menu={menu} />
+			</ScrollView>
+		</Block>
 	);
 }

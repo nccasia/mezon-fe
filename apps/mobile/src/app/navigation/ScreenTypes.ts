@@ -1,5 +1,5 @@
 import { EOpenSearchChannelFrom } from "@mezon/mobile-components";
-import { DirectEntity } from "@mezon/store-mobile";
+import { DirectEntity, NotiChannelCategorySettingEntity } from "@mezon/store-mobile";
 import { IChannel, OptionEvent } from "@mezon/utils";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -70,6 +70,9 @@ export const APP_SCREEN = {
     SETUP_ROLE_MEMBERS: 'ROUTES.MENU_CLAN.SETUP_ROLE_MEMBERS',
     SETUP_PERMISSIONS: 'ROUTES.MENU_CLAN.SETUP_PERMISSIONS',
     ROLE_DETAIL: 'ROUTES.MENU_CLAN.ROLE_DETAIL',
+    NOTIFICATION_SETTING: 'ROUTES.MENU_CLAN.NOTIFICATION_SETTING',
+    NOTIFICATION_OVERRIDES: 'ROUTES.MENU_CLAN.NOTIFICATION_OVERRIDES',
+    NOTIFICATION_SETTING_DETAIL: 'ROUTES.MENU_CLAN.NOTIFICATION_SETTING_DETAIL'
   },
 
   MENU_CHANNEL: {
@@ -171,6 +174,11 @@ type MenuClanStackParamList = {
   };
   [APP_SCREEN.MENU_CLAN.ROLE_DETAIL]: {
     roleId: string
+  };
+  [APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING]: undefined;
+  [APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES]: undefined;
+  [APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL]: {
+    notifyChannelCategorySetting: NotiChannelCategorySettingEntity,
   };
 };
 

@@ -69,7 +69,7 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmo
 	);
 
 	return (
-		<div className="flex flex-row h-full items-center gap-1 mr-3  ">
+		<div className="flex flex-row absolute h-11 items-center gap-1 mr-3 top-0 right-0">
 			<div onClick={handleOpenGifs} className="cursor-pointer block max-sm:hidden w-6 h-6">
 				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>

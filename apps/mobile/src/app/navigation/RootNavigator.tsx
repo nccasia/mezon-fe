@@ -29,7 +29,7 @@ import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
+import { AppState, DeviceEventEmitter, StatusBar, View } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
 import {
@@ -77,15 +77,12 @@ const NavigationMain = () => {
 	}, [isLoggedIn]);
 
 	useEffect(() => {
-		const timer = setTimeout(
-			async () => {
-				await BootSplash.hide({ fade: true });
-				await notifee.cancelAllNotifications();
-				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-				await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-			},
-			850,
-		);
+		const timer = setTimeout(async () => {
+			await BootSplash.hide({ fade: true });
+			await notifee.cancelAllNotifications();
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		}, 850);
 
 		return () => {
 			clearTimeout(timer);
@@ -255,7 +252,11 @@ const NavigationMain = () => {
 	);
 
 	if (!isReadyForUse) {
-		return <View />;
+		return (
+			<View>
+				<NetInfoComp />
+			</View>
+		);
 	}
 
 	return (

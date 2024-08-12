@@ -68,6 +68,7 @@ import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
+import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
 import {
@@ -178,10 +179,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
+		const seenIds = new Set();
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => {
+				if (emoji.id && !seenIds.has(emoji.id)) {
+					seenIds.add(emoji.id);
+					return true;
+				}
+				return false;
+			})
 			.slice(0, 20)
 			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+
 		callback(matches);
 	};
 
@@ -624,7 +634,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
 						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`,
 					},
-					maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`,
+					maxWidth: '100%',
+					maxHeight: '350px',
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
@@ -698,6 +709,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
+			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
 		</div>
 	);
 }

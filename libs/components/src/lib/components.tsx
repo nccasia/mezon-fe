@@ -59,7 +59,7 @@ export { default as SidebarClanItem } from './components/ModalListClans';
 export { default as SidebarTooltip } from './components/ModalListClans/SidebarTooltip';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
-
+export { default as FirstJoinPopup} from './components/FirstJoinPopup';
 export * from './components/AvatarImage/AvatarImage';
 export { default as CustomDropdown } from './components/CustomDropdown';
 export { ModalErrorTypeUpload, ModalOverData } from './components/ModalError';

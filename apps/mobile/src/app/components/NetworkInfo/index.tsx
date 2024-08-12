@@ -1,30 +1,27 @@
 import { Colors, size } from '@mezon/mobile-ui';
-import { appActions } from '@mezon/store-mobile';
+import { appActions, selectHasInternetMobile } from '@mezon/store-mobile';
 import NetInfo from '@react-native-community/netinfo';
-import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { hasNotch } from 'react-native-device-info';
-import Animated, { BounceIn } from 'react-native-reanimated';
-import { useDispatch } from 'react-redux';
+import Animated from 'react-native-reanimated';
+import { useDispatch, useSelector } from 'react-redux';
 
 const NetInfoComp = () => {
-	const [hasInternet, setHasInternet] = useState(false);
+	const hasInternet = useSelector(selectHasInternetMobile);
+
 	const dispatch = useDispatch();
-	useFocusEffect(
-		useCallback(() => {
-			const netInfoSubscription = NetInfo.addEventListener((state) => {
-				setHasInternet(state.isConnected);
-				dispatch(appActions.setHasInternetMobile(state.isConnected));
-			});
-			return () => {
-				netInfoSubscription();
-			};
-		}, []),
-	);
+	useEffect(() => {
+		const netInfoSubscription = NetInfo.addEventListener((state) => {
+			dispatch(appActions.setHasInternetMobile(state.isConnected));
+		});
+		return () => {
+			netInfoSubscription();
+		};
+	}, [dispatch]);
 
 	return !hasInternet ? (
-		<Animated.View entering={BounceIn.delay(400)} style={styles.container}>
+		<Animated.View style={styles.container}>
 			<Text style={styles.text1}>No internet connection</Text>
 			<Text numberOfLines={1} style={styles.text2}>
 				Please check your connection and try again
@@ -38,7 +35,7 @@ const styles = StyleSheet.create({
 		padding: 20,
 		paddingVertical: 15,
 		position: 'absolute',
-		zIndex: 1,
+		zIndex: 999999999999,
 		top: hasNotch() ? 60 : 20,
 		marginHorizontal: 10,
 		alignSelf: 'center',

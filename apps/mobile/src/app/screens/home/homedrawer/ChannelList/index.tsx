@@ -1,6 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useCategory, useUserPermission } from '@mezon/core';
-import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
+import {
+	EOpenSearchChannelFrom,
+	Icons,
+	STORAGE_DATA_CATEGORY_CHANNEL,
+	load,
+	save,
+	hasNonEmptyChannels
+} from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -163,7 +170,7 @@ const ChannelList = React.memo((props: any) => {
 						</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
+				{isLoading === 'loading' && !hasNonEmptyChannels(dataCategoryChannel || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlashList
 					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}

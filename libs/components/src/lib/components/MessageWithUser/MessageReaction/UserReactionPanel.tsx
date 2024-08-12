@@ -40,11 +40,11 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentClanId ?? '' : '',
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
-			emoji_id,
-			emoji,
+			emojiShowPanel.emojiId ?? '',
+			emojiShowPanel.emoji ?? '',
 			countRemoved,
 			message_sender_id,
 			true,
@@ -138,7 +138,6 @@ type SenderItemProps = {
 };
 
 const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId, removeEmojiSender, hideSenderOnPanel }) => {
-	const dispatch = useDispatch();
 	const handleRemoveEmojiSender = async (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
 		await removeEmojiSender(

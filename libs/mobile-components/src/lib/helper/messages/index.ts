@@ -1,14 +1,16 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
-import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
-import { STORAGE_KEY_TEMPORARY_ATTACHMENT } from '../../constant';
-import { load, save } from '../storage';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
-	ILinkOnMessage, ILinkVoiceRoomOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
-	IMentionOnMessage
+	IMentionOnMessage,
+	IMessageSendPayload,
 } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
+import { STORAGE_KEY_TEMPORARY_ATTACHMENT } from '../../constant';
+import { load, save } from '../storage';
 
 export function abbreviateText(filename: string) {
 	// Split the filename and extension
@@ -83,9 +85,11 @@ export const pushAttachmentToCache = (attachment: any, channelId: string | numbe
 
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
-export const isMentionOnMessage = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).username !== undefined || (element as IMentionOnMessage).rolename !== undefined;
+export const isMentionOnMessage = (element: MessageElementToken): element is IMentionOnMessage =>
+	(element as IMentionOnMessage).username !== undefined || (element as IMentionOnMessage).rolename !== undefined;
 
-export const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage => (element as IHashtagOnMessage).channelid !== undefined;
+export const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage =>
+	(element as IHashtagOnMessage).channelid !== undefined;
 
 export const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).shortname !== undefined;
 
@@ -95,3 +99,30 @@ export const isMarkdownOnMessage = (element: MessageElementToken): element is IM
 
 export const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILinkVoiceRoomOnMessage =>
 	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
+
+export const filterContent = (content: IMessageSendPayload) => {
+	const result: Partial<IMessageSendPayload> = {};
+
+	if (content?.t?.trim() !== '') {
+		result.t = content.t;
+	}
+	if (content.ej && content.ej.length > 0) {
+		result.ej = content.ej;
+	}
+	if (content.hg && content.hg.length > 0) {
+		result.hg = content.hg;
+	}
+	if (content.lk && content.lk.length > 0) {
+		result.lk = content.lk;
+	}
+	if (content.mk && content.mk.length > 0) {
+		result.mk = content.mk;
+	}
+
+	if (content.vk && content.vk.length > 0) {
+		result.vk = content.vk;
+	}
+
+	// Return undefined if the result is empty
+	return Object.keys(result).length > 0 ? (result as IMessageSendPayload) : undefined;
+};
