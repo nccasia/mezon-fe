@@ -17,9 +17,9 @@ import {
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector
+	useAppSelector,
 } from '@mezon/store';
-import { Direction_Mode, sleep } from '@mezon/utils';
+import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -51,37 +51,37 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 
-	const lastMessage = useSelector(selectMessageByMessageId(messages[messages.length - 1]))
-	const currentAccountId = useSelector(selectCurrentUserId)
+	const lastMessage = useSelector(selectMessageByMessageId(messages[messages.length - 1]));
+	const currentAccountId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
-	const loadMoreMessage = useCallback(async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
-		if (isFetching) {
-			return;
-		}
+	const loadMoreMessage = useCallback(
+		async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
+			if (isFetching) {
+				return;
+			}
 
-		if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
-			return;
-		}
+			if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
+				return;
+			}
 
-		if (direction === ELoadMoreDirection.top && !hasMoreTop) {
-			return;
-		}
+			if (direction === ELoadMoreDirection.top && !hasMoreTop) {
+				return;
+			}
 
-		if (typeof cb === 'function') {
-			cb();
-		}
+			if (typeof cb === 'function') {
+				cb();
+			}
 
+			if (direction === ELoadMoreDirection.bottom) {
+				await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
+			}
 
-		if (direction === ELoadMoreDirection.bottom) {
-			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
-		}
-
-		await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
-
-	}, [dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching]);
-
+			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
+		},
+		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching],
+	);
 
 	const chatRefData = useMemo(() => {
 		return {
@@ -93,26 +93,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage, chatRefOptions);
+	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
 
 	useEffect(() => {
 		if (lastMessage && lastMessage.sender_id === currentAccountId) {
 			dispatch(messagesActions.setIsJumpingToPresent(true));
 		}
-	}, [lastMessage])
+	}, [lastMessage]);
 
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
 			if (firstMessageId === messageId) {
-				return (
-					<ChatWelcome
-						key={messageId}
-						name={channelLabel}
-						avatarDM={avatarDM}
-						userName={userName}
-						mode={mode} 
-					/>
-				)
+				return <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />;
 			}
 			return (
 				<MemorizedChannelMessage
@@ -127,15 +119,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		});
 	}, [messages, firstMessageId, channelId, idMessageNotifed, mode, channelLabel, avatarDM, userName]);
 
-
 	useEffect(() => {
 		if (idMessageToJump && isMessageExist) {
-			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`)
-				.then((res) => {
-					if (res) {
-						dispatch(messagesActions.setIdMessageToJump(null));
-					}
-				});
+			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`).then((res) => {
+				if (res) {
+					dispatch(messagesActions.setIdMessageToJump(null));
+				}
+			});
 		}
 	}, [dispatch, idMessageToJump, isMessageExist, chatScrollRef]);
 
