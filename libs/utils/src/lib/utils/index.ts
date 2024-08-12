@@ -531,7 +531,6 @@ export const processText = async (inputString: string) => {
 					});
 				}
 			} catch (error) {
-				console.error('Error checking link type:', error);
 				links.push({
 					tp: '',
 					lk: link,
