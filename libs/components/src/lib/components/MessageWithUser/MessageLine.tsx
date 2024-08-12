@@ -12,7 +12,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, MessageImage, PlainText } from '../../components';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	mode?: number;
@@ -193,20 +193,15 @@ const RenderContent = memo(
 				}
 
 				if (isLinkOnMessage(element)) {
-					if (element.tp?.startsWith('image')) {
-						formattedContent.push(
-							<MessageImage key={`linkImage-${index}-${s}-${element.lk}`} attachmentData={{ url: element.lk ?? '' }} />,
-						);
-					} else {
-						formattedContent.push(
-							<MarkdownContent
-								isTokenClickAble={isTokenClickAble}
-								isSingleLine={isSingleLine}
-								key={`link-${index}-${s}-${element.lk}`}
-								content={element.lk ?? ''}
-							/>,
-						);
-					}
+					formattedContent.push(
+						<MarkdownContent
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`link-${index}-${s}-${element.lk}`}
+							content={element.lk ?? ''}
+							typeOfLink={element.tp ?? ''}
+						/>,
+					);
 				}
 
 				if (isLinkVoiceRoomOnMessage(element)) {

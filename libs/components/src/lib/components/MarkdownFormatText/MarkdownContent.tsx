@@ -4,15 +4,16 @@ import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
-import { PreClass } from '../../components';
+import { MessageImage, PreClass } from '../../components';
 
 type MarkdownContentOpt = {
 	content?: string;
 	isSingleLine: boolean;
 	isTokenClickAble: boolean;
+	typeOfLink?: string;
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingleLine, isTokenClickAble }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingleLine, isTokenClickAble, typeOfLink }) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const onClickLink = useCallback(
@@ -34,29 +35,33 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 			<div className="lineText contents dark:text-white text-colorTextLightMode">
-				<Markdown
-					children={content}
-					remarkPlugins={[remarkGfm]}
-					components={{
-						pre: PreClass,
-						p: 'span',
-						a: (props) => (
-							<span
-								onClick={() => onClickLink(props.href ?? '')}
-								rel="noopener noreferrer"
-								style={{
-									color: 'rgb(59,130,246)',
-									cursor: isSingleLine || !isTokenClickAble ? 'text' : 'pointer',
-									wordBreak: 'break-word',
-									textDecoration: isSingleLine || !isTokenClickAble ? 'none' : 'underline',
-								}}
-								className="tagLink"
-							>
-								{props.children}
-							</span>
-						),
-					}}
-				/>
+				{typeOfLink && typeOfLink.startsWith('image') ? (
+					<MessageImage key={`linkImage-${typeOfLink}`} attachmentData={{ url: content ?? '' }} />
+				) : (
+					<Markdown
+						children={content}
+						remarkPlugins={[remarkGfm]}
+						components={{
+							pre: PreClass,
+							p: 'span',
+							a: (props) => (
+								<span
+									onClick={() => onClickLink(props.href ?? '')}
+									rel="noopener noreferrer"
+									style={{
+										color: 'rgb(59,130,246)',
+										cursor: isSingleLine || !isTokenClickAble ? 'text' : 'pointer',
+										wordBreak: 'break-word',
+										textDecoration: isSingleLine || !isTokenClickAble ? 'none' : 'underline',
+									}}
+									className="tagLink"
+								>
+									{props.children}
+								</span>
+							),
+						}}
+					/>
+				)}
 			</div>
 		</article>
 	);
