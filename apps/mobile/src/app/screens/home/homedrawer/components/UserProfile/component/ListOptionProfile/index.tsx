@@ -76,6 +76,8 @@ const ListOptionProfile: React.FC<ListOptionProps> = memo(({ isMe, onClose, onFr
 		];
 	}, [onCancelAction, onClose, onCopyAction, onFriendAction, pending, t, themeValue.channelNormal]);
 
+	const copyOptions = profileOptions.find((item) => item.title === t('pendingContent.copyUsername'));
+
 	return (
 		<View style={styles.optionContainer}>
 			{!isMe ? (
@@ -89,7 +91,9 @@ const ListOptionProfile: React.FC<ListOptionProps> = memo(({ isMe, onClose, onFr
 						),
 				)
 			) : (
-				<OptionProfile option={profileOptions[3]}></OptionProfile>
+				<Pressable onPress={copyOptions.action}>
+					<OptionProfile option={copyOptions}></OptionProfile>
+				</Pressable>
 			)}
 		</View>
 	);
