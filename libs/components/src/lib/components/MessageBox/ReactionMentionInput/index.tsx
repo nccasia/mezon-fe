@@ -238,6 +238,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
+	console.log('linkList: ', linkList);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
 
@@ -275,7 +276,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						t: content,
 						hg: hashtagList,
 						ej: emojiList,
-						lk: linkList,
+						lk: await linkList,
 						mk: markdownList,
 						vk: voiceLinkRoomList,
 					},
@@ -315,7 +316,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							t: content,
 							hg: hashtagList,
 							ej: emojiList,
-							lk: linkList,
+							lk: await linkList,
 							mk: markdownList,
 							vk: voiceLinkRoomList,
 						},

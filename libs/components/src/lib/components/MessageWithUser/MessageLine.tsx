@@ -123,6 +123,7 @@ const RenderContent = memo(
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+
 		let lastindex = 0;
 		const content = useMemo(() => {
 			const formattedContent: React.ReactNode[] = [];

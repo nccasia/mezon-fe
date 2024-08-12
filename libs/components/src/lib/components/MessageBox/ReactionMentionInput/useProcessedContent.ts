@@ -9,6 +9,7 @@ const useProcessedContent = (inputText: string) => {
 	useEffect(() => {
 		const processInput = async () => {
 			const { links, markdowns, voiceRooms } = await processText(inputText);
+			console.log('links: ', links);
 			setLinkList(links);
 			setMarkdownList(markdowns);
 			setVoiceLinkRoomList(voiceRooms);
