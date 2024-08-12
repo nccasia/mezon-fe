@@ -1,4 +1,5 @@
 import {
+	ILinkOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -85,17 +86,27 @@ export function useMessageParser(message: IMessageWithUser) {
 		}
 	}, [message.references]);
 
-	const hasAttachmentInMessageRef = useMemo(() => {
-		if (message.references) {
-			return message.references[0]?.has_attachment;
-		}
-	}, [message.references]);
-
 	const messageContentRef = useMemo(() => {
 		if (message.references) {
 			return JSON.parse(message?.references[0]?.content ?? '{}');
 		}
 	}, [message.references]);
+
+	const messageLinkInContentRef = useMemo(() => {
+		if (messageContentRef) {
+			return messageContentRef.lk;
+		}
+	}, [messageContentRef]);
+
+	const hasAttachmentInMessageRef = useMemo(() => {
+		const hasImage = messageLinkInContentRef?.some((item: ILinkOnMessage) => item?.tp?.startsWith('image'));
+
+		if (message.references) {
+			return message.references[0]?.has_attachment || hasImage;
+		}
+
+		return hasImage;
+	}, [message.references, messageLinkInContentRef]);
 
 	const messageUsernameSenderRef = useMemo(() => {
 		if (message.references) {

@@ -159,9 +159,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const [titleMention, setTitleMention] = useState('');
 
-	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+	const handleChange: OnChangeHandlerFunc = async (event, newValue, newPlainTextValue, mentions) => {
 		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
-		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
+		const { links, markdowns, voiceRooms } = await processText(newPlainTextValue);
 		setChannelDraftMessage(
 			channelId,
 			messageId,
@@ -247,7 +247,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.username ?? ''
+											: (suggestion.username ?? '')
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}

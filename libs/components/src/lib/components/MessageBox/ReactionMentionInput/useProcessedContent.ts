@@ -7,8 +7,8 @@ const useProcessedContent = (inputText: string) => {
 	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
 
 	useEffect(() => {
-		const processInput = () => {
-			const { links, markdowns, voiceRooms } = processText(inputText);
+		const processInput = async () => {
+			const { links, markdowns, voiceRooms } = await processText(inputText);
 			setLinkList(links);
 			setMarkdownList(markdowns);
 			setVoiceLinkRoomList(voiceRooms);

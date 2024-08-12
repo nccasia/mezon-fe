@@ -1,3 +1,4 @@
+import { handleUrlInput } from '@mezon/transport';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -491,7 +492,7 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 	return result;
 };
 
-export const processText = (inputString: string) => {
+export const processText = async (inputString: string) => {
 	const links: ILinkOnMessage[] = [];
 	const markdowns: IMarkdownOnMessage[] = [];
 	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
@@ -513,14 +514,26 @@ export const processText = (inputString: string) => {
 			const endindex = i;
 			const link = inputString.substring(startindex, endindex);
 
-			if (link.startsWith(googleMeetPrefix)) {
-				voiceRooms.push({
-					vk: link,
-					s: startindex,
-					e: endindex,
-				});
-			} else {
+			try {
+				const checkTypeLink = await handleUrlInput(link);
+				if (link.startsWith(googleMeetPrefix)) {
+					voiceRooms.push({
+						vk: link,
+						s: startindex,
+						e: endindex,
+					});
+				} else {
+					links.push({
+						tp: checkTypeLink.filetype || '',
+						lk: link,
+						s: startindex,
+						e: endindex,
+					});
+				}
+			} catch (error) {
+				console.error('Error checking link type:', error);
 				links.push({
+					tp: '',
 					lk: link,
 					s: startindex,
 					e: endindex,

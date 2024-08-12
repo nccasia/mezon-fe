@@ -8,7 +8,7 @@ export function useSendInviteMessage() {
 
 	const sendInviteMessage = React.useCallback(
 		async (url: string, channel_id: string, channelMode: number) => {
-			const { links, markdowns } = processText(url);
+			const { links, markdowns } = await processText(url);
 
 			const content: IMessageSendPayload = {
 				t: url,

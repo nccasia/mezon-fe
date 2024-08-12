@@ -21,6 +21,7 @@ export interface IEmoji {
 	shortname: string | undefined;
 }
 export interface ILink {
+	tp: string | undefined;
 	lk: string | undefined;
 }
 export interface IMarkdown {
