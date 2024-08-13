@@ -46,6 +46,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
+			{(message?.references?.length) ?
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 				<Icons.ReplyCorner />
 				<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
@@ -79,19 +80,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 						)}
 					</div>
 				</div>
-			</div>
-
-			{!message.references && (
-				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
-					<Icons.ReplyCorner />
-					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
-						<div className="rounded-full dark:bg-bgSurface bg-bgLightModeButton size-4">
-							<Icons.IconReplyMessDeleted />
-						</div>
-						<i className="dark:text-zinc-400 text-colorTextLightMode text-[13px]">Original message was deleted</i>
+			</div>:
+			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+				<Icons.ReplyCorner />
+				<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
+					<div className="rounded-full dark:bg-bgSurface bg-bgLightModeButton size-4">
+						<Icons.IconReplyMessDeleted />
 					</div>
+					<i className="dark:text-zinc-400 text-colorTextLightMode text-[13px]">Original message was deleted</i>
 				</div>
-			)}
+			</div>
+			}
 		</div>
 	);
 };
