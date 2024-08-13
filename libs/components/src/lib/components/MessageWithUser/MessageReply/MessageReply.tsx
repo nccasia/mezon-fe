@@ -1,8 +1,9 @@
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectMessageDeletedId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
-import { memo, useCallback, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
@@ -22,6 +23,8 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageIdRef,
 		hasAttachmentInMessageRef,
 	} = useMessageParser(message);
+
+	const messsageDetetedIdList = useSelector(selectMessageDeletedId);
 
 	const dispatch = useAppDispatch();
 
@@ -44,44 +47,50 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		senderIdMessageRef ?? '',
 	);
 
+	const messageWasDeleted = useMemo(() => {
+		return messsageDetetedIdList.includes(messageIdRef ?? '');
+	}, [messsageDetetedIdList, messageIdRef]);
+
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
-			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
-				<Icons.ReplyCorner />
-				<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
-					<div className="w-5 h-5">
-						<AvatarImage className="w-5 h-5" alt="user avatar" userName={messageUsernameSenderRef} src={messageAvatarSenderRef} />
-					</div>
+			{!messageWasDeleted && (
+				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+					<Icons.ReplyCorner />
+					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
+						<div className="w-5 h-5">
+							<AvatarImage className="w-5 h-5" alt="user avatar" userName={messageUsernameSenderRef} src={messageAvatarSenderRef} />
+						</div>
 
-					<div className="gap-1 flex flex-row items-center w-full">
-						<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">{nameShowed}</span>
-						{hasAttachmentInMessageRef ? (
-							<div className=" flex flex-row items-center">
-								<div
-									onClick={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
-									className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
-								>
-									Click to see attachment
+						<div className="gap-1 flex flex-row items-center w-full">
+							<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">{nameShowed}</span>
+							{hasAttachmentInMessageRef ? (
+								<div className=" flex flex-row items-center">
+									<div
+										onClick={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+										className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
+									>
+										Click to see attachment
+									</div>
+									<Icons.ImageThumbnail />
 								</div>
-								<Icons.ImageThumbnail />
-							</div>
-						) : (
-							<div>
-								{' '}
-								<MessageLine
-									isTokenClickAble={false}
-									isJumMessageEnabled={true}
-									isSingleLine={true}
-									onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
-									content={messageContentRef}
-								/>
-							</div>
-						)}
+							) : (
+								<div>
+									{' '}
+									<MessageLine
+										isTokenClickAble={false}
+										isJumMessageEnabled={true}
+										isSingleLine={true}
+										onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+										content={messageContentRef}
+									/>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 
-			{!message.references && (
+			{messageWasDeleted && (
 				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">

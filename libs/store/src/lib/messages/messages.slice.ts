@@ -102,6 +102,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
+	messsageIdDeleted: string[];
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -565,6 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
+	messsageIdDeleted: [],
 };
 
 export type SetCursorChannelArgs = {
@@ -651,6 +653,7 @@ export const messagesSlice = createSlice({
 					break;
 				}
 				case 2: {
+					state.messsageIdDeleted.push(messageId);
 					handleRemoveOneMessage({ state, channelId, messageId });
 					break;
 				}
@@ -994,6 +997,8 @@ export const selectMessageByMessageId = (messageId: string) =>
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
+export const selectMessageDeletedId = createSelector(getMessagesState, (state) => state.messsageIdDeleted);
+
 // V2
 
 const emptyObject = {};
@@ -1182,7 +1187,7 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 		channelEntity.entities[nextMessageId].isStartedMessageGroup = isStartedMessageGroup;
 		channelEntity.entities[nextMessageId].isStartedMessageOfTheDay = isStartedMessageOfTheDay;
 	}
-
+	console.log('messageId-1', messageId);
 	return channelMessagesAdapter.removeOne(channelEntity, messageId);
 };
 
