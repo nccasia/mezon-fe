@@ -28,12 +28,7 @@ export function uploadImageToMinIOMobile(url: string, stream: Buffer, type: stri
 	});
 }
 
-export async function handleUploadEmoticon(
-	client: Client,
-	session: Session,
-	filename: string,
-	file: File,
-): Promise<ApiMessageAttachment> {
+export async function handleUploadEmoticon(client: Client, session: Session, filename: string, file: File): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
@@ -43,7 +38,7 @@ export async function handleUploadEmoticon(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			
+
 			const buf = await file?.arrayBuffer();
 
 			resolve(uploadFile(client, session, filename, fileType, file.size, Buffer.from(buf)));
@@ -113,17 +108,12 @@ export async function handleUploadFileMobile(
 	});
 }
 
-export function createUploadFilePath(
-	session: Session,
-	currentClanId: string,
-	currentChannelId: string,
-	filename: string,
-): string {
+export function createUploadFilePath(session: Session, currentClanId: string, currentChannelId: string, filename: string): string {
 	const ms = new Date().getMinutes();
 	filename = ms + filename;
-	filename = filename.replace(/-|\(|\)| /g, '_')
+	filename = filename.replace(/-|\(|\)| /g, '_');
 	if (!currentClanId) {
-		currentClanId = "0";
+		currentClanId = '0';
 	}
 	return currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 }
@@ -136,7 +126,6 @@ export async function uploadFile(
 	size: number,
 	buf: Buffer,
 	isMobile?: boolean,
-
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -150,9 +139,7 @@ export async function uploadFile(
 				reject(new Error('Failed to upload file. URL not available.'));
 				return;
 			}
-			const res = await (isMobile
-				? uploadImageToMinIOMobile(data.url || '', buf, type, size)
-				: uploadImageToMinIO(data.url || '', buf, size));
+			const res = await (isMobile ? uploadImageToMinIOMobile(data.url || '', buf, type, size) : uploadImageToMinIO(data.url || '', buf, size));
 			if (res.status !== 200) {
 				throw new Error('Failed to upload file to MinIO.');
 			}
@@ -170,8 +157,16 @@ export async function uploadFile(
 		}
 	});
 }
-
 export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
+	const defaultAttachment: ApiMessageAttachment = {
+		filename: '',
+		url: '',
+		filetype: '',
+		size: 0,
+		width: 0,
+		height: 0,
+	};
+
 	return new Promise<ApiMessageAttachment>((resolve, reject) => {
 		if (isValidUrl(url) && url.length < 512) {
 			fetch(url, { method: 'HEAD' })
@@ -191,14 +186,14 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 							});
 						}
 					} else {
-						reject(new Error('Failed to get URL. URL not available.'));
+						resolve(defaultAttachment);
 					}
 				})
 				.catch((e) => {
-					reject(new Error('Failed to get URL. URL not available.'));
+					resolve(defaultAttachment);
 				});
 		} else {
-			reject(new Error('Failed to get URL. URL not available.'));
+			resolve(defaultAttachment);
 		}
 	});
 }

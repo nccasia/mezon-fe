@@ -684,3 +684,7 @@ export type SearchFilter = {
 	field_name: string;
 	field_value?: string;
 };
+
+export enum ETypeLinkMedia {
+	IMAGE_PREFIX = 'image',
+}
