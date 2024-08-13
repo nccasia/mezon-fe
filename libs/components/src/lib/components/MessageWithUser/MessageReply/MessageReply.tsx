@@ -54,7 +54,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	},[message.references, messageIdsDeleted]);
 
 	return (
-		<div className="overflow-hidden " ref={markUpOnReplyParent} onClick={() => console.log(message.references)}>
+		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			{(!checkReplyDeleted && message?.references?.length) ?
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 				<Icons.ReplyCorner />
