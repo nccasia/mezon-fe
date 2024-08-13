@@ -95,9 +95,9 @@ export default function FriendsPage() {
 	const listFriendFilter = filterStatus(friends)
 		.filter((obj) => obj.user?.username?.includes(textSearch))
 		.sort((start, next) => {
-			const usernameStart = start.user?.display_name ?? '';
-			const usernameNext = next.user?.display_name ?? '';
-			return usernameStart.localeCompare(usernameNext);
+			const nameStart = (start.user?.display_name || start.user?.username) ?? '';
+			const nameNext = (next.user?.display_name || next.user?.username) ?? '';
+			return nameStart.localeCompare(nameNext);
 		});
 
 	const { setStatusMenu } = useMenu();
