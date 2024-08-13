@@ -1,8 +1,9 @@
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectMessageIdsDeleted, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
-import { memo, useCallback, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
@@ -44,9 +45,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		senderIdMessageRef ?? '',
 	);
 
+	const messageIdsDeleted = useSelector(selectMessageIdsDeleted);
+	const checkReplyDeleted = useMemo(() => {
+		if (Array.isArray(message?.references) && message.references.length > 0) {
+			return messageIdsDeleted.includes(message.references[0]?.message_ref_id || '');
+		}
+		return false;
+	},[message.references, messageIdsDeleted]);
+
 	return (
-		<div className="overflow-hidden " ref={markUpOnReplyParent}>
-			{message?.references?.length ?
+		<div className="overflow-hidden " ref={markUpOnReplyParent} onClick={() => console.log(message.references)}>
+			{(!checkReplyDeleted && message?.references?.length) ?
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 				<Icons.ReplyCorner />
 				<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">

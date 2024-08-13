@@ -102,6 +102,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
+	messageIdsDeleted: string[];
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -565,6 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
+	messageIdsDeleted: [],
 };
 
 export type SetCursorChannelArgs = {
@@ -651,6 +653,7 @@ export const messagesSlice = createSlice({
 					break;
 				}
 				case 2: {
+					state.messageIdsDeleted.push(messageId);
 					handleRemoveOneMessage({ state, channelId, messageId });
 					break;
 				}
@@ -910,6 +913,8 @@ export const selectMessagesEntities = createSelector(getMessagesState, (messageS
 });
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
+
+export const selectMessageIdsDeleted = createSelector(getMessagesState, (state: MessagesState) => state.messageIdsDeleted);
 
 export const selectMessageByChannelId = (channelId?: string | null) =>
 	createSelector(getMessagesState, (messagesState) => {
