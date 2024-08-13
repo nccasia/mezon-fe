@@ -1,6 +1,4 @@
 import { selectTheme } from '@mezon/store';
-import { handleUrlInput, isValidUrl } from '@mezon/transport';
-import { ETypeLinkMedia } from '@mezon/utils';
 import clx from 'classnames';
 import { memo, useCallback, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -21,18 +19,19 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 	const [isImage, setIsImage] = useState<boolean>(false);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (content && isValidUrl(content)) {
-			handleUrlInput(content).then((result) => {
-				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-					setTimeout(() => {
-						setIsImage(true);
-						setImageUrl(content);
-					}, 1000);
-				}
-			});
-		}
-	}, [content]);
+	// useEffect(() => {
+	// 	if (content && isValidUrl(content)) {
+	// 		handleUrlInput(content).then((result) => {
+	// 			console.log(result);
+	// 			if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+	// 				setTimeout(() => {
+	// 					setIsImage(true);
+	// 					setImageUrl(content);
+	// 				}, 1000);
+	// 			}
+	// 		});
+	// 	}
+	// }, [content]);
 
 	const onClickLink = useCallback(
 		(url: string) => {
@@ -49,6 +48,26 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 			lightMode: appearanceTheme === 'light',
 		},
 	);
+	const [previewData, setPreviewData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	useEffect(() => {
+		// Fetches the link preview data when the URL prop changes
+		const fetchData = async () => {
+			try {
+				const response = await fetch(content as string);
+				const data = await response.text();
+				console.log(data);
+				// Parsing logic to extract link preview data goes here
+
+				setLoading(false);
+			} catch (error) {
+				console.error(error);
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, [content]);
 
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>

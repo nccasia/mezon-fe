@@ -157,39 +157,84 @@ export async function uploadFile(
 		}
 	});
 }
-export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
-	const defaultAttachment: ApiMessageAttachment = {
+interface ApiMessageAttachment2 {
+	filename: string;
+	url: string;
+	filetype: string;
+	size: number;
+	width: number;
+	height: number;
+	title: string;
+	description: string;
+	image: string;
+}
+
+export function handleUrlInput(url: string): Promise<ApiMessageAttachment2> {
+	const defaultAttachment: ApiMessageAttachment2 = {
 		filename: '',
 		url: '',
 		filetype: '',
 		size: 0,
 		width: 0,
 		height: 0,
+		title: '',
+		description: '',
+		image: '',
 	};
 
-	return new Promise<ApiMessageAttachment>((resolve, reject) => {
+	return new Promise<ApiMessageAttachment2>((resolve, reject) => {
 		if (isValidUrl(url) && url.length < 512) {
-			fetch(url, { method: 'HEAD' })
+			// Fetching the headers first to check if the URL is valid
+			fetch(url, { method: 'GET', mode: 'no-cors' })
 				.then((response) => {
 					if (response.ok) {
 						const now = Date.now();
 						const contentSize = response.headers.get('Content-Length');
 						const contentType = response.headers.get('Content-Type');
-						if (contentType) {
-							resolve({
-								filename: now + contentType,
-								url: url,
-								filetype: contentType,
-								size: Number(contentSize),
-								width: 0,
-								height: 0,
+
+						// Fetching the full content to extract metadata
+						return fetch(url)
+							.then((textResponse) => {
+								if (textResponse.ok) {
+									return textResponse.text();
+								} else {
+									throw new Error(`Error fetching text content. Status: ${textResponse.status}`);
+								}
+							})
+							.then((textContent) => {
+								const parser = new DOMParser();
+								const doc = parser.parseFromString(textContent, 'text/html');
+
+								// Extracting metadata from the HTML document
+								const title = doc.querySelector('title')?.textContent || '';
+								const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+								const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
+
+								// Constructing the attachment object
+								const size = Number(contentSize);
+								resolve({
+									filename: now + (contentType || 'unknown'),
+									url: url,
+									filetype: contentType || '',
+									size: isNaN(size) ? 0 : size,
+									width: 0,
+									height: 0,
+									title: title,
+									description: description,
+									image: image,
+								});
+							})
+							.catch((error) => {
+								console.error('Error processing HTML content:', error);
+								resolve(defaultAttachment);
 							});
-						}
 					} else {
+						console.error(`Error: Response not OK. Status: ${response.status}`);
 						resolve(defaultAttachment);
 					}
 				})
-				.catch((e) => {
+				.catch((error) => {
+					console.error('Error fetching URL:', error);
 					resolve(defaultAttachment);
 				});
 		} else {
