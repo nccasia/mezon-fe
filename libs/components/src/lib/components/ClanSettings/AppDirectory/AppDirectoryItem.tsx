@@ -1,0 +1,31 @@
+import { Icons } from '@mezon/ui';
+import { IAppDirectoryItem } from "./AppDirectoryList";
+
+interface AppDirectoryItemProps {
+  appDriectory: IAppDirectoryItem
+}
+
+const AppDirectoryItem: React.FC<AppDirectoryItemProps> = ({ appDriectory }) => {
+  return (
+    <div className="p-4 h-[164px] flex-1 flex flex-col rounded-md dark:bg-[#2b2d31] bg-bgLightModeThird cursor-pointer dark:hover:bg-[#232428] hover:bg-bgLightModeButton">
+      <div className="h-12 flex gap-4">
+        <img className="h-full aspect-square rounded-full object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQJmekrSbFxQAfknxhfWeI0UGsECFiVM5_ng&s" />
+        <div className="h-full flex-1 flex flex-col justify-center">
+          <p className="flex-1 text-base font-medium">{appDriectory.botName}</p>
+          <p className="flex-1 text-xs">{appDriectory.botCate}</p>
+        </div>
+      </div>
+      <div className="pt-4 flex flex-1 overflow-hidden text-sm w-full">
+        <p className="line-clamp-2">
+          {appDriectory.botDescription}
+        </p>
+      </div>
+      <div className="pt-4 flex text-xs gap-2">
+        <Icons.CompassIcon height='16px' width='16px' />
+        <p>in {appDriectory.botNumber} servers</p>
+      </div>
+    </div>
+  )
+}
+
+export default AppDirectoryItem;

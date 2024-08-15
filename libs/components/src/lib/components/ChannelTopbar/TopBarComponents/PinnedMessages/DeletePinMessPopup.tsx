@@ -34,8 +34,8 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 								</div>
 								<span>
 									<MessageLine
+										isRenderImage={false}
 										isJumMessageEnabled={false}
-										isSingleLine={false}
 										isTokenClickAble={false}
 										content={JSON.parse(pinMessage.content || '')}
 									/>

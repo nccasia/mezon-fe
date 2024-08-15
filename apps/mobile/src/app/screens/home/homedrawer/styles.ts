@@ -456,6 +456,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingHorizontal: size.s_10,
 		marginVertical: size.s_30,
 	},
+	wrapperCenter: {
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "center",
+	},
 	channelView: {
 		flex: 1,
 		backgroundColor: colors.secondary
@@ -470,6 +475,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'center',
 	},
 	titleWelcomeMessage: {
+		marginTop: size.s_10,
 		fontSize: size.s_22,
 		marginBottom: size.s_10,
 		color: colors.textStrong,
@@ -479,6 +485,24 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.s_14,
 		color: colors.text,
 		marginBottom: size.s_10,
+	},
+	subTitleWelcomeMessageCenter: {
+		fontSize: size.s_14,
+		color: colors.text,
+		marginBottom: size.s_10,
+		textAlign: "center"
+	},
+	subTitleUsername: {
+		fontSize: size.s_18,
+		color: colors.text,
+		marginBottom: size.s_10,
+	},
+
+	subTitleWelcomeMessageWithHighlight: {
+		fontSize: size.s_14,
+		color: baseColor.blurple,
+		fontWeight: "bold",
+		marginBottom: size.s_10
 	},
 	wrapperAttachmentPreview: {
 		backgroundColor: Colors.secondary,

@@ -1,4 +1,4 @@
-import { useCategory, useClanRestriction, useOnClickOutside } from '@mezon/core';
+import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
@@ -91,7 +91,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
-
+  useEscapeKey(()=>setIsShowModalPanelClan(false))
 	return (
 		<>
 			{type === 'direct' ? (

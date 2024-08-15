@@ -102,7 +102,6 @@ function MessageWithUser({
 		{ 'dark:bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
-
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 	return (
 		<>

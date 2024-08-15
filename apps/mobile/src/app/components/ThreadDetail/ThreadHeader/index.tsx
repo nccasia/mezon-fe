@@ -35,13 +35,13 @@ export const ThreadHeader = memo(() => {
 						) : (
 							<MezonAvatar
 								avatarUrl={currentChannel.channel_avatar?.[0]}
-								username={currentChannel?.channel_label}
+								username={currentChannel?.channel_label || currentChannel?.usernames}
 								userStatus={userStatus}
 							/>
 						)}
 					</View>
 					<Text numberOfLines={5} style={styles.dmLabel}>
-						{currentChannel?.channel_label}
+						{currentChannel?.channel_label || currentChannel?.usernames}
 					</Text>
 				</View>
 			) : (
@@ -52,7 +52,7 @@ export const ThreadHeader = memo(() => {
 						<Icons.TextIcon width={20} height={20} color={themeValue.text} />
 					)}
 					<Text numberOfLines={1} style={styles.channelLabel}>
-						{currentChannel?.channel_label}
+						{currentChannel?.channel_label || currentChannel?.usernames}
 					</Text>
 				</View>
 			)}

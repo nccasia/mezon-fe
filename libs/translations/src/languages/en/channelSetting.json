@@ -4,6 +4,10 @@
             "title": "Channel Name",
             "placeholder": "Input Channel Name"
         },
+        "threadName": {
+            "title": "Thread Name",
+            "placeholder": "Input Thread Name"
+        },
         "channelDescription": {
             "title": "Channel Topic"
         },
@@ -54,6 +58,10 @@
         "channelDelete": {
             "title": "",
             "delete": "Delete Channel"
+        },
+        "threadDelete": {
+            "title": "",
+            "delete": "Delete Thread"
         }
     },
     "confirm": {

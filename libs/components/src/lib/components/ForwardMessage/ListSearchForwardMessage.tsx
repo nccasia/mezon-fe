@@ -1,5 +1,6 @@
 import { Checkbox } from '@mezon/ui';
 import { filterListByName, sortFilteredList, TypeSearch } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 
@@ -29,7 +30,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 							id={item.idDM}
 							avatar={item.avatarUser}
 							name={item.prioritizeName}
-							searchText={searchText}
+							searchText={item.typeChat === ChannelType.CHANNEL_TYPE_DM ? searchText : ''}
 							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.idDM)}
 							handleToggle={() => handleToggle(item.idDM, item.typeChat || 0)}
 							userName={item.userName}

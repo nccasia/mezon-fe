@@ -7,13 +7,13 @@ export const style = (colors: Attributes) =>
 			marginTop: size.s_6,
 			paddingLeft: size.s_10,
 			gap: 15,
+			height: size.s_24,
 		},
 		iconReply: {
 			width: size.s_34,
 			height: '100%',
 			alignItems: 'center',
 			paddingLeft: size.s_30,
-			marginTop: size.s_4,
 		},
 		deletedMessageReplyIcon: {
 			top: size.s_4,
@@ -29,7 +29,8 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			gap: 8,
 			marginRight: 0,
-			marginTop: size.s_4,
+			height: size.s_20,
+			alignContent: 'center',
 		},
 		avatarMessageBoxDefault: {
 			width: '100%',
@@ -57,7 +58,6 @@ export const style = (colors: Attributes) =>
 			width: '85%',
 			flexDirection: 'row',
 			alignItems: 'center',
-			top: -size.s_8,
 			gap: 4,
 		},
 		replyDisplayName: {

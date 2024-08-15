@@ -14,7 +14,7 @@ import {
 	selectCurrentClanId,
 	selectIsMessageHasReaction,
 	selectMessageByMessageId,
-	selectPinMessageByChannelId,
+	selectPinMessageByChannelId, setIsForwardAll,
 	setSelectedMessage,
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
@@ -113,6 +113,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 	};
+	
+	const handleForwardAllMessage = () => {
+		if (dmGroupChatList.length === 0) {
+			dispatch(directActions.fetchDirectMessage({}));
+		}
+		dispatch(toggleIsShowPopupForwardTrue());
+		dispatch(setSelectedMessage(message));
+		dispatch(setIsForwardAll(true));
+	}
 
 	const [openModalAddPin, setOpenModalAddPin] = useState(false);
 	const handlePinMessage = async () => {
@@ -342,6 +351,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
 		});
+		
+		{message?.isStartedMessageGroup &&
+			builder.when(checkPos, (builder) => {
+				builder.addMenuItem('forwardAll', 'Forward All Message', () => handleForwardAllMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />)})
+		}
+		
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(

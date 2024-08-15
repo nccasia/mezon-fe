@@ -61,11 +61,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
-	const { listChannels } = useChannels();
+	const { channels } = useChannels();
 
 	const listChannelsMention = useMemo(() => {
-		if (mode !== 3 && mode !== 4) {
-			return listChannels.map((item) => {
+		if (mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) {
+			return channels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -75,7 +75,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else {
 			return [];
 		}
-	}, [mode, listChannels]);
+	}, [mode, channels]);
+
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
 			textareaRef.current?.focus();
@@ -83,7 +84,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
 
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
@@ -247,7 +247,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.username ?? ''
+											: (suggestion.username ?? '')
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}

@@ -13,6 +13,7 @@ export const useEscapeKey = (handler: () => void) => {
 				dispatch(messagesActions.setOpenOptionMessageState(false));
 				dispatch(referencesActions.setDataReferences(null));
 				dispatch(reactionActions.setMessageMatchWithRef(false));
+
 				handler();
 			}
 		};

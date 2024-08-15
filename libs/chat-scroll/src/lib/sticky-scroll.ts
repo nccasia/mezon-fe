@@ -1,6 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useScroll } from './scroll';
 
+// brute force function to execute a function multiple times with a time limit
+// using requestAnimationFrame to ensure smooth execution
+function brushForceCall(fn: () => boolean, totalMs: number) {
+	const startTime = Date.now();
+	let lastTime = startTime;
+	let lastResult = false;
+
+	function loop() {
+		if (Date.now() - startTime > totalMs) {
+			return;
+		}
+
+		const result = fn();
+		if (result) {
+			return;
+		}
+
+		if (lastResult) {
+			lastTime = Date.now();
+		}
+
+		lastResult = result;
+		return requestAnimationFrame(loop);
+	}
+
+	const animationFrameId = loop();
+
+	return {
+		cancel: () => animationFrameId && cancelAnimationFrame(animationFrameId),
+	};
+}
+
 /**
  * React hook for keeping HTML element scroll at the bottom when content updates (if it is already at the bottom).
  * @param targetRef Reference of scrollable HTML element.
@@ -14,22 +46,40 @@ export const useStickyScroll = (
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
 	const [sticky, setSticky] = useState<boolean>(true);
 	const stickyRef = useRef(sticky);
+	const animationRef = useRef<ReturnType<typeof brushForceCall>>();
 
 	const { data: items } = data;
 
-	const totalItems = items?.length || 0;
-
 	const moveScrollToBottom = useCallback(async () => {
-		targetRef.current.scrollTop = targetRef.current.scrollHeight;
+		if (animationRef.current) {
+			animationRef.current.cancel();
+		}
+
+		if (!targetRef.current) {
+			return false;
+		}
+
+		function moveScroll() {
+			targetRef.current.scrollTop = targetRef.current.scrollHeight;
+			return false;
+		}
+
+		// try to move scroll to bottom multiple times to ensure it is at the bottom
+		// that is because sometimes the message is not yet rendered
+		// and scroll is not at the bottom
+		// animationRef.current = brushForceCall(moveScroll, 500);
+
+		// temporary fix for the stuck scroll issue
+		moveScroll();
 		return true;
-	}, [targetRef]);
+	}, [targetRef, animationRef]);
 
 	useEffect(() => {
 		stickyRef.current = sticky;
 		if (sticky) {
 			moveScrollToBottom();
 		}
-	}, [totalItems, targetRef, sticky, moveScrollToBottom]);
+	}, [items, targetRef, sticky, moveScrollToBottom]);
 
 	const updateStuckToBottom = useCallback(() => {
 		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
@@ -40,11 +90,14 @@ export const useStickyScroll = (
 		} else if (!stickyRef.current && currentlyAtBottom) {
 			setSticky(true);
 		}
-	}, [targetRef]);
+	}, [targetRef, stickyRef]);
 
-	const handleScroll = useCallback(() => {
-		updateStuckToBottom();
-	}, [updateStuckToBottom]);
+	const handleScroll = useCallback(
+		(e: any) => {
+			updateStuckToBottom();
+		},
+		[updateStuckToBottom],
+	);
 
 	const { setScrollEventHandler } = useScroll(targetRef);
 
@@ -71,12 +124,30 @@ export const useStickyScroll = (
 	 * Scrolls to message with given id.
 	 */
 	const scrollToMessage = async (id: string) => {
-		const messageElement = targetRef.current.querySelector(`#${id}`);
-		if (messageElement) {
-			messageElement.scrollIntoView();
-			return true;
+		if (animationRef.current) {
+			animationRef.current.cancel();
 		}
-		return false;
+
+		if (!targetRef.current) {
+			return false;
+		}
+
+		function moveScroll() {
+			const messageElement = targetRef.current.querySelector(`#${id}`);
+			if (messageElement) {
+				messageElement.scrollIntoView();
+				return true;
+			}
+			return false;
+		}
+
+		// try to move scroll to message multiple times to ensure it is at the message
+		// that is because sometimes the message is not yet rendered
+		// animationRef.current = brushForceCall(moveScroll, 500);
+
+		// temporary fix for the stuck scroll issue
+		moveScroll();
+		return true;
 	};
 
 	/**

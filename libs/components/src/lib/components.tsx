@@ -69,6 +69,7 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+export { default as AppDirectoryList } from './components/ClanSettings/AppDirectory/AppDirectoryList'
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';

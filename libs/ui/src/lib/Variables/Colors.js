@@ -61,6 +61,7 @@ module.exports = {
   textDarkTheme: "#ffffff",
   textLightUserName: '#17AC86',
   textThreadPrimary: '#B5BAC1',
+  textAppDirectory: '#dbdee1',
 
   /* border */
   borderDefault: '#1E1E1E',
@@ -79,6 +80,7 @@ module.exports = {
   buttonSearchHover: '#2C2E32',
   buttonMore: '#272120',
   buttonMoreHover: '#1E1A19',
+  buttonPrimary: '#5865F2',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',

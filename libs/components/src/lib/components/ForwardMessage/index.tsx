@@ -8,8 +8,19 @@ import {
 	selectAllUsesClan,
 	selectTheme,
 	useAppDispatch,
+	getIsFowardAll,
+	selectCurrentChannelId, selectMessageByChannelId, MessagesEntity,
 } from '@mezon/store';
-import { ChannelThreads, TypeSearch, UsersClanEntity, addAttributesSearchList, getAvatarForPrioritize, normalizeString, removeDuplicatesById } from '@mezon/utils';
+import {
+	ChannelThreads,
+	TypeSearch,
+	UsersClanEntity,
+	addAttributesSearchList,
+	getAvatarForPrioritize,
+	normalizeString,
+	removeDuplicatesById,
+	IMessageWithUser
+} from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -38,8 +49,17 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const accountId = userProfile?.user?.id ?? '';
+	const currentChannelId = useSelector(selectCurrentChannelId)
 	const membersInClan = useSelector(selectAllChannelMembers);
-
+	const isForwardAll = useSelector(getIsFowardAll);
+	const allMessages = useSelector(selectMessageByChannelId(currentChannelId));
+	const allMessagesBySenderId = Object.values(allMessages[1]).filter((message: any) => {
+		return message.sender_id === selectedMessage?.user?.id
+	}) as MessagesEntity[];
+	const startIndex = useMemo(() => {
+		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage.id)
+	}, [allMessages, selectedMessage]);
+	
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
 
@@ -60,6 +80,38 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 			setSelectedObjectIdSends((prevItems) => [...prevItems, { id, type, clanId, channel_label }]);
 		}
 	};
+	
+	const handleForward = () => {
+		return isForwardAll ? handleForwardAllMessage() : sentToMessage();
+	};
+	
+	const handleForwardAllMessage = async () => {
+		const combineMessages: MessagesEntity[] = [];
+		combineMessages.push(selectedMessage);
+		
+		let index = startIndex + 1;
+		while (index < allMessagesBySenderId.length && !allMessagesBySenderId[index].isStartedMessageGroup && allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id) {
+			combineMessages.push(allMessagesBySenderId[index]);
+			index++
+		}
+		
+		for (const selectedObjectIdSend of selectedObjectIdSends) {
+			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
+				combineMessages.forEach(message => {
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
+				})
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
+				combineMessages.forEach(message => {
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
+				})
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				combineMessages.forEach(message => {
+					sendForwardMessage(selectedObjectIdSend.clanId || '', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+				})
+			}
+		}
+		dispatch(toggleIsShowPopupForwardFalse());
+	}
 
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
@@ -248,7 +300,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					>
 						<MessageContent message={selectedMessage} />
 					</div>
-					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={() => sentToMessage()} />
+					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={handleForward} />
 				</div>
 			</div>
 		</Modal>

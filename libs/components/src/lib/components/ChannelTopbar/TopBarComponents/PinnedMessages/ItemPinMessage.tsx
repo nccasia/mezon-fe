@@ -3,6 +3,7 @@ import { useState } from 'react';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
 import { ModalDeletePinMess } from './DeletePinMessPopup';
+import { useGetPriorityNameFromUserClan } from '@mezon/core';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
@@ -13,6 +14,7 @@ type ItemPinMessageProps = {
 const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
+	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || "");
 	return (
 		<div
 			key={pinMessage.id}
@@ -21,21 +23,23 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			<div className="flex items-start gap-2">
 				<MemberProfile
 					isHideUserName={true}
-					avatar={pinMessage.avatar || ''}
-					name={pinMessage.username ?? ''}
+					avatar={priorityAvatar? priorityAvatar : pinMessage.avatar || ''}
+					name={namePriority? namePriority : pinMessage.username || ''} 
 					isHideStatus={true}
 					isHideIconStatus={true}
 					textColor="#fff"
 				/>
 				<div className="flex flex-col gap-1 text-left">
 					<div>
-						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
+						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
+							{namePriority? namePriority : pinMessage.username || ''}
+						</span>
 					</div>
 					<div className="leading-6">
 						<MessageLine
+							isRenderImage={false}
 							content={JSON.parse(pinMessage.content || '')}
 							isJumMessageEnabled={false}
-							isSingleLine={false}
 							isTokenClickAble={false}
 						/>
 					</div>

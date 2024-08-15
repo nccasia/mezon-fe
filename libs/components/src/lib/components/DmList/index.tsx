@@ -1,13 +1,12 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { selectDirectsOpenlist, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
-import { IconFriends } from '../../../../../ui/src/lib/Icons';
-import { ModalCreateDM } from './ModalCreateDmGroup/index';
+import CreateMessageGroup from './CreateMessageGroup';
 import ListDMChannel from './listDMChannel';
 
 export type ChannelListProps = { className?: string };
@@ -15,15 +14,20 @@ export type CategoriesState = Record<string, boolean>;
 
 const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 	return notSortedArr.slice().sort((a, b) => {
-		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-		const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+		const timestampA = parseFloat(a.last_sent_message?.timestamp || a.create_time_ms?.toString() || '0');
+		const timestampB = parseFloat(b.last_sent_message?.timestamp || b.create_time_ms?.toString() || '0');
 		return timestampB - timestampA;
 	});
 };
 
 function DirectMessageList() {
+	const navigate = useNavigate();
 	const pathname = useLocation().pathname;
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
+	const appearanceTheme = useSelector(selectTheme);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const buttonPlusRef = useRef<HTMLDivElement | null>(null);
+
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {
@@ -32,11 +36,10 @@ function DirectMessageList() {
 			return isUnique;
 		});
 	};
-	const navigate = useNavigate();
 
 	const sortedFilteredDataDM = useMemo(() => {
 		return sortDMItem(filterDmGroupsByChannelLabel(dmGroupChatList));
-	}, [dmGroupChatList])
+	}, [dmGroupChatList]);
 
 	useEffect(() => {
 		if (sortedFilteredDataDM.length === 0) {
@@ -44,19 +47,20 @@ function DirectMessageList() {
 		}
 	}, [sortedFilteredDataDM, navigate]);
 
-	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const onClickOpenModal = () => {
+	const onClickOpenModal = (event: React.MouseEvent) => {
 		setIsOpen(!isOpen);
 	};
 
+	const handleCloseModal = () => {
+		setIsOpen(false);
+	};
+
 	useEscapeKey(() => setIsOpen(false));
-	const appearanceTheme = useSelector(selectTheme);
+
+	useOnClickOutside(buttonPlusRef, handleCloseModal);
+
 	return (
 		<>
-			<div className="absolute">
-				<ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
-			</div>
-
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
 					<button
@@ -65,21 +69,23 @@ function DirectMessageList() {
 							navigate('/chat/direct/friends');
 						}}
 					>
-						<IconFriends />
+						<Icons.IconFriends />
 						Friends
 					</button>
 				</div>
 
 				<div className="text-xs font-semibold tracking-wide left-sp dark:text-[#AEAEAE] text-[#585858] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default dark:hover:text-white hover:text-black">
 					<p>DIRECT MESSAGES</p>
-					<button
+					<div
+						ref={buttonPlusRef}
 						onClick={onClickOpenModal}
-						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
+						className="relative cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
 					>
 						<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.Plus />
 						</Tooltip>
-					</button>
+						{isOpen && <CreateMessageGroup onClose={() => setIsOpen(false)} isOpen={isOpen} />}
+					</div>
 				</div>
 			</div>
 			<div

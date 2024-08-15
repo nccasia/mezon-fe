@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ItemObjProps, ItemSetting, sideBarListItem } from '../ItemObj';
 import SettingItem from '../SettingItem';
+import { useNavigate } from 'react-router-dom';
 
 type SettingSidebarProps = {
 	onClickItem?: (settingItem: ItemObjProps) => void;
@@ -19,7 +20,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
-
+	const navigate = useNavigate();
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
 			if(item.id === ItemSetting.ROLES || item.id === ItemSetting.OVERVIEW) {
@@ -45,6 +46,10 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	};
 
 	const handleClickButtonSidebar = (settingItem: ItemObjProps) => {
+		if(settingItem.id === ItemSetting.APP_DIRECTORY){
+			navigate("/application-directory");
+			return;
+		} 
 		onClickItem?.(settingItem);
 		setSelectedButton(settingItem.id);
 	};

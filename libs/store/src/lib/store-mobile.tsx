@@ -65,8 +65,42 @@ const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
+		blacklist: ['hasInternetMobile', 'isFromFcmMobile', 'loadingMainMobile'],
 	},
 	appReducer,
+);
+
+const persistedMessageReducer = persistReducer(
+	{
+		key: 'messages',
+		storage,
+		blacklist: ['typingUsers', 'isSending'],
+	},
+	messagesReducer,
+);
+
+const persistedCatReducer = persistReducer(
+	{
+		key: 'categories',
+		storage,
+	},
+	categoriesReducer,
+);
+
+const persistedChannelReducer = persistReducer(
+	{
+		key: 'channels',
+		storage,
+	},
+	channelsReducer,
+);
+
+const persistedThreadReducer = persistReducer(
+	{
+		key: 'threads',
+		storage,
+	},
+	threadsReducer,
 );
 
 const reducer = {
@@ -75,12 +109,12 @@ const reducer = {
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: channelsReducer,
+	channels: persistedChannelReducer,
 	channelMembers: channelMembersReducer,
-	threads: threadsReducer,
+	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: messagesReducer,
-	categories: categoriesReducer,
+	messages: persistedMessageReducer,
+	categories: persistedCatReducer,
 	rolesclan: RolesClanReducer,
 	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,

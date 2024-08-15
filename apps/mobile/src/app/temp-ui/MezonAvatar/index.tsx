@@ -20,7 +20,7 @@ interface IMezonAvatarProps {
 const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 	const { themeValue } = useTheme();
 	const { avatarUrl, username, width = 40, height = 40, userStatus, isBorderBoxImage, stacks, isShow = true } = props;
-	const styles = style(themeValue, height, width);
+	const styles = style(themeValue, height, width, stacks?.length);
 
 	if (!isShow) return (
 		<View style={{ height, width }}></View>

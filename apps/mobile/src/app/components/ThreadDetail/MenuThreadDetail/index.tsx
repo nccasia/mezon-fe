@@ -32,7 +32,7 @@ export default function MenuThreadDetail(props: { route: any }) {
 				<View style={styles.container}>
 					<ThreadHeader />
 					<ActionRow />
-					<AssetsViewer />
+					<AssetsViewer channelId={channel.channel_id} />
 				</View>
 			</SafeAreaView>
 		</threadDetailContext.Provider>

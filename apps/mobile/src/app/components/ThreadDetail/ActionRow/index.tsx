@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
 enum EActionRow {
@@ -24,7 +24,7 @@ export const ActionRow = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
-	const navigation = useNavigation<any>();
+	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
@@ -73,7 +73,7 @@ export const ActionRow = React.memo(() => {
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
-						channelId: currentChannel?.channel_id,
+						channelId: currentChannel?.channel_id
 					},
 				});
 			},

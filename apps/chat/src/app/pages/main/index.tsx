@@ -9,7 +9,6 @@ import {
 } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
-	channelsActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
@@ -20,8 +19,6 @@ import {
 	selectDmGroupCurrentType,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch,
-	usersClanActions,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP } from '@mezon/utils';
@@ -142,15 +139,10 @@ function MyApp() {
 
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
-
-	const dispatchApp = useAppDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
+
 	useEffect(() => {
-		if (currentClanId) {
-			dispatchApp(channelsActions.fetchChannels({ clanId: currentClanId }));
-			dispatchApp(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
-		}
-		if(currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE){
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			const urlVoice = `https://meet.google.com/${currentChannel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}
@@ -202,15 +194,22 @@ function MyApp() {
 					{clans.map((clan: IClan) => {
 						return (
 							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
-								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} active={!pathName.includes('direct') && currentClanId === clan.clan_id} />
+								<SidebarClanItem
+									linkClan={`/chat/clans/${clan.id}`}
+									option={clan}
+									active={!pathName.includes('direct') && currentClanId === clan.clan_id}
+								/>
 							</SidebarTooltip>
 						);
 					})}
 				</div>
-				<div className='mt-3'>
-					<SidebarTooltip titleTooltip='Add Clan'>
+				<div className="mt-3">
+					<SidebarTooltip titleTooltip="Add Clan">
 						<NavLinkComponent>
-							<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
+							<div
+								className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
+								onClick={openCreateClanModal}
+							>
 								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
 									<p className="text-2xl font-bold text-[#155EEF]">+</p>
 								</div>

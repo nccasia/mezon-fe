@@ -2,14 +2,15 @@ import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import memoizee from 'memoizee';
-import { ApiClanSticker, ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { stickersSlice } from '../giftStickerEmojiPanel/stickers.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { ClanSticker } from 'mezon-js';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
 
-export interface SettingClanStickerState extends EntityState<ApiClanSticker, string> {
+export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 }
@@ -22,14 +23,14 @@ export interface UpdateStickerArgs {
 	stickerId: string;
 }
 export const stickerAdapter = createEntityAdapter({
-	selectId: (sticker: ApiClanSticker) => sticker.id || '',
+	selectId: (sticker: ClanSticker) => sticker.id || '',
 });
 
 export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 });
-const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanStickersByClanId(mezon.session, clanId), {
+const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
 	maxAge: LIST_STICKER_CACHED_TIME,
 	normalizer: (args) => {

@@ -10,7 +10,8 @@
         "newOverride": "New Override"
     },
     "menuChannelStack": {
-        "channelSetting": "Channel Settings"
+        "channelSetting": "Channel Settings",
+        "threadSetting": "Thread Settings"
     },
     "settingStack": {
         "settings": "Settings",

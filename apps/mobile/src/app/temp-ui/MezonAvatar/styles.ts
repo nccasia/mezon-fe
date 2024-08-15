@@ -1,7 +1,7 @@
 import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes, height: number, width: number) => StyleSheet.create({
+export const style = (colors: Attributes, height: number, width: number, n = 1) => StyleSheet.create({
 	containerItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -54,9 +54,10 @@ export const style = (colors: Attributes, height: number, width: number) => Styl
 	listImageFriend: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		width: '100%',
 		flex: 1,
-		justifyContent: 'flex-end'
+		justifyContent: 'flex-end',
+		width: (width - 20) * n + 20,
+		height: height
 	},
 
 	imageContainer: {

@@ -61,6 +61,16 @@ export function useFriends() {
 		[dispatch],
 	);
 
+	const filteredFriends = useCallback(
+		(searchTerm: string) => {
+			return friends.filter(
+				(friend) =>
+					friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm),
+			);
+		},
+		[friends],
+	);
+
 	return useMemo(
 		() => ({
 			friends,
@@ -70,7 +80,8 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
+			filteredFriends,
 		}),
-		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend],
+		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends],
 	);
 }

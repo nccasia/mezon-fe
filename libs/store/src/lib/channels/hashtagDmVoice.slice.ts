@@ -1,14 +1,14 @@
 import { IChannelCategorySetting, IHashtagDmVoice, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
-import { ApiHashtagDmVoice } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { HashtagDm } from 'mezon-js';
 
 export interface HashtagDmVoiceEntity extends IHashtagDmVoice {
 	id: string; // Primary ID
 }
 
-export const mapHashtagDmVoiceToEntity = (HashtagDmVoiceRes: ApiHashtagDmVoice, directId: string) => {
+export const mapHashtagDmVoiceToEntity = (HashtagDmVoiceRes: HashtagDm, directId: string) => {
 	const id = directId+HashtagDmVoiceRes.channel_id;
 	return { ...HashtagDmVoiceRes, directId, id };
 };
@@ -30,7 +30,7 @@ type fetchHashtagDmVoiceArgs = {
 const LIST_COMMON_CHANNEL_VOID_CACHED_TIME = 1000 * 60 * 3;
 export const fetchHashtagDmVoiceCached = memoize(
 	(mezon: MezonValueContext, userIds: string[], limit: number) =>
-		mezon.client.hashtagDmVoiceList(mezon.session, userIds, limit),
+		mezon.socketRef.current?.hashtagDMList(userIds, limit),
 	{
 		promise: true,
 		maxAge: LIST_COMMON_CHANNEL_VOID_CACHED_TIME,
@@ -48,10 +48,10 @@ export const fetchHashtagDmVoice = createAsyncThunk('channels/fetchHashtagDmVoic
 	}
 	
 	const response = await fetchHashtagDmVoiceCached(mezon, userIds, 50);
-	if (!response.hashtage_voice) {
+	if (!response?.hashtag_dm) {
 		return [];
 	}
-	return response.hashtage_voice.map((channelvoid: any) => mapHashtagDmVoiceToEntity(channelvoid, directId));
+	return response.hashtag_dm.map((channelvoid: any) => mapHashtagDmVoiceToEntity(channelvoid, directId));
 });
 
 export const initialHashtagDmVoiceState: HashtagDmVoiceState = HashtagDmVoiceAdapter.getInitialState({

@@ -1,9 +1,9 @@
 import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId, selectDmGroupCurrentId, selectTypingUserIds, selectTypingUserIdsByChannelId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
 import { Coords } from '../ChannelLink';
@@ -35,6 +35,7 @@ export type MemberProfileProps = {
 	dataMemberCreate?: DataMemberCreate;
 	isHiddenAvatarPanel?: boolean;
 	userNameAva?: string;
+  hideLongName?:boolean;
 };
 
 function MemberProfile({
@@ -60,6 +61,7 @@ function MemberProfile({
 	dataMemberCreate,
 	isHiddenAvatarPanel,
 	userNameAva,
+  hideLongName
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
@@ -150,6 +152,8 @@ function MemberProfile({
 
 	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
 
+	const isListDm = useMemo(() => positionType === MemberProfileType.DM_LIST, [positionType]);
+
 	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
 	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '', []);
@@ -182,11 +186,14 @@ function MemberProfile({
 						isAnonymous={isAnonymous}
 					/>
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
-						<span
-							className={`absolute bottom-[0px] right-[-4px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode rounded-full`}
-						>
-							{status ? <OnlineStatus /> : <OfflineStatus />}
-						</span>
+						<StatusUser 
+							isListDm={isListDm}
+							isMemberChannel={isMemberChannel}
+							isMemberDMGroup={isMemberDMGroup}
+							status={status}
+							directMessageValue={directMessageValue}
+							userId={user?.user?.id}
+						/>
 					) : (
 						<></>
 					)}
@@ -231,7 +238,7 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									<span className={`truncate ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
+									<span className={`one-line ${hideLongName && 'truncate !block'} ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
 									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&
@@ -296,3 +303,46 @@ function MemberProfile({
 }
 
 export default MemberProfile;
+
+type StatusUserProps = {
+	status?: boolean;
+	isMemberDMGroup: boolean;
+	isMemberChannel: boolean;
+	isListDm: boolean;
+	directMessageValue?: directMessageValueProps;
+	userId?: string;
+}
+
+const StatusUser = memo((props: StatusUserProps) =>{
+	const {status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId =''} = props;
+	const typingUserIds = useSelector(selectTypingUserIds);
+	const currentDMChannelID = useSelector(selectDmGroupCurrentId);
+	const currentChannelID = useSelector(selectCurrentChannelId);
+	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
+	const typingListMemberChannelIds = useSelector(selectTypingUserIdsByChannelId(currentChannelID || ''));
+	const typingListDMIds = useSelector(selectTypingUserIdsByChannelId(directMessageValue?.dmID || ''));
+
+	const checkTypingUser = useMemo(() => {
+		switch (true) {
+			case isMemberDMGroup:
+				return typingListMemberDMIds?.includes(userId);
+			case isMemberChannel:
+				return typingListMemberChannelIds?.includes(userId);
+
+			case isListDm:
+				return Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM && 
+				typingListDMIds?.includes(directMessageValue?.userId[0] || '');
+
+			default:
+				return false;
+		}
+	}, [isMemberDMGroup, isMemberChannel, isListDm, typingUserIds]);
+
+	return(
+		<span
+			className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${(status && checkTypingUser) ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
+		>
+			{status ? (checkTypingUser ? <Icons.IconLoadingTyping defaultSize='bg-colorSuccess w-5 rounded-lg'/> : <OnlineStatus />) : <OfflineStatus />}
+		</span>
+	);
+})

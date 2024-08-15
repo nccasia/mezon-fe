@@ -96,15 +96,18 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 											>
 												<Icons.ShieldUserIcon color={'gray'} height={size.s_32} width={size.s_32} />
 												<Block flex={1}>
-													<Text color={themeValue.white}>{item.title}</Text>
+													<Block flexDirection='row' gap={size.s_6}>
+														<Text color={themeValue.white}>{item.title}</Text>
+														{item?.isView && (
+															<Icons.LockIcon color={themeValue.textDisabled} height={size.s_16} width={size.s_16} />
+														)}
+													</Block>
 													<Text color={themeValue.text}>
 														{item?.role_user_list?.role_users?.length || '0'} - {t('members')}
 													</Text>
+
 												</Block>
-												<Block flexDirection='row'>
-													{item?.isView && (
-														<Icons.EyeIcon color={themeValue.text} />
-													)}
+												<Block>
 													<Icons.ChevronSmallRightIcon color={themeValue.text} />
 												</Block>
 											</Block>

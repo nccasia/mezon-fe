@@ -42,4 +42,5 @@ export * from './lib/threads/threads.slice';
 export * from './lib/toasts/toasts.slice';
 export * from './lib/voice/voice.slice';
 export * from './lib/webhook/webhook.slice';
+export * from './lib/channels/channelUser.slice';
 

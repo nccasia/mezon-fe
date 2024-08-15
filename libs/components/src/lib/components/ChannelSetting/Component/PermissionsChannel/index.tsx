@@ -7,6 +7,7 @@ import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import ListMemberPermission from './listMemberPermission';
 import ListRolePermission from './listRolePermission';
+import PermissionManage from './PermissionManage';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -112,6 +113,8 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 							</div>
 						)}
 					</div>
+					<hr className="border-t border-solid dark:border-gray-700 border-bgModifierHoverLight mt-10 mb-[30px]" />
+					<PermissionManage channelID={channel.id}/>
 				</div>
 				{valueToggleInit !== valueToggle && (
 					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />

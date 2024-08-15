@@ -1,18 +1,19 @@
-import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
+import { createSticker, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
+import { ClanSticker } from 'mezon-js';
+import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 
 type ModalEditStickerProps = {
   handleCloseModal: () => void;
-  editSticker: ApiClanSticker | null;
+  editSticker: ClanSticker | null;
 };
-type EdittingSticker = Pick<ApiClanSticker, 'source' | 'shortname'> & {
+type EdittingSticker = Pick<ClanSticker, 'source' | 'shortname'> & {
   fileName: string | null;
 };
 const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) => {
@@ -24,7 +25,6 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
   const [openModal, setOpenModal] = useState(false);
   const [openModalType, setOpenModalType] = useState(false);
   const currentClanId = useSelector(selectCurrentClanId) || '';
-  const currentChannelId = useSelector(selectCurrentChannelId) || '';
   const dispatch = useAppDispatch();
   const { sessionRef, clientRef } = useMezon();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -84,7 +84,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     // TODO: check category
     const category = 'Among Us';
     const id = Snowflake.generate();
-    const path = 'stickers/' + id;
+    const path = 'stickers/' + id + '.webp';
     handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
       const request: ApiClanStickerAddRequest = {
         id: id,

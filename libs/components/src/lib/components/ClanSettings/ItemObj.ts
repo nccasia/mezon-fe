@@ -16,6 +16,7 @@ export const ItemSetting = {
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
+	APP_DIRECTORY: 'app-directory',
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -26,7 +27,10 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
 ];
 
-export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
+export const listItemSettingApp: ItemObjProps[] = [
+	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
+	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' },
+];
 
 export const sideBarListItem: ListSideBarProps[] = [
 	{
@@ -58,13 +62,11 @@ export const sideBarListItemClanPermission: ListSideBarProps[] = [
 ];
 
 export const categorySettingItem = {
-  OVERVIEW: 'overview',
-  PERMISSIONS: 'permissions'
-}
+	OVERVIEW: 'overview',
+	PERMISSIONS: 'permissions',
+};
 
 export const categorySettingList = [
-  { id: categorySettingItem.OVERVIEW, name: 'Overview' },
-  { id: categorySettingItem.PERMISSIONS, name: 'Permissions' },
-]
-
-
+	{ id: categorySettingItem.OVERVIEW, name: 'Overview' },
+	{ id: categorySettingItem.PERMISSIONS, name: 'Permissions' },
+];

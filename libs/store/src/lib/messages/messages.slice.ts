@@ -102,6 +102,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
+	idNewMessageResponse: string;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -565,6 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
+	idNewMessageResponse: '',
 };
 
 export type SetCursorChannelArgs = {
@@ -590,6 +592,9 @@ export const messagesSlice = createSlice({
 		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
+		},
+		setIdNewMessageResponse(state, action) {
+			state.idNewMessageResponse = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
@@ -646,6 +651,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							update_time: action.payload.update_time,
+							attachments: action.payload.attachments,
 						},
 					});
 					break;
@@ -1093,6 +1099,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
+export const selectNewIdMessageResponse = createSelector(getMessagesState, (state: MessagesState) => state.idNewMessageResponse);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	if (!channelId) return state;

@@ -9,7 +9,7 @@ import { normalizeString } from 'apps/mobile/src/app/utils/helpers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
@@ -200,40 +200,43 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			hasBackdrop={false}
 			style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}
 		>
-			<Block flex={1} marginTop={size.s_24}>
-				<Block flexDirection='row' justifyContent='center' marginBottom={size.s_18}>
-					<Block position='absolute' left={0}>
-						<TouchableOpacity onPress={() => onClose()}>
-							<Icons.CloseLargeIcon color={themeValue.textStrong} />
+			<SafeAreaView style={{ flex: 1 }}>
+				<Block flex={1} marginTop={size.s_24}>
+					<Block flexDirection='row' justifyContent='center' marginBottom={size.s_18}>
+						<Block position='absolute' left={0}>
+							<TouchableOpacity onPress={() => onClose()}>
+								<Icons.CloseLargeIcon color={themeValue.textStrong} />
+							</TouchableOpacity>
+						</Block>
+						<Text h3 color={themeValue.white}>{'Forward To'}</Text>
+					</Block>
+
+					<MezonInput
+						placeHolder={'Search'}
+						onTextChange={setSearchText}
+						value={searchText}
+						prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
+						inputWrapperStyle={{ backgroundColor: themeValue.primary }}
+					/>
+
+					<Block flex={1}>
+						<FlatList
+							keyboardShouldPersistTaps="handled"
+							data={filteredForwardObjects}
+							ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
+							keyExtractor={(item) => item?.channelId?.toString()}
+							renderItem={renderForwardObject}
+						/>
+					</Block>
+
+					<Block paddingTop={size.s_10}>
+						<TouchableOpacity style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} onPress={() => sentToMessage()}>
+							<Text style={styles.btnText}>{'Send'}{count}</Text>
 						</TouchableOpacity>
 					</Block>
-					<Text h3 color={themeValue.white}>{'Forward To'}</Text>
 				</Block>
+			</SafeAreaView>
 
-				<MezonInput
-					placeHolder={'Search'}
-					onTextChange={setSearchText}
-					value={searchText}
-					prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
-					inputWrapperStyle={{ backgroundColor: themeValue.primary }}
-				/>
-
-				<Block flex={1}>
-					<FlatList
-						keyboardShouldPersistTaps="handled"
-						data={filteredForwardObjects}
-						ItemSeparatorComponent={() => <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />}
-						keyExtractor={(item) => item?.channelId?.toString()}
-						renderItem={renderForwardObject}
-					/>
-				</Block>
-
-				<Block paddingTop={size.s_10}>
-					<TouchableOpacity style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} onPress={() => sentToMessage()}>
-						<Text style={styles.btnText}>{'Send'}{count}</Text>
-					</TouchableOpacity>
-				</Block>
-			</Block>
 		</Modal>
 	);
 };

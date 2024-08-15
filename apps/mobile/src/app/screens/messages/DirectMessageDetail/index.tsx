@@ -101,7 +101,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				store.dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: currentDmGroup?.id,
-						channelName: currentDmGroup?.channel_label,
+						channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 						type: currentDmGroup?.type,
 						noCache: true,
 						isFetchingLatestMessages: true,
@@ -111,7 +111,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 		});
 		return null;
-	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type]);
+	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
 	useEffect(() => {
 		return () => {
@@ -143,7 +143,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				await store.dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: currentDmGroup.id,
-						channelName: currentDmGroup.channel_label,
+						channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 						type: currentDmGroup.type,
 						noCache: true,
 						isFetchingLatestMessages: true,
@@ -201,14 +201,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
 							) : (
 								<View style={styles.wrapperTextAvatar}>
-									<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
+									<Text style={[styles.textAvatar]}>{(currentDmGroup?.channel_label || currentDmGroup?.usernames)?.charAt?.(0)}</Text>
 								</View>
 							)}
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 						</View>
 					)}
 					<Text style={styles.titleText} numberOfLines={1}>
-						{currentDmGroup?.channel_label}
+						{currentDmGroup?.channel_label || currentDmGroup?.usernames}
 					</Text>
 				</Pressable>
 				<View style={styles.actions}>
@@ -225,7 +225,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							<ChannelMessages
 								channelId={currentDmGroup.id}
 								clanId={'0'}
-								channelLabel={currentDmGroup?.channel_label}
+								channelLabel={currentDmGroup?.channel_label || currentDmGroup?.usernames}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 								)}

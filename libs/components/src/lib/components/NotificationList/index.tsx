@@ -96,7 +96,7 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 				</div>
 
 				<div
-					className={`dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+					className={`dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
 					{currentTabNotify === InboxType.INDIVIDUAL &&
 						notificationItem.map((notify: INotification, index: number) => {

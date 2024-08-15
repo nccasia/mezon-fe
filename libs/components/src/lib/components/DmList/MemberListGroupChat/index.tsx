@@ -31,6 +31,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 									positionType={MemberProfileType.DM_MEMBER_GROUP}
 									listProfile={true}
 									dataMemberCreate={dataMemberCreate}
+									directMessageId={directMessageId}
 								/>
 							</div>
 						))}

@@ -123,6 +123,7 @@ const ModalUserProfile = ({
 						setOpenModal={setOpenModal}
 						user={userById}
 						showPopupLeft={showPopupLeft}
+						kichUser={message?.user}
 					/>
 				)}
 			</div>

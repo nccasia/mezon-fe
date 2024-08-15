@@ -35,11 +35,10 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 		username ?? '',
 	);
 
-	const nameShowed = useShowName(pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
-
+	const nameShowed = useShowName(clanNick ? clanNick : pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
-			setIsShowPanelChannel(true);
+			setIsShowPanelChannel(!isShowPanelChannel);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
 			const distanceToBottom = windowHeight - clickY;
@@ -92,7 +91,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 				<div
 					className="text-base text-textLightUserName font-medium tracking-normal cursor-pointer break-all username"
 					ref={panelRef}
-					onMouseDown={(event) => handleMouseClick(event)}
+					onMouseDown={handleMouseClick}
 					role="button"
 					style={{ letterSpacing: '-0.01rem' }}
 				>

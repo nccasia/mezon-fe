@@ -10,6 +10,7 @@ import {
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -43,7 +44,7 @@ const ChannelLayout = () => {
 		<div
 			className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible"
 		>
-			{isChannelVoice ? <ChannelLayoutVoice /> :
+			{isChannelVoice ? <ChannelLayoutVoice channelLabel={currentChannel.channel_label}/> :
 			<>
 			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 				<Outlet />
@@ -90,15 +91,27 @@ const ChannelLayout = () => {
 
 export default ChannelLayout;
 
-const ChannelLayoutVoice = () =>{
+const ChannelLayoutVoice = ({channelLabel=''}:{channelLabel?: string}) =>{
+	const [statusCall, setStatusCall] = useState(false);
+	const handleStatusCall = () => setStatusCall(!statusCall);
 	return(
 		<div className="bg-black h-full flex flex-col font-semibold">
-			<p className='flex-1 flex justify-center items-center'>You've popped out the player to another tab.</p>
-			<div className="relative justify-center items-center gap-x-5 w-full bottom-5 flex h-[50px]">
-				<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950">
-					<Icons.PhoneOff defaultSize="rotate-[138deg] m-auto" />
-				</button>
-			</div>
+			{statusCall ?
+				<>
+					<p className='flex-1 flex justify-center items-center'>You've popped out the player to another tab.</p>
+					<div className="relative justify-center items-center gap-x-5 w-full bottom-5 flex h-[50px]">
+						<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950" onClick={handleStatusCall}>
+							<Icons.PhoneOff defaultSize="rotate-[138deg] m-auto" />
+						</button>
+					</div>
+				</>:
+				<div className="h-full flex flex-col justify-center items-center gap-y-4">
+					<h3 className="uppercase font-bold text-4xl">{channelLabel}</h3>
+					<button className="size-[50px] rounded-full bg-colorSuccess w-fit text-nowrap p-3 text-base" onClick={handleStatusCall}>
+						Join Call
+					</button>
+				</div>
+			}
 		</div>
 	)
 }

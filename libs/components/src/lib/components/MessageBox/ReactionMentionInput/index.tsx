@@ -26,6 +26,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -123,7 +124,7 @@ export type MentionReactInputProps = {
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
-	const { listChannels } = useChannels();
+	const { channels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
@@ -151,6 +152,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(
 		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
 	);
@@ -244,6 +247,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
+
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
@@ -391,8 +395,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	);
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-		if (props.mode !== 3 && props.mode !== 4) {
-			return listChannels.map((item) => {
+		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
+			return channels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -401,7 +405,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			}) as ChannelsMentionProps[];
 		}
 		return [];
-	}, [props.mode, listChannels]);
+	}, [props.mode, channels]);
 
 	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
@@ -469,7 +473,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId: currentChannelId as string,
+					channelId: props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannelId as string) : (currentDmId as string),
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
@@ -499,17 +503,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
 	useEffect(() => {
-		if (closeMenu && statusMenu) {
+		if ((closeMenu && statusMenu) || openEditMessageState) {
 			return;
 		}
 		if (
 			(getRefMessageReply !== null && openReplyMessageState) ||
-			!openEditMessageState ||
-			(emojiPicked?.shortName !== '' && !reactionRightState)
+			(emojiPicked?.shortName !== '' && !reactionRightState) ||
+			(!openEditMessageState && !idMessageRefEdit)
 		) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
+	}, [getRefMessageReply, openReplyMessageState, emojiPicked, openEditMessageState, idMessageRefEdit]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -526,7 +530,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						message_sender_id: getRefMessageReply.sender_id,
 						content: JSON.stringify(getRefMessageReply.content),
 						message_sender_username: getRefMessageReply.username,
-						mesages_sender_avatar: getRefMessageReply.avatar,
+						mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
 						message_sender_clan_nick: getRefMessageReply.clan_nick,
 						message_sender_display_name: getRefMessageReply.display_name,
 						has_attachment: getRefMessageReply.attachments?.length > 0,
@@ -708,7 +712,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
+			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
 }

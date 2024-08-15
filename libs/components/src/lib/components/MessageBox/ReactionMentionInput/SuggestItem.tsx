@@ -1,5 +1,5 @@
 import { selectAllChannels, selectAllHashtagDmVoice, selectMembersVoiceChannel } from '@mezon/store';
-import { getSrcEmoji, normalizeString } from '@mezon/utils';
+import { getSrcEmoji, normalizeString, SearchItemProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,6 +20,7 @@ type SuggestItemProps = {
 	emojiId?: string;
 	display?: string;
 	isHightLight?: boolean;
+	channel?: SearchItemProps;
 };
 
 const SuggestItem = ({
@@ -34,6 +35,7 @@ const SuggestItem = ({
 	emojiId,
 	display,
 	isHightLight = true,
+	channel,
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
@@ -48,7 +50,9 @@ const SuggestItem = ({
 	}, [channelId, membersVoice, specificChannel?.type]);
 
 	useEffect(() => {
-		if (directId && !isOpenSearchModal) {
+		if (channel) {
+			setSpecificChannel(channel)
+		} else if (directId && !isOpenSearchModal) {
 			commonChannelVoids.map((channel) => {
 				if (channel.channel_id === channelId) {
 					setSpecificChannel(channel);
@@ -62,7 +66,6 @@ const SuggestItem = ({
 			});
 		}
 	}, []);
-
 	return (
 		<div className={`flex flex-row items-center h-[24px] ${wrapSuggestItemStyle ?? 'justify-between'}`}>
 			<div className="flex flex-row items-center gap-2 py-[3px]">
@@ -78,16 +81,25 @@ const SuggestItem = ({
 				{emojiId && (
 					<img src={getSrcEmoji(emojiId)} alt={getSrcEmoji(emojiId)} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
 				)}
-				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.Hashtag defaultSize="w-5 h-5" />
-				)}
-				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.HashtagLocked defaultSize="w-5 h-5 " />
-				)}
-				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+					specificChannel?.parrent_id === '0' && <Icons.Hashtag defaultSize="w-5 h-5" />}
+				{specificChannel?.channel_private === 1 &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+					specificChannel?.parrent_id === '0' && <Icons.HashtagLocked defaultSize="w-5 h-5 " />}
+
+				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIcon defaultSize="w-5 h-5" />}
+
+				{specificChannel?.channel_private === 1 &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIconLocker className="w-5 h-5 " />}
+
+				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.Speaker defaultSize="w-5 5-5" />
 				)}
-				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+				{specificChannel?.channel_private === 1 && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
 

@@ -19,7 +19,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 	return (
 		listSearch.length > 0 &&
 		listSearch.map((item: SearchItemProps) => {
-			const isTypeChannel = item.type === TypeSearch.Channel_Type;
+			const isTypeChannel = item.typeChat === TypeSearch.Channel_Type;
 			return (
 				<div
 					ref={itemRef}
@@ -39,6 +39,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							subTextStyle="uppercase"
 							isOpenSearchModal
 							emojiId=""
+							channel= {item}
 						/>
 					) : (
 						<SuggestItem

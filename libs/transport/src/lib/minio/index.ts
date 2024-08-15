@@ -168,7 +168,7 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 	};
 
 	return new Promise<ApiMessageAttachment>((resolve, reject) => {
-		if (isValidUrl(url) && url.length < 512) {
+		if (url?.length < 512) {
 			fetch(url, { method: 'HEAD' })
 				.then((response) => {
 					if (response.ok) {

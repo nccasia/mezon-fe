@@ -79,6 +79,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			}
 
 			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
+
+			return true;
 		},
 		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching],
 	);
@@ -149,6 +151,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		}
 	}, [chatScrollRef, isViewingOlderMessages]);
 
+	// TODO: move this to another place
 	useEffect(() => {
 		// Update last message of channel when component unmount
 		return () => {

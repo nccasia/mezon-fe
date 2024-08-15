@@ -19,7 +19,7 @@ type SetupPermissionsScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS;
 export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<SetupPermissionsScreen>) => {
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const [originSelectedPermissions, setOriginSelectedPermissions] = useState<string[]>([]);
 	const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 	const [searchPermissionText, setSearchPermissionText] = useState('');
@@ -33,13 +33,13 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 	//Note: create new role
 	const newRole = useMemo(() => {
-		return RolesClan?.[RolesClan.length - 1];
-	}, [RolesClan]);
+		return rolesClan?.[rolesClan.length - 1];
+	}, [rolesClan]);
 
 	//Note: edit role
 	const clanRole = useMemo(() => {
-		return RolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, RolesClan]);
+		return rolesClan?.find((role) => role?.id === roleId);
+	}, [roleId, rolesClan]);
 
 	const isCanEditRole = useMemo(() => {
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
@@ -50,7 +50,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 			case EPermission.administrator:
 				return !isClanOwner;
 			case EPermission.manageClan:
-				return !isClanOwner && !userPermissionsStatus.administrator;
+				return (!isClanOwner && !userPermissionsStatus.administrator) || !isCanEditRole;
 			default:
 				return !isCanEditRole;
 		}

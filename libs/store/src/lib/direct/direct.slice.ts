@@ -123,6 +123,7 @@ export const fetchDirectMessage = createAsyncThunk(
 	'direct/fetchDirectMessage',
 	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
 		if (noCache) {
 			fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
 		}

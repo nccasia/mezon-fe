@@ -40,7 +40,10 @@ export type LastSeenTimeStampChannelArgs = {
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
 const fetchListNotificationCached = memoizee(
-	(mezon: MezonValueContext, clanId: string) => mezon.client.listNotifications(mezon.session, clanId, 50),
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.listNotifications(mezon.session, clanId, 50);
+		return { ...response, time: Date.now() };
+	},
 	{
 		promise: true,
 		maxAge: LIST_STICKER_CACHED_TIME,
@@ -61,8 +64,11 @@ export const fetchListNotification = createAsyncThunk(
 		if (!response.notifications) {
 			return [];
 		}
-		const notifications = response.notifications.map(mapNotificationToEntity);
-		return notifications;
+		if (Date.now() - response.time < 100) {
+			const notifications = response.notifications.map(mapNotificationToEntity);
+			return notifications;
+		}
+		return null;
 	},
 );
 
@@ -131,8 +137,10 @@ export const notificationSlice = createSlice({
 		setNotiListUnread(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
 			const ids = storedIds ? JSON.parse(storedIds) : [];
-			ids.push(action.payload.id);
-			localStorage.setItem('notiUnread', JSON.stringify(ids));
+			if (action.payload.clan_id !== '0') {
+				ids.push(action.payload.id);
+				localStorage.setItem('notiUnread', JSON.stringify(ids));
+			}
 		},
 
 		setStatusNoti(state) {
@@ -176,9 +184,13 @@ export const notificationSlice = createSlice({
 			.addCase(fetchListNotification.pending, (state: NotificationState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[]>) => {
-				notificationAdapter.setAll(state, action.payload);
-				state.loadingStatus = 'loaded';
+			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[] | null>) => {
+				if (action.payload !== null) {
+					notificationAdapter.setAll(state, action.payload);
+					state.loadingStatus = 'loaded';
+				} else {
+					state.loadingStatus = 'not loaded';
+				}
 			})
 			.addCase(fetchListNotification.rejected, (state: NotificationState, action) => {
 				state.loadingStatus = 'error';
@@ -222,13 +234,13 @@ export const notificationActions = {
 	setLastSeenTimeStampChannelThunk,
 };
 
-const { selectAll } = notificationAdapter.getSelectors();
+const { selectAll, selectEntities } = notificationAdapter.getSelectors();
 
 export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: NotificationState }): NotificationState =>
 	rootState[NOTIFICATION_FEATURE_KEY];
 
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
-
+export const selectNotificationEntities = createSelector(getNotificationState, selectEntities);
 export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
 

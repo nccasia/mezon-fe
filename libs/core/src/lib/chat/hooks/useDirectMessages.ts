@@ -1,15 +1,11 @@
-import {
-    directActions,
-    messagesActions,
-    selectDirectById,
-    useAppDispatch
-} from '@mezon/store';
+import { directActions, messagesActions, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChatMessages } from './useChatMessages';
+import { useFilteredContent } from './useFilteredContent';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
@@ -25,19 +21,22 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const channel = useSelector(selectDirectById(channelId));
 
 	const sendDirectMessage = React.useCallback(
-		async (content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>, 
+		async (
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>) => {
+			references?: Array<ApiMessageRef>,
+		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
+			const filteredContent = useFilteredContent(content);
 
 			if (!client || !session || !socket || !channel) {
 				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeChatMessage('0', channel.id, mode, content, mentions, attachments, references);
+			await socket.writeChatMessage('0', channel.id, mode, filteredContent, mentions, attachments, references);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
@@ -52,7 +51,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode}));
+		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }));
 	}, [channelId, dispatch, mode]);
 
 	return useMemo(

@@ -83,7 +83,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
-  const rolesInClan = useSelector(selectAllRolesClan);
+	const rolesInClan = useSelector(selectAllRolesClan);
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -161,7 +161,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
-        const isRoleMention = rolesInClan?.some((role) => tagName === role?.id)
+				const isRoleMention = rolesInClan?.some((role) => tagName === role?.id)
 				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
@@ -256,7 +256,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
+	if (message.isStartedMessageGroup && message.sender_id == '0')
+		return (
+			<WelcomeMessage channelId={props.channelId} />
+		)
 
 	const handlePressIn = () => {
 		Animated.timing(backgroundColor, {
@@ -351,7 +354,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<RenderTextMarkdownContent
 								content={{
 									...(typeof message.content === 'object' ? message.content : {}),
-									mentions: message.mentions
+									mentions: message.mentions,
 								}}
 								isEdited={isEdited}
 								translate={t}

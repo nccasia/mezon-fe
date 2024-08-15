@@ -1,7 +1,7 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import { ActionEmitEvent, IRoleMention, Icons, filterContent, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId, selectCurrentUserId, selectMemberById } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId, selectCurrentUserId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -93,7 +93,7 @@ export const ChatMessageInput = memo(
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
 			const { t } = useTranslation(['message']);
-			const { editSendMessage } = useChatSending({
+			const { editSendMessage, sendMessage } = useChatSending({
 				channelId,
 				mode,
 				directMessageId: channelId || '',
@@ -241,19 +241,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? [
-							{
-								message_id: '',
-								message_ref_id: targetMessage.id,
-								ref_type: 0,
-								message_sender_id: targetMessage?.sender_id,
-								message_sender_username: targetMessage?.username,
-								mesages_sender_avatar: targetMessage?.avatar,
-								message_sender_clan_nick: targetMessage?.clan_nick,
-								message_sender_display_name: targetMessage?.display_name,
-								content: JSON.stringify(targetMessage.content),
-								has_attachment: Boolean(targetMessage?.attachments?.length),
-							},
-						]
+						{
+							message_id: '',
+							message_ref_id: targetMessage.id,
+							ref_type: 0,
+							message_sender_id: targetMessage?.sender_id,
+							message_sender_username: targetMessage?.username,
+							mesages_sender_avatar: targetMessage?.avatar,
+							message_sender_clan_nick: targetMessage?.clan_nick,
+							message_sender_display_name: targetMessage?.display_name,
+							content: JSON.stringify(targetMessage.content),
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+						},
+					]
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 
@@ -265,22 +265,14 @@ export const ChatMessageInput = memo(
 							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
 							switch (mode) {
 								case ChannelStreamMode.STREAM_MODE_CHANNEL:
-									await Promise.all([
-										dispatch(
-											messagesActions.sendMessage({
-												channelId: channelId,
-												clanId: currentClanId || '',
-												mode,
-												content: filterContent(payloadSendMessage) ?? {},
-												mentions: simplifiedMentionList || [],
-												attachments: attachmentDataUnique || [],
-												references: reference,
-												anonymous: false,
-												mentionEveryone: isMentionEveryOne,
-												senderId: currentUserId,
-											}),
-										),
-									]);
+									await sendMessage(
+										payloadSendMessage,
+										simplifiedMentionList || [],
+										attachmentDataUnique || [],
+										reference,
+										false,
+										isMentionEveryOne,
+									);
 									break;
 								case ChannelStreamMode.STREAM_MODE_DM:
 								case ChannelStreamMode.STREAM_MODE_GROUP:

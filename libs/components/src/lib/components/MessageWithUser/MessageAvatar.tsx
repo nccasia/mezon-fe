@@ -37,7 +37,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 	const [positionTop, setPositionTop] = useState(0);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
-			setIsShowPanelChannel(true);
+			setIsShowPanelChannel(!isShowPanelChannel);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
 			const distanceToBottom = windowHeight - clickY;
@@ -65,7 +65,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 
 	return (
 		<div className="relative group">
-			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
+			<div className="pt-1" ref={panelRef} onMouseDown={handleMouseClick}>
 				<AvatarImage
 					onContextMenu={(e) => {
 						e.preventDefault();

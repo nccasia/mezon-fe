@@ -106,7 +106,8 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
-						channelId: channel?.channel_id
+						channelId: channel?.channel_id,
+						isChannel: isChannel
 					}
 				});
 			},
@@ -142,6 +143,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
 						channelId: channel?.channel_id,
+						isChannel: isChannel
 					},
 				});
 			},

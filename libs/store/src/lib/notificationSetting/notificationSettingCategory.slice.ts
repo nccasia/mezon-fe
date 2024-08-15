@@ -166,6 +166,7 @@ export const initialChannelCategorySettingState: ChannelCategorySettingState = c
 	loadingStatus: 'not loaded',
 	error: null,
 });
+
 export const channelCategorySettingSlice = createSlice({
 	name: "notichannelcategorysetting",
 	initialState: initialChannelCategorySettingState,

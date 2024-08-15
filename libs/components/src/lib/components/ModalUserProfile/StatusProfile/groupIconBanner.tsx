@@ -1,6 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useFriends } from '@mezon/core';
-import {ChannelMembersEntity, selectCurrentUserId, selectTheme, StateFriendProps, useAppSelector} from '@mezon/store';
+import { ChannelMembersEntity, selectCurrentUserId, selectTheme, StateFriendProps, useAppSelector } from '@mezon/store';
+import { IUser } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { OpenModalProps } from '..';
@@ -12,10 +13,11 @@ type GroupIconBannerProps = {
 	user: ChannelMembersEntity | null;
 	showPopupLeft?: boolean;
 	setOpenModal: React.Dispatch<React.SetStateAction<OpenModalProps>>;
+	kichUser?: IUser | null;
 };
 
 const GroupIconBanner = (props: GroupIconBannerProps) => {
-	const { checkAddFriend, openModal, user, showPopupLeft, setOpenModal } = props;
+	const { checkAddFriend, openModal, user, showPopupLeft, setOpenModal, kichUser } = props;
 	const appearanceTheme = useSelector(selectTheme);
 	const { addFriend, acceptFriend, deleteFriend } = useFriends();
 	const currentUserId = useAppSelector(selectCurrentUserId);
@@ -59,6 +61,13 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 										usernames: [user.user?.username || ''],
 										ids: [],
 									});
+								} else {
+									if (kichUser) {
+										addFriend({
+											usernames: [kichUser.username],
+											ids: [],
+										});
+									}
 								}
 							}}
 						>

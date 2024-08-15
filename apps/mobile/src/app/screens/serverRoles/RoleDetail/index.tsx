@@ -226,13 +226,13 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 											padding={size.s_12}
 											gap={size.s_10}
 										>
-											<Block flex={1}>
+											<Block flex={1} flexDirection='row' gap={size.s_6}>
 												<Text color={themeValue.white}>{item.actionTitle}</Text>
-											</Block>
-											<Block flexDirection='row'>
 												{item?.isView && (
-													<Icons.EyeIcon color={themeValue.text} />
+													<Icons.LockIcon color={themeValue.textDisabled} height={size.s_16} width={size.s_16} />
 												)}
+											</Block>
+											<Block>
 												<Icons.ChevronSmallRightIcon color={themeValue.text} />
 											</Block>
 										</Block>

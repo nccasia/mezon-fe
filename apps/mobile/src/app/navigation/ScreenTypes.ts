@@ -125,12 +125,12 @@ type MenuThreadStackParamList = {
   [APP_SCREEN.MENU_THREAD.BOTTOM_SHEET]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
-  [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity};
+  [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity };
 }
 
 type MenuChannelStackParamList = {
   [APP_SCREEN.MENU_CHANNEL.SETTINGS]: {
-    channelId: string;
+    channelId: string
   };
   [APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
     openSearchChannelFrom: EOpenSearchChannelFrom;

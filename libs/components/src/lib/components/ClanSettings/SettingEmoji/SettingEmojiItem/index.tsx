@@ -8,12 +8,13 @@ import {
 	useAppSelector,
 } from '@mezon/store';
 import { EPermission, getSrcEmoji } from '@mezon/utils';
-import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ClanEmoji } from 'mezon-js';
+import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type SettingEmojiItemProp = {
-	emoji: ApiClanEmojiListResponse;
+	emoji: ClanEmoji;
 };
 
 const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {

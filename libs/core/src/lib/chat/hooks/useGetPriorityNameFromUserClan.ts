@@ -1,4 +1,4 @@
-import { selectMemberById } from '@mezon/store';
+import { selectMemberById, selectMemberClanByUserId } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import useShowName from './useShowName';
@@ -6,27 +6,40 @@ import useShowName from './useShowName';
 export const useGetPriorityNameFromUserClan = (senderId: string) => {
 	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
-	const user = useSelector(selectMemberById(senderId));
+	const userClan = useSelector(selectMemberClanByUserId(senderId));
+	const userDR = useSelector(selectMemberById(senderId));
 
 	const usernameSender = useMemo(() => {
-		return user?.user?.username;
-	}, [user?.user?.username]);
+		if (userDR) {
+			return userDR?.user?.username;
+		} else {
+			return userClan?.user?.username;
+		}
+	}, [userClan?.user?.username, userDR]);
 
 	const clanNick = useMemo(() => {
-		return user?.clan_nick;
-	}, [user?.clan_nick]);
+		return userClan?.clan_nick;
+	}, [userClan?.clan_nick]);
 
 	const displayName = useMemo(() => {
-		return user?.user?.display_name;
-	}, [user?.user?.display_name]);
+		if (userDR) {
+			return userDR?.user?.display_name;
+		} else {
+			return userClan?.user?.display_name;
+		}
+	}, [userClan?.user?.display_name, userDR]);
 
 	const clanAvatar = useMemo(() => {
-		return user?.clan_avatar;
-	}, [user?.clan_avatar]);
+		return userClan?.clan_avatar;
+	}, [userClan?.clan_avatar]);
 
 	const generalAvatar = useMemo(() => {
-		return user?.user?.avatar_url;
-	}, [user?.user?.avatar_url]);
+		if (userDR) {
+			return userDR?.user?.avatar_url;
+		} else {
+			return userClan?.user?.avatar_url;
+		}
+	}, [userClan?.user?.avatar_url, userDR]);
 
 	const namePriority = useShowName(clanNick ?? '', displayName ?? '', usernameSender ?? '', senderId);
 

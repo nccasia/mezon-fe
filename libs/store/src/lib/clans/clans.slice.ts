@@ -14,8 +14,6 @@ import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
 
-import { directActions } from '../direct/direct.slice';
-
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -72,7 +70,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
-		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
 				clanId: clanId ?? '',

@@ -29,6 +29,7 @@ import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
 import ThreadsRoutes from './ThreadsRoutes';
+import AppDirectory from '../pages/AppDirectory';
 
 const Login = loadable(() => import('../pages/login'));
 const Homepage = loadable(() => import('../pages/homepage'));
@@ -85,6 +86,10 @@ export const Routes = () => {
 							path: '/',
 							loader: loaderWithStore(loginLoader),
 							element: <Homepage />,
+						},
+						{
+							path: '/application-directory',
+							element: <AppDirectory />,
 						},
 						{
 							path: 'guess',

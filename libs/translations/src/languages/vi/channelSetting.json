@@ -4,6 +4,10 @@
             "title": "Tên channel",
             "placeholder": "Nhập tên channel"
         },
+        "threadName": {
+            "title": "Tên Thread",
+            "placeholder": "Nhập tên thread"
+        },
         "channelDescription": {
             "title": "Chủ đề của channel"
         },
@@ -53,6 +57,10 @@
         "channelDelete": {
             "title": "",
             "delete": "Xóa Channel"
+        },
+        "threadDelete": {
+            "title": "",
+            "delete": "Xóa Thread"
         }
     },
     "confirm": {

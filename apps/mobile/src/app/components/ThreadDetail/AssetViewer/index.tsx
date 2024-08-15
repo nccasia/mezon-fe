@@ -1,4 +1,4 @@
-import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { attachmentActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useContext, useRef, useState } from 'react';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
@@ -24,24 +24,21 @@ const TabList = [
 	// "Files"
 ];
 
-export const AssetsViewer = React.memo(() => {
+export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) => {
 	const [pageID, setPageID] = useState<number>(0);
 	const ref = useRef<ScrollView>();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useContext(threadDetailContext);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
-	
+
 	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
 		const currentOffsetX = event.nativeEvent.contentOffset.x;
 		const windowWidth = Dimensions.get('window').width;
 
 		const pageID_ = Math.round(currentOffsetX / windowWidth);
 		if (pageID !== pageID_) {
-			
 			// Is tab media
-			if (pageID_ === 1)
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId: currentClanId, channelId: currentChannelId }));
+			if (pageID_ === 1) dispatch(attachmentActions.fetchChannelAttachments({ clanId: currentClanId, channelId: channelId }));
 			setPageID(pageID_);
 		}
 	}
@@ -62,7 +59,7 @@ export const AssetsViewer = React.memo(() => {
 						currentChannelId={
 							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
 								? currentChannel?.channel_id
-								: currentChannelId
+								: channelId
 						}
 					/>
 					{/* <Page2 />
@@ -76,7 +73,7 @@ export const AssetsViewer = React.memo(() => {
 // Just for testing purposes
 function Page2() {
 	return (
-		<View style={{ width: Dimensions.get('screen').width}}>
+		<View style={{ width: Dimensions.get('screen').width }}>
 			<Text style={{ color: 'white' }}>tab content</Text>
 		</View>
 	);
