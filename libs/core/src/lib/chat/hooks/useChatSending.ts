@@ -27,6 +27,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
 	const idNewMessageResponse = useSelector(selectNewIdMessageResponse);
+
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
 	// If not, using 2 hooks for direct and channel
@@ -39,10 +40,24 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		channelID = direct.id;
 		clanID = '0';
 	}
-
+	const [filteredContentMap, setFilteredContentMap] = useState<Record<string, IMessageSendPayload>>({});
+	const [filteredMentionMap, setFilteredMentionMap] = useState<Record<string, IMentionOnMessage[]>>({});
 	const [filteredLinkResults, setFilteredLinkResults] = React.useState<ApiMessageAttachment[]>([]);
 	const [filteredContent, setFilterContent] = useState<IMessageSendPayload>({});
 	const [filteredMention, setFilterMention] = useState<IMentionOnMessage[]>([]);
+	const [ids, setIds] = useState<string[]>([]);
+	const [idToLinksMap, setIdToLinksMap] = useState<Record<string, ApiMessageAttachment[]>>({});
+
+	useEffect(() => {
+		if (idNewMessageResponse) {
+			setIds((prevIds) => {
+				const newIds = [...prevIds, idNewMessageResponse];
+				return [...new Set(newIds)]; // Remove duplicates
+			});
+		}
+	}, [idNewMessageResponse]);
+
+	console.log(ids);
 
 	const sendMessage = React.useCallback(
 		async (
@@ -71,38 +86,81 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				}),
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId],
+		[dispatch, channelID, clanID, mode, currentUserId, idNewMessageResponse],
 	);
+	const processUrls = async (filteredContentMap: Record<string, IMessageSendPayload>, ids: string[]) => {
+		const idMap: Record<string, ApiMessageAttachment[]> = {};
+		const resultPromises = ids.map(async (id) => {
+			const content = filteredContentMap[id];
+			if (content?.lk) {
+				const urlPromises = (content.lk ?? []).map(async (item) => {
+					try {
+						// Ensure item.lk is a valid URL
+						if (typeof item.lk !== 'string') {
+							console.warn(`Invalid URL: ${item.lk}`);
+							return null;
+						}
 
+						const result = await handleUrlInput(item.lk);
+
+						if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+							return result as ApiMessageAttachment;
+						}
+
+						return null;
+					} catch (error) {
+						console.error(`Error processing URL ${item.lk}:`, error);
+						return null;
+					}
+				});
+
+				const results = await Promise.all(urlPromises);
+				const filteredLinkProcess = results.filter((result): result is ApiMessageAttachment => result !== null);
+
+				console.log(`ID: ${id} - Processed Links:`, filteredLinkProcess);
+				idMap[id] = filteredLinkProcess;
+			} else {
+				console.warn(`No links to process for ID: ${id}`);
+			}
+		});
+
+		await Promise.all(resultPromises);
+		console.log('ID to Links Map:', idMap);
+		return idMap;
+	};
+
+	// Usage in useEffect
 	useEffect(() => {
-		if (!filteredContent.lk) return;
-		const processUrls = async () => {
-			const resultPromises = (filteredContent.lk ?? []).map(async (item) => {
-				const result = await handleUrlInput(item.lk as string);
-				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-					return result as ApiMessageAttachment;
-				}
-				return null;
-			});
-			const results = await Promise.all(resultPromises);
-			const filteredLinkProcess = results.filter((result): result is ApiMessageAttachment => result !== null) as ApiMessageAttachment[];
-			setFilteredLinkResults(filteredLinkProcess);
+		if (!filteredContentMap || ids.length === 0) return;
+
+		const fetchAndProcessUrls = async () => {
+			const processedIdMap = await processUrls(filteredContentMap, ids);
+			setIdToLinksMap(processedIdMap);
 		};
-		processUrls();
-	}, [filteredContent.lk]);
+
+		fetchAndProcessUrls();
+	}, [filteredContentMap, ids]);
 
 	useEffect(() => {
-		if (!idNewMessageResponse || filteredLinkResults.length === 0) return;
-		const result = checkContentContainsOnlyUrls(filteredContent.t ?? '', filteredLinkResults);
-		const intervalId = setInterval(() => {
-			editSendMessage(result ? {} : filteredContent, idNewMessageResponse, filteredMention, filteredLinkResults);
-			setFilterContent({});
-			setFilteredLinkResults([]);
-			setFilterMention([]);
-			clearInterval(intervalId);
-		}, 1000);
-		return () => clearInterval(intervalId);
-	}, [idNewMessageResponse, filteredLinkResults]);
+		console.log('d');
+		console.log('ids.length: ', ids.length);
+		console.log('Object.keys(idToLinksMap).length: ', Object.keys(idToLinksMap).length);
+		if (ids.length === 0 || Object.keys(idToLinksMap).length === 0) return;
+		const sendAllMessages = async () => {
+			for (const id of ids) {
+				const content = filteredContentMap[id] || {};
+				const mentions = filteredMentionMap[id] || [];
+				const links = idToLinksMap[id] || [];
+				const result = checkContentContainsOnlyUrls(content.t ?? '', links);
+				console.log(content, id, mentions, links);
+				await editSendMessage(result ? {} : content, id, mentions, links);
+			}
+			setFilteredContentMap({});
+			setFilteredMentionMap({});
+			setIdToLinksMap({});
+		};
+		sendAllMessages();
+	}, [ids, idToLinksMap, filteredContentMap, filteredMentionMap, idNewMessageResponse]);
 
 	function checkContentContainsOnlyUrls(content: string, urls: ApiMessageAttachment[]) {
 		const urlsToCheck = urls.map((item) => item.url);
@@ -118,6 +176,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
 		async (content: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[], attachments?: ApiMessageAttachment[]) => {
+			console.log('attachments: ', attachments);
+			console.log('mentions: ', mentions);
+			console.log('messageId: ', messageId);
+			console.log('content: ', content);
+
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
