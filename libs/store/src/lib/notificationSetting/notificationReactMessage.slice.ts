@@ -19,7 +19,8 @@ export const initialNotifiReactMessageState: NotifiReactMessageState = {
 const LIST_NOTIFI_REACT_MESS_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotiReactMess = memoize(
 	(mezon: MezonValueContext, channelID: string) =>
-		mezon.client.getNotificationReactMessage(mezon.session, channelID),
+		// mezon.client.getNotificationReactMessage(mezon.session, channelID),
+		mezon.socketRef.current?.getNotificationReactMessage(channelID),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_REACT_MESS_CACHED_TIME,

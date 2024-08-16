@@ -19,7 +19,8 @@ export const initialDefaultNotificationClanState: DefaultNotificationClanState =
 const LIST_NOTIFI_CLAN_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationClanSetting = memoize(
 	(mezon: MezonValueContext, clanId: string) =>
-		mezon.client.getNotificationClanSetting(mezon.session, clanId),
+		// mezon.client.getNotificationClanSetting(mezon.session, clanId),
+		mezon.socketRef.current?.getNotificationClanSetting(clanId),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_CLAN_CACHED_TIME,
@@ -41,6 +42,8 @@ export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationc
 		fetchNotificationClanSetting.clear(mezon, clanId);
 	}
 	const response = await fetchNotificationClanSetting(mezon, clanId);
+	console.log("response setting", response);
+	
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}

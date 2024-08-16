@@ -22,7 +22,8 @@ export const initialNotificationSettingState: NotificationSettingState = {
 const LIST_NOTIFI_CHANEL_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationSetting = memoize(
 	(mezon: MezonValueContext, channelID: string) =>
-		mezon.client.getNotificationChannel(mezon.session, channelID),
+		// mezon.client.getNotificationChannel(mezon.session, channelID),
+		mezon.socketRef.current?.getNotificationChannelSetting(channelID),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_CHANEL_CACHED_TIME,
@@ -48,8 +49,12 @@ export const getNotificationSetting = createAsyncThunk('notificationsetting/getN
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		fetchNotificationSetting.clear(mezon, channelId);
+		console.log("no cache");
+		
 	}
 	const response = await fetchNotificationSetting(mezon, channelId);
+	console.log("response ", response);
+	
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}

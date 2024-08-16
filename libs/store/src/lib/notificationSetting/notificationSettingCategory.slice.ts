@@ -43,7 +43,8 @@ type SetDefaultNotificationPayload = {
 const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationCategorySetting = memoize(
 	(mezon: MezonValueContext, categoryId: string) =>
-		mezon.client.getNotificationCategory(mezon.session, categoryId),
+		// mezon.client.getNotificationCategory(mezon.session, categoryId),
+		mezon.socketRef.current?.getNotificationCategorySetting(categoryId),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_CATEGORY_CACHED_TIME,
