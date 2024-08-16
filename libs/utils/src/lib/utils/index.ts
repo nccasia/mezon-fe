@@ -310,7 +310,7 @@ export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number)
 };
 
 export const checkContinuousMessagesByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
-	return Math.abs(unixTime1 - unixTime2) <= TIME_COMBINE;
+	return Math.abs(unixTime1 - unixTime2) <= TIME_COMBINE * 1000;
 };
 
 export const checkSameDayByCreateTime = (createTime1: string | Date, createTime2: string | Date) => {

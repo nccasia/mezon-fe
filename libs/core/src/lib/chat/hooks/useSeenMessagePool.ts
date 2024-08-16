@@ -33,13 +33,13 @@ export function useSeenMessagePool() {
 		if (message.isSending) {
 			return;
 		}
-
+		
 		seenMessagePool.addSeenMessage({
 			clanId: message.clan_id || '',
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,
 			messageId: message.id || '',
-			messageCreatedAt: message.create_time_ms ? +message.create_time_ms : 0,
+			messageCreatedAt: message.creationTimeMs ? +message.creationTimeMs : 0,
 			messageSeenAt: +Date.now(),
 		});
 	}, []);
