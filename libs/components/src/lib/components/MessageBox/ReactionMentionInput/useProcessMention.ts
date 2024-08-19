@@ -15,14 +15,12 @@ const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[])
 			if (isRole) {
 				mentions.push({
 					role_id: id,
-					rolename: display,
 					s,
 					e,
 				});
 			} else {
 				mentions.push({
 					user_id: id,
-					username: display,
 					s,
 					e,
 				});
@@ -30,14 +28,12 @@ const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[])
 		} else if (childIndex === ETypeMEntion.HASHTAG) {
 			hashtags.push({
 				channelid: id,
-				channellabel: display,
 				s,
 				e,
 			});
 		} else if (childIndex === ETypeMEntion.EMOJI) {
 			emojis.push({
 				emojiid: id,
-				shortname: display,
 				s,
 				e,
 			});

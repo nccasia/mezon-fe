@@ -1,4 +1,5 @@
-import {  fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useEscapeKey } from '@mezon/core';
+import { fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -41,6 +42,10 @@ const SettingChannel = (props: ModalSettingProps) => {
 
 	const closeMenu = useSelector(selectCloseMenu);
 
+	const [openModalAdd, setOpenModalAdd] = useState(false);
+	useEscapeKey(!openModalAdd ? onClose : () => {});
+	
+
 	return (
 		<div className="flex fixed inset-0  w-screen z-10 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
 			<div className="flex text-gray- w-screen relative text-white">
@@ -68,7 +73,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 					stateMenu={menu}
 				/>
 				{currentSetting === EChannelSettingTab.OVERVIEW && <OverviewChannel channel={channel} />}
-				{currentSetting === EChannelSettingTab.PREMISSIONS && <PermissionsChannel channel={channel} />}
+				{currentSetting === EChannelSettingTab.PREMISSIONS && <PermissionsChannel channel={channel} setOpenModalAdd={setOpenModalAdd} openModalAdd={openModalAdd}/>}
 				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
 				{currentSetting === EChannelSettingTab.INTEGRATIONS && <IntegrationsChannel currentChannel={channel} />}
 				{currentSetting === EChannelSettingTab.CATEGORY && <SettingCategoryChannel channel={channel} />}

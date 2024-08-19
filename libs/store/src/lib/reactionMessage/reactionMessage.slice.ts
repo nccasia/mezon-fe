@@ -16,7 +16,7 @@ export interface ReactionEntity extends IReaction {
 }
 
 export type UpdateReactionMessageArgs = {
-	id: string;
+	id?: string;
 	channel_id?: string;
 	message_id?: string;
 	emoji_id: string;
@@ -183,18 +183,18 @@ export const reactionSlice = createSlice({
 				}
 			}
 
-			const existing = reactionAdapter.getSelectors().selectById(state, reactionDataSocket.id);
+			const existing = reactionAdapter.getSelectors().selectById(state, reactionDataSocket.id || '');
 			if (isAdd && !existing) {
 				reactionAdapter.addOne(state, mapReactionToEntity(reactionDataSocket));
 			} else if (isAdd && existing) {
 				reactionAdapter.updateOne(state, {
-					id: reactionDataSocket.id,
+					id: reactionDataSocket.id || '',
 					changes: {
 						count: existing.count + reactionDataSocket.count,
 					},
 				});
 			} else if (!isAdd && existing) {
-				reactionAdapter.removeOne(state, reactionDataSocket.id);
+				reactionAdapter.removeOne(state, reactionDataSocket.id || '');
 			} else {
 				// Do nothing when remove reaction and not found
 			}

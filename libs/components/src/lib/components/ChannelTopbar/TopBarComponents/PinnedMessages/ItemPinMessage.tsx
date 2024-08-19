@@ -1,5 +1,5 @@
 import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
-import { messagesActions, pinMessageActions, PinMessageEntity, selectCurrentClanId } from '@mezon/store';
+import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
@@ -16,17 +16,21 @@ type ItemPinMessageProps = {
 const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage, onClose } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
-	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || "");
+	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || '');
 
 	const currentClanID = useSelector(selectCurrentClanId);
 	const dispatch = useDispatch();
-	const { directToMessageById } = useJumpToMessage({ channelId: pinMessage?.channel_id || '', messageID: pinMessage.message_id || '', clanId: currentClanID || '' });
+	const { directToMessageById } = useJumpToMessage({
+		channelId: pinMessage?.channel_id || '',
+		messageID: pinMessage.message_id || '',
+		clanId: currentClanID || '',
+	});
 	const handleJumpMess = () => {
 		dispatch(pinMessageActions.setJumpPinMessageId(pinMessage.message_id));
 		onClose();
 		dispatch(messagesActions.setIdMessageToJump(pinMessage.message_id));
 		directToMessageById();
-	}
+	};
 
 	return (
 		<div
@@ -36,8 +40,8 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			<div className="flex items-start gap-2">
 				<MemberProfile
 					isHideUserName={true}
-					avatar={priorityAvatar? priorityAvatar : pinMessage.avatar || ''}
-					name={namePriority? namePriority : pinMessage.username || ''} 
+					avatar={priorityAvatar ? priorityAvatar : pinMessage.avatar || ''}
+					name={namePriority ? namePriority : pinMessage.username || ''}
 					isHideStatus={true}
 					isHideIconStatus={true}
 					textColor="#fff"
@@ -45,21 +49,16 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				<div className="flex flex-col gap-1 text-left">
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
-							{namePriority? namePriority : pinMessage.username || ''}
+							{namePriority ? namePriority : pinMessage.username || ''}
 						</span>
 					</div>
 					<div className="leading-6">
-						<MessageLine
-							isRenderImage={false}
-							content={JSON.parse(pinMessage.content || '')}
-							isJumMessageEnabled={false}
-							isTokenClickAble={false}
-						/>
+						<MessageLine content={JSON.parse(pinMessage.content || '')} isJumMessageEnabled={false} isTokenClickAble={false} />
 					</div>
 				</div>
 			</div>
 			<div className="h-fit flex gap-x-2 items-center opacity-0 group-hover/item-pinMess:opacity-100">
-				<p 
+				<p
 					onClick={handleJumpMess}
 					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit dark:text-white text-colorTextLightMode"
 				>

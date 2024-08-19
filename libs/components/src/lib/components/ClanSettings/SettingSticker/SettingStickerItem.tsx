@@ -19,7 +19,7 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === sticker.creator_id;
-	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]);
+	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, sticker.creator_id]);
 	const clanId = useSelector(selectCurrentClanId);
 	const handleUpdateSticker = () => {
 		updateSticker(sticker);
@@ -36,11 +36,11 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 			}
 		>
 			<div className="aspect-square h-[72px] overflow-hidden flex justify-center">
-				<img className={' w-auto h-full object-cover select-none'} src={sticker.source} />
+				<img className={' w-auto h-full object-cover select-none'} src={sticker.source} alt="" />
 			</div>
 			<p className="font-semibold dark:text-white text-textPrimaryLight">{sticker.shortname}</p>
 			<div className="flex items-end justify-center gap-1">
-				<img className="w-4 h-4 rounded-full select-none" src={dataAuthor.user?.avatar_url} />
+				<img className="w-4 h-4 rounded-full select-none" src={dataAuthor.user?.avatar_url} alt="" />
 				<p className="dark:text-white text-textPrimaryLight max-w-20 truncate">{dataAuthor.user?.username}</p>
 			</div>
 			{hasDeleteOrEditPermission && (

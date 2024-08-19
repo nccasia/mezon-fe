@@ -9,7 +9,11 @@ import {
 	selectTheme,
 	useAppDispatch,
 	getIsFowardAll,
-	selectCurrentChannelId, selectMessageByChannelId, MessagesEntity,
+	selectCurrentChannelId,
+	MessagesEntity,
+	selectDmGroupCurrentId,
+	selectModeResponsive,
+	useAppSelector, selectMessageEntitiesByChannelId,
 } from '@mezon/store';
 import {
 	ChannelThreads,
@@ -19,7 +23,7 @@ import {
 	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
-	IMessageWithUser
+	ModeResponsive, IMessageWithUser
 } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -31,7 +35,7 @@ import ListSearchForwardMessage from './ListSearchForwardMessage';
 type ModalParam = {
 	openModal: boolean;
 };
-type OpjectSend = {
+type ObjectSend = {
 	id: string;
 	type: number;
 	clanId?: string;
@@ -49,18 +53,19 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const accountId = userProfile?.user?.id ?? '';
-	const currentChannelId = useSelector(selectCurrentChannelId)
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
 	const membersInClan = useSelector(selectAllChannelMembers);
 	const isForwardAll = useSelector(getIsFowardAll);
-	const allMessages = useSelector(selectMessageByChannelId(currentChannelId));
-	const allMessagesBySenderId = Object.values(allMessages[1]).filter((message: any) => {
-		return message.sender_id === selectedMessage?.user?.id
-	}) as MessagesEntity[];
+	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''))
+	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const allMessagesBySenderId = convertedAllMessagesEntities.filter(message => message.sender_id === selectedMessage?.user?.id);
 	const startIndex = useMemo(() => {
 		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage.id)
-	}, [allMessages, selectedMessage]);
+	}, [allMessagesEntities, selectedMessage]);
 	
-	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
+	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<ObjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
 
 	useEffect(() => {
@@ -88,7 +93,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const handleForwardAllMessage = async () => {
 		const combineMessages: MessagesEntity[] = [];
 		combineMessages.push(selectedMessage);
-		
+
 		let index = startIndex + 1;
 		while (index < allMessagesBySenderId.length && !allMessagesBySenderId[index].isStartedMessageGroup && allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id) {
 			combineMessages.push(allMessagesBySenderId[index]);
@@ -97,26 +102,32 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				combineMessages.forEach(message => {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
-				})
+				for(const message of combineMessages) {
+					sendForwardMessage ('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
+				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				combineMessages.forEach(message => {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
-				})
+				for (const message of combineMessages) {
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, message);
+				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				combineMessages.forEach(message => {
-					sendForwardMessage(selectedObjectIdSend.clanId || '', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
-				})
+				for (const message of combineMessages) {
+					sendForwardMessage(
+						selectedObjectIdSend.clanId || '',
+						selectedObjectIdSend.id,
+						ChannelStreamMode.STREAM_MODE_CHANNEL,
+						message,
+					);
+				}
 			}
 		}
+		
 		dispatch(toggleIsShowPopupForwardFalse());
 	}
 
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
+				sendForwardMessage ('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {

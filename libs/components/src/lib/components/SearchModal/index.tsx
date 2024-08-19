@@ -161,11 +161,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					directActions.joinDirectMessage({
 						directMessageId: user.idDM,
 						channelName: '',
-						type: user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM,
+						type: user?.type ?? ChannelType.CHANNEL_TYPE_DM,
 					}),
 				);
 				if (result) {
-					navigate(toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM));
+					navigate(toDmGroupPageFromMainApp(user.idDM, user?.type ?? ChannelType.CHANNEL_TYPE_DM));
 				}
 			} else {
 				const response = await createDirectMessageWithUser(user.id);

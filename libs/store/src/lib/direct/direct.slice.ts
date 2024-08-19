@@ -1,10 +1,10 @@
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelMessageEvent, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
-import { hashtagDmVoiceActions } from '../channels/hashtagDmVoice.slice';
+import { hashtagDmActions } from '../channels/hashtagDm.slice';
 import { clansActions } from '../clans/clans.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
@@ -205,7 +205,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			const members = fetchChannelMembersResult.payload as members[];
 			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
 				const userIds = members.map((member: any) => member.user.id);
-				thunkAPI.dispatch(hashtagDmVoiceActions.fetchHashtagDmVoice({ userIds: userIds, directId: directMessageId }));
+				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
@@ -236,7 +236,7 @@ export const directSlice = createSlice({
 		setDmGroupCurrentType: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageType = action.payload;
 		},
-		updateDMSocket: (state, action: PayloadAction<ChannelMessageEvent>) => {
+		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
 			const payload = action.payload;
 			const timestamp = (Date.now() / 1000).toString();
 			const dmChannel = directAdapter.getSelectors().selectById(state, payload.channel_id);

@@ -1,13 +1,5 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import {
-	IEmojiOnMessage,
-	IExtendedMessage,
-	IHashtagOnMessage,
-	ILinkOnMessage,
-	ILinkVoiceRoomOnMessage,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
-} from '@mezon/utils';
+import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,10 +11,9 @@ type MessageLineProps = {
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
-
+	isHideLinkOneImage?: boolean;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
-	isRenderImage: boolean;
 };
 
 const MessageLine = ({
@@ -33,7 +24,7 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isTokenClickAble,
-	isRenderImage,
+	isHideLinkOneImage,
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -53,7 +44,7 @@ const MessageLine = ({
 	return (
 		<div onClick={isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}>
 			<RenderContent
-				isRenderImage={isRenderImage}
+				isHideLinkOneImage={isHideLinkOneImage}
 				isTokenClickAble={isTokenClickAble}
 				isOnlyContainEmoji={isOnlyContainEmoji}
 				isJumMessageEnabled={isJumMessageEnabled}
@@ -75,30 +66,22 @@ interface RenderContentProps {
 	allChannelVoice?: ChannelsEntity[];
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
-
+	isHideLinkOneImage?: boolean;
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
-	isRenderImage: boolean;
 }
-type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
-const isMentionOnMessageUser = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).user_id !== undefined;
+interface ElementToken {
+	s?: number;
+	e?: number;
+	kindOf: ETokenMessage;
+	user_id?: string;
+	role_id?: string;
+	channelid?: string;
+	emojiid?: string;
+}
 
-const isMentionOnMessageRole = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).role_id !== undefined;
-
-const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage => (element as IHashtagOnMessage).channelid !== undefined;
-
-const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).emojiid !== undefined;
-
-const isLinkOnMessage = (element: MessageElementToken): element is ILinkOnMessage => (element as ILinkOnMessage).lk !== undefined;
-
-const isMarkdownOnMessage = (element: MessageElementToken): element is IMarkdownOnMessage => (element as IMarkdownOnMessage).mk !== undefined;
-
-const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILinkVoiceRoomOnMessage =>
-	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
-
-// TODO: refactor component for message lines
 const RenderContent = memo(
 	({
 		data,
@@ -109,10 +92,18 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isRenderImage,
+		isHideLinkOneImage,
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
-		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		const elements: ElementToken[] = [
+			...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
+			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
+			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
+			...mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })),
+			...lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })),
+			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })),
+		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+
 		let lastindex = 0;
 		const content = useMemo(() => {
 			const formattedContent: React.ReactNode[] = [];
@@ -120,13 +111,16 @@ const RenderContent = memo(
 			elements.forEach((element, index) => {
 				const s = element.s ?? 0;
 				const e = element.e ?? 0;
+
+				let contentInElement = t?.substring(s, e);
+
 				if (lastindex < s) {
 					formattedContent.push(
 						<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />,
 					);
 				}
 
-				if (isHashtagOnMessage(element)) {
+				if (element.kindOf === ETokenMessage.HASHTAGS) {
 					formattedContent.push(
 						<ChannelHashtag
 							isTokenClickAble={isTokenClickAble}
@@ -137,57 +131,43 @@ const RenderContent = memo(
 					);
 				}
 
-				if (isMentionOnMessageUser(element)) {
+				if (element.kindOf === ETokenMessage.MENTIONS) {
 					formattedContent.push(
 						<MentionUser
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
-							tagName={element.username ?? ''}
-							tagUserId={element.user_id ?? ''}
+							key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+							tagName={contentInElement ?? ''}
+							tagUserId={element.user_id ? element.user_id : (element.role_id ?? '')}
 							mode={mode}
 						/>,
 					);
 				}
 
-				if (isMentionOnMessageRole(element)) {
-					formattedContent.push(
-						<MentionUser
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
-							tagName={element.rolename ?? ''}
-							tagUserId={element.role_id ?? ''}
-							mode={mode}
-						/>,
-					);
-				}
-
-				if (isEmojiOnMessage(element)) {
+				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
 							key={`emoji-${index}-${s}-${element.emojiid}`}
-							emojiSyntax={element.shortname ?? ''}
+							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
 							emojiId={element.emojiid ?? ''}
 						/>,
 					);
 				}
 
-				if (isLinkOnMessage(element)) {
+				if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
-							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`link-${index}-${s}-${element.lk}`}
-							content={element.lk as string}
+							key={`link-${index}-${s}-${contentInElement}`}
+							content={contentInElement}
 						/>,
 					);
 				}
 
-				if (isLinkVoiceRoomOnMessage(element)) {
-					const meetingCode = element.vk?.split('/').pop();
+				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
+					const meetingCode = contentInElement?.split('/').pop();
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 					voiceChannelFound
 						? formattedContent.push(
@@ -200,33 +180,29 @@ const RenderContent = memo(
 							)
 						: formattedContent.push(
 								<MarkdownContent
-									isRenderImage={isRenderImage}
 									isTokenClickAble={isTokenClickAble}
 									isJumMessageEnabled={isJumMessageEnabled}
-									key={`voicelink-${index}-${s}-${element.vk}`}
-									content={element.vk as string}
+									key={`voicelink-${index}-${s}-${contentInElement}`}
+									content={contentInElement}
 								/>,
 							);
 				}
 
-				if (isMarkdownOnMessage(element)) {
-					let markdownContent = element.mk || '';
-
+				if (element.kindOf === ETokenMessage.MARKDOWNS) {
 					if (isJumMessageEnabled) {
 						let replacement;
-						while (markdownContent.includes('```')) {
-							replacement = markdownContent.indexOf('```');
-							markdownContent = markdownContent.slice(0, replacement) + '`' + markdownContent.slice(replacement + 3);
+						while (contentInElement?.includes('```')) {
+							replacement = contentInElement.indexOf('```');
+							contentInElement = contentInElement.slice(0, replacement) + '`' + contentInElement.slice(replacement + 3);
 						}
 					}
 
 					formattedContent.push(
 						<MarkdownContent
-							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
-							key={`markdown-${index}-${s}-${element.mk}`}
-							content={markdownContent as string}
+							key={`markdown-${index}-${s}-${contentInElement}`}
+							content={contentInElement}
 						/>,
 					);
 				}

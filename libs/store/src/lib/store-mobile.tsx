@@ -26,7 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
-import { hashtagDmVoiceReducer } from './channels/hashtagDmVoice.slice';
+import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -153,7 +153,7 @@ const reducer = {
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: defaultNotificationCategoryReducer,
 	notichannelcategorysetting: channelCategorySettingReducer,
-	hashtagdmvoice: hashtagDmVoiceReducer,
+	hashtagdm: hashtagDmReducer,
 	notifireactmessage: notifiReactMessageReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,

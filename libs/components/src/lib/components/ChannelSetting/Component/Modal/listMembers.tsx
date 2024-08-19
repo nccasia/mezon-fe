@@ -62,7 +62,7 @@ const ItemMember = (props: ItemMemberProps) => {
 					src={avatarPrioritize}
 					classNameText='text-[9px] pt-[3px]'
 				/>
-				<p className="text-sm">{namePrioritize}</p>
+				<p className="text-sm one-line">{namePrioritize}</p>
 				<p className="text-contentTertiary font-light">{userName}</p>
 			</label>
 		</div>

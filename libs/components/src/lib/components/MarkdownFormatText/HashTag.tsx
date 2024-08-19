@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { ChannelsEntity, selectChannelById, selectCurrentChannel, selectHashtagDmVoiceById } from '@mezon/store';
+import { ChannelsEntity, selectChannelById, selectCurrentChannel, selectHashtagDmById } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const getChannelById = (channelHastagId: string) => {
 		let channel: ChannelsEntity;
 		if (directId !== undefined) {
-			channel = useSelector(selectHashtagDmVoiceById(directId + channelHastagId));
+			channel = useSelector(selectHashtagDmById(directId + channelHastagId));
 		} else {
 			channel = useSelector(selectChannelById(channelHastagId));
 		}

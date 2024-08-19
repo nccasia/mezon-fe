@@ -2,7 +2,6 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
-	selectCurrentUserId,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -10,14 +9,13 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectMessageByMessageId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotifed,
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
@@ -51,8 +49,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 
-	const lastMessage = useSelector(selectMessageByMessageId(messages[messages.length - 1]));
-	const currentAccountId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -96,12 +92,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
 	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
-
-	useEffect(() => {
-		if (lastMessage && lastMessage.sender_id === currentAccountId) {
-			dispatch(messagesActions.setIsJumpingToPresent(true));
-		}
-	}, [lastMessage]);
 
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {

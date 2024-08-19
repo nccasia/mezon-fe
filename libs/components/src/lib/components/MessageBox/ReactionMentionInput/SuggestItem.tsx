@@ -1,4 +1,4 @@
-import { selectAllChannels, selectAllHashtagDmVoice, selectMembersVoiceChannel } from '@mezon/store';
+import { selectAllChannels, selectHashtagDMByDirectId, selectMembersVoiceChannel } from '@mezon/store';
 import { getSrcEmoji, normalizeString, SearchItemProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -39,7 +39,7 @@ const SuggestItem = ({
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
-	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
+	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ""));
 	const [specificChannel, setSpecificChannel] = useState<any>(null);
 	const membersVoice = useSelector(selectMembersVoiceChannel);
 	const checkVoiceStatus = useMemo(() => {
@@ -53,7 +53,7 @@ const SuggestItem = ({
 		if (channel) {
 			setSpecificChannel(channel)
 		} else if (directId && !isOpenSearchModal) {
-			commonChannelVoids.map((channel) => {
+			commonChannels.map((channel) => {
 				if (channel.channel_id === channelId) {
 					setSpecificChannel(channel);
 				}

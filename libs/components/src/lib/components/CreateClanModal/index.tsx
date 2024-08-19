@@ -87,7 +87,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       e.target.value = null;
       return;
     }
-    handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
+    handleUploadFile(client, session, currentClanId || "0", currentChannelId || "0", file?.name, file).then((attachment: any) => {
       setUrlImage(attachment.url ?? '');
     });
   };

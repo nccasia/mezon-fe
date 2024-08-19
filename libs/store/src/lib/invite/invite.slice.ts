@@ -16,6 +16,7 @@ export const mapInviteToEntity = (inviteRes: ApiInviteUserRes, inviteId: string)
 export interface InviteState extends EntityState<InvitesEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	isClickInvite: boolean;
 }
 
 export const inviteAdapter = createEntityAdapter<InvitesEntity>();
@@ -85,6 +86,7 @@ export const initialInviteState: InviteState = inviteAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
+	isClickInvite: false,
 });
 
 export const inviteSlice = createSlice({
@@ -93,6 +95,9 @@ export const inviteSlice = createSlice({
 	reducers: {
 		add: inviteAdapter.addOne,
 		remove: inviteAdapter.removeOne,
+		setIsClickInvite: (state, action) => {
+			state.isClickInvite = action.payload;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -162,3 +167,5 @@ export const selectAllInvite = createSelector(getInviteState, selectAll);
 export const selectInviteEntities = createSelector(getInviteState, selectEntities);
 
 export const selectInviteById = (id: string) => createSelector(selectInviteEntities, (inviteEntities) => inviteEntities[id]);
+
+export const selectIsClickInvite = createSelector(getInviteState, state => state.isClickInvite);

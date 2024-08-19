@@ -47,16 +47,16 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 		...channelMess,
 		isFirst: channelMess.code === EMessageCode.FIRST_MESSAGE,
 		creationTime,
-		id: channelMess.id || '',
+		id: channelMess.id || channelMess.message_id || '',
 		date: new Date().toLocaleString(),
 		isAnonymous,
 		user: {
 			name: channelMess.username || '',
 			username: channelMess.username || '',
-			id: channelMess.sender_id || 'idUser',
+			id: channelMess.sender_id || '',
 			avatarSm: channelMess.avatar || '',
 		},
-		lastSeen: lastSeenId === channelMess.id,
+		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
 		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
 	};
 };
@@ -566,7 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	newMesssageUpdateImage: { id: '' },
+	newMesssageUpdateImage: { message_id: '' },
 };
 
 export type SetCursorChannelArgs = {
@@ -594,8 +594,14 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action) {
-			state.newMesssageUpdateImage = action.payload;
+		setNewMessageToUpdateImage(state, action: PayloadAction<ChannelMessage>) {
+			const data = action.payload;
+			state.newMesssageUpdateImage = {
+				channel_id: data.channel_id,
+				message_id: data.message_id,
+				clan_id: data.clan_id,
+				mode: data.mode,
+			};
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {

@@ -22,7 +22,7 @@ export const initialNotificationSettingState: NotificationSettingState = {
 const LIST_NOTIFI_CHANEL_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationSetting = memoize(
 	(mezon: MezonValueContext, channelID: string) =>
-		mezon.client.getNotificationChannel(mezon.session, channelID),
+		mezon.socketRef.current?.getNotificationChannelSetting(channelID),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_CHANEL_CACHED_TIME,
@@ -43,22 +43,28 @@ type GetNotificationSettingResponse = {
 	isCurrentChannel: boolean | undefined,
 }
 
-export const getNotificationSetting = createAsyncThunk('notificationsetting/getNotificationSetting', 
-	async ({channelId, noCache, isCurrentChannel = true}: FetchNotificationSettingsArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchNotificationSetting.clear(mezon, channelId);
-	}
-	const response = await fetchNotificationSetting(mezon, channelId);
-	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	const payload: GetNotificationSettingResponse = {
-		notificationSetting: response,
-		isCurrentChannel: isCurrentChannel,
-	}
-	return payload;
-});
+export const getNotificationSetting = createAsyncThunk('notificationsetting/getNotificationSetting',
+	async ({ channelId, noCache, isCurrentChannel = true }: FetchNotificationSettingsArgs, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchNotificationSetting.clear(mezon, channelId);
+		}
+		const response = await fetchNotificationSetting(mezon, channelId);
+		if (!response) {
+			return thunkAPI.rejectWithValue('Invalid session');
+		}
+		const apiNotificationUserChannel: ApiNotificationUserChannel = {
+			active: response.notification_user_channel?.active,
+			id: response.notification_user_channel?.id,
+			notification_setting_type: response.notification_user_channel?.notification_setting_type,
+			time_mute: response.notification_user_channel?.time_mute,
+		};
+		const payload: GetNotificationSettingResponse = {
+			notificationSetting: apiNotificationUserChannel,
+			isCurrentChannel: isCurrentChannel,
+		}
+		return payload;
+	});
 
 export type SetNotificationPayload = {
 	channel_id?: string;
@@ -81,8 +87,8 @@ export const setNotificationSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache:true }));
-		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id||"", noCache: true, isCurrentChannel: is_current_channel}));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
+		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || "", noCache: true, isCurrentChannel: is_current_channel }));
 		return response;
 	},
 );
@@ -108,8 +114,8 @@ export const setMuteNotificationSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache:true }));
-		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id || '', noCache: true, isCurrentChannel: is_current_channel}));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
+		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true, isCurrentChannel: is_current_channel }));
 		return response;
 	},
 );
@@ -129,7 +135,7 @@ export const deleteNotiChannelSetting = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
-		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id || '', noCache: true, isCurrentChannel: is_current_channel}));
+		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true, isCurrentChannel: is_current_channel }));
 		return response;
 	},
 );
@@ -145,7 +151,7 @@ export const notificationSettingSlice = createSlice({
 			})
 			.addCase(getNotificationSetting.fulfilled, (state: NotificationSettingState, action: PayloadAction<GetNotificationSettingResponse>) => {
 				const isCurrentChannel = action.payload.isCurrentChannel;
-				if(isCurrentChannel) {
+				if (isCurrentChannel) {
 					state.currentChannelNotificationSetting = action.payload.notificationSetting;
 				}
 				state.selectedChannelNotificationSetting = action.payload.notificationSetting;

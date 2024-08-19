@@ -136,7 +136,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 			const inputData = input.trim().toLowerCase();
 			if (inputData.startsWith('@')) {
 				const searchValue = inputData.substring(1);
-				const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.includes(searchValue));
+				const filteredMembers = listMembersNotInChannel.filter((member) => {
+					const clanName = member?.clanNick?.toLowerCase();
+					const displayName = member?.display_name?.toLowerCase();
+					const userName = member?.username?.toLowerCase();
+					return clanName?.includes(searchValue) || displayName?.includes(searchValue) || userName?.includes(searchValue);
+				});
 				setFilterItem({
 					listMembersNotInChannel: filteredMembers,
 					listRolesNotAddChannel: [],
@@ -147,8 +152,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 				const clanName = member?.clanNick?.toLowerCase();
 				const displayName = member?.display_name?.toLowerCase();
 				const userName = member?.username?.toLowerCase();
-				const lowerCaseSearchTerm = inputData.toLowerCase();
-				return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+				return clanName?.includes(inputData) || displayName?.includes(inputData) || userName?.includes(inputData);
 			});
 			const filteredRoles = listRolesNotAddChannel.filter((item) => item?.title?.toLowerCase().includes(inputData));
 			setFilterItem({

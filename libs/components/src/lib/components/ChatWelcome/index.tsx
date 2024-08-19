@@ -133,7 +133,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 					{name}
 				</p>
 			</div>
-			{!isDmGroup &&<p className='font-medium text-2xl'>{userName}</p>}
+			{!isDmGroup &&<p className='font-medium text-2xl dark:text-textDarkTheme text-textLightTheme'>{userName}</p>}
 			<div className="text-base">
 			<p className={classNameSubtext}>
 				{isDmGroup ? 

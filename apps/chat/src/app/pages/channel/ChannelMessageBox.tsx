@@ -79,7 +79,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	}, [subPanelActive]);
 
 	return (
-		<div className="mx-2 relative " role="button" aria-hidden ref={messageBox}>
+		<div className="mx-2 relative " role="button" ref={messageBox}>
 			{isEmojiOnChat && (
 				<div
 					style={{

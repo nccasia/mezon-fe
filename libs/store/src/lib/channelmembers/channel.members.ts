@@ -275,39 +275,27 @@ export const channelMembers = createSlice({
 		addRoleIdUser: (state, action) => {
 			const { id, channelId, userId } = action.payload;
 			const idMember = channelId + userId;
-			const existingMember = state.entities[idMember];
+			const existingMember = state.memberChannels?.find(member => member.id === idMember);
 
 			if (existingMember) {
 				const roleIds = existingMember.role_id || [];
 				const updatedRoleIds= [...roleIds, id];
-
-				channelMembersAdapter.updateOne(state, {
-					id: idMember,
-					changes: {
-						role_id: updatedRoleIds,
-					},
-				});
+				existingMember.role_id = updatedRoleIds;
 			}
 		},
 		removeRoleIdUser: (state, action) => {
 			const { id, channelId, userId } = action.payload;
 			const idMember = channelId + userId;
-			const existingMember = state.entities[idMember];
+			const existingMember = state.memberChannels?.find(member => member.id === idMember);
 
 			if (existingMember) {
-				const roleIds = existingMember.role_id || [];
+				const roleIds = existingMember?.role_id || [];
 				const roleIndex = roleIds.indexOf(id);
 				let updatedRoleIds;
 				if (roleIndex > -1) {
 					updatedRoleIds = roleIds.filter(roleId => roleId !== id);
 				} 
-
-				channelMembersAdapter.updateOne(state, {
-					id: idMember,
-					changes: {
-						role_id: updatedRoleIds,
-					},
-				});
+				existingMember.role_id = updatedRoleIds;
 			}
 		},
 		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
@@ -336,6 +324,7 @@ export const channelMembers = createSlice({
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
 				if (action.payload !== null) {
+					// console.log("🚀 ~ .addCase ~ action.payload:", action.payload)
 					channelMembersAdapter.setMany(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
@@ -443,6 +432,11 @@ export const selectMemberStatus = createSelector(getChannelMembersState, (state)
 export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
 
 export const selectMemberChannels = createSelector(getChannelMembersState, (state) => state.memberChannels);
+
+export const selectMemberChannelById = (userID: string, channelID: string) => 
+	createSelector(selectMemberChannels, (users) => {
+		return users?.find(user => user.id === (channelID + userID)) || null;
+	}) 
 
 export const selectMemberOnlineStatusById = (userId: string) =>
 	createSelector(selectMemberStatus, (status) => {

@@ -5,20 +5,20 @@ import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage,
 import {
 	directActions,
 	gifsStickerEmojiActions,
-	messagesActions,
+	messagesActions, MessagesEntity,
 	pinMessageActions,
 	reactionActions,
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
-	selectCurrentClanId,
+	selectCurrentClanId, selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
-	selectMessageByMessageId,
+	selectMessageByMessageId, selectMessageEntitiesByChannelId, selectModeResponsive,
 	selectPinMessageByChannelId, setIsForwardAll,
 	setSelectedMessage,
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
-	useAppDispatch,
+	useAppDispatch, useAppSelector,
 } from '@mezon/store';
 import {
 	ContextMenuItem,
@@ -29,7 +29,7 @@ import {
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
-	handleSaveImage,
+	handleSaveImage, ModeResponsive
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
@@ -52,6 +52,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
+	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || ''))
+	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
@@ -78,6 +83,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
+	
+	const isShowForwardAll = () => {
+		if(messagePosition === -1) return false;
+		return message.isStartedMessageGroup && messagePosition < convertedAllMessagesEntities.length - 1 && !convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup;
+	}
 
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
@@ -112,6 +122,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		}
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
+		dispatch(setIsForwardAll(false));
 	};
 	
 	const handleForwardAllMessage = () => {
@@ -352,7 +363,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
 		});
 		
-		{message?.isStartedMessageGroup &&
+		{isShowForwardAll() &&
 			builder.when(checkPos, (builder) => {
 				builder.addMenuItem('forwardAll', 'Forward All Message', () => handleForwardAllMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />)})
 		}

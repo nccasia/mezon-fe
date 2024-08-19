@@ -1,7 +1,7 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
 import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId, selectCurrentUserId } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -86,7 +86,6 @@ export const ChatMessageInput = memo(
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
-			const currentUserId = useSelector(selectCurrentUserId);
 			const [heightInput, setHeightInput] = useState(size.s_40);
 			const { themeValue } = useTheme();
 			const dispatch = useAppDispatch();
@@ -241,19 +240,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? [
-						{
-							message_id: '',
-							message_ref_id: targetMessage.id,
-							ref_type: 0,
-							message_sender_id: targetMessage?.sender_id,
-							message_sender_username: targetMessage?.username,
-							mesages_sender_avatar: targetMessage?.avatar,
-							message_sender_clan_nick: targetMessage?.clan_nick,
-							message_sender_display_name: targetMessage?.display_name,
-							content: JSON.stringify(targetMessage.content),
-							has_attachment: Boolean(targetMessage?.attachments?.length),
-						},
-					]
+							{
+								message_id: '',
+								message_ref_id: targetMessage.id,
+								ref_type: 0,
+								message_sender_id: targetMessage?.sender_id,
+								message_sender_username: targetMessage?.username,
+								mesages_sender_avatar: targetMessage?.avatar,
+								message_sender_clan_nick: targetMessage?.clan_nick,
+								message_sender_display_name: targetMessage?.display_name,
+								content: JSON.stringify(targetMessage.content),
+								has_attachment: Boolean(targetMessage?.attachments?.length),
+							},
+						]
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 

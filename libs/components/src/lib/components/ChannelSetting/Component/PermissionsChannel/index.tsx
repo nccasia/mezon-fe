@@ -1,4 +1,4 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, useEscapeKey } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { memo, useState } from 'react';
@@ -10,10 +10,12 @@ import ListRolePermission from './listRolePermission';
 import PermissionManage from './PermissionManage';
 export type PermissionsChannelProps = {
 	channel: IChannel;
+	openModalAdd: boolean;
+	setOpenModalAdd: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const PermissionsChannel = (props: PermissionsChannelProps) => {
-	const { channel } = props;
+	const { channel, openModalAdd, setOpenModalAdd } = props;
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
@@ -46,10 +48,12 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	const openAddMemRoleModal = () => {
 		setShowAddMemRole(true);
+		setOpenModalAdd(true);
 	};
 
 	const closeAddMemRoleModal = () => {
 		setShowAddMemRole(false);
+		setOpenModalAdd(false);
 	};
 
 	const handleSelectedUsersChange = (newSelectedUserIds: string[]) => {
@@ -58,6 +62,8 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const handleSelectedRolesChange = (newSelectedRoleIds: string[]) => {
 		setSelectedRoleIds(newSelectedRoleIds);
 	};
+
+	useEscapeKey(openModalAdd ? closeAddMemRoleModal : () => {});
 
 	return (
 		<>

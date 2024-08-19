@@ -25,9 +25,10 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
-import { hashtagDmVoiceReducer } from './channels/hashtagDmVoice.slice';
+import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -46,7 +47,6 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { adminApplicationReducer } from './application/applications.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -73,7 +73,7 @@ const persistedAppReducer = persistReducer(
 
 const persistedEmojiSuggestionReducer = persistReducer(
 	{
-		key: 'suggestionEmoji',
+		key: 'suggestionemoji',
 		storage,
 	},
 	emojiSuggestionReducer,
@@ -114,7 +114,7 @@ const persistedThreadReducer = persistReducer(
 
 const persistedChannelMembersReducer = persistReducer(
 	{
-		key: 'channelMembers',
+		key: 'channelmembers',
 		storage,
 		blacklist: ['onlineStatusUser'],
 	},
@@ -179,10 +179,10 @@ const persistedDefaultNotiCatReducer = persistReducer(
 
 const persistedHashTagDmReducer = persistReducer(
 	{
-		key: 'hashtagdmvoice',
+		key: 'hashtagdm',
 		storage,
 	},
-	hashtagDmVoiceReducer,
+	hashtagDmReducer,
 );
 
 const persistedNotiReactMsgReducer = persistReducer(
@@ -203,7 +203,7 @@ const persistedStickersReducer = persistReducer(
 
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
-		key: 'gifsStickersEmojis',
+		key: 'gifsstickersemojis',
 		storage,
 	},
 	gifsStickerEmojiReducer,
@@ -236,7 +236,7 @@ const reducer = {
 	defaultnotificationclan: persistedDefaultNotiClanReducer,
 	defaultnotificationcategory: persistedDefaultNotiCatReducer,
 	notichannelcategorysetting: persistedChannelCatSettingReducer,
-	hashtagdmvoice: persistedHashTagDmReducer,
+	hashtagdm: persistedHashTagDmReducer,
 	notifireactmessage: persistedNotiReactMsgReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,

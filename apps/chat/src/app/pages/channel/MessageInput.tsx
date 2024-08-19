@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
-import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllHashtagDmVoice, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { useAppParams, useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import { selectAllRolesClan, selectChannelDraftMessage, selectHashtagDMByDirectId, selectTheme, useAppSelector } from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -184,13 +184,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			setTitleMention('Emoji matching');
 		}
 	};
-
-	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
+	const { directId } = useAppParams();
+	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ""));
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
-	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
+	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (mode === ChannelStreamMode.STREAM_MODE_DM) {
-			return commonChannelVoids.map((item) => {
+			return commonChannels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -199,7 +199,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			}) as ChannelsMentionProps[];
 		}
 		return [];
-	}, [mode, commonChannelVoids]);
+	}, [mode, commonChannels]);
 
 	const handleSearchUserMention = (search: any, callback: any) => {
 		setValueHightlight(search);
@@ -209,7 +209,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
 		if (mode === ChannelStreamMode.STREAM_MODE_DM) {
-			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
+			callback(searchMentionsHashtag(search, commonChannelsMention ?? []));
 		} else {
 			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 		}

@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -13,7 +13,6 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
-	ApiNotifiReactMessage,
 	ApiNotificationChannelCategoySetting,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
@@ -26,7 +25,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -67,7 +66,7 @@ export type IRolesClan = ApiRole & {
 
 export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage;
+export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
@@ -79,7 +78,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = HashtagDm & {
+export type IHashtagDm = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -693,12 +692,9 @@ export enum ETypeLinkMedia {
 }
 
 export type MessageTypeUpdateLink = {
+	id?: string;
 	channel_id?: string;
-	code?: number;
-	create_time?: string;
-	id: string;
-	content?: IMessageSendPayload;
-	mentions?: IMentionOnMessage[];
-	attachments?: ApiMessageAttachment[];
-	references?: ApiMessageRef[];
+	message_id?: string;
+	clan_id?: string;
+	mode?: ChannelStreamMode;
 };

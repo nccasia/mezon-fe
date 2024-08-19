@@ -1,13 +1,5 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
-import {
-	IEmojiOnMessage,
-	IHashtagOnMessage,
-	ILinkOnMessage,
-	ILinkVoiceRoomOnMessage,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
-	IMessageSendPayload,
-} from '@mezon/utils';
+import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
 import { STORAGE_KEY_TEMPORARY_ATTACHMENT } from '../../constant';
 import { load, save } from '../storage';
@@ -82,23 +74,6 @@ export const pushAttachmentToCache = (attachment: any, channelId: string | numbe
 		});
 	}
 };
-
-type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
-
-export const isMentionOnMessage = (element: MessageElementToken): element is IMentionOnMessage =>
-	(element as IMentionOnMessage).username !== undefined || (element as IMentionOnMessage).rolename !== undefined;
-
-export const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage =>
-	(element as IHashtagOnMessage).channelid !== undefined;
-
-export const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).shortname !== undefined;
-
-export const isLinkOnMessage = (element: MessageElementToken): element is ILinkOnMessage => (element as ILinkOnMessage).lk !== undefined;
-
-export const isMarkdownOnMessage = (element: MessageElementToken): element is IMarkdownOnMessage => (element as IMarkdownOnMessage).mk !== undefined;
-
-export const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILinkVoiceRoomOnMessage =>
-	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
 
 export const filterContent = (content: IMessageSendPayload) => {
 	const result: Partial<IMessageSendPayload> = {};

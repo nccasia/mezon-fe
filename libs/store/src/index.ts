@@ -5,7 +5,7 @@ export * from './lib/auth/auth.slice';
 export * from './lib/categories/categories.slice';
 export * from './lib/channelmembers/channel.members';
 export * from './lib/channels/channels.slice';
-export * from './lib/channels/hashtagDmVoice.slice';
+export * from './lib/channels/hashtagDm.slice';
 export * from './lib/clanMembers/clan.members';
 export * from './lib/clanProfile/clanProfile.slice';
 export * from './lib/clans/clans.slice';

@@ -1,7 +1,7 @@
-import { useInvite } from '@mezon/core';
+import { useEscapeKey, useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { selectInviteById } from '@mezon/store';
+import { inviteActions, selectInviteById, selectIsClickInvite, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -41,11 +41,22 @@ export default function InvitePage() {
 
 	const handleJoinChannel = () => {
 		joinChannel();
+		handleBackNavigate();
 	};
 
+	const isClickInvite = useSelector(selectIsClickInvite);
 	const handleCancelJoin = () => {
-		navigate(`/chat/direct`);
+		if(isClickInvite) navigate(-1);
+		else navigate(`/chat/direct`);
+		handleBackNavigate();
 	};
+	
+	const dispatch = useAppDispatch();
+	const handleBackNavigate = () => {
+		dispatch(inviteActions.setIsClickInvite(false));
+	}
+
+	useEscapeKey(handleCancelJoin);
 
 	useEffect(() => {
 		if (userJoined) {

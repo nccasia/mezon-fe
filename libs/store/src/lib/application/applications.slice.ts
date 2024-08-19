@@ -1,5 +1,5 @@
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiAddAppRequest, ApiAppList } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -9,13 +9,13 @@ export const ADMIN_APPLICATIONS = 'adminApplication';
 export interface IApplicationState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	allApps: ApiAppList;
+	appsData: ApiAppList;
 }
 
 export const applicationInitialState: IApplicationState = {
 	loadingStatus: 'not loaded',
 	error: null,
-	allApps: {
+	appsData: {
 		apps: [],
 		next_cursor: undefined,
 		total_count: undefined,
@@ -25,7 +25,7 @@ export const applicationInitialState: IApplicationState = {
 const FETCH_CACHED_TIME = 3 * 60 * 1000;
 
 export interface IFetchAppsArg {
-	noCache: boolean;
+	noCache?: boolean;
 }
 
 const fetchApplicationsCached = memoizee((mezon: MezonValueContext) => mezon.client.ListApp(mezon.session), {
@@ -54,7 +54,11 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.addApp(mezon.session, data.request);
-		console.log(response);
+		if (response) {
+			thunkAPI.dispatch(fetchApplications({ noCache: true }));
+		} else {
+			thunkAPI.rejectWithValue({});
+		}
 	} catch (err) {
 		console.log(err);
 		return thunkAPI.rejectWithValue({ err });
@@ -66,11 +70,19 @@ export const adminApplicationSlice = createSlice({
 	initialState: applicationInitialState,
 	reducers: {},
 	extraReducers(builder) {
+		builder.addCase(fetchApplications.pending, (state) => {
+			state.loadingStatus = 'loading';
+		});
 		builder.addCase(fetchApplications.fulfilled, (state, action) => {
-			state.allApps = action.payload;
+			state.appsData = action.payload;
 			state.loadingStatus = 'loaded';
+		});
+		builder.addCase(fetchApplications.rejected, (state, action) => {
+			state.loadingStatus = 'not loaded';
 		});
 	},
 });
 
+export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicationState }): IApplicationState => rootState[ADMIN_APPLICATIONS];
+export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
 export const adminApplicationReducer = adminApplicationSlice.reducer;

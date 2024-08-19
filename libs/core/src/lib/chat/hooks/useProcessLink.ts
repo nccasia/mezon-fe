@@ -1,43 +1,71 @@
 import { handleUrlInput } from '@mezon/transport';
-import { ETypeLinkMedia, IMessageSendPayload, MessageTypeUpdateLink } from '@mezon/utils';
+import { ETypeLinkMedia, IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
-import { useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 
-type EditSendMessage = (
-	content: IMessageSendPayload,
-	messageId: string,
-	mentions: ApiMessageMention[],
-	attachments?: ApiMessageAttachment[],
-) => Promise<void>;
+type UseProcessLinkOptions = {
+	updateImageLinkMessage: (
+		clanId: string,
+		channelId: string,
+		mode: number,
+		content: IMessageSendPayload,
+		messageId: string,
+		mentions: ApiMessageMention[],
+		attachments?: ApiMessageAttachment[],
+	) => Promise<void>;
+};
 
-export function useProcessLinks(newMessageUpdateImage: MessageTypeUpdateLink, editSendMessage: EditSendMessage) {
-	useEffect(() => {
-		const linksOnMessage = newMessageUpdateImage?.content?.lk;
-		if (!linksOnMessage || linksOnMessage.length === 0) return;
+export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions) {
+	const processLink = useCallback(
+		(
+			clanId: string,
+			channelId: string,
+			mode: number,
+			contentPayload?: IMessageSendPayload,
+			mentionPayload?: ApiMessageMention[],
+			attachmentPayload?: ApiMessageAttachment[],
+			newMessageIdUpdateImage?: string,
+		) => {
+			if (!contentPayload?.lk) return;
 
-		const resultPromises = linksOnMessage.map((item) => {
-			return handleUrlInput(item.lk as string).then((result) => {
-				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-					return result as ApiMessageAttachment;
-				}
-				return null;
-			});
-		});
+			const resultPromises = contentPayload.lk.map((item) =>
+				handleUrlInput(contentPayload.t?.substring(item.s ?? 0, item.e) as string).then((result) => {
+					if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+						return result as ApiMessageAttachment;
+					}
+					return null;
+				}),
+			);
 
-		Promise.all(resultPromises)
-			.then((results) => {
-				const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
-				if (filteredImageAttachments.length > 0) {
-					editSendMessage(
-						{ ...newMessageUpdateImage.content },
-						newMessageUpdateImage.id ?? '',
-						newMessageUpdateImage.mentions ?? [],
-						filteredImageAttachments,
-					);
-				}
-			})
-			.catch((error) => {
-				console.error('Error processing URLs:', error);
-			});
-	}, [newMessageUpdateImage.id]);
+			Promise.all(resultPromises)
+				.then((results) => {
+					const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
+
+					const combinedAttachments = [...(attachmentPayload ?? []), ...filteredImageAttachments];
+
+					if (combinedAttachments.length > 0) {
+						updateImageLinkMessage(
+							clanId,
+							channelId,
+							mode,
+							contentPayload,
+							newMessageIdUpdateImage ?? '',
+							mentionPayload ?? [],
+							combinedAttachments,
+						);
+					}
+				})
+				.catch((error) => {
+					console.error('Error processing content payload:', error);
+				});
+		},
+		[updateImageLinkMessage],
+	);
+
+	return useMemo(
+		() => ({
+			processLink,
+		}),
+		[processLink],
+	);
 }

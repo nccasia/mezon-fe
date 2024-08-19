@@ -1,8 +1,9 @@
 import { useAppNavigation } from '@mezon/core';
-import { authActions, selectIsLogin, selectTheme, useAppDispatch } from '@mezon/store';
+import { authActions, fetchApplications, selectAllApps, selectIsLogin, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
+import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import CreateAppPopup from './CreateAppPopup';
@@ -32,6 +33,10 @@ function ApplicationsPage() {
 		}
 	}, [isLogin, navigate]);
 
+	useEffect(() => {
+		dispatch(fetchApplications({}));
+	}, [dispatch]);
+
 	return (
 		<>
 			<div>
@@ -52,7 +57,7 @@ function ApplicationsPage() {
 				</div>
 				<AppPageBottom />
 			</div>
-			{isShowCreatePopup && <CreateAppPopup togglePopup={toggleCreatePopup}/>}
+			{isShowCreatePopup && <CreateAppPopup togglePopup={toggleCreatePopup} />}
 		</>
 	);
 }
@@ -60,14 +65,43 @@ function ApplicationsPage() {
 const AppPageBottom = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [dropdownValue, setDropdownValue] = useState('Date of Creation');
-	const handleDropdownValue = (text: string) => {
-		setDropdownValue(text);
-	};
 	const selectedDropdownClass = 'dark:bg-[#313338] bg-[#f2f3f5]';
 
+	const allApplications = useSelector(selectAllApps);
+	const [appListForDisplaying, setAppListForDisplaying] = useState<ApiApp[] | undefined>(allApplications.apps);
+
+	const alphabetSort = (arr: Array<ApiApp> | undefined) => {
+		if (arr) {
+			const arrCopy = [...arr];
+			return arrCopy.sort((a, b) => {
+				const isANum = /^\d/.test(a.appname ?? '');
+				const isBNum = /^\d/.test(b.appname ?? '');
+				if (isANum && !isBNum) {
+					return -1;
+				} else if (!isANum && isBNum) {
+					return 1;
+				} else {
+					return (a.appname ?? '').localeCompare(b.appname ?? '');
+				}
+			});
+		}
+		return [];
+	};
 	const isChooseAZ = useMemo(() => {
 		return dropdownValue === 'A-Z';
 	}, [dropdownValue]);
+
+	useEffect(() => {
+		if (isChooseAZ) {
+			setAppListForDisplaying(alphabetSort(allApplications.apps));
+		} else {
+			setAppListForDisplaying(allApplications.apps);
+		}
+	}, [allApplications, isChooseAZ]);
+
+	const handleDropdownValue = (text: string) => {
+		setDropdownValue(text);
+	};
 
 	const [isSmallSizeSort, setIsSmallSizeSort] = useState(true);
 
@@ -112,7 +146,7 @@ const AppPageBottom = () => {
 						onClick={() => setIsSmallSizeSort(true)}
 					>
 						<div className={`w-5`}>
-							<Icons.SortBySizeBtn />
+							<Icons.SortBySmallSizeBtn className="w-full h-fit" />
 						</div>
 						<div>Small</div>
 					</div>
@@ -121,36 +155,39 @@ const AppPageBottom = () => {
 						onClick={() => setIsSmallSizeSort(false)}
 					>
 						<div className="w-5">
-							<Icons.SortBySizeBtn />
+							<Icons.SortByBigSizeBtn />
 						</div>
 						<div>Large</div>
 					</div>
 				</div>
 			</div>
-			<AllApplications isSmallSizeSort={isSmallSizeSort} />
+			<ApplicationsList isSmallSizeSort={isSmallSizeSort} appListForDisplaying={appListForDisplaying} />
 		</div>
 	);
 };
 
-const AllApplications = ({ isSmallSizeSort }: { isSmallSizeSort: boolean }) => {
-	const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+interface IApplicationsListProps {
+	isSmallSizeSort: boolean;
+	appListForDisplaying: ApiApp[] | undefined;
+}
+
+const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicationsListProps) => {
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
 			<div className="flex flex-wrap gap-4 gap-x-4">
-				{arr.map((value, index) => (
-					<div
-						key={index}
-						className="dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] w-fit rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl"
-					>
+				{appListForDisplaying &&
+					appListForDisplaying.map((value, index) => (
 						<div
-							className={`dark:bg-[#111214] bg-white aspect-square flex justify-center items-center rounded-md ${isSmallSizeSort ? 'w-[118px]' : 'w-[196px]'}`}
+							key={index}
+							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
 						>
-							K
+							<div className={`dark:bg-[#111214] bg-white aspect-square flex justify-center items-center rounded-md w-full`}>
+								{value.appname?.charAt(0).toUpperCase()}
+							</div>
+							<div className="w-full text-center truncate">{value.appname}</div>
 						</div>
-						<div className="w-full text-center">Komu bot</div>
-					</div>
-				))}
+					))}
 			</div>
 		</div>
 	);

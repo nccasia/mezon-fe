@@ -19,7 +19,7 @@ export const initialDefaultNotificationClanState: DefaultNotificationClanState =
 const LIST_NOTIFI_CLAN_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationClanSetting = memoize(
 	(mezon: MezonValueContext, clanId: string) =>
-		mezon.client.getNotificationClanSetting(mezon.session, clanId),
+		mezon.socketRef.current?.getNotificationClanSetting(clanId),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_CLAN_CACHED_TIME,
@@ -34,27 +34,32 @@ type fetchNotificationClanSettingsArgs = {
 	noCache?: boolean;
 };
 
-export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan', 
-	async ({clanId, noCache}:fetchNotificationClanSettingsArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchNotificationClanSetting.clear(mezon, clanId);
-	}
-	const response = await fetchNotificationClanSetting(mezon, clanId);
-	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	return response;
-});
+export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan',
+	async ({ clanId, noCache }: fetchNotificationClanSettingsArgs, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchNotificationClanSetting.clear(mezon, clanId);
+		}
+		const response = await fetchNotificationClanSetting(mezon, clanId);
+		if (!response) {
+			return thunkAPI.rejectWithValue('Invalid session');
+		}
+		const clanNotificationConfig: ApiNotificationSetting = {
+			id: response.notification_setting?.id,
+			notification_setting_type: response.notification_setting?.notification_setting_type,
+		};
+
+		return clanNotificationConfig;
+	});
 
 type SetDefaultNotificationPayload = {
-    clan_id?: string;
-    notification_type?: number;
+	clan_id?: string;
+	notification_type?: number;
 };
 
 export const setDefaultNotificationClan = createAsyncThunk(
 	'defaultnotificationclan/setDefaultNotificationClan',
-	async ({ clan_id, notification_type}: SetDefaultNotificationPayload, thunkAPI) => {
+	async ({ clan_id, notification_type }: SetDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			clan_id: clan_id,
@@ -62,10 +67,10 @@ export const setDefaultNotificationClan = createAsyncThunk(
 		}
 		const response = await mezon.client.setNotificationClan(mezon.session, body);
 		if (!response) {
-			
+
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getDefaultNotificationClan({clanId: clan_id || "", noCache: true}));
+		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || "", noCache: true }));
 		return response;
 	},
 );

@@ -1,4 +1,4 @@
-import { IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
+import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
 import { useMemo } from 'react';
 import MessageLine from './MessageLine';
 import { useMessageParser } from './useMessageParser';
@@ -59,28 +59,46 @@ const MessageText = ({
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
-}) => (
-	<>
-		{' '}
-		{lines?.length > 0 ? (
-			<div className="flex w-full">
-				<div className="w-full">
-					<MessageLine
-						isRenderImage={true}
-						isTokenClickAble={true}
-						isSearchMessage={isSearchMessage}
-						isOnlyContainEmoji={isOnlyContainEmoji}
-						isJumMessageEnabled={false}
-						content={content}
-						mode={mode}
-					/>
+}) => {
+	const attachmentOnMessage = useMemo(() => {
+		return message.attachments;
+	}, [message.attachments]);
+
+	const contentTonMessage = useMemo(() => {
+		return message.content.t;
+	}, [message.content.t]);
+
+	const checkOneLinkImage = useMemo(() => {
+		return (
+			attachmentOnMessage?.length === 1 &&
+			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+			attachmentOnMessage[0].url === contentTonMessage?.trim()
+		);
+	}, [attachmentOnMessage, contentTonMessage]);
+
+	return (
+		<>
+			{' '}
+			{lines?.length > 0 ? (
+				<div className="flex w-full">
+					<div className="w-full">
+						<MessageLine
+							isHideLinkOneImage={checkOneLinkImage}
+							isTokenClickAble={true}
+							isSearchMessage={isSearchMessage}
+							isOnlyContainEmoji={isOnlyContainEmoji}
+							isJumMessageEnabled={false}
+							content={content}
+							mode={mode}
+						/>
+					</div>
+					{isEdited && (
+						<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
+							(edited)
+						</p>
+					)}
 				</div>
-				{isEdited && (
-					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-						(edited)
-					</p>
-				)}
-			</div>
-		) : null}
-	</>
-);
+			) : null}
+		</>
+	);
+};

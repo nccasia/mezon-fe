@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { selectTheme } from '@mezon/store';
+import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import clx from 'classnames';
 import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
@@ -11,7 +11,6 @@ type MarkdownContentOpt = {
 	content?: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
-	isRenderImage: boolean;
 };
 
 const navigateToChannel = async (url: string, navigate: any) => {
@@ -19,29 +18,31 @@ const navigateToChannel = async (url: string, navigate: any) => {
 	const match = url.match(regex);
 	if (match) {
 		const [_, inviteId] = match;
-		if(inviteId){
-			navigate("/invite/" + inviteId);
+		if (inviteId) {
+			navigate('/invite/' + inviteId);
 		}
 	}
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
-	const origin = window.location.origin + "/invite/";
+	const dispatch = useAppDispatch();
+	const origin = window.location.origin + '/invite/';
 
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
 				if (url.startsWith(origin)) {
+					dispatch(inviteActions.setIsClickInvite(true));
 					navigateToChannel(url, navigate);
 				} else {
 					window.open(url, '_blank');
 				}
 			}
-		},[isJumMessageEnabled, isTokenClickAble],
+		},
+		[isJumMessageEnabled, isTokenClickAble],
 	);
-	
 
 	const classes = clx(
 		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',

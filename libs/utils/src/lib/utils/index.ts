@@ -16,6 +16,7 @@ import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
+	EMarkdownType,
 	ETokenMessage,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
@@ -422,24 +423,23 @@ export const getRoleList = (rolesInClan: ApiRole[]) => {
 };
 
 type ElementToken =
-	| (IMentionOnMessage & { type: ETokenMessage.MENTIONS })
-	| (IHashtagOnMessage & { type: ETokenMessage.HASHTAGS })
-	| (IEmojiOnMessage & { type: ETokenMessage.EMOJIS })
-	| (ILinkOnMessage & { type: ETokenMessage.LINKS })
-	| (IMarkdownOnMessage & { type: ETokenMessage.MARKDOWNS })
-	| (ILinkVoiceRoomOnMessage & { type: ETokenMessage.VOICE_LINKS });
+	| (IMentionOnMessage & { kindOf: ETokenMessage.MENTIONS })
+	| (IHashtagOnMessage & { kindOf: ETokenMessage.HASHTAGS })
+	| (IEmojiOnMessage & { kindOf: ETokenMessage.EMOJIS })
+	| (ILinkOnMessage & { kindOf: ETokenMessage.LINKS })
+	| (IMarkdownOnMessage & { kindOf: ETokenMessage.MARKDOWNS })
+	| (ILinkVoiceRoomOnMessage & { kindOf: ETokenMessage.VOICE_LINKS });
 
 export const createFormattedString = (data: IExtendedMessage): string => {
 	let { t = '' } = data;
 	const elements: ElementToken[] = [];
-
 	(Object.keys(data) as (keyof IExtendedMessage)[]).forEach((key) => {
 		const itemArray = data[key];
 
 		if (Array.isArray(itemArray)) {
 			itemArray.forEach((item) => {
 				if (item) {
-					const typedItem: ElementToken = { ...item, type: key as any }; // Casting key as any
+					const typedItem: ElementToken = { ...item, kindOf: key as any }; // Casting key as any
 					elements.push(typedItem);
 				}
 			});
@@ -457,32 +457,31 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 	elements.forEach((element) => {
 		const startindex = element.s ?? lastIndex;
 		const endindex = element.e ?? startindex;
-
 		result += t.slice(lastIndex, startindex);
-
-		switch (element.type) {
+		const contentInElement = t?.substring(startindex, endindex);
+		switch (element.kindOf) {
 			case ETokenMessage.MENTIONS: {
-				if (element.username) {
-					result += `@[${element.username.slice(1)}](${element.user_id})`;
-				} else if (element.rolename) {
-					result += `@[${element.rolename.slice(1)}](${element.role_id})`;
+				if (element.user_id) {
+					result += `@[${contentInElement.slice(1)}](${element.user_id})`;
+				} else if (element.role_id) {
+					result += `@[${contentInElement.slice(1)}](${element.role_id})`;
 				}
 				break;
 			}
 			case ETokenMessage.HASHTAGS:
-				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
+				result += `#[${contentInElement.slice(1)}](${element.channelid})`;
 				break;
 			case ETokenMessage.EMOJIS:
-				result += `[${element.shortname}](${element.emojiid})`;
+				result += `[${contentInElement}](${element.emojiid})`;
 				break;
 			case ETokenMessage.LINKS:
-				result += `${element.lk}`;
+				result += `${contentInElement}`;
 				break;
 			case ETokenMessage.MARKDOWNS:
-				result += `${element.mk}`;
+				result += `${contentInElement}`;
 				break;
 			case ETokenMessage.VOICE_LINKS:
-				result += `${element.vk}`;
+				result += `${contentInElement}`;
 				break;
 			default:
 				break;
@@ -519,13 +518,11 @@ export const processText = (inputString: string) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					vk: link,
 					s: startindex,
 					e: endindex,
 				});
 			} else {
 				links.push({
-					lk: link,
 					s: startindex,
 					e: endindex,
 				});
@@ -543,7 +540,7 @@ export const processText = (inputString: string) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: 'triple', mk: `\`\`\`${markdown}\`\`\``, s: startindex, e: endindex });
+					markdowns.push({ type: EMarkdownType.TRIPLE, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -559,7 +556,7 @@ export const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', mk: `\`${markdown}\``, s: startindex, e: endindex });
+					markdowns.push({ type: EMarkdownType.SINGLE, s: startindex, e: endindex });
 				}
 				i++;
 			}
@@ -584,7 +581,7 @@ export function isValidEmojiData(data: IExtendedMessage): boolean | undefined {
 		return false;
 	}
 
-	const validShortnames = data?.ej?.map((emoji: IEmojiOnMessage) => emoji?.shortname);
+	const validShortnames = data?.ej?.map((emoji: IEmojiOnMessage) => data.t?.substring(emoji.s ?? 0, emoji.e));
 
 	const shortnamesInT = data?.t
 		?.split(' ')
