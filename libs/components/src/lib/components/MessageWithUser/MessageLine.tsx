@@ -1,5 +1,5 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
+import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -80,6 +80,7 @@ interface ElementToken {
 	role_id?: string;
 	channelid?: string;
 	emojiid?: string;
+	type?: EMarkdownType;
 }
 
 const RenderContent = memo(
@@ -189,20 +190,23 @@ const RenderContent = memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MARKDOWNS) {
-					if (isJumMessageEnabled) {
-						let replacement;
-						while (contentInElement?.includes('```')) {
-							replacement = contentInElement.indexOf('```');
-							contentInElement = contentInElement.slice(0, replacement) + '`' + contentInElement.slice(replacement + 3);
-						}
-					}
+					let content = contentInElement ?? '';
 
+					if (isJumMessageEnabled) {
+						content = content.replace(/\n/g, '');
+
+						if (element.type === EMarkdownType.TRIPLE) {
+							content = content.replace(/```/g, '`');
+						}
+					} else {
+						content = convertMarkdown(content);
+					}
 					formattedContent.push(
 						<MarkdownContent
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
-							content={contentInElement}
+							content={content}
 						/>,
 					);
 				}

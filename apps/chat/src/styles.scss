@@ -418,7 +418,7 @@ input:-webkit-autofill:active {
 			}
 
 			span {
-				line-height: 1.375rem;
+				line-height: 1.6rem;
 				code {
 					border: 1px solid #1e1f22;
 					background-color: #2b2d31;
@@ -545,11 +545,11 @@ input:-webkit-autofill:active {
 }
 
 .attachment-scroll-light::-webkit-scrollbar-track {
-	background: #D3D5D7;
+	background: #d3d5d7;
 }
 
 .attachment-scroll-light::-webkit-scrollbar-thumb {
-	background: #7F8081;
+	background: #7f8081;
 }
 
 // css tagLink of markdown
@@ -703,28 +703,27 @@ input:-webkit-autofill:active {
 
 /* LoadingTyping.css */
 #dots #dot1 {
-    animation: load 1s infinite;
+	animation: load 1s infinite;
 }
 
 #dots #dot2 {
-    animation: load 1s infinite;
-    animation-delay: 0.2s;
+	animation: load 1s infinite;
+	animation-delay: 0.2s;
 }
 
 #dots #dot3 {
-    animation: load 1s infinite;
-    animation-delay: 0.4s;
+	animation: load 1s infinite;
+	animation-delay: 0.4s;
 }
 
 @keyframes load {
-    0% {
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+	0% {
+		opacity: 0;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
-

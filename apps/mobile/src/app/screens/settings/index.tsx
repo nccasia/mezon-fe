@@ -1,4 +1,5 @@
 import {
+	debounce,
 	Icons,
 	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -8,7 +9,7 @@ import {
 } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -20,6 +21,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t, i18n } = useTranslation(['setting']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+
+	const [filteredMenu, setFilteredMenu] = useState<IMezonMenuSectionProps[]>([]);
+	const [searchText, setSearchText] = useState<string>('')
 
 	const logout = async () => {
 		const store = await getStoreAsync();
@@ -269,12 +273,46 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		}
 	];
 
+	const renderedMenu = useMemo(() => {
+		if (searchText.trim() === '') {
+		  return menu;
+		}
+		return filteredMenu;
+	}, [filteredMenu]);
+
+	const debouncedHandleSearchChange = useCallback(
+		debounce((text) =>{ 
+			const results: IMezonMenuItemProps[] = [];
+			menu.forEach(section => {
+				if(!!section.title) {
+					const matchedItems = section.items.filter(item =>
+						item.title.toLowerCase().includes(text.toLowerCase())
+					);
+					results.push(...matchedItems);
+				}
+			});
+
+			setFilteredMenu([
+				{
+					title:'',
+					items: results
+				}
+			])
+		}, 300),
+		[],
+	);
+
+	const handleSearchChange =(text: string) => {
+		setSearchText(text)
+		debouncedHandleSearchChange(text)
+	}
+
 	return (
 		<View style={styles.settingContainer}>
 			<ScrollView contentContainerStyle={styles.settingScroll}>
-				<MezonSearch />
+				<MezonSearch value={searchText} onChangeText={handleSearchChange}/>
 
-				<MezonMenu menu={menu} />
+				<MezonMenu menu={renderedMenu} />
 			</ScrollView>
 		</View>
 	);
