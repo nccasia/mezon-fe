@@ -7,5 +7,5 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_14,
 			color: colors.text
 		},
-    threeDot: { width: 30, height: 20 }
+    threeDot: { width: 30, height: 20, marginLeft: size.s_6 }
 	});
