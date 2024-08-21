@@ -62,6 +62,10 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		return !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state);
 	}, [targetUser]);
 
+	const isIncomingRequestFriend = useMemo(() => {
+		return EFriendState.ReceivedRequestFriend === targetUser?.state;
+	}, [targetUser?.state]);
+
 	const isMe = useMemo(() => {
 		return userProfile?.user?.id === userId;
 	}, [userId, userProfile?.user?.id]);
@@ -163,13 +167,13 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		}
 	];
 
-	const handleAcceptFriend = () => {
+	const handleAcceptFriend = useCallback(() => {
 		acceptFriend(targetUser?.user?.username, targetUser?.user?.id);
-	}
+	}, []);
 
-	const handleIgnoreFriend = () => {
+	const handleIgnoreFriend = useCallback(() => {
 		deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
-	}
+	}, []);
 
 	const handleAddFriend = useCallback(() => {
 		const userIdToAddFriend = userId || user?.id;
@@ -237,9 +241,13 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 								onClose={handleCloseTooltip}
 								isMe={isMe}
 								pending={isPending}
+								isFriend={!!targetUser}
+								isReceivedRequest={isIncomingRequestFriend}
 								onFriendAction={handleAddFriend}
 								onCancelAction={handleCancelFriendRequest}
 								onCopyAction={handleCopyUsername}
+								onAcceptRequestFriendAction={handleAcceptFriend}
+								onRejectRequestFriendAction={handleIgnoreFriend}
 							/>
 						}
 					>
