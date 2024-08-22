@@ -82,7 +82,6 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const bottomSheetInviteRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [isShowTopNotifyBadge, setIsShowTopNotifyBadge] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -184,16 +183,6 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 		});
 	};
 
-	const handleScroll = (event) => {
-		const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
-		const paddingToBottom = size.s_50;
-		if (contentOffset.y <= 0) {
-			setIsShowTopNotifyBadge(true);
-		}
-		if (contentOffset.y + layoutMeasurement.height >= contentSize.height - paddingToBottom) {
-			setIsShowTopNotifyBadge(false);
-		}
-	};
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
@@ -229,26 +218,22 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<Block width={'100%'} height={'80%'} position="relative">
 					<FlashList
-						contentContainerStyle={{ paddingBottom: size.s_50 }}
 						data={categorizedChannels || []}
 						keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
 						estimatedItemSize={40}
 						ref={flashListRef}
 						onContentSizeChange={onContentSizeChange}
 						renderItem={renderItemChannelList}
-						onScroll={handleScroll}
 					/>
 					{notificationsActiveChannel?.length > 0 ? (
 						<TouchableOpacity
 							onPress={scrollToNewNotification}
-							style={[styles.newNotifyPopup, isShowTopNotifyBadge ? styles.newNotifyBadgeTop : styles.newNotifyBadgeBottom]}
+							style={[styles.newNotifyPopup]}
 						>
 							<Text style={styles.newNotifyText}>{t('@New')}</Text>
 						</TouchableOpacity>
 					) : null}
-				</Block>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

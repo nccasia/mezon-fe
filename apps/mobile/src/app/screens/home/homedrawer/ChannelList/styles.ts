@@ -64,16 +64,11 @@ export const style = (colors: Attributes) =>
       paddingHorizontal: size.s_14,
       paddingVertical: size.s_6,
       borderRadius: size.s_20,
+      bottom: size.s_20,
       left: '40%',
     },
-    newNotifyBadgeTop: {
-      top: size.s_10
-    },
-    newNotifyBadgeBottom: {
-      bottom: 70,
-    },
     newNotifyText: {
-      fontSize: size.s_18,
+      fontSize: size.s_14,
       fontWeight: '600',
       color: colors.white,
       textAlign: 'center'
