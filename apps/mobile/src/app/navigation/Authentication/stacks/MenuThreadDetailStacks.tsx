@@ -6,7 +6,7 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -16,25 +16,20 @@ import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm'
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import ThreadAddButton from '../../../components/ThreadDetail/ThreadAddButton';
 import { APP_SCREEN } from '../../ScreenTypes';
-import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const Stack = createStackNavigator();
-	const { t } = useTranslation(['notificationSetting']);
+	const { t } = useTranslation(['notificationSetting', 'createThread']);
 	const { openThreadMessageState } = useReference();
 	const navigation = useNavigation();
-	const [isChannel, setIsChannel] = useState<boolean>();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const currentChannelById = useMemo(() => {
-		return channelsEntities?.[(currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '']
-	}, [currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities])
+		return channelsEntities?.[(currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || ''];
+	}, [currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities]);
 
-	useEffect(() => {
-		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
-	}, [currentChannel]);
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -55,7 +50,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				headerStyle: {
 					backgroundColor: themeValue.secondary,
 				},
-				cardStyle: { backgroundColor: "transparent" },
+				cardStyle: { backgroundColor: 'transparent' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 		>
@@ -71,13 +66,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				component={CreateThreadModal}
 				options={{
 					headerShown: true,
-					headerTitle: 'Threads',
+					headerTitle: t('threads', { ns: 'createThread' }),
+					headerTitleAlign: 'center',
 					headerRight: () => <ThreadAddButton />,
-					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20 }}>
-							<Icons.CloseIcon color={themeValue.text} />
-						</TouchableOpacity>
-					)
 				}}
 			/>
 			<Stack.Screen
@@ -96,7 +87,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 									{!openThreadMessageState && (
 										<View style={{ marginRight: size.s_10 }}>
 											{currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-												currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+											currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 												<Icons.TextLockIcon width={18} height={18} color={themeValue.textStrong} />
 											) : (
 												<Icons.TextIcon width={18} height={18} color={themeValue.textStrong} />
@@ -122,24 +113,20 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					headerTintColor: Colors.white,
 				}}
 			/>
-			<Stack.Screen
-				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
-				component={MuteThreadDetailModal}
-			/>
-
+			<Stack.Screen name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL} component={MuteThreadDetailModal} />
 		</Stack.Navigator>
 	);
 };
 
 const style = (colors: Attributes) => StyleSheet.create({
-	headerLeft: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	btnBack: {
-		paddingLeft: size.s_16,
-		paddingRight: size.s_14,
-		height: '100%',
-		justifyContent: 'center',
-	},
-});
+		headerLeft: {
+			flexDirection: 'row',
+			alignItems: 'center',
+		},
+		btnBack: {
+			paddingLeft: size.s_16,
+			paddingRight: size.s_14,
+			height: '100%',
+			justifyContent: 'center',
+		},
+	});

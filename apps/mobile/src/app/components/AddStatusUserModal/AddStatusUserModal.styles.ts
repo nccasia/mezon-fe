@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
   headerModal: { backgroundColor: Colors.transparent },
   titleHeader: {
     width: '76%',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   option: {
     backgroundColor: Colors.secondary,
@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: size.s_10,
     marginTop: size.s_30
-  }
+  },
+  titleModal: {flex: 1, textAlign: 'center' }
 })
 

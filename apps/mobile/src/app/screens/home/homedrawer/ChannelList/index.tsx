@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUserPermission } from '@mezon/core';
+import { useChannels, useUserPermission } from '@mezon/core';
 import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, isEmpty } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -7,7 +7,9 @@ import {
 	categoriesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
+	selectCurrentChannel,
 	selectCurrentClan,
+	selectNotificationMentions,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
@@ -30,6 +32,37 @@ import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
 
+function useNotificationsActiveChannel() {
+	const channelEntities = useSelector((state: RootState) => state?.channels?.channelMetadata?.entities);
+	const notificationMentions = useSelector(selectNotificationMentions);
+	const { listChannels } = useChannels();
+	const notificationsActiveChannel = [];
+
+	if (!listChannels?.length) return;
+	listChannels
+		?.flatMap((channel) => [channel, ...(channel?.threads || [])])
+		?.forEach((channel) => {
+			const lastChannelTimestamp = channelEntities[channel?.channel_id]?.lastSeenTimestamp || 0;
+			const notificationFilter = notificationMentions
+				?.map((notification) => {
+					if (
+						notification?.content?.channel_id === channel?.channel_id &&
+						notification?.content?.update_time?.seconds > lastChannelTimestamp
+					) {
+						return {
+							...notification,
+							category_id: channel?.category_id,
+						};
+					}
+					return undefined;
+				})
+				?.filter(Boolean);
+			if (notificationFilter?.length) notificationsActiveChannel?.push(...notificationFilter);
+		});
+
+	return notificationsActiveChannel;
+}
+
 const ChannelList = React.memo(({ data }: { data: any }) => {
 	const categorizedChannels = useMemo(() => {
 		return !!data && typeof data === 'string' ? JSON.parse(data) : [];
@@ -40,6 +73,7 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 	const { t } = useTranslation(['searchMessageChannel']);
+	const notificationsActiveChannel = useNotificationsActiveChannel();
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
@@ -47,6 +81,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const [isShowTopNotifyBadge, setIsShowTopNotifyBadge] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -58,6 +94,27 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
 	}, []);
+
+	const flashListRef = useRef(null);
+	const scrollToItemById = (id) => {
+		const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
+		if (flashListRef?.current) {
+			flashListRef?.current?.scrollToIndex({ index, animated: true });
+		}
+	};
+
+	const onContentSizeChange = (w, h) => {
+		if (categorizedChannels?.length && h > 0) {
+			setTimeout(() => {
+				scrollToItemById(currentChannel?.category_id);
+			}, 300);
+		}
+	};
+
+	const scrollToNewNotification = () => {
+		const [firstNotification] = notificationsActiveChannel || [];
+		scrollToItemById(firstNotification?.category_id || currentChannel?.category_id);
+	};
 
 	const handleLongPressCategory = useCallback((category: ICategoryChannel) => {
 		bottomSheetCategoryMenuRef.current?.present();
@@ -126,6 +183,18 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			},
 		});
 	};
+
+	const handleScroll = (event) => {
+		const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+		const paddingToBottom = size.s_50;
+		if (contentOffset.y <= 0) {
+			setIsShowTopNotifyBadge(true);
+		}
+		if (contentOffset.y + layoutMeasurement.height >= contentSize.height - paddingToBottom) {
+			setIsShowTopNotifyBadge(false);
+		}
+	};
+
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
@@ -160,12 +229,26 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlashList
-					data={categorizedChannels || []}
-					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
-					estimatedItemSize={40}
-					renderItem={renderItemChannelList}
-				/>
+				<Block width={'100%'} height={'80%'} position="relative">
+					<FlashList
+						contentContainerStyle={{ paddingBottom: size.s_50 }}
+						data={categorizedChannels || []}
+						keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
+						estimatedItemSize={40}
+						ref={flashListRef}
+						onContentSizeChange={onContentSizeChange}
+						renderItem={renderItemChannelList}
+						onScroll={handleScroll}
+					/>
+					{notificationsActiveChannel?.length > 0 ? (
+						<TouchableOpacity
+							onPress={scrollToNewNotification}
+							style={[styles.newNotifyPopup, isShowTopNotifyBadge ? styles.newNotifyBadgeTop : styles.newNotifyBadgeBottom]}
+						>
+							<Text style={styles.newNotifyText}>{t('@New')}</Text>
+						</TouchableOpacity>
+					) : null}
+				</Block>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

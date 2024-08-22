@@ -71,6 +71,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
 	};
 
+  const showUserStatusBottomSheet = () =>{
+    userStatusBottomSheetRef?.current?.present();
+  }
+
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
@@ -81,9 +85,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				</View>
 
 				<TouchableOpacity
-					onPress={() => {
-						userStatusBottomSheetRef?.current?.present();
-					}}
+					onPress={showUserStatusBottomSheet}
 					style={styles.viewImageProfile}
 				>
 					{user?.userProfile?.user?.avatar_url ? (
@@ -107,12 +109,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity
-						style={styles.viewInfo}
-						onPress={() => {
-							userStatusBottomSheetRef?.current?.present();
-						}}
-					>
+					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
 						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
 						<Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
 					</TouchableOpacity>

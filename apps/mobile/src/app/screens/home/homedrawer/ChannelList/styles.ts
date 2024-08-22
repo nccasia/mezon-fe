@@ -1,4 +1,4 @@
-import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -58,4 +58,24 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.s_14,
 		},
+    newNotifyPopup: {
+      backgroundColor: baseColor.redStrong,
+      position: 'absolute',
+      paddingHorizontal: size.s_14,
+      paddingVertical: size.s_6,
+      borderRadius: size.s_20,
+      left: '40%',
+    },
+    newNotifyBadgeTop: {
+      top: size.s_10
+    },
+    newNotifyBadgeBottom: {
+      bottom: 70,
+    },
+    newNotifyText: {
+      fontSize: size.s_18,
+      fontWeight: '600',
+      color: colors.white,
+      textAlign: 'center'
+    }
 	});
