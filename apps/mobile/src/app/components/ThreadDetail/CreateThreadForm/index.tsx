@@ -154,7 +154,9 @@ export default function CreateThreadForm() {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 	return (
-		<KeyboardAvoidingView style={styles.createChannelContainer}>
+		<KeyboardAvoidingView
+			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+			style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
 				<Formik
 					validate={(values) => {
