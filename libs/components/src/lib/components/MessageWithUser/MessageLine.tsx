@@ -192,7 +192,7 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.MARKDOWNS) {
 					if (isJumMessageEnabled) {
 						formattedContent.push(
-							<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={contentInElement ?? ''} />,
+							<PlainText isSearchMessage={isSearchMessage} key={`markdown-${s}-${lastindex}`} text={contentInElement ?? ''} />,
 						);
 					} else {
 						formattedContent.push(
