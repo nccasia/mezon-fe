@@ -1,5 +1,5 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
+import { EMarkdownType, ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -190,25 +190,20 @@ const RenderContent = memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MARKDOWNS) {
-					let content = contentInElement ?? '';
-
 					if (isJumMessageEnabled) {
-						content = content.replace(/\n/g, '');
-
-						if (element.type === EMarkdownType.TRIPLE) {
-							content = content.replace(/```/g, '`');
-						}
+						formattedContent.push(
+							<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={contentInElement ?? ''} />,
+						);
 					} else {
-						content = convertMarkdown(content);
+						formattedContent.push(
+							<MarkdownContent
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								key={`markdown-${index}-${s}-${contentInElement}`}
+								content={contentInElement}
+							/>,
+						);
 					}
-					formattedContent.push(
-						<MarkdownContent
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							key={`markdown-${index}-${s}-${contentInElement}`}
-							content={content}
-						/>,
-					);
 				}
 
 				lastindex = e;
