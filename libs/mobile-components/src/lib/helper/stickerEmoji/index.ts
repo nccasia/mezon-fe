@@ -1,9 +1,9 @@
 import { useEmojiSuggestion } from '@mezon/core';
-import { uploadFile } from "@mezon/transport";
-import { IEmoji } from '@mezon/utils';
+import { createUploadFilePath, uploadFile } from "@mezon/transport";
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from "mezon-js";
 import { ApiMessageAttachment } from "mezon-js/api.gen";
+import RNFS from 'react-native-fs';
 import { STORAGE_RECENT_EMOJI } from '../../constant';
 import { load, save } from '../storage';
 
@@ -16,7 +16,7 @@ interface IFile {
 }
 
 interface IEmojiWithChannel {
-    [key: string]: IEmoji[]
+    [key: string]: string[]
 }
 
 export async function handleUploadEmoticonMobile(client: Client, session: Session, filename: string, file: IFile): Promise<ApiMessageAttachment> {
@@ -46,21 +46,71 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
 
 export function getEmojis(clan_id: string) {
     const { categoriesEmoji, emojis } = useEmojiSuggestion();
-    const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
+    const recentEmojiIDs: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
+    const recentClanEmojiIDs = recentEmojiIDs?.[clan_id] || [];
 
-    const recentClanEmojis = recentEmojis?.[clan_id] || [];
+    const recentEmojis = recentClanEmojiIDs
+        .map(emojiID => emojis.find(emoji => emoji.id === emojiID))
+        .filter(emoji => !!emoji)
+        .map(attr => ({ ...attr, category: "Recent" }));
+
     return {
         categoriesEmoji,
-        emojis: [...recentClanEmojis, ...emojis],
+        emojis: [...recentEmojis, ...emojis],
     }
 }
 
-export async function setRecentEmoji(emoji: IEmoji, clan_id: string) {
+export async function setRecentEmojiById(emojiIDs: string[], clan_id: string) {
     const oldRecentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
-    const oldRecentClanEmojis: IEmoji[] = oldRecentEmojis?.[clan_id] || [];
-    if (oldRecentClanEmojis.every(e => e.id !== emoji.id)) {
-        const currentRecentClanEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentClanEmojis];
-        const currentEmoji = { ...oldRecentEmojis, [clan_id]: currentRecentClanEmojis }
-        save(STORAGE_RECENT_EMOJI, currentEmoji);
-    }
+    const oldRecentClanEmojiID: string[] = oldRecentEmojis?.[clan_id] || [];
+
+    const newRecentEmojis = emojiIDs
+        .filter(emojiID => oldRecentClanEmojiID.every(oldEmoji => oldEmoji !== emojiID))
+
+    const currentEmoji = { ...oldRecentEmojis, [clan_id]: [...newRecentEmojis, ...oldRecentClanEmojiID] }
+    save(STORAGE_RECENT_EMOJI, currentEmoji);
 }
+
+export async function handleUploadAttachments(sessionRef: any, clientRef: any, clan_id: string, channel_id: string, attachments: ApiMessageAttachment[]) {
+    const session = sessionRef.current;
+    const client = clientRef.current;
+
+    const uploadedAttachments = await Promise.all(
+        attachments?.map((att) => {
+            return handleUploadAttachmentMobile(client, session, clan_id, channel_id, att);
+        }));
+
+    return uploadedAttachments
+};
+
+export async function handleUploadAttachmentMobile(
+    client: Client,
+    session: Session,
+    currentClanId: string,
+    currentChannelId: string,
+    attachment: ApiMessageAttachment
+): Promise<ApiMessageAttachment> {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
+        try {
+            const fileType = attachment.filetype || "text/plainText";
+            const filePath = attachment.url || "";
+            const fileName = attachment.filename || "";
+            const fileSize = Number(attachment.size) || 0;
+            const fileData = await RNFS.readFile(filePath, 'base64');
+            const arrayBuffer = BufferMobile.from(fileData, 'base64');
+
+            if (!arrayBuffer) {
+                console.log('Failed to read file data.');
+                return;
+            }
+
+            const fullFilename = createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+            resolve(uploadFile(client, session, fullFilename, fileType, fileSize, arrayBuffer, true));
+        }
+        catch (error) {
+            console.log('handleUploadFileMobile Error: ', error);
+            reject(new Error(`${error}`));
+        }
+    });
+};

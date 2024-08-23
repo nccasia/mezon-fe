@@ -2,7 +2,8 @@ import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions, selectAttachmentData, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
-import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
+import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -15,17 +16,14 @@ interface IProps {
 	currentChannelId: string;
 }
 
-export interface IFile {
-	uri: string;
-	name: string;
-	type: string;
-	size: string;
-	fileData: any;
+interface IRenderItem {
+	isUseCamera: boolean;
 }
+
 const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [photos, setPhotos] = useState([]);
+	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
@@ -150,14 +148,15 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		);
 	}
 
-	const renderItem = ({ item }) => {
-		if (item?.isUseCamera) {
+	const renderItem = ({ item: node, index }: { item: PhotoIdentifier | IRenderItem, index: number }) => {
+		if ((node as IRenderItem).isUseCamera) {
 			return (
 				<TouchableOpacity style={styles.cameraPicker} onPress={onOpenCamera}>
 					<CameraIcon color={themeValue.text} width={size.s_24} height={size.s_24} />
 				</TouchableOpacity>
 			);
 		}
+		const item = node as PhotoIdentifier;
 		const fileName = item?.node?.image?.filename || item?.node?.image?.uri;
 		const isVideo = item?.node?.type?.startsWith?.('video');
 		const isSelected = attachmentsFileName?.some((i) => i?.includes(getFullFileName(fileName)));
@@ -190,26 +189,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		);
 	};
 
-	const handleGalleryPress = async (file: any) => {
+	const handleGalleryPress = async (file: PhotoIdentifier) => {
 		try {
 			const image = file?.node?.image;
 			const type = file?.node?.type;
-			const name = file?.node?.image?.filename || file?.node?.image?.uri;
+			const size = file?.node?.image?.fileSize;
+			const filename = file?.node?.image?.filename || file?.node?.image?.uri;
 			let filePath = image?.uri;
-			const filename = getFullFileName(name);
 
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: currentChannelId,
-					attachments: [
-						{
-							url: filePath,
-							filename,
-							filetype: type,
-						},
-					],
-				}),
-			);
 			if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
 				const ms = new Date().getTime();
 				const ext = image.extension;
@@ -221,17 +208,20 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
 				}
 			}
-			const fileData = await RNFS.readFile(filePath, 'base64');
 
-			const fileFormat: IFile = {
-				uri: filePath,
-				name: image?.filename || image?.uri,
-				type: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-				size: image?.fileSize,
-				fileData,
-			};
-
-			onPickGallery([fileFormat]);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [
+						{
+							url: filePath,
+							filename,
+							filetype: type,
+							size
+						},
+					],
+				}),
+			);
 		} catch (err) {
 			console.log('Error: ', err);
 		}
@@ -259,20 +249,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 								url: file?.uri,
 								filename: file?.fileName || file?.uri,
 								filetype: file?.type,
+								size: file?.fileSize,
 							},
 						],
 					}),
 				);
-				const fileBase64 = await RNFS.readFile(file?.uri, 'base64');
-				const fileFormat: IFile = {
-					uri: file?.uri,
-					name: file?.fileName,
-					type: file?.type,
-					size: file?.fileSize?.toString(),
-					fileData: fileBase64,
-				};
-
-				onPickGallery([fileFormat]);
 			}
 		});
 	};
@@ -287,12 +268,13 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		<View style={{ flex: 1 }}>
 			<FlatList
 				data={[{ isUseCamera: true }, ...photos]}
+				// @ts-check
 				renderItem={renderItem}
 				keyExtractor={(item, index) => `${index.toString()}_gallery`}
 				numColumns={3}
 				onEndReached={handleLoadMore}
 				onEndReachedThreshold={0.5}
-				ListFooterComponent={() => loading && <Text>Loading...</Text>}
+				ListFooterComponent={() => loading && <Text style={{ color: themeValue.text }}>Loading...</Text>}
 			/>
 		</View>
 	);

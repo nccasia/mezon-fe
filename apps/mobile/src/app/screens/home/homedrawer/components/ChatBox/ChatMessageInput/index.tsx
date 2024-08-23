@@ -1,8 +1,9 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons, getAttachmentUnique, handleUploadAttachments, setRecentEmojiById } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
-import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectCurrentChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -92,6 +93,9 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
+			const currentChannelID = useSelector(selectCurrentChannelId);
+
+			const { sessionRef, clientRef } = useMezon();
 			const { t } = useTranslation(['message']);
 			const { editSendMessage, sendMessage } = useChatSending({
 				channelId,
@@ -105,7 +109,7 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
-			
+
 			const removeTags = (text: string) => {
 				if (!text)
 					return '';
@@ -212,6 +216,8 @@ export const ChatMessageInput = memo(
 					}
 				});
 
+				setRecentEmojiById(emojisOnMessage.map(emoji => emoji.emojiid), currentClanId || "0")
+
 				const payloadSendMessage: IMessageSendPayload = {
 					t: removeTags(text),
 					hg: hashtagsOnMessage,
@@ -228,15 +234,18 @@ export const ChatMessageInput = memo(
 					references: [],
 				};
 
-				const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-				const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
-				if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
-					Toast.show({
-						type: 'error',
-						text1: t('toast.attachmentIsLoading'),
-					});
-					return;
-				}
+				const attachmentQueue = getAttachmentUnique(attachmentDataRef);
+				const attachmentDataUnique = await handleUploadAttachments(sessionRef, clientRef, currentClanId, currentChannelID, attachmentQueue);
+
+				// const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
+				// if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
+				// 	Toast.show({
+				// 		type: 'error',
+				// 		text1: t('toast.attachmentIsLoading'),
+				// 	});
+				// 	return;
+				// }
+
 				dispatch(
 					referencesActions.resetDataAttachment({
 						channelId: channelId,
@@ -245,19 +254,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([
-							{
-								message_id: '',
-								message_ref_id: targetMessage.id,
-								ref_type: 0,
-								message_sender_id: targetMessage?.sender_id,
-								message_sender_username: targetMessage?.username,
-								mesages_sender_avatar: targetMessage?.avatar,
-								message_sender_clan_nick: targetMessage?.clan_nick,
-								message_sender_display_name: targetMessage?.display_name,
-								content: JSON.stringify(targetMessage.content),
-								has_attachment: Boolean(targetMessage?.attachments?.length),
-							},
-						] as Array<ApiMessageRef>)
+						{
+							message_id: '',
+							message_ref_id: targetMessage.id,
+							ref_type: 0,
+							message_sender_id: targetMessage?.sender_id,
+							message_sender_username: targetMessage?.username,
+							mesages_sender_avatar: targetMessage?.avatar,
+							message_sender_clan_nick: targetMessage?.clan_nick,
+							message_sender_display_name: targetMessage?.display_name,
+							content: JSON.stringify(targetMessage.content),
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+						},
+					] as Array<ApiMessageRef>)
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 

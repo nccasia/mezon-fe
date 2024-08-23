@@ -10,7 +10,6 @@ import {
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	setRecentEmoji,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
 import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
@@ -133,7 +132,7 @@ export default function EmojiSelector({
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
 			onSelected(emoji.id, emoji.shortname);
-			setRecentEmoji(emoji, currentClan?.id || "0");
+			// setRecentEmoji(emoji, currentClan?.id || "0");
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));

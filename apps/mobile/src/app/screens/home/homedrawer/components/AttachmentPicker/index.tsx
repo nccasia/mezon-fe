@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
-import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -10,7 +10,7 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import Gallery, { IFile } from './Gallery';
+import Gallery from './Gallery';
 import { style } from './styles';
 
 export type AttachmentPickerProps = {
@@ -89,32 +89,8 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	};
 
 	const handleFiles = (files: IFile | any) => {
-		const session = sessionRef.current;
-		const client = clientRef.current;
-		if (!files || !client || !session || !currentChannelId) {
-			throw new Error('Client or files are not initialized');
-		}
-
-		const promises = Array.from(files).map((file: IFile | any) => {
-			return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
-		});
-
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => handleFinishUpload(attachment));
-		});
+		console.log(files[0].size);
 	};
-
-	const handleFinishUpload = useCallback(
-		(attachment: ApiMessageAttachment) => {
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: currentChannelId,
-					attachments: [attachment],
-				}),
-			);
-		},
-		[currentChannelId, dispatch],
-	);
 
 	return (
 		<View style={styles.container}>

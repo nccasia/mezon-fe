@@ -84,6 +84,7 @@
     "react-modal-hook": "^3.0.2",
     "react-native": "0.73.2",
     "react-native-device-info": "^11.1.0",
+    "react-native-fs": "^2.20.0",
     "react-native-mmkv": "^2.12.2",
     "react-redux": "9.1.0",
     "react-router-dom": "^6.21.2",
