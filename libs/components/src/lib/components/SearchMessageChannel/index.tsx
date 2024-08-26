@@ -8,10 +8,10 @@ import {
 	selectDmGroupCurrentId,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectPrefixSearch,
 	selectValueInputSearchMessage,
 	useAppDispatch,
 } from '@mezon/store';
-import { SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
@@ -20,7 +20,7 @@ import SearchMessageChannelModal from './SearchMessageChannelModal';
 import SelectGroup from './SelectGroup';
 import SelectItem from './SelectItem';
 import darkMentionsInputStyle from './StyleSearchMessages';
-import { hasKeySearch, searchFieldName } from './constant';
+import { hasKeySearch } from './constant';
 
 type SearchMessageChannelProps = {
 	mode?: ChannelStreamMode;
@@ -66,6 +66,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
 
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
+	const prefixSearch = useSelector(selectPrefixSearch(currentChannel?.channel_id as string));
+	console.log('prefixSearch: ', prefixSearch);
 
 	const userListData = UserMentionList({
 		channelID: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? ''),
@@ -114,26 +116,26 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
 		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
-		setValueDisplay(newPlainTextValue);
-		const filter: SearchFilter[] = [];
-		if (mentions.length === 0) {
-			filter.push(
-				{
-					field_name: 'content',
-					field_value: value,
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string },
-			);
-		}
-		for (const mention of mentions) {
-			const convertMention = mention.display.split(':');
-			filter.push(
-				{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-			);
-		}
-		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
+		// setValueDisplay(newPlainTextValue);
+		// const filter: SearchFilter[] = [];
+		// if (mentions.length === 0) {
+		// 	filter.push(
+		// 		{
+		// 			field_name: 'content',
+		// 			field_value: value,
+		// 		},
+		// 		{ field_name: 'channel_id', field_value: currentChannel?.id },
+		// 		{ field_name: 'clan_id', field_value: currentClanId as string },
+		// 	);
+		// }
+		// for (const mention of mentions) {
+		// 	const convertMention = mention.display.split(':');
+		// 	filter.push(
+		// 		{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
+		// 		{ field_name: 'channel_id', field_value: currentChannel?.id },
+		// 	);
+		// }
+		// setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 	};
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
@@ -162,10 +164,17 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	};
 
 	const handleClickSearchOptions = (value: string) => {
+		console.log('handleClickSearchOptions', value);
+		// dispatch(
+		// 	searchMessagesActions.setValueInputSearch({
+		// 		channelId: currentChannel?.id ?? '',
+		// 		value: hasKeySearch(value ?? '') ? value : valueInputSearch + value,
+		// 	}),
+		// );
 		dispatch(
-			searchMessagesActions.setValueInputSearch({
+			searchMessagesActions.setPrefixSearch({
 				channelId: currentChannel?.id ?? '',
-				value: hasKeySearch(value ?? '') ? value : valueInputSearch + value,
+				prefix: value,
 			}),
 		);
 		searchRef.current?.focus();

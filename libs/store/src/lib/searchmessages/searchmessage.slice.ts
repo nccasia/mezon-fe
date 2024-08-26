@@ -29,6 +29,7 @@ export interface SearchMessageState extends EntityState<SearchMessageEntity, str
 	totalResult: number;
 	currentPage: number;
 	valueInputSearch: Record<string, string>;
+	prefixSearch: Record<string, string>;
 }
 
 export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
@@ -55,6 +56,7 @@ export const initialSearchMessageState: SearchMessageState = SearchMessageAdapte
 	totalResult: 0,
 	currentPage: 1,
 	valueInputSearch: {},
+	prefixSearch: {},
 });
 
 export const searchMessageSlice = createSlice({
@@ -77,6 +79,11 @@ export const searchMessageSlice = createSlice({
 			console.log('action.payload', action.payload);
 			const { channelId, value } = action.payload;
 			state.valueInputSearch[channelId] = value;
+		},
+
+		setPrefixSearch: (state, action: PayloadAction<{ channelId: string; prefix: string }>) => {
+			const { channelId, prefix } = action.payload;
+			state.prefixSearch[channelId] = prefix;
 		},
 	},
 
@@ -125,6 +132,7 @@ export const selectTotalResultSearchMessage = createSelector(getSearchMessageSta
 export const selectCurrentPage = createSelector(getSearchMessageState, (state) => state.currentPage);
 
 export const selectIsSearchMessage = (channelId: string) => createSelector(getSearchMessageState, (state) => state.isSearchMessage[channelId]);
+export const selectPrefixSearch = (channelId: string) => createSelector(getSearchMessageState, (state) => state.prefixSearch[channelId]);
 
 export const selectValueInputSearchMessage = (channelId: string) =>
 	createSelector(getSearchMessageState, (state) => state.valueInputSearch[channelId]);
