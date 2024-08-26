@@ -66,7 +66,15 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 	const organizationMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.organizationMenu.edit'),
-			onPress: () => reserve(),
+			onPress: () => {
+				dismiss();
+				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
+					screen: APP_SCREEN.MENU_CLAN.CATEGORY_SETTING,
+					params: {
+						categoryId: category?.category_id,
+					},
+				});
+			},
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 			isShow: isCanManageChannel
 		},

@@ -1,0 +1,28 @@
+{
+    "fields": {
+        "categoryName": {
+            "title": "Category Name",
+            "placeholder": "Text Channels"
+        },
+        "categoryPermission": {
+            "title": "",
+            "permission": "Category Permissions",
+            "description": "Change privacy settings and customize how members can interact with this channel."
+        },
+        "categoryDelete": {
+            "title": "",
+            "delete": "Delete Category"
+        }
+    },
+    "confirm": {
+        "delete": {
+            "content": "Are you sure you want to delete {{categoryName}}?. This cannot be undone",
+            "confirmText": "Delete",
+            "title": "Delete category"
+        },
+        "save": "Save"
+    },
+    "toast": {
+        "updated": "Update successfully"
+    }
+}

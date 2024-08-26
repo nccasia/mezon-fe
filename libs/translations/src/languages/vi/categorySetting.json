@@ -1,0 +1,28 @@
+{
+    "fields": {
+        "categoryName": {
+            "title": "Tên Category",
+            "placeholder": "Nhập vào tên Category"
+        },
+        "categoryPermission": {
+            "title": "",
+            "permission": "Quyền hạn category",
+            "description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với channel này."
+        },
+        "categoryDelete": {
+            "title": "",
+            "delete": "Xóa Category"
+        }
+    },
+    "confirm": {
+        "delete": {
+            "content": "Bạn có chắc muốn xóa channel {{categoryName}}?. Hành động này không thể khôi phục lại",
+            "confirmText": "Xóa",
+            "title": "Xóa category"
+        },
+        "save": "Lưu"
+    },
+    "toast": {
+        "updated": "Cập nhật thành công"
+    }
+}
