@@ -87,14 +87,6 @@ export function useClans() {
 
 	const remainingMember = usersClan.map((user) => user.user).slice(5);
 
-	// const listUserSearch: UserSearchDataProps[] = usersClan.map((user) => {
-	// 	return {
-	// 		id: user?.user?.id ?? '',
-	// 		display: user?.user?.username ?? '',
-	// 		avatarUrl: user?.user?.avatar_url ?? '',
-	// 	};
-	// });
-
 	return useMemo(
 		() => ({
 			clans,
@@ -103,7 +95,6 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
-			// listUserSearch,
 			showNumEvent,
 			setClanShowNumEvent,
 			getUserClanProfile,
@@ -119,7 +110,6 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
-			// listUserSearch,
 			showNumEvent,
 			setClanShowNumEvent,
 			getUserClanProfile,

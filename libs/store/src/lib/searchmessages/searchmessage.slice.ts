@@ -30,6 +30,7 @@ export interface SearchMessageState extends EntityState<SearchMessageEntity, str
 	currentPage: number;
 	valueInputSearch: Record<string, string>;
 	prefixSearch: Record<string, string>;
+	searchValue: string;
 }
 
 export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
@@ -57,6 +58,7 @@ export const initialSearchMessageState: SearchMessageState = SearchMessageAdapte
 	currentPage: 1,
 	valueInputSearch: {},
 	prefixSearch: {},
+	searchValue: '',
 });
 
 export const searchMessageSlice = createSlice({
@@ -75,15 +77,19 @@ export const searchMessageSlice = createSlice({
 		setCurrentPage: (state, action: PayloadAction<number>) => {
 			state.currentPage = action.payload;
 		},
-		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
-			console.log('action.payload', action.payload);
-			const { channelId, value } = action.payload;
-			state.valueInputSearch[channelId] = value;
-		},
+		// setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
+		// 	console.log('action.payload', action.payload);
+		// 	const { channelId, value } = action.payload;
+		// 	state.valueInputSearch[channelId] = value;
+		// },
 
 		setPrefixSearch: (state, action: PayloadAction<{ channelId: string; prefix: string }>) => {
 			const { channelId, prefix } = action.payload;
 			state.prefixSearch[channelId] = prefix;
+		},
+
+		setSearchValue: (state, action) => {
+			state.searchValue = action.payload;
 		},
 	},
 
@@ -133,6 +139,7 @@ export const selectCurrentPage = createSelector(getSearchMessageState, (state) =
 
 export const selectIsSearchMessage = (channelId: string) => createSelector(getSearchMessageState, (state) => state.isSearchMessage[channelId]);
 export const selectPrefixSearch = (channelId: string) => createSelector(getSearchMessageState, (state) => state.prefixSearch[channelId]);
+export const selectValueSearch = () => createSelector(getSearchMessageState, (state) => state.searchValue);
 
 export const selectValueInputSearchMessage = (channelId: string) =>
 	createSelector(getSearchMessageState, (state) => state.valueInputSearch[channelId]);
