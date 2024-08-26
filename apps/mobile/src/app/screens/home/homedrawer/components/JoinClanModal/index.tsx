@@ -53,37 +53,35 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 	};
 
 	return (
-		<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-			<MezonModal
-				visible={visible}
-				visibleChange={(visible) => {
-					setVisible(visible);
-				}}
-				headerStyles={styles.headerModal}
-			>
-				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-					<Block width={'100%'} height={'100%'} paddingHorizontal={size.s_20} paddingVertical={size.s_10} position={'relative'}>
-						<Block marginBottom={size.s_40}>
-							<Text style={styles.title}>{t('joinClan.joinExistClan')}</Text>
-							<Text style={styles.description}>{t('joinClan.enterInvite')}</Text>
-						</Block>
-						<Block>
-							<MezonInput
-								label={t('joinClan.labelInput')}
-								onTextChange={setInviteLink}
-								placeHolder={`https://mezon.ai/invite/1813407038846046912`}
-								value={inviteLink}
-							/>
-							{!isValidInvite && <ErrorInput errorMessage={t('joinClan.errorMessage')} />}
-							<Text style={styles.textExample}>{t('joinClan.linkInviteEx')}</Text>
-						</Block>
-						<TouchableOpacity onPress={() => joinChannel()} style={styles.btnInvite}>
-							<Text style={styles.textInviteBtn}>{t('joinClan.joinInviteLink')}</Text>
-						</TouchableOpacity>
+		<MezonModal
+			visible={visible}
+			visibleChange={(visible) => {
+				setVisible(visible);
+			}}
+			headerStyles={styles.headerModal}
+		>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<Block width={'100%'} height={'100%'} paddingHorizontal={size.s_20} paddingVertical={size.s_10} position={'relative'}>
+					<Block marginBottom={size.s_40}>
+						<Text style={styles.title}>{t('joinClan.joinExistClan')}</Text>
+						<Text style={styles.description}>{t('joinClan.enterInvite')}</Text>
 					</Block>
-				</TouchableWithoutFeedback>
-			</MezonModal>
-		</KeyboardAvoidingView>
+					<Block>
+						<MezonInput
+							label={t('joinClan.labelInput')}
+							onTextChange={setInviteLink}
+							placeHolder={`https://mezon.ai/invite/1813407038846046912`}
+							value={inviteLink}
+						/>
+						{!isValidInvite && <ErrorInput errorMessage={t('joinClan.errorMessage')} />}
+						<Text style={styles.textExample}>{t('joinClan.linkInviteEx')}</Text>
+					</Block>
+					<TouchableOpacity onPress={() => joinChannel()} style={styles.btnInvite}>
+						<Text style={styles.textInviteBtn}>{t('joinClan.joinInviteLink')}</Text>
+					</TouchableOpacity>
+				</Block>
+			</TouchableWithoutFeedback>
+		</MezonModal>
 	);
 };
 

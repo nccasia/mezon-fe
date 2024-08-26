@@ -24,11 +24,10 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.secondary,
 		},
 		createClan: {
-			width: '100%',
 			flexDirection: 'row',
 			alignItems: 'center',
-			borderRadius: 8,
-			marginTop: size.s_10,
+			alignSelf: 'center',
+			marginVertical: size.s_10,
 		},
 		clanName: {
 			color: colors.textStrong,

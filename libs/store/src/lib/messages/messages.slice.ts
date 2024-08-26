@@ -1,27 +1,27 @@
 import {
-	ApiChannelMessageHeaderWithChannel,
-	ChannelDraftMessages,
-	Direction_Mode,
-	EMessageCode,
-	EmojiDataOptionals,
-	IMessageSendPayload,
-	IMessageWithUser,
-	LIMIT_MESSAGE,
-	LoadingStatus,
-	MessageTypeUpdateLink,
-	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime,
+  ApiChannelMessageHeaderWithChannel,
+  ChannelDraftMessages,
+  Direction_Mode,
+  EMessageCode,
+  EmojiDataOptionals,
+  IMessageSendPayload,
+  IMessageWithUser,
+  LIMIT_MESSAGE,
+  LoadingStatus,
+  MessageTypeUpdateLink,
+  checkContinuousMessagesByCreateTimeMs,
+  checkSameDayByCreateTime,
 } from '@mezon/utils';
 import {
-	EntityState,
-	GetThunkAPI,
-	PayloadAction,
-	createAsyncThunk,
-	createEntityAdapter,
-	createSelector,
-	createSelectorCreator,
-	createSlice,
-	weakMapMemoize,
+  EntityState,
+  GetThunkAPI,
+  PayloadAction,
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSelectorCreator,
+  createSlice,
+  weakMapMemoize,
 } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
@@ -56,7 +56,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			id: channelMess.sender_id || '',
 		},
 		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
-		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
+		create_time_seconds: channelMess.create_time_seconds || creationTime.getTime() / 1000,
 	};
 };
 
@@ -198,7 +198,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const firstMessage = response.messages[response.messages.length - 1];
-		if (firstMessage.code === EMessageCode.FIRST_MESSAGE) {
+		if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
 
@@ -226,7 +226,7 @@ export const fetchMessages = createAsyncThunk(
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
 		const lastLoadMessage = messages[messages.length - 1];
-		const hasMore = lastLoadMessage.isFirst === false ? false : true;
+		const hasMore = lastLoadMessage?.isFirst === false ? false : true;
 
 		if (messages.length > 0) {
 			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
@@ -247,7 +247,7 @@ export const fetchMessages = createAsyncThunk(
 					channelId: lastMessage.channel_id || '',
 					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
-					messageCreatedAt: lastMessage.create_time_ms ? +lastMessage.create_time_ms : 0,
+					messageCreatedAt: lastMessage.create_time_seconds ? +lastMessage.create_time_seconds : 0,
 					messageSeenAt: 0,
 				});
 			}
@@ -909,15 +909,15 @@ export const selectAllMessages = createSelector(getMessagesState, (messageState)
 });
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
-	if (a.create_time_ms && b.create_time_ms) {
-		return +b.create_time_ms - +a.create_time_ms;
+	if (a.create_time_seconds && b.create_time_seconds) {
+		return +b.create_time_seconds - +a.create_time_seconds;
 	}
 	return 0;
 }
 
 export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
-	if (a.create_time_ms && b.create_time_ms) {
-		return +a.create_time_ms - +b.create_time_ms;
+	if (a.create_time_seconds && b.create_time_seconds) {
+		return +a.create_time_seconds - +b.create_time_seconds;
 	}
 	return 0;
 }
@@ -1174,7 +1174,7 @@ const handleUpdateIsCombineMessage = (
 	const firstMessage = entities[messageIds[0]];
 	let prevMessageSenderId = firstMessage.sender_id || '';
 	let prevMessageCreateTime = firstMessage.create_time || '';
-	let prevMessageCreationTimeMs = firstMessage.create_time_ms || 0;
+	let prevMessageCreationTimeMs = firstMessage.create_time_seconds || 0;
 
 	if (needUpdateFirstMessage) {
 		firstMessage.isStartedMessageGroup = true;
@@ -1182,9 +1182,9 @@ const handleUpdateIsCombineMessage = (
 	}
 
 	messageIds.slice(1, messageIds.length).forEach((id) => {
-		const { sender_id, create_time_ms, create_time } = entities[id];
+		const { sender_id, create_time_seconds, create_time } = entities[id];
 		const isSameDay = checkSameDayByCreateTime(create_time, prevMessageCreateTime);
-		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(create_time_ms || 0, prevMessageCreationTimeMs);
+		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(create_time_seconds || 0, prevMessageCreationTimeMs);
 
 		const isStartedMessageGroup = Boolean(sender_id !== prevMessageSenderId || !isSameDay || !isContinuousMessages);
 
@@ -1193,7 +1193,7 @@ const handleUpdateIsCombineMessage = (
 
 		prevMessageSenderId = sender_id;
 		prevMessageCreateTime = create_time;
-		prevMessageCreationTimeMs = create_time_ms || 0;
+		prevMessageCreationTimeMs = create_time_seconds || 0;
 	});
 
 	return channelEntity;
@@ -1203,6 +1203,8 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
+	const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
+
 	if (index === -1) return channelEntity;
 
 	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
@@ -1211,6 +1213,23 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	if (nextMessageId && isStartedMessageGroup) {
 		channelEntity.entities[nextMessageId].isStartedMessageGroup = isStartedMessageGroup;
 		channelEntity.entities[nextMessageId].isStartedMessageOfTheDay = isStartedMessageOfTheDay;
+	}
+
+	// check if the message is the  channel last message
+	// if it is, remove the last message
+	if (state.lastMessageByChannel[channelId]?.id === messageId) {
+		if (isViewingOlderMessages) {
+			// remove last message
+			delete state.lastMessageByChannel[channelId];
+		} else {
+			// get let last message id
+			const prevMessageId = channelEntity.ids[index - 1];
+
+			if (prevMessageId) {
+				// set last message id to the previous message
+				state.lastMessageByChannel[channelId] = channelEntity.entities[prevMessageId];
+			}
+		}
 	}
 
 	return channelMessagesAdapter.removeOne(channelEntity, messageId);

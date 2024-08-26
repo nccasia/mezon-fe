@@ -106,7 +106,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			},
 		});
 	} catch (err) {
-		console.log('Tom log  => err', err);
+		console.log('err', err);
 	}
 };
 

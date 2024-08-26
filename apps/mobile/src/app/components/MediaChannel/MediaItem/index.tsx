@@ -29,7 +29,7 @@ const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 			{checkIsVideo ? (
 				<ExpoVideo
 					onError={(err) => {
-						console.log('*** load error', err);
+						console.log('load error', err);
 					}}
 					source={{
 						uri: data?.url,

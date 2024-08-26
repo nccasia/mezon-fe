@@ -1,5 +1,3 @@
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { reduxPersistStorage as storage } from '@mezon/mobile-components';
 import { MezonContextValue } from '@mezon/transport';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,6 +44,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import storage from '@react-native-async-storage/async-storage';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',

@@ -29,8 +29,8 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 	const timeMessage = useMemo(() => {
-		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp) {
-			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp);
+		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
+			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
 			return lastTime;
 		}
 	}, [thread]);

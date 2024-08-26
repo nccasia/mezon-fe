@@ -94,53 +94,51 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	};
 
 	return (
-		<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-			<MezonModal
-				visible={visible}
-				visibleChange={(visible) => {
-					setVisible(visible);
-				}}
-				headerStyles={styles.headerModal}
-			>
-				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-					<View style={styles.wrapperCreateClanModal}>
-						<Text style={styles.headerTitle}>{t('title')}</Text>
-						<Text style={styles.headerSubTitle}>{t('subTitle')}</Text>
-						<View style={styles.boxImage}>
-							<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
-								{!urlImage ? (
-									<View style={[styles.uploadCreateClan]}>
-										<AddIcon style={styles.addIcon} height={30} width={30} color={Colors.bgButton} />
-										<UploadImage height={20} width={20} color={Colors.bgGrayLight} />
-										<Text style={styles.uploadText}>{t('upload')}</Text>
-									</View>
-								) : (
-									<View style={[styles.uploadCreateClan, styles.overflowImage]}>
-										<Image source={{ uri: urlImage }} style={styles.image} />
-									</View>
-								)}
-							</TouchableOpacity>
-						</View>
-
-						<MezonInput
-							label={t('clanName')}
-							onTextChange={setNameClan}
-							placeHolder={`${userProfile?.user?.username}'s clan`}
-							value={nameClan}
-							maxCharacter={64}
-							errorMessage={t('errorMessage')}
-						/>
-
-						<Text style={styles.community}>
-							{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
-						</Text>
-						<MezonButton disabled={!isCheckValid} viewContainerStyle={styles.button} onPress={handleCreateClan}>
-							<Text style={styles.buttonText}>{t('createServer')}</Text>
-						</MezonButton>
+		<MezonModal
+			visible={visible}
+			visibleChange={(visible) => {
+				setVisible(visible);
+			}}
+			headerStyles={styles.headerModal}
+		>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<View style={styles.wrapperCreateClanModal}>
+					<Text style={styles.headerTitle}>{t('title')}</Text>
+					<Text style={styles.headerSubTitle}>{t('subTitle')}</Text>
+					<View style={styles.boxImage}>
+						<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
+							{!urlImage ? (
+								<View style={[styles.uploadCreateClan]}>
+									<AddIcon style={styles.addIcon} height={30} width={30} color={Colors.bgButton} />
+									<UploadImage height={20} width={20} color={Colors.bgGrayLight} />
+									<Text style={styles.uploadText}>{t('upload')}</Text>
+								</View>
+							) : (
+								<View style={[styles.uploadCreateClan, styles.overflowImage]}>
+									<Image source={{ uri: urlImage }} style={styles.image} />
+								</View>
+							)}
+						</TouchableOpacity>
 					</View>
-				</TouchableWithoutFeedback>
-			</MezonModal>
-		</KeyboardAvoidingView>
+
+					<MezonInput
+						label={t('clanName')}
+						onTextChange={setNameClan}
+						placeHolder={`${userProfile?.user?.username}'s clan`}
+						value={nameClan}
+						maxCharacter={64}
+						errorMessage={t('errorMessage')}
+					/>
+
+					<Text style={styles.community}>
+						{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
+					</Text>
+					<MezonButton disabled={!isCheckValid} viewContainerStyle={styles.button} onPress={handleCreateClan}>
+						<Text style={styles.buttonText}>{t('createServer')}</Text>
+					</MezonButton>
+				</View>
+			</TouchableWithoutFeedback>
+		</MezonModal>
 	);
 };
 

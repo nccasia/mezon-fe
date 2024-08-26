@@ -23,8 +23,8 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
 
 	const timeMessage = useMemo(() => {
-		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp) {
-			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp);
+		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
+			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
 			return lastTime;
 		}
 	}, [thread]);

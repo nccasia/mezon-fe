@@ -14,8 +14,8 @@ export type CategoriesState = Record<string, boolean>;
 
 const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 	return notSortedArr.slice().sort((a, b) => {
-		const timestampA = parseFloat(a.last_sent_message?.timestamp || a.create_time_ms?.toString() || '0');
-		const timestampB = parseFloat(b.last_sent_message?.timestamp || b.create_time_ms?.toString() || '0');
+		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
+		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
 		return timestampB - timestampA;
 	});
 };

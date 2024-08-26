@@ -1,7 +1,17 @@
 import { useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
-import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, getIsFowardAll, getSelectedMessage, MessagesEntity, selectCurrentChannelId, selectDirectsOpenlist, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
+import {
+	DirectEntity,
+	MessagesEntity,
+	getIsFowardAll,
+	getSelectedMessage,
+	selectCurrentChannelId,
+	selectDirectsOpenlist,
+	selectDmGroupCurrentId,
+	selectMessageEntitiesByChannelId,
+	useAppSelector,
+} from '@mezon/store-mobile';
 import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
 import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
 import { MezonInput } from 'apps/mobile/src/app/temp-ui';
@@ -40,20 +50,22 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 	const { sendForwardMessage } = useSendForwardMessage();
 	const { t } = useTranslation('message');
 	const { themeValue } = useTheme();
-	
-	const isForwardAll = useSelector(getIsFowardAll)
+
+	const isForwardAll = useSelector(getIsFowardAll);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const selectedMessage = useSelector(getSelectedMessage);
 
-	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''))
-	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const allMessagesEntities = useAppSelector((state) =>
+		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
+	);
+	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const allMessagesBySenderId = useMemo(() => {
-		return convertedAllMessagesEntities?.filter(message => message.sender_id === selectedMessage?.user?.id);
+		return convertedAllMessagesEntities?.filter((message) => message.sender_id === selectedMessage?.user?.id);
 	}, [allMessagesEntities, selectedMessage?.user?.id]);
 
 	const startIndex = useMemo(() => {
-		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage?.id)
+		return allMessagesBySenderId.findIndex((message) => message.id === selectedMessage?.id);
 	}, [allMessagesEntities, selectedMessage?.id]);
 
 	const mapDirectMessageToForwardObject = (dm: DirectEntity): IForwardIObject => {
@@ -62,9 +74,9 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			type: dm?.type,
 			avatar: dm?.type === ChannelType.CHANNEL_TYPE_DM ? dm?.channel_avatar?.[0] : 'assets/images/avatar-group.png',
 			name: dm?.channel_label,
-			clanId: ''
-		}
-	}
+			clanId: '',
+		};
+	};
 
 	const mapChannelToForwardObject = (channel: ChannelThreads): IForwardIObject => {
 		return {
@@ -72,29 +84,32 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			type: channel?.type,
 			avatar: '#',
 			name: channel?.channel_label,
-			clanId: channel?.clan_id
-		}
-	}
+			clanId: channel?.clan_id,
+		};
+	};
 
 	const allForwardObject = useMemo(() => {
-		const listDMForward = dmGroupChatList?.filter(dm => dm?.type === ChannelType.CHANNEL_TYPE_DM && dm?.channel_label)
+		const listDMForward = dmGroupChatList
+			?.filter((dm) => dm?.type === ChannelType.CHANNEL_TYPE_DM && dm?.channel_label)
 			.map(mapDirectMessageToForwardObject);
 
-		const listGroupForward = dmGroupChatList?.filter(groupChat => groupChat?.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat?.channel_label)
+		const listGroupForward = dmGroupChatList
+			?.filter((groupChat) => groupChat?.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat?.channel_label)
 			.map(mapDirectMessageToForwardObject);
 
-		const listTextChannel = listChannels?.filter(channel => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
+		const listTextChannel = listChannels
+			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.channel_label)
 			.map(mapChannelToForwardObject);
 
-		return [...listDMForward, ...listGroupForward, ...listTextChannel]
-	}, [dmGroupChatList, listChannels])
+		return [...listDMForward, ...listGroupForward, ...listTextChannel];
+	}, [dmGroupChatList, listChannels]);
 
 	const filteredForwardObjects = useMemo(() => {
 		if (searchText?.trim()?.charAt(0) === '#') {
-			return allForwardObject.filter(ob => ob.type === ChannelType.CHANNEL_TYPE_TEXT)
+			return allForwardObject.filter((ob) => ob.type === ChannelType.CHANNEL_TYPE_TEXT);
 		}
-		return allForwardObject.filter(ob => normalizeString(ob?.name).includes(normalizeString(searchText)));
-	}, [searchText, allForwardObject])
+		return allForwardObject.filter((ob) => normalizeString(ob?.name).includes(normalizeString(searchText)));
+	}, [searchText, allForwardObject]);
 
 	const isChecked = (forwardObject: IForwardIObject) => {
 		const { channelId, type } = forwardObject;
@@ -113,34 +128,38 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			combineMessages.push(selectedMessage);
 
 			let index = startIndex + 1;
-			while (index < allMessagesBySenderId.length && !allMessagesBySenderId[index].isStartedMessageGroup && allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id) {
+			while (
+				index < allMessagesBySenderId.length &&
+				!allMessagesBySenderId[index].isStartedMessageGroup &&
+				allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id
+			) {
 				combineMessages.push(allMessagesBySenderId[index]);
-				index++
+				index++;
 			}
 
 			for (const selectedObjectSend of selectedForwardObjects) {
 				const { type, channelId, clanId = '' } = selectedObjectSend;
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
-						for(const message of combineMessages) {
-							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+						for (const message of combineMessages) {
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_GROUP:
-						for(const message of combineMessages) {
-							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+						for (const message of combineMessages) {
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
-						for(const message of combineMessages) {
-							sendForwardMessage (clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+						for (const message of combineMessages) {
+							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
 						}
 						break;
 					default:
 						break;
 				}
 			}
-			
+
 			Toast.show({
 				type: 'success',
 				props: {
@@ -152,7 +171,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			console.log('Forward all messages log => error', error);
 		}
 		onClose && onClose();
-	}
+	};
 
 	const sentToMessage = async () => {
 		if (!selectedForwardObjects.length) return;
@@ -181,62 +200,68 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				},
 			});
 		} catch (error) {
-			console.log('Tom log  => error', error);
+			console.log('error', error);
 		}
 		onClose && onClose();
 	};
 
 	const onSelectChange = (value: boolean, item: IForwardIObject) => {
 		if (value) {
-			setSelectedForwardObjects(prevValue => [...prevValue, item])
+			setSelectedForwardObjects((prevValue) => [...prevValue, item]);
 			return;
 		}
-		const newValue = selectedForwardObjects.filter(ob => ob.channelId !== item.channelId)
+		const newValue = selectedForwardObjects.filter((ob) => ob.channelId !== item.channelId);
 		setSelectedForwardObjects(newValue);
-	}
+	};
 
 	const renderAvatar = (item: IForwardIObject) => {
 		const { type } = item;
 		switch (type) {
 			case ChannelType.CHANNEL_TYPE_DM:
 				if (item?.avatar) {
-					return (
-						<Image source={{ uri: item?.avatar || '' }} style={styles.memberAvatar} />
-					)
+					return <Image source={{ uri: item?.avatar || '' }} style={styles.memberAvatar} />;
 				}
 				return (
-					<Block height={size.s_34} width={size.s_34} justifyContent='center' borderRadius={50} backgroundColor={themeValue.colorAvatarDefault}>
+					<Block
+						height={size.s_34}
+						width={size.s_34}
+						justifyContent="center"
+						borderRadius={50}
+						backgroundColor={themeValue.colorAvatarDefault}
+					>
 						<Text center>{item?.name?.charAt(0)?.toUpperCase()}</Text>
 					</Block>
-				)
+				);
 			case ChannelType.CHANNEL_TYPE_GROUP:
 				return (
 					<View style={styles.groupAvatar}>
 						<UserGroupIcon />
 					</View>
-				)
+				);
 			case ChannelType.CHANNEL_TYPE_TEXT:
 				return (
 					<Block width={size.s_34} height={size.s_34}>
-						<Text center h2 color={themeValue.white}>#</Text>
+						<Text center h2 color={themeValue.white}>
+							#
+						</Text>
 					</Block>
-				)
+				);
 			default:
 				break;
 		}
-	}
+	};
 
 	const renderForwardObject = ({ item }: { item: IForwardIObject }) => {
 		return (
 			<TouchableOpacity onPress={() => onSelectChange(!isChecked(item), item)}>
-				<Block flexDirection='row' padding={size.s_10} gap={size.s_6} justifyContent='center'>
-					<Block>
-						{renderAvatar(item)}
+				<Block flexDirection="row" padding={size.s_10} gap={size.s_6} justifyContent="center">
+					<Block>{renderAvatar(item)}</Block>
+					<Block flex={1} justifyContent="center">
+						<Text color={themeValue.textStrong} numberOfLines={1}>
+							{item.name}
+						</Text>
 					</Block>
-					<Block flex={1} justifyContent='center'>
-						<Text color={themeValue.textStrong} numberOfLines={1}>{item.name}</Text>
-					</Block>
-					<Block justifyContent='center'>
+					<Block justifyContent="center">
 						<BouncyCheckbox
 							size={20}
 							isChecked={isChecked(item)}
@@ -254,28 +279,26 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 					</Block>
 				</Block>
 			</TouchableOpacity>
-		)
-	}
+		);
+	};
 
 	const count = useMemo(() => {
-		if (selectedForwardObjects.length) return ` (${selectedForwardObjects.length})`
-	}, [selectedForwardObjects])
+		if (selectedForwardObjects.length) return ` (${selectedForwardObjects.length})`;
+	}, [selectedForwardObjects]);
 
 	return (
-		<Modal
-			isVisible={show}
-			hasBackdrop={false}
-			style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}
-		>
+		<Modal isVisible={show} hasBackdrop={false} style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}>
 			<SafeAreaView style={{ flex: 1 }}>
 				<Block flex={1} marginTop={size.s_24}>
-					<Block flexDirection='row' justifyContent='center' marginBottom={size.s_18}>
-						<Block position='absolute' left={0}>
+					<Block flexDirection="row" justifyContent="center" marginBottom={size.s_18}>
+						<Block position="absolute" left={0}>
 							<TouchableOpacity onPress={() => onClose()}>
 								<Icons.CloseLargeIcon color={themeValue.textStrong} />
 							</TouchableOpacity>
 						</Block>
-						<Text h3 color={themeValue.white}>{'Forward To'}</Text>
+						<Text h3 color={themeValue.white}>
+							{'Forward To'}
+						</Text>
 					</Block>
 
 					<MezonInput
@@ -297,16 +320,18 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 					</Block>
 
 					<Block paddingTop={size.s_10}>
-						<TouchableOpacity 
-							style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} 
+						<TouchableOpacity
+							style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]}
 							onPress={handleForward}
 						>
-							<Text style={styles.btnText}>{'Send'}{count}</Text>
+							<Text style={styles.btnText}>
+								{'Send'}
+								{count}
+							</Text>
 						</TouchableOpacity>
 					</Block>
 				</Block>
 			</SafeAreaView>
-
 		</Modal>
 	);
 };

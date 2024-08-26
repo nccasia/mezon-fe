@@ -1,27 +1,23 @@
-import { useAppNavigation, useAuth, useDirect, useFriends } from '@mezon/core';
+import { useAppNavigation, useAuth, useDirect } from '@mezon/core';
 import {
 	DirectEntity,
-	IFriend,
 	directActions,
 	messagesActions,
-	selectAllChannelMembers,
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
-	selectAllUsesClan,
+	selectAllUsersByUser,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import {
 	SearchItemProps,
 	TypeSearch,
-	UsersClanEntity,
 	addAttributesSearchList,
 	filterListByName,
-	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
-	sortFilteredList,
+	sortFilteredList
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -41,12 +37,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { createDirectMessageWithUser } = useDirect();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
+	const listUserInClan = useSelector(selectAllUsersByUser)
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1);
-	const usersClan = useSelector(selectAllUsesClan);
-	const membersInClan = useSelector(selectAllChannelMembers);
 
-	const { friends } = useFriends();
 	const dispatch = useAppDispatch();
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +48,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const ITEM_HEIGHT = 32;
 	const appearanceTheme = useSelector(selectTheme);
 
-	const listMemSearch = useMemo(() => {
+	const listDirectSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
 			? listDM.map((itemDM: DirectEntity) => {
 					return {
@@ -63,7 +57,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						displayName: itemDM.channel_label,
-						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
+						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
 						type: ChannelType.CHANNEL_TYPE_DM,
 					};
@@ -76,61 +70,21 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemGr?.channel_label ?? '',
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
-						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
+						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
 						typeChat: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
-
-		const listFriendsSearch = friends.length
-			? friends.map((itemFriend: IFriend) => {
-					return {
-						id: itemFriend?.id ?? '',
-						name: itemFriend?.user?.username ?? '',
-						avatarUser: itemFriend?.user?.avatar_url ?? '',
-						displayName: itemFriend?.user?.display_name ?? '',
-						lastSentTimeStamp: '0',
-						idDM: '',
-						typeChat: TypeSearch.Dm_Type,
-					};
-				})
-			: [];
-
-		const listUserClanSearch = usersClan.length
-			? usersClan.map((itemUserClan: UsersClanEntity) => {
-					return {
-						id: itemUserClan?.id ?? '',
-						name: itemUserClan?.user?.username ?? '',
-						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
-						displayName: itemUserClan?.user?.display_name ?? '',
-						clanNick: itemUserClan?.clan_nick ?? '',
-						lastSentTimeStamp: '0',
-						idDM: '',
-						typeChat: TypeSearch.Dm_Type,
-					};
-				})
-			: [];
-		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
 		const listSearch = [
-			...listDMSearch.map((itemDM) => {
-				const user = usersClanMap.get(itemDM.id);
-				return user
-					? {
-							...itemDM,
-							clanNick: user.clanNick || '',
-							displayName: user.displayName || itemDM.displayName,
-							avatarUser: user.avatarUser || '',
-						}
-					: itemDM;
-			}),
+			...listDMSearch,
 			...listGroupSearch,
-			...listFriendsSearch,
 		];
 		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
-		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, membersInClan);
+		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, listUserInClan);
 		return addPropsIntoSearchList;
-	}, [accountId, friends, listDM, listGroup, membersInClan, usersClan]);
+	}, [accountId, listDM, listGroup, listUserInClan]);
+
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
 			return {
@@ -140,18 +94,34 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				icon: '#',
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
-				lastSentTimeStamp: 0,
+				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp_seconds || 0),
 				typeChat: TypeSearch.Channel_Type,
 				prioritizeName: item?.channel_label ?? '',
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
-				meeting_code: item.meeting_code
+				meeting_code: item.meeting_code,
 			};
 		});
-		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
-		return sortedList;
+		return list;
 	}, [listChannels]);
+
+	const listMemberSearch = useMemo(() => {
+		const list = listUserInClan.map((item) => {
+			return {
+				id: item?.id ?? '',
+				prioritizeName: item?.display_name ??  "",
+				name: item?.username ?? '',
+				avatarUser: item?.avatar_url ?? '',
+				displayName: item?.display_name ?? '',
+				lastSentTimeStamp: '0',
+				idDM: '',
+				typeChat: TypeSearch.Dm_Type,
+				type: ChannelType.CHANNEL_TYPE_DM
+			};
+		});
+		return list;
+	}, [listUserInClan]);
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
@@ -221,11 +191,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const isNoResult =
 		!listChannelSearch.filter((item) => item.prioritizeName.indexOf(normalizeSearchText) > -1 || item.name.indexOf(normalizeSearchText) > -1)
 			.length &&
-		!listMemSearch.filter((item: SearchItemProps) => item.prioritizeName && item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
+		!listDirectSearch.filter((item: SearchItemProps) => item.prioritizeName && item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
 
 	const totalLists = useMemo(() => {
-		return listMemSearch.concat(listChannelSearch);
-	}, [listMemSearch, listChannelSearch, normalizeSearchText]);
+		const list = listDirectSearch.concat(listChannelSearch);
+		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		return sortedList;
+	}, [listDirectSearch, listChannelSearch]);
 
 	const totalListsFiltered = useMemo(() => {
 		return filterListByName(totalLists, normalizeSearchText, isSearchByUsername);
@@ -239,29 +211,28 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return totalListsSorted.filter((item) => item.typeChat === TypeSearch.Channel_Type);
 	}, [totalListsSorted]);
 
-	const memSearchSorted = useMemo(() => {
-		return totalListsSorted.filter((item) => item.typeChat === TypeSearch.Dm_Type);
-	}, [totalListsSorted]);
-
+	const totalListsMemberFiltered = useMemo(() => {
+		return filterListByName(listMemberSearch, normalizeSearchText, isSearchByUsername);
+	}, [listMemberSearch, normalizeSearchText, isSearchByUsername]);
+	const totalListMembersSorted = useMemo(() => {
+		return sortFilteredList(totalListsMemberFiltered, normalizeSearchText, isSearchByUsername);
+	}, [totalListsMemberFiltered, normalizeSearchText, isSearchByUsername]);
 	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
 
 	// Define a function to get the list to use based on the search text
 	const getListToUse = (
 		normalizeSearchText: string,
-		memSearchSorted: SearchItemProps[],
 		channelSearchSorted: SearchItemProps[],
 		totalListsSorted: SearchItemProps[],
 	) => {
-		if (normalizeSearchText.startsWith('@')) {
-			return memSearchSorted;
-		} else if (normalizeSearchText.startsWith('#')) {
+		if (normalizeSearchText.startsWith('#')) {
 			return channelSearchSorted;
 		}
 		return totalListsSorted;
 	};
 
 	useEffect(() => {
-		const listToUseChecked = getListToUse(normalizeSearchText, memSearchSorted, channelSearchSorted, totalListsSorted);
+		const listToUseChecked = getListToUse(normalizeSearchText, channelSearchSorted, totalListsSorted);
 		setListToUse(listToUseChecked);
 		setIdActive('');
 	}, [normalizeSearchText]);
@@ -377,7 +348,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal
-								listSearch={totalListsSorted.slice(0,50)}
+								listSearch={totalListsSorted.slice(0, 50)}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
 								searchText={normalizeSearchText}
@@ -396,7 +367,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={memSearchSorted.slice(0,50)}
+										listSearch={totalListMembersSorted.slice(0,50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText}
@@ -410,7 +381,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									<ListSearchModal
-										listSearch={channelSearchSorted.slice(0,50)}
+										listSearch={channelSearchSorted.slice(0, 50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText.slice(1)}

@@ -81,8 +81,6 @@ export default class App {
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
 				if (process.platform == 'win32' || process.platform == 'linux') {
-					deeplinkingUrl = argv.slice(1);
-
 					const url = argv.pop().slice(1);
 
 					if (url) {
@@ -110,12 +108,22 @@ export default class App {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
 
+		// Protocol handler for osx
+		App.application.on('open-url', function (event, url) {
+			event.preventDefault();
+
+			if (url) {
+				const index = url.indexOf('=');
+				const dataString = url.substring(index + 1);
+
+				if (dataString) {
+					App.loadMainWindow({ deepLinkUrl: dataString });
+				}
+			}
+		});
+
 		App.application.on('will-finish-launching', function () {
-			// Protocol handler for osx
-			App.application.on('open-url', function (event, url) {
-				event.preventDefault();
-				deeplinkingUrl = url;
-			});
+			// console.log("will-finish-launching");
 		});
 
 		// if main window is ready to show, close the splash window and show the main window
@@ -170,11 +178,7 @@ export default class App {
 			);
 		}
 
-		if (process.platform == 'win32' || process.platform == 'linux') {
-			// Keep only command line / deep linked arguments
-			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('mezon.ai');
-		}
+		App.application.setAppUserModelId('mezon.ai');
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {

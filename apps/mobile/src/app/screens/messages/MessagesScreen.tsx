@@ -1,13 +1,7 @@
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import {
-	DirectEntity,
-	RootState,
-	selectAllClans,
-	selectDirectsOpenlist,
-	selectTypingUserIdsByChannelId,
-} from '@mezon/store-mobile';
+import { DirectEntity, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
@@ -37,7 +31,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: directMessage?.id }
+			params: { directMessageId: directMessage?.id },
 		});
 	};
 
@@ -47,7 +41,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
-			username: username
+			username: username,
 		}));
 	}, [directMessage]);
 
@@ -78,7 +72,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 	const lastMessageTime = useMemo(() => {
 		if (directMessage?.last_sent_message?.content) {
-			const timestamp = Number(directMessage?.last_sent_message?.timestamp);
+			const timestamp = Number(directMessage?.last_sent_message?.timestamp_seconds);
 			return moment.unix(timestamp).format('DD/MM/YYYY HH:mm');
 		}
 		return null;
@@ -138,8 +132,8 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clans = useSelector(selectAllClans);
 
 	const sortDM = (a, b) => {
-		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-		const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+		const timestampA = parseFloat(a.last_sent_message?.timestamp_seconds || '0');
+		const timestampB = parseFloat(b.last_sent_message?.timestamp_seconds || '0');
 		return timestampB - timestampA;
 	};
 

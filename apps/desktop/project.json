@@ -16,6 +16,16 @@
           "url": "https://cdn.mezon.vn/release/"
         }
       ],
+      "mac": {
+        "icon": "apps/chat/src/assets/mac-icon.png",        
+        "appId": "mezon.ai",
+        "publish": [
+          {
+            "provider": "generic",
+            "url": "https://cdn.mezon.vn/release/"
+          }
+        ]
+      },
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": [
@@ -113,6 +123,16 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/packages",
         "prepackageOnly": true,
+        "mac": {
+          "icon": "apps/chat/src/assets/mac-icon.png",        
+          "appId": "mezon.ai",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
+        },
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": [
@@ -160,6 +180,16 @@
         "frontendProject": "chat",
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
+        "mac": {
+          "icon": "apps/chat/src/assets/mac-icon.png",        
+          "appId": "mezon.ai",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
+        },
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": [

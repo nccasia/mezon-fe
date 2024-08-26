@@ -16,7 +16,7 @@ export const RenderVideoChat = React.memo(
 			>
 				<ExpoVideo
 					onError={(err) => {
-						console.log('*** load error', err);
+						console.log('load error', err);
 					}}
 					source={{
 						uri: videoURL,

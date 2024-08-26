@@ -39,7 +39,7 @@ export function useSeenMessagePool() {
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,
 			messageId: message.id || '',
-			messageCreatedAt: message.create_time_ms ? +message.create_time_ms : 0,
+			messageCreatedAt: message.create_time_seconds ? +message.create_time_seconds : 0,
 			messageSeenAt: +Date.now(),
 		});
 	}, []);

@@ -199,7 +199,7 @@ const NavigationMain = () => {
 				return;
 			}
 		} catch (error) {
-			console.log('Tom log  => error authLoader', error);
+			console.log('error authLoader', error);
 		}
 	}, []);
 

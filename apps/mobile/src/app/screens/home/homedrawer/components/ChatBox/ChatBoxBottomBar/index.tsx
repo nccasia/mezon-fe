@@ -396,7 +396,7 @@ export const ChatBoxBottomBar = memo(
 			// Write the text to the file
 			await RNFS.writeFile(path, text, 'utf8')
 				.then((success) => {
-					console.log('FILE WRITTEN!');
+					//console.log('FILE WRITTEN!');
 				})
 				.catch((err) => {
 					console.log(err.message);

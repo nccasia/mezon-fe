@@ -18,7 +18,6 @@ export const useCheckUpdatedVersion = () => {
 				country: 'vn',
 			});
 
-			console.log('*** check', check);
 			if (check.detail === 'remote > local') {
 				setNeedUpdate(true);
 				navigation.navigate(APP_SCREEN.SERVERS.STACK, {

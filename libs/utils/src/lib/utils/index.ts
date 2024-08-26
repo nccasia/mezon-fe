@@ -103,13 +103,13 @@ export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity
 	return userIds;
 };
 
-export const convertTimeMessage = (timestamp: string) => {
-	const textTime = formatDistanceToNowStrict(new Date(parseInt(timestamp) * 1000), { addSuffix: true });
+export const convertTimeMessage = (timestamp: number) => {
+	const textTime = formatDistanceToNowStrict(new Date(timestamp * 1000), { addSuffix: true });
 	return textTime;
 };
 
-export const isGreaterOneMonth = (timestamp: string) => {
-	const date = new Date(parseInt(timestamp) * 1000);
+export const isGreaterOneMonth = (timestamp: number) => {
+	const date = new Date(timestamp * 1000);
 	const now = new Date();
 	const result = differenceInDays(now, date);
 	return result;

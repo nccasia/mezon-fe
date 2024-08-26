@@ -77,11 +77,11 @@ export function useThreads() {
 	}, [channels, currentChannel, currentChannelId]);
 
 	const threadChannelOld = useMemo(() => {
-		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) > 30);
+		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) > 30);
 	}, [threadChannel]);
 
 	const threadChannelOnline = useMemo(() => {
-		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
+		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) <= 30);
 	}, [threadChannel]);
 
 	const threadCurrentChannel = useMemo(() => {

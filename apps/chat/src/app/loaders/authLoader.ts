@@ -1,4 +1,4 @@
-import { accountActions, authActions, clansActions, directActions, friendsActions, listChannelsByUserActions } from '@mezon/store';
+import { accountActions, authActions, clansActions, directActions, friendsActions, listChannelsByUserActions, listUsersByUserActions } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -25,6 +25,7 @@ function getRedirectTo(initialPath?: string): string {
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
 	dispatch(clansActions.joinClan({ clanId: '0' }));
 	dispatch(listChannelsByUserActions.fetchListChannelsByUser())
+	dispatch(listUsersByUserActions.fetchListUsersByUser())
 	dispatch(friendsActions.fetchListFriends({}));
 	dispatch(directActions.fetchDirectMessage({}));
 	try {

@@ -56,6 +56,18 @@ export const listChannelsByUserSlice = createSlice({
 		removeAll: listChannelsByUserAdapter.removeAll,
 		remove: listChannelsByUserAdapter.removeOne,
 		update: listChannelsByUserAdapter.updateOne,
+		updateLastSentTime: (state, action: PayloadAction<{ channelId: string }>) => {
+			const payload = action.payload;
+			const timestamp = (Date.now() / 1000);
+			listChannelsByUserAdapter.updateOne(state, {
+				id: payload.channelId,
+				changes: {
+					last_sent_message: {
+						timestamp_seconds: timestamp,
+					},
+				},
+			});
+		},
 	},
 	extraReducers: (builder) => {
 		builder

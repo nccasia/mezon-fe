@@ -33,6 +33,7 @@ import {
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
+	selectIsShowPopupQuickMess,
 	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
 	selectMessageByMessageId,
@@ -191,9 +192,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	const { trackEnterPress } = useEnterPressTracker();
+	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
 		const isEnterKey = key === 'Enter';
+		const isComposing = event.nativeEvent.isComposing;
 
 		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
@@ -207,7 +210,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		switch (key) {
 			case 'Enter': {
-				if (shiftKey) {
+				if (shiftKey || isComposing) {
 					return;
 				} else {
 					event.preventDefault();
@@ -484,13 +487,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 
 	useEffect(() => {
-		if ((closeMenu && statusMenu) || openEditMessageState) {
-			return;
+		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
+			return editorRef?.current?.blur();
 		}
 		if (getRefMessageReply !== null || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit]);
+	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -703,7 +706,6 @@ const useEnterPressTracker = () => {
 
 	const resetEnterCount = () => {
 		setEnterCount(0);
-		handleClosePopupQuickMess();
 		if (timerRef.current) {
 			clearTimeout(timerRef.current);
 			timerRef.current = null;
