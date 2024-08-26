@@ -43,7 +43,7 @@ export const fetchEventManagement = createAsyncThunk(
 		}
 
 		const response = await fetchEventManagementCached(mezon, clanId);
-				
+
 		if (!response.events) {
 			return [];
 		}
@@ -55,11 +55,11 @@ export const fetchEventManagement = createAsyncThunk(
 
 type CreateEventManagementyload = {
 	clan_id: string,
-	channel_id: string, 
-	address: string, 
-	title: string, 
-	start_time: string, 
-	end_time: string, 
+	channel_id: string,
+	address: string,
+	title: string,
+	start_time: string,
+	end_time: string,
 	description: string,
 	logo: string,
 };
@@ -79,8 +79,8 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			logo: logo || '',
 		}
 		const response = await mezon.client.createEvent(mezon.session, body);
-		if(response){
-			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true}));
+		if (response) {
+			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true }));
 		} else {
 			return thunkAPI.rejectWithValue([]);
 		}
@@ -98,7 +98,7 @@ export const fetchDeleteEventManagement = createAsyncThunk('deleteEventManagemen
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
 		if (response) {
-			thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true}));
+			thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);

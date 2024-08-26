@@ -6,6 +6,7 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -39,6 +40,7 @@ import {
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
+	EventManagement,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -49,7 +51,7 @@ import {
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
 	VoiceJoinedEvent,
-	VoiceLeavedEvent,
+	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -404,6 +406,28 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId],
 	);
 
+
+	const onEventCreate = useCallback(
+		(eventManagement: EventManagement) => {
+			if (eventManagement) {
+				const createEventPayload = {
+					clan_id: eventManagement.clan_id,
+					channel_id: eventManagement.channel_id,
+					address: eventManagement.address,
+					title: eventManagement.title,
+					start_time: eventManagement.start_time,
+					end_time: eventManagement.end_time,
+					description: eventManagement.description,
+					logo: eventManagement.logo
+				};
+
+				dispatch(eventManagementActions.fetchCreateEventManagement(createEventPayload));
+			}
+		},
+		[dispatch]
+	);
+
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -449,6 +473,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelupdated = onchannelupdated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.onEventCreate = onEventCreate;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -471,6 +497,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
+			onEventCreate,
 		],
 	);
 
@@ -497,31 +524,31 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -547,6 +574,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelupdated,
 		onHeartbeatTimeout,
 		setCallbackEventFn,
+		onEventCreate,
 	]);
 
 	useEffect(() => {
