@@ -49,6 +49,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	lottieProgressBar: {
 		width: '100%',
-		height: size.s_10,
+		height: size.s_8,
+		marginBottom: -size.s_4
 	}
 })

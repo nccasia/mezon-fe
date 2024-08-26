@@ -2,10 +2,10 @@ import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, selectAllRolesClan } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -19,8 +19,12 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 
 	const allClanRoles = useMemo(() => {
-		return (rolesClan || []).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
-	}, [rolesClan, isClanOwner, userPermissionsStatus])
+		return (rolesClan || []).filter(r => r?.slug !== EPermission.everyone).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
+	}, [rolesClan, isClanOwner, userPermissionsStatus]);
+
+	const everyoneRole = useMemo(() => {
+		return (rolesClan || []).find(r => r?.slug === EPermission.everyone);
+	}, [rolesClan])
 
 	navigation.setOptions({
 		headerRight: () => (
@@ -30,9 +34,8 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 		),
 	});
 
-	const navigateToRoleEveryone = () => {
-		//Todo: update later
-		Toast.show({ type: 'info', text1: 'Updating...' });
+	const navigateToEveryoneRole = () => {
+		navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS, { roleId: everyoneRole?.id })
 	};
 
 	const navigateToRoleDetail = (clanRole: RolesClanEntity) => {
@@ -46,7 +49,7 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 				</Text>
 			</Block>
 
-			<TouchableOpacity onPress={() => navigateToRoleEveryone()}>
+			<TouchableOpacity onPress={navigateToEveryoneRole}>
 				<Block
 					flexDirection="row"
 					alignItems="center"

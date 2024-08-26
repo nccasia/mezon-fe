@@ -2,8 +2,9 @@
 import {
   RolesClanEntity,
   selectAllRolesClan,
+  selectCurrentChannelId,
   selectCurrentClan,
-  selectMemberById,
+  selectUserChannelById
 } from '@mezon/store';
 import { EPermission } from "@mezon/utils";
 import { useMemo } from "react";
@@ -19,12 +20,13 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
     [EPermission.deleteMessage]: false,
     [EPermission.manageThread]: false,
     [EPermission.manageClan]: false,
+    [EPermission.everyone]: true,
   };
 
   clanRoles.forEach((role) => {
     const activeRole = activeRoleIds.includes(role?.id);
 
-    if (activeRole) {
+    if (activeRole || role?.slug === EPermission.everyone) {
       const listOfActivePermission = role?.permission_list?.permissions?.filter(p => p?.active) || [];
       listOfActivePermission.forEach((permission) => {
         if (permission?.slug) {
@@ -40,7 +42,8 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
 
 export function useUserPermission() {
   const { userId, userProfile } = useAuth();
-  const userById = useSelector(selectMemberById(userId || ''));
+  const currentChannelId = useSelector(selectCurrentChannelId);
+  const userById = useSelector(selectUserChannelById(userId || '', currentChannelId || ''));
   const currentClan = useSelector(selectCurrentClan);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const userPermissionsStatus = useMemo(() => {

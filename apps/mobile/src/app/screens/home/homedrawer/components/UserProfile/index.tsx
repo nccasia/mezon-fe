@@ -1,7 +1,7 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectDirectsOpenlist, selectMemberById } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectCurrentChannelId, selectDirectsOpenlist, selectUserChannelById } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -39,7 +39,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
-	const userById = useSelector(selectMemberById(userId || user?.id || ''));
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userById = useSelector(selectUserChannelById(userId || user?.id || '', currentChannelId || ''));
 	const userStatus = useMemberStatus(userId || user?.id);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { color } = useMixImageColor(userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url);

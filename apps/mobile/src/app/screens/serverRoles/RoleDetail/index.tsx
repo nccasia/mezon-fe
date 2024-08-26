@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
+import { rolesClanActions, selectAllRolesClan, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -21,7 +21,8 @@ type RoleDetailScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_DETAIL;
 export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetailScreen>) => {
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
 	const [showModalConfirmSave, setShowModalConfirmSave] = useState(false);
@@ -31,8 +32,8 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 
 	const clanRole = useMemo(() => {
-		return RolesClan.find((role) => role?.id === roleId);
-	}, [roleId, RolesClan]);
+		return rolesClan.find((role) => role?.id === roleId);
+	}, [roleId, rolesClan]);
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
@@ -126,7 +127,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			{
 				text: 'Yes',
 				onPress: async () => {
-					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
+					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id, clanId: currentClanId || "" }));
 					if (response?.payload) {
 						// Toast.show({
 						// 	type: 'success',

@@ -18,7 +18,7 @@ type SetupMembersScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS;
 export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMembersScreen>) => {
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const usersClan = useSelector(selectAllUsesClan);
 	const [originSelectedMembers, setOriginSelectedMembers] = useState<string[]>([]);
 	const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -29,13 +29,13 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 
 	//Note: create new role
 	const newRole = useMemo(() => {
-		return RolesClan?.[RolesClan.length - 1];
-	}, [RolesClan]);
+		return rolesClan?.[rolesClan.length - 1];
+	}, [rolesClan]);
 
 	//Note: edit role
 	const clanRole = useMemo(() => {
-		return RolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, RolesClan]);
+		return rolesClan?.find((role) => role?.id === roleId);
+	}, [roleId, rolesClan]);
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);

@@ -1,10 +1,11 @@
-import { useRoles } from "@mezon/core";
+import { useRoles, useUserPermission } from "@mezon/core";
 import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { baseColor, Block, Colors, size, Text, useTheme, verticalScale } from "@mezon/mobile-ui";
-import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
+import { ChannelMembersEntity, RolesClanEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
+import { EPermission } from "@mezon/utils";
 import { toastConfig } from "apps/mobile/src/app/configs/toastConfig";
 import { IMezonMenuSectionProps, MezonAvatar, MezonMenu } from "apps/mobile/src/app/temp-ui";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -28,13 +29,34 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
     const [selectedRole, setSelectedRole] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation('message');
+    const { isClanOwner, userPermissionsStatus } = useUserPermission();
     const activeRoleOfUser = useMemo(() => {
         return rolesClan?.filter(role => user?.role_id?.includes(role?.id)) || [];
     }, [rolesClan, user?.role_id])
 
-    const isClanOwner = useMemo(() => {
-        return currentClan?.creator_id === user?.user?.id
-    }, [currentClan?.creator_id, user?.user?.id])
+    const getPermissionDisable = useCallback((role: RolesClanEntity) => {
+        const permissionActiveList = role?.permission_list?.permissions?.filter(p => p?.active) || [];
+
+        if (!permissionActiveList.length) {
+            return false;
+        }
+
+        for (const p of permissionActiveList) {
+            const { slug } = p;
+            switch (slug) {
+                case EPermission.administrator:
+                    return !isClanOwner;
+                case EPermission.manageClan:
+                    return !(isClanOwner || userPermissionsStatus.administrator);
+                default:
+                    return false;
+            }
+        }
+    }, [userPermissionsStatus, isClanOwner])
+
+    const removeEveryoneRole = useCallback((role: RolesClanEntity) => {
+        return role?.slug !== EPermission.everyone
+    }, [])
 
     const handleAfterUpdate = (isSuccess: boolean) => {
         if (isSuccess) {
@@ -92,8 +114,12 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
     }, [user?.role_id])
 
     const roleList = useMemo(() => {
-        return !editMode ? activeRoleOfUser : rolesClan
-    }, [editMode, activeRoleOfUser, rolesClan])
+        return editMode
+            ? (rolesClan || [])
+                .filter(removeEveryoneRole)
+                .map(r => ({ ...r, disabled: getPermissionDisable(r) }))
+            : activeRoleOfUser.map(r => ({ ...r, disabled: false }))
+    }, [editMode, activeRoleOfUser, rolesClan, getPermissionDisable, removeEveryoneRole]);
 
     const menuActions = useMemo(() => (
         profileSetting
@@ -160,9 +186,10 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                         <Text color={themeValue.text} h5>{t('manage.roles')}</Text>
                         <Block borderRadius={size.s_10} overflow="hidden" marginTop={size.s_8}>
                             {roleList.map(role => {
+                                const { id, title, disabled } = role;
                                 if (editMode) {
                                     return (
-                                        <TouchableOpacity key={role?.id} onPress={() => onSelectedRoleChange(!selectedRole?.includes(role?.id), role?.id)} disabled={isLoading}>
+                                        <TouchableOpacity key={id} onPress={() => onSelectedRoleChange(!selectedRole?.includes(id), id)} disabled={isLoading || disabled}>
                                             <Block
                                                 backgroundColor={themeValue.secondary}
                                                 padding={size.s_14}
@@ -173,27 +200,27 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                                             >
                                                 <Block height={size.s_20} width={size.s_20}>
                                                     <BouncyCheckbox
-                                                        disabled={isLoading}
+                                                        disabled={isLoading || disabled}
                                                         size={20}
-                                                        isChecked={selectedRole?.includes(role?.id)}
-                                                        onPress={(value) => onSelectedRoleChange(value, role?.id)}
-                                                        fillColor={isLoading ? Colors.bgGrayDark : Colors.bgButton}
+                                                        isChecked={selectedRole?.includes(id)}
+                                                        onPress={(value) => onSelectedRoleChange(value, id)}
+                                                        fillColor={isLoading || disabled ? Colors.bgGrayDark : Colors.bgButton}
                                                         iconStyle={{ borderRadius: 5 }}
                                                         innerIconStyle={{
                                                             borderWidth: 1.5,
-                                                            borderColor: selectedRole?.includes(role?.id) ? Colors.bgButton : Colors.tertiary,
+                                                            borderColor: selectedRole?.includes(id) ? Colors.bgButton : Colors.tertiary,
                                                             borderRadius: 5,
                                                         }}
                                                         textStyle={{ fontFamily: "JosefinSans-Regular" }}
                                                     />
                                                 </Block>
-                                                <Text color={isLoading ? themeValue.textDisabled : themeValue.white} h4>{role?.title}</Text>
+                                                <Text color={isLoading || disabled ? themeValue.textDisabled : themeValue.white} h4>{title}</Text>
                                             </Block>
                                         </TouchableOpacity>
                                     )
                                 }
                                 return (
-                                    <Block key={role?.id} backgroundColor={themeValue.secondary} padding={size.s_14} borderBottomWidth={1} borderBottomColor={themeValue.tertiary}>
+                                    <Block key={id} backgroundColor={themeValue.secondary} padding={size.s_14} borderBottomWidth={1} borderBottomColor={themeValue.tertiary}>
                                         <Text color={themeValue.white} h4>{role?.title}</Text>
                                     </Block>
                                 )

@@ -155,12 +155,14 @@ const UserSettingProfile = ({
 				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} />
 			</MezonModal>
 
-			<ManageUserModal
-				visible={visibleManageUserModal}
-				user={user}
-				onclose={handleUserModalClose}
-				profileSetting={profileSetting}
-			/>
+			{visibleManageUserModal && (
+				<ManageUserModal
+					visible={visibleManageUserModal}
+					user={user}
+					onclose={handleUserModalClose}
+					profileSetting={profileSetting}
+				/>
+			)}
 		</Block>
 	);
 };
