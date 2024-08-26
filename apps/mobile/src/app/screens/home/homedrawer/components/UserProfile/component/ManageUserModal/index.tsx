@@ -41,17 +41,14 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
             return false;
         }
 
-        for (const p of permissionActiveList) {
-            const { slug } = p;
-            switch (slug) {
-                case EPermission.administrator:
-                    return !isClanOwner;
-                case EPermission.manageClan:
-                    return !(isClanOwner || userPermissionsStatus.administrator);
-                default:
-                    return false;
+        return permissionActiveList.some(({ slug }) => {
+            if (slug === EPermission.administrator) {
+                return !isClanOwner;
+            } else if (slug === EPermission.manageClan) {
+                return !(isClanOwner || userPermissionsStatus.administrator);
             }
-        }
+            return false;
+        });
     }, [userPermissionsStatus, isClanOwner])
 
     const removeEveryoneRole = useCallback((role: RolesClanEntity) => {
