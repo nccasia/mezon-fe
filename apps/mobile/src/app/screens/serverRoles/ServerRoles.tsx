@@ -19,11 +19,13 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 
 	const allClanRoles = useMemo(() => {
-		return (rolesClan || []).filter(r => r?.slug !== EPermission.everyone).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
+		if (!rolesClan || rolesClan?.length === 0) return [];
+		return rolesClan.filter(r => r?.slug !== EPermission.everyone).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
 	}, [rolesClan, isClanOwner, userPermissionsStatus]);
 
 	const everyoneRole = useMemo(() => {
-		return (rolesClan || []).find(r => r?.slug === EPermission.everyone);
+		if (!rolesClan || rolesClan?.length === 0) return [];
+		return rolesClan.find(r => r?.slug === EPermission.everyone);
 	}, [rolesClan])
 
 	navigation.setOptions({
