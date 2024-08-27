@@ -17,7 +17,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import NotificationSetting from '../../../components/NotificationSetting';
+import NotificationSetting from '../../../components/MuteThreadDetailModal/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
@@ -242,7 +242,7 @@ const HomeDefaultHeader = React.memo(
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+									currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
 								) : (
 									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />

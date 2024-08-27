@@ -1,10 +1,9 @@
-import { Attributes, Metrics, size } from "@mezon/mobile-ui";
+import { Attributes, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
-    padding: Metrics.size.xl
+    backgroundColor: colors.primary
   },
   headerTitle: {
     textAlign: 'center',
@@ -40,5 +39,5 @@ export const style = (colors: Attributes) => StyleSheet.create({
     width: 35,
     height: 35,
   },
-  leftIcon: {flexDirection: 'row', alignItems: 'center'}
+  leftIcon: { flexDirection: 'row', alignItems: 'center' }
 });

@@ -1,15 +1,15 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { MezonRadioButton } from '../../../temp-ui';
-import { ENotificationType } from '../../NotificationSetting';
+import { ENotificationType } from '..';
+import { MezonRadioButton } from '../../../../temp-ui';
 import { style } from '../NotificationSetting.styles';
 
 interface FilterCheckboxProps {
 	id: number | string;
 	isChecked: boolean;
 	label: string;
-	defaultNotifyName?: string;
+	defaultNotifyName?: number;
 	onCheckboxPress: (checked: boolean, id: number | string) => void;
 	customStyles?: ViewStyle;
 	leftIcon?: JSX.Element;

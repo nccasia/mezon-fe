@@ -1,5 +1,4 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AngleRight, Icons } from '@mezon/mobile-components';
+import { AngleRight } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
@@ -12,14 +11,13 @@ import { IChannel } from '@mezon/utils';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../temp-ui';
-import NotificationSetting from '../NotificationSetting';
+import MuteChannelOption from './MuteChannelOption';
 import { style } from './MuteThreadDetailModal.styles';
 
 type RootStackParamList = {
@@ -43,65 +41,18 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['notificationSetting']);
-	const menu = useMemo(
-		() =>
-			[
-				{
-					items: [
-						{
-							title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
-							onPress: () => {
-								handleScheduleMute(15 * 60 * 1000);
-							},
-						},
-						{
-							title: t('notifySettingThreadModal.muteDuration.forOneHour'),
-							onPress: () => {
-								handleScheduleMute(60 * 60 * 1000);
-							},
-						},
-						{
-							title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
-							onPress: () => {
-								handleScheduleMute(3 * 60 * 60 * 1000);
-							},
-						},
-						{
-							title: t('notifySettingThreadModal.muteDuration.forEightHours'),
-							onPress: () => {
-								handleScheduleMute(8 * 60 * 60 * 1000);
-							},
-						},
-						{
-							title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
-							onPress: () => {
-								handleScheduleMute(24 * 60 * 60 * 1000);
-							},
-						},
-						{
-							title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
-							onPress: () => {
-								handleScheduleMute(Infinity);
-							},
-						},
-					],
-				},
-			] as IMezonMenuSectionProps[],
-		[],
-	);
-
 	const navigation = useNavigation<any>();
 	const [mutedUntil, setMutedUntil] = useState('');
-	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const [isChannel, setIsChannel] = useState<boolean>();
 	const { currentChannel } = route?.params || {};
+
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
 
-	useEffect(() => {
-		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
+	const isChannel = useMemo(() => {
+		return currentChannel?.parrent_id !== "0";
 	}, [currentChannel]);
+
 
 	navigation.setOptions({
 		headerShown: true,
@@ -129,8 +80,10 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 
-	const openBottomSheet = () => {
-		bottomSheetRef.current?.present();
+	const navigateToNotificationDetail = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+			screen: APP_SCREEN.MENU_THREAD.NOTIFICATION_DETAIL_CHANNEL
+		});
 	};
 
 	useEffect(() => {
@@ -160,80 +113,20 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		}
 	}, [getNotificationChannelSelected, dispatch, currentChannel?.channel_id, currentClanId]);
 
-	const muteOrUnMuteChannel = (active: ENotificationActive) => {
-		const body = {
-			channel_id: currentChannel?.channel_id || '',
-			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-			clan_id: currentClanId || '',
-			active,
-		};
-		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-		navigateToThreadDetail();
-	};
-
-	const navigateToThreadDetail = () => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentChannel } });
-	};
-
-	const handleScheduleMute = (duration: number) => {
-		if (duration !== Infinity) {
-			const now = new Date();
-			const unmuteTime = new Date(now.getTime() + duration);
-			const unmuteTimeISO = unmuteTime.toISOString();
-
-			const body = {
-				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-				clan_id: currentClanId || '',
-				time_mute: unmuteTimeISO,
-			};
-			dispatch(notificationSettingActions.setNotificationSetting(body));
-		} else {
-			const body = {
-				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-				clan_id: currentClanId || '',
-				active: ENotificationActive.OFF,
-			};
-			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-		}
-		navigateToThreadDetail();
-	};
-
 	return (
 		<View style={styles.wrapper}>
-			{getNotificationChannelSelected?.active === ENotificationActive.ON ||
-				getNotificationChannelSelected.id == "0" ? (
-				<MezonMenu menu={menu} />
-			) : (
-				<View style={styles.optionsBox}>
-					<TouchableOpacity
-						onPress={() => {
-							muteOrUnMuteChannel(1);
-						}}
-						style={styles.wrapperUnmuteBox}
-					>
-						<Icons.BellSlashIcon width={20} height={20} style={{ marginRight: 20 }} color={themeValue.text} />
-						<Text
-							style={styles.option}
-						>{`Unmute ${isDMThread ? currentChannel?.channel_label : isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`} `}</Text>
-					</TouchableOpacity>
-				</View>
-			)}
+			<MuteChannelOption navigateBack />
 			{mutedUntil ? <Text style={styles.InfoTitle}>{mutedUntil}</Text> : null}
+
 			{!isDMThread ? (
 				<Block>
-					<TouchableOpacity onPress={() => openBottomSheet()} style={styles.wrapperItemNotification}>
+					<TouchableOpacity onPress={() => navigateToNotificationDetail()} style={styles.wrapperItemNotification}>
 						<Text style={styles.option}>{t('bottomSheet.title')}</Text>
 						<AngleRight width={20} height={20} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.InfoTitle}>{t('notifySettingThreadModal.description')}</Text>
 				</Block>
 			) : null}
-
-			<MezonBottomSheet heightFitContent ref={bottomSheetRef}>
-				<NotificationSetting />
-			</MezonBottomSheet>
 		</View>
 	);
 };

@@ -11,12 +11,12 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
+import ChannelNotificationSettings from '../../../components/MuteThreadDetailModal/ChannelNotificationSettings';
 import CreateThreadModal from '../../../components/ThreadDetail';
 import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm';
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import ThreadAddButton from '../../../components/ThreadDetail/ThreadAddButton';
 import { APP_SCREEN } from '../../ScreenTypes';
-import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
@@ -125,6 +125,11 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 			<Stack.Screen
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_THREAD.NOTIFICATION_DETAIL_CHANNEL}
+				component={ChannelNotificationSettings}
 			/>
 
 		</Stack.Navigator>

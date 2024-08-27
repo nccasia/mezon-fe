@@ -3,11 +3,11 @@ import {
 	notifiReactMessageActions,
 	notificationSettingActions,
 	selectCurrentChannelId,
+	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiReactMessage,
-	selectCurrentChannelNotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import React, { useEffect, useState } from 'react';
@@ -15,15 +15,15 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { MezonRadioButton } from '../../temp-ui';
+import { MezonRadioButton } from '../../../temp-ui';
 import FilterCheckbox from './FilterCheckbox/FilterCheckbox';
 import { style } from './NotificationSetting.styles';
 
 export const enum ENotificationType {
-	CATEGORY_DEFAULT = 'Use Category Default',
-	ALL_MESSAGE = 'ALL',
-	NOTHING_MESSAGE = 'NOTHING',
-	MENTION_MESSAGE = 'MENTION',
+	CATEGORY_DEFAULT = 0,
+	ALL_MESSAGE = 1,
+	NOTHING_MESSAGE = 2,
+	MENTION_MESSAGE = 3,
 }
 
 export default function NotificationSetting() {
@@ -43,7 +43,7 @@ export default function NotificationSetting() {
 			isChecked: false,
 			value: ENotificationType.ALL_MESSAGE,
 		},
-    {
+		{
 			id: 2,
 			label: t('bottomSheet.labelOptions.mentionMessage'),
 			isChecked: false,
@@ -113,7 +113,6 @@ export default function NotificationSetting() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.headerTitle}>{t('bottomSheet.title')}</Text>
 			<View style={styles.optionsSetting}>
 				<TouchableOpacity onPress={handleCheckboxPress} style={styles.option}>
 					<Text style={styles.labelOption}>{t('bottomSheet.labelOptions.reactionMessage')}</Text>

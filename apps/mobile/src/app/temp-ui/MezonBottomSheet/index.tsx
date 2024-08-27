@@ -2,7 +2,7 @@ import { BottomSheetModalProps, BottomSheetScrollView, BottomSheetModal as Origi
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode, Ref, forwardRef, useCallback, useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, ViewStyle } from 'react-native';
 import Backdrop from './backdrop';
 import { style } from './styles';
 
@@ -14,13 +14,14 @@ export interface IMezonBottomSheetProps extends BottomSheetModalProps {
 	headerRight?: ReactNode;
 	heightFitContent?: boolean;
 	snapPoints?: string[];
+	innerStyle?: ViewStyle;
 }
 
 const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
-	const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = 'sm' } = props;
+	const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = 'sm', innerStyle } = props;
 	const themeValue = useTheme().themeValue;
 	const styles = useMemo(() => style(themeValue), [themeValue]);
-	
+
 	const renderHeader = useCallback(() => {
 		if (title || headerLeft || headerRight) {
 			return (
@@ -33,7 +34,7 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 		}
 		return null;
 	}, [title, headerLeft, headerRight, styles, titleSize]);
-	
+
 	return (
 		<OriginalBottomSheet
 			{...props}
@@ -46,7 +47,7 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 			enableDynamicSizing={heightFitContent}
 			handleIndicatorStyle={styles.handleIndicator}
 		>
-			<BottomSheetScrollView>
+			<BottomSheetScrollView style={innerStyle}>
 				{renderHeader()}
 				{children}
 			</BottomSheetScrollView>
