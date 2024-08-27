@@ -3093,7 +3093,7 @@ export function ThreadIconLocker(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconRemove({ className = '' }: { className: string }) {
+export function IconRemove({ className = '', handleClick= ()=>{} }: { className: string; handleClick?: () => void; }) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -3104,6 +3104,7 @@ export function IconRemove({ className = '' }: { className: string }) {
 			fill="none"
 			viewBox="0 0 24 24"
 			className={className}
+			onClick={handleClick}
 		>
 			<path
 				fill="currentColor"
