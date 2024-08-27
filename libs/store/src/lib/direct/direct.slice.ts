@@ -37,8 +37,8 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 function extractDMMeta(channel: DirectEntity): DMMeta {
 	return {
 		id: channel.id,
-		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds || 0),
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds || 0),
+		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
 		notifiCount: Number(channel.count_mess_unread || 0),
 	};
 }
@@ -135,8 +135,8 @@ export const fetchDirectMessage = createAsyncThunk(
 		if (Date.now() - response.time < 100) {
 			const listStatusUnreadDM = response.channeldesc.map((channel) => {
 				const status = getStatusUnread(
-					Number(channel.last_seen_message?.timestamp_seconds ?? ''),
-					Number(channel.last_sent_message?.timestamp_seconds ?? ''),
+					Number(channel.last_seen_message?.timestamp_seconds),
+					Number(channel.last_sent_message?.timestamp_seconds),
 				);
 				return { dmId: channel.channel_id ?? '', isUnread: status };
 			});
@@ -375,6 +375,13 @@ export const selectAllDirectMessages = createSelector(getDirectState, selectAll)
 export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => state.currentDirectMessageId);
 
 export const selectDmGroupCurrentType = createSelector(getDirectState, (state) => state.currentDirectMessageType);
+
+export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, selectDmGroupCurrentId,
+	(directMessages, currentId) => {
+		const currentDm = directMessages.find((dm) => dm.id === currentId);
+		return currentDm?.user_id || [];
+	}
+)
 
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 

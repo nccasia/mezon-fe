@@ -1,15 +1,14 @@
 import {
-    ClansEntity,
-    clansActions,
-    selectAllClans,
-    selectAllUsesClan,
-    selectCurrentClan,
-    selectCurrentClanId,
-    selectShowNumEvent,
-    useAppDispatch,
-    userClanProfileActions,
+	ClansEntity,
+	clansActions,
+	selectAllClans,
+	selectAllUsesClan,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectShowNumEvent,
+	useAppDispatch,
+	userClanProfileActions,
 } from '@mezon/store';
-import { UserSearchDataProps } from '@mezon/utils';
 import { ApiUpdateClanDescRequest } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -76,10 +75,10 @@ export function useClans() {
 		},
 		[dispatch],
 	);
-	
+
 	const deleteClan = React.useCallback(
-		async({ clanId } : {clanId: string}) =>{
-			await dispatch(clansActions.deleteClan({clanId}));
+		async ({ clanId }: { clanId: string }) => {
+			await dispatch(clansActions.deleteClan({ clanId }));
 		},
 		[dispatch],
 	);
@@ -87,14 +86,6 @@ export function useClans() {
 	const avatarClans = usersClan.map((user) => user.user?.avatar_url).slice(0, 5);
 
 	const remainingMember = usersClan.map((user) => user.user).slice(5);
-
-	const listUserSearch: UserSearchDataProps[] = usersClan.map((user) => {
-		return {
-			id: user?.user?.id ?? '',
-			display: user?.user?.username ?? '',
-			avatarUrl: user?.user?.avatar_url ?? '',
-		};
-	});
 
 	return useMemo(
 		() => ({
@@ -104,7 +95,6 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
-			listUserSearch,
 			showNumEvent,
 			setClanShowNumEvent,
 			getUserClanProfile,
@@ -120,7 +110,6 @@ export function useClans() {
 			usersClan,
 			avatarClans,
 			remainingMember,
-			listUserSearch,
 			showNumEvent,
 			setClanShowNumEvent,
 			getUserClanProfile,

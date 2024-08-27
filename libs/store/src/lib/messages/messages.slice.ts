@@ -1,27 +1,27 @@
 import {
-    ApiChannelMessageHeaderWithChannel,
-    ChannelDraftMessages,
-    Direction_Mode,
-    EMessageCode,
-    EmojiDataOptionals,
-    IMessageSendPayload,
-    IMessageWithUser,
-    LIMIT_MESSAGE,
-    LoadingStatus,
-    MessageTypeUpdateLink,
-    checkContinuousMessagesByCreateTimeMs,
-    checkSameDayByCreateTime,
+	ApiChannelMessageHeaderWithChannel,
+	ChannelDraftMessages,
+	Direction_Mode,
+	EMessageCode,
+	EmojiDataOptionals,
+	IMessageSendPayload,
+	IMessageWithUser,
+	LIMIT_MESSAGE,
+	LoadingStatus,
+	MessageTypeUpdateLink,
+	checkContinuousMessagesByCreateTimeMs,
+	checkSameDayByCreateTime,
 } from '@mezon/utils';
 import {
-    EntityState,
-    GetThunkAPI,
-    PayloadAction,
-    createAsyncThunk,
-    createEntityAdapter,
-    createSelector,
-    createSelectorCreator,
-    createSlice,
-    weakMapMemoize,
+	EntityState,
+	GetThunkAPI,
+	PayloadAction,
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSelectorCreator,
+	createSlice,
+	weakMapMemoize,
 } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
@@ -198,7 +198,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const firstMessage = response.messages[response.messages.length - 1];
-		if (firstMessage.code === EMessageCode.FIRST_MESSAGE) {
+		if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
 
@@ -226,7 +226,7 @@ export const fetchMessages = createAsyncThunk(
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
 		const lastLoadMessage = messages[messages.length - 1];
-		const hasMore = lastLoadMessage.isFirst === false ? false : true;
+		const hasMore = lastLoadMessage?.isFirst === false ? false : true;
 
 		if (messages.length > 0) {
 			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
@@ -380,7 +380,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
+			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now);
 		} catch (e) {
 			console.error('Error updating last seen message', e);
 		}

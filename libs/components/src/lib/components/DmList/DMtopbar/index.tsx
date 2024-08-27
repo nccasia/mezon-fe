@@ -11,7 +11,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { Tooltip } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -55,7 +55,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
-			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full" >
+			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center flex-1">
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
@@ -65,7 +65,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						avatar={
 							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
 								? 'assets/images/avatar-group.png'
-								: currentDmGroup?.channel_avatar?.at(0) ?? ''
+								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
 						}
 						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
 						status={userStatus}
@@ -129,7 +129,13 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								</button>
 							)}
 						</div>
-						<SearchMessageChannel />
+						<SearchMessageChannel
+							mode={
+								currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM
+									? ChannelStreamMode.STREAM_MODE_DM
+									: ChannelStreamMode.STREAM_MODE_GROUP
+							}
+						/>
 						<div
 							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
 							id="inBox"
@@ -196,31 +202,31 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }:{currentDmGroup:DirectEntity, appearanceTheme:string}) => {
+const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGroup: DirectEntity; appearanceTheme: string }) => {
 	const [openAddToGroup, setOpenAddToGroup] = useState<boolean>(false);
 	const handleOpenAddToGroupModal = () => {
 		setOpenAddToGroup(!openAddToGroup);
-	}
+	};
 	const modalAddMemRef = useRef<HTMLDivElement | null>(null);
 	useOnClickOutside(modalAddMemRef, () => setOpenAddToGroup(false));
 	return (
 		<div onClick={handleOpenAddToGroupModal} ref={modalAddMemRef}>
-			{openAddToGroup &&
-				<div className='relative top-4 cursor-pointer'>
-					<CreateMessageGroup currentDM={currentDmGroup} isOpen={openAddToGroup} onClose={handleOpenAddToGroupModal} classNames='right-0 left-auto' />
+			{openAddToGroup && (
+				<div className="relative top-4 cursor-pointer">
+					<CreateMessageGroup
+						currentDM={currentDmGroup}
+						isOpen={openAddToGroup}
+						onClose={handleOpenAddToGroupModal}
+						classNames="right-0 left-auto"
+					/>
 				</div>
-			}
-			<Tooltip
-				content="Add friends to DM"
-				trigger="hover"
-				animation="duration-500"
-				style={appearanceTheme === 'light' ? 'light' : 'dark'}
-			>
+			)}
+			<Tooltip content="Add friends to DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 				<Icons.IconAddFriendDM />
 			</Tooltip>
 		</div>
-	)
-}
+	);
+};
 
 DmTopbar.Skeleton = () => {
 	return (

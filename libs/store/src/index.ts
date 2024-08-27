@@ -45,3 +45,4 @@ export * from './lib/webhook/webhook.slice';
 export * from './lib/channels/channelUser.slice';
 export * from './lib/application/applications.slice'
 export * from './lib/permissionChannel/permissionRoleChannel.slice';
+export * from './lib/channels/listUsers.slice';

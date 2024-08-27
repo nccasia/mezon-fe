@@ -44,7 +44,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import storage from 'redux-persist/es/storage';
+import storage from '@react-native-async-storage/async-storage';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',

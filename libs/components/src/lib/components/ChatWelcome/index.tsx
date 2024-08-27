@@ -1,8 +1,9 @@
-import { useAppParams } from '@mezon/core';
-import { selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { useAppParams, useFriends } from '@mezon/core';
+import { selectCurrentChannel, selectDirectById, selectFriendStatus, selectMemberByUserId, selectUserIdCurrentDm } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
@@ -121,6 +122,7 @@ type WelComeDmProps = {
 
 const WelComeDm = (props: WelComeDmProps) => {
 	const {name='', userName='', avatar='', classNameSubtext, showName, isDmGroup} = props;
+	const usernameDm = userName.slice(0, -1);
 	return(
 		<>
 			<AvatarImage
@@ -135,18 +137,91 @@ const WelComeDm = (props: WelComeDmProps) => {
 					{name}
 				</p>
 			</div>
-			{!isDmGroup &&<p className='font-medium text-2xl dark:text-textDarkTheme text-textLightTheme'>{userName}</p>}
+			{!isDmGroup &&<p className='font-medium text-2xl dark:text-textDarkTheme text-textLightTheme'>{usernameDm}</p>}
 			<div className="text-base">
-			<p className={classNameSubtext}>
-				{isDmGroup ? 
-					(
-						<>Welcome to the beginning of the {showName} group.</>
-					) : (
-						<>This is the beginning of your direct message history with {showName}</>
-					)
-				}
-			</p>
+				<p className={classNameSubtext}>
+					{isDmGroup ? 
+						(
+							<>Welcome to the beginning of the {showName} group.</>
+						) : (
+							<>This is the beginning of your direct message history with {showName}</>
+						)
+					}
+				</p>
 			</div>
+			{!isDmGroup && <StatusFriend userName={usernameDm}/>}
 		</>
 	)
 }
+
+type StatusFriendProps = {
+	userName?: string;
+}
+
+const StatusFriend = memo((props: StatusFriendProps) => {
+	const {userName=""} = props;
+	const userID = useSelector(selectUserIdCurrentDm);
+	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
+	const { acceptFriend, deleteFriend, addFriend } = useFriends();
+	return (
+		<div className="flex gap-x-2 items-center text-sm">
+			{checkAddFriend.myPendingFriend &&
+				<>
+					<p className="dark:text-contentTertiary text-colorTextLightMode">Sent you a friend request:</p>
+					<button 
+						className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+						onClick={() => {
+							acceptFriend(userName, userID[0]);
+						}}
+					>
+						Accept
+					</button>
+					<button 
+						className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+						onClick={() => {
+							deleteFriend(userName, userID[0]);
+						}}
+					>
+						Ignore
+					</button>
+				</>
+			}
+			{checkAddFriend.friend &&
+				<button 
+					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+					onClick={() => {
+						deleteFriend(userName, userID[0]);
+					}}
+				>
+					Remove Friend
+				</button>
+			}
+			{checkAddFriend.otherPendingFriend &&
+				<button 
+					className="rounded bg-bgSelectItem opacity-50 cursor-not-allowed px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+					onClick={() => console.log(1)}
+				>
+					Friend Request Sent
+				</button>
+			}
+			{checkAddFriend.noFriend &&
+				<button 
+					className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+					onClick={() => {
+						addFriend({
+							ids: userID,
+							usernames: [userName],
+						})
+					}}
+				>
+					Add Friend
+				</button>
+			}
+			<button 
+				className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+			>
+				Block
+			</button>
+		</div>
+	)
+})

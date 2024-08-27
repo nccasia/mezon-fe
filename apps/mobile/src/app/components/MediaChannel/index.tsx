@@ -1,6 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto } from '@mezon/store-mobile';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store-mobile';
 import { useCallback, useMemo, useState } from 'react';
 import { Dimensions, Platform, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -13,7 +12,7 @@ const MediaChannel = () => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const attachments = useSelector(selectAttachmentPhoto());
-	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const [imageSelected, setImageSelected] = useState<AttachmentEntity>();
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
@@ -21,7 +20,7 @@ const MediaChannel = () => {
 	}, [widthScreen]);
 
 	const openImage = useCallback(
-		(image: ApiMessageAttachment) => {
+		(image: AttachmentEntity) => {
 			setImageSelected(image);
 			setVisibleImageModal(true);
 		},

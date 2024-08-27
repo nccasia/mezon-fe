@@ -1,18 +1,20 @@
-import { Icons } from '@mezon/components';
-import { useClans, useSearchMessages, useThreads } from '@mezon/core';
+import { Icons, UserMentionList } from '@mezon/components';
+import { useSearchMessages, useThreads } from '@mezon/core';
 import {
 	appActions,
 	searchMessagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectDmGroupCurrentId,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectValueInputSearchMessage,
 	useAppDispatch,
 } from '@mezon/store';
 import { SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import SearchMessageChannelModal from './SearchMessageChannelModal';
 import SelectGroup from './SelectGroup';
@@ -20,15 +22,39 @@ import SelectItem from './SelectItem';
 import darkMentionsInputStyle from './StyleSearchMessages';
 import { hasKeySearch, searchFieldName } from './constant';
 
-const SearchMessageChannel = () => {
+type SearchMessageChannelProps = {
+	mode?: ChannelStreamMode;
+};
+interface ExtendedSuggestionDataItem extends SuggestionDataItem {
+	subDisplay?: string;
+}
+
+const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
 	const { fetchSearchMessages, currentPage } = useSearchMessages();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+
 	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
+
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
-	const { listUserSearch } = useClans();
+
+	const userListData = UserMentionList({
+		channelID: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? ''),
+		channelMode: mode,
+	});
+
+	const userListDataSearchByMention = userListData.map((user) => {
+		return {
+			id: user?.id ?? '',
+			display: user?.username ?? '',
+			avatarUrl: user?.avatarUrl ?? '',
+			subDisplay: user?.display,
+		};
+	});
+
 	const { setIsShowCreateThread } = useThreads();
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
@@ -64,7 +90,6 @@ const SearchMessageChannel = () => {
 		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
 		setValueDisplay(newPlainTextValue);
 		const filter: SearchFilter[] = [];
-		filter.push();
 		if (mentions.length === 0) {
 			filter.push(
 				{
@@ -76,8 +101,11 @@ const SearchMessageChannel = () => {
 			);
 		}
 		for (const mention of mentions) {
-			const convertMemtion = mention.display.split(':');
-			filter.push({ field_name: searchFieldName[convertMemtion[0]], field_value: convertMemtion[1] });
+			const convertMention = mention.display.split(':');
+			filter.push(
+				{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
+				{ field_name: 'channel_id', field_value: currentChannel?.id },
+			);
 		}
 		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 	};
@@ -177,7 +205,7 @@ const SearchMessageChannel = () => {
 				>
 					<Mention
 						appendSpaceOnAdd={true}
-						data={listUserSearch ?? []}
+						data={userListDataSearchByMention ?? []}
 						trigger="from:"
 						displayTransform={(id: any, display: any) => {
 							return `from:${display}`;
@@ -190,10 +218,10 @@ const SearchMessageChannel = () => {
 
 					<Mention
 						appendSpaceOnAdd={true}
-						data={listUserSearch ?? []}
+						data={userListDataSearchByMention ?? []}
 						trigger="mentions:"
 						displayTransform={(id: any, display: any) => {
-							return `from:${display}`;
+							return `mentions:${display}`;
 						}}
 						renderSuggestion={(suggestion) => {
 							return <SelectItem title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;

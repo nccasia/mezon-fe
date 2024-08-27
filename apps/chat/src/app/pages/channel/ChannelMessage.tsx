@@ -82,21 +82,25 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	useEffect(() => {
 		preloadMessageContextMenu(messageId);
 	}, [preloadMessageContextMenu, messageId]);
+
 	return (
 		<>
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
-			<div className="fullBoxText relative group ">
-				<MessageWithUser
-					message={mess as IMessageWithUser}
-					mode={mode}
-					isEditing={isEditing}
-					isHighlight={isHighlight}
-					popup={popup}
-					editor={editor}
-					onContextMenu={handleContextMenu}
-				/>
-			</div>
+			{!mess.isFirst && (
+				<div className="fullBoxText relative group ">
+					<MessageWithUser
+						message={mess as IMessageWithUser}
+						mode={mode}
+						isEditing={isEditing}
+						isHighlight={isHighlight}
+						popup={popup}
+						editor={editor}
+						onContextMenu={handleContextMenu}
+					/>
+				</div>
+			)}
+
 			{lastSeen && <UnreadMessageBreak />}
 			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</>

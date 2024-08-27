@@ -137,7 +137,6 @@ function MessageWithUser({
 								</div>
 							</div>
 						</div>
-						<MessageStatus message={message} isMessNotifyMention={isMessNotifyMention} />
 					</div>
 				</div>
 				<MessageReaction message={message} mode={mode} />

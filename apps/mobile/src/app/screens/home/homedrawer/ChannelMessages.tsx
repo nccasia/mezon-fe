@@ -1,7 +1,7 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, cloneDeep, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { attachmentActions, useAppSelector } from '@mezon/store';
+import { attachmentActions, AttachmentEntity, useAppSelector } from '@mezon/store';
 import { messagesActions, RootState, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
@@ -50,7 +50,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	const [messageSelected, setMessageSelected] = useState<IMessageWithUser | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
-	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const [imageSelected, setImageSelected] = useState<AttachmentEntity>();
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
@@ -153,7 +153,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		);
 	};
 	const onOpenImage = useCallback(
-		async (image: ApiMessageAttachment) => {
+		async (image: AttachmentEntity) => {
 			await dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			setImageSelected(image);
 			setVisibleImageModal(true);

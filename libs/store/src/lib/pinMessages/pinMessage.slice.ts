@@ -107,7 +107,7 @@ export const joinPinMessage = createAsyncThunk('messages/joinPinMessage', async 
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const now = Math.floor(Date.now() / 1000);
-		await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now.toString(), 1);
+		await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 1);
 	} catch (e) {
 		console.error('Error updating last seen message', e);
 	}
@@ -119,7 +119,7 @@ export const updateLastSeenPin = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now.toString(), 0);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 0);
 		} catch (e) {
 			console.error('Error updating last seen message', e);
 		}

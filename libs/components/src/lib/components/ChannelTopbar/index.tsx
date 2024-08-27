@@ -21,7 +21,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelType, NotificationType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,9 +36,10 @@ import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
 	isChannelVoice?: boolean;
+	mode?: ChannelStreamMode;
 };
 
-function ChannelTopbar({ channel }: ChannelTopbarProps) {
+function ChannelTopbar({ channel, mode }: ChannelTopbarProps) {
 	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -47,16 +48,12 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			{isChannelVoice ? (
-				<TopBarChannelVoice channel={channel} />
-			) : (
-				<TopBarChannelText channel={channel} />
-			)}
+			{isChannelVoice ? <TopBarChannelVoice channel={channel} /> : <TopBarChannelText channel={channel} mode={mode} />}
 		</div>
 	);
 }
 
-function TopBarChannelVoice({channel}: ChannelTopbarProps){
+function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
@@ -78,14 +75,14 @@ function TopBarChannelVoice({channel}: ChannelTopbarProps){
 				</div>
 			</div>
 		</>
-	)
+	);
 }
 
-function TopBarChannelText({channel, isChannelVoice}: ChannelTopbarProps) {
+function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
 
-	return(
+	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
@@ -101,7 +98,7 @@ function TopBarChannelText({channel, isChannelVoice}: ChannelTopbarProps) {
 								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 						</div>
-						<SearchMessageChannel />
+						<SearchMessageChannel mode={mode} />
 					</div>
 					<div
 						className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
@@ -116,7 +113,7 @@ function TopBarChannelText({channel, isChannelVoice}: ChannelTopbarProps) {
 				</div>
 			</div>
 		</>
-	)
+	);
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
@@ -235,12 +232,12 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages onClose={handleClose}/>}
+			{isShowPinMessage && <PinnedMessages onClose={handleClose} />}
 		</div>
 	);
 }
 
-export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boolean, isVoiceChannel?: boolean }) {
+export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boolean; isVoiceChannel?: boolean }) {
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
@@ -287,7 +284,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.Inbox defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''}/>
+					<Icons.Inbox defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>

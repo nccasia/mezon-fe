@@ -1,18 +1,17 @@
 import { useAuth } from '@mezon/core';
 import { UserGroupIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectDirectById, selectDirectsUnreadlist } from '@mezon/store-mobile';
+import { DirectEntity, selectDirectsUnreadlist } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
 import { ChannelType } from 'mezon-js';
 import React, { memo } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
 
 const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 	const navigation = useNavigation<any>();
-	const currentDirect = useSelector(selectDirectById(dm?.id || ''));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const getBadge = (dm: DirectEntity) => {
@@ -28,7 +27,7 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 							</View>
 						)}
 						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{currentDirect?.count_mess_unread}</Text>
+							<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
 						</View>
 					</View>
 				);
@@ -37,7 +36,7 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 					<View style={styles.groupAvatar}>
 						<UserGroupIcon />
 						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{currentDirect?.count_mess_unread}</Text>
+							<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
 						</View>
 					</View>
 				);
@@ -68,10 +67,10 @@ export const UnreadDMBadgeList = React.memo(() => {
 	const styles = style(themeValue);
 	return (
 		<View style={styles.container}>
-				{!!unReadDM?.length &&
-					unReadDM?.map((dm: DirectEntity, index) => {
-						return <UnreadDMBadgeItem key={dm?.id} dm={dm} />;
-					})}
+			{!!unReadDM?.length &&
+				unReadDM?.map((dm: DirectEntity, index) => {
+					return <UnreadDMBadgeItem key={`${dm?.id}_${index}`} dm={dm} />;
+				})}
 		</View>
 	);
 });

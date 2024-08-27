@@ -367,6 +367,10 @@ export type IChannelUser = ChannelDescription & {
 	id: string;
 };
 
+export type IUsers = ApiUser & {
+	id: string;
+};
+
 export type IPermissionRoleChannel = PermissionRoleChannel & {
 	id: string;
 };
