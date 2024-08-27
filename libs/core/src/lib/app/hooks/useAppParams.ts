@@ -1,13 +1,15 @@
 import { useMemo } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function useAppParams() {
 	const { clanId, channelId, directId, type } = useParams();
-	const { pathname: currentURL, search } = useLocation();
+	// const { pathname: currentURL, search } = useLocation();
+	const currentURL = "";
 
-	const query = useMemo(() => new URLSearchParams(search), [search]);
+	// const query = useMemo(() => new URLSearchParams(search), [search]);
 
-	const messageId = query.get('messageId');
+	// const messageId = query.get('messageId');
+	const messageId = "";
 
 	return useMemo(
 		() => ({

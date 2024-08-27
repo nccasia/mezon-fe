@@ -25,7 +25,7 @@ import {
 	toastActions,
 	useAppDispatch,
 	usersClanActions,
-	voiceActions,
+	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { NotificationCode } from '@mezon/utils';
@@ -54,7 +54,7 @@ import {
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -79,7 +79,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -210,7 +210,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			user?.user_ids.forEach((userID: any) => {
 				if (userID === userId) {
 					if (channelId === user.channel_id) {
-						navigate(`/chat/clans/${clanId}`);
+						// navigate(`/chat/clans/${clanId}`);
 					}
 					if (directId === user.channel_id) {
 						navigate(`/chat/direct/friends`);
@@ -233,14 +233,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			});
 		},
-		[channelId, clanId, dispatch, navigate, userId, directId],
+		[channelId, clanId, dispatch, userId, directId],
 	);
 	const onuserclanremoved = useCallback(
 		(user: UserClanRemovedEvent) => {
 			user?.user_ids.forEach((id: any) => {
 				if (id === userId) {
 					if (clanId === user.clan_id) {
-						navigate(`/chat/direct/friends`);
+						// navigate(`/chat/direct/friends`);
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 				} else {
@@ -248,7 +248,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 			});
 		},
-		[userId, clanId, navigate, dispatch],
+		[userId, clanId, dispatch],
 	);
 
 	const onuserchanneladded = useCallback(
@@ -497,31 +497,31 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 		};
 	}, [
 		onchannelmessage,

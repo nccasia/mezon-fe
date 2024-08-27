@@ -284,7 +284,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	request: {},
-	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	// idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	idChannelSelected: JSON.parse('{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 });
@@ -391,7 +392,7 @@ export const channelsSlice = createSlice({
 		},
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
-			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+			// localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
 		},
 	},
 	extraReducers: (builder) => {
@@ -538,7 +539,8 @@ export const selectChannelsByClanId = (clainId: string) =>
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
 	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+		// const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+		const idsSelectedChannel = JSON.parse('{}');
 		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
 			const selectedChannel = channels.find((channel) => channel.channel_id === idsSelectedChannel[clanId]);
 			if (selectedChannel) {
