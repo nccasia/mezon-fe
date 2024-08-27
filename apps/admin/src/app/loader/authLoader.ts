@@ -35,14 +35,14 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 			throw new Error('Session expired');
 		}
 		return {
-			isLogin: true,
+			isLogin: true
 		} as IAuthLoaderData;
 	} catch (error) {
 		const redirectTo = getRedirectTo(initialPath);
 		const redirect = redirectTo ? `/login?redirect=${redirectTo}` : '/login';
 		return {
 			isLogin: false,
-			redirect: redirect,
+			redirect: redirect
 		} as IAuthLoaderData;
 	}
 };

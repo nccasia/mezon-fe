@@ -46,15 +46,15 @@ export default function InvitePage() {
 
 	const isClickInvite = useSelector(selectIsClickInvite);
 	const handleCancelJoin = () => {
-		if(isClickInvite) navigate(-1);
+		if (isClickInvite) navigate(-1);
 		else navigate(`/chat/direct`);
 		handleBackNavigate();
 	};
-	
+
 	const dispatch = useAppDispatch();
 	const handleBackNavigate = () => {
 		dispatch(inviteActions.setIsClickInvite(false));
-	}
+	};
 
 	useEscapeKey(handleCancelJoin);
 

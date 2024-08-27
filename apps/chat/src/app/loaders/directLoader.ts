@@ -1,6 +1,6 @@
-import {channelsActions, emojiSuggestionActions} from '@mezon/store';
+import { channelsActions, emojiSuggestionActions } from '@mezon/store';
+import { ModeResponsive } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
-import {ModeResponsive} from "@mezon/utils";
 
 export const directLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: true }));

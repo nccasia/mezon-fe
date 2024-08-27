@@ -15,7 +15,7 @@ import {
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
@@ -79,14 +79,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 			return true;
 		},
-		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching],
+		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching]
 	);
 
 	const chatRefData = useMemo(() => {
 		return {
 			data: messages,
 			hasNextPage: hasMoreBottom,
-			hasPreviousPage: hasMoreTop,
+			hasPreviousPage: hasMoreTop
 		};
 	}, [messages, hasMoreBottom, hasMoreTop]);
 
@@ -151,8 +151,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return () => {
 			dispatch(
 				messagesActions.UpdateChannelLastMessage({
-					channelId,
-				}),
+					channelId
+				})
 			);
 		};
 	}, [channelId, dispatch]);
@@ -179,8 +179,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				className={classNames(
 					'dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full md:[overflow-anchor:none]',
 					{
-						customScrollLightMode: appearanceTheme === 'light',
-					},
+						customScrollLightMode: appearanceTheme === 'light'
+					}
 				)}
 				id="scrollLoading"
 				ref={chatRef}

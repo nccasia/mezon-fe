@@ -1,4 +1,3 @@
-
 // const isDarkTheme = Appearance.getColorScheme() === 'dark';
 // TODO: hardcode to check only dark theme
 const isDarkTheme = true;
@@ -71,7 +70,7 @@ const BaseColors = {
 	gray600: '#3D3D3D',
 	gray700: '#202020',
 	gray800: '#121212',
-	gray900: '#0C0C0C',
+	gray900: '#0C0C0C'
 };
 
 //TODO: can update more
@@ -87,8 +86,8 @@ const darkThemeColor = {
 
 	/* border color */
 	borderGray: BaseColors.gray600,
-	borderRed: BaseColors.red600,
-}
+	borderRed: BaseColors.red600
+};
 
 const lightThemeColor = {
 	/* text color */
@@ -102,8 +101,8 @@ const lightThemeColor = {
 
 	/* border color */
 	borderGray: BaseColors.gray600,
-	borderRed: BaseColors.red600,
-}
+	borderRed: BaseColors.red600
+};
 
 const colors = {
 	primary: isDarkTheme ? '#1E1F22' : '#FFFFFF',
@@ -128,7 +127,7 @@ const colors = {
 	borderPrimary: '#363940',
 	borderMessageHighlight: '#F0B132',
 	borderMessageReply: '#2882f0',
-  borderGrayishBrown: '#7f7e7e87',
+	borderGrayishBrown: '#7f7e7e87',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
@@ -137,7 +136,7 @@ const colors = {
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
 	caribbeanGreen: '#1FA07C',
-  vividScarlet: '#d1323f',
+	vividScarlet: '#d1323f',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -146,18 +145,18 @@ const colors = {
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
 	bgMention: '#3b426e',
-	red: "red",
-	orange: "#e77132",
-	goldenrodYellow: "#f2b13a",
+	red: 'red',
+	orange: '#e77132',
+	goldenrodYellow: '#f2b13a',
 	green: 'green',
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',
-  midnightIndigoBg: '#3b426e',
+	midnightIndigoBg: '#3b426e',
 	bgReply: '#383B47',
-  midnightBlue: '#3b426e',
-  jetBlack: '#29292b',
-  darkCharcoalGray: '#2b2b2e',
+	midnightBlue: '#3b426e',
+	jetBlack: '#29292b',
+	darkCharcoalGray: '#2b2b2e',
 	// background button
 	pink: '#e148c7',
 	bgButton: '#5865f2',
@@ -165,8 +164,7 @@ const colors = {
 	bgToggleOffBtn: '#c3c3c3',
 	charcoalBlack: '#1e1f22',
 	mentionBg: 'rgba(60, 66, 112, 0.5)',
-  darkGray: '#333333',
+	darkGray: '#333333'
 };
 
 export { colors, darkThemeColor, lightThemeColor };
-

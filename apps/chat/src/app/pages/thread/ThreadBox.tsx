@@ -7,7 +7,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -28,7 +28,7 @@ const ThreadBox = () => {
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
+		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
 	});
 
 	const createThread = useCallback(
@@ -39,12 +39,12 @@ const ThreadBox = () => {
 				channel_private: value.isPrivate,
 				parrent_id: currentChannelId as string,
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT,
+				type: ChannelType.CHANNEL_TYPE_TEXT
 			};
 			const thread = await dispatch(createNewChannel(body));
 			return thread.payload;
 		},
-		[currentChannel, currentChannelId, currentClanId, dispatch],
+		[currentChannel, currentChannelId, currentClanId, dispatch]
 	);
 
 	const handleSend = useCallback(
@@ -53,7 +53,7 @@ const ThreadBox = () => {
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			value?: ThreadValue,
+			value?: ThreadValue
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
@@ -63,8 +63,8 @@ const ThreadBox = () => {
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
-								channelType: thread.type as number,
-							}),
+								channelType: thread.type as number
+							})
 						);
 						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
@@ -73,7 +73,7 @@ const ThreadBox = () => {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, currentClanId, dispatch, sendMessageThread, sessionUser],
+		[createThread, currentClanId, dispatch, sendMessageThread, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {

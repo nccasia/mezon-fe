@@ -1,7 +1,7 @@
-import {channelsActions, clansActions, emojiSuggestionActions} from '@mezon/store';
+import { channelsActions, clansActions, emojiSuggestionActions } from '@mezon/store';
+import { ModeResponsive } from '@mezon/utils';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
-import {ModeResponsive} from "@mezon/utils";
 
 export type ClanLoaderData = {
 	clanId: string;
@@ -17,7 +17,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(clansActions.changeCurrentClan({ clanId }));
 	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 	return {
-		clanId,
+		clanId
 	} as ClanLoaderData;
 };
 

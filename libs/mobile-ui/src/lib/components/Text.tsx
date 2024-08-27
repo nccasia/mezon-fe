@@ -58,7 +58,7 @@ export const Text: React.FC<ITextWrapperProps> = ({
 				left && styles.left,
 				bold && styles.bold,
 				!!color && { color: color },
-				!!fontFamily && { fontFamily: fontFamily },
+				!!fontFamily && { fontFamily: fontFamily }
 			]}
 			{...rest}
 		>
@@ -71,60 +71,60 @@ const styles = StyleSheet.create({
 	h1: {
 		fontSize: verticalScale(32),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h2: {
 		fontSize: verticalScale(24),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h25: {
 		fontSize: verticalScale(23),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h3: {
 		fontSize: verticalScale(18),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h4: {
 		fontSize: verticalScale(16),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h5: {
 		fontSize: verticalScale(13),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	h6: {
 		fontSize: verticalScale(10),
 		marginLeft: 0,
-		marginRight: 0,
+		marginRight: 0
 	},
 	center: {
 		textAlign: 'center',
 		alignItems: 'center',
 		alignContent: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	left: {
 		textAlign: 'left',
 		alignItems: 'flex-start',
 		alignContent: 'flex-start',
-		justifyContent: 'flex-start',
+		justifyContent: 'flex-start'
 	},
 	right: {
 		textAlign: 'right',
 		alignItems: 'flex-end',
 		alignContent: 'flex-end',
-		justifyContent: 'flex-end',
+		justifyContent: 'flex-end'
 	},
 	bold: {
-		fontWeight: 'bold',
+		fontWeight: 'bold'
 	},
 	styleDefault: {
-		fontFamily: 'OpenSans-Bold',
-	},
+		fontFamily: 'OpenSans-Bold'
+	}
 });

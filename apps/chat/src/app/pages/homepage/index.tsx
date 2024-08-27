@@ -89,7 +89,7 @@ function Homepage() {
 							</div>
 							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
-						<div className='flex justify-center mt-10'>
+						<div className="flex justify-center mt-10">
 							<Link
 								to={'/mezon'}
 								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center hoverBoxShadow"
@@ -132,7 +132,6 @@ function Homepage() {
 								<div>Download for Windows</div>
 							</a>
 						</div>
-						
 					</div>
 				</div>
 			</div>

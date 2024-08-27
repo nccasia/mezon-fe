@@ -17,7 +17,7 @@
         }
       ],
       "mac": {
-        "icon": "apps/chat/src/assets/mac-icon.png",
+        "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "mezon.ai",
         "target": [
           "default"
@@ -30,7 +30,7 @@
         ]
       },
       "win": {
-        "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
+        "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
         "target": [
           "nsis"
         ],
@@ -130,7 +130,7 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.png",
+          "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "mezon.ai",
           "target": [
             "default"
@@ -143,7 +143,7 @@
           ]
         },
         "win": {
-          "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
+          "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis"
           ],
@@ -193,11 +193,17 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.png",
+          "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "mezon.ai",
           "target": [
             "default"
           ],
+          "hardenedRuntime": false,
+          "entitlements": "apps/desktop/src/assets/entitlements.mas.plist",
+          "entitlementsInherit": "./resources/mac/entitlements.mas.inherit.plist",
+          "entitlementsLoginHelper": "./resources/mac/entitlements.mas.inherit.plist",
+          "provisioningProfile": "./mas.provisionprofile",
+          "singleArchFiles": "*",
           "publish": [
             {
               "provider": "generic",
@@ -206,7 +212,7 @@
           ]
         },
         "win": {
-          "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
+          "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
           "target": [
             "nsis"
           ],
@@ -248,7 +254,8 @@
       }
     },
     "lint": {
-      "command": "eslint apps/desktop/**/*.ts"
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",

@@ -1377,12 +1377,7 @@ export const ClockWarningIcon = ({ width = 24, height = 24, color = 'white', ...
 );
 
 export const ClockIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
-	<Svg
-		width={width} height={height}
-		viewBox="0 0 32 33"
-		fill="none"
-		{...props}
-	>
+	<Svg width={width} height={height} viewBox="0 0 32 33" fill="none" {...props}>
 		<Path
 			fillRule="evenodd"
 			clipRule="evenodd"

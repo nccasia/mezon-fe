@@ -27,7 +27,7 @@ export class TrayIcon {
 				{
 					label: 'Check for updates',
 					type: 'normal',
-					click: () => autoUpdater.checkForUpdates(),
+					click: () => autoUpdater.checkForUpdates()
 				},
 				{
 					label: 'Show Mezon',
@@ -36,7 +36,7 @@ export class TrayIcon {
 						if (App.mainWindow) {
 							App.mainWindow.show();
 						}
-					},
+					}
 				},
 				{
 					label: 'Quit Mezon',
@@ -44,8 +44,8 @@ export class TrayIcon {
 					click: function () {
 						isQuitting = true;
 						App.application.quit();
-					},
-				},
+					}
+				}
 			];
 			const contextMenu = Menu.buildFromTemplate(template);
 

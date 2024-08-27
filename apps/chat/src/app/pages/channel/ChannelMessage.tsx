@@ -4,7 +4,7 @@ import {
 	MessageContextMenuProps,
 	MessageWithUser,
 	UnreadMessageBreak,
-	useMessageContextMenu,
+	useMessageContextMenu
 } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
@@ -13,7 +13,7 @@ import {
 	selectLastSeenMessage,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -55,7 +55,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
 			showMessageContextMenu(event, messageId, mode, props);
 		},
-		[showMessageContextMenu, messageId, mode],
+		[showMessageContextMenu, messageId, mode]
 	);
 
 	const mess = useMemo(() => {

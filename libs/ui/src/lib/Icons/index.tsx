@@ -2834,7 +2834,7 @@ export function IconClockChannel() {
 			<rect fill="url(#b)" height="56.67" rx="3.23" width="85.13" x="17.43" y="33.33" />
 			<rect fill="#ffd01a" height="56.67" rx="3.23" width="66.95" x="17.43" y="33.33" />
 			<g fill="none" strokeMiterlimit="10">
-				<g stroke="#ffa600" stroke-width="2.262054">
+				<g stroke="#ffa600" strokeWidth="2.262054">
 					<path d="m17.43 81.75h85.14" />
 					<path d="m17.43 41.58h66.95" />
 					<path d="m84.38 75.05h18.19" />
@@ -2844,7 +2844,7 @@ export function IconClockChannel() {
 					<path d="m84.38 48.28h18.19" />
 					<path d="m84.38 41.58h18.19" />
 				</g>
-				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" stroke-linecap="round" stroke-width="4.095565" />
+				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" strokeLinecap="round" strokeWidth="4.095565" />
 			</g>
 			<circle cx="50.91" cy="55.98" fill="#270813" r="5.96" />
 			<path d="m50.91 56-5.36 11.83a2.05 2.05 0 0 0 1.87 2.89h7a2.05 2.05 0 0 0 1.87-2.89z" fill="#270813" />
@@ -3372,8 +3372,8 @@ export const PicSuccessModal = ({ defaultFill = '#AEAEAE', defaultSize = '' }) =
 			<defs>
 				<rect id="a" height="80" rx="40" width="80"/>
 			</defs>
-			<g fill="none" fill-rule="evenodd">
-				<g stroke-linecap="round" stroke-width="2.252">
+			<g fill="none" fillRule="evenodd">
+				<g strokeLinecap="round" strokeWidth="2.252">
 					<path d="m151.113 82.556a4.556 4.556 0 1 1 -9.113 0 4.556 4.556 0 0 1 9.113 0zm-45.113-63a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-78 16a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-5 76a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-21-29a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0z" stroke="#595d63"/>
 					<path d="m42.927 43.17 1.235 1.234m6.266 6.266 1.235 1.235m-8.736.001 1.235-1.235m6.266-6.266 1.235-1.235" stroke="#494c51"/>
 					<path d="m124 60h3.341m3.659 0h3.341m-5.341-2.913v-1.087m0 8.087v-1.087" stroke="#494c51"/>
@@ -3388,18 +3388,18 @@ export const PicSuccessModal = ({ defaultFill = '#AEAEAE', defaultSize = '' }) =
 					</g>
 				</g>
 				<path d="m151.353 98.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m127.841 33.36-1.234 1.234m-6.267 6.266-1.234 1.235m8.735 0-1.234-1.235m-6.267-6.266-1.234-1.235" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m127.841 33.36-1.234 1.234m-6.267 6.266-1.234 1.235m8.735 0-1.234-1.235m-6.267-6.266-1.234-1.235" stroke="#494c51" strokeLinecap="round" strokeWidth="2.252"/>
 				<path d="m122.353 37.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m34.842 77.36-1.235 1.234m-6.267 6.266-1.234 1.235m8.736 0-1.235-1.235m-6.267-6.266-1.234-1.234" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m34.842 77.36-1.235 1.234m-6.267 6.266-1.234 1.235m8.736 0-1.235-1.235m-6.267-6.266-1.234-1.234" stroke="#494c51" strokeLinecap="round" strokeWidth="2.252"/>
 				<path d="m29.353 81.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m85 17v1.747m0 8.253v1.747m-6-5.747h1.747m9.253 0h1.747" stroke="#595d63" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m85 17v1.747m0 8.253v1.747m-6-5.747h1.747m9.253 0h1.747" stroke="#595d63" strokeLinecap="round" strokeWidth="2.252"/>
 				<path d="m85.912 23.913a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
 				<path d="m147.729 118.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-130.729-19a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#494c51"/>
 				<path d="m61.729 29.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m6-17a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m21 35a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m22-6a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m42 28a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-137.729 53a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#595d63"/>
-				<path d="m19.54 50.917v2.128m0 8.861v1.747m-6.177-6.178h1.747m8.86 0h1.748" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m19.54 50.917v2.128m0 8.861v1.747m-6.177-6.178h1.747m8.86 0h1.748" stroke="#494c51" strokeLinecap="round" strokeWidth="2.252"/>
 				<path d="m20.333 58.268a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
 				<g transform="translate(40 43)">
-					<use stroke="#fff" stroke-opacity=".2" stroke-width="6" xlinkHref="#a"/>
+					<use stroke="#fff" strokeOpacity=".2" strokeWidth="6" xlinkHref="#a"/>
 					<use xlinkHref="#a"/>
 				</g>
 				<path d="m62.77 81.24-5.17 5.28 13.785 14.08 31.015-29.92-5.17-5.28-25.845 24.64-8.616-8.8z" fill="#3ba55c"/>

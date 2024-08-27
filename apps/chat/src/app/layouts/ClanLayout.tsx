@@ -6,7 +6,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentVoiceChannel,
-	selectStatusMenu,
+	selectStatusMenu
 } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';

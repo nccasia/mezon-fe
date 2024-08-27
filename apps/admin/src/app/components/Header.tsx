@@ -2,16 +2,16 @@ import { useAuth } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import IconDarkMode from '../../assets/icons/IconDarkMode.png';
 import IconLightMode from '../../assets/icons/IconLightMode.png';
 import { useAppearance } from '../context/AppearanceContext';
-import { Link } from 'react-router-dom';
 
-interface IHeaderProps{
-	toggleSideBar: ()=> void
+interface IHeaderProps {
+	toggleSideBar: () => void;
 }
 
-const Header = ({toggleSideBar}: IHeaderProps) => {
+const Header = ({ toggleSideBar }: IHeaderProps) => {
 	const { userProfile } = useAuth();
 	const [showMenu, setShowMenu] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -44,9 +44,9 @@ const Header = ({toggleSideBar}: IHeaderProps) => {
 		<div
 			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
 		>
-			<div className='flex items-center gap-3'>
-				<div onClick={toggleSideBar} className='w-8 hidden max-lg:block'>
-					<Icons.MenuBarIcon className='w-full'/>
+			<div className="flex items-center gap-3">
+				<div onClick={toggleSideBar} className="w-8 hidden max-lg:block">
+					<Icons.MenuBarIcon className="w-full" />
 				</div>
 				<Link to="/admin/applications" className="flex flex-row items-center justify-center gap-[4px]">
 					<Image

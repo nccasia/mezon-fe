@@ -24,12 +24,12 @@ import DMRoutes from './DMRoutes';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { useCallback, useEffect, useMemo } from 'react';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
+import AppDirectory from '../pages/AppDirectory';
 import ThreadsMain from '../pages/thread';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
 import ThreadsRoutes from './ThreadsRoutes';
-import AppDirectory from '../pages/AppDirectory';
 
 const Login = loadable(() => import('../pages/login'));
 const Homepage = loadable(() => import('../pages/homepage'));
@@ -57,10 +57,10 @@ export const Routes = () => {
 				await loaderFunction({
 					...props,
 					dispatch,
-					initialPath: window.location.pathname,
+					initialPath: window.location.pathname
 				});
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	useEffect(() => {
@@ -80,16 +80,16 @@ export const Routes = () => {
 						// initial route to redirect to /chat
 						{
 							path: '/mezon',
-							element: <InitialRoutes />,
+							element: <InitialRoutes />
 						},
 						{
 							path: '/',
 							loader: loaderWithStore(loginLoader),
-							element: <Homepage />,
+							element: <Homepage />
 						},
 						{
 							path: '/application-directory',
-							element: <AppDirectory />,
+							element: <AppDirectory />
 						},
 						{
 							path: 'guess',
@@ -98,14 +98,14 @@ export const Routes = () => {
 								{
 									path: 'login',
 									loader: loaderWithStore(loginLoader),
-									element: <Login />,
+									element: <Login />
 								},
 								{
 									path: 'login-desktop',
 									loader: loaderWithStore(loginLoader),
-									element: <LoginDesktop />,
-								},
-							],
+									element: <LoginDesktop />
+								}
+							]
 						},
 						{
 							path: 'chat',
@@ -135,11 +135,11 @@ export const Routes = () => {
 															children: [
 																{
 																	path: '',
-																	element: <ClanIndex />,
+																	element: <ClanIndex />
 																},
 																{
 																	path: 'member-safety',
-																	element: <MemberMain />,
+																	element: <MemberMain />
 																},
 																{
 																	path: 'channels',
@@ -147,7 +147,7 @@ export const Routes = () => {
 																	children: [
 																		{
 																			path: '',
-																			element: <ChannelIndex />,
+																			element: <ChannelIndex />
 																		},
 																		{
 																			path: ':channelId',
@@ -161,17 +161,17 @@ export const Routes = () => {
 																					children: [
 																						{
 																							path: ':threadId',
-																							element: <ThreadsMain />,
-																						},
-																					],
-																				},
-																			],
-																		},
-																	],
-																},
-															],
-														},
-													],
+																							element: <ThreadsMain />
+																						}
+																					]
+																				}
+																			]
+																		}
+																	]
+																}
+															]
+														}
+													]
 												},
 												{
 													path: 'direct',
@@ -180,13 +180,13 @@ export const Routes = () => {
 													children: [
 														{
 															path: '',
-															element: <DirectMessageIndex />,
+															element: <DirectMessageIndex />
 														},
 
 														{
 															path: 'friends',
 															loader: loaderWithStore(friendsLoader),
-															element: <FriendsPage />,
+															element: <FriendsPage />
 														},
 														{
 															path: 'message',
@@ -194,23 +194,23 @@ export const Routes = () => {
 															children: [
 																{
 																	path: '',
-																	element: <DirectMessageIndex />,
+																	element: <DirectMessageIndex />
 																},
 																{
 																	path: ':directId/:type',
 																	loader: loaderWithStore(directMessageLoader),
 																	shouldRevalidate: shouldRevalidateChannel,
-																	element: <DirectMessage />,
-																},
-															],
-														},
-													],
-												},
-											],
-										},
-									],
-								},
-							],
+																	element: <DirectMessage />
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
 						},
 						{
 							path: 'invite',
@@ -222,19 +222,19 @@ export const Routes = () => {
 									path: ':inviteId',
 									loader: loaderWithStore(inviteLoader),
 									shouldRevalidate: shouldRevalidateInvite,
-									element: <InvitePage />,
-								},
-							],
+									element: <InvitePage />
+								}
+							]
 						},
 						// fallback route, renders when no other route is matched
 						{
 							path: '*',
-							element: <InitialRoutes />,
-						},
-					],
-				},
+							element: <InitialRoutes />
+						}
+					]
+				}
 			]),
-		[loaderWithStore],
+		[loaderWithStore]
 	);
 
 	return <RouterProvider router={routes} />;

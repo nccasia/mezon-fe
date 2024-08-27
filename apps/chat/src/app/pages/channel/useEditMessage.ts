@@ -31,7 +31,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 			message_id: string,
 			draftContent: IMessageSendPayload,
 			draftMention: ApiMessageMention[],
-			attachmentsOnMessage: ApiMessageAttachment[],
+			attachmentsOnMessage: ApiMessageAttachment[]
 		) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
@@ -40,12 +40,12 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 						message_id: message_id,
 						draftContent: draftContent,
 						draftMention: draftMention,
-						draftAttachment: attachmentsOnMessage,
-					},
-				}),
+						draftAttachment: attachmentsOnMessage
+					}
+				})
 			);
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
@@ -57,7 +57,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 			dispatch(referencesActions.setOpenEditMessageState(false));
 			processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message);
 		},
-		[editSendMessage, setChannelDraftMessage, dispatch, processLink, clanIdInMes, channelId, mode],
+		[editSendMessage, setChannelDraftMessage, dispatch, processLink, clanIdInMes, channelId, mode]
 	);
 
 	return {
@@ -65,6 +65,6 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		idMessageRefEdit,
 		handleCancelEdit,
 		handleSend,
-		setChannelDraftMessage,
+		setChannelDraftMessage
 	};
 };

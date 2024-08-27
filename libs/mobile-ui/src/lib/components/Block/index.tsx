@@ -5,8 +5,8 @@ import { BlockProps } from './Types';
 
 const styles = StyleSheet.create({
 	block: {
-		flex: 1,
-	},
+		flex: 1
+	}
 });
 
 const Block = forwardRef((props: BlockProps, ref: React.ForwardedRef<View>) => {
@@ -89,13 +89,13 @@ const Block = forwardRef((props: BlockProps, ref: React.ForwardedRef<View>) => {
 				? {
 						paddingLeft: CONTAINER_SPACING,
 						paddingRight: CONTAINER_SPACING,
-						paddingHorizontal: CONTAINER_SPACING,
+						paddingHorizontal: CONTAINER_SPACING
 					}
 				: containerFluid
 					? {
 							paddingLeft: CONTAINER_FLUID_SPACING,
 							paddingRight: CONTAINER_FLUID_SPACING,
-							paddingHorizontal: CONTAINER_FLUID_SPACING,
+							paddingHorizontal: CONTAINER_FLUID_SPACING
 						}
 					: { paddingLeft, paddingRight, paddingHorizontal },
 
@@ -145,9 +145,9 @@ const Block = forwardRef((props: BlockProps, ref: React.ForwardedRef<View>) => {
 				{ shadowColor },
 				{ shadowOffset },
 				{ shadowOpacity },
-				{ shadowRadius },
+				{ shadowRadius }
 			]),
-			style,
+			style
 		],
 		[
 			container,
@@ -207,8 +207,8 @@ const Block = forwardRef((props: BlockProps, ref: React.ForwardedRef<View>) => {
 			borderTopWidth,
 			marginHorizontal,
 			marginVertical,
-			style,
-		],
+			style
+		]
 	);
 
 	return (

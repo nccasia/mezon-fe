@@ -1,7 +1,7 @@
 export enum EOpenSearchChannelFrom {
 	ChannelList,
 	HeaderDefault,
-	ActionMenu,
+	ActionMenu
 }
 
 export interface IRoleMention {

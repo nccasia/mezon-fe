@@ -20,7 +20,7 @@ const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
 	port: process.env.NX_CHAT_APP_API_PORT as string,
 	key: process.env.NX_CHAT_APP_API_KEY as string,
-	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
 };
 
 export function App() {
@@ -31,11 +31,11 @@ export function App() {
 			children: [
 				{
 					path: '',
-					element: <InitialRoutes />,
+					element: <InitialRoutes />
 				},
 				{
 					path: 'login',
-					element: <Login />,
+					element: <Login />
 				},
 				{
 					path: 'admin',
@@ -43,28 +43,28 @@ export function App() {
 					children: [
 						{
 							path: '',
-							element: <InitialRoutes />,
+							element: <InitialRoutes />
 						},
 						{
 							path: 'applications',
-							element: <ApplicationsPage />,
+							element: <ApplicationsPage />
 						},
 						{
 							path: 'teams',
-							element: <TeamsPage />,
+							element: <TeamsPage />
 						},
 						{
 							path: 'embeds',
-							element: <EmbedsPage />,
+							element: <EmbedsPage />
 						},
 						{
 							path: 'docs',
-							element: <DocsPage />,
-						},
-					],
-				},
-			],
-		},
+							element: <DocsPage />
+						}
+					]
+				}
+			]
+		}
 	]);
 
 	const mezon = useMezon();
@@ -87,8 +87,8 @@ function AppWrapper() {
 	useEffect(() => {
 		WebFont.load({
 			google: {
-				families: ['gg sans'],
-			},
+				families: ['gg sans']
+			}
 		});
 	}, []);
 

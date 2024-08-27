@@ -1,6 +1,6 @@
 export default {
 	control: {
-		fontSize: 16,
+		fontSize: 16
 	},
 
 	'&multiLine': {
@@ -8,17 +8,17 @@ export default {
 			fontFamily: 'gg sans, sans-serif',
 			minHeight: 35,
 			border: 'none',
-			outline: 'none',
+			outline: 'none'
 		},
 		highlighter: {
-			border: '1px solid transparent',
+			border: '1px solid transparent'
 		},
 		input: {
 			padding: '9px 10px',
 			border: 'none',
 			outline: 'none',
-			whiteSpace: 'pre-wrap',
-		},
+			whiteSpace: 'pre-wrap'
+		}
 	},
 
 	'&singleLine': {
@@ -27,12 +27,12 @@ export default {
 
 		highlighter: {
 			padding: 1,
-			border: '2px inset transparent',
+			border: '2px inset transparent'
 		},
 		input: {
 			padding: 1,
-			border: '2px inset',
-		},
+			border: '2px inset'
+		}
 	},
 
 	suggestions: {
@@ -41,15 +41,15 @@ export default {
 		top: '20px',
 		list: {
 			overflowY: 'auto',
-			maxHeight: '450px',
+			maxHeight: '450px'
 		},
 		item: {
 			margin: '0 8px',
 			padding: '8px',
 			'&focused': {
 				backgroundColor: '#35373C',
-				borderRadius: 3,
-			},
-		},
-	},
+				borderRadius: 3
+			}
+		}
+	}
 };

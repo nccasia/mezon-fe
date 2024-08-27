@@ -33,8 +33,8 @@ function useChannelSeen(channelId: string) {
 			notificationActions.setLastSeenTimeStampChannel({
 				channelId,
 				lastSeenTimeStamp: timestamp + TIME_OFFSET,
-				clanId: currentChannel?.clan_id ?? '',
-			}),
+				clanId: currentChannel?.clan_id ?? ''
+			})
 		);
 		if (isMessageRead && channelId === currentChannel?.channel_id) {
 			dispatch(notificationActions.setIsMessageRead(false));
@@ -151,4 +151,3 @@ const SearchMessageChannel = () => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
 	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
 };
-

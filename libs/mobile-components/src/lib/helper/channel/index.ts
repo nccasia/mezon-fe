@@ -94,9 +94,9 @@ export const cleanChannelData = (channels: any[]) => {
 				return {
 					...thread,
 					last_sent_message: undefined,
-					last_seen_message: undefined,
+					last_seen_message: undefined
 				};
-			}),
+			})
 		};
 	});
 };

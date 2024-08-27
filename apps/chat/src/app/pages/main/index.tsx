@@ -5,7 +5,7 @@ import {
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
-	SidebarTooltip,
+	SidebarTooltip
 } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
@@ -28,9 +28,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
-import DirectUnreads from './directUnreads';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
+import DirectUnreads from './directUnreads';
 
 function MyApp() {
 	const elementHTML = document.documentElement;
@@ -106,7 +106,7 @@ function MyApp() {
 				openSearchModal();
 			}
 		},
-		[openSearchModal],
+		[openSearchModal]
 	);
 
 	useEffect(() => {
@@ -190,7 +190,7 @@ function MyApp() {
 								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
 									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 								</SidebarTooltip>
-							),
+							)
 					)}
 				</div>
 				<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>

@@ -37,11 +37,11 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
-			mentionEveryone?: boolean,
+			mentionEveryone?: boolean
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
 		},
-		[sendMessage],
+		[sendMessage]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -90,7 +90,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 			{isEmojiOnChat && (
 				<div
 					style={{
-						right: setMarginleft,
+						right: setMarginleft
 					}}
 					onClick={(e) => {
 						e.stopPropagation();

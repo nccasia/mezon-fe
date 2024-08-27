@@ -25,7 +25,7 @@ export const loginLoader: CustomLoaderFunction = async ({ initialPath }) => {
 
 	return {
 		initialPath,
-		redirectTo,
+		redirectTo
 	} as ILoginLoaderData;
 };
 

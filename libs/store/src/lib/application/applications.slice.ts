@@ -86,6 +86,16 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 	}
 });
 
+export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async (data: { appId: string, clanId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
+	} catch (err) {
+		console.log(err);
+		return thunkAPI.rejectWithValue({ err });
+	}
+});
+
 export const adminApplicationSlice = createSlice({
 	name: ADMIN_APPLICATIONS,
 	initialState: applicationInitialState,

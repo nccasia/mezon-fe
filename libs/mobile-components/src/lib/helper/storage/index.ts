@@ -5,7 +5,7 @@ const AppKey = '7268428d-d814-4eca-8829-176553sad3';
 
 export const AppStorage = new MMKV({
 	id: `user-${appName}-storage`,
-	encryptionKey: AppKey,
+	encryptionKey: AppKey
 });
 
 /**
@@ -74,7 +74,9 @@ export function save(key: string, value: any) {
 export async function remove(key: string) {
 	try {
 		AppStorage.delete(key);
-	} catch { /* empty */ }
+	} catch {
+		/* empty */
+	}
 }
 
 interface Storage {
@@ -87,12 +89,12 @@ export const reduxPersistStorage: Storage = {
 		AppStorage.set(key, value);
 		return Promise.resolve(true);
 	},
-	getItem: key => {
+	getItem: (key) => {
 		const value = AppStorage.getString(key);
 		return Promise.resolve(value);
 	},
-	removeItem: key => {
+	removeItem: (key) => {
 		AppStorage.delete(key);
 		return Promise.resolve();
-	},
+	}
 };

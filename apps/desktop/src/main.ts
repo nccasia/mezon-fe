@@ -51,8 +51,8 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 					pathname: baseUrl,
 					protocol: 'file:',
 					slashes: true,
-					query: { notificationPath: path },
-				}),
+					query: { notificationPath: path }
+				})
 			);
 		}
 
@@ -77,11 +77,11 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 			type: 'info',
 			buttons: ['Download', 'Cancel'],
 			title: 'Updates available',
-			message: `There is a new update for the app ${info.version}!! Do you want to download??`,
+			message: `There is a new update for the app ${info.version}!! Do you want to download??`
 		})
 		.then((result) => {
 			if (result.response === 0) {
-				autoUpdater.downloadUpdate();	
+				autoUpdater.downloadUpdate();
 			}
 		});
 });
@@ -89,7 +89,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
 		title: 'No update',
-		body: 'The current version is the latest. ' + info.version,
+		body: 'The current version is the latest. ' + info.version
 	}).show();
 });
 
@@ -100,7 +100,7 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 			type: 'info',
 			buttons: ['Install now', 'Cancel'],
 			title: 'Mezon install',
-			message: `Install mezon version ${info.version} now.`,
+			message: `Install mezon version ${info.version} now.`
 		})
 		.then((result) => {
 			if (result.response === 0) {
@@ -113,12 +113,12 @@ autoUpdater.on('download-progress', (progressObj) => {
 	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
 	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
 	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-	log.info("downloading...", log_message)
+	log.info('downloading...', log_message);
 });
 
 autoUpdater.on('error', (error) => {
 	dialog.showMessageBox({
-		message: `Error: ${error.message} !!`,
+		message: `Error: ${error.message} !!`
 	});
 });
 

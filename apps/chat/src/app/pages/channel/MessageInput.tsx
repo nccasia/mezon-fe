@@ -11,7 +11,7 @@ import {
 	filterEmptyArrays,
 	getRoleList,
 	processText,
-	searchMentionsHashtag,
+	searchMentionsHashtag
 } from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import { ChannelStreamMode } from 'mezon-js';
@@ -45,7 +45,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		channelId,
 		channelLabel,
 		mode,
-		message,
+		message
 	);
 	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -75,7 +75,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
-					subText: item?.category_name ?? '',
+					subText: item?.category_name ?? ''
 				};
 			});
 		} else {
@@ -99,7 +99,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			ej: channelDraftMessage.draftContent?.ej,
 			lk: channelDraftMessage.draftContent?.lk,
 			mk: channelDraftMessage.draftContent?.mk,
-			vk: channelDraftMessage.draftContent?.vk,
+			vk: channelDraftMessage.draftContent?.vk
 		};
 	}, [channelDraftMessage.draftContent, messageId]);
 
@@ -109,7 +109,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const addMentionToContent = useMemo(
 		() => addMention(processedContentDraft, processedMentionDraft),
-		[processedContentDraft, processedMentionDraft],
+		[processedContentDraft, processedMentionDraft]
 	);
 
 	const attachmentOnMessage = useMemo(() => {
@@ -181,10 +181,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				ej: emojiList,
 				lk: links,
 				mk: markdowns,
-				vk: voiceRooms,
+				vk: voiceRooms
 			},
 			mentionList,
-			attachmentOnMessage ?? [],
+			attachmentOnMessage ?? []
 		);
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -205,7 +205,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
-					subText: item?.clan_name ?? '',
+					subText: item?.clan_name ?? ''
 				};
 			}) as ChannelsMentionProps[];
 		}
