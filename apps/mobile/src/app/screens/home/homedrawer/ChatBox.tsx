@@ -65,6 +65,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 						hiddenIcon={props?.hiddenIcon}
 						messageAction={props?.messageAction}
 						onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
+            directMessageId={props?.directMessageId}
 					/>
 				</Block>
 			) : (

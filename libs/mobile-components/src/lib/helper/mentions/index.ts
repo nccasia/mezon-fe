@@ -1,3 +1,6 @@
+import { ChannelsEntity, HashtagDmEntity } from "@mezon/store-mobile";
+import { ChannelStreamMode } from "mezon-js";
+
 export const convertMentionsToText = (text: string) => {
 	if (!text) {
 		return '';
@@ -8,7 +11,7 @@ export const convertMentionsToText = (text: string) => {
 		if (userMention) {
 			return `@[${userMention}]`;
 		} else if (hashtagMention && hashtagId) {
-			return `<#${hashtagId}>`;
+			return `<#${hashtagId}#${hashtagMention}>`;
 		} else if (tagValue) {
 			return `${tagValue}`;
 		} else {
@@ -31,3 +34,11 @@ export const convertMentionsToData = (text: string) => {
 	}
 	return result;
 };
+
+export const getChannelHashtag = (directMessageId: string, hashtagDmEntities: Record<string, HashtagDmEntity> , channelHashtagId: string, channelsEntities:Record<string, ChannelsEntity>, mode)=>{
+  if (directMessageId && [ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
+    return hashtagDmEntities?.[directMessageId + channelHashtagId];
+  } else {
+    return channelsEntities[channelHashtagId];
+  }
+}

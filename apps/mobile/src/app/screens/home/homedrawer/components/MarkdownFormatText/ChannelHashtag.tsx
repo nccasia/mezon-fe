@@ -1,13 +1,17 @@
-import { ChannelsEntity } from '@mezon/store';
+import { getChannelHashtag } from '@mezon/mobile-components';
+import { ChannelsEntity, HashtagDmEntity } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 
 type IChannelHashtag = {
 	channelHashtagId: string;
-	channelsEntities: any;
+	channelsEntities?: Record<string, ChannelsEntity>;
+	hashtagDmEntities?: Record<string, HashtagDmEntity>;
+	directMessageId?: string;
+	mode?: number;
 };
-export const ChannelHashtag = ({ channelHashtagId, channelsEntities }: IChannelHashtag) => {
+export const ChannelHashtag = ({ channelHashtagId, channelsEntities, hashtagDmEntities, directMessageId, mode }: IChannelHashtag) => {
 	const getChannelById = (channelHashtagId: string): ChannelsEntity => {
-		const channel = channelsEntities?.[channelHashtagId];
+    const channel = getChannelHashtag(directMessageId, hashtagDmEntities, channelHashtagId, channelsEntities, mode);
 		if (channel) {
 			return channel;
 		}

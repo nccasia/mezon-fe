@@ -1,8 +1,9 @@
 import { useChannels } from '@mezon/core';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { selectHashtagDMByDirectId, useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
-import { FC, memo, useEffect, useMemo } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import React, { FC, memo, useEffect, useMemo } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
@@ -89,19 +90,29 @@ export interface MentionHashtagSuggestionsProps {
 	// channelId: string;
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
+	directMessageId: string;
+	mode: number;
 }
 
-const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect }) => {
-	const { listChannels } = useChannels();
+const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = React.memo(({ keyword, onSelect, directMessageId, mode }) => {
+	const { channels } = useChannels();
+	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directMessageId || ''));
 
 	const listChannelsMention = useMemo(() => {
-		return listChannels.map((item) => ({
+		let channelsMention = [];
+		if ([ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
+			channelsMention = commonChannelDms;
+		} else {
+			channelsMention = channels;
+		}
+		return channelsMention?.map((item) => ({
+			...item,
 			id: item?.channel_id ?? '',
 			display: item?.channel_label ?? '',
 			subText: item?.category_name ?? '',
 			name: item?.channel_label ?? '',
 		}));
-	}, [listChannels]);
+	}, [channels, commonChannelDms, mode]);
 	if (keyword == null) {
 		return null;
 	}
@@ -116,7 +127,13 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			data={listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
-					<SuggestItem channelId={item?.id} isDisplayDefaultAvatar={false} name={item?.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText.toUpperCase()} />
+					<SuggestItem
+						channel={item}
+						channelId={item?.id}
+						isDisplayDefaultAvatar={false}
+						name={item?.display ?? ''}
+						subText={(item as ChannelsMention).subText.toUpperCase()}
+					/>
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}
@@ -124,7 +141,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			keyboardShouldPersistTaps="handled"
 		/>
 	);
-};
+});
 
 export interface IEmojiSuggestionProps {
 	keyword?: string;

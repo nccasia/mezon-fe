@@ -4,6 +4,7 @@ import {
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
 	getAttachmentUnique,
+	getChannelHashtag,
 	load,
 	mentionUserPattern,
 	save,
@@ -16,6 +17,7 @@ import {
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiSuggestion,
+	selectHashtagDmEntities,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -72,6 +74,7 @@ interface IChatInputProps {
 	messageAction?: EMessageActionType;
 	onDeleteMessageActionNeedToResolve?: () => void;
 	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
+	directMessageId?: string;
 }
 
 export const ChatBoxBottomBar = memo(
@@ -83,6 +86,7 @@ export const ChatBoxBottomBar = memo(
 		messageAction,
 		onDeleteMessageActionNeedToResolve,
 		onShowKeyboardBottomSheet,
+		directMessageId = '',
 	}: IChatInputProps) => {
 		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
@@ -104,8 +108,9 @@ export const ChatBoxBottomBar = memo(
 		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
+		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
 		const inputTriggersConfig = useMemo(() => {
-			const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		const isDM = [ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 
 			if (isDM) {
 				const newTriggersConfig = { ...triggersConfig };
@@ -268,14 +273,15 @@ export const ChatBoxBottomBar = memo(
 						mentionBeforeCount++;
 						return;
 					}
+
 					if (word.startsWith('<#') && word.endsWith('>')) {
-						const channelId = word.slice(2, -1);
-						const channelInfo = getChannelById(channelId);
+						const channelId = extractChannelIdHashtag(word);
+						const channelInfo = getChannelHashtag(directMessageId, hashtagDmEntities, channelId, channelsEntities, mode);
 						if (channelInfo) {
 							const startindex = convertedHashtag.indexOf(word, indexOfLastHashtag);
 							indexOfLastHashtag = startindex + 1;
 							hashtagList.push({
-								channelid: channelInfo.id.toString() ?? '',
+								channelid: channelInfo.channel_id.toString() ?? '',
 								s: mentionUsers?.length ? startindex - 2 * mentionBeforeCount : startindex,
 								e: startindex + word.length - 2 * mentionBeforeCount,
 							});
@@ -292,6 +298,14 @@ export const ChatBoxBottomBar = memo(
 			saveMessageToCache(text);
 		};
 
+   function extractChannelIdHashtag(word) {
+      const firstHashIndex = word.indexOf('#', 2);
+      if (firstHashIndex !== -1) {
+          return word.slice(2, firstHashIndex);
+      } else {
+          return word.slice(2, -1);
+      }
+  }
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
 			cursorPositionRef.current = selection.start;
 		};
@@ -468,7 +482,7 @@ export const ChatBoxBottomBar = memo(
 					mentionTextValue={mentionTextValue}
 					channelMode={mode}
 				/>
-				<HashtagSuggestions {...triggers.hashtag} />
+				<HashtagSuggestions directMessageId={directMessageId} mode={mode} {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />
 
 				{!!attachmentDataRef?.length && (
@@ -511,6 +525,8 @@ export const ChatBoxBottomBar = memo(
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
 						attachmentDataRef={attachmentDataRef}
+						directMessageId={directMessageId}
+						hashtagDmEntities={hashtagDmEntities}
 					/>
 				</Block>
 			</Block>

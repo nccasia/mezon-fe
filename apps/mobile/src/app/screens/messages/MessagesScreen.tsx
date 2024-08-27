@@ -65,7 +65,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 				<Text style={[styles.defaultText, styles.lastMessage]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
-				{!!content && <RenderTextMarkdownContent content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
+				{!!content && <RenderTextMarkdownContent isHiddenHashtag={true} content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
 			</View>
 		);
 	};

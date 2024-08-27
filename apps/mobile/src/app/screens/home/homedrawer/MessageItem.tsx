@@ -1,15 +1,20 @@
 import {
 	ActionEmitEvent,
 	getUpdateOrAddClanChannelCache,
+	remove,
 	ReplyIcon,
 	ReplyMessageDeleted,
 	save,
+	setDefaultChannelLoader,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	ChannelsEntity,
+	clansActions,
 	getStoreAsync,
 	messagesActions,
 	MessagesEntity,
@@ -33,7 +38,7 @@ import { style } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ETypeLinkMedia } from '@mezon/utils';
-import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { setSelectedMessage } from '@mezon/store-mobile';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
@@ -43,6 +48,7 @@ import { MessageReferences } from './components/MessageReferences';
 import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
+import { useNavigation } from '@react-navigation/native';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -85,6 +91,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
 	const rolesInClan = useSelector(selectAllRolesClan);
+	const navigation = useNavigation<any>();
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -202,10 +209,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const channelId = channel?.channel_id;
 			const clanId = channel?.clan_id;
 
-			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
+			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+          handleChangeClan(clanId);
+          DeviceEventEmitter.emit(ActionEmitEvent.ON_MENTION_HASHTAG_DM, {
+            isMentionHashtagDM:  true
+          });
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
@@ -214,6 +225,22 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			console.log(error);
 		}
 	}, []);
+
+  const handleChangeClan = useCallback(async (clanId: string) => {
+    navigation.navigate('HomeDefault');
+    const store = await getStoreAsync();
+    await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+    save(STORAGE_CLAN_ID, clanId);
+		const promises = [];
+		promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+		promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+		const results = await Promise.all(promises);
+		const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+		if (channelResp) {
+			await setDefaultChannelLoader(channelResp.payload, clanId);
+		}
+}, []);
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -373,6 +400,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								isNumberOfLine={isNumberOfLine}
 								isMessageReply={false}
 								mode={mode}
+                directMessageId={props?.channelId}
 							/>
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}

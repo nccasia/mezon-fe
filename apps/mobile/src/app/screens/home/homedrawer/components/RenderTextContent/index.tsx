@@ -1,15 +1,20 @@
+import { getChannelHashtag, mentionRegex, mentionRegexSplit } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
+import { ChannelsEntity, HashtagDmEntity } from '@mezon/store-mobile';
 import React from 'react';
 import { Text } from 'react-native';
-import { channelIdRegex, highlightEmojiRegex} from '../../../../../utils/helpers';
+import { channelIdRegex, highlightEmojiRegex } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
-import { mentionRegex, mentionRegexSplit } from '@mezon/mobile-components';
 
-export const renderTextContent = (text: string, channelsEntities?: Record<string, ChannelsEntity>) => {
+export const renderTextContent = (
+	text: string,
+	channelsEntities?: Record<string, ChannelsEntity>,
+	hashtagDmEntities?: Record<string, HashtagDmEntity>,
+	directMessageId?: string,
+	mode?: number,
+) => {
 	const getChannelById = (channelHashtagId: string) => {
-		const channel = channelsEntities?.[channelHashtagId];
+		const channel = getChannelHashtag(directMessageId, hashtagDmEntities, channelHashtagId, channelsEntities, mode);
 		if (channel) {
 			return channel;
 		} else {
@@ -19,19 +24,23 @@ export const renderTextContent = (text: string, channelsEntities?: Record<string
 		}
 	};
 
-	const renderChannelMention = (id: string) => {
-		const channelId = id?.match(channelIdRegex)[1];
-		const channel = getChannelById(channelId);
+  const renderChannelMention = (id: string) => {
+    const match = id?.match(channelIdRegex);
+    if (!match) {
+        return null;
+    }
+    const channelId = match[1];
+    const channel = getChannelById(channelId);
 
-		return (
-			<Text>
-				<Text style={styles.contentMessageMention}>
-					{'#'}
-					{channel?.channel_label || ''}
-				</Text>
-			</Text>
-		);
-	};
+    return (
+        <Text>
+            <Text style={styles.contentMessageMention}>
+                {'#'}
+                {channel?.channel_label || ''}
+            </Text>
+        </Text>
+    );
+};
 
 	const renderUserMention = (id: string) => {
 		return (

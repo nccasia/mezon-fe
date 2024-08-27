@@ -9,7 +9,7 @@ import {
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
-import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
+import { HashtagDmEntity, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -60,6 +60,8 @@ interface IChatMessageInputProps {
 	isShowCreateThread?: boolean;
 	channelsEntities?: any;
 	attachmentDataRef?: ApiMessageAttachment[];
+  directMessageId?: string;
+  hashtagDmEntities?:Record<string, HashtagDmEntity>;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
 
@@ -91,6 +93,8 @@ export const ChatMessageInput = memo(
 				isShowCreateThread,
 				channelsEntities,
 				attachmentDataRef,
+        directMessageId,
+        hashtagDmEntities
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
@@ -112,8 +116,8 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
-			
-			const removeTags = (text: string) => {
+
+      const removeTags = (text: string) => {
 				if (!text)
 					return '';
 				return text?.replace?.(/@\[(.*?)\]/g, '@$1');
@@ -342,7 +346,7 @@ export const ChatMessageInput = memo(
 								},
 								{ height: Math.max(size.s_40, heightInput) },
 							]}
-							children={renderTextContent(text, channelsEntities)}
+							children={renderTextContent(text, channelsEntities, hashtagDmEntities, directMessageId, mode)}
 							onContentSizeChange={(e) => {
 								if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
 							}}
