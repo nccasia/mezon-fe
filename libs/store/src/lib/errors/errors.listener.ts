@@ -1,5 +1,6 @@
 import { trackError } from '@mezon/utils';
 import { createListenerMiddleware } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { Toast, ToastPayload, toastActions } from '../toasts';
 
 // Create the middleware instance and methods
@@ -37,8 +38,8 @@ function getErrorFromRejectedWithValue(action: any) {
 		error: action.error,
 		action: action,
 		config: action.meta.error || {
-			toast: true,
-		},
+			toast: true
+		}
 	};
 }
 
@@ -55,7 +56,7 @@ function createErrorToast(error: any): ToastPayload {
 		message: error.message,
 		type: 'error',
 		id: Date.now().toString(),
-		position: 'top-right',
+		position: 'top-right'
 	};
 
 	if (typeof error.config === 'object' && error.config.toast) {
@@ -66,7 +67,7 @@ function createErrorToast(error: any): ToastPayload {
 		if (typeof error.config.toast === 'object') {
 			toast = {
 				...toast,
-				...error.config.toast,
+				...error.config.toast
 			};
 		}
 	}
@@ -79,26 +80,44 @@ function createErrorToast(error: any): ToastPayload {
 errorListenerMiddleware.startListening({
 	//   actionCreator: anyActionCreator,
 	predicate: isErrorPredicate,
-	effect: async (action, listenerApi) => {
+	effect: async (action: any, listenerApi) => {
 		const error = normalizeError(action);
 
 		trackError(error);
+
+		if (action.payload) {
+			const key = Object.keys(action.payload);
+			if (key.length === 0) {
+				if (typeof action.payload.json === 'function') {
+					action.payload.json().then((data: any) => {
+						Sentry.captureException(data.message);
+					});
+				}
+			} else {
+				if (typeof action.payload[key[0]].json === 'function') {
+					action.payload[key[0]].json().then((data: any) => {
+						Sentry.captureException(data.message);
+					});
+				} else {
+					Sentry.captureException(action.payload);
+				}
+			}
+		}
 
 		if (!error) {
 			return;
 		}
 
-        if (error && error.config && !error.config.toast) {
-          return;
-        }
+		if (error && error.config && !error.config.toast) {
+			return;
+		}
 
-        const toast = createErrorToast(error);
-    
-        if (!toast) {
-            return;
-        }
+		const toast = createErrorToast(error);
 
-        listenerApi.dispatch(toastActions.addToast(toast));
+		if (!toast) {
+			return;
+		}
 
-	},
+		listenerApi.dispatch(toastActions.addToast(toast));
+	}
 });

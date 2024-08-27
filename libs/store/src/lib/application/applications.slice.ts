@@ -11,6 +11,7 @@ export interface IApplicationState {
 	error?: string | null;
 	appsData: ApiAppList;
 	appDetail: ApiApp;
+	currentAppId?: string;
 }
 
 export const applicationInitialState: IApplicationState = {
@@ -19,7 +20,7 @@ export const applicationInitialState: IApplicationState = {
 	appsData: {
 		apps: [],
 		next_cursor: undefined,
-		total_count: undefined,
+		total_count: undefined
 	},
 	appDetail: {
 		id: '',
@@ -29,8 +30,9 @@ export const applicationInitialState: IApplicationState = {
 		disable_time: undefined,
 		is_shadow: undefined,
 		role: undefined,
-		token: undefined,
+		token: undefined
 	},
+	currentAppId: undefined
 };
 
 const FETCH_CACHED_TIME = 3 * 60 * 1000;
@@ -44,7 +46,7 @@ const fetchApplicationsCached = memoizee((mezon: MezonValueContext) => mezon.cli
 	maxAge: FETCH_CACHED_TIME,
 	normalizer: (args) => {
 		return args[0].session.username as string;
-	},
+	}
 });
 
 export const fetchApplications = createAsyncThunk('adminApplication/fetchApplications', async ({ noCache }: IFetchAppsArg, thunkAPI) => {
@@ -57,14 +59,15 @@ export const fetchApplications = createAsyncThunk('adminApplication/fetchApplica
 		return response;
 	} catch (err) {
 		console.log(err);
-		return thunkAPI.rejectWithValue({});
+		return thunkAPI.rejectWithValue({ err });
 	}
 });
 
-export const getApplicationDetail = createAsyncThunk('adminApplication/getApplicationDetail', async ({appId}: {appId: string}, thunkAPI) => {
+export const getApplicationDetail = createAsyncThunk('adminApplication/getApplicationDetail', async ({ appId }: { appId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getApp(mezon.session, appId);
+		thunkAPI.dispatch(setCurrentAppId(appId));
 		return response;
 	} catch (err) {
 		return thunkAPI.rejectWithValue({ err });
@@ -86,7 +89,7 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 	}
 });
 
-export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async (data: { appId: string, clanId: string }, thunkAPI) => {
+export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async (data: { appId: string; clanId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
@@ -99,7 +102,11 @@ export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async 
 export const adminApplicationSlice = createSlice({
 	name: ADMIN_APPLICATIONS,
 	initialState: applicationInitialState,
-	reducers: {},
+	reducers: {
+		setCurrentAppId: (state, action) => {
+			state.currentAppId = action.payload;
+		}
+	},
 	extraReducers(builder) {
 		builder.addCase(fetchApplications.pending, (state) => {
 			state.loadingStatus = 'loading';
@@ -114,13 +121,14 @@ export const adminApplicationSlice = createSlice({
 		builder.addCase(getApplicationDetail.fulfilled, (state, action) => {
 			state.appDetail = action.payload;
 		});
-	},
+	}
 });
 
 export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicationState }): IApplicationState => rootState[ADMIN_APPLICATIONS];
 export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
 export const selectAppDetail = createSelector(getApplicationState, (state) => state.appDetail);
-export const adminApplicationReducer = adminApplicationSlice.reducer;
+export const selectCurrentAppId = createSelector(getApplicationState, (state) => state.currentAppId);
 
-export const selectAppById = (appId: string) => 
-	createSelector(selectAllApps, allApp => allApp.apps?.find(app => app.id === appId) || null);
+export const selectAppById = (appId: string) => createSelector(selectAllApps, (allApp) => allApp.apps?.find((app) => app.id === appId) || null);
+export const adminApplicationReducer = adminApplicationSlice.reducer;
+export const { setCurrentAppId } = adminApplicationSlice.actions;

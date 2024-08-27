@@ -1,5 +1,6 @@
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
@@ -38,7 +39,7 @@ const clanMetaAdapter = createEntityAdapter<ClanMeta>();
 function extractClanMeta(clan: ClansEntity): ClanMeta {
 	return {
 		id: clan.id,
-		showNumEvent: true,
+		showNumEvent: true
 	};
 }
 
@@ -74,10 +75,10 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 			voiceActions.fetchVoiceChannelMembers({
 				clanId: clanId ?? '',
 				channelId: '',
-				channelType: ChannelType.CHANNEL_TYPE_VOICE,
-			}),
+				channelType: ChannelType.CHANNEL_TYPE_VOICE
+			})
 		);
-	},
+	}
 );
 
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
@@ -111,7 +112,7 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 			banner: '',
 			clan_name: clan_name,
 			creator_id: '',
-			logo: logo ?? '',
+			logo: logo ?? ''
 		};
 		const response = await mezon.client.createClanDesc(mezon.session, body);
 		if (!response) {
@@ -124,17 +125,16 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
-
 export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateClanName(clan_name);
 		return isDuplicateName?.exist;
 	} catch (error: any) {
+		Sentry.captureException(error);
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-
 });
 
 export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: ChangeCurrentClanArgs, thunkAPI) => {
@@ -180,7 +180,7 @@ export const updateClan = createAsyncThunk(
 				creator_id,
 				clan_name,
 				logo,
-				banner,
+				banner
 			};
 
 			const response = await mezon.client.updateClanDesc(mezon.session, clan_id, request);
@@ -195,7 +195,7 @@ export const updateClan = createAsyncThunk(
 			const errmsg = await error.json();
 			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-	},
+	}
 );
 
 type UpdateLinkUser = {
@@ -218,7 +218,7 @@ export const updateUser = createAsyncThunk(
 				location: '',
 				timezone: '',
 				username: user_name,
-				about_me: about_me,
+				about_me: about_me
 			};
 			const response = await mezon.client.updateAccount(mezon.session, body);
 			if (!response) {
@@ -232,7 +232,7 @@ export const updateUser = createAsyncThunk(
 			const errmsg = await error.json();
 			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-	},
+	}
 );
 interface JoinClanPayload {
 	clanId: string;
@@ -242,7 +242,8 @@ export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.socketRef.current?.joinClanChat(clanId);
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		Sentry.captureException(error);
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 
@@ -250,7 +251,7 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
-	clanMetadata: clanMetaAdapter.getInitialState(),
+	clanMetadata: clanMetaAdapter.getInitialState()
 });
 
 export const clansSlice = createSlice({
@@ -274,7 +275,7 @@ export const clansSlice = createSlice({
 		},
 		removeByClanID: (state, action: PayloadAction<string>) => {
 			clansAdapter.removeOne(state, action.payload);
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -312,7 +313,7 @@ export const clansSlice = createSlice({
 			state.loadingStatus = 'error';
 			state.error = action.error.message;
 		});
-	},
+	}
 });
 
 /*
@@ -347,7 +348,7 @@ export const clansActions = {
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
-	joinClan,
+	joinClan
 };
 
 /*
@@ -375,7 +376,7 @@ export const selectClansEntities = createSelector(getClansState, selectEntities)
 export const selectClanById = (id: string) => createSelector(selectClansEntities, (clansEntities) => clansEntities[id]);
 
 export const selectCurrentClan = createSelector(selectClansEntities, selectCurrentClanId, (clansEntities, clanId) =>
-	clanId ? clansEntities[clanId] : null,
+	clanId ? clansEntities[clanId] : null
 );
 
 export const selectDefaultClanId = createSelector(selectAllClans, (clans) => (clans.length > 0 ? clans[0].id : null));
@@ -386,4 +387,4 @@ export const selectShowNumEvent = (clanId: string) =>
 		return clan?.showNumEvent || false;
 	});
 
-export const selectClanByUserId = (userId: string) => createSelector(selectAllClans, (clans) => clans.filter(clan => clan.creator_id === userId))
+export const selectClanByUserId = (userId: string) => createSelector(selectAllClans, (clans) => clans.filter((clan) => clan.creator_id === userId));
