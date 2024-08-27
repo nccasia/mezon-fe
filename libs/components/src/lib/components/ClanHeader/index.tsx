@@ -5,17 +5,16 @@ import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
+import ModalConfirm from '../ModalConfirm';
 import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
-import LeaveClanPopup from './LeaveClanPopup';
 import ModalCreateCategory from './ModalCreateCategory';
-import { useNavigate } from 'react-router-dom';
-import ModalConfirm from '../ModalConfirm';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -95,7 +94,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
+	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasClanPermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
   useEscapeKey(()=>setIsShowModalPanelClan(false))
