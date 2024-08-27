@@ -172,7 +172,7 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const removeAttachmentByUrl = useCallback((filename: string) => {
-			const index = attachmentDataRef.findIndex((attachment => attachment.filename === filename));
+			const index = attachmentDataRef?.findIndex((attachment => attachment.filename === filename));
 
 			dispatch(
 				referencesActions.removeAttachment({

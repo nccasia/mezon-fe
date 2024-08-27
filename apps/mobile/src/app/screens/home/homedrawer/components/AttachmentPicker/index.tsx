@@ -105,7 +105,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		});
 	};
 
-	const handleSelectedAttachments = (file: IFile) => {
+	const handleSelectedAttachments = useCallback((file: IFile) => {
 		dispatch(
 			referencesActions.setAttachmentData({
 				channelId: currentChannelId,
@@ -129,7 +129,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				size: file.size as number,
 			}]
 		}));
-	}
+	}, [])
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
