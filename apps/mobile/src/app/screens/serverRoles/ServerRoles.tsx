@@ -1,7 +1,7 @@
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
-import { RolesClanEntity, selectAllRolesClan } from '@mezon/store-mobile';
+import { RolesClanEntity, selectAllRolesClan, selectEveryoneRole } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,16 +17,12 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { themeValue } = useTheme();
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+	const everyoneRole = useSelector(selectEveryoneRole);
 
-	const allClanRoles = useMemo(() => {
+	const allClanRolesWithoutEveryoneRole = useMemo(() => {
 		if (!rolesClan || rolesClan?.length === 0) return [];
 		return rolesClan.filter(r => r?.slug !== EPermission.everyone).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
 	}, [rolesClan, isClanOwner, userPermissionsStatus]);
-
-	const everyoneRole = useMemo(() => {
-		if (!rolesClan || rolesClan?.length === 0) return [];
-		return rolesClan.find(r => r?.slug === EPermission.everyone);
-	}, [rolesClan])
 
 	navigation.setOptions({
 		headerRight: () => (
@@ -77,13 +73,13 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 
 			<Block marginTop={size.s_10} flex={1}>
 				<Text color={themeValue.text}>
-					{t('roles')} - {allClanRoles?.length || '0'}
+					{t('roles')} - {allClanRolesWithoutEveryoneRole?.length || '0'}
 				</Text>
-				{allClanRoles.length ? (
+				{allClanRolesWithoutEveryoneRole.length ? (
 					<Block marginVertical={size.s_10} flex={1}>
 						<Block borderRadius={size.s_10} overflow="hidden">
 							<FlatList
-								data={allClanRoles}
+								data={allClanRolesWithoutEveryoneRole}
 								scrollEnabled
 								showsVerticalScrollIndicator={false}
 								keyExtractor={(item) => item.id}

@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectAllUsesClan, UsersClanEntity } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectAllUsesClan, selectRoleByRoleId, UsersClanEntity } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -26,16 +26,12 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
 	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
 
 	//Note: create new role
 	const newRole = useMemo(() => {
 		return rolesClan?.[rolesClan.length - 1];
 	}, [rolesClan]);
-
-	//Note: edit role
-	const clanRole = useMemo(() => {
-		return rolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, rolesClan]);
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);

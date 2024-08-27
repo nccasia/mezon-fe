@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectRoleByRoleId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
@@ -34,11 +35,6 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const newRole = useMemo(() => {
 		return rolesClan?.[rolesClan.length - 1];
 	}, [rolesClan]);
-
-	//Note: edit role
-	const clanRole = useMemo(() => {
-		return rolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, rolesClan]);
 
 	const isCanEditRole = useMemo(() => {
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });

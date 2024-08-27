@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
-import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectAllRolesClan, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { rolesClanActions, selectCurrentClanId, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -21,7 +21,6 @@ type RoleDetailScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_DETAIL;
 export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetailScreen>) => {
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
-	const rolesClan = useSelector(selectAllRolesClan);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
@@ -30,16 +29,14 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
-
-	const clanRole = useMemo(() => {
-		return rolesClan.find((role) => role?.id === roleId);
-	}, [roleId, rolesClan]);
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
 	}, [originRoleName, currentRoleName]);
 
 	const isCanEditRole = useMemo(() => {
+		if (!clanRole) return false;
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
 	}, [isClanOwner, clanRole, userPermissionsStatus])
 
@@ -90,8 +87,8 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
 		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
 		const response = await updateRole(
-			clanRole.clan_id,
-			clanRole.id,
+			clanRole?.clan_id,
+			clanRole?.id,
 			currentRoleName,
 			selectedMembers,
 			selectedPermissions,
@@ -153,8 +150,8 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 
 	useEffect(() => {
 		if (clanRole?.title) {
-			setOriginRoleName(clanRole.title);
-			setCurrentRoleName(clanRole.title);
+			setOriginRoleName(clanRole?.title);
+			setCurrentRoleName(clanRole?.title);
 		}
 	}, [clanRole?.title]);
 
@@ -199,7 +196,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			<Block backgroundColor={themeValue.primary} flex={1} paddingHorizontal={size.s_14}>
 				<Block marginTop={size.s_14}>
 					<MezonInput
-						value={currentRoleName}
+						value={currentRoleName || ''}
 						onTextChange={setCurrentRoleName}
 						placeHolder={t('roleDetail.roleName')}
 						label={t('roleDetail.roleName')}

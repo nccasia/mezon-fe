@@ -310,3 +310,5 @@ export const selectCurrentRole = createSelector(selectRolesClanEntities, selectC
 RoleId ? RolesClanEntities[RoleId] : null,);
 export const selectAllRoleMember = createSelector(getRolesClanState, (state)=>state.roleMembers);
 export const selectMembersByRoleID = (roleID:string)=>{createSelector(selectAllRoleMember, (roleMembers)=>{return roleMembers[roleID]});}
+export const selectRoleByRoleId = (roleID: string) => createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find(r => r?.id === roleID))
+export const selectEveryoneRole = createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find(r => r?.id === String(process.env.NX_CHAT_APP_EVERYONE_ROLE_ID)))
