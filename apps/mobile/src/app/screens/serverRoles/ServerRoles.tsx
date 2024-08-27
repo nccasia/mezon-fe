@@ -19,9 +19,9 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 	const everyoneRole = useSelector(selectEveryoneRole);
 
-	const allClanRolesWithoutEveryoneRole = useMemo(() => {
+	const allClanRole = useMemo(() => {
 		if (!rolesClan || rolesClan?.length === 0) return [];
-		return rolesClan.filter(r => r?.slug !== EPermission.everyone).map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
+		return rolesClan.map(role => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }))
 	}, [rolesClan, isClanOwner, userPermissionsStatus]);
 
 	navigation.setOptions({
@@ -73,18 +73,20 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 
 			<Block marginTop={size.s_10} flex={1}>
 				<Text color={themeValue.text}>
-					{t('roles')} - {allClanRolesWithoutEveryoneRole?.length || '0'}
+					{t('roles')} - {allClanRole?.length - 1 || '0'}
 				</Text>
-				{allClanRolesWithoutEveryoneRole.length ? (
+				{allClanRole.length ? (
 					<Block marginVertical={size.s_10} flex={1}>
 						<Block borderRadius={size.s_10} overflow="hidden">
 							<FlatList
-								data={allClanRolesWithoutEveryoneRole}
+								data={allClanRole}
 								scrollEnabled
 								showsVerticalScrollIndicator={false}
 								keyExtractor={(item) => item.id}
-								ItemSeparatorComponent={SeparatorWithLine}
-								renderItem={({ item }) => {
+								renderItem={({ item, index }) => {
+									if (item?.slug === EPermission.everyone) {
+										return null;
+									}
 									return (
 										<TouchableOpacity onPress={() => navigateToRoleDetail(item)}>
 											<Block
@@ -112,6 +114,9 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 													<Icons.ChevronSmallRightIcon color={themeValue.text} />
 												</Block>
 											</Block>
+											{index !== allClanRole.length - 1 && (
+												<SeparatorWithLine />
+											)}
 										</TouchableOpacity>
 									);
 								}}
