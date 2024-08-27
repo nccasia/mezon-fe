@@ -407,7 +407,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 
-	const onEventCreate = useCallback(
+	const onEventCreated = useCallback(
 		(eventManagement: EventManagement) => {
 			if (eventManagement) {
 				const createEventPayload = {
@@ -474,7 +474,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
 
-			socket.onEventCreate = onEventCreate;
+			socket.onEventCreated = onEventCreated;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -497,7 +497,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
-			onEventCreate,
+			onEventCreated,
 		],
 	);
 
@@ -574,7 +574,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelupdated,
 		onHeartbeatTimeout,
 		setCallbackEventFn,
-		onEventCreate,
+		onEventCreated,
 	]);
 
 	useEffect(() => {
