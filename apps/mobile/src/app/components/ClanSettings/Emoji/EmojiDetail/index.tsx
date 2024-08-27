@@ -38,6 +38,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 			source: getSrcEmoji(item.id as string),
 			shortname: ':' + emojiName + ':',
 			category: item.category,
+			clan_id: clanId as string,
 		};
 		await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: item.id || '' }));
 	};
