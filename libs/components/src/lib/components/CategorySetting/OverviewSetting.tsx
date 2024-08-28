@@ -73,7 +73,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({ category, onClose })
 						value={categoryName}
 						onChange={(e) => handleChangeCategoryName(e.target.value)}
 						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeSecond text-base rounded placeholder:text-sm"
-						placeholder="Support has arrived!"
+						placeholder="Enter your category name here..."
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 						onKeyDown={handlePressEnter}
 					/>
