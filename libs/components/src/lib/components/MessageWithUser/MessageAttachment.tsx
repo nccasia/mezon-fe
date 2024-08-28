@@ -1,4 +1,4 @@
-import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { EMimeTypes, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -19,9 +19,12 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	const documents: ApiMessageAttachment[] = [];
 
 	attachments.forEach((attachment) => {
-		if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
+		if (
+			(attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
+			!attachment.url?.includes(EMimeTypes.tenor)
+		) {
 			videos.push(attachment);
-		} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
+		} else if (attachment.filetype?.indexOf(EMimeTypes.png) !== -1 || attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1) {
 			images.push(attachment);
 		} else {
 			documents.push(attachment);
@@ -34,7 +37,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 	attachments,
 	messageId,
 	onContextMenu,
-	mode,
+	mode
 }) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
 
@@ -43,7 +46,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 			{videos.length > 0 && (
 				<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 					{videos.map((video, index) => (
-						<div key={`${video.url}_${index}`} className="w-fit gap-y-2">
+						<div key={`${video.url}_${index}`} className="w-fit max-h-[350px] gap-y-2">
 							<MessageVideo attachmentData={video} />
 						</div>
 					))}

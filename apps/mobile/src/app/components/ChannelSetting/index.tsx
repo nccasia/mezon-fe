@@ -1,6 +1,7 @@
 import { CheckIcon, isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
+import { DrawerActions } from '@react-navigation/native';
 import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -28,15 +29,15 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
 	const channel = useSelector(selectChannelById(channelId || ''));
-	const isChannel = useMemo(() => channel.parrent_id === "0", [channel.parrent_id])
+	const isChannel = useMemo(() => channel?.parrent_id === '0', [channel?.parrent_id]);
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 	const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
-		channelTopic: '',
+		channelTopic: ''
 	});
 	const [currentSettingValue, setCurrentSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
-		channelTopic: '',
+		channelTopic: ''
 	});
 	const isNotChanged = useMemo(() => {
 		return isEqual(originSettingValue, currentSettingValue);
@@ -48,7 +49,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 			<Pressable onPress={() => handleSaveChannelSetting()}>
 				<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
 			</Pressable>
-		),
+		)
 	});
 
 	const handleUpdateValue = (value: Partial<IChannelSettingValue>) => {
@@ -59,7 +60,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		if (channel?.channel_id) {
 			const initialChannelSettingValue: IChannelSettingValue = {
 				channelName: channel?.channel_label,
-				channelTopic: '',
+				channelTopic: ''
 			};
 			setOriginSettingValue(initialChannelSettingValue);
 			setCurrentSettingValue(initialChannelSettingValue);
@@ -70,7 +71,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: currentSettingValue?.channelName,
-			category_id: channel.category_id,
+			category_id: channel.category_id
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 		navigation?.goBack();
@@ -78,8 +79,8 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 			type: 'success',
 			props: {
 				text2: t('toast.updated'),
-				leadingIcon: <CheckIcon color={Colors.green} />,
-			},
+				leadingIcon: <CheckIcon color={Colors.green} />
+			}
 		});
 	};
 
@@ -91,9 +92,9 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					expandable: true,
 					icon: <FolderPlusIcon color={themeValue.text} />,
 					isShow: isChannel
-				},
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const permissionMenu = useMemo(
@@ -104,9 +105,9 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					expandable: true,
 					icon: <UserShieldIcon color={themeValue.text} />,
 					isShow: isChannel
-				},
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const notificationMenu = useMemo(
@@ -115,20 +116,20 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelNotifications.notification'),
 					expandable: true,
-					icon: <BellIcon color={themeValue.text} />,
+					icon: <BellIcon color={themeValue.text} />
 				},
 				{
 					title: t('fields.channelNotifications.pinned'),
 					expandable: true,
-					icon: <PinIcon color={themeValue.text} />,
+					icon: <PinIcon color={themeValue.text} />
 				},
 				{
 					title: t('fields.channelNotifications.invite'),
 					expandable: true,
-					icon: <LinkIcon color={themeValue.text} />,
-				},
+					icon: <LinkIcon color={themeValue.text} />
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const webhookMenu = useMemo(
@@ -139,9 +140,9 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					expandable: true,
 					icon: <WebhookIcon color={themeValue.text} />,
 					isShow: isChannel
-				},
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const deleteMenu = useMemo(
@@ -151,10 +152,10 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					title: isChannel ? t('fields.channelDelete.delete') : t('fields.threadDelete.delete'),
 					textStyle: { color: 'red' },
 					onPress: () => handlePressDeleteChannel(),
-					icon: <TrashIcon color="red" />,
-				},
+					icon: <TrashIcon color="red" />
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const topMenu = useMemo(
@@ -163,14 +164,14 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{ items: categoryMenu },
 				{
 					items: permissionMenu,
-					bottomDescription: t('fields.channelPermission.description'),
+					bottomDescription: t('fields.channelPermission.description')
 				},
 				{
 					items: notificationMenu,
-					bottomDescription: '',
-				},
+					bottomDescription: ''
+				}
 			] satisfies IMezonMenuSectionProps[],
-		[],
+		[]
 	);
 
 	const bottomMenu = useMemo(() => [{ items: webhookMenu }, { items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
@@ -180,22 +181,22 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 			[
 				{
 					title: t('fields.channelHideInactivity._1hour'),
-					value: 0,
+					value: 0
 				},
 				{
 					title: t('fields.channelHideInactivity._24hours'),
-					value: 1,
+					value: 1
 				},
 				{
 					title: t('fields.channelHideInactivity._3days'),
-					value: 2,
+					value: 2
 				},
 				{
 					title: t('fields.channelHideInactivity._1Week'),
-					value: 3,
-				},
+					value: 3
+				}
 			] satisfies IMezonOptionData,
-		[],
+		[]
 	);
 
 	const slowModeOptions = useMemo(
@@ -203,77 +204,77 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 			[
 				{
 					value: 0,
-					name: t('fields.channelSlowMode.slowModeOff'),
+					name: t('fields.channelSlowMode.slowModeOff')
 				},
 				{
 					value: 1,
-					name: t('fields.channelSlowMode._5seconds'),
+					name: t('fields.channelSlowMode._5seconds')
 				},
 				{
 					value: 2,
-					name: t('fields.channelSlowMode._10seconds'),
+					name: t('fields.channelSlowMode._10seconds')
 				},
 				{
 					value: 3,
-					name: t('fields.channelSlowMode._15seconds'),
+					name: t('fields.channelSlowMode._15seconds')
 				},
 				{
 					value: 4,
-					name: t('fields.channelSlowMode._30seconds'),
+					name: t('fields.channelSlowMode._30seconds')
 				},
 				{
 					value: 5,
-					name: t('fields.channelSlowMode._1minute'),
+					name: t('fields.channelSlowMode._1minute')
 				},
 				{
 					value: 6,
-					name: t('fields.channelSlowMode._1minute'),
+					name: t('fields.channelSlowMode._1minute')
 				},
 				{
 					value: 7,
-					name: t('fields.channelSlowMode._2minutes'),
+					name: t('fields.channelSlowMode._2minutes')
 				},
 				{
 					value: 8,
-					name: t('fields.channelSlowMode._5minutes'),
+					name: t('fields.channelSlowMode._5minutes')
 				},
 				{
 					value: 9,
-					name: t('fields.channelSlowMode._10minutes'),
+					name: t('fields.channelSlowMode._10minutes')
 				},
 				{
 					value: 10,
-					name: t('fields.channelSlowMode._15minutes'),
+					name: t('fields.channelSlowMode._15minutes')
 				},
 				{
 					value: 11,
-					name: t('fields.channelSlowMode._30minutes'),
+					name: t('fields.channelSlowMode._30minutes')
 				},
 				{
 					value: 12,
-					name: t('fields.channelSlowMode._1hour'),
+					name: t('fields.channelSlowMode._1hour')
 				},
 				{
 					value: 13,
-					name: t('fields.channelSlowMode._2hours'),
+					name: t('fields.channelSlowMode._2hours')
 				},
 				{
 					value: 14,
-					name: t('fields.channelSlowMode._6hours'),
-				},
+					name: t('fields.channelSlowMode._6hours')
+				}
 			] satisfies IMezonSliderData,
-		[],
+		[]
 	);
 
 	const handleDeleteChannel = async () => {
 		await dispatch(
 			channelsActions.deleteChannel({
 				channelId: channel?.channel_id,
-				clanId: channel?.clan_id,
-			}),
+				clanId: channel?.clan_id
+			})
 		);
-
 		navigation.navigate(APP_SCREEN.HOME);
+		navigation.dispatch(DrawerActions.openDrawer());
 	};
 
 	const handleDeleteModalVisibleChange = (visible: boolean) => {
@@ -293,12 +294,14 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					onTextChange={(text) => handleUpdateValue({ channelName: text })}
 				/>
 
-				{isChannel && <MezonInput
-					label={t('fields.channelDescription.title')}
-					value={currentSettingValue.channelTopic}
-					onTextChange={(text) => handleUpdateValue({ channelTopic: text })}
-					textarea
-				/>}
+				{isChannel && (
+					<MezonInput
+						label={t('fields.channelDescription.title')}
+						value={currentSettingValue.channelTopic}
+						onTextChange={(text) => handleUpdateValue({ channelTopic: text })}
+						textarea
+					/>
+				)}
 			</View>
 
 			<MezonMenu menu={topMenu} />
@@ -320,7 +323,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				title={t('confirm.delete.title')}
 				confirmText={t('confirm.delete.confirmText')}
 				content={t('confirm.delete.content', {
-					channelName: channel?.channel_label,
+					channelName: channel?.channel_label
 				})}
 			/>
 		</ScrollView>

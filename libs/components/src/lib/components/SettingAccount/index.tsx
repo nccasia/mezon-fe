@@ -39,12 +39,12 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 				<div className="h-[100px] bg-black" style={{ backgroundColor: color }}></div>
 				<div className="flex justify-between relative -top-5 px-4 flex-col sbm:flex-row sbm:items-center">
 					<div className="flex items-center gap-x-4">
-						<AvatarImage 
+						<AvatarImage
 							alt={userProfile?.user?.username || ''}
 							userName={userProfile?.user?.username}
 							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
 							src={urlImg}
-							classNameText='!text-5xl'
+							classNameText="!text-5xl"
 						/>
 						<div className="font-semibold text-lg">{userProfile?.user?.display_name}</div>
 					</div>
@@ -59,7 +59,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 					<div className="flex justify-between items-center mb-4">
 						<div>
 							<h4 className="uppercase font-bold text-xs dark:text-zinc-400 text-textLightTheme mb-1">Display Name</h4>
-							<p>{userProfile?.user?.display_name}</p>
+							<p>{userProfile?.user?.display_name || "You haven't added a display name yet."}</p>
 						</div>
 						<div className="bg-zinc-600 h-fit rounded px-4 py-2 cursor-pointer hover:bg-opacity-80 text-white" onClick={handleClick}>
 							Edit

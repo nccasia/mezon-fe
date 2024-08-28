@@ -72,6 +72,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 		el.addEventListener('scroll', handler);
 
 		return () => {
+			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
 			el.removeEventListener('scroll', handler);
 		};
 	}, [handlerId, targetRef, options]);

@@ -36,9 +36,7 @@ const Setting = () => {
 						{currentSetting === EUserSettings.ACCOUNT && (
 							<SettingAccount menuIsOpen={menuIsOpen} onSettingProfile={handleSettingItemClick} />
 						)}
-						{currentSetting === EUserSettings.PROFILES && (
-							<SettingRightProfile menuIsOpen={menuIsOpen} isUserProfile={isShowSettingFooter?.isUserProfile} />
-						)}
+						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} />}
 						{currentSetting === EUserSettings.APPEARANCE && <SettingAppearance menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={closeSetting} />
 

@@ -1,6 +1,6 @@
-import { fetchApplications, selectAppById, useAppDispatch } from '@mezon/store';
+import { selectAppById } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useLoaderData, useParams } from 'react-router-dom';
 import { useAppearance } from '../../context/AppearanceContext';
@@ -9,7 +9,6 @@ import ModalAddBot from './ModalAddBot';
 import ModalTry from './ModalTry';
 
 const Install: React.FC = () => {
-	const dispatch = useAppDispatch();
 	const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
 	const { applicationId } = useParams();
 	const appSelect = useSelector(selectAppById(applicationId || ''));
@@ -24,10 +23,6 @@ const Install: React.FC = () => {
 		setOpenModalTry(!openModalTry);
 	}, [openModalTry]);
 
-	useEffect(() => {
-		dispatch(fetchApplications({}));
-	}, [dispatch]);
-
 	if (!isLogin) {
 		return <Navigate to={redirect || '/login'} replace />;
 	}
@@ -36,7 +31,7 @@ const Install: React.FC = () => {
 		<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-col h-screen dark:text-textDarkTheme text-textLightTheme relative justify-center items-center">
 			<HeaderInstall />
 			{!openModalAdd && !openModalTry ? (
-				<div className="rounded bg-bgProfileBody max-w-[440px] w-full px-4 py-8 flex flex-col items-center">
+				<div className="rounded dark:bg-bgProfileBody bg-bgLightMode border dark:border-bgTertiary border-gray-200 max-w-[440px] w-full px-4 py-8 flex flex-col items-center">
 					<div className="rounded-full dark:text-bgAvatarLight text-bgAvatarDark dark:bg-bgAvatarDark bg-bgAvatarLight text-2xl font-bold size-[80px] min-w-[80px] uppercase flex justify-center items-center">
 						{appSelect?.appname?.at(0)}
 					</div>
@@ -68,7 +63,7 @@ const HeaderInstall = memo(() => {
 				width={36}
 				height={36}
 			/>
-			<span className="text-2xl font-bold">MEZON</span>
+			<span className="text-2xl font-bold dark:text-black text-colorTextLightMode">MEZON</span>
 		</div>
 	);
 });
@@ -81,25 +76,15 @@ type ContentInstallProps = {
 const ContentInstall = memo((props: ContentInstallProps) => {
 	const { handleOpenModalAdd, handleOpenModalTry } = props;
 	return (
-		<div className="bg-bgTertiary rounded w-full cursor-pointer">
-			<div className="flex items-center gap-x-3 pt-2" onClick={handleOpenModalTry}>
-				<Icons.AddPerson className="text-contentTertiary ml-4" />
-				<div className="flex justify-between items-center pb-2 flex-1 border-b border-solid border-gray-700">
-					<div>
-						<h4 className="text-base font-medium">Try It Now</h4>
-						<p className="text-contentTertiary text-xs">Use this app everywhere!</p>
-					</div>
-					<Icons.ArrowRight defaultSize="size-6 mr-2" />
-				</div>
-			</div>
+		<div className="dark:bg-bgTertiary bg-bgLightModeThird rounded w-full cursor-pointer">
 			<div className="flex items-center gap-x-3 py-2" onClick={handleOpenModalAdd}>
 				<Icons.AddServe className="text-contentTertiary ml-4" />
 				<div className="flex justify-between items-center flex-1">
 					<div>
 						<h4 className="text-base font-medium">Add to Server</h4>
-						<p className="text-contentTertiary text-xs">Customise your server by adding this app</p>
+						<p className="dark:text-contentTertiary text-colorTextLightMode text-xs">Customise your server by adding this app</p>
 					</div>
-					<Icons.ArrowRight defaultSize="size-6 mr-2" />
+					<Icons.ArrowRight defaultSize="size-6 mr-2 dark:text-contentTertiary text-contentTertiary" />
 				</div>
 			</div>
 		</div>
