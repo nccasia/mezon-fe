@@ -208,7 +208,7 @@ export const renderRulesCustom = {
 			);
 		}
 
-		if (content?.startsWith('::')) {
+		if (content?.startsWith(':')) {
 			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />;
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {

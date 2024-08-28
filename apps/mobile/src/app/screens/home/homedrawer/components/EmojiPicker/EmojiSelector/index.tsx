@@ -1,4 +1,5 @@
 import {
+	ActionEmitEvent,
 	BicycleIcon,
 	BowlIcon,
 	debounce,
@@ -20,7 +21,7 @@ import { getSrcEmoji, IEmoji } from '@mezon/utils';
 import { MezonClanAvatar } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
@@ -136,10 +137,12 @@ export default function EmojiSelector({
 			setRecentEmoji(emoji, currentClan?.id || "0");
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
-				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));
+				const emojiItemName = `:${emoji.shortname?.split(':').join('')}:`;
+				DeviceEventEmitter.emit(ActionEmitEvent.ADD_EMOJI_PICKED, { shortName: emojiItemName });
+				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emojiItemName));
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
-						shortName: emoji.shortname,
+						shortName: emojiItemName,
 						id: emoji.id,
 					}),
 				);
