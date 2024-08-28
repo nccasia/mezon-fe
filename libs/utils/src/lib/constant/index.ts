@@ -12,6 +12,7 @@ export const TIME_OF_SHOWING_FIRST_POPUP = 1000 * 60 * 5;
 export const KEY_KEYBOARD = { BACKSPACE: 8, TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
 export const GROUP_CHAT_MAXIMUM_MEMBERS = 9;
 export const EVERYONE_ROLE_ID = '1825450696619593728';
+export const CATEGORY_NAME_MIN_LENGTH = 0;
 
 export const threadError: ThreadError = {
 	name: 'Thread Name is required',
@@ -41,5 +42,5 @@ export const failAttachment = {
 	filetype: 'unknown',
 	size: 0,
 	width: 0,
-	height: 0,
+	height: 0
 };

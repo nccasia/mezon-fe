@@ -1,6 +1,6 @@
 import { useEscapeKey } from '@mezon/core';
 import { categoriesActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
-import { ICategory, ValidateSpecialCharacters } from '@mezon/utils';
+import { CATEGORY_NAME_MIN_LENGTH, ICategory, KEY_KEYBOARD, ValidateSpecialCharacters } from '@mezon/utils';
 import { ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -25,7 +25,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({ category, onClose })
 
 		const regex = ValidateSpecialCharacters();
 
-		if (categoryName.length === 0 || categoryName.length === 64 || !regex.test(categoryName)) {
+		if (categoryName.length === CATEGORY_NAME_MIN_LENGTH || !regex.test(categoryName)) {
 			setIsInvalidName(true);
 		} else {
 			setIsInvalidName(false);
@@ -58,7 +58,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({ category, onClose })
 	});
 
 	const handlePressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter' && !isInvalidName) {
+		if (e.keyCode === KEY_KEYBOARD.ENTER && !isInvalidName) {
 			handleSave();
 		}
 	};
