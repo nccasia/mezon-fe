@@ -8,7 +8,7 @@ import {
 	selectIsUseProfileDM,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -41,14 +41,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIsShowMemberListDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsShowMemberListDM(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return (
@@ -131,7 +131,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 						<SearchMessageChannel
 							mode={
-								currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM
+								currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 									? ChannelStreamMode.STREAM_MODE_DM
 									: ChannelStreamMode.STREAM_MODE_GROUP
 							}
