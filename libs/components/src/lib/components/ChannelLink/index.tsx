@@ -6,7 +6,7 @@ import {
 	selectCurrentChannelId,
 	useAppDispatch,
 	useAppSelector,
-	voiceActions,
+	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, EPermission, IChannel, MouseButton } from '@mezon/utils';
@@ -37,13 +37,13 @@ export type Coords = {
 
 enum StatusVoiceChannel {
 	Active = 1,
-	No_Active = 0,
+	No_Active = 0
 }
 
 export const classes = {
 	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
 	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton',
-	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton',
+	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton'
 };
 
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
@@ -59,7 +59,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 
@@ -82,15 +82,15 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
-		const mouseY = event.clientY + window.screenY;
+		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
 
 		if (event.button === MouseButton.RIGHT) {
 			await dispatch(
 				notificationSettingActions.getNotificationSetting({
 					channelId: channel.channel_id || '',
-					isCurrentChannel: channel.channel_id === currentChannelId,
-				}),
+					isCurrentChannel: channel.channel_id === currentChannelId
+				})
 			);
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
@@ -129,7 +129,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				window.open(urlVoice, '_blank', 'noreferrer');
 			}
 		},
-		[channel.status],
+		[channel.status]
 	);
 	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (

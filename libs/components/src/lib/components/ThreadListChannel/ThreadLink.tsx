@@ -5,7 +5,7 @@ import {
 	selectCountNotifyByChannelId,
 	selectCurrentChannel,
 	selectIsUnreadChannelById,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
@@ -38,7 +38,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 
 	const channelPath = toChannelPage(thread.channel_id as string, thread.clan_id || '');
@@ -49,7 +49,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
-		const mouseY = event.clientY + window.screenY;
+		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
 
 		if (event.button === MouseButton.RIGHT) {

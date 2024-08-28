@@ -1,20 +1,21 @@
-import {useClanRestriction, useEscapeKey} from '@mezon/core';
+import { useClanRestriction, useEscapeKey } from '@mezon/core';
 import {
+	SetMuteNotificationPayload,
+	SetNotificationPayload,
 	notificationSettingActions,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
-	useAppDispatch,
 	selectSelectedChannelNotificationSetting,
-	SetMuteNotificationPayload, SetNotificationPayload
-} from "@mezon/store";
+	useAppDispatch
+} from '@mezon/store';
 import { ENotificationTypes, EPermission, IChannel } from '@mezon/utils';
-import { format } from "date-fns";
+import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { NotificationType } from "mezon-js";
+import { NotificationType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
 import ItemPanel from './ItemPanel';
@@ -29,42 +30,42 @@ type PanelChannel = {
 
 const typeChannel = {
 	text: 1,
-	voice: 4,
+	voice: 4
 };
 export const notiLabels: Record<number, string> = {
-  [NotificationType.ALL_MESSAGE]: "All",
-  [NotificationType.MENTION_MESSAGE]: 'Only @mention',
-  [NotificationType.NOTHING_MESSAGE]: 'Nothing'
+	[NotificationType.ALL_MESSAGE]: 'All',
+	[NotificationType.MENTION_MESSAGE]: 'Only @mention',
+	[NotificationType.NOTHING_MESSAGE]: 'Nothing'
 };
 
 export const notificationTypesList = [
 	{
-    label: 'All',
-    value: NotificationType.ALL_MESSAGE
-  },
-  {
-    label: 'Only @mention',
-    value: NotificationType.MENTION_MESSAGE
-  },
-  {
-    label: 'Nothing',
-    value: NotificationType.NOTHING_MESSAGE
-  },
-]
+		label: 'All',
+		value: NotificationType.ALL_MESSAGE
+	},
+	{
+		label: 'Only @mention',
+		value: NotificationType.MENTION_MESSAGE
+	},
+	{
+		label: 'Nothing',
+		value: NotificationType.NOTHING_MESSAGE
+	}
+];
 
 const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel }: PanelChannel) => {
-  const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
-  const dispatch = useAppDispatch();
-  const currentChannelId = useSelector(selectCurrentChannelId);
-  const currentClan = useSelector(selectCurrentClan);
+	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const dispatch = useAppDispatch();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClan = useSelector(selectCurrentClan);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-  const [nameChildren, setNameChildren] = useState('');
-  const [mutedUntil, setmutedUntil] = useState('');
-  const [defaultNotifiName, setDefaultNotifiName] = useState('');
-  const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
-  const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-  
+	const [nameChildren, setNameChildren] = useState('');
+	const [mutedUntil, setmutedUntil] = useState('');
+	const [defaultNotifiName, setDefaultNotifiName] = useState('');
+	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+
 	const handleEditChannel = () => {
 		setOpenSetting(true);
 		setIsShowPanelChannel(false);
@@ -73,61 +74,63 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const handleDeleteChannel = () => {
 		onDeleteChannel();
 	};
-  
-  const handleScheduleMute = (duration: number) => {
-    if (duration !== Infinity) {
-      const now = new Date();
-      const unmuteTime = new Date(now.getTime() + duration);
-      const unmuteTimeISO = unmuteTime.toISOString();
-      
-      const body: SetNotificationPayload = {
-        channel_id: channel.channel_id || '',
-        notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-        clan_id: currentClan?.clan_id || '',
-        time_mute: unmuteTimeISO,
-	      is_current_channel: channel.channel_id === currentChannelId
-      };
-      dispatch(notificationSettingActions.setNotificationSetting(body));
-    } else {
-      const body: SetMuteNotificationPayload = {
-        channel_id: channel.channel_id || '',
-        notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-        clan_id: currentClan?.clan_id || '',
-        active: 0,
-	      is_current_channel: channel.channel_id === currentChannelId
-      };
-      dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-    }
-  };
-  
-  const muteOrUnMuteChannel = (active: number) => {
-    const body = {
-      channel_id: channel.channel_id || '',
-      notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-      clan_id: currentClan?.clan_id || '',
-      active: active,
-	    is_current_channel: channel.channel_id === currentChannelId
-    };
-    dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-  };
-  
-  const setNotification = (notificationType: number | 0) => {
-    if(notificationType) {
-      const body = {
-        channel_id: channel.channel_id || '',
-        notification_type: notificationType || 0,
-        clan_id: currentClan?.clan_id || '',
-	      is_current_channel: channel.channel_id === currentChannelId
-      };
-      dispatch(notificationSettingActions.setNotificationSetting(body));
-    } else {
-      dispatch(notificationSettingActions.deleteNotiChannelSetting({
-	      channel_id: channel.channel_id || '',
-	      clan_id: currentClan?.clan_id || '',
-	      is_current_channel: channel.channel_id === currentChannelId
-			}));
-    }
-  };
+
+	const handleScheduleMute = (duration: number) => {
+		if (duration !== Infinity) {
+			const now = new Date();
+			const unmuteTime = new Date(now.getTime() + duration);
+			const unmuteTimeISO = unmuteTime.toISOString();
+
+			const body: SetNotificationPayload = {
+				channel_id: channel.channel_id || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+				clan_id: currentClan?.clan_id || '',
+				time_mute: unmuteTimeISO,
+				is_current_channel: channel.channel_id === currentChannelId
+			};
+			dispatch(notificationSettingActions.setNotificationSetting(body));
+		} else {
+			const body: SetMuteNotificationPayload = {
+				channel_id: channel.channel_id || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+				clan_id: currentClan?.clan_id || '',
+				active: 0,
+				is_current_channel: channel.channel_id === currentChannelId
+			};
+			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+		}
+	};
+
+	const muteOrUnMuteChannel = (active: number) => {
+		const body = {
+			channel_id: channel.channel_id || '',
+			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+			clan_id: currentClan?.clan_id || '',
+			active: active,
+			is_current_channel: channel.channel_id === currentChannelId
+		};
+		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+	};
+
+	const setNotification = (notificationType: number | 0) => {
+		if (notificationType) {
+			const body = {
+				channel_id: channel.channel_id || '',
+				notification_type: notificationType || 0,
+				clan_id: currentClan?.clan_id || '',
+				is_current_channel: channel.channel_id === currentChannelId
+			};
+			dispatch(notificationSettingActions.setNotificationSetting(body));
+		} else {
+			dispatch(
+				notificationSettingActions.deleteNotiChannelSetting({
+					channel_id: channel.channel_id || '',
+					clan_id: currentClan?.clan_id || '',
+					is_current_channel: channel.channel_id === currentChannelId
+				})
+			);
+		}
+	};
 
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
@@ -135,52 +138,52 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			setPositionTop(true);
 		}
 	}, [coords.distanceToBottom]);
-  
-  useEffect(() => {
-    if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === "0") {
-      setNameChildren('Mute Channel');
-      setmutedUntil('');
-    } else {
-      setNameChildren('Unmute Channel');
-      if (getNotificationChannelSelected?.time_mute) {
-        const timeMute = new Date(getNotificationChannelSelected.time_mute);
-        const currentTime = new Date();
-        if (timeMute > currentTime) {
-          const timeDifference = timeMute.getTime() - currentTime.getTime();
-          const formattedDate = format(timeMute, 'dd/MM, HH:mm');
-          setmutedUntil(`Muted until ${formattedDate}`);
-          
-          setTimeout(() => {
-            const body = {
-              channel_id: currentChannelId || '',
-              notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-              clan_id: currentClan?.clan_id || '',
-              active: 1,
-	            is_current_channel: channel.channel_id === currentChannelId
-            };
-            dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-          }, timeDifference);
-        }
-      }
-    }
-    if (defaultNotificationCategory?.notification_setting_type) {
-      setDefaultNotifiName(notiLabels[defaultNotificationCategory?.notification_setting_type]);
-    } else if (defaultNotificationClan?.notification_setting_type) {
-      setDefaultNotifiName(notiLabels[defaultNotificationClan.notification_setting_type]);
-    }
-  }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
-  
-  const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
-  const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-  const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
-  const [hasManageChannelPermission] = useClanRestriction([EPermission.manageThread]);
 
-  const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
-  const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
-	
-	useEscapeKey(() => setIsShowPanelChannel(false))
+	useEffect(() => {
+		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0') {
+			setNameChildren('Mute Channel');
+			setmutedUntil('');
+		} else {
+			setNameChildren('Unmute Channel');
+			if (getNotificationChannelSelected?.time_mute) {
+				const timeMute = new Date(getNotificationChannelSelected.time_mute);
+				const currentTime = new Date();
+				if (timeMute > currentTime) {
+					const timeDifference = timeMute.getTime() - currentTime.getTime();
+					const formattedDate = format(timeMute, 'dd/MM, HH:mm');
+					setmutedUntil(`Muted until ${formattedDate}`);
 
-  return (
+					setTimeout(() => {
+						const body = {
+							channel_id: currentChannelId || '',
+							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+							clan_id: currentClan?.clan_id || '',
+							active: 1,
+							is_current_channel: channel.channel_id === currentChannelId
+						};
+						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+					}, timeDifference);
+				}
+			}
+		}
+		if (defaultNotificationCategory?.notification_setting_type) {
+			setDefaultNotifiName(notiLabels[defaultNotificationCategory?.notification_setting_type]);
+		} else if (defaultNotificationClan?.notification_setting_type) {
+			setDefaultNotifiName(notiLabels[defaultNotificationClan.notification_setting_type]);
+		}
+	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
+
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
+	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageThread]);
+
+	const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
+	const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
+
+	useEscapeKey(() => setIsShowPanelChannel(false));
+
+	return (
 		<div
 			ref={panelRef}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
@@ -202,37 +205,30 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			{channel.parrent_id === '0' ? (
 				<>
 					<GroupPanels>
-            {(getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === "0") ? (
-              <Dropdown
-                trigger="hover"
-                dismissOnClick={false}
-                renderTrigger={() => (
-                  <div>
-                    <ItemPanel
-                      children={nameChildren}
-                      dropdown="change here"
-                      onClick={() => muteOrUnMuteChannel(0)}/>
-                  </div>
-                )}
-                label=""
-                placement="right-start"
-                className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
-              >
-                <ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(15 * 60 * 1000)}/>
-                <ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(60 * 60 * 1000)}/>
-                <ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)}/>
-                <ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)}/>
-                <ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)}/>
-                <ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)}/>
-              </Dropdown>
-            ) : (
-              <ItemPanel
-                children={nameChildren}
-                onClick={() => muteOrUnMuteChannel(1)}
-                subText={mutedUntil}
-              />
-            )}
-						
+						{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
+							<Dropdown
+								trigger="hover"
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<div>
+										<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
+									</div>
+								)}
+								label=""
+								placement="right-start"
+								className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+							>
+								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(15 * 60 * 1000)} />
+								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(60 * 60 * 1000)} />
+								<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)} />
+								<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)} />
+								<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)} />
+								<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+							</Dropdown>
+						) : (
+							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
+						)}
+
 						{channel.type === typeChannel.text && (
 							<Dropdown
 								trigger="hover"
@@ -244,33 +240,33 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 								)}
 								label=""
 								placement="right-start"
-                className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
-                <ItemPanel
-                  children="Use Category Default"
-                  type="radio"
-                  name="NotificationSetting"
-                  defaultNotifi={true}
-                  checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
-                  subText={defaultNotifiName}
-                  onClick={() => setNotification(ENotificationTypes.DEFAULT)}
-                />
-                {notificationTypesList.map(notification => (
-                  <ItemPanel
-                    children={notification.label}
-                    notificationId={notification.value}
-                    type="radio"
-                    name="NotificationSetting"
-                    key={notification.value}
-                    checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
-                    onClick={() => setNotification(notification.value)}
-                  />
-                ))}
+								<ItemPanel
+									children="Use Category Default"
+									type="radio"
+									name="NotificationSetting"
+									defaultNotifi={true}
+									checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
+									subText={defaultNotifiName}
+									onClick={() => setNotification(ENotificationTypes.DEFAULT)}
+								/>
+								{notificationTypesList.map((notification) => (
+									<ItemPanel
+										children={notification.label}
+										notificationId={notification.value}
+										type="radio"
+										name="NotificationSetting"
+										key={notification.value}
+										checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+										onClick={() => setNotification(notification.value)}
+									/>
+								))}
 							</Dropdown>
 						)}
 					</GroupPanels>
 
-					{(isShowManageChannel) && (
+					{isShowManageChannel && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" />}
@@ -322,7 +318,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{(isShowManageThread) && (
+					{isShowManageThread && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Create Thread" />
