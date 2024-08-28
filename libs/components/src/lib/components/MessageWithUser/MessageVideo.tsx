@@ -6,8 +6,8 @@ export type MessageImage = {
 
 function MessageVideo({ attachmentData }: MessageImage) {
 	return (
-		<div className="relative w-full h-[200px]">
-			<video src={attachmentData.url} controls={true} autoPlay={false} className="w-full h-full object-cover"></video>
+		<div className="relative overflow-hidden w-full h-full max-w-fit rounded-lg">
+			<video src={attachmentData.url} controls={true} autoPlay={false} className="w-full h-full object-contain"></video>
 		</div>
 	);
 }

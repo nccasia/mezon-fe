@@ -7,7 +7,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
-import SettingUserClanProfileSave, { ModalSettingSave } from './settingUserClanProfileSave';
+import SettingUserClanProfileSave, { ModalSettingSave } from './SettingUserClanProfileSave';
 
 interface SettingRightClanEditProps {
 	flagOption: boolean;
@@ -15,13 +15,15 @@ interface SettingRightClanEditProps {
 	clanId: string;
 }
 
-const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption, setFlagOption, clanId }) => {
+const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption, clanId, setFlagOption }) => {
 	const { userProfile } = useAuth();
 	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
+
+	const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
 	useEffect(() => {
 		setDraftProfile(userClansProfile);
@@ -36,8 +38,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 
 	const editProfile = useMemo<Profilesform>(() => {
 		const profileVaile = {
-			displayName: userProfile?.user?.username ?? '',
-			urlImage: userProfile?.user?.avatar_url ?? '',
+			displayName: '',
+			urlImage: userProfile?.user?.avatar_url ?? ''
 		};
 		if (draftProfile?.nick_name) {
 			profileVaile.displayName = draftProfile?.nick_name;
@@ -49,8 +51,6 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 	}, [draftProfile, userProfile]);
 
 	const { displayName, urlImage } = editProfile;
-
-	const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -72,7 +72,7 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 			(attachment) => {
 				setUrlImage(attachment.url || '');
 				setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
-			},
+			}
 		);
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +86,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 	};
 
 	const handleClose = () => {
-		if (userClansProfile?.nick_name !== undefined || userClansProfile?.avartar !== undefined) {
+		if (userClansProfile?.nick_name || userClansProfile?.avartar) {
+			console.log(1);
 			setDisplayName(userClansProfile.nick_name || '');
 			setUrlImage(userClansProfile.avartar || '');
 		} else {
@@ -107,8 +108,9 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 		flagOption: flagOption,
 		handleClose,
 		handleSaveClose,
-		handleUpdateUser,
+		handleUpdateUser
 	};
+
 	return (
 		<>
 			<div className="flex-1 flex mt-[10px] gap-x-8 sbm:flex-row flex-col">
@@ -123,8 +125,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 							onChange={handleDisplayName}
 							type="text"
 							className="rounded-[3px] w-full dark:text-white text-black border dark:border-white border-slate-200 px-4 py-2 mt-2 outline-none  dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
-							placeholder={userProfile?.user?.username}
-							defaultValue={displayName === userProfile?.user?.username ? '' : displayName}
+							placeholder={userProfile?.user?.display_name || userProfile?.user?.username}
+							value={displayName}
 							maxLength={32}
 						/>
 					</div>
@@ -148,7 +150,7 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 				</div>
 				<div className="flex-1 text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">PREVIEW</p>
-					<SettingRightClanCard profiles={editProfile} />
+					<SettingRightClanCard profiles={editProfile} currentDisplayName={!displayName ? userProfile?.user?.display_name : ''} />
 				</div>
 			</div>
 			<SettingUserClanProfileSave PropsSave={saveProfile} />

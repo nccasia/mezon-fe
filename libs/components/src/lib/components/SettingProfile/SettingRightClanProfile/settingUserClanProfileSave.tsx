@@ -7,10 +7,10 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => Promise<void>;
 };
-export type PropsModalSettingSave = {
+export type SettingUserClanProfileSaveProps = {
 	PropsSave: ModalSettingSave;
 };
-const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
+const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
 	return PropsSave.flagOption || clickRole === 'New Role' ? (

@@ -5,7 +5,8 @@ import {
 	ChannelType,
 	HashtagDm,
 	Notification,
-	NotificationChannelCategorySetting, NotificationType,
+	NotificationChannelCategorySetting,
+	NotificationType,
 	NotifiReactMessage,
 	PermissionRoleChannel
 } from 'mezon-js';
@@ -38,6 +39,7 @@ import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
+export * from './mimeTypes';
 export * from './permissions';
 export * from './thumbnailPos';
 
@@ -762,7 +764,7 @@ export enum ENotificationTypes {
 	DEFAULT = 0,
 	ALL_MESSAGE = NotificationType.ALL_MESSAGE,
 	MENTION_MESSAGE = NotificationType.MENTION_MESSAGE,
-	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE,
+	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE
 }
 
 export type PreSendAttachment = {
@@ -783,9 +785,9 @@ export type UploadingAttachmentStatus = {
 export enum EUploadingStatus {
 	LOADING = 'loading',
 	SUCCESSFULLY = 'successfully',
-	ERROR = 'error',
+	ERROR = 'error'
 }
 
 export enum EFailAttachment {
-	FAIL_ATTACHMENT = 'failAttachment',
+	FAIL_ATTACHMENT = 'failAttachment'
 }

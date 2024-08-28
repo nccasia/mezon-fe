@@ -1,13 +1,18 @@
-import { selectAllCategories, selectCategoryIdSortChannel } from '@mezon/store';
+import { categoriesActions, selectAllCategories, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useAppNavigation } from '../../app/hooks/useAppNavigation';
 import { useChannels } from './useChannels';
 
 export function useCategory() {
 	const { listChannels } = useChannels();
 	const categories = useSelector(selectAllCategories);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { toChannelPage, toMembersPage } = useAppNavigation();
 
 	const categorizedChannels = React.useMemo(() => {
 		const results = categories.map((category) => {
@@ -31,10 +36,38 @@ export function useCategory() {
 		return results as ICategoryChannel[];
 	}, [categories, listChannels, categoryIdSortChannel]);
 
+	const handleDeleteCategory = async ({ category }: { category: ICategoryChannel }) => {
+		await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
+		const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
+
+		let channelNavId = '';
+		if (targetIndex !== -1) {
+			if (targetIndex === 0) {
+				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+				if (!channelNavId) {
+					const clanPath = toMembersPage(category.clan_id ?? '');
+					navigate(clanPath);
+					return;
+				}
+			} else if (targetIndex === categorizedChannels.length - 1) {
+				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+			} else {
+				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+			}
+		}
+
+		if (channelNavId && category.clan_id) {
+			const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
+			navigate(channelPath);
+			return;
+		}
+	};
+
 	return useMemo(
 		() => ({
-			categorizedChannels
+			categorizedChannels,
+			handleDeleteCategory
 		}),
-		[categorizedChannels]
+		[categorizedChannels, handleDeleteCategory]
 	);
 }

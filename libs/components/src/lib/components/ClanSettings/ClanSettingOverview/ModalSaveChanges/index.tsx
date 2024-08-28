@@ -1,4 +1,3 @@
-
 type ModalSaveChangesProps = {
 	onSave: () => void;
 	onReset: () => void;
@@ -13,16 +12,10 @@ const ModalSaveChanges = ({ onSave, onReset }: ModalSaveChangesProps) => {
 			<div className="flex flex-row justify-between items-center">
 				<h3>Careful — you have unsaved changes!</h3>
 				<div className="flex flex-row justify-end gap-[20px]">
-					<button
-						onClick={onReset}
-						className="rounded px-4 py-1.5 hover:underline"
-					>
+					<button onClick={onReset} className="rounded px-4 py-1.5 hover:underline">
 						Reset
 					</button>
-					<button
-						onClick={onSave}
-						className="ml-auto bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white"
-					>
+					<button onClick={onSave} className="ml-auto bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white">
 						Save Changes
 					</button>
 				</div>

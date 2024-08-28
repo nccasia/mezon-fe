@@ -79,7 +79,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 					handleCancel={handleCancelLeave}
 					handleConfirm={handleLeaveDmGroup}
 					title="delete"
-					leaveName="this group"
+					modalName="this group"
 					buttonName="Delete Group"
 				/>
 			)}

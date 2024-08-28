@@ -10,6 +10,7 @@ import RootLayout from '../layouts/RootLayout';
 import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
+import { applicationLoader } from '../loader/applicationLoader';
 import InitialRoutes from './InititalRoutes';
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
@@ -72,6 +73,7 @@ export const Routes = () => {
 											<Outlet />
 										</div>
 									),
+									loader: loaderWithStore(applicationLoader),
 									children: [
 										{
 											path: '*',

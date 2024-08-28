@@ -3452,7 +3452,7 @@ export const PicSuccessModal = ({ defaultFill = '#AEAEAE', defaultSize = '' }) =
 				/>
 				<path d="m20.333 58.268a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51" />
 				<g transform="translate(40 43)">
-					<use stroke="#fff" strokeOpacity=".2" strokeWidth="6" xlinkHref="#a" />
+					<use stroke={defaultFill} strokeOpacity=".2" strokeWidth="6" xlinkHref="#a" />
 					<use xlinkHref="#a" />
 				</g>
 				<path d="m62.77 81.24-5.17 5.28 13.785 14.08 31.015-29.92-5.17-5.28-25.845 24.64-8.616-8.8z" fill="#3ba55c" />

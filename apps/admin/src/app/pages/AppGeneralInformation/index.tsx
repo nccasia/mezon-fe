@@ -1,18 +1,58 @@
-import { getApplicationDetail, selectAppDetail, useAppDispatch } from '@mezon/store';
+import { ModalSaveChanges } from '@mezon/components';
+import { editApplication, selectAppDetail, useAppDispatch } from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { ApiApp } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { ApiApp, ApiMessageAttachment, MezonUpdateAppBody } from 'mezon-js/api.gen';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 const GeneralInformation = () => {
-	const appId = useParams().applicationId;
+	const { sessionRef, clientRef } = useMezon();
+	const appId = useParams().applicationId as string;
 	const appDetail = useSelector(selectAppDetail);
 	const dispatch = useAppDispatch();
 
+	const [appLogoUrl, setAppLogoUrl] = useState(appDetail.applogo);
+	const appLogoRef = useRef<HTMLInputElement>(null);
+	const [hasChanges, setHasChanges] = useState(false);
+
 	useEffect(() => {
-		dispatch(getApplicationDetail({ appId: appId as string }));
-	}, [appId, dispatch]);
+		const computeHasChanges = appLogoUrl !== appDetail.applogo;
+		if (computeHasChanges) {
+			setHasChanges(true);
+		}
+	}, [appDetail.applogo, appLogoUrl]);
+
+	const handleResetChange = () => {
+		setAppLogoUrl(appDetail.applogo);
+		setHasChanges(false);
+	};
+
+	const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
+			const client = clientRef.current;
+			const session = sessionRef.current;
+			if (!client || !session) {
+				throw new Error('Client or file is not initialized');
+			}
+			handleUploadFile(client, session, '', '', e.target.files[0].name, e.target.files[0]).then((attachment: ApiMessageAttachment) => {
+				setAppLogoUrl(attachment.url);
+			});
+		}
+	};
+
+	const handleClearLogo = () => {
+		setAppLogoUrl('');
+	};
+
+	const handleEditApp = async () => {
+		const updateRequest: MezonUpdateAppBody = {
+			applogo: appLogoUrl
+		};
+		await dispatch(editApplication({ request: updateRequest, appId: appId }));
+		setHasChanges(false);
+	};
 
 	return (
 		<div className="flex flex-col gap-10">
@@ -27,26 +67,44 @@ const GeneralInformation = () => {
 					<span className="cursor-pointer text-blue-700 hover:text-blue-400 hover:underline">Admin Policy</span>.
 				</div>
 			</div>
-			<div className="flex gap-5">
+			<div className="flex gap-5 max-md:flex-col">
 				<div className="flex flex-col gap-2 w-fit">
 					<div className="text-[12px] uppercase font-semibold">App Icon</div>
 					<div className="w-fit flex flex-col items-center p-5 gap-4 bg-[#f2f3f5] dark:bg-[#2b2d31] border dark:border-[#4d4f52] rounded-md">
-						<div className="relative w-[144px]">
-							<img
-								className="aspect-square w-full"
-								style={{ borderRadius: '25px' }}
-								src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
-								alt="app-icon"
-							/>
+						<input type="file" hidden ref={appLogoRef} onChange={handleChooseFile} />
+						<div className="relative w-[144px] cursor-pointer" onClick={() => appLogoRef.current?.click()}>
+							{appLogoUrl ? (
+								<img
+									className="aspect-square w-full hover:grayscale-[50%]"
+									style={{ borderRadius: '25px' }}
+									src={appLogoUrl}
+									alt={appDetail.appname}
+								/>
+							) : (
+								<div
+									className="select-none aspect-square w-full flex justify-center items-center bg-bgLightModeThird dark:bg-[#141416] hover:bg-[#c6ccd2]"
+									style={{ borderRadius: '25px' }}
+								>
+									{appDetail.appname && appDetail.appname.charAt(0).toUpperCase()}
+								</div>
+							)}
 							<div className="absolute right-[-5px] top-[-5px] p-[8px] bg-[#e3e5e8] rounded-full z-10 shadow-xl border">
 								<Icons.SelectFileIcon className="w-6 h-6" />
 							</div>
-							<div className="uppercase hidden">Choose a neat icon</div>
 						</div>
-						<div className="text-blue-600 cursor-pointer">Remove</div>
+						{appLogoUrl ? (
+							<div className="text-blue-600 cursor-pointer" onClick={handleClearLogo}>
+								Remove
+							</div>
+						) : (
+							<div className="text-[10px]">
+								Size: <span className="font-semibold">1024x1024</span>
+							</div>
+						)}
 					</div>
 				</div>
-				{appDetail.token && <AppDetailRight appDetail={appDetail} appId={appId as string} />}
+				<AppDetailRight appDetail={appDetail} appId={appId as string} />
+				{hasChanges && <ModalSaveChanges onReset={handleResetChange} onSave={handleEditApp} />}
 			</div>
 		</div>
 	);
@@ -61,20 +119,16 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
 	};
-	const [appNameField, setAppNameField] = useState(appDetail.appname);
-	const handleAppNameFieldOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setAppNameField(e.target.value);
-	};
 
 	return (
 		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
 				<div className="text-[12px] uppercase font-semibold">Name</div>
 				<input
-					value={appNameField}
-					onChange={handleAppNameFieldOnchange}
-					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
+					value={appDetail.appname}
+					className="cursor-not-allowed w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
 					type="text"
+					readOnly={true}
 				/>
 			</div>
 			<div className="flex flex-col gap-2">

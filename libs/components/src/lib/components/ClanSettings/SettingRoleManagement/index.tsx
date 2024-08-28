@@ -13,7 +13,7 @@ import {
 	setSelectedRoleId
 } from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
-import SettingUserClanProfileSave from '../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave';
+import SettingUserClanProfileSave from '../../SettingProfile/SettingRightClanProfile/SettingUserClanProfileSave';
 import SettingListRole from './SettingListRole';
 import SettingValueDisplayRole from './SettingOptionRole';
 type EditNewRole = {
@@ -52,12 +52,12 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 			dispatch(setSelectedPermissions(permissionIds));
 		}
 	};
-	const handleSaveClose = () => {};
+	const handleSaveClose = () => null;
 
 	const handleUpdateUser = async (hasChangeRole?: boolean) => {
 		if (isCreateNewRole) {
 			const respond = await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
-			if(!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
+			if (!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
 		} else {
 			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);
 		}
@@ -67,12 +67,12 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 		flagOption: isChange,
 		handleClose,
 		handleSaveClose,
-		handleUpdateUser,
+		handleUpdateUser
 	};
 	return flagOption ? (
 		<>
 			<div className="absolute top-0 left-0 w-full h-full pl-2 flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
-				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() => handleUpdateUser(true)}/>
+				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() => handleUpdateUser(true)} />
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
 						{isCreateNewRole ? (
@@ -85,7 +85,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 				</div>
 				<SettingUserClanProfileSave PropsSave={saveProfile} />
 			</div>
-			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3"/>
+			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3" />
 		</>
 	) : null;
 };

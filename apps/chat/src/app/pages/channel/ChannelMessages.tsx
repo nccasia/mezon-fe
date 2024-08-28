@@ -2,6 +2,7 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
+	selectAllMessagesByChannelId,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -9,9 +10,8 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectAllMessagesByChannelId,
 	selectMessageIsLoading,
-	selectMessageNotifed,
+	selectMessageNotified,
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
@@ -37,7 +37,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
-	const idMessageNotifed = useSelector(selectMessageNotifed);
+	const idMessageNotified = useSelector(selectMessageNotified);
 	const firstMessageId = useAppSelector((state) => selectFirstMessageId(state, channelId));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent);
@@ -102,18 +102,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					key={message.id}
 					message={message}
 					channelId={channelId}
-					isHighlight={message.id === idMessageNotifed}
+					isHighlight={message.id === idMessageNotified}
 					mode={mode}
 					channelLabel={channelLabel ?? ''}
 				/>
 			);
 		});
-	}, [messages, firstMessageId, channelId, idMessageNotifed, mode, channelLabel, avatarDM, userName]);
+	}, [messages, firstMessageId, channelId, idMessageNotified, mode, channelLabel, avatarDM, userName]);
 
 	// Jump to message when user is jumping to message
 	useEffect(() => {
 		if (idMessageToJump && isMessageExist) {
-			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`).then((res) => {
+			chatScrollRef.scrollToMessage(idMessageToJump).then((res) => {
 				if (res) {
 					dispatch(messagesActions.setIdMessageToJump(null));
 				}

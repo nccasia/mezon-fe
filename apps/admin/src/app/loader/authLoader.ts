@@ -1,4 +1,4 @@
-import { accountActions, authActions } from '@mezon/store';
+import { accountActions, authActions, fetchApplications } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -30,7 +30,7 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 		}
 
 		const profileResponse = await dispatch(accountActions.getUserProfile());
-
+		dispatch(fetchApplications({}));
 		if ((profileResponse as unknown as IWithError).error) {
 			throw new Error('Session expired');
 		}

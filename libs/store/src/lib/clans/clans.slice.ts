@@ -3,7 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
-import { getUserProfile } from '../account/account.slice';
+import { accountActions } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
@@ -225,7 +225,7 @@ export const updateUser = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			if (response) {
-				thunkAPI.dispatch(getUserProfile({ noCache }));
+				thunkAPI.dispatch(accountActions.getUserProfile({ noCache: true }));
 			}
 			return response as true;
 		} catch (error: any) {

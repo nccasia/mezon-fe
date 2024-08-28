@@ -5,10 +5,9 @@ import { format } from 'url';
 import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
-import { setup } from 'electron-push-receiver';
 import tray from '../Tray';
+import { setup } from './push-receiver';
 
-let deeplinkingUrl;
 const isQuitting = false;
 
 export default class App {
