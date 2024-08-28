@@ -25,7 +25,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({ category, onClose })
 
 		const regex = ValidateSpecialCharacters();
 
-		if (!categoryName.length || !regex.test(categoryName)) {
+		if (!categoryName.length || categoryName.length >= Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED) || !regex.test(categoryName)) {
 			setIsInvalidName(true);
 		} else {
 			setIsInvalidName(false);
