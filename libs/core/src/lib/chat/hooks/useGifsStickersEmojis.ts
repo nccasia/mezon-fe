@@ -13,21 +13,21 @@ export function useGifsStickersEmoji() {
 		(state: SubPanelName) => {
 			dispatch(gifsStickerEmojiActions.setSubPanelActive(state));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setValueInputSearch = useCallback(
 		(valueSearch: string) => {
 			dispatch(gifsStickerEmojiActions.setValueInputSearch(valueSearch));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setPlaceHolderInput = useCallback(
 		(valuePlaceHolder: string) => {
 			dispatch(gifsStickerEmojiActions.setPlaceHolderInput(valuePlaceHolder));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -37,8 +37,8 @@ export function useGifsStickersEmoji() {
 			valueInputToCheckHandleSearch,
 			setValueInputSearch,
 			setPlaceHolderInput,
-			valuePlaceHolder,
+			valuePlaceHolder
 		}),
-		[subPanelActive, setSubPanelActive, valueInputToCheckHandleSearch, setValueInputSearch, setPlaceHolderInput, valuePlaceHolder],
+		[subPanelActive, setSubPanelActive, valueInputToCheckHandleSearch, setValueInputSearch, setPlaceHolderInput, valuePlaceHolder]
 	);
 }

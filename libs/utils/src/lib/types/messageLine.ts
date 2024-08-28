@@ -7,7 +7,7 @@ export interface IStartEndIndex {
 
 export enum EMarkdownType {
 	TRIPLE = 't',
-	SINGLE = 's',
+	SINGLE = 's'
 }
 
 export interface IMention {
@@ -32,6 +32,6 @@ export interface IExtendedMessage extends IMessageSendPayload {
 }
 export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
 export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
-export interface ILinkOnMessage extends IStartEndIndex {}
+export type ILinkOnMessage = IStartEndIndex;
 export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {}
-export interface ILinkVoiceRoomOnMessage extends IStartEndIndex {}
+export type ILinkVoiceRoomOnMessage = IStartEndIndex;

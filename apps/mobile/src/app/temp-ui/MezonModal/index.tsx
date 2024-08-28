@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
 import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -86,12 +86,18 @@ export const MezonModal = (props: IMezonModalProps) => {
 									<Pressable onPress={() => setVisible(false)}>
 										<Icons.CloseIcon color={themeValue.textStrong} />
 									</Pressable>
-									{isTitleString ? <Text style={[styles.textTitle, titleStyle]}>{title}</Text> : <View style={titleStyle}>{title}</View>}
-									{rightBtnText ? (
-										<Pressable onPress={() => onClickRightBtn()}>
-											<Text style={styles.confirm}>{rightBtnText}</Text>
-										</Pressable>
-									) : null}
+									{isTitleString ? (
+										<Text style={[styles.textTitle, titleStyle]}>{title}</Text>
+									) : (
+										<View style={titleStyle}>{title}</View>
+									)}
+									<Block width={size.s_60}>
+										{rightBtnText ? (
+											<Pressable onPress={() => onClickRightBtn()}>
+												<Text style={styles.confirm}>{rightBtnText}</Text>
+											</Pressable>
+										) : null}
+									</Block>
 								</View>
 								{confirmText ? (
 									<Pressable onPress={() => pressConfirm()}>

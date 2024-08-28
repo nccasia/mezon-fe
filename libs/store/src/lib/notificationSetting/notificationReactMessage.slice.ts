@@ -12,7 +12,7 @@ export interface NotifiReactMessageState {
 
 export const initialNotifiReactMessageState: NotifiReactMessageState = {
 	loadingStatus: 'not loaded',
-	notifiReactMessage: null,
+	notifiReactMessage: null
 };
 
 type fetchNotifiReactMessArgs = {
@@ -28,7 +28,7 @@ export const getNotifiReactMessage = createAsyncThunk(
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
 		return response;
-	},
+	}
 );
 
 type SetNotifiReactMessagePayload = {
@@ -45,7 +45,7 @@ export const setNotifiReactMessage = createAsyncThunk(
 		}
 		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
 		return response;
-	},
+	}
 );
 
 type DeleteNotifiReactMessagePayload = {
@@ -62,7 +62,7 @@ export const deleteNotifiReactMessage = createAsyncThunk(
 		}
 		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
 		return response;
-	},
+	}
 );
 
 export const notifiReactMessageSlice = createSlice({
@@ -82,7 +82,7 @@ export const notifiReactMessageSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -94,7 +94,7 @@ export const notifiReactMessageActions = {
 	...notifiReactMessageSlice.actions,
 	getNotifiReactMessage,
 	setNotifiReactMessage,
-	deleteNotifiReactMessage,
+	deleteNotifiReactMessage
 };
 
 export const getNotifiReactMessageState = (rootState: { [NOTIFI_REACT_MESSAGE_FEATURE_KEY]: NotifiReactMessageState }): NotifiReactMessageState =>

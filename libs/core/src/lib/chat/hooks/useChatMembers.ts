@@ -8,6 +8,6 @@ export function useChatMembers({ channelId }: useMessagesOptions) {
 	const { members } = useChannelMembers({ channelId });
 
 	return {
-		members,
+		members
 	};
 }

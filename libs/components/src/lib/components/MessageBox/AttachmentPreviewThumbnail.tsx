@@ -1,16 +1,16 @@
 import { Icons } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
-import { RenderAttachmentThumbnail } from '../../components';
+import { RenderAttachmentThumbnail } from '../ThumbnailAttachmentRender';
 
-interface ThumbnailProps {
+interface AttachmentPreviewThumbnailProps {
 	attachment: ApiMessageAttachment;
 	onRemove?: (channelId: string, index: number) => void;
 	indexOfItem: number;
 	channelId: string;
 }
 
-const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove, indexOfItem, channelId }) => {
+const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({ attachment, onRemove, indexOfItem, channelId }) => {
 	const [isHideAttachment, setIsHideAttachment] = useState(false);
 
 	const handleRemove = () => {
@@ -18,6 +18,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove, indexOfItem
 			onRemove(channelId, indexOfItem);
 		}
 	};
+
 	const filename = attachment.filename;
 	const displayedFilename = filename && filename.length > 25 ? filename.substring(0, 25) + '...' : filename;
 	const thumbnailAttachment = RenderAttachmentThumbnail(attachment);
@@ -32,9 +33,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove, indexOfItem
 			className="flex justify-center items-center p-2 mb-3 rounded dark:bg-bgSecondary bg-bgLightSecondary w-[216px] h-[216px] flex-shrink-0 border dark:text-textDarkTheme text-textLightTheme dark:border-bgSecondary relative"
 		>
 			<div className="cursor-pointer rounded-md flex flex-row justify-center items-center mb-2">
-				<div>
-					<div>{thumbnailAttachment}</div>
-				</div>
+				<div>{thumbnailAttachment}</div>
 				<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-row w-21 top-[-1px] right-[-16px] h-8 absolute rounded-sm shadow-shadowInbox">
 					<button
 						onClick={handleShowAttachment}
@@ -64,4 +63,4 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove, indexOfItem
 	);
 };
 
-export default Thumbnail;
+export default AttachmentPreviewThumbnail;

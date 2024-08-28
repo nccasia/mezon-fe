@@ -1,12 +1,11 @@
 import { useReference } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -16,25 +15,15 @@ import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm'
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import ThreadAddButton from '../../../components/ThreadDetail/ThreadAddButton';
 import { APP_SCREEN } from '../../ScreenTypes';
-import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const Stack = createStackNavigator();
-	const { t } = useTranslation(['notificationSetting']);
 	const { openThreadMessageState } = useReference();
 	const navigation = useNavigation();
-	const [isChannel, setIsChannel] = useState<boolean>();
+  const { t } = useTranslation(['notificationSetting', 'createThread']);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const channelsEntities = useSelector(selectChannelsEntities);
-	const currentChannelById = useMemo(() => {
-		return channelsEntities?.[(currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '']
-	}, [currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities])
-
-	useEffect(() => {
-		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
-	}, [currentChannel]);
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -71,13 +60,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				component={CreateThreadModal}
 				options={{
 					headerShown: true,
-					headerTitle: 'Threads',
+					headerTitle: t('threads', { ns: 'createThread' }),
+          headerTitleAlign: 'center',
 					headerRight: () => <ThreadAddButton />,
-					headerLeft: () => (
-						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20 }}>
-							<Icons.CloseIcon color={themeValue.text} />
-						</TouchableOpacity>
-					)
 				}}
 			/>
 			<Stack.Screen
@@ -104,7 +89,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 										</View>
 									)}
 									<Text style={{ color: themeValue.textStrong, fontSize: size.h6, fontWeight: '700' }}>
-										{openThreadMessageState ? 'New Thread' : currentChannelById?.channel_label}
+										{openThreadMessageState ? t('newThread', { ns: 'createThread' }) : currentChannel?.channel_label}
 									</Text>
 									<Icons.ChevronSmallRightIcon width={14} height={14} style={{ marginLeft: 5 }} color={themeValue.text} />
 								</View>

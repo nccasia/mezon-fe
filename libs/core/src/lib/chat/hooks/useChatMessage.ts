@@ -9,6 +9,6 @@ export function useChatMessage(messageId: string) {
 	};
 
 	return {
-		markMessageAsSeen,
+		markMessageAsSeen
 	};
 }

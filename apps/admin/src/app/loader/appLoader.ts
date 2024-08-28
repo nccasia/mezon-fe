@@ -15,7 +15,7 @@ export type CustomLoaderFunction<Context = any> = {
 			dispatch: AppDispatch;
 			initialPath?: string;
 		},
-		handlerCtx?: unknown,
+		handlerCtx?: unknown
 	): DataFunctionReturnValue;
 } & {
 	hydrate?: boolean;
@@ -27,7 +27,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(appActions.setInitialPath(pathname));
 
 	return {
-		pathname,
+		pathname
 	} as IAppLoaderData;
 };
 

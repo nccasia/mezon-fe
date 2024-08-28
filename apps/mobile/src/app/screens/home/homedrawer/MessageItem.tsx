@@ -4,7 +4,7 @@ import {
 	ReplyIcon,
 	ReplyMessageDeleted,
 	save,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
@@ -17,8 +17,7 @@ import {
 	selectAllRolesClan,
 	selectAllUsesClan,
 	selectIdMessageToJump,
-	selectMessageEntityById,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -32,8 +31,8 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { setSelectedMessage } from '@mezon/store';
 import { ETypeLinkMedia } from '@mezon/utils';
-import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
@@ -78,8 +77,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	} = props;
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
-	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
-	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
+	const message: MessagesEntity = props?.message;
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -127,11 +125,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	useEffect(() => {
 		if (props?.messageId) {
-			const timestamp = Date.now() / 1000;
 			markMessageAsSeen(message);
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 		}
-	}, [dispatch, markMessageAsSeen, message, props.messageId]);
+	}, [markMessageAsSeen, message, props.messageId]);
 
 	const onLongPressImage = useCallback(() => {
 		if (preventAction) return;
@@ -399,6 +395,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={isEdited} />
 		</Animated.View>
 	);
-});
+},
+  (prevProps, nextProps) => {
+	return prevProps.messageId + prevProps?.message.update_time === 
+	nextProps.messageId + nextProps?.message.update_time;
+  }
+);
 
 export default MessageItem;

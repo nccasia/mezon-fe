@@ -1,5 +1,6 @@
 import { IPinMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -34,8 +35,8 @@ const fetchChannelPinMessagesCached = memoize(
 		maxAge: CHANNEL_PIN_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 export const mapChannelPinMessagesToEntity = (pinMessageRes: ApiPinMessageRequest) => {
@@ -61,7 +62,7 @@ export const fetchChannelPinMessages = createAsyncThunk(
 
 		const pinMessages = response.pin_messages_list.map((pinMessageRes) => mapChannelPinMessagesToEntity(pinMessageRes));
 		return pinMessages;
-	},
+	}
 );
 type SetChannelPinMessagesPayload = {
 	channel_id: string;
@@ -73,7 +74,7 @@ export const setChannelPinMessage = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			channel_id: channel_id,
-			message_id: message_id,
+			message_id: message_id
 		};
 		const response = await mezon.client.createPinMessage(mezon.session, body);
 		if (!response) {
@@ -81,7 +82,7 @@ export const setChannelPinMessage = createAsyncThunk(
 		}
 		thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
 		return response;
-	},
+	}
 );
 
 export const deleteChannelPinMessage = createAsyncThunk(
@@ -94,7 +95,7 @@ export const deleteChannelPinMessage = createAsyncThunk(
 		}
 		thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
 		return response;
-	},
+	}
 );
 
 type UpdatePinMessage = {
@@ -109,6 +110,7 @@ export const joinPinMessage = createAsyncThunk('messages/joinPinMessage', async 
 		const now = Math.floor(Date.now() / 1000);
 		await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 1);
 	} catch (e) {
+		Sentry.captureException(e);
 		console.error('Error updating last seen message', e);
 	}
 });
@@ -121,15 +123,16 @@ export const updateLastSeenPin = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 0);
 		} catch (e) {
+			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
 		}
-	},
+	}
 );
 
 export const initialPinMessageState: PinMessageState = pinMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	jumpPinMessageId: '', 
+	jumpPinMessageId: ''
 });
 
 export const pinMessageSlice = createSlice({
@@ -156,7 +159,7 @@ export const pinMessageSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -188,7 +191,7 @@ export const pinMessageActions = {
 	setChannelPinMessage,
 	deleteChannelPinMessage,
 	updateLastSeenPin,
-	joinPinMessage,
+	joinPinMessage
 };
 
 /*

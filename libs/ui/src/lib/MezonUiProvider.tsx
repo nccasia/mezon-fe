@@ -13,7 +13,7 @@ type MezonUiContextValue = {
 };
 
 export const MezonUiContext = React.createContext<MezonUiContextValue>({
-	selectedTheme: 'light',
+	selectedTheme: 'light'
 });
 
 export function MezonUiProvider({ children, themeName }: Props) {

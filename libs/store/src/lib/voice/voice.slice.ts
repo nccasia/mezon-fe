@@ -49,14 +49,14 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 				participant: channelRes.participant || '',
 				voice_channel_label: '',
 				last_screenshot: '',
-				id: channelRes.id || '',
+				id: channelRes.id || ''
 			};
 		});
 
 		thunkAPI.dispatch(voiceActions.addMany(members));
 		const voices = response.voice_channel_users;
 		return voices;
-	},
+	}
 );
 
 export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
@@ -66,7 +66,7 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	showCamera: false,
 	showScreen: false,
 	statusCall: false,
-	voiceConnectionState: false,
+	voiceConnectionState: false
 });
 
 export const voiceSlice = createSlice({
@@ -84,7 +84,7 @@ export const voiceSlice = createSlice({
 		},
 		setVoiceConnectionState: (state, action: PayloadAction<boolean>) => {
 			state.voiceConnectionState = action.payload;
-		},
+		}
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -100,7 +100,7 @@ export const voiceSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -128,7 +128,7 @@ export const voiceReducer = voiceSlice.reducer;
  */
 export const voiceActions = {
 	...voiceSlice.actions,
-	fetchVoiceChannelMembers,
+	fetchVoiceChannelMembers
 };
 
 /*

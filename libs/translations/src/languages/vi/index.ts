@@ -6,13 +6,13 @@ import categoryMenu from './categoryMenu.json';
 import { default as channelCreator, default as channelMenu } from './channelCreator.json';
 import channelSetting from './channelSetting.json';
 import clan from './clan.json';
+import clanEmojiSetting from './clanEmojiSetting.json';
 import clanMenu from './clanMenu.json';
 import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
-import clanEmojiSetting from './clanEmojiSetting.json';
 import clanRoles from './clanRoles.json';
 import clanSetting from './clanSetting.json';
-import clanStickerSettings from "./clanStickerSetting.json";
+import clanStickerSettings from './clanStickerSetting.json';
 import common from './common.json';
 import createThread from './createThread.json';
 import customUserStatus from './customUserStatus.json';
@@ -23,6 +23,7 @@ import eventMenu from './eventMenu.json';
 import friends from './friends.json';
 import inviteToChannel from './inviteToChannel.json';
 import media from './media.json';
+import menuCustomDM from './menuCustomDM.json';
 import message from './message.json';
 import notification from './notification.json';
 import notificationSetting from './notificationSetting.json';
@@ -35,7 +36,6 @@ import searchMessageChannel from './searchMessageChannel.json';
 import setting from './setting.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
-import menuCustomDM from './menuCustomDM.json';
 
 export default {
 	inviteToChannel,
@@ -76,5 +76,5 @@ export default {
 	searchMessageChannel,
 	clanNotificationsSetting,
 	clanStickerSettings,
-  menuCustomDM
+	menuCustomDM
 };

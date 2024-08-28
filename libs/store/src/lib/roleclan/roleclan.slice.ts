@@ -1,4 +1,4 @@
-import { IRolesClan, LoadingStatus } from '@mezon/utils';
+import { EPermission, IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -23,22 +23,22 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentRoleId?: string | null;
-	roleMembers:Record<string,RoleUserListRoleUser[]> 
+	roleMembers: Record<string, RoleUserListRoleUser[]>;
 	roles: IRolesClan[];
 }
 
 export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
 
 type GetRolePayload = {
-	clanId?: string,
-	repace?: boolean,
-	channelId?: string,
+	clanId?: string;
+	repace?: boolean;
+	channelId?: string;
 };
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
+		const response = await mezon.client.listRoles(mezon.session, 100, 1, '', clanId);
 		if (!response.roles) {
 			return [];
 		}
@@ -46,94 +46,90 @@ export const fetchRolesClan = createAsyncThunk(
 			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
 		return response.roles.map(mapRolesClanToEntity);
-	},
+	}
 );
 
-type FetchReturnMembersRole ={
-	roleID:string
-	members:RoleUserListRoleUser[]
-}
+type FetchReturnMembersRole = {
+	roleID: string;
+	members: RoleUserListRoleUser[];
+};
 
 type FetchMembersRolePayload = {
 	roleId: string;
-	clanId: string
+	clanId: string;
 };
-export const fetchMembersRole = createAsyncThunk(
-	'MembersRole/fetchMembersRole',
-	async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listRoleUsers(mezon.session,roleId, 100,'');
-		if (!response.role_users) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return ({
-			roleID: roleId,members:response.role_users
-		}) as FetchReturnMembersRole;
-	},
-);
+export const fetchMembersRole = createAsyncThunk('MembersRole/fetchMembersRole', async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const response = await mezon.client.listRoleUsers(mezon.session, roleId, 100, '');
+	if (!response.role_users) {
+		return thunkAPI.rejectWithValue([]);
+	}
+	return {
+		roleID: roleId,
+		members: response.role_users
+	} as FetchReturnMembersRole;
+});
 
 export const fetchDeleteRole = createAsyncThunk(
-
 	'DeleteRole/fetchDeleteRole',
 
 	async ({ roleId, clanId }: FetchMembersRolePayload, thunkAPI) => {
-		try{
+		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateRoleDelete(mezon.session,roleId,{clan_id: clanId});
-			thunkAPI.dispatch(rolesClanActions.remove(roleId))
+			const response = await mezon.client.updateRoleDelete(mezon.session, roleId, { clan_id: clanId });
+			thunkAPI.dispatch(rolesClanActions.remove(roleId));
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
 			return response;
-		}catch{
+		} catch {
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 type CreateRolePayload = {
 	clan_id: string;
-    title: string | undefined;
-    add_user_ids: string[];
-    active_permission_ids: string[];
+	title: string | undefined;
+	add_user_ids: string[];
+	active_permission_ids: string[];
 };
 
 export const fetchCreateRole = createAsyncThunk(
 	'CreatRole/fetchCreateRole',
-	async ({ clan_id, title, add_user_ids, active_permission_ids}: CreateRolePayload, thunkAPI) => {
+	async ({ clan_id, title, add_user_ids, active_permission_ids }: CreateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			active_permission_ids: active_permission_ids || [],
-    		add_user_ids: add_user_ids || [],
-    		allow_mention: 0,
-    		clan_id: clan_id,
-    		color: '',
-    		description: '',
-    		display_online: 0,
-    		title: title ?? '',
-		}
-		const response = await mezon.client.createRole(mezon.session,body);
+			add_user_ids: add_user_ids || [],
+			allow_mention: 0,
+			clan_id: clan_id,
+			color: '',
+			description: '',
+			display_online: 0,
+			title: title ?? ''
+		};
+		const response = await mezon.client.createRole(mezon.session, body);
 		if (!response) {
-			
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
-	},
+	}
 );
 
 type UpdateRolePayload = {
-    role_id: string;
-    title: string | undefined;
-    add_user_ids: string[];
-    active_permission_ids: string[];
-    remove_user_ids: string[];
-    remove_permission_ids: string[];
+	role_id: string;
+	title: string | undefined;
+	add_user_ids: string[];
+	active_permission_ids: string[];
+	remove_user_ids: string[];
+	remove_permission_ids: string[];
 	clanId: string;
 };
 
 export const fetchUpdateRole = createAsyncThunk(
 	'UpdateRole/fetchUpdateRole',
-	async ({ role_id, title, add_user_ids, active_permission_ids,remove_user_ids, remove_permission_ids, clanId}: UpdateRolePayload, thunkAPI) => {
+	async ({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids, clanId }: UpdateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			role_id: role_id,
@@ -148,14 +144,13 @@ export const fetchUpdateRole = createAsyncThunk(
 			remove_user_ids: remove_user_ids || [],
 			remove_permission_ids: remove_permission_ids || [],
 			clan_id: clanId
-		}
+		};
 		const response = await mezon.client.updateRole(mezon.session, role_id, body);
 		if (!response) {
-			
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
-	},
+	}
 );
 
 export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitialState({
@@ -163,7 +158,7 @@ export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitial
 	RolesClan: [],
 	roleMembers: {},
 	roles: [],
-	error: null,
+	error: null
 });
 
 export const RolesClanSlice = createSlice({
@@ -175,7 +170,7 @@ export const RolesClanSlice = createSlice({
 		removeRoleByChannel: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
 			const updatedRoles = Object.values(state.entities).filter((role) => {
-				if(role.channel_ids){
+				if (role.channel_ids) {
 					return !role.channel_ids.includes(channelId);
 				}
 			});
@@ -183,7 +178,7 @@ export const RolesClanSlice = createSlice({
 		},
 		setCurrentRoleId: (state, action: PayloadAction<string>) => {
 			state.currentRoleId = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -199,52 +194,59 @@ export const RolesClanSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		builder
-			.addCase(fetchMembersRole.fulfilled, (state: RolesClanState, action: PayloadAction<FetchReturnMembersRole>) => {
-				state.roleMembers[action.payload.roleID]=(action.payload.members);
-			})
-	},
+		builder.addCase(fetchMembersRole.fulfilled, (state: RolesClanState, action: PayloadAction<FetchReturnMembersRole>) => {
+			state.roleMembers[action.payload.roleID] = action.payload.members;
+		});
+	}
 });
 
 export const roleSlice = createSlice({
 	name: 'roleId',
 	initialState: {
-	  selectedRoleId: '',
-	  nameRoleNew: '',
-	  selectedPermissions: [] as string[],
-	  addPermissions: [],
-	  addMemberRoles: [] as string[],
-	  removePermissions: [],
-	  removeMemberRoles: [],
+		selectedRoleId: '',
+		nameRoleNew: '',
+		selectedPermissions: [] as string[],
+		addPermissions: [],
+		addMemberRoles: [] as string[],
+		removePermissions: [],
+		removeMemberRoles: []
 	},
 	reducers: {
-	  setSelectedRoleId: (state, action) => {
-		state.selectedRoleId = action.payload;
-	  },
-	  setNameRoleNew: (state, action) => {
-		state.nameRoleNew = action.payload;
-	  },
-	  setSelectedPermissions: (state, action) => {
-		state.selectedPermissions = action.payload;
-	  },
-	  setAddPermissions: (state, action) => {
-		state.addPermissions = action.payload;
-	  },
-	  setAddMemberRoles: (state, action) => {
-		state.addMemberRoles = action.payload;
-	  },
-	  setRemovePermissions: (state, action) => {
-		state.removePermissions = action.payload;
-	  },
-	  setRemoveMemberRoles: (state, action) => {
-		state.removeMemberRoles = action.payload;
-	  },
-	},
-  });
+		setSelectedRoleId: (state, action) => {
+			state.selectedRoleId = action.payload;
+		},
+		setNameRoleNew: (state, action) => {
+			state.nameRoleNew = action.payload;
+		},
+		setSelectedPermissions: (state, action) => {
+			state.selectedPermissions = action.payload;
+		},
+		setAddPermissions: (state, action) => {
+			state.addPermissions = action.payload;
+		},
+		setAddMemberRoles: (state, action) => {
+			state.addMemberRoles = action.payload;
+		},
+		setRemovePermissions: (state, action) => {
+			state.removePermissions = action.payload;
+		},
+		setRemoveMemberRoles: (state, action) => {
+			state.removeMemberRoles = action.payload;
+		}
+	}
+});
 
 export const roleIdReducer = roleSlice.reducer;
 
-export const { setSelectedRoleId, setNameRoleNew, setAddPermissions, setAddMemberRoles, setRemovePermissions, setRemoveMemberRoles, setSelectedPermissions} = roleSlice.actions;
+export const {
+	setSelectedRoleId,
+	setNameRoleNew,
+	setAddPermissions,
+	setAddMemberRoles,
+	setRemovePermissions,
+	setRemoveMemberRoles,
+	setSelectedPermissions
+} = roleSlice.actions;
 
 export const getSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
 
@@ -260,41 +262,39 @@ export const getRemovePermissions = (state: RootState) => state.roleId.removePer
 
 export const getRemoveMemberRoles = (state: RootState) => state.roleId.removeMemberRoles;
 
-
 export const updateRoleSlice = createSlice({
 	name: 'isshow',
 	initialState: {
-	  isShow: false,
+		isShow: false
 	},
 	reducers: {
-	  toggleIsShowTrue: (state) => {
-		state.isShow = true;
-	  },
-	  toggleIsShowFalse: (state) => {
-		state.isShow = false;
-	  },
-	},
-  });
-  
-  export const IsShowReducer= updateRoleSlice.reducer;
-  
-  export const { toggleIsShowTrue, toggleIsShowFalse } = updateRoleSlice.actions;
-  
-  export const getIsShow = (state: RootState) => state.isshow.isShow;
+		toggleIsShowTrue: (state) => {
+			state.isShow = true;
+		},
+		toggleIsShowFalse: (state) => {
+			state.isShow = false;
+		}
+	}
+});
+
+export const IsShowReducer = updateRoleSlice.reducer;
+
+export const { toggleIsShowTrue, toggleIsShowFalse } = updateRoleSlice.actions;
+
+export const getIsShow = (state: RootState) => state.isshow.isShow;
 
 /*
  * Export reducer for store configuration.
  */
 export const RolesClanReducer = RolesClanSlice.reducer;
-export const rolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole, fetchCreateRole, fetchUpdateRole};
-
+export const rolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole, fetchCreateRole, fetchUpdateRole };
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
 
-export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesClanState }): RolesClanState =>
-	rootState[ROLES_CLAN_FEATURE_KEY];
+export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesClanState }): RolesClanState => rootState[ROLES_CLAN_FEATURE_KEY];
 
 export const selectAllRolesClan = createSelector(getRolesClanState, selectAll);
+export const selectEveryoneRole = createSelector(selectAllRolesClan, (state)=>state.find(role=> role.slug === EPermission.everyone));
 
 export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => state.currentRoleId);
 
@@ -311,4 +311,3 @@ RoleId ? RolesClanEntities[RoleId] : null,);
 export const selectAllRoleMember = createSelector(getRolesClanState, (state)=>state.roleMembers);
 export const selectMembersByRoleID = (roleID:string)=>{createSelector(selectAllRoleMember, (roleMembers)=>{return roleMembers[roleID]});}
 export const selectRoleByRoleId = (roleID: string) => createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find(r => r?.id === roleID))
-export const selectEveryoneRole = createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find(r => r?.id === String(process.env.NX_CHAT_APP_EVERYONE_ROLE_ID)))

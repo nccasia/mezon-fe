@@ -1,5 +1,5 @@
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { NotificationChannelCategorySetting } from 'mezon-js';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -13,7 +13,7 @@ export interface DefaultNotificationCategoryState {
 
 export const initialDefaultNotificationCategoryState: DefaultNotificationCategoryState = {
 	loadingStatus: 'not loaded',
-	defaultNotificationCategory: null,
+	defaultNotificationCategory: null
 };
 
 type fetchNotificationCategorySettingsArgs = {
@@ -32,11 +32,11 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 
 		const apiNotificationSetting = response.notification_user_channel
 			? {
-				id: response.notification_user_channel.id,
-				notification_setting_type: response.notification_user_channel.notification_setting_type,
-				active: response.notification_user_channel.active,
-				time_mute: response.notification_user_channel.time_mute
-			}
+					id: response.notification_user_channel.id,
+					notification_setting_type: response.notification_user_channel.notification_setting_type,
+					active: response.notification_user_channel.active,
+					time_mute: response.notification_user_channel.time_mute
+				}
 			: {};
 
 		return apiNotificationSetting;
@@ -48,7 +48,7 @@ export type SetDefaultNotificationPayload = {
 	notification_type?: number;
 	time_mute?: string;
 	clan_id: string;
-	active?: number
+	active?: number;
 };
 
 export const setDefaultNotificationCategory = createAsyncThunk(
@@ -58,17 +58,16 @@ export const setDefaultNotificationCategory = createAsyncThunk(
 		const body = {
 			channel_category_id: category_id,
 			notification_type: notification_type,
-			time_mute: time_mute,
-		}
+			time_mute: time_mute
+		};
 		const response = await mezon.client.setNotificationCategory(mezon.session, body);
 		if (!response) {
-
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
 		return response;
-	},
+	}
 );
 
 type DeleteDefaultNotificationPayload = {
@@ -80,34 +79,33 @@ export const deleteDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/deleteDefaultNotificationCategory',
 	async ({ category_id, clan_id }: DeleteDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteNotificationCategory(mezon.session, category_id || "");
+		const response = await mezon.client.deleteNotificationCategory(mezon.session, category_id || '');
 		if (!response) {
-
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
 		return response;
-	},
+	}
 );
 
 export const setMuteCategory = createAsyncThunk(
 	'defaultnotificationcategory/setMuteCategory',
-	async({category_id, notification_type, active, clan_id}: SetDefaultNotificationPayload, thunkAPI) => {
+	async ({ category_id, notification_type, active, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.setMuteNotificationCategory (mezon.session, {
+		const response = await mezon.client.setMuteNotificationCategory(mezon.session, {
 			active: active,
 			notification_type: notification_type,
 			id: category_id
 		});
 		if (!response) {
-			return thunkAPI.rejectWithValue ([]);
+			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
-		return response
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
+		return response;
 	}
-)
+);
 
 export const defaultNotificationCategorySlice = createSlice({
 	name: DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY,
@@ -118,24 +116,26 @@ export const defaultNotificationCategorySlice = createSlice({
 			.addCase(getDefaultNotificationCategory.pending, (state: DefaultNotificationCategoryState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(getDefaultNotificationCategory.fulfilled, (state: DefaultNotificationCategoryState, action: PayloadAction<ApiNotificationSetting>) => {
-				state.defaultNotificationCategory = action.payload;
-				state.loadingStatus = 'loaded';
-			})
+			.addCase(
+				getDefaultNotificationCategory.fulfilled,
+				(state: DefaultNotificationCategoryState, action: PayloadAction<ApiNotificationSetting>) => {
+					state.defaultNotificationCategory = action.payload;
+					state.loadingStatus = 'loaded';
+				}
+			)
 			.addCase(getDefaultNotificationCategory.rejected, (state: DefaultNotificationCategoryState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 //
-
 
 export interface NotiChannelCategorySettingEntity extends IChannelCategorySetting {
 	id: string; // Primary ID
 }
 
-export const mapChannelCategorySettingToEntity = (ChannelCategorySettingRes:NotificationChannelCategorySetting) => {
+export const mapChannelCategorySettingToEntity = (ChannelCategorySettingRes: NotificationChannelCategorySetting) => {
 	const id = (ChannelCategorySettingRes as unknown as any).id;
 	return { ...ChannelCategorySettingRes, id };
 };
@@ -150,7 +150,8 @@ export const channelCategorySettingAdapter = createEntityAdapter<NotiChannelCate
 type fetchChannelCategorySettingPayload = {
 	clanId: string;
 };
-export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySetting/fetchChannelCategorySetting',
+export const fetchChannelCategorySetting = createAsyncThunk(
+	'channelCategorySetting/fetchChannelCategorySetting',
 	async ({ clanId }: fetchChannelCategorySettingPayload, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const response = await mezon.socketRef.current?.getNotificationChannelCategorySetting(clanId);
@@ -159,34 +160,36 @@ export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySett
 			return [];
 		}
 		return response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
-	});
+	}
+);
 
 export const initialChannelCategorySettingState: ChannelCategorySettingState = channelCategorySettingAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 
 export const channelCategorySettingSlice = createSlice({
-	name: "notichannelcategorysetting",
+	name: 'notichannelcategorysetting',
 	initialState: initialChannelCategorySettingState,
-	reducers: {
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchChannelCategorySetting.pending, (state: ChannelCategorySettingState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelCategorySetting.fulfilled, (state: ChannelCategorySettingState, action: PayloadAction<IChannelCategorySetting[]>) => {
-				channelCategorySettingAdapter.setAll(state, action.payload);
-				state.loadingStatus = 'loaded';
-			})
+			.addCase(
+				fetchChannelCategorySetting.fulfilled,
+				(state: ChannelCategorySettingState, action: PayloadAction<IChannelCategorySetting[]>) => {
+					channelCategorySettingAdapter.setAll(state, action.payload);
+					state.loadingStatus = 'loaded';
+				}
+			)
 			.addCase(fetchChannelCategorySetting.rejected, (state: ChannelCategorySettingState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
-
 
 export const channelCategorySettingReducer = channelCategorySettingSlice.reducer;
 export const defaultNotificationCategoryReducer = defaultNotificationCategorySlice.reducer;
@@ -200,16 +203,19 @@ export const defaultNotificationCategoryActions = {
 	setMuteCategory
 };
 
-export const getDefaultNotificationCategoryState = (rootState: { [DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY]: DefaultNotificationCategoryState }): DefaultNotificationCategoryState => rootState[DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY];
+export const getDefaultNotificationCategoryState = (rootState: {
+	[DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY]: DefaultNotificationCategoryState;
+}): DefaultNotificationCategoryState => rootState[DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY];
 
-export const selectDefaultNotificationCategory = createSelector(getDefaultNotificationCategoryState, (state: DefaultNotificationCategoryState) => state.defaultNotificationCategory);
-
-
+export const selectDefaultNotificationCategory = createSelector(
+	getDefaultNotificationCategoryState,
+	(state: DefaultNotificationCategoryState) => state.defaultNotificationCategory
+);
 
 const { selectAll } = channelCategorySettingAdapter.getSelectors();
 
-export const getchannelCategorySettingListState = (rootState: { ["notichannelcategorysetting"]: ChannelCategorySettingState }): ChannelCategorySettingState => rootState["notichannelcategorysetting"];
+export const getchannelCategorySettingListState = (rootState: {
+	['notichannelcategorysetting']: ChannelCategorySettingState;
+}): ChannelCategorySettingState => rootState['notichannelcategorysetting'];
 
 export const selectAllchannelCategorySetting = createSelector(getchannelCategorySettingListState, selectAll);
-
-

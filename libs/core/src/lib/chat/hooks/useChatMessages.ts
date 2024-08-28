@@ -8,7 +8,7 @@ import {
 	selectMessageByUserId,
 	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useMemo } from 'react';
@@ -46,7 +46,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		(status: boolean) => {
 			dispatch(messagesActions.setOpenOptionMessageState(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -59,7 +59,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			lastMessageByUserId,
 			loadMoreMessage,
 			setOpenOptionMessageState,
-			lastMessage,
+			lastMessage
 		}),
 		[
 			client,
@@ -70,7 +70,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			lastMessageByUserId,
 			loadMoreMessage,
 			setOpenOptionMessageState,
-			lastMessage,
-		],
+			lastMessage
+		]
 	);
 }

@@ -1,72 +1,133 @@
 import { useChatSending } from '@mezon/core';
-import { referencesActions, selectAttachmentAfterUpload, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectAttachmentByChannelId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { handleFiles } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { EUploadingStatus, failAttachment, fetchAndCreateFiles } from '@mezon/utils';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
 	currentChannelId: string;
-	onFinishUpload: (attachment: ApiMessageAttachment) => void;
 };
-function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }: FileSelectionButtonProps) {
-	const { sessionRef, clientRef } = useMezon();
 
-	const dispatch = useAppDispatch();
+function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
+	const { sessionRef, clientRef } = useMezon();
 	const session = sessionRef.current;
 	const client = clientRef.current;
-	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
-	const [attachmentPreview, setAttachmentPreview] = useState<ApiMessageAttachment[]>([]);
+	const dispatch = useAppDispatch();
+
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(currentChannelId));
+
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
+
 	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
 
 	useEffect(() => {
-		if (attachmentPreview && attachmentPreview?.length > 0) {
+		if (
+			attachmentFilteredByChannelId?.messageId !== '' &&
+			attachmentFilteredByChannelId !== null &&
+			attachmentFilteredByChannelId.files.length > 0 &&
+			client &&
+			session
+		) {
 			dispatch(
-				referencesActions.setAttachmentData({
+				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					attachments: attachmentPreview ?? [],
+					messageId: '',
+					files: [],
+				}),
+			);
+			fetchAndCreateFiles(attachmentFilteredByChannelId.files).then((createdFiles) => {
+				const promises = createdFiles?.map((file) => {
+					return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
+				});
+
+				Promise.all(promises)
+					.then((results) => {
+						updateImageLinkMessage(
+							newMessage.clan_id,
+							newMessage.channel_id ?? '',
+							newMessage.mode,
+							newMessage.content,
+							newMessage.message_id,
+							newMessage.mentions,
+							results,
+							undefined,
+							false,
+						);
+					})
+					.then(() => {
+						dispatch(
+							referencesActions.setUploadingStatus({
+								channelId: currentChannelId,
+								messageId: attachmentFilteredByChannelId?.messageId ?? '',
+								statusUpload: EUploadingStatus.SUCCESSFULLY,
+								count: attachmentFilteredByChannelId?.files?.length,
+							}),
+						);
+					})
+					.catch((error) => {
+						updateImageLinkMessage(
+							newMessage.clan_id,
+							newMessage.channel_id ?? '',
+							newMessage.mode,
+							newMessage.content,
+							newMessage.message_id,
+							newMessage.mentions,
+							[failAttachment],
+							undefined,
+							false,
+						);
+						dispatch(
+							referencesActions.setUploadingStatus({
+								channelId: currentChannelId,
+								messageId: attachmentFilteredByChannelId?.messageId ?? '',
+								statusUpload: EUploadingStatus.ERROR,
+								count: attachmentFilteredByChannelId?.files?.length,
+							}),
+						);
+						console.error('Error uploading files:', error);
+					});
+				dispatch(
+					referencesActions.setUploadingStatus({
+						channelId: currentChannelId,
+						messageId: attachmentFilteredByChannelId?.messageId ?? '',
+						statusUpload: EUploadingStatus.LOADING,
+						count: attachmentFilteredByChannelId?.files?.length,
+					}),
+				);
+			});
+		}
+	}, [attachmentFilteredByChannelId?.messageId, currentChannelId]);
+
+	useEffect(() => {
+		if (newMessage.isMe && attachmentFilteredByChannelId?.files.length > 0) {
+			dispatch(
+				referencesActions.updateAttachmentMessageId({
+					channelId: currentChannelId,
+					messageId: newMessage.message_id ?? '',
 				}),
 			);
 		}
-	}, [attachmentPreview]);
-
-	useEffect(() => {
-		if (client && session && attachmentAfterUpload[currentChannelId]?.length > 0) {
-			const promises = attachmentAfterUpload[currentChannelId]?.map((file) =>
-				handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file),
-			);
-
-			Promise.all(promises)
-				.then((results) => {
-					updateImageLinkMessage(
-						newMessage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '0',
-						newMessage.channel_id ?? '',
-						newMessage.mode,
-						newMessage.content,
-						newMessage.message_id,
-						newMessage.mentions,
-						results,
-						undefined,
-						true,
-					);
-				})
-				.catch((error) => {
-					console.error('Error uploading files:', error);
-				});
-		}
-		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: '', files: [] }));
 	}, [newMessage]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
-			handleFiles(Array.from(e.target.files), setAttachmentPreview);
-			dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, files: Array.from(e.target.files) }));
-			e.target.value = '';
+			const fileArr = Array.from(e.target.files);
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					messageId: '',
+					files: fileArr.map((file) => ({
+						filename: file.name,
+						filetype: file.type,
+						size: file.size,
+						url: URL.createObjectURL(file),
+					})),
+				}),
+			),
+				(e.target.value = '');
 		}
 	};
 

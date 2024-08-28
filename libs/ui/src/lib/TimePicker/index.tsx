@@ -17,7 +17,7 @@ function TimePicker(props: TimePickerProps) {
 				options.push(
 					<option key={timeString} value={timeString}>
 						{timeString}
-					</option>,
+					</option>
 				);
 			}
 		}

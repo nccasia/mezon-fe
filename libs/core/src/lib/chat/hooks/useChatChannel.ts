@@ -10,8 +10,8 @@ export function useChatChannel(channelId: string) {
 	return useMemo(
 		() => ({
 			members,
-			threads,
+			threads
 		}),
-		[members, threads],
+		[members, threads]
 	);
 }

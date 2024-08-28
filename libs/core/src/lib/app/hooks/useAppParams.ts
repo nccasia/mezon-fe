@@ -16,8 +16,8 @@ export function useAppParams() {
 			directId,
 			type,
 			currentURL,
-			messageId,
+			messageId
 		}),
-		[clanId, channelId, directId, type, currentURL, messageId],
+		[clanId, channelId, directId, type, currentURL, messageId]
 	);
 }

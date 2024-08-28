@@ -16,7 +16,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { mess, closeModal, mode } = props;
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
-		mode: mode,
+		mode: mode
 	});
 
 	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);

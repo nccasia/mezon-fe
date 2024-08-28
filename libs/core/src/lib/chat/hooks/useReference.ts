@@ -1,16 +1,16 @@
 import {
 	messagesActions,
 	referencesActions,
-	selectAttachmentData,
+	selectAttachmentByChannelId,
 	selectDataReferences,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
 	selectOpenThreadMessageState,
 	selectStatusLoadingAttachment,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
-import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -18,59 +18,56 @@ export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+
+	const checkAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files?.length > 0;
+	}, [attachmentFilteredByChannelId]);
 
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
 			dispatch(referencesActions.setStatusLoadingAttachment(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setDataReferences = useCallback(
 		(dataReference: ApiMessageRef[]) => {
 			dispatch(referencesActions.setDataReferences(dataReference));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIdMessageToJump = useCallback(
 		(idMessageToJump: string) => {
 			dispatch(messagesActions.setIdMessageToJump(idMessageToJump));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(threadsActions.setOpenThreadMessageState(status));
 		},
-		[dispatch],
-	);
-
-	const setAttachmentData = useCallback(
-		(attachments: ApiMessageAttachment[]) => {
-			dispatch(referencesActions.setAttachmentData({ channelId: channelId || '', attachments }));
-		},
-		[channelId, dispatch],
+		[dispatch]
 	);
 
 	const setOpenOptionMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(messagesActions.setOpenOptionMessageState(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const removeAttachmentByIndex = (channelId: string, indexItem: number) => {
 		dispatch(
 			referencesActions.removeAttachment({
 				channelId: channelId || '',
-				index: indexItem,
-			}),
+				index: indexItem
+			})
 		);
 	};
 
@@ -81,14 +78,14 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
+			attachmentFilteredByChannelId,
+			checkAttachment
 		}),
 		[
 			setDataReferences,
@@ -96,14 +93,15 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
-		],
+			attachmentFilteredByChannelId,
+			checkAttachment,
+			removeAttachmentByIndex
+		]
 	);
 }

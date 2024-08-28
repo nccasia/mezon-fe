@@ -11,8 +11,8 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 
 	return useMemo(
 		() => ({
-			members,
+			members
 		}),
-		[members],
+		[members]
 	);
 }

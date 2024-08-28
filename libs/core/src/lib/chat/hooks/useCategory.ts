@@ -24,7 +24,7 @@ export function useCategory() {
 
 			return {
 				...category,
-				channels: categoryChannels,
+				channels: categoryChannels
 			};
 		});
 
@@ -33,8 +33,8 @@ export function useCategory() {
 
 	return useMemo(
 		() => ({
-			categorizedChannels,
+			categorizedChannels
 		}),
-		[categorizedChannels],
+		[categorizedChannels]
 	);
 }

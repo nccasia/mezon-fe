@@ -3,17 +3,16 @@ import { PreloadedRootState } from '@mezon/store';
 const preloadedState = {
 	app: {
 		theme: 'light',
-		loadingStatus: 'loaded',
+		loadingStatus: 'loaded'
 	},
 	account: {
-		loadingStatus: 'loaded',
+		loadingStatus: 'loaded'
 	},
 	threads: {
 		loadingStatus: 'loaded',
 		entities: {},
-		ids: [],
-	},
+		ids: []
+	}
 } as unknown as PreloadedRootState;
 
 export { preloadedState };
-

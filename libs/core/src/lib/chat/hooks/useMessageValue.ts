@@ -4,7 +4,7 @@ import {
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	selectRequestByChannelId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { ModeResponsive, RequestInput } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
@@ -23,26 +23,26 @@ export function useMessageValue(channelId?: string) {
 				dispatch(
 					channelsActions.setRequestInput({
 						channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
-						request,
-					}),
+						request
+					})
 				);
 			} else {
 				dispatch(
 					channelsActions.setRequestInput({
 						channelId: currentDmGroupId || '',
-						request,
-					}),
+						request
+					})
 				);
 			}
 		},
-		[currentChannelId, currentDmGroupId, mode, dispatch],
+		[currentChannelId, currentDmGroupId, mode, dispatch]
 	);
 
 	const setModeResponsive = useCallback(
 		(value: string) => {
 			dispatch(channelsActions.setModeResponsive(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -52,8 +52,8 @@ export function useMessageValue(channelId?: string) {
 			currentDmGroupId,
 			request,
 			setRequestInput,
-			setModeResponsive,
+			setModeResponsive
 		}),
-		[setRequestInput, setModeResponsive, request, currentDmGroupId, mode, currentChannelId],
+		[setRequestInput, setModeResponsive, request, currentDmGroupId, mode, currentChannelId]
 	);
 }

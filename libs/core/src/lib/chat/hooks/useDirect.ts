@@ -14,20 +14,20 @@ export function useDirect({ autoFetch = false }: UseDirectParams = { autoFetch: 
 			const bodyCreateDm: ApiCreateChannelDescRequest = {
 				type: ChannelType.CHANNEL_TYPE_DM,
 				channel_private: 1,
-				user_ids: [userId],
+				user_ids: [userId]
 			};
 			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
 
 			return resPayload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
 		() => ({
-			createDirectMessageWithUser,
+			createDirectMessageWithUser
 		}),
-		[createDirectMessageWithUser],
+		[createDirectMessageWithUser]
 	);
 }

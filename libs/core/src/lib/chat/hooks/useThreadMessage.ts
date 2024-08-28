@@ -23,7 +23,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			thread?: ApiChannelDescription,
+			thread?: ApiChannelDescription
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -41,7 +41,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, mode, dispatch, channelId],
+		[sessionRef, clientRef, socketRef, currentClanId, mode, dispatch, channelId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -53,7 +53,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 	const EditSendMessage = React.useCallback(
 		async (content: string, messageId: string) => {
 			const editMessage: IMessageSendPayload = {
-				t: content,
+				t: content
 			};
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -64,15 +64,15 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			}
 			await socket.updateChatMessage(currentClanId, channelId, mode, messageId, editMessage);
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, mode, channelId],
+		[sessionRef, clientRef, socketRef, currentClanId, mode, channelId]
 	);
 
 	return useMemo(
 		() => ({
 			sendMessageThread,
 			sendMessageTyping,
-			EditSendMessage,
+			EditSendMessage
 		}),
-		[sendMessageThread, sendMessageTyping, EditSendMessage],
+		[sendMessageThread, sendMessageTyping, EditSendMessage]
 	);
 }

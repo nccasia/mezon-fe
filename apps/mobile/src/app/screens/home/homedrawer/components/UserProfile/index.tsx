@@ -183,8 +183,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<MezonAvatar
 						width={80}
 						height={80}
-						avatarUrl={userById ? userById.clan_avatar : user?.avatar_url}
-						username={userById ? userById.clan_nick : user?.display_name || userById?.user?.username}
+						avatarUrl={userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
+						username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
 					/>

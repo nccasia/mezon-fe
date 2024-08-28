@@ -1,5 +1,6 @@
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
@@ -7,7 +8,7 @@ export const REACTION_FEATURE_KEY = 'reaction';
 
 export const mapReactionToEntity = (reaction: UpdateReactionMessageArgs) => {
 	return {
-		...reaction,
+		...reaction
 	} as ReactionEntity;
 };
 
@@ -54,7 +55,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 }
 
 export const reactionAdapter = createEntityAdapter({
-	selectId: (emo: ReactionEntity) => emo.id || '',
+	selectId: (emo: ReactionEntity) => emo.id || ''
 });
 
 export const updateReactionMessage = createAsyncThunk(
@@ -67,7 +68,7 @@ export const updateReactionMessage = createAsyncThunk(
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 export type WriteMessageReactionArgs = {
@@ -98,9 +99,10 @@ export const writeMessageReaction = createAsyncThunk(
 
 			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
-			return thunkAPI.rejectWithValue('Error while writing message reaction');
+			Sentry.captureException(e);
+			return thunkAPI.rejectWithValue(e);
 		}
-	},
+	}
 );
 
 export const initialReactionState: ReactionState = reactionAdapter.getInitialState({
@@ -117,10 +119,10 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		top: 0,
 		right: 0,
 		left: 0,
-		bottom: 0,
+		bottom: 0
 	},
 	emojiHover: null,
-	computedMessageReactions: {},
+	computedMessageReactions: {}
 });
 
 export const reactionSlice = createSlice({
@@ -153,7 +155,7 @@ export const reactionSlice = createSlice({
 		setReactionDataSocket: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
 			const reactionDataSocket = {
 				...action.payload,
-				count: action.payload.count || 1,
+				count: action.payload.count || 1
 			};
 
 			const emojiLastest: EmojiStorage = {
@@ -161,7 +163,7 @@ export const reactionSlice = createSlice({
 				emoji: reactionDataSocket.emoji ?? '',
 				messageId: reactionDataSocket.message_id ?? '',
 				senderId: reactionDataSocket.sender_id ?? '',
-				action: reactionDataSocket.action ?? false,
+				action: reactionDataSocket.action ?? false
 			};
 
 			saveRecentEmoji(emojiLastest);
@@ -175,7 +177,7 @@ export const reactionSlice = createSlice({
 					(reaction) =>
 						reaction.message_id === reactionDataSocket.message_id &&
 						reaction.emoji === reactionDataSocket.emoji &&
-						reaction.sender_id === reactionDataSocket.sender_id,
+						reaction.sender_id === reactionDataSocket.sender_id
 				);
 
 				if (reaction) {
@@ -190,8 +192,8 @@ export const reactionSlice = createSlice({
 				reactionAdapter.updateOne(state, {
 					id: reactionDataSocket.id || '',
 					changes: {
-						count: existing.count + reactionDataSocket.count,
-					},
+						count: existing.count + reactionDataSocket.count
+					}
 				});
 			} else if (!isAdd && existing) {
 				reactionAdapter.removeOne(state, reactionDataSocket.id || '');
@@ -225,8 +227,8 @@ export const reactionSlice = createSlice({
 				reactionAdapter.upsertMany(state, reactions);
 				state.computedMessageReactions[message.id] = combineMessageReactions(state, message.id);
 			}
-		},
-	},
+		}
+	}
 });
 function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	const storedEmojis = localStorage.getItem('recentEmojis');
@@ -272,13 +274,13 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 				message_id: messageId,
 				// TODO: TBD
 				id: '',
-				channel_id: '',
+				channel_id: ''
 			};
 		}
 
 		const newSender = {
 			sender_id: reaction.sender_id,
-			count: reaction.count,
+			count: reaction.count
 		};
 
 		const reactionData = dataCombined[emoji];
@@ -301,7 +303,7 @@ export const reactionReducer = reactionSlice.reducer;
 export const reactionActions = {
 	...reactionSlice.actions,
 	updateReactionMessage,
-	writeMessageReaction,
+	writeMessageReaction
 };
 
 const { selectAll, selectEntities } = reactionAdapter.getSelectors();

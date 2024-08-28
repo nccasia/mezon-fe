@@ -8,7 +8,7 @@ export function useUserPolicy(clanId: string) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const permissions = useSelector(selectAllPermissionsUser);
-	const permissionsDefault = useSelector(selectAllPermissionsDefault)
+	const permissionsDefault = useSelector(selectAllPermissionsDefault);
 	const permissionKeys = useSelector(selectAllPermissionsUserKey) as EPermission[];
 
 	const fetchPolicies = useCallback(() => {
@@ -23,8 +23,8 @@ export function useUserPolicy(clanId: string) {
 			permissionKeys,
 			userId,
 			fetchPolicies,
-			permissionsDefault,
+			permissionsDefault
 		}),
-		[permissions, userId, permissionKeys, fetchPolicies, permissionsDefault],
+		[permissions, userId, permissionKeys, fetchPolicies, permissionsDefault]
 	);
 }

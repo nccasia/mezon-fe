@@ -18,7 +18,7 @@ export const mapSearchMessageToEntity = (searchMessage: ApiSearchMessageDocument
 		...searchMessage,
 		avatar: searchMessage.avatar_url,
 		id: searchMessage.message_id || '',
-		content: searchMessage.content ? JSON.parse(searchMessage.content) : null,
+		content: searchMessage.content ? JSON.parse(searchMessage.content) : null
 	};
 };
 
@@ -45,7 +45,7 @@ export const fetchListSearchMessage = createAsyncThunk(
 		const searchMessage = response.messages.map(mapSearchMessageToEntity);
 		thunkAPI.dispatch(searchMessagesActions.setTotalResults(response.total ?? 0));
 		return searchMessage;
-	},
+	}
 );
 
 export const initialSearchMessageState: SearchMessageState = SearchMessageAdapter.getInitialState({
@@ -54,7 +54,7 @@ export const initialSearchMessageState: SearchMessageState = SearchMessageAdapte
 	isSearchMessage: {},
 	totalResult: 0,
 	currentPage: 1,
-	valueInputSearch: {},
+	valueInputSearch: {}
 });
 
 export const searchMessageSlice = createSlice({
@@ -76,7 +76,7 @@ export const searchMessageSlice = createSlice({
 		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
 			const { channelId, value } = action.payload;
 			state.valueInputSearch[channelId] = value;
-		},
+		}
 	},
 
 	extraReducers: (builder) => {
@@ -94,20 +94,20 @@ export const searchMessageSlice = createSlice({
 					SearchMessageAdapter.removeMany(state, ids);
 					SearchMessageAdapter.upsertMany(state, action.payload);
 					state.loadingStatus = 'loaded';
-				},
+				}
 			)
 			.addCase(fetchListSearchMessage.rejected, (state: SearchMessageState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const searchMessageReducer = searchMessageSlice.reducer;
 
 export const searchMessagesActions = {
 	...searchMessageSlice.actions,
-	fetchListSearchMessage,
+	fetchListSearchMessage
 };
 
 const { selectAll } = SearchMessageAdapter.getSelectors();

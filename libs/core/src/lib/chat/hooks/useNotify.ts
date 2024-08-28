@@ -12,14 +12,14 @@ export function useNotification() {
 			const ids = [id];
 			dispatch(notificationActions.deleteNotify({ ids, clanId }));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setMessageNotifedId = useCallback(
 		(idMessageNotifed: string) => {
 			dispatch(notificationActions.setMessageNotifedId(idMessageNotifed));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -27,8 +27,8 @@ export function useNotification() {
 			notification,
 			deleteNotify,
 			setMessageNotifedId,
-			idMessageNotifed,
+			idMessageNotifed
 		}),
-		[notification, deleteNotify, setMessageNotifedId, idMessageNotifed],
+		[notification, deleteNotify, setMessageNotifedId, idMessageNotifed]
 	);
 }

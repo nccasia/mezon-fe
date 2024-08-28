@@ -1,4 +1,12 @@
-import { accountActions, authActions, clansActions, directActions, friendsActions, listChannelsByUserActions, listUsersByUserActions } from '@mezon/store';
+import {
+	accountActions,
+	authActions,
+	clansActions,
+	directActions,
+	friendsActions,
+	listChannelsByUserActions,
+	listUsersByUserActions
+} from '@mezon/store';
 import { IWithError } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -24,8 +32,8 @@ function getRedirectTo(initialPath?: string): string {
 
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
 	dispatch(clansActions.joinClan({ clanId: '0' }));
-	dispatch(listChannelsByUserActions.fetchListChannelsByUser())
-	dispatch(listUsersByUserActions.fetchListUsersByUser())
+	dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+	dispatch(listUsersByUserActions.fetchListUsersByUser());
 	dispatch(friendsActions.fetchListFriends({}));
 	dispatch(directActions.fetchDirectMessage({}));
 	try {
@@ -40,14 +48,14 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 			throw new Error('Session expired');
 		}
 		return {
-			isLogin: true,
+			isLogin: true
 		} as IAuthLoaderData;
 	} catch (error) {
 		const redirectTo = getRedirectTo(initialPath);
 		const redirect = redirectTo ? `/guess/login?redirect=${redirectTo}` : '/guess/login';
 		return {
 			isLogin: false,
-			redirect: redirect,
+			redirect: redirect
 		} as IAuthLoaderData;
 	}
 };

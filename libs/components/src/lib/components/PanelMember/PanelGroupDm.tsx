@@ -2,6 +2,9 @@ import { Dropdown } from 'flowbite-react';
 import ItemPanelMember from './ItemPanelMember';
 import { useAppNavigation, useAppParams } from '@mezon/core';
 import { deleteChannel, fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { useState } from 'react';
+import LeaveClanPopup from '../ClanHeader/LeaveClanPopup';
+import ModalConfirm from '../ModalConfirm';
 
 interface PanelGroupDMPProps {
 	isDmGroupOwner: boolean;
@@ -14,6 +17,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const { directId } = useAppParams();
 	const currentUserId = useAppSelector(selectCurrentUserId)
 	const { navigate } = useAppNavigation();
+	const [popupLeave, setPopupLeave] = useState<boolean>(false);
 	const handleLeaveDmGroup = async () => {
 		const isLeaveOrDeleteGroup = lastOne 
     ? await dispatch(deleteChannel({ clanId: "", channelId: dmGroupId ?? '', isDmGroup:true})) 
@@ -26,6 +30,16 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 		}
     await dispatch(fetchDirectMessage({ noCache: true }));
 	}
+
+	const handleConfirmLeave = (e : Event) => {
+    e.stopPropagation();
+		setPopupLeave(true);
+	}
+
+	const handleCancelLeave = () => {
+		setPopupLeave(false);
+	}
+  
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
@@ -56,8 +70,12 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 					<ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children={lastOne ? "Delete Group" : "Leave Group"} danger onClick={handleLeaveDmGroup} />
-		</>
+			<ItemPanelMember children={lastOne ? "Delete Group" : "Leave Group"} danger onClick={handleConfirmLeave} />
+      {
+				popupLeave && lastOne &&
+				<ModalConfirm handleCancel={handleCancelLeave} handleConfirm={handleLeaveDmGroup} title='delete' leaveName='this group' buttonName='Delete Group' />
+			}
+      </>
 	);
 };
 

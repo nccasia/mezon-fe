@@ -1,25 +1,22 @@
-import { appActions, useAppDispatch } from "@mezon/store";
-import { useCallback, useMemo } from "react";
+import { appActions, useAppDispatch } from '@mezon/store';
+import { useCallback, useMemo } from 'react';
 
 export function useHandlePopupQuickMess() {
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-    const handleOpenPopupQuickMess = useCallback(() => {
+	const handleOpenPopupQuickMess = useCallback(() => {
 		dispatch(appActions.setIsShowPopupQuickMess(true));
-	},[dispatch]);
+	}, [dispatch]);
 
-    const handleClosePopupQuickMess = useCallback(() => {
+	const handleClosePopupQuickMess = useCallback(() => {
 		dispatch(appActions.setIsShowPopupQuickMess(false));
-	},[dispatch]);
+	}, [dispatch]);
 
-    return useMemo(
+	return useMemo(
 		() => ({
 			handleOpenPopupQuickMess,
-            handleClosePopupQuickMess,
+			handleClosePopupQuickMess
 		}),
-		[
-            handleOpenPopupQuickMess,
-            handleClosePopupQuickMess,
-        ],
+		[handleOpenPopupQuickMess, handleClosePopupQuickMess]
 	);
 }

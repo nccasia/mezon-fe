@@ -6,7 +6,7 @@ import {
 	selectDataGifsFeatured,
 	selectGifsDataSearch,
 	selectLoadingStatusGifs,
-	selectTrendingClickingStatus,
+	selectTrendingClickingStatus
 } from '@mezon/store';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { useCallback, useMemo } from 'react';
@@ -26,7 +26,7 @@ export function useGifs() {
 		(valueSearch: string) => {
 			dispatch(gifsActions.fetchGifsDataSearch(valueSearch));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const fetchGifsDataFeatured = useCallback(() => {
@@ -37,20 +37,20 @@ export function useGifs() {
 		(status: boolean) => {
 			dispatch(gifsActions.setClickedTrendingGif(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setShowCategories = useCallback(
 		(status: boolean) => {
 			dispatch(gifsActions.setShowCategories(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 	const setButtonArrowBack = useCallback(
 		(status: boolean) => {
 			dispatch(gifsActions.setButtonArrowBack(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 	return useMemo(
 		() => ({
@@ -65,7 +65,7 @@ export function useGifs() {
 			categoriesStatus,
 			setShowCategories,
 			buttonArrowBackStatus,
-			setButtonArrowBack,
+			setButtonArrowBack
 		}),
 		[
 			dataGifCategories,
@@ -79,7 +79,7 @@ export function useGifs() {
 			categoriesStatus,
 			setShowCategories,
 			buttonArrowBackStatus,
-			setButtonArrowBack,
-		],
+			setButtonArrowBack
+		]
 	);
 }

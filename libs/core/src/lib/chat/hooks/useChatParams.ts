@@ -9,8 +9,8 @@ export function useChatParams() {
 	return useMemo(
 		() => ({
 			currentChannelId,
-			currentClanId,
+			currentClanId
 		}),
-		[currentChannelId, currentClanId],
+		[currentChannelId, currentClanId]
 	);
 }

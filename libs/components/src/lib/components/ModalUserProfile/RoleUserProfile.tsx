@@ -59,7 +59,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 
 	const filteredListRoleBySearch = useMemo(() => {
 		return activeRolesWithoutUserRoles?.filter((role) => {
-			return role.title?.toLowerCase().includes(searchTerm.toLowerCase());
+        return role.slug !== 'everyone' && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
 

@@ -7,12 +7,12 @@ export interface ErrorState {
 export const ERRORS_FEATURE_KEY = 'errors';
 
 export const initialErrorState: ErrorState = {
-	errors: [],
+	errors: []
 };
 
 export type ErrorPayload = {
-  message?: string;
-}
+	message?: string;
+};
 
 export type ErrorAction = PayloadAction<ErrorPayload>;
 
@@ -28,8 +28,8 @@ export const errorsSlice = createSlice({
 		},
 		clearErrors: (state) => {
 			state.errors = [];
-		},
-	},
+		}
+	}
 });
 
 export const { addError, removeError, clearErrors } = errorsSlice.actions;

@@ -1,31 +1,29 @@
-import { directActions, useAppDispatch } from "@mezon/store";
-import { ChannelType } from "mezon-js";
-import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
-import { useCallback, useMemo } from "react";
+import { directActions, useAppDispatch } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
+import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { useCallback, useMemo } from 'react';
 
-export function useSilentSendMess () {
-    const dispatch = useAppDispatch();
-    const createSilentSendMess = useCallback(
-        async (userId: string) => {
+export function useSilentSendMess() {
+	const dispatch = useAppDispatch();
+	const createSilentSendMess = useCallback(
+		async (userId: string) => {
 			const bodyCreateDm: ApiCreateChannelDescRequest = {
 				type: ChannelType.CHANNEL_TYPE_DM,
 				channel_private: 1,
-				user_ids: [userId],
+				user_ids: [userId]
 			};
 			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
 
 			return resPayload;
 		},
-		[dispatch],
-    );
+		[dispatch]
+	);
 
-    return useMemo(
-        () =>({
-            createSilentSendMess
-        }), 
-        [
-            createSilentSendMess
-        ]
-    )
+	return useMemo(
+		() => ({
+			createSilentSendMess
+		}),
+		[createSilentSendMess]
+	);
 }

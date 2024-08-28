@@ -37,7 +37,7 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 
 			{hasFileVideo && (
 				<div className={`w-35 h-32 flex flex-row justify-center items-center relative mt-[-10px]`}>
-					<MessageVideo hideSpinning={true} attachmentData={attachment} />
+					<MessageVideo attachmentData={attachment} />
 				</div>
 			)}
 

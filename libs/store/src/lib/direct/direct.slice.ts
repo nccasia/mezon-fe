@@ -39,7 +39,7 @@ function extractDMMeta(channel: DirectEntity): DMMeta {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		notifiCount: Number(channel.count_mess_unread || 0),
+		notifiCount: Number(channel.count_mess_unread || 0)
 	};
 }
 export interface DirectRootState {
@@ -68,8 +68,8 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 					channelsActions.joinChat({
 						clanId: '0',
 						channelId: response.channel_id as string,
-						channelType: response.type as number,
-					}),
+						channelType: response.type as number
+					})
 				);
 			}
 			return response;
@@ -108,7 +108,7 @@ export const openDirectMessage = createAsyncThunk(
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 type fetchDmGroupArgs = {
@@ -136,7 +136,7 @@ export const fetchDirectMessage = createAsyncThunk(
 			const listStatusUnreadDM = response.channeldesc.map((channel) => {
 				const status = getStatusUnread(
 					Number(channel.last_seen_message?.timestamp_seconds),
-					Number(channel.last_sent_message?.timestamp_seconds),
+					Number(channel.last_sent_message?.timestamp_seconds)
 				);
 				return { dmId: channel.channel_id ?? '', isUnread: status };
 			});
@@ -164,7 +164,7 @@ export const fetchDirectMessage = createAsyncThunk(
 		const meta = channels.map((ch) => extractDMMeta(ch));
 		thunkAPI.dispatch(directActions.updateBulkDirectMetadata(meta));
 		return channels;
-	},
+	}
 );
 
 interface JoinDirectMessagePayload {
@@ -193,15 +193,15 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	async ({ directMessageId, type, noCache = false, isFetchingLatestMessages = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
-			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type??ChannelType.CHANNEL_TYPE_DM));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages }));
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: '',
 					channelId: directMessageId,
 					channelType: ChannelType.CHANNEL_TYPE_TEXT,
-					noCache,
-				}),
+					noCache
+				})
 			);
 			const members = fetchChannelMembersResult.payload as members[];
 			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
@@ -214,7 +214,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 export const initialDirectState: DirectState = directAdapter.getInitialState({
@@ -222,7 +222,7 @@ export const initialDirectState: DirectState = directAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	dmMetadata: dmMetaAdapter.getInitialState(),
-	statusDMChannelUnread: {},
+	statusDMChannelUnread: {}
 });
 
 export const directSlice = createSlice({
@@ -249,17 +249,17 @@ export const directSlice = createSlice({
 						content: payload.content,
 						id: payload.id,
 						sender_id: payload.sender_id,
-						timestamp_seconds: timestamp,
-					},
-				},
+						timestamp_seconds: timestamp
+					}
+				}
 			});
 
 			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
 				directAdapter.updateOne(state, {
 					id: payload.channel_id,
 					changes: {
-						active: ActiveDm.OPEN_DM,
-					},
+						active: ActiveDm.OPEN_DM
+					}
 				});
 			}
 		},
@@ -273,9 +273,9 @@ export const directSlice = createSlice({
 						content: payload.content,
 						id: payload.id,
 						sender_id: payload.sender_id,
-						timestamp_seconds: timestamp,
-					},
-				},
+						timestamp_seconds: timestamp
+					}
+				}
 			});
 		},
 		updateBulkDirectMetadata: (state, action: PayloadAction<DMMeta[]>) => {
@@ -301,8 +301,8 @@ export const directSlice = createSlice({
 				directAdapter.updateOne(state, {
 					id: channelId,
 					changes: {
-						count_mess_unread: (entity.count_mess_unread || 0) + 1,
-					},
+						count_mess_unread: (entity.count_mess_unread || 0) + 1
+					}
 				});
 			}
 		},
@@ -314,8 +314,8 @@ export const directSlice = createSlice({
 				directAdapter.updateOne(state, {
 					id: action.payload.channelId,
 					changes: {
-						count_mess_unread: 0,
-					},
+						count_mess_unread: 0
+					}
 				});
 				const status = getStatusUnread(action.payload.timestamp, channel.lastSentTimestamp);
 				state.statusDMChannelUnread[action.payload.channelId] = status;
@@ -330,7 +330,7 @@ export const directSlice = createSlice({
 		},
 		removeByDirectID: (state, action: PayloadAction<string>) => {
 			directAdapter.removeOne(state, action.payload);
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -345,7 +345,7 @@ export const directSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const directReducer = directSlice.reducer;
@@ -356,7 +356,7 @@ export const directActions = {
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
-	openDirectMessage,
+	openDirectMessage
 };
 
 const getStatusUnread = (lastSeenStamp: number, lastSentStamp: number) => {
@@ -376,12 +376,10 @@ export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => 
 
 export const selectDmGroupCurrentType = createSelector(getDirectState, (state) => state.currentDirectMessageType);
 
-export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, selectDmGroupCurrentId,
-	(directMessages, currentId) => {
-		const currentDm = directMessages.find((dm) => dm.id === currentId);
-		return currentDm?.user_id || [];
-	}
-)
+export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, selectDmGroupCurrentId, (directMessages, currentId) => {
+	const currentDm = directMessages.find((dm) => dm.id === currentId);
+	return currentDm?.user_id || [];
+});
 
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 

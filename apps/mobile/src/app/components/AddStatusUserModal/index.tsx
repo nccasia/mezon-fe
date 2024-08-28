@@ -53,7 +53,8 @@ const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, handleC
 			title={t('editStatus')}
 			visibleChange={setIsVisible}
 			headerStyles={styles.headerModal}
-			rightBtnText={t('save')}
+      titleStyle={styles.titleModal}
+			rightBtnText={lineStatus ? t('save') : ''}
 			onClickRightBtn={() => {
 				handleCustomUserStatus(lineStatus, ETypeCustomUserStatus.Save);
 			}}

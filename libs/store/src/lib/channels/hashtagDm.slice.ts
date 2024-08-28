@@ -1,7 +1,7 @@
 import { IHashtagDm, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { HashtagDm } from 'mezon-js';
+import { ensureSocket, getMezonCtx } from '../helpers';
 
 export interface HashtagDmEntity extends IHashtagDm {
 	id: string; // Primary ID
@@ -9,7 +9,7 @@ export interface HashtagDmEntity extends IHashtagDm {
 }
 
 export const mapHashtagDmToEntity = (HashtagDmRes: HashtagDm, directId: string) => {
-	const id = directId+HashtagDmRes.channel_id;
+	const id = directId + HashtagDmRes.channel_id;
 	return { ...HashtagDmRes, directId, id };
 };
 
@@ -37,13 +37,12 @@ export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async 
 
 export const initialHashtagDmState: HashtagDmState = HashtagDmAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 export const hashtagDmSlice = createSlice({
-	name: "hashtagdm",
+	name: 'hashtagdm',
 	initialState: initialHashtagDmState,
-	reducers: {
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchHashtagDm.pending, (state: HashtagDmState) => {
@@ -57,9 +56,8 @@ export const hashtagDmSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
-
 
 export const hashtagDmReducer = hashtagDmSlice.reducer;
 
@@ -67,17 +65,17 @@ export const hashtagDmActions = { ...hashtagDmSlice.actions, fetchHashtagDm };
 
 const { selectAll, selectEntities } = HashtagDmAdapter.getSelectors();
 
-export const gethashtagDmState = (rootState: { ["hashtagdm"]: HashtagDmState }): HashtagDmState => rootState["hashtagdm"];
+export const gethashtagDmState = (rootState: { ['hashtagdm']: HashtagDmState }): HashtagDmState => rootState['hashtagdm'];
 
 export const selectAllHashtagDm = createSelector(gethashtagDmState, selectAll);
 
 export const selectHashtagDmEntities = createSelector(gethashtagDmState, selectEntities);
 
-export const selectHashtagDMByDirectId = (id: string) => 
+export const selectHashtagDMByDirectId = (id: string) =>
 	createSelector(selectAllHashtagDm, (channelEntities) => {
-		return channelEntities.filter(channel => channel.directId === id)
-	})
-export const selectHashtagDmById = (id: string) => 
+		return channelEntities.filter((channel) => channel.directId === id);
+	});
+export const selectHashtagDmById = (id: string) =>
 	createSelector(selectHashtagDmEntities, (clansEntities) => {
-		return clansEntities[id] || null
+		return clansEntities[id] || null;
 	});

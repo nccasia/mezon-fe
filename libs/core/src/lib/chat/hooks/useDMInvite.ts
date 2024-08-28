@@ -1,4 +1,12 @@
-import { channelMembersActions, inviteActions, selectAllChannels, selectAllDirectMessages, selectAllUsesClan, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
+import {
+	channelMembersActions,
+	inviteActions,
+	selectAllChannels,
+	selectAllDirectMessages,
+	selectAllUsesClan,
+	selectMembersByChannelId,
+	useAppDispatch
+} from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { ApiLinkInviteUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo } from 'react';
@@ -43,13 +51,13 @@ export function useDMInvite(channelID?: string) {
 				inviteActions.createLinkInviteUser({
 					clan_id: clan_id,
 					channel_id: channel_id,
-					expiry_time: expiry_time,
-				}),
+					expiry_time: expiry_time
+				})
 			);
 			const payload = action.payload as ApiLinkInviteUser;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const listUserInvite = useMemo(() => {
@@ -63,7 +71,7 @@ export function useDMInvite(channelID?: string) {
 	useEffect(() => {
 		if (channelID)
 			dispatch(
-				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT })
 			);
 	}, [channelID]);
 
@@ -71,8 +79,8 @@ export function useDMInvite(channelID?: string) {
 		() => ({
 			listDMInvite,
 			listUserInvite,
-			createLinkInviteUser,
+			createLinkInviteUser
 		}),
-		[listDMInvite, createLinkInviteUser, listUserInvite],
+		[listDMInvite, createLinkInviteUser, listUserInvite]
 	);
 }

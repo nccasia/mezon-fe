@@ -1,11 +1,12 @@
-import { Spinner } from 'flowbite-react';
+import { EFailAttachment } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useMemo, useState } from 'react';
-import { Icons } from '../../components';
-import { RenderAttachmentThumbnail } from '../ThumbnailAttachmentRender';
+import { useState } from 'react';
+import { Icons, RenderAttachmentThumbnail } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
+	readonly mode?: ChannelStreamMode;
 };
 function formatFileSize(bytes: number) {
 	if (bytes >= 1000000) {
@@ -17,11 +18,12 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-function MessageLinkFile({ attachmentData }: MessageImage) {
+function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
+	const attachmentToFile = mapApiMessageAttachmentToFile(attachmentData);
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentToFile, 'w-8 h-10');
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
@@ -34,45 +36,51 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		setHoverShowOptButtonStatus(true);
 	};
 
-	const isUploadSuccessfully = useMemo(() => {
-		return attachmentData.size && attachmentData.size > 0;
-	}, [attachmentData.size]);
-
 	return (
 		<div
-			onMouseEnter={isUploadSuccessfully ? hoverOptButton : () => {}}
+			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
 			className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
-			{!isUploadSuccessfully && (
-				<div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-					<Spinner aria-label="Loading spinner" />
-				</div>
-			)}{' '}
 			<div className="flex items-center">{thumbnailAttachment}</div>
-			{hideTheInformationFile && (
-				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
-					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
-					<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
-				</div>
-			)}
-			{hideTheInformationFile && hoverShowOptButtonStatus && (
-				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
-					<div
-						onClick={handleDownload}
-						role="button"
-						className="rounded-l-md  w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
-					>
-						<Icons.Download defaultSize="w-4 h-4" />
-					</div>
-					<div className={` rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
-						<Icons.TrashIcon className="w-4 h-4" />
-					</div>
-				</div>
+			{attachmentData.filename === EFailAttachment.FAIL_ATTACHMENT ? (
+				<div className="text-red-500">Attachment failed to load.</div>
+			) : (
+				hideTheInformationFile && (
+					<>
+						<div className="cursor-pointer" onClick={handleDownload} onKeyDown={handleDownload}>
+							<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
+							<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
+						</div>
+						{hoverShowOptButtonStatus && (
+							<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
+								<div
+									onClick={handleDownload}
+									role="button"
+									className="rounded-l-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+								>
+									<Icons.Download defaultSize="w-4 h-4" />
+								</div>
+								<div className={`rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
+									<Icons.TrashIcon className="w-4 h-4" />
+								</div>
+							</div>
+						)}
+					</>
+				)
 			)}
 		</div>
 	);
 }
 
 export default MessageLinkFile;
+
+export function mapApiMessageAttachmentToFile(attachment: ApiMessageAttachment): File {
+	const fileContent = new Blob();
+	const file = new File([fileContent], attachment.filename || 'unknown', {
+		type: attachment.filetype || 'application/octet-stream',
+		lastModified: new Date().getTime(),
+	});
+	return file;
+}

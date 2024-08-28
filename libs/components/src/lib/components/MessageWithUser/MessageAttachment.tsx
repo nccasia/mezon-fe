@@ -37,6 +37,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 	mode,
 }) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
+
 	return (
 		<>
 			{videos.length > 0 && (
@@ -63,7 +64,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 			)}
 
 			{documents.length > 0 &&
-				documents.map((document, index) => <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} />)}
+				documents.map((document, index) => <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} />)}
 		</>
 	);
 };

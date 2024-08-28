@@ -1,18 +1,19 @@
+import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, cloneDeep, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
-import { attachmentActions, AttachmentEntity, useAppSelector } from '@mezon/store';
-import { messagesActions, RootState, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
-import { FlashList } from '@shopify/flash-list';
+import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
+import { attachmentActions, AttachmentEntity, selectAllMessagesByChannelId, useAppSelector } from '@mezon/store';
+import { messagesActions, RootState, selectHasMoreMessageByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { Direction_Mode, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
+import { ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import { MessageItemBS } from './components';
+import ChannelMessageList from './components/ChannelMessageList';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { MessageUserTyping } from './components/MessageUserTyping';
@@ -22,7 +23,6 @@ import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 
-const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 type ChannelMessagesProps = {
@@ -37,7 +37,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
@@ -53,10 +53,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	const [imageSelected, setImageSelected] = useState<AttachmentEntity>();
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
-
-	const loadMoreMessage = React.useCallback(async () => {
-		await dispatch(messagesActions.loadMoreMessage({ channelId }));
-	}, [dispatch, channelId]);
 
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
@@ -98,7 +94,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 
 	const onConfirmAction = useCallback(
 		(payload: IConfirmActionPayload) => {
-			const { type, message, senderDisplayName, user } = payload;
+			const { type, message} = payload;
 			switch (type) {
 				case EMessageActionType.DeleteMessage:
 					deleteSendMessage(message?.id);
@@ -116,41 +112,48 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		[deleteSendMessage],
 	);
 
-	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
-	const onLoadMore = useCallback(async () => {
-		if (isLoadMore || isLoading === 'loading') {
-			return;
-		}
-		setIsLoadMore(true);
-		await loadMoreMessage();
-		setIsLoadMore(false);
-	}, [isLoadMore, loadMoreMessage, isLoading]);
+	const isLoadMore = useRef<boolean>(false);
+	const [,setTriggerRender] = useState<boolean>(false);
+
+	const onLoadMore = useCallback(
+		async (direction: ELoadMoreDirection) => {
+			if (isLoadMore.current) return;
+			isLoadMore.current = true;
+			setTriggerRender(true);
+			if (direction === ELoadMoreDirection.bottom) {
+				await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP, fromMobile: true }));
+				isLoadMore.current = false;
+				setTriggerRender(false);
+				return;
+			}
+			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP, fromMobile: true }));
+			isLoadMore.current = false;
+			setTriggerRender(false);
+			return true;
+		},
+		[dispatch, channelId],
+	);
 
 	const handleScroll = useCallback(
 		(event: { nativeEvent: { contentOffset: { y: any } } }) => {
 			const offsetY = event.nativeEvent.contentOffset.y;
 			const threshold = 300; // Adjust this value to determine when to show the button
-
-			if (offsetY > threshold && !showScrollToBottomButton) {
-				setShowScrollToBottomButton(true);
-			} else if (offsetY <= threshold && showScrollToBottomButton) {
+			if (offsetY > threshold && showScrollToBottomButton) {
 				setShowScrollToBottomButton(false);
+			} else if (offsetY <= threshold && !showScrollToBottomButton) {
+				setShowScrollToBottomButton(true);
+			}
+
+			if (offsetY <= 0) {
+				onLoadMore(ELoadMoreDirection.top);
 			}
 		},
-		[showScrollToBottomButton],
+		[showScrollToBottomButton, onLoadMore],
 	);
 
 	const scrollToBottom = () => {
-		flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
-	};
-
-	const ViewLoadMore = () => {
-		return (
-			<View style={styles.loadMoreChannelMessage}>
-				<ActivityIndicator size="large" color={Colors.tertiary} />
-			</View>
-		);
+		flatListRef.current.scrollToEnd({ animated: true });
 	};
 	const onOpenImage = useCallback(
 		async (image: AttachmentEntity) => {
@@ -161,19 +164,14 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		[channelId, clanId, dispatch],
 	);
 
-	const dataReverse = useMemo(() => {
-		const data = cloneDeep(messages);
-		return data.reverse();
-	}, [messages]);
-
 	const jumpToRepliedMessage = useCallback(
 		(messageId: string) => {
-			const indexToJump = dataReverse.findIndex((message) => message === messageId);
+			const indexToJump = messages.findIndex((message) => message.id === messageId);
 			if (indexToJump !== -1 && flatListRef.current) {
 				flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
 			}
 		},
-		[dataReverse],
+		[messages],
 	);
 
 	const onMessageAction = useCallback((payload: IMessageActionPayload) => {
@@ -198,9 +196,9 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		({ item }) => {
 			return (
 				<MessageItem
-					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
-					messageId={item}
+					message={item}
+					messageId={item.id}
 					mode={mode}
 					channelId={channelId}
 					channelName={channelLabel}
@@ -236,21 +234,15 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
 					<MessageItemSkeleton skeletonNumber={15} />
 				)}
-				<FlashList
-					ref={flatListRef}
-					inverted
-					data={dataReverse || []}
-					onScroll={handleScroll}
-					keyboardShouldPersistTaps={'handled'}
-					contentContainerStyle={styles.listChannels}
+				
+				<ChannelMessageList
+					flatListRef={flatListRef}
+					messages={messages}
+					handleScroll={handleScroll}
 					renderItem={renderItem}
-					removeClippedSubviews={false}
-					keyExtractor={(item) => `${item}`}
-					estimatedItemSize={ITEM_HEIGHT}
-					onEndReached={messages?.length ? onLoadMore : undefined}
-					onEndReachedThreshold={0.1}
-					showsVerticalScrollIndicator={false}
-					ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
+					onLoadMore={onLoadMore}
+					isLoadMore={isLoadMore.current}
+					hasMoreMessage={hasMoreMessage}
 				/>
 
 				{showScrollToBottomButton && (

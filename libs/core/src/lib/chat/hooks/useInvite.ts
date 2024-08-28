@@ -11,13 +11,13 @@ export function useInvite() {
 				inviteActions.createLinkInviteUser({
 					clan_id: clan_id,
 					channel_id: channel_id,
-					expiry_time: expiry_time,
-				}),
+					expiry_time: expiry_time
+				})
 			);
 			const payload = action.payload as ApiLinkInviteUser;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const inviteUser = React.useCallback(
@@ -26,7 +26,7 @@ export function useInvite() {
 			const payload = action.payload as ApiInviteUserRes;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const getLinkInvite = React.useCallback(
@@ -35,15 +35,15 @@ export function useInvite() {
 			const payload = action.payload as ApiInviteUserRes;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
 		() => ({
 			createLinkInviteUser,
 			inviteUser,
-			getLinkInvite,
+			getLinkInvite
 		}),
-		[createLinkInviteUser, inviteUser, getLinkInvite],
+		[createLinkInviteUser, inviteUser, getLinkInvite]
 	);
 }

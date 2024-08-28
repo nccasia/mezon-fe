@@ -38,8 +38,8 @@ const fetchChannelAttachmentsCached = memoize(
 		maxAge: CHANNEL_ATTACHMENTS_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[2] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachment, channelId?: string, clanId?: string) => {
@@ -58,7 +58,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 
 		const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));
 		return attachments;
-	},
+	}
 );
 
 export const initialAttachmentState: AttachmentState = attachmentAdapter.getInitialState({
@@ -67,7 +67,7 @@ export const initialAttachmentState: AttachmentState = attachmentAdapter.getInit
 	attachment: '',
 	openModalAttachment: false,
 	mode: undefined,
-	messageId: '',
+	messageId: ''
 });
 
 export const attachmentSlice = createSlice({
@@ -88,7 +88,7 @@ export const attachmentSlice = createSlice({
 		},
 		setMessageId: (state, action) => {
 			state.messageId = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -103,7 +103,7 @@ export const attachmentSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -131,7 +131,7 @@ export const attachmentReducer = attachmentSlice.reducer;
  */
 export const attachmentActions = {
 	...attachmentSlice.actions,
-	fetchChannelAttachments,
+	fetchChannelAttachments
 };
 
 /*

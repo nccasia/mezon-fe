@@ -14,5 +14,5 @@ contextBridge.exposeInMainWorld('electron', {
 		return ipcRenderer.removeListener(channel, listener);
 	},
 	getDeviceId: () => ipcRenderer.invoke('get-device-id'),
-	senderId: (senderId) => ipcRenderer.invoke('sender-id', senderId),
+	senderId: (senderId) => ipcRenderer.invoke('sender-id', senderId)
 });

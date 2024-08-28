@@ -9,13 +9,13 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectMessageIdsByChannelId,
+	selectAllMessagesByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotifed,
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
@@ -34,8 +34,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
-	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
-
+	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotifed = useSelector(selectMessageNotifed);
@@ -79,14 +78,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 			return true;
 		},
-		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching],
+		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching]
 	);
 
 	const chatRefData = useMemo(() => {
 		return {
 			data: messages,
 			hasNextPage: hasMoreBottom,
-			hasPreviousPage: hasMoreTop,
+			hasPreviousPage: hasMoreTop
 		};
 	}, [messages, hasMoreBottom, hasMoreTop]);
 
@@ -95,15 +94,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
 
 	const messagesView = useMemo(() => {
-		return messages.map((messageId) => {
+		return messages.map((message) => {
 			return (
 				<MemorizedChannelMessage
 					avatarDM={avatarDM}
 					userName={userName}
-					key={messageId}
-					messageId={messageId}
+					key={message.id}
+					message={message}
 					channelId={channelId}
-					isHighlight={messageId === idMessageNotifed}
+					isHighlight={message.id === idMessageNotifed}
 					mode={mode}
 					channelLabel={channelLabel ?? ''}
 				/>
@@ -151,8 +150,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return () => {
 			dispatch(
 				messagesActions.UpdateChannelLastMessage({
-					channelId,
-				}),
+					channelId
+				})
 			);
 		};
 	}, [channelId, dispatch]);
@@ -179,8 +178,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				className={classNames(
 					'dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full md:[overflow-anchor:none]',
 					{
-						customScrollLightMode: appearanceTheme === 'light',
-					},
+						customScrollLightMode: appearanceTheme === 'light'
+					}
 				)}
 				id="scrollLoading"
 				ref={chatRef}

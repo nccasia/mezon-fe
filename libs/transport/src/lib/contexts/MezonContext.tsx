@@ -73,7 +73,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			return session;
 		},
-		[createSocket],
+		[createSocket]
 	);
 
 	const authenticateGoogle = useCallback(
@@ -96,7 +96,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			return session;
 		},
-		[createSocket],
+		[createSocket]
 	);
 
 	const authenticateApple = useCallback(
@@ -119,7 +119,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			return session;
 		},
-		[createSocket],
+		[createSocket]
 	);
 
 	const logOutMezon = useCallback(async () => {
@@ -151,7 +151,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			return session;
 		},
-		[clientRef],
+		[clientRef]
 	);
 
 	const refreshSession = useCallback(
@@ -171,7 +171,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			return newSession;
 		},
-		[clientRef, socketRef],
+		[clientRef, socketRef]
 	);
 
 	const reconnect = React.useCallback(
@@ -203,7 +203,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				}, 5000);
 			});
 		},
-		[createSocket],
+		[createSocket]
 	);
 
 	const addStatusFollow = React.useCallback(
@@ -217,7 +217,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const statusFollow = await socket.followUsers(userIds);
 			return statusFollow;
 		},
-		[socketRef],
+		[socketRef]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
@@ -234,7 +234,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
-			reconnect,
+			reconnect
 		}),
 		[
 			clientRef,
@@ -249,8 +249,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
-			reconnect,
-		],
+			reconnect
+		]
 	);
 
 	React.useEffect(() => {
@@ -280,4 +280,3 @@ const MezonSuspense: React.FC<MezonSuspenseProps> = ({ children }: MezonSuspense
 };
 
 export { MezonContext, MezonContextConsumer, MezonContextProvider, MezonSuspense };
-

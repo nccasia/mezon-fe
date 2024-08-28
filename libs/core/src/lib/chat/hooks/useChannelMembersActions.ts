@@ -13,9 +13,9 @@ export function useChannelMembersActions() {
 	const removeMemberChannel = useCallback(
 		async ({ channelId, userIds }: RemoveChannelUsers) => {
 			await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
-			dispatch(directActions.fetchDirectMessage({noCache: true}))
+			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const removeMemberClan = useCallback(
@@ -26,18 +26,18 @@ export function useChannelMembersActions() {
 					clanId: clanId,
 					channelId: channelId,
 					noCache: true,
-					channelType: ChannelType.CHANNEL_TYPE_TEXT,
-				}),
+					channelType: ChannelType.CHANNEL_TYPE_TEXT
+				})
 			);
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
 		() => ({
 			removeMemberChannel,
-			removeMemberClan,
+			removeMemberClan
 		}),
-		[removeMemberChannel, removeMemberClan],
+		[removeMemberChannel, removeMemberClan]
 	);
 }

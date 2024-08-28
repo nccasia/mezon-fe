@@ -1,11 +1,11 @@
 import { ViewProps, ViewStyle } from 'react-native';
 
 export interface BlockProps extends ViewProps, ViewStyle {
-  container?: boolean;
+	container?: boolean;
 
-  containerFluid?: boolean;
+	containerFluid?: boolean;
 
-  block?: boolean;
+	block?: boolean;
 
-  backgroundColor?: any;
+	backgroundColor?: any;
 }

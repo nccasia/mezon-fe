@@ -13,7 +13,7 @@ export function useSendInviteMessage() {
 			const content: IMessageSendPayload = {
 				t: url,
 				lk: links,
-				mk: markdowns,
+				mk: markdowns
 			};
 
 			const session = sessionRef.current;
@@ -27,14 +27,14 @@ export function useSendInviteMessage() {
 
 			await socket.writeChatMessage('0', channel_id, channelMode, content, [], [], []);
 		},
-		[sessionRef, clientRef, socketRef],
+		[sessionRef, clientRef, socketRef]
 	);
 
 	return useMemo(
 		() => ({
 			client,
-			sendInviteMessage,
+			sendInviteMessage
 		}),
-		[client, sendInviteMessage],
+		[client, sendInviteMessage]
 	);
 }

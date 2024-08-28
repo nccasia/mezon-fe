@@ -18,7 +18,7 @@ export type MenuBuilderPluginSetup = (builder: MenuBuilder) => void;
 
 export type MenuBuilderPlugin = {
 	setup: MenuBuilderPluginSetup;
-}
+};
 export class MenuBuilder {
 	private plugins: MenuBuilderPlugin[] = [];
 	private items: ContextMenuItem[] = [];
@@ -35,7 +35,7 @@ export class MenuBuilder {
 		subMenuItems = null,
 		hasSubmenu = false,
 		disabled = false,
-		classNames?: string,
+		classNames?: string
 	): MenuBuilder {
 		this.items.push(this.craftMenuItem(id, label, handleItemClick, icon, subMenuItems, hasSubmenu, disabled, classNames));
 		return this;
@@ -75,7 +75,7 @@ export class MenuBuilder {
 		subMenuItems = null,
 		hasSubmenu = false,
 		disabled = false,
-		classNames?: string,
+		classNames?: string
 	): ContextMenuItem {
 		const clickHandler = handleItemClick || (() => console.log('No handler for this item'));
 		return {
@@ -86,7 +86,7 @@ export class MenuBuilder {
 			subMenuItems,
 			hasSubmenu,
 			disabled,
-			classNames,
+			classNames
 		};
 	}
 }

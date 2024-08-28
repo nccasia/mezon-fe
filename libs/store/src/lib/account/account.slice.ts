@@ -18,7 +18,7 @@ export interface AccountState {
 export const initialAccountState: AccountState = {
 	loadingStatus: 'not loaded',
 	account: null,
-	userProfile: null,
+	userProfile: null
 };
 
 const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 3;
@@ -27,7 +27,7 @@ const fetchUserProfileCached = memoize((mezon: MezonValueContext) => mezon.clien
 	maxAge: CHANNEL_PROFILE_CACHED_TIME,
 	normalizer: (args) => {
 		return args[0].session.username || '';
-	},
+	}
 });
 
 export const getUserProfile = createAsyncThunk<IUserAccount, { noCache: boolean } | void>('account/user', async (arg, thunkAPI) => {
@@ -49,7 +49,7 @@ export const accountSlice = createSlice({
 	reducers: {
 		setAccount(state, action) {
 			state.account = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -64,7 +64,7 @@ export const accountSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*

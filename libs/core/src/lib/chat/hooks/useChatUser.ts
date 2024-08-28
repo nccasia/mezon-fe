@@ -6,8 +6,8 @@ export function useChatUser(userId: string) {
 
 	return useMemo(
 		() => ({
-			isOnline,
+			isOnline
 		}),
-		[isOnline],
+		[isOnline]
 	);
 }

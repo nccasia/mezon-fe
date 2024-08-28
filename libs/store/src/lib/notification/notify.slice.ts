@@ -49,8 +49,8 @@ const fetchListNotificationCached = memoizee(
 		maxAge: LIST_STICKER_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 export const fetchListNotification = createAsyncThunk(
@@ -69,7 +69,7 @@ export const fetchListNotification = createAsyncThunk(
 			return notifications;
 		}
 		return null;
-	},
+	}
 );
 
 export const deleteNotify = createAsyncThunk('notification/deleteNotify', async ({ ids, clanId }: { ids: string[]; clanId: string }, thunkAPI) => {
@@ -86,14 +86,14 @@ export const setAllLastSeenTimeStampChannelThunk = createAsyncThunk(
 	'notification/setAllLastSeenTimeStampChannel',
 	async (payload: LastSeenTimeStampChannelArgs[], thunkAPI) => {
 		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannel(payload));
-	},
+	}
 );
 
 export const setLastSeenTimeStampChannelThunk = createAsyncThunk(
 	'notification/setLastSeenTimeStampChannel',
 	async (payload: LastSeenTimeStampChannelArgs, thunkAPI) => {
 		thunkAPI.dispatch(notificationActions.setLastSeenTimeStampChannel(payload));
-	},
+	}
 );
 
 export const initialNotificationState: NotificationState = notificationAdapter.getInitialState({
@@ -106,7 +106,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
-	isShowInbox: false,
+	isShowInbox: false
 });
 
 export const notificationSlice = createSlice({
@@ -119,7 +119,7 @@ export const notificationSlice = createSlice({
 				const quantityNotify = countNotifyByChannelId(
 					newState,
 					action.payload.channel_id,
-					newState.lastSeenTimeStampChannels[action.payload.channel_id],
+					newState.lastSeenTimeStampChannels[action.payload.channel_id]
 				);
 				const quantityNotifyClan = countNotifyByClanId(newState, action.payload.clan_id);
 				state.quantityNotifyChannels[action.payload.channel_id] = quantityNotify;
@@ -174,7 +174,7 @@ export const notificationSlice = createSlice({
 		},
 		setIsShowInbox(state, action: PayloadAction<boolean>) {
 			state.isShowInbox = action.payload;
-		},
+		}
 	},
 
 	extraReducers: (builder) => {
@@ -194,16 +194,16 @@ export const notificationSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 const countNotifyByChannelId = (state: NotificationState, channelId: string, after = 0) => {
 	const listNotifies = Object.values(state.entities);
 	const listNotifiesMention = listNotifies.filter(
-		(notify: INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED,
+		(notify: INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED
 	);
 	const quantityNotify = listNotifiesMention.filter(
-		(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+		(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after
 	).length;
 	return quantityNotify;
 };
@@ -229,7 +229,7 @@ export const notificationActions = {
 	fetchListNotification,
 	deleteNotify,
 	setAllLastSeenTimeStampChannelThunk,
-	setLastSeenTimeStampChannelThunk,
+	setLastSeenTimeStampChannelThunk
 };
 
 const { selectAll, selectEntities } = notificationAdapter.getSelectors();
@@ -244,14 +244,12 @@ export const selectNotificationByCode = (code: number) =>
 
 export const selectNotificationMentions = createSelector(selectAllNotification, (notifications) =>
 	notifications.filter(
-		(notification) => notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED,
-	),
+		(notification) => notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED
+	)
 );
 export const selectNotificationMentionsByChannelId = (channelId: string, after = 0) =>
 	createSelector(selectNotificationMentions, (notifications) =>
-		notifications.filter(
-			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-		),
+		notifications.filter((notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after)
 	);
 
 export const selectNotificationMentionCountByChannelId = (channelId: string, after = 0) =>
@@ -259,8 +257,8 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 		selectNotificationMentions,
 		(notifications) =>
 			notifications.filter(
-				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-			).length,
+				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after
+			).length
 	);
 
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) => {

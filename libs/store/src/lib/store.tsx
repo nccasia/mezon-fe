@@ -29,6 +29,7 @@ import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
+import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -48,185 +49,184 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { listUsersByUserReducer } from './channels/listUsers.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
-		storage,
+		storage
 	},
-	authReducer,
+	authReducer
 );
 
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage,
+		storage
 	},
-	clansReducer,
+	clansReducer
 );
 
 const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
-		storage,
+		storage
 	},
-	appReducer,
+	appReducer
 );
 
 const persistedEmojiSuggestionReducer = persistReducer(
 	{
 		key: 'suggestionemoji',
-		storage,
+		storage
 	},
-	emojiSuggestionReducer,
+	emojiSuggestionReducer
 );
 
 const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending'],
+		blacklist: ['typingUsers', 'isSending']
 	},
-	messagesReducer,
+	messagesReducer
 );
 
 const persistedCatReducer = persistReducer(
 	{
 		key: 'categories',
-		storage,
+		storage
 	},
-	categoriesReducer,
+	categoriesReducer
 );
 
 const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
-		blacklist: ['request'],
+		blacklist: ['request']
 	},
-	channelsReducer,
+	channelsReducer
 );
 
 const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
-		storage,
+		storage
 	},
-	threadsReducer,
+	threadsReducer
 );
 
 const persistedChannelMembersReducer = persistReducer(
 	{
 		key: 'channelmembers',
 		storage,
-		blacklist: ['onlineStatusUser'],
+		blacklist: ['onlineStatusUser']
 	},
-	channelMembersReducer,
+	channelMembersReducer
 );
 
 const persistedListUsersByUserReducer = persistReducer(
 	{
 		key: 'listusersbyuserid',
 		storage,
-		blacklist: ['onlineStatusUser'],
+		blacklist: ['onlineStatusUser']
 	},
-	listUsersByUserReducer,
+	listUsersByUserReducer
 );
 
 const persistedListchannelsByUserReducer = persistReducer(
 	{
 		key: 'listchannelbyusers',
-		storage,
+		storage
 	},
-	listchannelsByUserReducer,
+	listchannelsByUserReducer
 );
 
 const persistedPermissionRoleChannelReducer = persistReducer(
 	{
 		key: 'listpermissionroleschannel',
-		storage,
+		storage
 	},
-	permissionRoleChannelReducer,
+	permissionRoleChannelReducer
 );
 
 const persistedRolesClanReducer = persistReducer(
 	{
 		key: 'rolesclan',
-		storage,
+		storage
 	},
-	RolesClanReducer,
+	RolesClanReducer
 );
 
 const persistedEventMngtReducer = persistReducer(
 	{
 		key: 'eventmanagement',
-		storage,
+		storage
 	},
-	eventManagementReducer,
+	eventManagementReducer
 );
 
 const persistedChannelCatSettingReducer = persistReducer(
 	{
 		key: 'notichannelcategorysetting',
-		storage,
+		storage
 	},
-	channelCategorySettingReducer,
+	channelCategorySettingReducer
 );
 
 const persistedPinMsgReducer = persistReducer(
 	{
 		key: 'pinmessages',
-		storage,
+		storage
 	},
-	pinMessageReducer,
+	pinMessageReducer
 );
 
 const persistedDefaultNotiClanReducer = persistReducer(
 	{
 		key: 'defaultnotificationclan',
-		storage,
+		storage
 	},
-	defaultNotificationClanReducer,
+	defaultNotificationClanReducer
 );
 
 const persistedDefaultNotiCatReducer = persistReducer(
 	{
 		key: 'defaultnotificationcategory',
-		storage,
+		storage
 	},
-	defaultNotificationCategoryReducer,
+	defaultNotificationCategoryReducer
 );
 
 const persistedHashTagDmReducer = persistReducer(
 	{
 		key: 'hashtagdm',
-		storage,
+		storage
 	},
-	hashtagDmReducer,
+	hashtagDmReducer
 );
 
 const persistedNotiReactMsgReducer = persistReducer(
 	{
 		key: 'notifireactmessage',
-		storage,
+		storage
 	},
-	notifiReactMessageReducer,
+	notifiReactMessageReducer
 );
 
 const persistedStickersReducer = persistReducer(
 	{
 		key: 'stickers',
-		storage,
+		storage
 	},
-	stickersReducer,
+	stickersReducer
 );
 
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
-		storage,
+		storage
 	},
-	gifsStickerEmojiReducer,
+	gifsStickerEmojiReducer
 );
 
 const reducer = {
@@ -276,11 +276,11 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer,
-	adminApplication: adminApplicationReducer,
+	adminApplication: adminApplicationReducer
 };
 
 let storeInstance = configureStore({
-	reducer,
+	reducer
 });
 
 let storeCreated = false;
@@ -297,12 +297,12 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 			getDefaultMiddleware({
 				thunk: {
 					extraArgument: {
-						mezon,
-					},
+						mezon
+					}
 				},
 				immutableCheck: false,
-				serializableCheck: false,
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
+				serializableCheck: false
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
 	});
 	storeInstance = store;
 	storeCreated = true;

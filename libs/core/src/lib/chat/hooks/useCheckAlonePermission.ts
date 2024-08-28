@@ -1,7 +1,7 @@
-import { selectCurrentClanId } from "@mezon/store";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { useUserPolicy } from "../../policy/hooks/useUserPolicy";
+import { selectCurrentClanId } from '@mezon/store';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { useUserPolicy } from '../../policy/hooks/useUserPolicy';
 
 export function useCheckAlonePermission() {
 	const currentClanId = useSelector(selectCurrentClanId);

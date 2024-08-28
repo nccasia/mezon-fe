@@ -13,7 +13,7 @@ import { Routes } from './routes';
 if (typeof window !== 'undefined') {
 	WebFont.load({
 		google: {
-			families: ['gg sans'],
+			families: ['gg sans']
 		}
 	});
 }
@@ -22,7 +22,7 @@ const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
 	port: process.env.NX_CHAT_APP_API_PORT as string,
 	key: process.env.NX_CHAT_APP_API_KEY as string,
-	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
 };
 
 export function App() {

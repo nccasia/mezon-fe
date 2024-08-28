@@ -12,19 +12,19 @@ export function useAccount() {
 					avatar_url: logoUrl,
 					display_name: displayName,
 					about_me: aboutMe,
-          noCache
-				}),
+					noCache
+				})
 			);
 			const payload = action.payload as ClansEntity;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
 		() => ({
-			updateUser,
+			updateUser
 		}),
-		[updateUser],
+		[updateUser]
 	);
 }

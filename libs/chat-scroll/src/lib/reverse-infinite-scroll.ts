@@ -14,7 +14,7 @@ export const useReverseInfiniteScroll = (
 	targetRef: React.MutableRefObject<Element>,
 	data: IChatScrollData,
 	loadMoreCb: ILoadMoreCb,
-	options?: IUseReverseInfiniteScrollOptions,
+	options?: IUseReverseInfiniteScrollOptions
 ): IUseReverseInfiniteScrollResponse => {
 	const loadMoreRef = useRef<ILoadMoreCb>(loadMoreCb);
 
@@ -23,7 +23,7 @@ export const useReverseInfiniteScroll = (
 		scrollThresholdValue,
 		enabled: initialEnabled,
 		onReachTop,
-		onReachBottom,
+		onReachBottom
 	} = useReverseInfiniteScrollOptions(options || {});
 
 	const { hasPreviousPage, hasNextPage } = data;
@@ -42,7 +42,7 @@ export const useReverseInfiniteScroll = (
 		setScrollTop,
 		getClientHeight,
 		storeCurrentScrollHeight,
-		storeCurrentScrollTop,
+		storeCurrentScrollTop
 	} = useScroll(targetRef);
 
 	// need more data at the top
@@ -54,7 +54,7 @@ export const useReverseInfiniteScroll = (
 		}
 		const checkMap = {
 			[EScrollThresholdType.fraction]: () => getScrollTop() <= getCurrentScrollHeight() * scrollThresholdValue,
-			[EScrollThresholdType.pixels]: () => getScrollTop() <= scrollThresholdValue,
+			[EScrollThresholdType.pixels]: () => getScrollTop() <= scrollThresholdValue
 		};
 
 		return checkMap[scrollThresholdType]?.() ?? false;
@@ -147,7 +147,7 @@ export const useReverseInfiniteScroll = (
 		setFetched,
 		storeCurrentScrollHeight,
 		storeCurrentScrollTop,
-		targetRef,
+		targetRef
 	]);
 
 	useEffect(() => {
@@ -182,7 +182,7 @@ const DUMMY_FN = () => {};
 const useReverseInfiniteScrollOptions = (options: IUseReverseInfiniteScrollOptions) => {
 	const scrollThresholdType = options?.scrollThreshold?.type ?? EScrollThresholdType.fraction;
 
-	const scrollThresholdValue = options?.scrollThreshold?.value ?? scrollThresholdType === EScrollThresholdType.fraction ? 0.2 : 1000;
+	const scrollThresholdValue = (options?.scrollThreshold?.value ?? scrollThresholdType === EScrollThresholdType.fraction) ? 0.2 : 1000;
 
 	const enabled = options?.enabled ?? true;
 
@@ -212,7 +212,7 @@ export enum ELoadMoreDirection {
 	/**
 	 * Loading more data at the bottom.
 	 */
-	bottom,
+	bottom
 }
 
 /**
@@ -272,7 +272,7 @@ export enum EScrollThresholdType {
 	/**
 	 * Distance to top in pixels.
 	 */
-	pixels,
+	pixels
 }
 
 /**

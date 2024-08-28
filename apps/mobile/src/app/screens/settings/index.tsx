@@ -24,6 +24,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 
 	const [filteredMenu, setFilteredMenu] = useState<IMezonMenuSectionProps[]>([]);
 	const [searchText, setSearchText] = useState<string>('')
+	const [isShowCancel, setIsShowCancel] = useState<boolean>(false)
 
 	const logout = async () => {
 		const store = await getStoreAsync();
@@ -307,10 +308,24 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		debouncedHandleSearchChange(text)
 	}
 
+	const handleSearchFocus = () => {
+		setIsShowCancel(true)
+	}
+
+	const handleSearchBlur = () => {
+		setIsShowCancel(false)
+	}
+
 	return (
 		<View style={styles.settingContainer}>
 			<ScrollView contentContainerStyle={styles.settingScroll}>
-				<MezonSearch value={searchText} onChangeText={handleSearchChange}/>
+				<MezonSearch 
+					value={searchText}
+					isShowCancel={isShowCancel}
+					onChangeText={handleSearchChange}
+					onFocusText={handleSearchFocus}
+					onBlurText={handleSearchBlur}
+				/>
 
 				<MezonMenu menu={renderedMenu} />
 			</ScrollView>

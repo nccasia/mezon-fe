@@ -1,7 +1,7 @@
-import { IEventManagement, LoadingStatus } from "@mezon/utils";
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
+import { IEventManagement, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
-import { ApiEventManagement } from "mezon-js/api.gen";
+import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
@@ -13,16 +13,13 @@ export interface EventManagementEntity extends IEventManagement {
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
 
 const EVENT_MANAGEMENT_CACHED_TIME = 1000 * 60 * 3;
-const fetchEventManagementCached = memoize(
-	(mezon: MezonValueContext, clanId: string) => mezon.client.listEvents(mezon.session, clanId),
-	{
-		promise: true,
-		maxAge: EVENT_MANAGEMENT_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1] + args[0].session.username;
-		},
-	},
-);
+const fetchEventManagementCached = memoize((mezon: MezonValueContext, clanId: string) => mezon.client.listEvents(mezon.session, clanId), {
+	promise: true,
+	maxAge: EVENT_MANAGEMENT_CACHED_TIME,
+	normalizer: (args) => {
+		return args[1] + args[0].session.username;
+	}
+});
 
 export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?: string) => {
 	return { ...eventRes, id: eventRes.id || '' };
@@ -43,25 +40,25 @@ export const fetchEventManagement = createAsyncThunk(
 		}
 
 		const response = await fetchEventManagementCached(mezon, clanId);
-				
+
 		if (!response.events) {
 			return [];
 		}
 
 		const events = response.events.map((eventRes) => mapEventManagementToEntity(eventRes, clanId));
 		return events;
-	},
+	}
 );
 
 type CreateEventManagementyload = {
-	clan_id: string,
-	channel_id: string, 
-	address: string, 
-	title: string, 
-	start_time: string, 
-	end_time: string, 
-	description: string,
-	logo: string,
+	clan_id: string;
+	channel_id: string;
+	address: string;
+	title: string;
+	start_time: string;
+	end_time: string;
+	description: string;
+	logo: string;
 };
 
 export const fetchCreateEventManagement = createAsyncThunk(
@@ -76,34 +73,37 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			start_time: start_time,
 			end_time: end_time,
 			description: description || '',
-			logo: logo || '',
-		}
+			logo: logo || ''
+		};
 		const response = await mezon.client.createEvent(mezon.session, body);
-		if(response){
-			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true}));
+		if (response) {
+			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true }));
 		} else {
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
-	},
+	}
 );
 
 type fetchDeleteEventManagementPayload = {
 	eventID: string;
 	clanId: string;
-}
+};
 
-export const fetchDeleteEventManagement = createAsyncThunk('deleteEventManagement/fetchDeleteEventManagement', async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
-		if (response) {
-			thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true}));
+export const fetchDeleteEventManagement = createAsyncThunk(
+	'deleteEventManagement/fetchDeleteEventManagement',
+	async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
+			if (response) {
+				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true }));
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
 		}
-	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
 	}
-});
+);
 
 export interface EventManagementState extends EntityState<EventManagementEntity, string> {
 	loadingStatus: LoadingStatus;
@@ -114,7 +114,7 @@ export interface EventManagementState extends EntityState<EventManagementEntity,
 export const initialEventManagementState: EventManagementState = eventManagementAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	chooseEvent: null,
+	chooseEvent: null
 });
 
 export const eventManagementSlice = createSlice({
@@ -144,7 +144,7 @@ export const eventManagementSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const eventManagementReducer = eventManagementSlice.reducer;
@@ -153,12 +153,13 @@ export const eventManagementActions = {
 	...eventManagementSlice.actions,
 	fetchEventManagement,
 	fetchCreateEventManagement,
-	fetchDeleteEventManagement,
+	fetchDeleteEventManagement
 };
 
 const { selectAll, selectEntities } = eventManagementAdapter.getSelectors();
 
-export const getEventManagementState = (rootState: { [EVENT_MANAGEMENT_FEATURE_KEY]: EventManagementState }): EventManagementState => rootState[EVENT_MANAGEMENT_FEATURE_KEY];
+export const getEventManagementState = (rootState: { [EVENT_MANAGEMENT_FEATURE_KEY]: EventManagementState }): EventManagementState =>
+	rootState[EVENT_MANAGEMENT_FEATURE_KEY];
 
 export const selectAllEventManagement = createSelector(getEventManagementState, selectAll);
 
@@ -167,5 +168,3 @@ export const selectEventManagementEntities = createSelector(getEventManagementSt
 export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
-
-

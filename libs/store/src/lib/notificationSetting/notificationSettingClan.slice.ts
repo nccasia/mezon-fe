@@ -1,5 +1,5 @@
 import { IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY = 'defaultnotificationclan';
@@ -12,15 +12,15 @@ export interface DefaultNotificationClanState {
 
 export const initialDefaultNotificationClanState: DefaultNotificationClanState = {
 	loadingStatus: 'not loaded',
-	defaultNotificationClan: null,
+	defaultNotificationClan: null
 };
-
 
 type fetchNotificationClanSettingsArgs = {
 	clanId: string;
 };
 
-export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan',
+export const getDefaultNotificationClan = createAsyncThunk(
+	'defaultnotificationclan/getDefaultNotificationClan',
 	async ({ clanId }: fetchNotificationClanSettingsArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const response = await mezon.socketRef.current?.getNotificationClanSetting(clanId);
@@ -29,11 +29,12 @@ export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationc
 		}
 		const clanNotificationConfig: ApiNotificationSetting = {
 			id: response.notification_setting?.id,
-			notification_setting_type: response.notification_setting?.notification_setting_type,
+			notification_setting_type: response.notification_setting?.notification_setting_type
 		};
 
 		return clanNotificationConfig;
-	});
+	}
+);
 
 type SetDefaultNotificationPayload = {
 	clan_id?: string;
@@ -46,18 +47,16 @@ export const setDefaultNotificationClan = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			clan_id: clan_id,
-			notification_type: notification_type,
-		}
+			notification_type: notification_type
+		};
 		const response = await mezon.client.setNotificationClan(mezon.session, body);
 		if (!response) {
-
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || "" }));
+		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || '' }));
 		return response;
-	},
+	}
 );
-
 
 export const defaultNotificationClanSlice = createSlice({
 	name: DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY,
@@ -76,7 +75,7 @@ export const defaultNotificationClanSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export interface DefaultNotificationListEntity extends IDefaultNotification {
@@ -87,6 +86,11 @@ export const defaultNotificationClanReducer = defaultNotificationClanSlice.reduc
 
 export const defaultNotificationActions = { ...defaultNotificationClanSlice.actions, getDefaultNotificationClan, setDefaultNotificationClan };
 
-export const getDefaultNotificationClanState = (rootState: { [DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY]: DefaultNotificationClanState }): DefaultNotificationClanState => rootState[DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY];
+export const getDefaultNotificationClanState = (rootState: {
+	[DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY]: DefaultNotificationClanState;
+}): DefaultNotificationClanState => rootState[DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY];
 
-export const selectDefaultNotificationClan = createSelector(getDefaultNotificationClanState, (state: DefaultNotificationClanState) => state.defaultNotificationClan);
+export const selectDefaultNotificationClan = createSelector(
+	getDefaultNotificationClanState,
+	(state: DefaultNotificationClanState) => state.defaultNotificationClan
+);

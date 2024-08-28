@@ -24,6 +24,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import storage from '@react-native-async-storage/async-storage';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
@@ -44,89 +45,87 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import storage from '@react-native-async-storage/async-storage';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
-		storage,
+		storage
 	},
-	authReducer,
+	authReducer
 );
 
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
 		storage,
-		blacklist: ['loadingStatus'],
+		blacklist: ['loadingStatus']
 	},
-	clansReducer,
+	clansReducer
 );
 
 const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
-		blacklist: ['hasInternetMobile', 'isFromFcmMobile', 'loadingMainMobile'],
+		blacklist: ['hasInternetMobile', 'isFromFcmMobile', 'loadingMainMobile']
 	},
-	appReducer,
+	appReducer
 );
 
 const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending'],
+		blacklist: ['typingUsers', 'isSending']
 	},
-	messagesReducer,
+	messagesReducer
 );
 
 const persistedCatReducer = persistReducer(
 	{
 		key: 'categories',
-		storage,
+		storage
 	},
-	categoriesReducer,
+	categoriesReducer
 );
 
 const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
-		blacklist: ['loadingStatus'],
+		blacklist: ['loadingStatus']
 	},
-	channelsReducer,
+	channelsReducer
 );
 
 const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
-		storage,
+		storage
 	},
-	threadsReducer,
+	threadsReducer
 );
-
 
 const persistedChannelMembberReducer = persistReducer(
 	{
 		key: 'channelsMember',
-		storage,
+		storage
 	},
-	channelMembersReducer,
+	channelMembersReducer
 );
 
 const persistedUserClanReducer = persistReducer(
 	{
 		key: 'usersClan',
-		storage,
+		storage
 	},
-	usersClanReducer,
+	usersClanReducer
 );
 const persistedEmojiSuggestionReducer = persistReducer(
 	{
 		key: 'emojiSuggestion',
-		storage,
+		storage
 	},
-	emojiSuggestionReducer,
+	emojiSuggestionReducer
 );
 
 const reducer = {
@@ -172,11 +171,11 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
-	settingSticker: settingStickerReducer,
+	settingSticker: settingStickerReducer
 };
 
 let storeInstance = configureStore({
-	reducer,
+	reducer
 });
 
 let storeCreated = false;
@@ -193,12 +192,12 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 			getDefaultMiddleware({
 				thunk: {
 					extraArgument: {
-						mezon,
-					},
+						mezon
+					}
 				},
 				immutableCheck: false,
-				serializableCheck: false,
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
+				serializableCheck: false
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
 	});
 	storeInstance = store;
 	storeCreated = true;

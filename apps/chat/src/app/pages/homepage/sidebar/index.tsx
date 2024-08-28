@@ -40,7 +40,7 @@ const SideBar = ({ sideBarIsOpen, toggleSideBar }: SideBarProps) => {
 						<div>Careers</div>
 					</div>
 				</div>
-				<div className='flex flex-col gap-3 mb-[70px]'>
+				<div className="flex flex-col gap-3 mb-[70px]">
 					<a
 						className="bottom flex flex-1 items-center justify-center text-white bg-[#5865f2] px-[20px] py-[7px] font-semibold cursor-pointer"
 						style={{ borderRadius: '28px' }}

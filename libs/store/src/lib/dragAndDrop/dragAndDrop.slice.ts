@@ -11,7 +11,7 @@ export interface DragAndDropState {
 export const initialDragAndDropState: DragAndDropState = {
 	loadingStatus: 'not loaded',
 	error: null,
-	draggingState: false,
+	draggingState: false
 };
 
 export const dragAndDropSlice = createSlice({
@@ -20,8 +20,8 @@ export const dragAndDropSlice = createSlice({
 	reducers: {
 		setDraggingState: (state, action) => {
 			state.draggingState = action.payload;
-		},
-	},
+		}
+	}
 });
 
 export const dragAndDropReducer = dragAndDropSlice.reducer;

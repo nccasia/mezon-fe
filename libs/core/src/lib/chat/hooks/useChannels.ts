@@ -12,7 +12,7 @@ export function useChannels() {
 			const thread = channels.filter((thread) => channel && channel?.channel_id === thread.parrent_id) as ChannelsEntity[];
 			return {
 				...channel,
-				threads: thread,
+				threads: thread
 			};
 		});
 		return channelThread as ChannelThreads[];
@@ -21,8 +21,8 @@ export function useChannels() {
 	return React.useMemo(
 		() => ({
 			channels,
-			listChannels,
+			listChannels
 		}),
-		[channels, listChannels],
+		[channels, listChannels]
 	);
 }

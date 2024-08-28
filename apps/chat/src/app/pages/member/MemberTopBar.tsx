@@ -1,5 +1,5 @@
-import {Icons} from '@mezon/components';
-import {Button} from 'flowbite-react';
+import { Icons } from '@mezon/components';
+import { Button } from 'flowbite-react';
 
 const MemberTopBar = () => {
 	return (

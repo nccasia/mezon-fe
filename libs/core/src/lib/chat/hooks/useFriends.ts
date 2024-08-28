@@ -15,70 +15,69 @@ export function useFriends() {
 		async (requestAddFriend: requestAddFriendParam) => {
 			await dispatch(friendsActions.sendRequestAddFriend(requestAddFriend));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const acceptFriend = useCallback(
 		(userName: string, id: string) => {
 			const body = {
 				usernames: [userName],
-				ids: [id],
+				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestAddFriend(body));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const deleteFriend = useCallback(
 		(userName: string, id: string) => {
 			const body = {
 				usernames: [userName],
-				ids: [id],
+				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestDeleteFriend(body));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const blockFriend = useCallback(
 		(userName: string, id: string) => {
 			const body = {
 				usernames: [userName],
-				ids: [id],
+				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestBlockFriend(body));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const unBlockFriend = useCallback(
 		(userName: string, id: string) => {
 			const body = {
 				usernames: [userName],
-				ids: [id],
+				ids: [id]
 			};
 			dispatch(friendsActions.sendRequestDeleteFriend(body));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const filteredFriends = useCallback(
 		(searchTerm: string, isAddMember?: boolean) => {
-      if(isAddMember){
-        return friends.filter((friend) => {
-          if(friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm)){
-            if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
-              return friend;
-            }
-          }
-        });
-      }
+			if (isAddMember) {
+				return friends.filter((friend) => {
+					if (friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm)) {
+						if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
+							return friend;
+						}
+					}
+				});
+			}
 			return friends.filter(
-				(friend) =>
-					friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm),
+				(friend) => friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm)
 			);
 		},
-		[friends],
+		[friends]
 	);
 
 	return useMemo(
@@ -90,8 +89,8 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
-			filteredFriends,
+			filteredFriends
 		}),
-		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends],
+		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends]
 	);
 }

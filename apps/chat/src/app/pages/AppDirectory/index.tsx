@@ -14,28 +14,28 @@ const AppDirectory = () => {
 	const categoryArr: ICategoryArr[] = [
 		{
 			icon: <Icons.GlobalIcon />,
-			title: 'All',
+			title: 'All'
 		},
 		{
 			icon: <Icons.TVIcon />,
-			title: 'Entertainment',
+			title: 'Entertainment'
 		},
 		{
 			icon: <Icons.GamingConsoleIcon />,
-			title: 'Games',
+			title: 'Games'
 		},
 		{
 			icon: <Icons.ToolIcon />,
-			title: 'Moderation and Tools',
+			title: 'Moderation and Tools'
 		},
 		{
 			icon: <Icons.IconFriends />,
-			title: 'Social',
+			title: 'Social'
 		},
 		{
 			icon: <Icons.UtilitiesIcon />,
-			title: 'Utilities',
-		},
+			title: 'Utilities'
+		}
 	];
 	const appearanceTheme = useSelector(selectTheme);
 	const elementHTML = document.documentElement;
@@ -51,7 +51,7 @@ const AppDirectory = () => {
 				break;
 		}
 	}, [appearanceTheme]);
-	
+
 	const [inputValue, setInputValue] = useState('');
 	const inputOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value);
@@ -88,13 +88,13 @@ const AppDirectory = () => {
 									placeholder="Search thousands of apps"
 									className="dark:bg-[#1e1f22] bg-bgLightModeThird flex-1 dark:text-textDarkTheme text-textLightTheme p-[12px] text-[16px] outline-none rounded-l-md"
 								/>
-								
+
 								<div className="w-fit">
 									{!inputValue ? (
 										<Icons.SearchIcon className="dark:text-[#626365] text-textLightTheme w-[25px] cursor-pointer" />
 									) : (
-										<div className='flex gap-3 items-center'>
-											<div className='text-[#626365] text-[12px]'>'ENTER' to Search</div>
+										<div className="flex gap-3 items-center">
+											<div className="text-[#626365] text-[12px]">'ENTER' to Search</div>
 											<Icons.CloseIcon onClick={() => setInputValue('')} className="text-[#626365] w-[25px] cursor-pointer" />
 										</div>
 									)}
@@ -144,20 +144,20 @@ const AppDirectory = () => {
 						</div>
 					</div>
 				</div>
-				<div className={"w-full max-w-screen-lg flex flex-col gap-8"}>
+				<div className={'w-full max-w-screen-lg flex flex-col gap-8'}>
 					<AppDirectoryList />
 				</div>
 				<div className={'w-full dark:bg-[#2b2d31] bg-bgLightModeThird flex h-[76px] overflow-hidden rounded-md'}>
-					<div className='px-4 pt-3 h-16'>
+					<div className="px-4 pt-3 h-16">
 						<Icons.AppDirectoryFooterRobot />
 					</div>
-					<div className='flex flex-col justify-center flex-1'>
-						<p className='text-base font-semibold'>New too apps ?</p>
-						<p className='text-sm'>Check out our starter guide to get familiar with all the cool things apps can do!</p>
+					<div className="flex flex-col justify-center flex-1">
+						<p className="text-base font-semibold">New too apps ?</p>
+						<p className="text-sm">Check out our starter guide to get familiar with all the cool things apps can do!</p>
 					</div>
-          <div className='px-8 items-center flex'>
-            <Button label='Learn More' className='h-10'/>
-          </div>
+					<div className="px-8 items-center flex">
+						<Button label="Learn More" className="h-10" />
+					</div>
 				</div>
 			</div>
 		</div>

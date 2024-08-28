@@ -6,7 +6,7 @@ import {
 	selectEmojiObjSuggestion,
 	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
@@ -20,7 +20,7 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 		id,
 		src,
 		category,
-		shortname,
+		shortname
 	}));
 };
 
@@ -37,7 +37,7 @@ export function useEmojiSuggestion() {
 				id: emojiFound?.id,
 				src: emojiFound?.src,
 				category: 'Recent',
-				shortname: emojiFound?.shortname,
+				shortname: emojiFound?.shortname
 			};
 		});
 	}
@@ -63,35 +63,35 @@ export function useEmojiSuggestion() {
 		(emojId: string, emojiShortname: string) => {
 			dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ id: emojId, shortName: emojiShortname }));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIsEmojiListShowed = useCallback(
 		(isOpen: boolean) => {
 			dispatch(emojiSuggestionActions.setStatusSuggestionEmojiList(isOpen));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setTextToSearchEmojiSuggesion = useCallback(
 		(textSearch: string) => {
 			dispatch(emojiSuggestionActions.setTextToSearchEmojiSuggestion(textSearch));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setAddEmojiActionChatbox = useCallback(
 		(isAdd: boolean) => {
 			dispatch(emojiSuggestionActions.setAddEmojiActionChatbox(isAdd));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setShiftPressed = useCallback(
 		(isPress: boolean) => {
 			dispatch(emojiSuggestionActions.setShiftPressed(isPress));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -108,7 +108,7 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
-			setSuggestionEmojiObjPicked,
+			setSuggestionEmojiObjPicked
 		}),
 		[
 			emojiPicked,
@@ -122,7 +122,7 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
-			setSuggestionEmojiObjPicked,
-		],
+			setSuggestionEmojiObjPicked
+		]
 	);
 }

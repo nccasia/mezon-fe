@@ -1,7 +1,17 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectJumpPinMessageId } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectDmGroupCurrentId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectJumpPinMessageId,
+	selectUploadingStatus,
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { EUploadingStatus } from '@mezon/utils';
 import classNames from 'classnames';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -48,6 +58,7 @@ function MessageWithUser({
 	isSearchMessage,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
+
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
@@ -57,6 +68,26 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+
+	const currentDmOrChannelId = useMemo(
+		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannelId : currentDmId),
+		[currentChannelId, currentDmId, mode],
+	);
+	const { statusUpload, count } = useSelector(selectUploadingStatus(currentDmOrChannelId ?? '', message.id));
+	// Computed values
+	const attachments = message.attachments ?? [];
+	const mentions = message.mentions ?? [];
+	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
+	const isMeMessage = message.isMe;
+
+	const shouldNotRender = useMemo(() => {
+		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length === 0 && mentions.length === 0;
+	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
+
+	const shouldSkipAttachmentRender = useMemo(() => {
+		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length !== 0 && mentions.length !== 0;
+	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
 
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
@@ -107,41 +138,57 @@ function MessageWithUser({
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
+
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
-			<div className={containerClass} ref={containerRef} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
-				<div className="relative rounded-sm overflow-visible">
-					<div className={childDivClass}></div>
-					<div className={parentDivClass}>
-						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}>
-							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
-							<div className="w-full relative h-full">
-								<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
-								<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
-									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
-										{isEditing && editor}
-										{!isEditing && (
-											<MessageContent
-												message={message}
-												isCombine={isCombine}
-												isSending={message.isSending}
-												isError={message.isError}
-												mode={mode}
-												isSearchMessage={isSearchMessage}
-											/>
-										)}
-										<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+			{!shouldNotRender && (
+				<div className={containerClass} ref={containerRef} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
+					<div className="relative rounded-sm overflow-visible">
+						<div className={childDivClass}></div>
+						<div className={parentDivClass}>
+							{checkMessageHasReply && <MessageReply message={message} />}
+							<div
+								className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
+							>
+								<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
+								<div className="w-full relative h-full">
+									<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
+									<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
+										<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+											{isEditing && editor}
+											{!isEditing && (
+												<MessageContent
+													message={message}
+													isCombine={isCombine}
+													isSending={message.isSending}
+													isError={message.isError}
+													mode={mode}
+													isSearchMessage={isSearchMessage}
+												/>
+											)}
+											{statusUpload === EUploadingStatus.LOADING ? (
+												<div
+													className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2 relative`}
+												>
+													Uploading {count} {count === 1 ? 'file' : 'files'}!
+												</div>
+											) : (
+												!shouldSkipAttachmentRender && (
+													<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												)
+											)}
+										</div>
 									</div>
 								</div>
 							</div>
+							<MessageStatus message={message} isMessNotifyMention={isMessNotifyMention} />
 						</div>
 					</div>
+					<MessageReaction message={message} mode={mode} />
+					{isHover && popup}
 				</div>
-				<MessageReaction message={message} mode={mode} />
-				{isHover && popup}
-			</div>
+			)}
 		</>
 	);
 }

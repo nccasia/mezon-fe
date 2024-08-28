@@ -2,10 +2,10 @@ import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import memoizee from 'memoizee';
+import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { stickersSlice } from '../giftStickerEmojiPanel/stickers.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { ClanSticker } from 'mezon-js';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
@@ -21,22 +21,22 @@ export interface FetchStickerArgs {
 export interface UpdateStickerArgs {
 	request: MezonUpdateClanStickerByIdBody;
 	stickerId: string;
-  clan_id: string;
+	clan_id: string;
 }
 export const stickerAdapter = createEntityAdapter({
-	selectId: (sticker: ClanSticker) => sticker.id || '',
+	selectId: (sticker: ClanSticker) => sticker.id || ''
 });
 
 export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
 	maxAge: LIST_STICKER_CACHED_TIME,
 	normalizer: (args) => {
 		return args[1] + args[0].session.username;
-	},
+	}
 });
 
 export const fetchStickerByClanId = createAsyncThunk(
@@ -55,7 +55,7 @@ export const fetchStickerByClanId = createAsyncThunk(
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 export const createSticker = createAsyncThunk(
 	'settingClanSticker/createSticker',
@@ -69,32 +69,35 @@ export const createSticker = createAsyncThunk(
 				return thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue({});
+			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
-export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker', async ({ request, stickerId, clan_id }: UpdateStickerArgs, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
-		if (res) {
-      thunkAPI.dispatch(fetchStickerByClanId({ clanId: clan_id, noCache: true }));
+export const updateSticker = createAsyncThunk(
+	'settingClanSticker/updateSticker',
+	async ({ request, stickerId, clan_id }: UpdateStickerArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
+			if (res) {
+				thunkAPI.dispatch(fetchStickerByClanId({ clanId: clan_id, noCache: true }));
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue({ error });
 		}
-	} catch (error) {
-		return thunkAPI.rejectWithValue({});
 	}
-});
+);
 
 export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
 		if (res) {
-      thunkAPI.dispatch(fetchStickerByClanId({ clanId: data.clan_id, noCache: true }));
+			thunkAPI.dispatch(fetchStickerByClanId({ clanId: data.clan_id, noCache: true }));
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({});
+		return thunkAPI.rejectWithValue({ error });
 	}
 });
 
@@ -115,12 +118,12 @@ export const settingClanStickerSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const stickerSettingActions = {
 	...stickersSlice.actions,
-	fetchStickerByClanId,
+	fetchStickerByClanId
 };
 
 export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>

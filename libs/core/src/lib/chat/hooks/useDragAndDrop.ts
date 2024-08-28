@@ -9,13 +9,13 @@ export function useDragAndDrop() {
 		(status: boolean) => {
 			dispatch(dragAndDropAction.setDraggingState(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 	return useMemo(
 		() => ({
 			draggingState,
-			setDraggingState,
+			setDraggingState
 		}),
-		[draggingState, setDraggingState],
+		[draggingState, setDraggingState]
 	);
 }

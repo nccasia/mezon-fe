@@ -7,13 +7,14 @@ import {
 	categoriesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
+	selectCurrentChannel,
 	selectCurrentClan,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -54,6 +55,9 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
+	const flashListRef = useRef(null);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -86,6 +90,22 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 		},
 		[categoryIdSortChannel, dispatch],
 	);
+
+	const onContentSizeChange = useCallback((w, h) => {
+		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
+			timeoutRef.current = setTimeout(() => {
+				scrollToItemById(currentChannel?.category_id);
+			}, 300);
+		}
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
@@ -126,6 +146,14 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			},
 		});
 	};
+
+	const scrollToItemById = (id) => {
+		const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
+		if (index !== -1 && flashListRef?.current) {
+			flashListRef?.current?.scrollToIndex({ index, animated: true });
+		}
+	};
+
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
@@ -154,13 +182,13 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<Icons.CalendarIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
-						<Text style={styles.titleEvent} >
-							{allEventManagement?.length > 0 ? `${allEventManagement?.length} Events` : 'Events'}
-						</Text>
+						<Text style={styles.titleEvent}>{allEventManagement?.length > 0 ? `${allEventManagement?.length} Events` : 'Events'}</Text>
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlashList
+					onContentSizeChange={onContentSizeChange}
+					ref={flashListRef}
 					data={categorizedChannels || []}
 					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
 					estimatedItemSize={40}
@@ -171,15 +199,15 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
 				<ClanMenu inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
-			
+
 			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
 				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
-			
+
 			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent onDismiss={() => setCurrentPressedChannel(null)}>
 				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
-			
+
 			<MezonBottomSheet
 				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}

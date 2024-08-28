@@ -1,4 +1,4 @@
 export enum EThumbnailPos {
 	CHANNEL_BOX = 'CHANNEL',
-	CHAT_BOX = 'THREAD',
+	CHAT_BOX = 'THREAD'
 }

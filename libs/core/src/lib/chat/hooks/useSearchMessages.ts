@@ -6,7 +6,7 @@ import {
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage,
 	selectValueInputSearchMessage,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
@@ -25,7 +25,7 @@ export function useSearchMessages() {
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
 			await dispatch(searchMessagesActions.fetchListSearchMessage({ filters, from, size, sorts }));
 		},
-		[dispatch],
+		[dispatch]
 	);
 	return useMemo(
 		() => ({
@@ -34,8 +34,8 @@ export function useSearchMessages() {
 			messageSearchByChannelId,
 			totalResult,
 			currentPage,
-			valueSearchMessage,
+			valueSearchMessage
 		}),
-		[fetchSearchMessages, searchMessages, messageSearchByChannelId, totalResult, currentPage, valueSearchMessage],
+		[fetchSearchMessages, searchMessages, messageSearchByChannelId, totalResult, currentPage, valueSearchMessage]
 	);
 }

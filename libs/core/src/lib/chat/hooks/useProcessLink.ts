@@ -13,7 +13,7 @@ type UseProcessLinkOptions = {
 		mentions?: ApiMessageMention[],
 		attachments?: ApiMessageAttachment[],
 		messageEdit?: IMessageWithUser,
-		hideEditted?: boolean,
+		hideEditted?: boolean
 	) => Promise<void>;
 };
 
@@ -27,16 +27,17 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			mentionPayload?: ApiMessageMention[],
 			attachmentPayload?: ApiMessageAttachment[],
 			newMessageIdUpdateImage?: string,
-			messageEdit?: IMessageWithUser,
+			messageEdit?: IMessageWithUser
 		) => {
 			if (!contentPayload?.lk && messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 				const filteredAttachments =
 					messageEdit?.attachments?.filter(
 						(attachment) =>
 							attachment.url &&
+							attachment?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
 							!attachment.url.startsWith('https://cdn.mezon.vn') &&
 							contentPayload?.t &&
-							!contentPayload.t.includes(attachment.url),
+							!contentPayload.t.includes(attachment.url)
 					) ?? [];
 				const finalAttachments = messageEdit?.attachments?.filter((attachment) => !filteredAttachments.includes(attachment));
 				if (messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
@@ -49,7 +50,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 						mentionPayload ?? [],
 						finalAttachments,
 						undefined,
-						true,
+						true
 					);
 				}
 			} else if (contentPayload?.lk) {
@@ -59,14 +60,15 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 							return result as ApiMessageAttachment;
 						}
 						return null;
-					}),
+					})
 				);
 
 				Promise.all(resultPromises)
 					.then((results) => {
+						console.log('results', results);
 						const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
 						const combinedAttachments = [...(attachmentPayload ?? []), ...filteredImageAttachments].filter(
-							(attachment, index, self) => index === self.findIndex((a) => a.url === attachment.url),
+							(attachment, index, self) => index === self.findIndex((a) => a.url === attachment.url)
 						);
 						if (combinedAttachments.length > 0) {
 							updateImageLinkMessage(
@@ -78,7 +80,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 								mentionPayload ?? [],
 								combinedAttachments,
 								undefined,
-								!messageEdit ? false : true,
+								!messageEdit ? false : true
 							);
 						}
 					})
@@ -87,13 +89,13 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 					});
 			}
 		},
-		[updateImageLinkMessage],
+		[updateImageLinkMessage]
 	);
 
 	return useMemo(
 		() => ({
-			processLink,
+			processLink
 		}),
-		[processLink],
+		[processLink]
 	);
 }

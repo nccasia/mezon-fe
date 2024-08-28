@@ -45,8 +45,8 @@ const AppLayout = () => {
 						const baseUrl = 'https://mezon.ai';
 						const relativeLink = fullLink.replace(baseUrl, '');
 						navigate(relativeLink);
-					},
-				},
+					}
+				}
 			);
 		}
 		onMessageListener()
@@ -70,8 +70,8 @@ const AppLayout = () => {
 					fcmActions.registFcmDeviceToken({
 						tokenId: fcmTokenObject.token ?? '',
 						deviceId: fcmTokenObject.deviceId ?? '',
-						platform: 'desktop',
-					}),
+						platform: 'desktop'
+					})
 				);
 			} else {
 				requestForToken()

@@ -43,8 +43,8 @@ export const initialAppState: AppState = {
 	hasInternetMobile: false,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile : true },
-	isShowPopupQuickMess: false,
+	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true },
+	isShowPopupQuickMess: false
 };
 
 export const appSlice = createSlice({
@@ -93,25 +93,25 @@ export const appSlice = createSlice({
 		setIsShowSettingFooterStatus: (state, action) => {
 			state.isShowSettingFooter = {
 				...state.isShowSettingFooter,
-				status: action.payload,
+				status: action.payload
 			};
 		},
 		setIsShowSettingFooterInitTab: (state, action) => {
 			state.isShowSettingFooter = {
 				...state.isShowSettingFooter,
-				initTab: action.payload,
+				initTab: action.payload
 			};
 		},
 		setIsUserProfile: (state, action) => {
 			state.isShowSettingFooter = {
 				...state.isShowSettingFooter,
-				isUserProfile: action.payload,
-			}
+				isUserProfile: action.payload
+			};
 		},
 		setIsShowPopupQuickMess: (state, action) => {
 			state.isShowPopupQuickMess = action.payload;
 		}
-	},
+	}
 });
 
 /*

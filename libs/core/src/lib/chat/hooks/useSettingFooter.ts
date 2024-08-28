@@ -1,39 +1,35 @@
-import { appActions, useAppDispatch } from "@mezon/store";
-import { useCallback, useMemo } from "react";
+import { appActions, useAppDispatch } from '@mezon/store';
+import { useCallback, useMemo } from 'react';
 
 export function useSettingFooter() {
-    const dispatch = useAppDispatch();
-    const setIsShowSettingFooterStatus = useCallback(
+	const dispatch = useAppDispatch();
+	const setIsShowSettingFooterStatus = useCallback(
 		(status: boolean) => {
 			dispatch(appActions.setIsShowSettingFooterStatus(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
-	
+
 	const setIsShowSettingFooterInitTab = useCallback(
 		(value: string) => {
 			dispatch(appActions.setIsShowSettingFooterInitTab(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
-	
+
 	const setIsUserProfile = useCallback(
 		(isUserProfile: boolean) => {
 			dispatch(appActions.setIsUserProfile(isUserProfile));
 		},
 		[dispatch]
-	)
-	
-    return useMemo(
+	);
+
+	return useMemo(
 		() => ({
 			setIsShowSettingFooterStatus,
 			setIsShowSettingFooterInitTab,
 			setIsUserProfile
 		}),
-		[ 
-            setIsShowSettingFooterStatus,
-			setIsShowSettingFooterInitTab,
-			setIsUserProfile
-        ],
+		[setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile]
 	);
 }

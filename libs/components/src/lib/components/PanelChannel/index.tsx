@@ -9,7 +9,7 @@ import {
 	selectSelectedChannelNotificationSetting,
 	SetMuteNotificationPayload, SetNotificationPayload
 } from "@mezon/store";
-import { EPermission, IChannel } from '@mezon/utils';
+import { ENotificationTypes, EPermission, IChannel } from '@mezon/utils';
 import { format } from "date-fns";
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from "mezon-js";
@@ -251,9 +251,9 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   type="radio"
                   name="NotificationSetting"
                   defaultNotifi={true}
-                  checked={getNotificationChannelSelected?.notification_setting_type === 0}
+                  checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
                   subText={defaultNotifiName}
-                  onClick={() => setNotification(0)}
+                  onClick={() => setNotification(ENotificationTypes.DEFAULT)}
                 />
                 {notificationTypesList.map(notification => (
                   <ItemPanel

@@ -19,7 +19,7 @@ export function useClanProfileSetting({ clanId }: useProfileClanOptions) {
 			const payload = action.payload;
 			return payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	useEffect(() => {
@@ -30,6 +30,6 @@ export function useClanProfileSetting({ clanId }: useProfileClanOptions) {
 
 	return {
 		updateUserClanProfile,
-		clanProfile,
+		clanProfile
 	};
 }

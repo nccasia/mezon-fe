@@ -31,7 +31,7 @@ export function getAttachmentUnique(attachments: ApiMessageAttachment[]) {
 				acc[cur.filename] = cur;
 			}
 			return acc;
-		}, {}),
+		}, {})
 	);
 }
 
@@ -62,7 +62,7 @@ export const pushAttachmentToCache = (attachment: any, channelId: string | numbe
 	if (Array.isArray(attachment)) {
 		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
 			...allCachedAttachment,
-			[channelId]: attachment,
+			[channelId]: attachment
 		});
 	} else {
 		const currentAttachment = allCachedAttachment[channelId] || [];
@@ -70,7 +70,7 @@ export const pushAttachmentToCache = (attachment: any, channelId: string | numbe
 
 		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
 			...allCachedAttachment,
-			[channelId]: currentAttachment,
+			[channelId]: currentAttachment
 		});
 	}
 };

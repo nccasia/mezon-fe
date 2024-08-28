@@ -27,25 +27,21 @@ export interface ListChannelsByUserRootState {
 	[LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState;
 }
 
+export const fetchListChannelsByUser = createAsyncThunk('channelsByUser/fetchListChannelsByUser', async (_, thunkAPI) => {
+	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-export const fetchListChannelsByUser = createAsyncThunk(
-	'channelsByUser/fetchListChannelsByUser',
-	async (_, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	
-		const response = await mezon.socketRef.current?.ListChannelByUserId();
-		if (!response?.channeldesc) {
-			return [];
-		}
+	const response = await mezon.socketRef.current?.ListChannelByUserId();
+	if (!response?.channeldesc) {
+		return [];
+	}
 
-		const channels = response.channeldesc.map(mapChannelsByUserToEntity);
-		return channels;
-	},
-);
+	const channels = response.channeldesc.map(mapChannelsByUserToEntity);
+	return channels;
+});
 
 export const initialListChannelsByUserState: ListChannelsByUserState = listChannelsByUserAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 
 export const listChannelsByUserSlice = createSlice({
@@ -58,16 +54,16 @@ export const listChannelsByUserSlice = createSlice({
 		update: listChannelsByUserAdapter.updateOne,
 		updateLastSentTime: (state, action: PayloadAction<{ channelId: string }>) => {
 			const payload = action.payload;
-			const timestamp = (Date.now() / 1000);
+			const timestamp = Date.now() / 1000;
 			listChannelsByUserAdapter.updateOne(state, {
 				id: payload.channelId,
 				changes: {
 					last_sent_message: {
-						timestamp_seconds: timestamp,
-					},
-				},
+						timestamp_seconds: timestamp
+					}
+				}
 			});
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -82,7 +78,7 @@ export const listChannelsByUserSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -111,7 +107,7 @@ export const listchannelsByUserReducer = listChannelsByUserSlice.reducer;
 
 export const listChannelsByUserActions = {
 	...listChannelsByUserSlice.actions,
-	fetchListChannelsByUser,
+	fetchListChannelsByUser
 };
 
 /*
@@ -132,6 +128,7 @@ import { mess } from '@mezon/store';
  */
 const { selectAll } = listChannelsByUserAdapter.getSelectors();
 
-export const getChannelsByUserState = (rootState: { [LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState }): ListChannelsByUserState => rootState[LIST_CHANNELS_USER_FEATURE_KEY];
+export const getChannelsByUserState = (rootState: { [LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState }): ListChannelsByUserState =>
+	rootState[LIST_CHANNELS_USER_FEATURE_KEY];
 
 export const selectAllChannelsByUser = createSelector(getChannelsByUserState, selectAll);

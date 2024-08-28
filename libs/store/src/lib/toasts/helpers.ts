@@ -1,9 +1,9 @@
-import { ToastPayload } from "./types";
+import { ToastPayload } from './types';
 
 export function withToast(payload: Partial<ToastPayload> & { message: string }) {
-    return {
-        toast: {
-            ...payload,
-        }
-    };
+	return {
+		toast: {
+			...payload
+		}
+	};
 }

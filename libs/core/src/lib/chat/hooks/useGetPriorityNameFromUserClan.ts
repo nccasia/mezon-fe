@@ -55,6 +55,6 @@ export const useGetPriorityNameFromUserClan = (senderId: string) => {
 		generalAvatar,
 		namePriority,
 		priorityAvatar,
-		isAnonymous,
+		isAnonymous
 	};
 };

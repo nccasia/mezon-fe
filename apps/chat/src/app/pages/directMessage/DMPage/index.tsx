@@ -13,7 +13,7 @@ import {
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
 	selectStatusMenu,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -92,7 +92,7 @@ export default function DirectMessage() {
 	};
 	const checkTypeDm = useMemo(
 		() => (Number(type) === ChannelType.CHANNEL_TYPE_GROUP ? isShowMemberListDM : isUseProfileDM),
-		[isShowMemberListDM, isUseProfileDM, type],
+		[isShowMemberListDM, isUseProfileDM, type]
 	);
 	useEffect(() => {
 		if (isShowCreateThread) {
@@ -141,7 +141,7 @@ export default function DirectMessage() {
 								id="emojiPicker"
 								className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 								style={{
-									right: setMarginleft,
+									right: setMarginleft
 								}}
 							>
 								<div className="mb-0 z-10 h-full">
@@ -166,7 +166,7 @@ export default function DirectMessage() {
 									left:
 										distanceToRight < WIDTH_EMOJI_PANEL
 											? `${positionOfSmileButton.left - WIDTH_EMOJI_PANEL}px`
-											: `${positionOfSmileButton.right}px`,
+											: `${positionOfSmileButton.right}px`
 								}}
 							>
 								<div className="mb-0 z-50 h-full ">
@@ -188,13 +188,19 @@ export default function DirectMessage() {
 								<ChannelTyping
 									channelId={directId}
 									mode={
-										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+											? ChannelStreamMode.STREAM_MODE_DM
+											: ChannelStreamMode.STREAM_MODE_GROUP
 									}
 								/>
 							)}
 							<DirectMessageBox
 								directParamId={directId ?? ''}
-								mode={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+								mode={
+									currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+										? ChannelStreamMode.STREAM_MODE_DM
+										: ChannelStreamMode.STREAM_MODE_GROUP
+								}
 							/>
 						</div>
 					</div>

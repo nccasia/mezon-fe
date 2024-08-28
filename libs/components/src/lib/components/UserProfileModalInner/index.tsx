@@ -7,9 +7,10 @@ import {
 	useSettingFooter
 } from '@mezon/core';
 import {
-	notificationActions, selectCurrentUserId,
+	ChannelMembersEntity,
+	notificationActions, selectCurrentChannelId, selectCurrentUserId, selectDmGroupCurrentId,
 	selectFriendStatus,
-	selectMemberByUserId, selectModeResponsive,
+	selectMemberByUserId, selectMembersByChannelId, selectModeResponsive,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -43,7 +44,11 @@ const initOpenModal = {
 const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfileModalInnerProps) => {
 	const dispatch = useAppDispatch();
 	const userProfileRef = useRef<HTMLDivElement | null>(null);
-	const userById = useSelector(selectMemberByUserId(userId ?? ''));
+	const modeResponsive = useAppSelector(selectModeResponsive);
+	const currentChannelId = useAppSelector(selectCurrentChannelId);
+	const currentDmId = useAppSelector(selectDmGroupCurrentId);
+	const channelMembers = useAppSelector(selectMembersByChannelId(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId))
+	const userById = channelMembers.find(member => member?.user?.id === userId) as ChannelMembersEntity;
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const userCustomStatus = useMemberCustomStatus(userId || '');
 	const [openGroupIconBanner, setGroupIconBanner] = useState<OpenModalProps>(initOpenModal);
@@ -55,8 +60,9 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const isSelf = currentUserId === userId;
 	const [isOPenEditOption, setIsOPenEditOption] = useState (false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const modeResponsive = useAppSelector(selectModeResponsive);
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
+	const displayAvatar = userById?.clan_avatar || userById?.user?.avatar_url;
+	const displayUsername = userById?.clan_nick || userById?.user?.display_name || userById?.user?.username
 	
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
@@ -143,8 +149,8 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 					</div>
 					<div className="flex absolute bottom-[-60px] w-full">
 						<AvatarProfile
-							avatar={userById?.user?.avatar_url}
-							username={userById?.user?.username || notify?.content?.username}
+							avatar={displayAvatar}
+							username={displayUsername || notify?.content?.username}
 							userToDisplay={userById}
 							customStatus={userCustomStatus}
 							styleAvatar="w-[120px] h-[120px] rounded-full"

@@ -38,19 +38,19 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 			dispatch(
 				messagesActions.remove({
 					channelId: channelIdDelete,
-					messageId,
-				}),
+					messageId
+				})
 			);
 
 			await socket.removeChatMessage(clanId || '', channelIdDelete, mode, messageId);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode],
+		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode]
 	);
 
 	return useMemo(
 		() => ({
-			deleteSendMessage,
+			deleteSendMessage
 		}),
-		[deleteSendMessage],
+		[deleteSendMessage]
 	);
 }

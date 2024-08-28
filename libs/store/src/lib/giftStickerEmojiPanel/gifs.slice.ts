@@ -12,7 +12,7 @@ export interface GifEntity extends IGif {
 }
 
 export const gifsAdapter = createEntityAdapter<GifCategoriesEntity>({
-	selectId: (emo: GifCategoriesEntity) => emo.id || emo.path || '',
+	selectId: (emo: GifCategoriesEntity) => emo.id || emo.path || ''
 } as any);
 
 export interface GifsState extends EntityState<GifCategoriesEntity, string> {
@@ -32,7 +32,7 @@ export const initialGifsState: GifsState = {
 	dataGifsFeatured: [],
 	trendingClickingStatus: false,
 	categoriesStatus: false,
-	buttonArrowBackStatus: false,
+	buttonArrowBackStatus: false
 };
 
 const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
@@ -103,7 +103,7 @@ export const gifsSlice = createSlice({
 		},
 		setButtonArrowBack: (state, action) => {
 			state.buttonArrowBackStatus = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -142,7 +142,7 @@ export const gifsSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const gifsReducer = gifsSlice.reducer;
@@ -151,7 +151,7 @@ export const gifsActions = {
 	...gifsSlice.actions,
 	fetchGifCategories,
 	fetchGifsDataSearch,
-	fetchGifCategoryFeatured,
+	fetchGifCategoryFeatured
 };
 
 const { selectAll, selectEntities } = gifsAdapter.getSelectors();

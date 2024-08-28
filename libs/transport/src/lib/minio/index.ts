@@ -23,8 +23,8 @@ export function uploadImageToMinIOMobile(url: string, stream: Buffer, type: stri
 		body: stream,
 		headers: {
 			'Content-Type': type,
-			'Content-Length': size?.toString() || '1000',
-		},
+			'Content-Length': size?.toString() || '1000'
+		}
 	});
 }
 
@@ -54,7 +54,7 @@ export async function handleUploadFile(
 	currentClanId: string,
 	currentChannelId: string,
 	filename: string,
-	file: File,
+	file: File
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -81,7 +81,7 @@ export async function handleUploadFileMobile(
 	currentClanId: string,
 	currentChannelId: string,
 	filename: string,
-	file: any,
+	file: any
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -112,7 +112,7 @@ export function createUploadFilePath(
 	session: Session,
 	currentClanId: string,
 	currentChannelId: string,
-	filename: string,
+	filename: string
 ): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
 
@@ -135,7 +135,7 @@ export async function uploadFile(
 	size: number,
 	buf: Buffer,
 	isMobile?: boolean,
-	originalFilename?: string,
+	originalFilename?: string
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -143,7 +143,7 @@ export async function uploadFile(
 			const data = await client.uploadAttachmentFile(session, {
 				filename: filename,
 				filetype: type,
-				size: size,
+				size: size
 			});
 			if (!data?.url) {
 				reject(new Error('Failed to upload file. URL not available.'));
@@ -160,7 +160,7 @@ export async function uploadFile(
 				filetype: type,
 				size: size,
 				width: 0,
-				height: 0,
+				height: 0
 			});
 		} catch (error) {
 			reject(new Error(`${error}`));
@@ -174,7 +174,7 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 		filetype: '',
 		size: 0,
 		width: 0,
-		height: 0,
+		height: 0
 	};
 
 	return new Promise<ApiMessageAttachment>((resolve, reject) => {
@@ -195,7 +195,7 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 								filetype: contentType,
 								size: Number(contentSize),
 								width: 0,
-								height: 0,
+								height: 0
 							});
 						}
 					} else {

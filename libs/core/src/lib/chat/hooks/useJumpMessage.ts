@@ -29,9 +29,9 @@ export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMess
 	return useMemo(
 		() => ({
 			directToMessageById,
-			jumpToMessage,
+			jumpToMessage
 		}),
-		[directToMessageById, jumpToMessage],
+		[directToMessageById, jumpToMessage]
 	);
 }
 export function getJumpToMessageId() {

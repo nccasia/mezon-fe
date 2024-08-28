@@ -57,7 +57,7 @@ export function ensureClient(mezon: MezonContextValue): MezonValueContext {
 	return {
 		...mezon,
 		client: mezon.clientRef.current,
-		session: mezon.sessionRef.current,
+		session: mezon.sessionRef.current
 	} as MezonValueContext;
 }
 

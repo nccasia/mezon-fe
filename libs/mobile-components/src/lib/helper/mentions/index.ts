@@ -26,7 +26,7 @@ export const convertMentionsToData = (text: string) => {
 		const id = match[3];
 		result.push({
 			id: id,
-			display: `${prefix === '{@}' ? '@' : '#'}${mention}`,
+			display: `${prefix === '{@}' ? '@' : '#'}${mention}`
 		});
 	}
 	return result;

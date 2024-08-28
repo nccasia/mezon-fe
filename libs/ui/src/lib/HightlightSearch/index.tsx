@@ -7,7 +7,7 @@ const HighlightMatch = (content: string, valueSearch: string[]) => {
 
 	if (normalizedSearchTerms.length === 0) return content;
 
-	let matchPositions: { start: number; end: number; key: number }[] = [];
+	const matchPositions: { start: number; end: number; key: number }[] = [];
 
 	normalizedSearchTerms.forEach((term, termIndex) => {
 		const positions = KMPHighlight(normalizedItemName, term);
@@ -15,14 +15,14 @@ const HighlightMatch = (content: string, valueSearch: string[]) => {
 			matchPositions.push({
 				start: position,
 				end: position + term.length,
-				key: termIndex,
+				key: termIndex
 			});
 		});
 	});
 
 	matchPositions.sort((a, b) => a.start - b.start);
 
-	let parts: (string | JSX.Element)[] = [];
+	const parts: (string | JSX.Element)[] = [];
 	let startIndex = 0;
 
 	matchPositions.forEach((match) => {
@@ -36,7 +36,7 @@ const HighlightMatch = (content: string, valueSearch: string[]) => {
 			parts.push(
 				<span className="bg-[#FAE7C1] dark:bg-[#6A5936]" key={`${match.key}-${match.start}`}>
 					{highlightedText}
-				</span>,
+				</span>
 			);
 
 			startIndex = match.end;

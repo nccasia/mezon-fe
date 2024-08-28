@@ -6,7 +6,7 @@ type ItemPanelMemberProps = {
 	dropdown?: boolean;
 	type?: 'radio' | 'checkbox' | 'none';
 	danger?: boolean;
-	onClick?: () => void;
+	onClick?: (e : any) => void;
 };
 
 const ItemPanelMember = ({ children, dropdown, type, danger, onClick }: ItemPanelMemberProps) => {

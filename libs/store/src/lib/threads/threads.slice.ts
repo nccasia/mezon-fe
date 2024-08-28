@@ -60,7 +60,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	isPrivate: 0,
 	nameValueThread: {},
 	valueThread: null,
-	openThreadMessageState: false,
+	openThreadMessageState: false
 });
 
 export const threadsSlice = createSlice({
@@ -72,11 +72,11 @@ export const threadsSlice = createSlice({
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
 				...state.isShowCreateThread,
-				[action.payload.channelId]: action.payload.isShowCreateThread,
+				[action.payload.channelId]: action.payload.isShowCreateThread
 			};
 			state.listThreadId = {
 				...state.listThreadId,
-				[action.payload.channelId]: '',
+				[action.payload.channelId]: ''
 			};
 		},
 		setNameThreadError: (state, action: PayloadAction<string>) => {
@@ -94,13 +94,13 @@ export const threadsSlice = createSlice({
 		setListThreadId: (state, action: PayloadAction<{ channelId: string; threadId: string }>) => {
 			state.listThreadId = {
 				...state.listThreadId,
-				[action.payload.channelId]: action.payload.threadId,
+				[action.payload.channelId]: action.payload.threadId
 			};
 		},
 		setNameValueThread: (state, action: PayloadAction<{ channelId: string; nameValue: string }>) => {
 			state.nameValueThread = {
 				...state.nameValueThread,
-				[action.payload.channelId]: action.payload.nameValue,
+				[action.payload.channelId]: action.payload.nameValue
 			};
 		},
 		setOpenThreadMessageState(state, action) {
@@ -108,7 +108,7 @@ export const threadsSlice = createSlice({
 		},
 		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
 			state.currentThread = action.payload;
-		},
+		}
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -124,7 +124,7 @@ export const threadsSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*

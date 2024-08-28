@@ -1,12 +1,12 @@
 import { IMessageWithUser } from '@mezon/utils';
-import {createSelector, createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 export const popupForwardSlice = createSlice({
 	name: 'forwardmessage',
 	initialState: {
 		openPopupForward: false,
 		message: {} as IMessageWithUser,
-		isForwardAll: false,
+		isForwardAll: false
 	},
 	reducers: {
 		toggleIsShowPopupForwardTrue: (state) => {
@@ -21,7 +21,7 @@ export const popupForwardSlice = createSlice({
 		setIsForwardAll: (state, action) => {
 			state.isForwardAll = action.payload;
 		}
-	},
+	}
 });
 
 export const popupForwardReducer = popupForwardSlice.reducer;

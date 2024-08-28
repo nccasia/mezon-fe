@@ -16,7 +16,7 @@ export interface StickersState extends EntityState<StickersEntity, string> {
 export const initialStickersState: StickersState = stickersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	stickersData: null,
+	stickersData: null
 });
 
 export const fetchStickersData = createAsyncThunk<any>('stickers/fetchStatus', async (_, thunkAPI) => {
@@ -38,7 +38,7 @@ export const stickersSlice = createSlice({
 	initialState: initialStickersState,
 	reducers: {
 		add: stickersAdapter.addOne,
-		remove: stickersAdapter.removeOne,
+		remove: stickersAdapter.removeOne
 	},
 	extraReducers: (builder) => {
 		builder
@@ -53,14 +53,14 @@ export const stickersSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const stickersReducer = stickersSlice.reducer;
 
 export const stickersActions = {
 	...stickersSlice.actions,
-	fetchStickersData,
+	fetchStickersData
 };
 
 const { selectAll, selectEntities } = stickersAdapter.getSelectors();

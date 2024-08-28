@@ -30,8 +30,8 @@ export function useChannelMembersOnlineStatus({ channelId }: UseChannelMembersOn
 	return useMemo(
 		() => ({
 			onlineMembers,
-			offlineMembers,
+			offlineMembers
 		}),
-		[offlineMembers, onlineMembers],
+		[offlineMembers, onlineMembers]
 	);
 }

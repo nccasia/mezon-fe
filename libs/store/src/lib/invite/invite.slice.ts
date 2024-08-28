@@ -35,7 +35,7 @@ export const createLinkInviteUser = createAsyncThunk(
 			const body = {
 				channel_id: channel_id,
 				clan_id: clan_id,
-				expiry_time: expiry_time,
+				expiry_time: expiry_time
 			};
 			const response = await mezon.client.createLinkInviteUser(mezon.session, body);
 			if (!response) {
@@ -46,7 +46,7 @@ export const createLinkInviteUser = createAsyncThunk(
 			const errmsg = await error.json();
 			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-	},
+	}
 );
 
 type InviteUser = {
@@ -86,7 +86,7 @@ export const initialInviteState: InviteState = inviteAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
-	isClickInvite: false,
+	isClickInvite: false
 });
 
 export const inviteSlice = createSlice({
@@ -112,7 +112,7 @@ export const inviteSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -142,7 +142,7 @@ export const inviteActions = {
 	...inviteSlice.actions,
 	createLinkInviteUser,
 	inviteUser,
-	getLinkInvite,
+	getLinkInvite
 };
 
 /*
@@ -168,4 +168,4 @@ export const selectInviteEntities = createSelector(getInviteState, selectEntitie
 
 export const selectInviteById = (id: string) => createSelector(selectInviteEntities, (inviteEntities) => inviteEntities[id]);
 
-export const selectIsClickInvite = createSelector(getInviteState, state => state.isClickInvite);
+export const selectIsClickInvite = createSelector(getInviteState, (state) => state.isClickInvite);

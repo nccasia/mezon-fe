@@ -6,9 +6,9 @@ export function useRoles() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const deleteRole = React.useCallback(
 		async (roleId: string) => {
-			await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || ""}));
+			await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || '' }));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const createRole = React.useCallback(
@@ -17,7 +17,7 @@ export function useRoles() {
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 			return response?.payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const updateRole = React.useCallback(
@@ -28,22 +28,30 @@ export function useRoles() {
 			add_user_ids: string[],
 			active_permission_ids: string[],
 			remove_user_ids: string[],
-			remove_permission_ids: string[],
+			remove_permission_ids: string[]
 		) => {
 			const response = await dispatch(
-				rolesClanActions.fetchUpdateRole({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids, clanId }),
+				rolesClanActions.fetchUpdateRole({
+					role_id,
+					title,
+					add_user_ids,
+					active_permission_ids,
+					remove_user_ids,
+					remove_permission_ids,
+					clanId
+				})
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 			return response?.payload;
 		},
-		[dispatch],
+		[dispatch]
 	);
 	return useMemo(
 		() => ({
 			deleteRole,
 			createRole,
-			updateRole,
+			updateRole
 		}),
-		[deleteRole, createRole, updateRole],
+		[deleteRole, createRole, updateRole]
 	);
 }

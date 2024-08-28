@@ -1,7 +1,7 @@
 import { IUsers, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSocket, getMezonCtx } from '../helpers';
 import { ApiUser } from 'mezon-js/api.gen';
+import { ensureSocket, getMezonCtx } from '../helpers';
 
 export const LIST_USERS_BY_USER_FEATURE_KEY = 'listusersbyuserid';
 
@@ -27,24 +27,20 @@ export interface ListUsersRootState {
 	[LIST_USERS_BY_USER_FEATURE_KEY]: ListUsersState;
 }
 
+export const fetchListUsersByUser = createAsyncThunk('usersByUser/fetchListUsersByUser', async (_, thunkAPI) => {
+	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-export const fetchListUsersByUser = createAsyncThunk(
-	'usersByUser/fetchListUsersByUser',
-	async (_, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	
-		const response = await mezon.socketRef.current?.ListUsersByUserId();
-		if (!response?.user) {
-			return [];
-		}
-		const users = response?.user.map(mapUsersToEntity);
-		return users;
-	},
-);
+	const response = await mezon.socketRef.current?.ListUsersByUserId();
+	if (!response?.user) {
+		return [];
+	}
+	const users = response?.user.map(mapUsersToEntity);
+	return users;
+});
 
 export const initialListUsersByUserState: ListUsersState = listUsersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 
 export const listUsersByUserSlice = createSlice({
@@ -54,7 +50,7 @@ export const listUsersByUserSlice = createSlice({
 		add: listUsersAdapter.addOne,
 		removeAll: listUsersAdapter.removeAll,
 		remove: listUsersAdapter.removeOne,
-		update: listUsersAdapter.updateOne,
+		update: listUsersAdapter.updateOne
 	},
 	extraReducers: (builder) => {
 		builder
@@ -69,7 +65,7 @@ export const listUsersByUserSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -98,7 +94,7 @@ export const listUsersByUserReducer = listUsersByUserSlice.reducer;
 
 export const listUsersByUserActions = {
 	...listUsersByUserSlice.actions,
-	fetchListUsersByUser,
+	fetchListUsersByUser
 };
 
 /*
@@ -119,6 +115,7 @@ import { mess } from '@mezon/store';
  */
 const { selectAll } = listUsersAdapter.getSelectors();
 
-export const getUsersByUserState = (rootState: { [LIST_USERS_BY_USER_FEATURE_KEY]: ListUsersState }): ListUsersState => rootState[LIST_USERS_BY_USER_FEATURE_KEY];
+export const getUsersByUserState = (rootState: { [LIST_USERS_BY_USER_FEATURE_KEY]: ListUsersState }): ListUsersState =>
+	rootState[LIST_USERS_BY_USER_FEATURE_KEY];
 
 export const selectAllUsersByUser = createSelector(getUsersByUserState, selectAll);

@@ -1,5 +1,5 @@
-import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useAuth, useCategory, useChannelMembersActions, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { categoriesActions, selectCurrentClan, selectCurrentClanId, selectCurrentVoiceChannelId, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
@@ -14,6 +14,8 @@ import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
 import LeaveClanPopup from './LeaveClanPopup';
 import ModalCreateCategory from './ModalCreateCategory';
+import { useNavigate } from 'react-router-dom';
+import ModalConfirm from '../ModalConfirm';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -30,6 +32,11 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+  const { removeMemberClan } = useChannelMembersActions();
+	const { userProfile } = useAuth();
+	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
+	const currentClan = useSelector(selectCurrentClan);
+	const navigate = useNavigate();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -92,6 +99,13 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
   useEscapeKey(()=>setIsShowModalPanelClan(false))
+
+  const handleLeaveClan = async () => {
+		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
+		toggleLeaveClanPopup();
+		navigate("/mezon");
+	};
+
 	return (
 		<>
 			{type === 'direct' ? (
@@ -162,7 +176,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			)}
 
-			{isShowLeaveClanPopup && <LeaveClanPopup toggleShowPopup={toggleLeaveClanPopup}/>}
+			{isShowLeaveClanPopup && <ModalConfirm handleCancel={toggleLeaveClanPopup} handleConfirm={handleLeaveClan} leaveName={currentClan?.clan_name} title='leave' buttonName='Leave Clan'/> }
 
 			{openServerSettings && (
 				<ClanSetting

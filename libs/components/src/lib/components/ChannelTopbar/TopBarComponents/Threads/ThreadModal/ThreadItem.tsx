@@ -1,5 +1,5 @@
 import { useAppNavigation, useChatMessages, useClans } from '@mezon/core';
-import { ChannelsEntity, selectMemberByUserId } from '@mezon/store';
+import {ChannelsEntity, selectMemberByUserId, selectMembersByChannelId, useAppSelector} from '@mezon/store';
 import { convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
@@ -17,9 +17,10 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
+	const threadMembers = useAppSelector(selectMembersByChannelId(thread.channel_id));
+	const previewAvatarList = threadMembers.slice(0, 5).map(member => member?.user?.avatar_url);
 
 	const { avatarImg, username } = useMessageSender(user);
-	const { avatarClans, remainingMember } = useClans();
 	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
 
 	const timeMessage = useMemo(() => {
@@ -64,8 +65,8 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 				</div>
 				<div className="w-[120px]">
 					<Avatar.Group className="flex gap-3 justify-end">
-						{avatarClans?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
-						{remainingMember && remainingMember.length > 0 && <Avatar.Counter total={remainingMember?.length} className="h-6 w-6" />}
+						{previewAvatarList?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
+						{threadMembers && threadMembers.length > 5 && <Avatar.Counter total={threadMembers?.length - 5} className="h-6 w-6" />}
 					</Avatar.Group>
 				</div>
 			</div>

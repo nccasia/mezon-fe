@@ -31,7 +31,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			setContentPayload(content);
 			setMentionPayload(mentions);
@@ -51,7 +51,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				dispatch(directActions.updateLastSeenTime(lastMessage));
 			}
 		},
-		[sessionRef, clientRef, socketRef, channel, mode, dispatch, lastMessage],
+		[sessionRef, clientRef, socketRef, channel, mode, dispatch, lastMessage]
 	);
 
 	const loadMoreMessage = React.useCallback(async () => {
@@ -75,7 +75,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageUpdateImage.message_id,
+				newMessageUpdateImage.message_id
 			);
 		}
 		setContentPayload({});
@@ -87,8 +87,8 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			client,
 			sendDirectMessage,
 			loadMoreMessage,
-			sendMessageTyping,
+			sendMessageTyping
 		}),
-		[client, sendMessageTyping, sendDirectMessage, loadMoreMessage],
+		[client, sendMessageTyping, sendDirectMessage, loadMoreMessage]
 	);
 }

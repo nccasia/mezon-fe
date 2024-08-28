@@ -304,10 +304,14 @@ export function AddPerson(props: React.HTMLAttributes<SVGElement>) {
 export function AddServe(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
-			<path fill="currentColor" d="M10.55 4.4c.13-.24.1-.54-.12-.71L8.6 2.24a1 1 0 0 0-1.24 0l-4 3.15a1 1 0 0 0-.38.79v4.03c0 .43.5.66.82.39l2.28-1.9a3 3 0 0 1 3.84 0c.03.02.08 0 .08-.04V6.42a4 4 0 0 1 .55-2.02ZM7.36 10.23a1 1 0 0 1 1.28 0l1.18.99 2.98 2.48 1.84 1.53a1 1 0 0 1-.67 1.77.1.1 0 0 0-.1.09l-.23 3.06a2 2 0 0 1-2 1.85H4.36a2 2 0 0 1-2-1.85l-.24-3.16a1 1 0 0 1-.76-1.76l6-5Z" >
-			</path>
-			<path fill="currentColor" d="M12 10.2c0 .14.07.28.18.38l3.74 3.12a3 3 0 0 1 .03 4.58.55.55 0 0 0-.2.37l-.12 1.65a4 4 0 0 1-.17.9c-.12.38.13.8.52.8H20a2 2 0 0 0 2-2V3.61a1.5 1.5 0 0 0-2-1.41l-6.66 2.33A2 2 0 0 0 12 6.42">
-			</path>
+			<path
+				fill="currentColor"
+				d="M10.55 4.4c.13-.24.1-.54-.12-.71L8.6 2.24a1 1 0 0 0-1.24 0l-4 3.15a1 1 0 0 0-.38.79v4.03c0 .43.5.66.82.39l2.28-1.9a3 3 0 0 1 3.84 0c.03.02.08 0 .08-.04V6.42a4 4 0 0 1 .55-2.02ZM7.36 10.23a1 1 0 0 1 1.28 0l1.18.99 2.98 2.48 1.84 1.53a1 1 0 0 1-.67 1.77.1.1 0 0 0-.1.09l-.23 3.06a2 2 0 0 1-2 1.85H4.36a2 2 0 0 1-2-1.85l-.24-3.16a1 1 0 0 1-.76-1.76l6-5Z"
+			></path>
+			<path
+				fill="currentColor"
+				d="M12 10.2c0 .14.07.28.18.38l3.74 3.12a3 3 0 0 1 .03 4.58.55.55 0 0 0-.2.37l-.12 1.65a4 4 0 0 1-.17.9c-.12.38.13.8.52.8H20a2 2 0 0 0 2-2V3.61a1.5 1.5 0 0 0-2-1.41l-6.66 2.33A2 2 0 0 0 12 6.42"
+			></path>
 		</svg>
 	);
 }
@@ -1746,7 +1750,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4',
+	defaultSize = 'w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4'
 }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
@@ -2834,7 +2838,7 @@ export function IconClockChannel() {
 			<rect fill="url(#b)" height="56.67" rx="3.23" width="85.13" x="17.43" y="33.33" />
 			<rect fill="#ffd01a" height="56.67" rx="3.23" width="66.95" x="17.43" y="33.33" />
 			<g fill="none" strokeMiterlimit="10">
-				<g stroke="#ffa600" stroke-width="2.262054">
+				<g stroke="#ffa600" strokeWidth="2.262054">
 					<path d="m17.43 81.75h85.14" />
 					<path d="m17.43 41.58h66.95" />
 					<path d="m84.38 75.05h18.19" />
@@ -2844,7 +2848,7 @@ export function IconClockChannel() {
 					<path d="m84.38 48.28h18.19" />
 					<path d="m84.38 41.58h18.19" />
 				</g>
-				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" stroke-linecap="round" stroke-width="4.095565" />
+				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" strokeLinecap="round" strokeWidth="4.095565" />
 			</g>
 			<circle cx="50.91" cy="55.98" fill="#270813" r="5.96" />
 			<path d="m50.91 56-5.36 11.83a2.05 2.05 0 0 0 1.87 2.89h7a2.05 2.05 0 0 0 1.87-2.89z" fill="#270813" />
@@ -3349,18 +3353,44 @@ export const IconLock = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) =
 
 export const IconClock = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
 	return (
-		<svg className={defaultSize} aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" fillRule="evenodd" d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm1-18a1 1 0 1 0-2 0v7c0 .27.1.52.3.7l3 3a1 1 0 0 0 1.4-1.4L13 11.58V5Z" clipRule="evenodd" >
-			</path>
+		<svg
+			className={defaultSize}
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm1-18a1 1 0 1 0-2 0v7c0 .27.1.52.3.7l3 3a1 1 0 0 0 1.4-1.4L13 11.58V5Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
 
 export const IconProtected = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
 	return (
-		<svg className={defaultSize} aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" fillRule="evenodd" d="M4.27 5.22A2.66 2.66 0 0 0 3 7.5v2.3c0 5.6 3.3 10.68 8.42 12.95.37.17.79.17 1.16 0A14.18 14.18 0 0 0 21 9.78V7.5c0-.93-.48-1.78-1.27-2.27l-6.17-3.76a3 3 0 0 0-3.12 0L4.27 5.22ZM6 7.68l6-3.66V12H6.22C6.08 11.28 6 10.54 6 9.78v-2.1Zm6 12.01V12h5.78A11.19 11.19 0 0 1 12 19.7Z" clipRule="evenodd" >
-			</path>
+		<svg
+			className={defaultSize}
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M4.27 5.22A2.66 2.66 0 0 0 3 7.5v2.3c0 5.6 3.3 10.68 8.42 12.95.37.17.79.17 1.16 0A14.18 14.18 0 0 0 21 9.78V7.5c0-.93-.48-1.78-1.27-2.27l-6.17-3.76a3 3 0 0 0-3.12 0L4.27 5.22ZM6 7.68l6-3.66V12H6.22C6.08 11.28 6 10.54 6 9.78v-2.1Zm6 12.01V12h5.78A11.19 11.19 0 0 1 12 19.7Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
@@ -3369,39 +3399,63 @@ export const PicSuccessModal = ({ defaultFill = '#AEAEAE', defaultSize = '' }) =
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" height="130" width="158" className={defaultSize}>
 			<defs>
-				<rect id="a" height="80" rx="40" width="80"/>
+				<rect id="a" height="80" rx="40" width="80" />
 			</defs>
-			<g fill="none" fill-rule="evenodd">
-				<g stroke-linecap="round" stroke-width="2.252">
-					<path d="m151.113 82.556a4.556 4.556 0 1 1 -9.113 0 4.556 4.556 0 0 1 9.113 0zm-45.113-63a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-78 16a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-5 76a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-21-29a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0z" stroke="#595d63"/>
-					<path d="m42.927 43.17 1.235 1.234m6.266 6.266 1.235 1.235m-8.736.001 1.235-1.235m6.266-6.266 1.235-1.235" stroke="#494c51"/>
-					<path d="m124 60h3.341m3.659 0h3.341m-5.341-2.913v-1.087m0 8.087v-1.087" stroke="#494c51"/>
-					<path d="m131.532 112.483v-3.341m0-4.507v-3.34m-2.836 5.594h-1.087m7.847 0h-1.087" stroke="#595d63"/>
-					<path d="m40.468 128.753v-3.341m0-4.507v-3.34m2.836 5.594h1.087m-7.847 0h1.087" stroke="#595d63"/>
+			<g fill="none" fillRule="evenodd">
+				<g strokeLinecap="round" strokeWidth="2.252">
+					<path
+						d="m151.113 82.556a4.556 4.556 0 1 1 -9.113 0 4.556 4.556 0 0 1 9.113 0zm-45.113-63a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-78 16a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-5 76a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-21-29a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0z"
+						stroke="#595d63"
+					/>
+					<path d="m42.927 43.17 1.235 1.234m6.266 6.266 1.235 1.235m-8.736.001 1.235-1.235m6.266-6.266 1.235-1.235" stroke="#494c51" />
+					<path d="m124 60h3.341m3.659 0h3.341m-5.341-2.913v-1.087m0 8.087v-1.087" stroke="#494c51" />
+					<path d="m131.532 112.483v-3.341m0-4.507v-3.34m-2.836 5.594h-1.087m7.847 0h-1.087" stroke="#595d63" />
+					<path d="m40.468 128.753v-3.341m0-4.507v-3.34m2.836 5.594h1.087m-7.847 0h1.087" stroke="#595d63" />
 					<g stroke="#494c51">
-						<path d="m140.662 53.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087"/>
-						<path d="m95.662 13.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087"/>
-						<path d="m121.338 125.958v-3.341m0-4.507v-3.34m2.837 5.594h1.087m-7.848 0h1.087"/>
-						<path d="m48.152 11.155v3.34m0 4.508v3.34m2.837-5.593h1.087m-7.848 0h1.087"/>
-						<path d="m156.841 94.36-1.235 1.234m-6.266 6.266-1.234 1.235m8.735 0-1.235-1.235m-6.266-6.266-1.234-1.234"/>
+						<path d="m140.662 53.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087" />
+						<path d="m95.662 13.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087" />
+						<path d="m121.338 125.958v-3.341m0-4.507v-3.34m2.837 5.594h1.087m-7.848 0h1.087" />
+						<path d="m48.152 11.155v3.34m0 4.508v3.34m2.837-5.593h1.087m-7.848 0h1.087" />
+						<path d="m156.841 94.36-1.235 1.234m-6.266 6.266-1.234 1.235m8.735 0-1.235-1.235m-6.266-6.266-1.234-1.234" />
 					</g>
 				</g>
-				<path d="m151.353 98.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m127.841 33.36-1.234 1.234m-6.267 6.266-1.234 1.235m8.735 0-1.234-1.235m-6.267-6.266-1.234-1.235" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
-				<path d="m122.353 37.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m34.842 77.36-1.235 1.234m-6.267 6.266-1.234 1.235m8.736 0-1.235-1.235m-6.267-6.266-1.234-1.234" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
-				<path d="m29.353 81.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
-				<path d="m85 17v1.747m0 8.253v1.747m-6-5.747h1.747m9.253 0h1.747" stroke="#595d63" stroke-linecap="round" stroke-width="2.252"/>
-				<path d="m85.912 23.913a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
-				<path d="m147.729 118.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-130.729-19a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#494c51"/>
-				<path d="m61.729 29.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m6-17a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m21 35a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m22-6a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m42 28a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-137.729 53a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#595d63"/>
-				<path d="m19.54 50.917v2.128m0 8.861v1.747m-6.177-6.178h1.747m8.86 0h1.748" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
-				<path d="m20.333 58.268a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
+				<path d="m151.353 98.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51" />
+				<path
+					d="m127.841 33.36-1.234 1.234m-6.267 6.266-1.234 1.235m8.735 0-1.234-1.235m-6.267-6.266-1.234-1.235"
+					stroke="#494c51"
+					strokeLinecap="round"
+					strokeWidth="2.252"
+				/>
+				<path d="m122.353 37.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51" />
+				<path
+					d="m34.842 77.36-1.235 1.234m-6.267 6.266-1.234 1.235m8.736 0-1.235-1.235m-6.267-6.266-1.234-1.234"
+					stroke="#494c51"
+					strokeLinecap="round"
+					strokeWidth="2.252"
+				/>
+				<path d="m29.353 81.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51" />
+				<path d="m85 17v1.747m0 8.253v1.747m-6-5.747h1.747m9.253 0h1.747" stroke="#595d63" strokeLinecap="round" strokeWidth="2.252" />
+				<path d="m85.912 23.913a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51" />
+				<path
+					d="m147.729 118.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-130.729-19a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0"
+					fill="#494c51"
+				/>
+				<path
+					d="m61.729 29.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m6-17a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m21 35a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m22-6a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m42 28a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-137.729 53a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0"
+					fill="#595d63"
+				/>
+				<path
+					d="m19.54 50.917v2.128m0 8.861v1.747m-6.177-6.178h1.747m8.86 0h1.748"
+					stroke="#494c51"
+					strokeLinecap="round"
+					strokeWidth="2.252"
+				/>
+				<path d="m20.333 58.268a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51" />
 				<g transform="translate(40 43)">
-					<use stroke="#fff" stroke-opacity=".2" stroke-width="6" xlinkHref="#a"/>
-					<use xlinkHref="#a"/>
+					<use stroke="#fff" strokeOpacity=".2" strokeWidth="6" xlinkHref="#a" />
+					<use xlinkHref="#a" />
 				</g>
-				<path d="m62.77 81.24-5.17 5.28 13.785 14.08 31.015-29.92-5.17-5.28-25.845 24.64-8.616-8.8z" fill="#3ba55c"/>
+				<path d="m62.77 81.24-5.17 5.28 13.785 14.08 31.015-29.92-5.17-5.28-25.845 24.64-8.616-8.8z" fill="#3ba55c" />
 			</g>
 		</svg>
 	);
@@ -3418,16 +3472,28 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 	);
 };
 
-export const IconLoadingTyping = ({ iconFill = 'dark:fill-textDarkTheme fill-textPrimaryLight', width='18',height='8',bgFill='bg-transparent'}) => {
+export const IconLoadingTyping = ({
+	iconFill = 'dark:fill-textDarkTheme fill-textPrimaryLight',
+	width = '18',
+	height = '8',
+	bgFill = 'bg-transparent'
+}) => {
 	return (
-    <span  className={`rounded-lg flex items-center justify-center px-[2px] py-[1px] ${bgFill}`}>
-    <svg id="dots" width={width} height={height} viewBox="0 0 100 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-    <circle id="dot1" cx="13" cy="30" r="13" className={iconFill}></circle>
-    <circle id="dot2" cx="50" cy="30" r="13" className={iconFill}></circle>
-    <circle id="dot3" cx="86" cy="30" r="13" className={iconFill}></circle>
-</svg>
-    </span>
-
+		<span className={`rounded-lg flex items-center justify-center px-[2px] py-[1px] ${bgFill}`}>
+			<svg
+				id="dots"
+				width={width}
+				height={height}
+				viewBox="0 0 100 60"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				xmlnsXlink="http://www.w3.org/1999/xlink"
+			>
+				<circle id="dot1" cx="13" cy="30" r="13" className={iconFill}></circle>
+				<circle id="dot2" cx="50" cy="30" r="13" className={iconFill}></circle>
+				<circle id="dot3" cx="86" cy="30" r="13" className={iconFill}></circle>
+			</svg>
+		</span>
 	);
 };
 

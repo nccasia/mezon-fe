@@ -10,8 +10,8 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 		directActions.joinDirectMessage({
 			directMessageId: directId,
 			channelName: '',
-			type: Number(type),
-		}),
+			type: Number(type)
+		})
 	);
 
 	return null;

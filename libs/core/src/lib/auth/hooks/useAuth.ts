@@ -23,7 +23,7 @@ export function useAuth() {
 				return session;
 			}
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const loginByGoogle = useCallback(
@@ -33,9 +33,9 @@ export function useAuth() {
 			dispatch(accountActions.setAccount(session));
 			return session;
 		},
-		[dispatch],
+		[dispatch]
 	);
-	
+
 	const loginByApple = useCallback(
 		async (token: string) => {
 			const action = await dispatch(authActions.authenticateApple(token));
@@ -43,7 +43,7 @@ export function useAuth() {
 			dispatch(accountActions.setAccount(session));
 			return session;
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
@@ -53,8 +53,8 @@ export function useAuth() {
 			loginEmail,
 			loginByGoogle,
 			loginByApple,
-			fetchUserProfile,
+			fetchUserProfile
 		}),
-		[userProfile, userId, loginEmail, loginByGoogle, loginByApple, fetchUserProfile],
+		[userProfile, userId, loginEmail, loginByGoogle, loginByApple, fetchUserProfile]
 	);
 }

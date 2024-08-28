@@ -51,7 +51,7 @@ export const updateUserClanProfile = createAsyncThunk(
 		const body: ApiUpdateClanProfileRequest = {
 			clan_id: clanId,
 			nick_name: username || '',
-			avatar: avatarUrl || '',
+			avatar: avatarUrl || ''
 		};
 		const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body);
 		if (!response) {
@@ -59,14 +59,14 @@ export const updateUserClanProfile = createAsyncThunk(
 		}
 		thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
 		return response as true;
-	},
+	}
 );
 
 export const initialUserClanProfileState: UserClanProfileState = userClanProfileAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	showModalFooterProfile: false,
-	showModalCustomStatus: false,
+	showModalCustomStatus: false
 });
 
 export const userClanProfileSlice = createSlice({
@@ -83,7 +83,7 @@ export const userClanProfileSlice = createSlice({
 		},
 		setShowModalCustomStatus: (state, action: PayloadAction<boolean>) => {
 			state.showModalCustomStatus = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -98,7 +98,7 @@ export const userClanProfileSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const userClanProfileReducer = userClanProfileSlice.reducer;
@@ -106,7 +106,7 @@ export const userClanProfileReducer = userClanProfileSlice.reducer;
 export const userClanProfileActions = {
 	...userClanProfileSlice.actions,
 	fetchUserClanProfile,
-	updateUserClanProfile,
+	updateUserClanProfile
 };
 
 const { selectAll } = userClanProfileAdapter.getSelectors();

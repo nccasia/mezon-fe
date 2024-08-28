@@ -15,6 +15,10 @@
 			"options": {
 				"tasks": ["assembleRelease"]
 			}
-		}
+		},
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
 	}
 }

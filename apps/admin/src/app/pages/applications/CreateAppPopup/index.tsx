@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { useAppDispatch, createApplication } from '@mezon/store';
+import { createApplication, useAppDispatch } from '@mezon/store';
 import { ApiAddAppRequest } from 'mezon-js/api.gen';
 import { FormEvent, useState } from 'react';
 
@@ -20,20 +20,20 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			setNotification(
 				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
 					A name is required to create your new application.
-				</div>,
+				</div>
 			);
 		} else if (inputValue && !isChecked) {
 			return setNotification(
 				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
 					The <span className="font-semibold hover:underline">Terms of Service</span> must be accepted.
-				</div>,
+				</div>
 			);
 		} else {
 			setNotification(null);
 			const createRequest: ApiAddAppRequest = {
 				appname: inputValue,
 				creator_id: userProfile?.user?.id,
-				role: 0,
+				role: 0
 			};
 			await dispatch(createApplication({ request: createRequest }));
 			togglePopup();
@@ -76,7 +76,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
 						Cancel
 					</div>
-					<button type='submit' className="bg-blue-600 hover:bg-blue-800 text-white rounded-md px-[20px] py-[9px] cursor-pointer">
+					<button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white rounded-md px-[20px] py-[9px] cursor-pointer">
 						Create
 					</button>
 				</div>

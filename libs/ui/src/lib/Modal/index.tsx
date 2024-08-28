@@ -1,4 +1,3 @@
-
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { Hashtag, HashtagLocked, Speaker, SpeakerLocked } from '../Icons';
@@ -32,7 +31,7 @@ const Modal = (props: ModalProps) => {
 		subTitleBox,
 		classSubTitleBox,
 		classNameWrapperChild,
-		hasChannel,
+		hasChannel
 	} = props;
 	return (
 		showModal && (

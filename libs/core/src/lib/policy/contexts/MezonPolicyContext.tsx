@@ -12,7 +12,7 @@ type MezonPolicyValue = {
 };
 
 export const MezonPolicy = React.createContext<MezonPolicyValue>({
-	permissionKeys: [],
+	permissionKeys: []
 });
 
 export function MezonPolicyProvider({ children, clanId }: Props) {

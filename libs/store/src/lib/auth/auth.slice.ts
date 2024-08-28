@@ -27,7 +27,7 @@ export interface ISession {
 export const initialAuthState: AuthState = {
 	loadingStatus: 'not loaded',
 	session: null,
-	isLogin: false,
+	isLogin: false
 };
 
 function normalizeSession(session: Session): ISession {
@@ -113,7 +113,7 @@ export const authSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -129,7 +129,7 @@ export const authSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		
+
 		builder
 			.addCase(authenticateApple.pending, (state: AuthState) => {
 				state.loadingStatus = 'loading';
@@ -174,7 +174,7 @@ export const authSlice = createSlice({
 				state.session = null;
 				state.isLogin = false;
 			});
-	},
+	}
 });
 
 /*
@@ -188,7 +188,7 @@ export const authActions = {
 	authenticateApple,
 	authenticateEmail,
 	refreshSession,
-	logOut,
+	logOut
 };
 
 export const getAuthState = (rootState: { [AUTH_FEATURE_KEY]: AuthState }): AuthState => rootState[AUTH_FEATURE_KEY];

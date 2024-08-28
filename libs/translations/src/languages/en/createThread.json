@@ -1,13 +1,15 @@
 {
+  "threads": "Threads",
   "emptyThread": {
     "textNoThread": "There are no threads",
     "textNotify": "Stay focus on conversation with a threads - a temporary text channel.",
     "createThreads": "Create Thread"
   },
-  "otherThreads": "other Threads",
-  "joinedThreads": "joined threads",
+  "otherThreads": "OLDER THREADS",
+  "joinedThreads": "JOINED THREADS",
   "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).",
   "threadName": "Thread Name",
   "privateThread": "Private Thread",
-  "onlyPeopleInviteThread": "Only people you invite and moderators can see this thread"
+  "onlyPeopleInviteThread": "Only people you invite and moderators can see this thread",
+  "newThread": "New Thread"
 }

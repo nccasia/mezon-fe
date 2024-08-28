@@ -8,26 +8,21 @@ export function useMenu() {
 		async (status: boolean) => {
 			await dispatch(appActions.setCloseMenu(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setStatusMenu = React.useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setStatusMenu(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
-		() => (
-			{ 
-				setCloseMenu, 
-				setStatusMenu, 
-			}
-		),
-		[
-			setCloseMenu, 
-			setStatusMenu,
-		],
+		() => ({
+			setCloseMenu,
+			setStatusMenu
+		}),
+		[setCloseMenu, setStatusMenu]
 	);
 }

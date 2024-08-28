@@ -4,7 +4,7 @@ describe('app reducer', () => {
 	it('should handle initial state', () => {
 		const expected = appAdapter.getInitialState({
 			loadingStatus: 'not loaded',
-			error: null,
+			error: null
 		});
 
 		expect(appReducer(undefined, { type: '' })).toEqual(expected);
@@ -18,8 +18,8 @@ describe('app reducer', () => {
 				loadingStatus: 'loading',
 				error: null,
 				entities: {},
-				ids: [],
-			}),
+				ids: []
+			})
 		);
 
 		state = appReducer(state, fetchApp.fulfilled([{ id: 1 }], ''));
@@ -29,8 +29,8 @@ describe('app reducer', () => {
 				loadingStatus: 'loaded',
 				error: null,
 				entities: { 1: { id: 1 } },
-				ids: [1],
-			}),
+				ids: [1]
+			})
 		);
 
 		state = appReducer(state, fetchApp.rejected(new Error('Uh oh'), ''));
@@ -40,8 +40,8 @@ describe('app reducer', () => {
 				loadingStatus: 'error',
 				error: 'Uh oh',
 				entities: { 1: { id: 1 } },
-				ids: [1],
-			}),
+				ids: [1]
+			})
 		);
 	});
 });

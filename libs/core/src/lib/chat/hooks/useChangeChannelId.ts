@@ -1,28 +1,25 @@
-import { channelsActions, useAppDispatch } from "@mezon/store";
-import { useCallback, useMemo } from "react";
+import { channelsActions, useAppDispatch } from '@mezon/store';
+import { useCallback, useMemo } from 'react';
 
 export function useChangeChannelId() {
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-    const setIdChannelSelected = useCallback(
+	const setIdChannelSelected = useCallback(
 		(channelId: string, clanId: string) => {
-            dispatch(
-                channelsActions.setIdChannelSelected({
-                    clanId,
-                    channelId,
-                }),
-            );
-			
+			dispatch(
+				channelsActions.setIdChannelSelected({
+					clanId,
+					channelId
+				})
+			);
 		},
-		[dispatch],
+		[dispatch]
 	);
 
-    return useMemo(
+	return useMemo(
 		() => ({
-            setIdChannelSelected,
+			setIdChannelSelected
 		}),
-		[
-            setIdChannelSelected,
-        ],
+		[setIdChannelSelected]
 	);
 }

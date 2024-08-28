@@ -16,7 +16,7 @@ export const initialGifsStickersEmojisState: GifsStickersEmojisState = {
 	error: null,
 	subPanelActive: SubPanelName.NONE,
 	valueInputToCheckHandleSearchState: '',
-	placeHolder: 'Find the perfect emoji',
+	placeHolder: 'Find the perfect emoji'
 };
 
 export const gifsStickersEmojisSlice = createSlice({
@@ -31,8 +31,8 @@ export const gifsStickersEmojisSlice = createSlice({
 		},
 		setPlaceHolderInput: (state, action) => {
 			state.placeHolder = action.payload;
-		},
-	},
+		}
+	}
 });
 
 export const gifsStickerEmojiReducer = gifsStickersEmojisSlice.reducer;
@@ -46,7 +46,7 @@ export const selectSubPanelActive = createSelector(getgifsStickerEmojiState, (st
 
 export const selectValueInputSearch = createSelector(
 	getgifsStickerEmojiState,
-	(state: GifsStickersEmojisState) => state.valueInputToCheckHandleSearchState,
+	(state: GifsStickersEmojisState) => state.valueInputToCheckHandleSearchState
 );
 
 export const selectPlaceHolder = createSelector(getgifsStickerEmojiState, (state: GifsStickersEmojisState) => state.placeHolder);

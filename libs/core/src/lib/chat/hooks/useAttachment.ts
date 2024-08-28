@@ -8,21 +8,21 @@ export function useAttachments() {
 		(status: string) => {
 			dispatch(attachmentActions.setAttachment(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setOpenModalAttachment = useCallback(
 		(status: boolean) => {
 			dispatch(attachmentActions.setOpenModalAttachment(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMemo(
 		() => ({
 			setAttachment,
-			setOpenModalAttachment,
+			setOpenModalAttachment
 		}),
-		[setAttachment, setOpenModalAttachment],
+		[setAttachment, setOpenModalAttachment]
 	);
 }

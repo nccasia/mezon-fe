@@ -16,7 +16,7 @@ export type CustomLoaderFunction<Context = any> = {
 			dispatch: AppDispatch;
 			initialPath?: string;
 		},
-		handlerCtx?: unknown,
+		handlerCtx?: unknown
 	): DataFunctionReturnValue;
 } & {
 	hydrate?: boolean;
@@ -43,7 +43,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(appActions.setInitialParams(params));
 	return {
 		pathname,
-		redirectTo,
+		redirectTo
 	} as IAppLoaderData;
 };
 

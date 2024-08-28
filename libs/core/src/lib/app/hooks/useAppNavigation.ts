@@ -65,7 +65,7 @@ export function useAppNavigation() {
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
 			toDmGroupPageFromMainApp,
-			toMessageChannel,
+			toMessageChannel
 		}),
 		[
 			navigate,
@@ -79,7 +79,7 @@ export function useAppNavigation() {
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
 			toDmGroupPageFromMainApp,
-			toMessageChannel,
-		],
+			toMessageChannel
+		]
 	);
 }

@@ -51,8 +51,8 @@ export const fetchListFriendsCached = memoize(
 		maxAge: LIST_FRIEND_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[2] + args[3] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 type fetchListFriendsArgs = {
@@ -92,8 +92,8 @@ export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', a
 			err.json().then((data: any) => {
 				thunkAPI.dispatch(
 					friendsActions.setSentStatusMobile({
-						isSuccess: false,
-					}),
+						isSuccess: false
+					})
 				);
 				toast.error(data.message);
 			});
@@ -102,8 +102,8 @@ export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', a
 			if (data) {
 				thunkAPI.dispatch(
 					friendsActions.setSentStatusMobile({
-						isSuccess: true,
-					}),
+						isSuccess: true
+					})
 				);
 				thunkAPI.dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
@@ -123,7 +123,7 @@ export const sendRequestDeleteFriend = createAsyncThunk(
 		}
 		thunkAPI.dispatch(friendsActions.fetchListFriends({ noCache: true }));
 		return response;
-	},
+	}
 );
 
 export const sendRequestBlockFriend = createAsyncThunk('friends/requestBlockFriends', async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
@@ -141,7 +141,7 @@ export const initialFriendsState: FriendsState = friendsAdapter.getInitialState(
 	friends: [],
 	error: null,
 	currentTabStatus: 'all',
-	statusSentMobile: null,
+	statusSentMobile: null
 });
 
 export const friendsSlice = createSlice({
@@ -155,7 +155,7 @@ export const friendsSlice = createSlice({
 		},
 		setSentStatusMobile: (state, action: PayloadAction<IStatusSentMobile | null>) => {
 			state.statusSentMobile = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -174,7 +174,7 @@ export const friendsSlice = createSlice({
 			state.loadingStatus = 'error';
 			state.error = action.error.message ?? 'No valid ID or username was provided.';
 		});
-	},
+	}
 });
 
 export const friendsReducer = friendsSlice.reducer;
@@ -184,7 +184,7 @@ export const friendsActions = {
 	fetchListFriends,
 	sendRequestAddFriend,
 	sendRequestDeleteFriend,
-	sendRequestBlockFriend,
+	sendRequestBlockFriend
 };
 
 const { selectAll } = friendsAdapter.getSelectors();
@@ -200,7 +200,7 @@ export const selectFriendStatus = (userID: string) =>
 			otherPendingFriend: false,
 			myPendingFriend: false,
 			blockFriend: false,
-			friend: false,
+			friend: false
 		};
 
 		const friend = friends.find((friend) => friend.id === userID);

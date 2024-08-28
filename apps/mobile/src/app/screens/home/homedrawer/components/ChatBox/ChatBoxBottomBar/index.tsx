@@ -1,4 +1,3 @@
-import { useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
@@ -16,6 +15,7 @@ import {
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiSuggestion,
+	threadsActions,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -100,8 +100,6 @@ export const ChatBoxBottomBar = memo(
 		const emojiPicked = useSelector(selectEmojiSuggestion);
 		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
-		const { setOpenThreadMessageState } = useReference();
-		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
 		const inputTriggersConfig = useMemo(() => {
@@ -310,8 +308,8 @@ export const ChatBoxBottomBar = memo(
 					handleTextInputChange(targetMessage.content.t);
 					break;
 				case EMessageActionType.CreateThread:
-					setOpenThreadMessageState(true);
-					setValueThread(targetMessage);
+					dispatch(threadsActions.setOpenThreadMessageState(true));
+					dispatch(threadsActions.setValueThread(targetMessage));
 					timeoutRef.current = setTimeout(() => {
 						navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
 					}, 500);

@@ -38,7 +38,7 @@ export const fetchUsersClan = createAsyncThunk('UsersClan/fetchUsersClan', async
 
 export const initialUsersClanState: UsersClanState = UsersClanAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 
 export const UsersClanSlice = createSlice({
@@ -54,9 +54,9 @@ export const UsersClanSlice = createSlice({
 				changes: {
 					clan_nick: clanNick,
 					clan_avatar: clanAvt
-				},
+				}
 			});
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -72,7 +72,7 @@ export const UsersClanSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*

@@ -16,23 +16,23 @@ export function useDirectMembers({ channelId }: useDirectMembersOptions = {}) {
 		const roles = [
 			{
 				id: '',
-				title: '',
-			},
+				title: ''
+			}
 		];
 
 		return roles.map((role) => {
 			const categoryChannels = rawMembers.filter(
 				//   (member) => member && member?.role_id === role.id
-				(member) => member,
+				(member) => member
 			) as ChannelMembersEntity[];
 			return {
 				...role,
-				users: categoryChannels,
+				users: categoryChannels
 			};
 		});
 	}, [rawMembers]);
 
 	return {
-		members,
+		members
 	};
 }

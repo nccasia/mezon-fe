@@ -10,7 +10,7 @@ import {
 	selectMemberStatus,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { Button, Image, InputField } from '@mezon/ui';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,7 +21,7 @@ const tabData = [
 	{ title: 'All', value: 'all' },
 	{ title: 'Online', value: 'online' },
 	{ title: 'Pending', value: 'pending' },
-	{ title: 'Block', value: 'block' },
+	{ title: 'Block', value: 'block' }
 ];
 
 export default function FriendsPage() {
@@ -43,7 +43,7 @@ export default function FriendsPage() {
 
 	const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
 		usernames: [],
-		ids: [],
+		ids: []
 	});
 
 	useEffect(() => {
@@ -70,7 +70,7 @@ export default function FriendsPage() {
 	const resetField = () => {
 		setRequestAddFriend({
 			usernames: [],
-			ids: [],
+			ids: []
 		});
 	};
 	const handleAddFriend = async () => {
@@ -106,7 +106,7 @@ export default function FriendsPage() {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const closeMenuMobile = closeMenu && !statusMenu;
-	
+
 	const appearanceTheme = useSelector(selectTheme);
 	const addFriendImg = useMemo(() => {
 		if (appearanceTheme === 'light') {
@@ -212,7 +212,9 @@ export default function FriendsPage() {
 									height={48}
 									className="object-cover w-[376px]"
 								/>
-								<div className='dark:text-contentTertiary text-textLightTheme'>Komuu is waiting on friends. You don't have to, though!</div>
+								<div className="dark:text-contentTertiary text-textLightTheme">
+									Komuu is waiting on friends. You don't have to, though!
+								</div>
 							</div>
 						</div>
 					)}

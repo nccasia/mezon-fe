@@ -13,6 +13,6 @@ export const useDeleteMessageHook = (channelId: string, channelLabel: string, mo
 		deleteMessage,
 		setDeleteMessage,
 		handleDeleteMessage,
-		deleteSendMessage,
+		deleteSendMessage
 	};
 };

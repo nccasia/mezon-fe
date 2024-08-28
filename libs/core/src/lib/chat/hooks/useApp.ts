@@ -7,38 +7,38 @@ export function useApp() {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	// TODO: separate theme into a separate hook
 	const appearanceTheme = useSelector(selectTheme);
-	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
+	const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)');
 	const elementHTML = document.documentElement;
 
 	const setAppearanceTheme = useCallback(
 		(value: string) => {
 			dispatch(appActions.setTheme(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIsShowMemberList = useCallback(
 		(value: boolean) => {
 			dispatch(appActions.setIsShowMemberList(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
-	
-	useEffect(()=>{
-		switch(appearanceTheme){
+
+	useEffect(() => {
+		switch (appearanceTheme) {
 			case undefined:
 				setAppearanceTheme('dark');
 				break;
-			case "dark":
+			case 'dark':
 				elementHTML.classList.add('dark');
 				break;
-			case "light":
+			case 'light':
 				elementHTML.classList.remove('dark');
 				break;
 			default:
 				break;
 		}
-	}, [appearanceTheme])
+	}, [appearanceTheme]);
 
 	return useMemo(
 		() => ({
@@ -46,8 +46,8 @@ export function useApp() {
 			setIsShowMemberList,
 			setAppearanceTheme,
 			systemIsDark,
-			elementHTML,
+			elementHTML
 		}),
-		[ isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark, elementHTML],
+		[isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark, elementHTML]
 	);
 }

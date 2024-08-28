@@ -11,7 +11,7 @@ export function useUserRestriction(restrictions: EPermission[]) {
 		if (!Array.isArray(restrictions)) {
 			return true;
 		}
-		if (restrictions.length===0) {
+		if (restrictions.length === 0) {
 			return true;
 		}
 		return restrictions.every((restriction) => permissionKeys.includes(restriction));

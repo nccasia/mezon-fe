@@ -1,17 +1,17 @@
 import {
-    selectAllChannels,
-    selectAllThreads,
-    selectCurrentChannel,
-    selectCurrentChannelId,
-    selectIsPrivate,
-    selectIsShowCreateThread,
-    selectListThreadId,
-    selectMessageThreadError,
-    selectNameThreadError,
-    selectNameValueThread,
-    selectValueThread,
-    threadsActions,
-    useAppDispatch,
+	selectAllChannels,
+	selectAllThreads,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectIsPrivate,
+	selectIsShowCreateThread,
+	selectListThreadId,
+	selectMessageThreadError,
+	selectNameThreadError,
+	selectNameValueThread,
+	selectValueThread,
+	threadsActions,
+	useAppDispatch
 } from '@mezon/store';
 import { IMessageWithUser, isGreaterOneMonth } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
@@ -40,28 +40,28 @@ export function useThreads() {
 		(value: boolean) => {
 			dispatch(threadsActions.setOpenThreadMessageState(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
 		},
-		[currentChannelId, dispatch],
+		[currentChannelId, dispatch]
 	);
 
 	const setNameValueThread = useCallback(
 		(nameValue: string) => {
 			dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue }));
 		},
-		[currentChannelId, dispatch],
+		[currentChannelId, dispatch]
 	);
 
 	const setValueThread = useCallback(
 		(value: IMessageWithUser | null) => {
 			dispatch(threadsActions.setValueThread(value));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const threadChannel = useMemo(() => {
@@ -107,7 +107,7 @@ export function useThreads() {
 			setNameValueThread,
 			setValueThread,
 			setOpenThreadMessageState,
-			setTurnOffThreadMessage,
+			setTurnOffThreadMessage
 		}),
 		[
 			isPrivate,
@@ -125,7 +125,7 @@ export function useThreads() {
 			setIsShowCreateThread,
 			setValueThread,
 			setOpenThreadMessageState,
-			setTurnOffThreadMessage,
-		],
+			setTurnOffThreadMessage
+		]
 	);
 }

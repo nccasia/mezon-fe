@@ -15,13 +15,13 @@ export const useChatScroll = (
 	targetRef: React.MutableRefObject<Element>,
 	data: IChatScrollData,
 	loadMoreCb: ILoadMoreCb,
-	options?: IUseChatScrollOptions,
+	options?: IUseChatScrollOptions
 ): IUseChatScrollReturn => {
 	const {
 		disable: disableReverseInfiniteScroll,
 		enable: enableReverseInfiniteScroll,
 		enabled: reverseInfiniteScrollEnabled,
-		updateLoadMoreCb,
+		updateLoadMoreCb
 	} = useReverseInfiniteScroll(targetRef, data, loadMoreCb, options?.reverseInfiniteScroll ?? {});
 
 	const {
@@ -30,7 +30,7 @@ export const useChatScroll = (
 		enabled: stickyScrollEnabled,
 		scrollToBottom,
 		scrollToMessage,
-		sticky,
+		sticky
 	} = useStickyScroll(targetRef, data, options?.stickyScroll ?? {});
 
 	return {
@@ -43,7 +43,7 @@ export const useChatScroll = (
 		sticky,
 		scrollToBottom,
 		scrollToMessage,
-		updateLoadMoreCb,
+		updateLoadMoreCb
 	};
 };
 

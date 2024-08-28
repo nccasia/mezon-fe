@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: size.s_10,
     marginTop: size.s_30
-  }
+  },
+  titleModal: {flex: 1, textAlign: 'center' }
 })
 
