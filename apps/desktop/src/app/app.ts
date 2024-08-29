@@ -6,7 +6,7 @@ import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
-import { setup } from './push-receiver';
+import { setupPushReceiver } from './services/push-receiver';
 
 const isQuitting = false;
 
@@ -46,7 +46,7 @@ export default class App {
 			tray.init(isQuitting);
 		}
 
-		setup(App.mainWindow.webContents);
+		setupPushReceiver(App.mainWindow.webContents);
 	}
 
 	private static onActivate() {

@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import Store from 'electron-store';
 import { listen, register } from 'push-receiver-v2';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import {
 	NOTIFICATION_RECEIVED,
 	NOTIFICATION_SERVICE_ERROR,
@@ -28,7 +28,7 @@ const firebaseConfig = {
 let started = false;
 
 // To be call from the main process
-export function setup(webContents: Electron.WebContents) {
+function setup(webContents: Electron.WebContents) {
 	// Will be called by the renderer process
 	ipcMain.on(START_NOTIFICATION_SERVICE, async (_, senderId: string) => {
 		// Retrieve saved credentials
@@ -78,3 +78,5 @@ function onNotificationFactory(webContents: Electron.WebContents) {
 		}
 	};
 }
+
+export { setup as setupPushReceiver };
