@@ -1,5 +1,5 @@
 import { ExitSetting, Icons, SettingAccount, SettingAppearance, SettingItem, SettingRightProfile } from '@mezon/components';
-import { useSettingFooter } from '@mezon/core';
+import { useEscapeKey, useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
 import { EUserSettings } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -25,6 +25,9 @@ const Setting = () => {
 	useEffect(() => {
 		setCurrentSetting(isShowSettingFooter?.initTab || 'Account');
 	}, [isShowSettingFooter?.initTab]);
+
+	useEscapeKey(closeSetting);
+
 	return (
 		<div>
 			{isShowSettingFooter?.status ? (

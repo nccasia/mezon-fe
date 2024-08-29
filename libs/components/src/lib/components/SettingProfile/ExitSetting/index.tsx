@@ -1,5 +1,3 @@
-import { useEscapeKey } from '@mezon/core';
-
 export type ModalExitProps = {
 	onClose: () => void;
 };
@@ -8,8 +6,6 @@ const ExitSetting = (props: ModalExitProps) => {
 	const handleClose = () => {
 		onClose();
 	};
-
-	useEscapeKey(handleClose);
 
 	return (
 		<div className="relative dark:bg-bgPrimary bg-[#ffff] w-1/12 xl:w-1/5 flex-grow hidden sbm:block">

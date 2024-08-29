@@ -1,37 +1,41 @@
-import { selectAllEmojiSuggestion } from '@mezon/store';
+import { useEscapeKey } from '@mezon/core';
+import { selectAllEmojiSuggestion, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { Modal } from '@mezon/ui';
 import { EEmojiCategory } from '@mezon/utils';
+import { ClanEmoji } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import ModalSticker, { EGraphicType } from '../SettingSticker/ModalEditSticker';
 import SettingEmojiList from './SettingEmojiList';
-import ModalSticker, {EGraphicType} from "../SettingSticker/ModalEditSticker";
-import { ClanEmoji } from "mezon-js";
-import { Modal } from "@mezon/ui";
-import {useEscapeKey} from "@mezon/core";
 
 const SettingEmoji = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM && emoji?.src);
-	const [selectedEmoji, setSelectedEmoji] = useState<ClanEmoji | null> (null);
-	const [isOpenEditModal, setIsOpenEditModal] = useState<boolean> (false);
-	
+	const [selectedEmoji, setSelectedEmoji] = useState<ClanEmoji | null>(null);
+	const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
+
 	const handleOpenUpdateEmojiModal = (emoji: ClanEmoji) => {
 		setSelectedEmoji(emoji);
 		setIsOpenEditModal(true);
-	}
-	
+		dispatch(settingClanStickerActions.openModalInChild());
+	};
+
 	const handleCreateEmoji = () => {
 		setSelectedEmoji(null);
 		setIsOpenEditModal(true);
-	}
-	
+		dispatch(settingClanStickerActions.openModalInChild());
+	};
+
 	const handleCloseModal = () => {
 		setIsOpenEditModal(false);
-	}
-	
+		dispatch(settingClanStickerActions.closeModalInChild());
+	};
+
 	useEscapeKey(handleCloseModal);
-	
+
 	return (
 		<>
 			<div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
@@ -55,17 +59,17 @@ const SettingEmoji = () => {
 				</div>
 			</div>
 
-			<SettingEmojiList title={'Emoji'} emojiList={emojiList} onUpdateEmoji={handleOpenUpdateEmojiModal}/>
+			<SettingEmojiList title={'Emoji'} emojiList={emojiList} onUpdateEmoji={handleOpenUpdateEmojiModal} />
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
-			
+
 			{isOpenEditModal && (
 				<Modal
-	        showModal={isOpenEditModal}
-	        onClose={handleCloseModal}
-	        classNameBox={'max-w-[600px]'}
-	        children={<ModalSticker graphic={selectedEmoji} handleCloseModal={handleCloseModal} type={EGraphicType.EMOJI}/>}
+					showModal={isOpenEditModal}
+					onClose={handleCloseModal}
+					classNameBox={'max-w-[600px]'}
+					children={<ModalSticker graphic={selectedEmoji} handleCloseModal={handleCloseModal} type={EGraphicType.EMOJI} />}
 				/>
 			)}
 		</>

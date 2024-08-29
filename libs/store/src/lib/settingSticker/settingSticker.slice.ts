@@ -4,7 +4,6 @@ import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, cre
 import memoizee from 'memoizee';
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
-import { stickersSlice } from '../giftStickerEmojiPanel/stickers.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
@@ -13,6 +12,7 @@ const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
 export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	hasGrandchildModal: boolean;
 }
 export interface FetchStickerArgs {
 	clanId: string;
@@ -29,7 +29,8 @@ export const stickerAdapter = createEntityAdapter({
 
 export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null
+	error: null,
+	hasGrandchildModal: false
 });
 const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
@@ -104,7 +105,14 @@ export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker'
 export const settingClanStickerSlice = createSlice({
 	name: SETTING_CLAN_STICKER,
 	initialState: initialSettingClanStickerState,
-	reducers: {},
+	reducers: {
+		openModalInChild: (state) => {
+			state.hasGrandchildModal = true;
+		},
+		closeModalInChild: (state) => {
+			state.hasGrandchildModal = false;
+		}
+	},
 	extraReducers(builder) {
 		builder
 			.addCase(fetchStickerByClanId.fulfilled, (state: SettingClanStickerState, actions) => {
@@ -122,7 +130,7 @@ export const settingClanStickerSlice = createSlice({
 });
 
 export const stickerSettingActions = {
-	...stickersSlice.actions,
+	...settingClanStickerSlice.actions,
 	fetchStickerByClanId
 };
 
@@ -130,6 +138,7 @@ export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: Sett
 	rootState[SETTING_CLAN_STICKER];
 const { selectAll, selectEntities } = stickerAdapter.getSelectors();
 export const selectAllStickerSuggestion = createSelector(getStickerSettingState, selectAll);
+export const hasGrandchildModal = createSelector(getStickerSettingState, (state) => state.hasGrandchildModal);
 export const selectStickerSuggestionEntities = createSelector(getStickerSettingState, selectEntities);
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByClanId };

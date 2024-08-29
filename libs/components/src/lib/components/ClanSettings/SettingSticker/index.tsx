@@ -1,12 +1,12 @@
+import { useEscapeKey } from '@mezon/core';
 import { selectAllStickerSuggestion, selectCurrentClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
-import ModalSticker, {EGraphicType} from './ModalEditSticker';
+import ModalSticker, { EGraphicType } from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
-import {useEscapeKey} from "@mezon/core";
 
 const SettingSticker = () => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
@@ -14,23 +14,29 @@ const SettingSticker = () => {
 	const listSticker = useSelector(selectAllStickerSuggestion);
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const dispatch = useAppDispatch();
+
 	const handleUpdateSticker = (sticker: ClanSticker) => {
 		setEditSticker(sticker);
 		setShowModalSticker(true);
+		dispatch(settingClanStickerActions.openModalInChild());
 	};
+
 	const handleCloseModal = () => {
 		setShowModalSticker(false);
 		setEditSticker(null);
+		dispatch(settingClanStickerActions.closeModalInChild());
 	};
+
 	const handleOpenModalUpload = () => {
 		setShowModalSticker(true);
+		dispatch(settingClanStickerActions.openModalInChild());
 	};
 	useEffect(() => {
-		dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId }))
-	},[])
-	
+		dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId }));
+	}, []);
+
 	useEscapeKey(handleCloseModal);
-	
+
 	return (
 		<>
 			<div className="flex flex-col gap-6 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
@@ -49,7 +55,7 @@ const SettingSticker = () => {
 					</div>
 					<Button label="upload sticker" className="capitalize" onClick={handleOpenModalUpload}></Button>
 				</div>
-				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] w">
+				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] md:gap-x-[calc((100%_-_116px_*_6)/5)]">
 					{listSticker.map((sticker) => (
 						<SettingStickerItem key={sticker.id} sticker={sticker} updateSticker={handleUpdateSticker} />
 					))}
@@ -67,7 +73,9 @@ const SettingSticker = () => {
 				showModal={showModalSticker}
 				onClose={handleCloseModal}
 				classNameBox={'max-w-[600px]'}
-				children={<ModalSticker key={editSticker?.id} graphic={editSticker} handleCloseModal={handleCloseModal} type={EGraphicType.STICKER}/>}
+				children={
+					<ModalSticker key={editSticker?.id} graphic={editSticker} handleCloseModal={handleCloseModal} type={EGraphicType.STICKER} />
+				}
 			/>
 		</>
 	);
