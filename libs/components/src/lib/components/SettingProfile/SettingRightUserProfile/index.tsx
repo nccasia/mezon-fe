@@ -13,20 +13,18 @@ const SettingRightUser = ({
 	onClanProfileClick,
 	name,
 	avatar,
-	nameDisplay,
-	aboutMe,
-	menuIsOpen,
+	currentDisplayName,
+	aboutMe
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
 	avatar: string;
-	nameDisplay: string;
+	currentDisplayName: string;
 	aboutMe: string;
-	menuIsOpen: boolean;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
-	const [displayName, setDisplayName] = useState(nameDisplay);
+
 	const [urlImage, setUrlImage] = useState(avatar);
 	const { updateUser } = useAccount();
 	const [flags, setFlags] = useState(true);
@@ -36,9 +34,12 @@ const SettingRightUser = ({
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const currentClanId = useSelector(selectCurrentClanId) || '';
+
+	const [valueDisplayName, setValueDisplayName] = useState<string>(currentDisplayName || '');
+
 	const handleUpdateUser = async () => {
-		if (name || urlImage || displayName || editAboutUser) {
-			await updateUser(name, urlImage, displayName, editAboutUser);
+		if (name || urlImage || valueDisplayName || editAboutUser) {
+			await updateUser(name, urlImage, valueDisplayName, editAboutUser);
 			if (currentChannelId && currentClanId) {
 				await dispatch(
 					channelMembersActions.fetchChannelMembers({
@@ -46,8 +47,8 @@ const SettingRightUser = ({
 						channelId: currentChannelId || '',
 						channelType: ChannelType.CHANNEL_TYPE_TEXT,
 						noCache: true,
-						repace: true,
-					}),
+						repace: true
+					})
 				);
 			}
 		}
@@ -76,13 +77,15 @@ const SettingRightUser = ({
 			e.target.value = null;
 			return;
 		}
-		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', imageAvatarResize?.name, imageAvatarResize).then((attachment: any) => {
-			setUrlImage(attachment.url ?? '');
-		});
+		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', imageAvatarResize?.name, imageAvatarResize).then(
+			(attachment: any) => {
+				setUrlImage(attachment.url ?? '');
+			}
+		);
 		setFlags(true);
 	};
 	const handleClose = () => {
-		setDisplayName(nameDisplay);
+		setValueDisplayName(currentDisplayName);
 		setEditAboutUser(aboutMe);
 		setUrlImage(avatar);
 		setFlags(false);
@@ -92,11 +95,11 @@ const SettingRightUser = ({
 		setFlags(false);
 	};
 	const editProfile: Profilesform = {
-		displayName: displayName || '',
-		urlImage: urlImage || '',
+		displayName: valueDisplayName || '',
+		urlImage: urlImage || ''
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setDisplayName(e.target.value);
+		setValueDisplayName(e.target.value);
 		setFlags(true);
 	};
 
@@ -108,7 +111,7 @@ const SettingRightUser = ({
 	const handleRemoveButtonClick = () => {
 		setFlagsRemoveAvartar(true);
 		setFlags(true);
-		setUrlImage(process.env.NX_LOGO_MEZON || "");
+		setUrlImage(process.env.NX_LOGO_MEZON || '');
 	};
 	const onchangeAboutUser = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setEditAboutUser(e.target.value);
@@ -116,19 +119,10 @@ const SettingRightUser = ({
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (
-		<div
-			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
-		>
-			<div className="dark:text-white text-black">
-				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-semibold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-semibold tracking-wider" onClick={handleClanProfileButtonClick}>
-					Clan Profiles
-				</button>
-			</div>
-			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 sbm:flex-row flex-col">
+		<>
+			<div className="flex-1 flex z-0 gap-x-8 sbm:flex-row flex-col">
 				<div className="flex-1 dark:text-[#CCCCCC] text-black">
-					<div className="mt-[20px]">
+					<div>
 						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
 							DISPLAY NAME
 						</label>
@@ -137,9 +131,9 @@ const SettingRightUser = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full border px-4 py-2 mt-2 focus:outline-none focus:border-white-500 font-normal text-sm tracking-wide"
-							placeholder={displayName}
-							value={displayName}
+							className="bg-bgTertiary rounded-[3px] w-full px-4 py-2 mt-2 focus:outline-none font-normal text-sm tracking-wide"
+							placeholder={valueDisplayName || name}
+							value={valueDisplayName}
 							maxLength={32}
 						/>
 					</div>
@@ -186,7 +180,7 @@ const SettingRightUser = ({
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||
-			(displayName !== nameDisplay && flags) ||
+			(valueDisplayName !== currentDisplayName && flags) ||
 			(flagsRemoveAvartar !== false && flags) ||
 			(editAboutUser !== aboutMe && flags) ? (
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
@@ -218,7 +212,7 @@ const SettingRightUser = ({
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
-		</div>
+		</>
 	);
 };
 export default SettingRightUser;

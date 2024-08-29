@@ -394,6 +394,10 @@ export const channelsSlice = createSlice({
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+		},
+		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
+			delete state.idChannelSelected[action.payload.clanId];
+			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
 		}
 	},
 	extraReducers: (builder) => {

@@ -46,38 +46,23 @@ export const useStickyScroll = (
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
 	const [sticky, setSticky] = useState<boolean>(true);
 	const stickyRef = useRef(sticky);
-	const animationRef = useRef<ReturnType<typeof brushForceCall>>();
 	const { setScrollEventHandler } = useScroll(targetRef);
 
-	const { data: items } = data;
+	const { data: messages } = data;
 
-	const lastItemId = useMemo(() => {
-		return items.length > 0 ? items[items.length - 1] : '';
-	}, [items]);
+	const lastMessageId = useMemo(() => {
+		return messages.length > 0 ? messages[messages.length - 1]?.id : null;
+	}, [messages]);
 
-	const moveScrollToBottom = useCallback(async () => {
-		if (animationRef.current) {
-			animationRef.current.cancel();
-		}
-
-		if (!targetRef.current) {
-			return false;
-		}
-
-		function moveScroll() {
+	const moveScrollToBottom = useCallback(() => {
+		return new Promise<boolean>((resolve) => {
+			if (!targetRef.current) {
+				return resolve(false);
+			}
 			targetRef.current.scrollTop = targetRef.current.scrollHeight;
-			return false;
-		}
-
-		// try to move scroll to bottom multiple times to ensure it is at the bottom
-		// that is because sometimes the message is not yet rendered
-		// and scroll is not at the bottom
-		// animationRef.current = brushForceCall(moveScroll, 500);
-
-		// temporary fix for the stuck scroll issue
-		moveScroll();
-		return true;
-	}, [targetRef, animationRef]);
+			resolve(true);
+		});
+	}, [targetRef]);
 
 	const updateStuckToBottom = useCallback(() => {
 		if (!targetRef.current) {
@@ -122,32 +107,25 @@ export const useStickyScroll = (
 	/**
 	 * Scrolls to message with given id.
 	 */
-	const scrollToMessage = async (id: string) => {
-		if (animationRef.current) {
-			animationRef.current.cancel();
-		}
-
-		if (!targetRef.current) {
-			return false;
-		}
-
-		function moveScroll() {
-			const messageElement = targetRef.current.querySelector(`#${id}`);
-			if (messageElement) {
-				messageElement.scrollIntoView();
-				return true;
-			}
-			return false;
-		}
-
-		// try to move scroll to message multiple times to ensure it is at the message
-		// that is because sometimes the message is not yet rendered
-		// animationRef.current = brushForceCall(moveScroll, 500);
-
-		// temporary fix for the stuck scroll issue
-		moveScroll();
-		return true;
-	};
+	const scrollToMessage = useCallback(
+		(id: string) => {
+			let scrollTimeoutId: NodeJS.Timeout | null = null;
+			return new Promise<boolean>((resolve) => {
+				scrollTimeoutId && clearTimeout(scrollTimeoutId);
+				scrollTimeoutId = setTimeout(() => {
+					requestAnimationFrame(() => {
+						const messageElement = targetRef.current.querySelector(`#msg-${id}`);
+						if (messageElement) {
+							messageElement.scrollIntoView({ behavior: 'instant' });
+							return resolve(true);
+						}
+						return resolve(false);
+					});
+				}, 0);
+			});
+		},
+		[targetRef]
+	);
 
 	/**
 	 * Enables sticky scroll behavior.
@@ -159,13 +137,19 @@ export const useStickyScroll = (
 	 */
 	const disable = () => setEnabled(false);
 
+	useEffect(() => {
+		requestAnimationFrame(() => {
+			scrollToBottom();
+		});
+	}, []);
+
 	// update sticky scroll state when data changes
 	useEffect(() => {
 		stickyRef.current = sticky;
 		if (sticky) {
-			scrollToBottom();
+			scrollToMessage(lastMessageId);
 		}
-	}, [lastItemId, targetRef, sticky, scrollToBottom]);
+	}, [lastMessageId, stickyRef, sticky, scrollToMessage]);
 
 	return {
 		enabled,

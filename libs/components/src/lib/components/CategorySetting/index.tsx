@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/ui';
-import { ICategory } from '@mezon/utils';
+import { ICategoryChannel } from '@mezon/utils';
 import React, { useState } from 'react';
 import ExitSetting from '../ChannelSetting/exitSetting';
 import { categorySettingItem, categorySettingList, ItemObjProps } from '../ClanSettings/ItemObj';
@@ -8,7 +8,7 @@ import OverviewSetting from './OverviewSetting';
 
 interface ICategorySettingProps {
 	onClose: () => void;
-	category: ICategory | null;
+	category: ICategoryChannel;
 }
 
 const CategorySetting: React.FC<ICategorySettingProps> = ({ onClose, category }) => {
@@ -47,7 +47,7 @@ const CategorySetting: React.FC<ICategorySettingProps> = ({ onClose, category })
 						handleMenu={(value: boolean) => setMenu(value)}
 						currentSetting={currentSetting}
 						setIsShowDeletePopup={() => setIsShowDeletePopup(true)}
-						categoryName={category?.category_name || ''}
+						category={category}
 					/>
 				</div>
 				<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[40px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">

@@ -8,14 +8,14 @@ import {
 	selectIsUseProfileDM,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import MemberProfile from '../../MemberProfile';
@@ -41,14 +41,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		async (status: boolean) => {
 			await dispatch(appActions.setIsUseProfileDM(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const setIsShowMemberListDM = useCallback(
 		async (status: boolean) => {
 			await dispatch(appActions.setIsShowMemberListDM(status));
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return (
@@ -131,7 +131,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 						<SearchMessageChannel
 							mode={
-								currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM
+								currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 									? ChannelStreamMode.STREAM_MODE_DM
 									: ChannelStreamMode.STREAM_MODE_GROUP
 							}

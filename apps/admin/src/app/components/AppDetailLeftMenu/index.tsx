@@ -1,4 +1,8 @@
+import { selectAllApps, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { Dropdown } from 'flowbite-react';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { ITabs } from '../../common/constants/tabSideBar';
 
@@ -9,6 +13,13 @@ interface ISideBarProps {
 }
 
 const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps) => {
+	const [dropdownValue, setDropdownValue] = useState('Choose application');
+	const handleDropdownValue = (text: string) => {
+		setDropdownValue(text);
+	};
+	const appearanceTheme = useSelector(selectTheme);
+	const allApps = useSelector(selectAllApps);
+
 	return (
 		<div className="flex flex-col gap-6 items-center w-full ">
 			<Link to={'/admin/applications'} className="w-full flex gap-1 items-center">
@@ -19,6 +30,32 @@ const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps)
 			</Link>
 			<div className="w-full">
 				<div className="text-[12px] font-semibold">SELECT APP</div>
+				<Dropdown
+					trigger="click"
+					renderTrigger={() => (
+						<div className="w-full h-[40px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
+							<p className="truncate max-w-[90%]">{dropdownValue}</p>
+							<div>
+								<Icons.ArrowDownFill />
+							</div>
+						</div>
+					)}
+					label=""
+					placement="bottom-end"
+					className={`dark:bg-black bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+				>
+					{allApps.apps &&
+						allApps.apps.map((item) => (
+							<Dropdown.Item
+								key={item.id}
+								children={<div>{item.appname}</div>}
+								onClick={() => {
+									handleDropdownValue(item.appname as string);
+								}}
+								className={`truncate`}
+							/>
+						))}
+				</Dropdown>
 			</div>
 			<div className="w-full">
 				<div className="text-[12px] font-semibold mb-2">SETTINGS</div>

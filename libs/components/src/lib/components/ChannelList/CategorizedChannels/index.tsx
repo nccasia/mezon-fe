@@ -1,4 +1,4 @@
-import { UserRestrictionZone, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
 import { categoriesActions, channelsActions, defaultNotificationCategoryActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
@@ -6,6 +6,7 @@ import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import CategorySetting from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
+import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';
 import ChannelListItem from '../ChannelListItem';
 
@@ -24,9 +25,11 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		mouseY: 0,
 		distanceToBottom: 0
 	});
+	const [showModal, setShowModal] = useState(false);
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
 	const [isShowCategoryChannels, setIsShowCategoryChannels] = useState<boolean>(true);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
 
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
@@ -70,6 +73,16 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		openModalCreateNewChannel(category);
 	};
 
+	const openModalDeleteCategory = () => {
+		setShowModal(true);
+		setIsShowPanelCategory(false);
+	};
+
+	const confirmDeleteCategory = async () => {
+		handleDeleteCategory({ category });
+		setShowModal(false);
+	};
+
 	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
 
 	useEscapeKey(() => setIsShowPanelCategory(false));
@@ -106,8 +119,21 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						<PanelCategory
 							coords={coords}
 							setIsShowPanelChannel={setIsShowPanelCategory}
+							onDeleteCategory={openModalDeleteCategory}
 							setOpenSetting={setIsShowCategorySetting}
 							category={category}
+						/>
+					)}
+
+					{showModal && (
+						<ModalConfirm
+							handleCancel={() => setShowModal(false)}
+							modalName={category.category_name || ''}
+							handleConfirm={confirmDeleteCategory}
+							title="delete"
+							buttonName="Delete category"
+							message="This cannot be undone"
+							customModalName="Category"
 						/>
 					)}
 

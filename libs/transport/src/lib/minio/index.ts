@@ -122,7 +122,9 @@ export function createUploadFilePath(
 	if (!currentClanId) {
 		currentClanId = '0';
 	}
-
+	if (!currentChannelId) {
+		currentChannelId = '0';
+	}
 	const filePath = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 	return { filePath, originalFilename };
 }

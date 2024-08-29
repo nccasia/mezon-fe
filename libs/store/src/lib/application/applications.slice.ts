@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiAddAppRequest, ApiApp, ApiAppList } from 'mezon-js/api.gen';
+import { ApiAddAppRequest, ApiApp, ApiAppList, MezonUpdateAppBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const ADMIN_APPLICATIONS = 'adminApplication';
@@ -99,6 +99,22 @@ export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async 
 	}
 });
 
+export const editApplication = createAsyncThunk(
+	'adminApplication/editApplication',
+	async (data: { request: MezonUpdateAppBody; appId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateApp(mezon.session, data.appId, data.request);
+			if (response) {
+				return data.request;
+			}
+		} catch (err) {
+			console.log(err);
+			return thunkAPI.rejectWithValue({ err });
+		}
+	}
+);
+
 export const adminApplicationSlice = createSlice({
 	name: ADMIN_APPLICATIONS,
 	initialState: applicationInitialState,
@@ -120,6 +136,12 @@ export const adminApplicationSlice = createSlice({
 		});
 		builder.addCase(getApplicationDetail.fulfilled, (state, action) => {
 			state.appDetail = action.payload;
+		});
+		builder.addCase(editApplication.fulfilled, (state, action) => {
+			state.appDetail = {
+				...state.appDetail,
+				...action.payload
+			};
 		});
 	}
 });

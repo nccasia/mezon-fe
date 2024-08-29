@@ -18,7 +18,7 @@ export const ThreadHeader = memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
-	const currentDmGroup = useSelector(selectDmGroupCurrent(currentChannel.id ?? ''));
+	const currentDmGroup = useSelector(selectDmGroupCurrent(currentChannel?.id ?? ''));
 	const bottomSheetMenuCustom = useRef<BottomSheetModal>(null);
 	const snapPointsMenuCustom = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type) ? ['30%'] : ['15%'];

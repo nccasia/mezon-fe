@@ -108,7 +108,7 @@ const AppPageBottom = () => {
 
 	return (
 		<div>
-			<div className="flex justify-between mb-[32px] max-md:block">
+			<div className="flex justify-between items-center mb-[32px] max-md:block">
 				<div className="flex gap-4 w-fit items-center">
 					<div>Sort by:</div>
 					<Dropdown
@@ -143,7 +143,7 @@ const AppPageBottom = () => {
 				</div>
 				<div className="flex w-fit gap-4 max-md:mt-4">
 					<div
-						className={`cursor-pointer flex items-center gap-3 px-3 max-md:p-3 rounded-md ${isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
+						className={`cursor-pointer flex items-center gap-3 p-3 max-md:p-3 rounded-md w-fit h-fit ${isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
 						onClick={() => setIsSmallSizeSort(true)}
 					>
 						<div className={`w-5`}>
@@ -152,7 +152,7 @@ const AppPageBottom = () => {
 						<div>Small</div>
 					</div>
 					<div
-						className={`cursor-pointer flex items-center gap-3 px-3 max-md:p-3 rounded-md ${!isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
+						className={`cursor-pointer flex items-center gap-3 p-3 max-md:p-3 rounded-md w-fit h-fit ${!isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
 						onClick={() => setIsSmallSizeSort(false)}
 					>
 						<div className="w-5">
@@ -194,9 +194,13 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 							key={index}
 							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
 						>
-							<div className={`dark:bg-[#111214] bg-white aspect-square flex justify-center items-center rounded-md w-full`}>
-								{value.appname?.charAt(0).toUpperCase()}
-							</div>
+							{value.applogo ? (
+								<img src={value.applogo} alt="" className="aspect-square object-cover rounded-md w-full" />
+							) : (
+								<div className={`dark:bg-[#111214] bg-white aspect-square flex justify-center items-center rounded-md w-full`}>
+									{value.appname?.charAt(0).toUpperCase()}
+								</div>
+							)}
 							<div className="w-full text-center truncate">{value.appname}</div>
 						</div>
 					))}

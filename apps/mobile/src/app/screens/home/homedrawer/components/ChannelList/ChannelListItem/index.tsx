@@ -4,7 +4,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, selectIsUnreadChannelById, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
@@ -30,7 +30,7 @@ interface IChannelListItemProps {
 
 export enum StatusVoiceChannel {
 	Active = 1,
-	No_Active = 0,
+	No_Active = 0
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
@@ -63,7 +63,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 
 			await Promise.all([
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave),
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
 			]);
 
 			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
@@ -90,13 +90,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
-					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
-					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
-
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 						{props.data.channel_label}
 					</Text>

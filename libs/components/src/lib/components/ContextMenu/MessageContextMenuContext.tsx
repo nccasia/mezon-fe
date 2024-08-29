@@ -12,7 +12,7 @@ type MessageContextMenuContextValue = {
 		event: React.MouseEvent<HTMLElement>,
 		messageId: string,
 		mode: ChannelStreamMode,
-		props?: Partial<MessageContextMenuProps>,
+		props?: Partial<MessageContextMenuProps>
 	) => void;
 	preloadMessageContextMenu: (messageId: string) => void;
 	setPositionShow: (showPostion: SHOW_POSITION) => void;
@@ -32,10 +32,14 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	showMessageContextMenu: () => {},
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	preloadMessageContextMenu: () => {},
-	setPositionShow: () => {},
+	setPositionShow: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
 	posShowMenu: SHOW_POSITION.NONE,
-	setImageURL: () => {},
-	imageSrc: '',
+	setImageURL: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
+	imageSrc: ''
 });
 
 export const MessageContextMenuProvider = ({ children }: { children: React.ReactNode }) => {
@@ -46,12 +50,10 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
 
 	const { show } = useContextMenu({
-		id: MESSAGE_CONTEXT_MENU_ID,
+		id: MESSAGE_CONTEXT_MENU_ID
 	});
 
 	const menu = useMemo(() => {
-		if (!messageId) return null;
-
 		return <MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageId} elementTarget={elementTarget} activeMode={activeMode} />;
 	}, [messageId, elementTarget, activeMode]);
 
@@ -73,10 +75,10 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 			show({
 				event,
 				props,
-				position,
+				position
 			});
 		},
-		[show],
+		[show]
 	);
 
 	const showMessageContextMenu = useCallback(
@@ -86,11 +88,11 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 			setActiveMode(mode);
 			const niceProps = {
 				messageId,
-				...props,
+				...props
 			};
 			showContextMenu(event, niceProps);
 		},
-		[showContextMenu],
+		[]
 	);
 
 	const value = useMemo(
@@ -101,9 +103,9 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 			setPositionShow,
 			posShowMenu,
 			setImageURL,
-			imageSrc,
+			imageSrc
 		}),
-		[showMessageContextMenu, preloadMessageContextMenu, messageId, setPositionShow, posShowMenu, setImageURL, imageSrc],
+		[showMessageContextMenu, preloadMessageContextMenu, messageId, setPositionShow, posShowMenu, setImageURL, imageSrc]
 	);
 
 	return (

@@ -18,7 +18,7 @@ export interface FetchNotificationArgs {
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	messageNotifedId: string;
+	messageNotifiedId: string;
 	isMessageRead: boolean;
 	newNotificationStatus: boolean;
 	quantityNotifyChannels: Record<string, number>;
@@ -100,7 +100,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	loadingStatus: 'not loaded',
 	notificationMentions: [],
 	error: null,
-	messageNotifedId: '',
+	messageNotifiedId: '',
 	isMessageRead: false,
 	newNotificationStatus: false,
 	quantityNotifyChannels: {},
@@ -127,8 +127,8 @@ export const notificationSlice = createSlice({
 			}
 		},
 		remove: notificationAdapter.removeOne,
-		setMessageNotifedId(state, action) {
-			state.messageNotifedId = action.payload;
+		setMessageNotifiedId(state, action) {
+			state.messageNotifiedId = action.payload;
 		},
 		setIsMessageRead(state, action) {
 			state.isMessageRead = action.payload;
@@ -265,7 +265,7 @@ export const selectNotificationMessages = createSelector(selectAllNotification, 
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
 });
 
-export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);
+export const selectMessageNotified = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifiedId);
 
 export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
 
