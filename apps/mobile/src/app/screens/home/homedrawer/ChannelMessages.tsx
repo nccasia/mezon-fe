@@ -72,8 +72,8 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		return () => {
 			dispatch(
 				messagesActions.UpdateChannelLastMessage({
-					channelId,
-				}),
+					channelId
+				})
 			);
 		};
 	}, [channelId, dispatch]);
@@ -94,7 +94,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 
 	const onConfirmAction = useCallback(
 		(payload: IConfirmActionPayload) => {
-			const { type, message} = payload;
+			const { type, message } = payload;
 			switch (type) {
 				case EMessageActionType.DeleteMessage:
 					deleteSendMessage(message?.id);
@@ -109,12 +109,12 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					break;
 			}
 		},
-		[deleteSendMessage],
+		[deleteSendMessage]
 	);
 
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 	const isLoadMore = useRef<boolean>(false);
-	const [,setTriggerRender] = useState<boolean>(false);
+	const [, setTriggerRender] = useState<boolean>(false);
 
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
@@ -132,7 +132,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 			setTriggerRender(false);
 			return true;
 		},
-		[dispatch, channelId],
+		[dispatch, channelId]
 	);
 
 	const handleScroll = useCallback(
@@ -146,10 +146,10 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 			}
 
 			if (offsetY <= 0) {
-				onLoadMore(ELoadMoreDirection.top);
+				onLoadMore(ELoadMoreDirection.bottom);
 			}
 		},
-		[showScrollToBottomButton, onLoadMore],
+		[showScrollToBottomButton, onLoadMore]
 	);
 
 	const scrollToBottom = () => {
@@ -161,7 +161,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 			setImageSelected(image);
 			setVisibleImageModal(true);
 		},
-		[channelId, clanId, dispatch],
+		[channelId, clanId, dispatch]
 	);
 
 	const jumpToRepliedMessage = useCallback(
@@ -171,7 +171,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 				flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
 			}
 		},
-		[messages],
+		[messages]
 	);
 
 	const onMessageAction = useCallback((payload: IMessageActionPayload) => {
@@ -193,11 +193,13 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	}, []);
 
 	const renderItem = useCallback(
-		({ item }) => {
+		({ item, index }) => {
+			const previousMessage = messages?.[index + 1];
 			return (
 				<MessageItem
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					message={item}
+					previousMessage={previousMessage}
 					messageId={item.id}
 					mode={mode}
 					channelId={channelId}
@@ -208,7 +210,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 				/>
 			);
 		},
-		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction],
+		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction]
 	);
 
 	const checkChannelCacheLoading = useMemo(() => {
@@ -234,7 +236,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
 					<MessageItemSkeleton skeletonNumber={15} />
 				)}
-				
+
 				<ChannelMessageList
 					flatListRef={flatListRef}
 					messages={messages}

@@ -56,7 +56,7 @@ export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>()
 
 const fetchChannelMembersCached = memoize(
 	async (mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) => {
-		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
+		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 2000, '');
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -99,7 +99,6 @@ export const fetchChannelMembers = createAsyncThunk(
 
 			const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 			thunkAPI.dispatch(channelMembersActions.addMany(members));
-			const userIds = members.map((member) => member.user?.id || '');
 			const customStatusInit = members.map((member) => {
 				const status = (member?.user?.metadata as any)?.status ?? '';
 				return { userId: member.user?.id ?? '', customStatus: status };
@@ -109,8 +108,6 @@ export const fetchChannelMembers = createAsyncThunk(
 			});
 			thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
 			thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
-			thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
-			thunkAPI.dispatch(channelMembersActions.followUserStatus());
 			thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
 			return members;
 		}

@@ -47,6 +47,7 @@ const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_I
 
 export type MessageItemProps = {
 	message?: MessagesEntity;
+	previousMessage?: MessagesEntity;
 	messageId?: string;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -62,335 +63,352 @@ export type MessageItemProps = {
 	preventAction?: boolean;
 };
 
-const MessageItem = React.memo((props: MessageItemProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const {
-		mode,
-		onOpenImage,
-		isNumberOfLine,
-		jumpToRepliedMessage,
-		onMessageAction,
-		setIsOnlyEmojiPicker,
-		showUserInformation = false,
-		preventAction = false,
-	} = props;
-	const dispatch = useAppDispatch();
-	const { t } = useTranslation('message');
-	const message: MessagesEntity = props?.message;
-	const { markMessageAsSeen } = useSeenMessagePool();
-	const userProfile = useSelector(selectAllAccount);
-	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const usersClan = useSelector(selectAllUsesClan);
-	const rolesInClan = useSelector(selectAllRolesClan);
+const MessageItem = React.memo(
+	(props: MessageItemProps) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
+		const {
+			mode,
+			onOpenImage,
+			isNumberOfLine,
+			jumpToRepliedMessage,
+			onMessageAction,
+			setIsOnlyEmojiPicker,
+			showUserInformation = false,
+			preventAction = false
+		} = props;
+		const dispatch = useAppDispatch();
+		const { t } = useTranslation('message');
+		const message: MessagesEntity = props?.message;
+		const previousMessage: MessagesEntity = props?.previousMessage;
 
-	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
-	const hasIncludeMention = useMemo(() => {
-		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
-	}, [message?.content?.t, userProfile]);
-	const messageReferences = useMemo(() => {
-		return message?.references?.[0] as ApiMessageRef;
-	}, [message?.references]);
+		const { markMessageAsSeen } = useSeenMessagePool();
+		const userProfile = useSelector(selectAllAccount);
+		const idMessageToJump = useSelector(selectIdMessageToJump);
+		const usersClan = useSelector(selectAllUsesClan);
+		const rolesInClan = useSelector(selectAllRolesClan);
 
-	const isCombine = !message?.isStartedMessageGroup;
-	const swipeableRef = React.useRef(null);
-	const backgroundColor = React.useRef(new Animated.Value(0)).current;
+		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+		const hasIncludeMention = useMemo(() => {
+			return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
+		}, [message?.content?.t, userProfile]);
+		const messageReferences = useMemo(() => {
+			return message?.references?.[0] as ApiMessageRef;
+		}, [message?.references]);
 
-	const checkMessageTargetToMoved = useMemo(() => {
-		return idMessageToJump === message?.id;
-	}, [idMessageToJump, message?.id]);
+		const isSameUser = useMemo(() => {
+			return message?.user?.id === previousMessage?.user?.id;
+		}, [message?.user?.id, previousMessage?.user?.id]);
 
-	const isMessageReplyDeleted = useMemo(() => {
-		return !messageReferences && message?.references && message?.references?.length;
-	}, [messageReferences, message.references]);
+		const isTimeGreaterThan5Minutes = useMemo(() => {
+			if (message?.create_time && previousMessage?.create_time) {
+				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 5 * 60 * 1000;
+			}
+			return false;
+		}, [message?.create_time, previousMessage?.create_time]);
 
-	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
-	}, [mode]);
+		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 
-	const messageAvatar = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return message?.clan_avatar || message?.avatar;
-		}
-		return message?.avatar;
-	}, [message?.clan_avatar, message?.avatar, mode]);
+		const swipeableRef = React.useRef(null);
+		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
-	const checkOneLinkImage = useMemo(() => {
-		return (
-			message?.attachments?.length === 1 &&
-			message?.attachments[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-			message?.attachments[0].url === message?.content?.t?.trim()
+		const checkMessageTargetToMoved = useMemo(() => {
+			return idMessageToJump === message?.id;
+		}, [idMessageToJump, message?.id]);
+
+		const isMessageReplyDeleted = useMemo(() => {
+			return !messageReferences && message?.references && message?.references?.length;
+		}, [messageReferences, message.references]);
+
+		const isDM = useMemo(() => {
+			return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		}, [mode]);
+
+		const messageAvatar = useMemo(() => {
+			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+				return message?.clan_avatar || message?.avatar;
+			}
+			return message?.avatar;
+		}, [message?.clan_avatar, message?.avatar, mode]);
+
+		const checkOneLinkImage = useMemo(() => {
+			return (
+				message?.attachments?.length === 1 &&
+				message?.attachments[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+				message?.attachments[0].url === message?.content?.t?.trim()
+			);
+		}, [message?.attachments, message?.content?.t]);
+
+		useEffect(() => {
+			if (props?.messageId) {
+				markMessageAsSeen(message);
+			}
+		}, [markMessageAsSeen, message, props.messageId]);
+
+		const onLongPressImage = useCallback(() => {
+			if (preventAction) return;
+			setIsOnlyEmojiPicker(false);
+			onMessageAction({
+				type: EMessageBSToShow.MessageAction,
+				senderDisplayName,
+				message
+			});
+			dispatch(setSelectedMessage(message));
+		}, [message, preventAction]);
+
+		const onPressAvatar = useCallback(() => {
+			if (preventAction) return;
+			setIsOnlyEmojiPicker(false);
+			onMessageAction({
+				type: EMessageBSToShow.UserInformation,
+				user: message?.user,
+				message
+			});
+		}, [preventAction, setIsOnlyEmojiPicker, onMessageAction, message]);
+
+		const onPressInfoUser = useCallback(() => {
+			if (preventAction) return;
+			setIsOnlyEmojiPicker(false);
+
+			onMessageAction({
+				type: EMessageBSToShow.UserInformation,
+				user: message?.user,
+				message
+			});
+		}, [message, onMessageAction, preventAction, setIsOnlyEmojiPicker]);
+
+		const onMention = useCallback(
+			async (mentionedUser: string) => {
+				try {
+					const tagName = mentionedUser?.slice(1);
+					const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
+					const isRoleMention = rolesInClan?.some((role) => tagName === role?.id);
+					if (!mentionedUser || tagName === 'here' || isRoleMention) return;
+					onMessageAction({
+						type: EMessageBSToShow.UserInformation,
+						user: clanUser?.user
+					});
+				} catch (error) {
+					console.log('error', error);
+				}
+			},
+			[usersClan, onMessageAction]
 		);
-	}, [message?.attachments, message?.content?.t]);
 
-	useEffect(() => {
-		if (props?.messageId) {
-			markMessageAsSeen(message);
-		}
-	}, [markMessageAsSeen, message, props.messageId]);
+		const jumpToChannel = async (channelId: string, clanId: string) => {
+			const store = await getStoreAsync();
+			// TODO: do we need to jump to message here?
+			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
+			store.dispatch(
+				channelsActions.joinChannel({
+					clanId,
+					channelId,
+					noFetchMembers: false
+				})
+			);
+		};
 
-	const onLongPressImage = useCallback(() => {
-		if (preventAction) return;
-		setIsOnlyEmojiPicker(false);
-		onMessageAction({
-			type: EMessageBSToShow.MessageAction,
-			senderDisplayName,
-			message,
-		});
-		dispatch(setSelectedMessage(message));
-	}, [message, preventAction]);
-
-	const onPressAvatar = useCallback(() => {
-		if (preventAction) return;
-		setIsOnlyEmojiPicker(false);
-		onMessageAction({
-			type: EMessageBSToShow.UserInformation,
-			user: message?.user,
-			message,
-		});
-	}, [preventAction, setIsOnlyEmojiPicker, onMessageAction, message]);
-
-	const onPressInfoUser = useCallback(() => {
-		if (preventAction) return;
-		setIsOnlyEmojiPicker(false);
-
-		onMessageAction({
-			type: EMessageBSToShow.UserInformation,
-			user: message?.user,
-			message,
-		});
-	}, [message, onMessageAction, preventAction, setIsOnlyEmojiPicker]);
-
-	const onMention = useCallback(
-		async (mentionedUser: string) => {
+		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
 			try {
-				const tagName = mentionedUser?.slice(1);
-				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
-				const isRoleMention = rolesInClan?.some((role) => tagName === role?.id)
-				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
-				onMessageAction({
-					type: EMessageBSToShow.UserInformation,
-					user: clanUser?.user,
-				});
+				const type = channel?.type;
+				const channelId = channel?.channel_id;
+				const clanId = channel?.clan_id;
+
+				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
+					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+					await Linking.openURL(urlVoice);
+				} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+					await jumpToChannel(channelId, clanId);
+				}
 			} catch (error) {
-				console.log('error', error);
+				console.log(error);
 			}
-		},
-		[usersClan, onMessageAction],
-	);
+		}, []);
 
-	const jumpToChannel = async (channelId: string, clanId: string) => {
-		const store = await getStoreAsync();
-		// TODO: do we need to jump to message here?
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
-		store.dispatch(
-			channelsActions.joinChannel({
-				clanId,
-				channelId,
-				noFetchMembers: false,
-			}),
-		);
-	};
-
-	const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
-		try {
-			const type = channel?.type;
-			const channelId = channel?.channel_id;
-			const clanId = channel?.clan_id;
-
-			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
-				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-				await Linking.openURL(urlVoice);
-			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				await jumpToChannel(channelId, clanId);
+		const senderDisplayName = useMemo(() => {
+			if (isDM) {
+				return message?.display_name || message?.username || '';
 			}
-		} catch (error) {
-			console.log(error);
+			return message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+		}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
+
+		const usernameMessage = useMemo(() => {
+			return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
+		}, [isDM, message?.display_name, message?.user?.username]);
+
+		const renderRightActions = (progress, dragX) => {
+			const scale = dragX.interpolate({
+				inputRange: [-50, 0],
+				outputRange: [1, 0],
+				extrapolate: 'clamp'
+			});
+			return (
+				<Animated.View style={[{ transform: [{ scale }] }, { alignItems: 'center', justifyContent: 'center' }]}>
+					<ReplyMessageDeleted width={70} height={25} color={Colors.bgViolet} />
+				</Animated.View>
+			);
+		};
+
+		const handleSwipeableOpen = (direction: 'left' | 'right') => {
+			if (preventAction && swipeableRef.current) {
+				swipeableRef.current.close();
+			}
+			if (direction === 'right') {
+				swipeableRef.current?.close();
+				const payload: IMessageActionNeedToResolve = {
+					type: EMessageActionType.Reply,
+					targetMessage: message,
+					isStillShowKeyboard: true,
+					replyTo: senderDisplayName
+				};
+				//Note: trigger to ChatBox.tsx
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
+			}
+		};
+
+		// Message welcome
+		if (message?.sender_id === '0' && !message?.content?.t) {
+			return <WelcomeMessage channelId={props.channelId} />;
 		}
-	}, []);
 
-	const senderDisplayName = useMemo(() => {
-		if (isDM) {
-			return message?.display_name || message?.username || '';
-		}
-		return message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
+		const handlePressIn = () => {
+			Animated.timing(backgroundColor, {
+				toValue: 1,
+				duration: 500,
+				useNativeDriver: false
+			}).start();
+		};
 
-	const usernameMessage = useMemo(() => {
-		return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
-	}, [isDM, message?.display_name, message?.user?.username]);
+		const handlePressOut = () => {
+			Animated.timing(backgroundColor, {
+				toValue: 0,
+				duration: 500,
+				useNativeDriver: false
+			}).start();
+		};
 
-	const renderRightActions = (progress, dragX) => {
-		const scale = dragX.interpolate({
-			inputRange: [-50, 0],
-			outputRange: [1, 0],
-			extrapolate: 'clamp',
+		const bgColor = backgroundColor.interpolate({
+			inputRange: [0, 1],
+			outputRange: ['transparent', themeValue.secondaryWeight]
 		});
+
 		return (
-			<Animated.View style={[{ transform: [{ scale }] }, { alignItems: 'center', justifyContent: 'center' }]}>
-				<ReplyMessageDeleted width={70} height={25} color={Colors.bgViolet} />
-			</Animated.View>
-		);
-	};
-
-	const handleSwipeableOpen = (direction: 'left' | 'right') => {
-		if (preventAction && swipeableRef.current) {
-			swipeableRef.current.close();
-		}
-		if (direction === 'right') {
-			swipeableRef.current?.close();
-			const payload: IMessageActionNeedToResolve = {
-				type: EMessageActionType.Reply,
-				targetMessage: message,
-				isStillShowKeyboard: true,
-				replyTo: senderDisplayName,
-			};
-			//Note: trigger to ChatBox.tsx
-			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
-		}
-	};
-
-	if (message.isStartedMessageGroup && message.sender_id == '0')
-		return (
-			<WelcomeMessage channelId={props.channelId} />
-		)
-
-	const handlePressIn = () => {
-		Animated.timing(backgroundColor, {
-			toValue: 1,
-			duration: 500,
-			useNativeDriver: false,
-		}).start();
-	};
-
-	const handlePressOut = () => {
-		Animated.timing(backgroundColor, {
-			toValue: 0,
-			duration: 500,
-			useNativeDriver: false,
-		}).start();
-	};
-
-	const bgColor = backgroundColor.interpolate({
-		inputRange: [0, 1],
-		outputRange: ['transparent', themeValue.secondaryWeight],
-	});
-
-	return (
-		<Animated.View style={[{ backgroundColor: bgColor }]}>
-			{/* <Swipeable
+			<Animated.View style={[{ backgroundColor: bgColor }]}>
+				{/* <Swipeable
 			renderRightActions={renderRightActions}
 			ref={swipeableRef}
 			overshootRight={false}
 			onSwipeableOpen={handleSwipeableOpen}
 			hitSlop={{ left: -10 }
 		> */}
-			<View
-				style={[
-					styles.messageWrapper,
-					(isCombine || preventAction) && { marginTop: 0 },
-					hasIncludeMention && styles.highlightMessageMention,
-					checkMessageTargetToMoved && styles.highlightMessageReply,
-				]}
-			>
-				{!!messageReferences && (
-					<MessageReferences
-						messageReferences={messageReferences}
-						preventAction={preventAction}
-						isMessageReply={true}
-						jumpToRepliedMessage={jumpToRepliedMessage}
-						mode={mode}
-					/>
-				)}
-				{isMessageReplyDeleted ? (
-					<View style={styles.aboveMessageDeleteReply}>
-						<View style={styles.iconReply}>
-							<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
-						</View>
-						<View style={styles.iconMessageDeleteReply}>
-							<ReplyMessageDeleted width={18} height={9} />
-						</View>
-						<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
-					</View>
-				) : null}
-				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-					<AvatarMessage
-						onPress={onPressAvatar}
-						id={message?.user?.id}
-						avatar={messageAvatar}
-						username={usernameMessage}
-						isShow={!isCombine || !!message?.references?.length || showUserInformation}
-					/>
-					<Pressable
-						style={[styles.rowMessageBox]}
-						delayLongPress={Platform.OS === 'ios' ? 300 : 100}
-						onPressIn={handlePressIn}
-						onPressOut={handlePressOut}
-						onLongPress={() => {
-							if (preventAction) return;
-							setIsOnlyEmojiPicker(false);
-							onMessageAction({
-								type: EMessageBSToShow.MessageAction,
-								senderDisplayName,
-								message,
-							});
-							dispatch(setSelectedMessage(message));
-						}}
-					>
-						<InfoUserMessage
-							onPress={onPressInfoUser}
-							senderDisplayName={senderDisplayName}
-							isShow={!isCombine || !!message?.references?.length || showUserInformation}
-							createTime={message?.create_time}
+				<View
+					style={[
+						styles.messageWrapper,
+						(isCombine || preventAction) && { marginTop: 0 },
+						hasIncludeMention && styles.highlightMessageMention,
+						checkMessageTargetToMoved && styles.highlightMessageReply
+					]}
+				>
+					{!!messageReferences && (
+						<MessageReferences
+							messageReferences={messageReferences}
+							preventAction={preventAction}
+							isMessageReply={true}
+							jumpToRepliedMessage={jumpToRepliedMessage}
+							mode={mode}
 						/>
-						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-						<Block opacity={message.isError ? 0.6 : 1}>
-							<RenderTextMarkdownContent
-								content={{
-									...(typeof message.content === 'object' ? message.content : {}),
-									mentions: message.mentions,
-									...(checkOneLinkImage ? { t: '' } : {})
-								}}
-								isEdited={message?.hideEditted}
-								translate={t}
-								onMention={onMention}
-								onChannelMention={onChannelMention}
-								isNumberOfLine={isNumberOfLine}
-								isMessageReply={false}
-								mode={mode}
+					)}
+					{isMessageReplyDeleted ? (
+						<View style={styles.aboveMessageDeleteReply}>
+							<View style={styles.iconReply}>
+								<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
+							</View>
+							<View style={styles.iconMessageDeleteReply}>
+								<ReplyMessageDeleted width={18} height={9} />
+							</View>
+							<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
+						</View>
+					) : null}
+					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+						<AvatarMessage
+							onPress={onPressAvatar}
+							id={message?.user?.id}
+							avatar={messageAvatar}
+							username={usernameMessage}
+							isShow={!isCombine || !!message?.references?.length || showUserInformation}
+						/>
+						<Pressable
+							style={[styles.rowMessageBox]}
+							delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+							onPressIn={handlePressIn}
+							onPressOut={handlePressOut}
+							onLongPress={() => {
+								if (preventAction) return;
+								setIsOnlyEmojiPicker(false);
+								onMessageAction({
+									type: EMessageBSToShow.MessageAction,
+									senderDisplayName,
+									message
+								});
+								dispatch(setSelectedMessage(message));
+							}}
+						>
+							<InfoUserMessage
+								onPress={onPressInfoUser}
+								senderDisplayName={senderDisplayName}
+								isShow={!isCombine || !!message?.references?.length || showUserInformation}
+								createTime={message?.create_time}
 							/>
-						</Block>
-						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-						{!preventAction ? (
-							<MessageAction
-								message={message}
-								mode={mode}
-								userProfile={userProfile}
-								preventAction={preventAction}
-								openEmojiPicker={() => {
-									setIsOnlyEmojiPicker(true);
-									onMessageAction({
-										type: EMessageBSToShow.MessageAction,
-										senderDisplayName,
-										message,
-									});
-								}}
-							/>
-						) : null}
-					</Pressable>
+							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
+							<Block opacity={message.isError ? 0.6 : 1}>
+								<RenderTextMarkdownContent
+									content={{
+										...(typeof message.content === 'object' ? message.content : {}),
+										mentions: message.mentions,
+										...(checkOneLinkImage ? { t: '' } : {})
+									}}
+									isEdited={message?.hideEditted}
+									translate={t}
+									onMention={onMention}
+									onChannelMention={onChannelMention}
+									isNumberOfLine={isNumberOfLine}
+									isMessageReply={false}
+									mode={mode}
+								/>
+							</Block>
+							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
+							{!preventAction ? (
+								<MessageAction
+									message={message}
+									mode={mode}
+									userProfile={userProfile}
+									preventAction={preventAction}
+									openEmojiPicker={() => {
+										setIsOnlyEmojiPicker(true);
+										onMessageAction({
+											type: EMessageBSToShow.MessageAction,
+											senderDisplayName,
+											message
+										});
+									}}
+								/>
+							) : null}
+						</Pressable>
+					</View>
 				</View>
-			</View>
-			{/* </Swipeable> */}
-			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />
-		</Animated.View>
-	);
-},
-  (prevProps, nextProps) => {
-	return prevProps.messageId + prevProps?.message.update_time === 
-	nextProps.messageId + nextProps?.message.update_time;
-  }
+				{/* </Swipeable> */}
+				<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />
+			</Animated.View>
+		);
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id ===
+			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id
+		);
+	}
 );
 
 export default MessageItem;

@@ -41,7 +41,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 
 	useEffect(() => {
 		navigation.setOptions({
-			headerBackTitleVisible: false,
+			headerBackTitleVisible: false
 		});
 	}, [navigation]);
 
@@ -56,7 +56,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 		const response = await launchImageLibrary({
 			mediaType: 'photo',
 			includeBase64: true,
-			quality: 1,
+			quality: 1
 		});
 
 		if (response.didCancel) {
@@ -74,45 +74,48 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 		const file = await handleSelectImage();
 		try {
 			if (file) {
-				timerRef.current = setTimeout(async () => {
-					const croppedFile = await openCropper({
-						path: file.uri,
-						mediaType: 'photo',
-						includeBase64: true,
-						compressImageQuality: QUALITY_IMAGE_UPLOAD,
-						...(typeof width === 'number' && { width: width, height: width }),
-					});
-					const uploadImagePayload = {
-						name: file.fileName,
-						size: croppedFile.size,
-						type: croppedFile.mime,
-						uri: croppedFile.path,
-						fileData: croppedFile.data,
-					} as IFile;
-					dispatch(appActions.setLoadingMainMobile(true));
-					
-					const session = sessionRef.current;
-					const client = clientRef.current;
-					const fileNameParts = file.fileName?.split('.');
-					const shortname = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
-					const id = Snowflake.generate();
-					const path = 'emojis/' + id + '.webp';
-
-					handleUploadEmoticonMobile(client, session, path, uploadImagePayload)
-						.then(async (attachment: ApiMessageAttachment) => {
-							const request: ApiClanEmojiCreateRequest = {
-								id: id,
-								category: 'Custom',
-								clan_id: currentClanId,
-								shortname: ':' + shortname + ':',
-								source: attachment.url,
-							};
-							dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
-						})
-						.finally(() => {
-							dispatch(appActions.setLoadingMainMobile(false));
+				timerRef.current = setTimeout(
+					async () => {
+						const croppedFile = await openCropper({
+							path: file.uri,
+							mediaType: 'photo',
+							includeBase64: true,
+							compressImageQuality: QUALITY_IMAGE_UPLOAD,
+							...(typeof width === 'number' && { width: width, height: width })
 						});
-				}, Platform.OS === 'ios' ? 500 : 0);
+						const uploadImagePayload = {
+							name: file.fileName,
+							size: croppedFile.size,
+							type: croppedFile.mime,
+							uri: croppedFile.path,
+							fileData: croppedFile.data
+						} as IFile;
+						dispatch(appActions.setLoadingMainMobile(true));
+
+						const session = sessionRef.current;
+						const client = clientRef.current;
+						const fileNameParts = file.fileName?.split('.');
+						const shortname = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
+						const id = Snowflake.generate();
+						const path = 'emojis/' + id + '.webp';
+
+						handleUploadEmoticonMobile(client, session, path, uploadImagePayload)
+							.then(async (attachment: ApiMessageAttachment) => {
+								const request: ApiClanEmojiCreateRequest = {
+									id: id,
+									category: 'Custom',
+									clan_id: currentClanId,
+									shortname: shortname,
+									source: attachment.url
+								};
+								dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
+							})
+							.finally(() => {
+								dispatch(appActions.setLoadingMainMobile(false));
+							});
+					},
+					Platform.OS === 'ios' ? 500 : 0
+				);
 			}
 		} catch (e) {
 			dispatch(appActions.setLoadingMainMobile(false));

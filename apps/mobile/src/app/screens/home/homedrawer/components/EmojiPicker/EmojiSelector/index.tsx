@@ -76,10 +76,10 @@ export default function EmojiSelector({
 	onSelected,
 	isReactMessage = false,
 	handleBottomSheetExpand,
-	handleBottomSheetCollapse,
+	handleBottomSheetCollapse
 }: EmojiSelectorProps) {
 	const currentClan = useAppSelector(selectCurrentClan);
-	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || "0");
+	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || '0');
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
@@ -92,14 +92,13 @@ export default function EmojiSelector({
 	const cateIcon = useMemo(
 		() => [
 			<Icons.ClockIcon color={themeValue.textStrong} />,
-			!!currentClan?.logo
-				? <View style={{ height: 24, width: 24, borderRadius: 12, overflow: "hidden" }}>
-					<MezonClanAvatar
-						alt={currentClan?.clan_name}
-						image={currentClan?.logo}
-					/>
+			currentClan?.logo ? (
+				<View style={{ height: 24, width: 24, borderRadius: 12, overflow: 'hidden' }}>
+					<MezonClanAvatar alt={currentClan?.clan_name} image={currentClan?.logo} />
 				</View>
-				: <PenIcon color={themeValue.textStrong} />,
+			) : (
+				<PenIcon color={themeValue.textStrong} />
+			),
 			<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
 			<LeafIcon color={themeValue.textStrong} />,
 			<BowlIcon color={themeValue.textStrong} />,
@@ -107,45 +106,50 @@ export default function EmojiSelector({
 			<BicycleIcon color={themeValue.textStrong} />,
 			<ObjectIcon color={themeValue.textStrong} />,
 			<HeartIcon color={themeValue.textStrong} />,
-			<RibbonIcon color={themeValue.textStrong} />,
+			<RibbonIcon color={themeValue.textStrong} />
 		],
-		[themeValue],
+		[themeValue]
 	);
 
-	const categoriesWithIcons = useMemo(() => categoriesEmoji.map((category, index) => ({
-		displayName: category === "Custom" && currentClan?.clan_name ? currentClan?.clan_name : category,
-		name: category,
-		icon: cateIcon[index],
-		emojis: emojis.filter((emoji) => emoji.category.includes(category))
-			.map((emoji) => ({
-				...emoji,
-				category: category,
-			}))
-	})), [categoriesEmoji, emojis, currentClan])
+	const categoriesWithIcons = useMemo(
+		() =>
+			categoriesEmoji.map((category, index) => ({
+				displayName: category === 'Custom' && currentClan?.clan_name ? currentClan?.clan_name : category,
+				name: category,
+				icon: cateIcon[index],
+				emojis: emojis
+					.filter((emoji) => emoji.category.includes(category))
+					.map((emoji) => ({
+						...emoji,
+						category: category
+					}))
+			})),
+		[categoriesEmoji, emojis, currentClan]
+	);
 
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
 			refs[item] = { position: 0 };
 			return refs;
-		}, {}),
+		}, {})
 	);
 
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
 			onSelected(emoji.id, emoji.shortname);
-			setRecentEmoji(emoji, currentClan?.id || "0");
+			setRecentEmoji(emoji, currentClan?.id || '0');
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
 						shortName: emoji.shortname,
-						id: emoji.id,
-					}),
+						id: emoji.id
+					})
 				);
 			}
 		},
-		[dispatch, handleBottomSheetCollapse, isReactMessage, onSelected],
+		[dispatch, handleBottomSheetCollapse, isReactMessage, onSelected]
 	);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
@@ -160,7 +164,7 @@ export default function EmojiSelector({
 
 	const debouncedSetSearchText = useCallback(
 		debounce((text) => onSearchEmoji(text), 300),
-		[],
+		[]
 	);
 
 	return (
@@ -197,12 +201,12 @@ export default function EmojiSelector({
 								setSelectedCategory(item.name);
 								refScrollView.current?.scrollTo({
 									y: categoryRefs.current[item.name].position - 130,
-									animated: true,
+									animated: true
 								});
 							}}
 							style={{
 								...styles.cateItem,
-								backgroundColor: item.name === selectedCategory ? baseColor.blurple : 'transparent',
+								backgroundColor: item.name === selectedCategory ? baseColor.blurple : 'transparent'
 							}}
 						>
 							{item.icon}

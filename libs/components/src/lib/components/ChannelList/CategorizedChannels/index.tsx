@@ -36,7 +36,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
-		const mouseY = event.clientY + window.screenY;
+		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
 
 		if (event.button === MouseButton.RIGHT) {

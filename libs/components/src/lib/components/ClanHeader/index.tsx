@@ -36,7 +36,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const { removeMemberClan } = useChannelMembersActions();
 	const { userProfile } = useAuth();
@@ -103,7 +102,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
+	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasClanPermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
 	useEscapeKey(() => {

@@ -42,7 +42,7 @@ export const TYPE_MENTION = {
 	userMention: '@',
 	hashtag: '#',
 	voiceChannel: '##voice',
-	userRoleMention: '@role',
+	userRoleMention: '@role'
 };
 /**
  * custom style for markdown
@@ -51,32 +51,32 @@ export const TYPE_MENTION = {
 export const markdownStyles = (colors: Attributes) =>
 	StyleSheet.create({
 		heading1: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		heading2: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		heading3: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		heading4: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		heading5: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		heading6: {
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		body: {
 			color: colors.textStrong,
-			fontSize: size.medium,
+			fontSize: size.medium
 		},
 		paragraph: {
 			marginTop: 0,
 			marginBottom: 0,
 			paddingTop: 0,
-			paddingBottom: 0,
+			paddingBottom: 0
 		},
 		code_block: {
 			color: colors.text,
@@ -84,13 +84,13 @@ export const markdownStyles = (colors: Attributes) =>
 			paddingVertical: 1,
 			borderColor: colors.text,
 			borderRadius: 5,
-			lineHeight: size.s_20,
+			lineHeight: size.s_20
 		},
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.primary,
 			fontSize: size.small,
-			lineHeight: size.s_17,
+			lineHeight: size.s_17
 		},
 		fence: {
 			color: colors.text,
@@ -99,74 +99,74 @@ export const markdownStyles = (colors: Attributes) =>
 			borderColor: colors.borderHighlight,
 			borderRadius: 5,
 			fontSize: size.small,
-			lineHeight: size.s_20,
+			lineHeight: size.s_20
 		},
 		link: {
 			color: colors.textLink,
 			textDecorationLine: 'none',
-			lineHeight: size.s_17,
+			lineHeight: size.s_17
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
-			height: size.s_20,
+			height: size.s_20
 		},
 		editedText: {
 			fontSize: size.small,
-			color: colors.textDisabled,
+			color: colors.textDisabled
 		},
 		mention: {
 			fontSize: size.medium,
 			color: colors.textLink,
 			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20,
+			lineHeight: size.s_20
 		},
 		blockquote: {
 			backgroundColor: Colors.tertiaryWeight,
-			borderColor: Colors.textGray,
+			borderColor: Colors.textGray
 		},
 		tr: {
-			borderColor: colors.border,
+			borderColor: colors.border
 		},
 		hr: {
 			backgroundColor: colors.borderRadio,
-			height: 2,
+			height: 2
 		},
 		voiceChannel: {
 			backgroundColor: colors.midnightBlue,
 			flexDirection: 'row',
 			gap: size.s_2,
 			alignItems: 'center',
-			justifyContent: 'center',
+			justifyContent: 'center'
 		},
 		textVoiceChannel: {
 			fontSize: size.medium,
 			color: colors.textLink,
-			lineHeight: size.s_20,
+			lineHeight: size.s_20
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
 			color: colors.textRoleLink,
-			backgroundColor: colors.darkMossGreen,
-		},
+			backgroundColor: colors.darkMossGreen
+		}
 	});
 
 const styleMessageReply = (colors: Attributes) =>
 	StyleSheet.create({
 		body: {
 			color: colors.text,
-			fontSize: size.small,
+			fontSize: size.small
 		},
 		textVoiceChannel: {
 			fontSize: size.small,
 			color: colors.textDisabled,
-			lineHeight: size.s_20,
+			lineHeight: size.s_20
 		},
 		mention: {
 			fontSize: size.small,
 			color: colors.textLink,
 			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20,
-		},
+			lineHeight: size.s_20
+		}
 	});
 
 export type IMarkdownProps = {
@@ -208,7 +208,7 @@ export const renderRulesCustom = {
 			);
 		}
 
-		if (content?.startsWith('::')) {
+		if (content?.startsWith(':')) {
 			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />;
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
@@ -228,7 +228,7 @@ export const renderRulesCustom = {
 					style={[
 						styles.mention,
 						content?.includes?.('# unknown') && styles.unknownChannel,
-						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention,
+						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention
 					]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
 				>
@@ -277,7 +277,7 @@ export const renderRulesCustom = {
 				{content}
 			</Text>
 		);
-	},
+	}
 };
 
 /**
@@ -352,7 +352,7 @@ export const RenderTextMarkdownContent = React.memo(
 			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
 			...mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })),
 			...lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })),
-			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })),
+			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS }))
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		let lastIndex = 0;
@@ -379,7 +379,7 @@ export const RenderTextMarkdownContent = React.memo(
 						tagUserId: element.user_id,
 						mode,
 						usersClan,
-						usersInChannel,
+						usersInChannel
 					});
 				}
 				if (element.kindOf === ETokenMessage.EMOJIS) {
@@ -387,7 +387,7 @@ export const RenderTextMarkdownContent = React.memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
-					formattedContent += formatBlockCode(contentInElement,isMessageReply);
+					formattedContent += formatBlockCode(contentInElement, isMessageReply);
 				}
 
 				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
@@ -436,7 +436,7 @@ export const RenderTextMarkdownContent = React.memo(
 							channel_id: dataChannel?.[1],
 							clan_id: dataChannel?.[2],
 							status: Number(dataChannel?.[3] || 1),
-							meeting_code: dataChannel?.[4] || '',
+							meeting_code: dataChannel?.[4] || ''
 						};
 						onChannelMention && onChannelMention(payloadChannel);
 						return false;
@@ -454,7 +454,7 @@ export const RenderTextMarkdownContent = React.memo(
 				style={{
 					flex: 1,
 					maxHeight: isMessageReply ? size.s_17 : size.s_20 * 10 - size.s_10,
-					overflow: 'hidden',
+					overflow: 'hidden'
 				}}
 			>
 				{isMessageReply && (
@@ -465,7 +465,7 @@ export const RenderTextMarkdownContent = React.memo(
 							left: 0,
 							right: 0,
 							bottom: 0,
-							zIndex: 1,
+							zIndex: 1
 						}}
 					/>
 				)}
@@ -474,5 +474,5 @@ export const RenderTextMarkdownContent = React.memo(
 		) : (
 			renderMarkdown()
 		);
-	},
+	}
 );
