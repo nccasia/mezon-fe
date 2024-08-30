@@ -1,11 +1,5 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	ID_MENTION_HERE,
-	IRoleMention,
-	IS_TABLET,
-	Icons
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, IS_TABLET, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
@@ -17,7 +11,7 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
-	filterEmptyArrays,
+	filterEmptyArrays
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -89,9 +83,9 @@ export const ChatMessageInput = memo(
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
 				channelsEntities,
-				attachmentDataRef,
+				attachmentDataRef
 			}: IChatMessageInputProps,
-			ref: MutableRefObject<TextInput>,
+			ref: MutableRefObject<TextInput>
 		) => {
 			const [heightInput, setHeightInput] = useState(size.s_40);
 			const { themeValue } = useTheme();
@@ -102,21 +96,20 @@ export const ChatMessageInput = memo(
 			const { editSendMessage, sendMessage } = useChatSending({
 				channelId,
 				mode,
-				directMessageId: channelId || '',
+				directMessageId: channelId || ''
 			});
 			const rolesInClan = useSelector(selectAllRolesClan);
 			const roleList = useMemo(() => {
 				return rolesInClan?.map((item) => ({
 					roleId: item.id ?? '',
-					roleName: item.title ?? '',
+					roleName: item.title ?? ''
 				}));
 			}, [rolesInClan]);
 
 			const removeTags = (text: string) => {
-				if (!text)
-					return '';
+				if (!text) return '';
 				return text?.replace?.(/@\[(.*?)\]/g, '@$1');
-			}
+			};
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();
@@ -132,18 +125,18 @@ export const ChatMessageInput = memo(
 			//start: DM stuff
 			const { sendDirectMessage } = useDirectMessages({
 				channelId,
-				mode,
+				mode
 			});
 			const handleSendDM = useCallback(
 				async (
 					content: IMessageSendPayload,
 					mentions?: Array<ApiMessageMention>,
 					attachments?: Array<ApiMessageAttachment>,
-					references?: Array<ApiMessageRef>,
+					references?: Array<ApiMessageRef>
 				) => {
 					await sendDirectMessage(content, mentions, attachments, references);
 				},
-				[sendDirectMessage],
+				[sendDirectMessage]
 			);
 
 			const handleDirectMessageTyping = useCallback(async () => {
@@ -182,12 +175,13 @@ export const ChatMessageInput = memo(
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
-					const { attachments } = messageActionNeedToResolve.targetMessage;
-					await editSendMessage(editMessage, messageId, mentions, attachments, true);
+					if (editMessage.t !== messageActionNeedToResolve?.targetMessage?.content.t) {
+						const { attachments } = messageActionNeedToResolve.targetMessage;
+						await editSendMessage(editMessage, messageId, mentions, attachments, true);
+					}
 				},
-				[editSendMessage, messageActionNeedToResolve],
+				[editSendMessage, messageActionNeedToResolve]
 			);
-
 
 			const doesIdRoleExist = (id: string, roles: IRoleMention[]): boolean => {
 				return roles?.some((role) => role?.roleId === id);
@@ -202,13 +196,13 @@ export const ChatMessageInput = memo(
 						return {
 							role_id: role?.roleId,
 							s: mention.s,
-							e: mention.e,
+							e: mention.e
 						};
 					} else {
 						return {
 							user_id: mention.user_id,
 							s: mention.s,
-							e: mention.e,
+							e: mention.e
 						};
 					}
 				});
@@ -219,14 +213,14 @@ export const ChatMessageInput = memo(
 					ej: emojisOnMessage,
 					lk: linksOnMessage,
 					mk: markdownsOnMessage,
-					vk: voiceLinkRoomOnMessage,
+					vk: voiceLinkRoomOnMessage
 				};
 
 				const payloadThreadSendMessage: IPayloadThreadSendMessage = {
 					content: payloadSendMessage,
 					mentions: simplifiedMentionList,
 					attachments: [],
-					references: [],
+					references: []
 				};
 
 				// TODO: - nghia - reset attachments
@@ -241,19 +235,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([
-						{
-							message_id: '',
-							message_ref_id: targetMessage.id,
-							ref_type: 0,
-							message_sender_id: targetMessage?.sender_id,
-							message_sender_username: targetMessage?.username,
-							mesages_sender_avatar: targetMessage?.avatar,
-							message_sender_clan_nick: targetMessage?.clan_nick,
-							message_sender_display_name: targetMessage?.display_name,
-							content: JSON.stringify(targetMessage.content),
-							has_attachment: Boolean(targetMessage?.attachments?.length),
-						},
-					] as Array<ApiMessageRef>)
+							{
+								message_id: '',
+								message_ref_id: targetMessage.id,
+								ref_type: 0,
+								message_sender_id: targetMessage?.sender_id,
+								message_sender_username: targetMessage?.username,
+								mesages_sender_avatar: targetMessage?.avatar,
+								message_sender_clan_nick: targetMessage?.clan_nick,
+								message_sender_display_name: targetMessage?.display_name,
+								content: JSON.stringify(targetMessage.content),
+								has_attachment: Boolean(targetMessage?.attachments?.length)
+							}
+						] as Array<ApiMessageRef>)
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 
@@ -262,7 +256,7 @@ export const ChatMessageInput = memo(
 						await onEditMessage(
 							filterEmptyArrays(payloadSendMessage),
 							messageActionNeedToResolve?.targetMessage?.id,
-							simplifiedMentionList || [],
+							simplifiedMentionList || []
 						);
 					} else {
 						if (![EMessageActionType.CreateThread].includes(messageAction)) {
@@ -275,7 +269,7 @@ export const ChatMessageInput = memo(
 										attachmentDataRef || [],
 										reference,
 										false,
-										isMentionEveryOne,
+										isMentionEveryOne
 									);
 									break;
 								case ChannelStreamMode.STREAM_MODE_DM:
@@ -284,7 +278,7 @@ export const ChatMessageInput = memo(
 										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList,
 										attachmentDataRef || [],
-										reference,
+										reference
 									);
 									break;
 								default:
@@ -327,9 +321,9 @@ export const ChatMessageInput = memo(
 							style={[
 								styles.inputStyle,
 								(text?.length > 0 || !isShowCreateThread) && {
-									width: isShowAttachControl && isShowCreateThread ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput,
+									width: isShowAttachControl && isShowCreateThread ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput
 								},
-								{ height: Math.max(size.s_40, heightInput) },
+								{ height: Math.max(size.s_40, heightInput) }
 							]}
 							children={renderTextContent(text, channelsEntities)}
 							onContentSizeChange={(e) => {
@@ -354,6 +348,6 @@ export const ChatMessageInput = memo(
 					</Block>
 				</Block>
 			);
-		},
-	),
+		}
+	)
 );
