@@ -7,7 +7,19 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ENotificationTypes, EPermission, ICategory } from '@mezon/utils';
+import {
+	ACTIVE,
+	DEFAULT_ID,
+	ENotificationTypes,
+	EPermission,
+	FOR_15_MINUTES,
+	FOR_1_HOUR,
+	FOR_24_HOURS,
+	FOR_3_HOURS,
+	FOR_8_HOURS,
+	ICategory,
+	MUTE
+} from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
@@ -132,28 +144,28 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 				<ItemPanel children="Collapse All Categories" />
 			</GroupPanels>
 			<GroupPanels>
-				{defaultCategoryNotificationSetting?.active === 1 || defaultCategoryNotificationSetting?.id === '0' ? (
+				{defaultCategoryNotificationSetting?.active === ACTIVE || defaultCategoryNotificationSetting?.id === DEFAULT_ID ? (
 					<Dropdown
 						trigger="hover"
 						dismissOnClick={false}
 						renderTrigger={() => (
 							<div>
-								<ItemPanel children={'Mute Category'} dropdown="change here" onClick={() => handleMuteCategory(0)} />
+								<ItemPanel children={'Mute Category'} dropdown="change here" onClick={() => handleMuteCategory(MUTE)} />
 							</div>
 						)}
 						label=""
 						placement="right-start"
 						className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 					>
-						<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(15 * 60 * 1000)} />
-						<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(60 * 60 * 1000)} />
-						<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)} />
-						<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)} />
-						<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)} />
+						<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
+						<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
+						<ItemPanel children="For 3 Hours" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
+						<ItemPanel children="For 8 Hours" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
+						<ItemPanel children="For 24 Hours" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
 						<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
 					</Dropdown>
 				) : (
-					<ItemPanel children={'Unmute Category'} onClick={() => handleMuteCategory(1)} subText={muteUntil} />
+					<ItemPanel children={'Unmute Category'} onClick={() => handleMuteCategory(ACTIVE)} subText={muteUntil} />
 				)}
 
 				<Dropdown
