@@ -57,7 +57,7 @@ export default function useUpdateAttachmentMessages({ currentChannelId, currentC
                         newMessage.mentions,
                         results,
                         undefined,
-                        true
+                        false
                     );
                 })
                 .then(() => {
@@ -80,7 +80,7 @@ export default function useUpdateAttachmentMessages({ currentChannelId, currentC
                         newMessage.mentions,
                         [failAttachment],
                         undefined,
-                        true
+                        false
                     );
 
                     dispatch(
