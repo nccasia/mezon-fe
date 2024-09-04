@@ -1,14 +1,16 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
+import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IFile, MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validInput } from '../../../../../utils/validate';
@@ -31,21 +33,33 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const { createClans } = useClans();
 	const handleCreateClan = async () => {
-		setIsSubmitting(true);
 		const store = await getStoreAsync();
-		createClans(nameClan?.trim?.(), urlImage)
-			.then(async (res) => {
-				if (res && res?.clan_id) {
-					store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
-					save(STORAGE_CLAN_ID, res?.clan_id);
-					store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
-					await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
-					setVisible(false);
+		await store
+			.dispatch(checkDuplicateNameClan(nameClan.trim()))
+			.then(unwrapResult)
+			.then((result) => {
+				if (result) {
+					Toast.show({
+						type: 'error',
+						text1: t('duplicateNameMessage')
+					});
+				} else {
+					setIsSubmitting(true);
+					createClans(nameClan?.trim?.(), urlImage)
+						.then(async (res) => {
+							if (res && res?.clan_id) {
+								store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
+								save(STORAGE_CLAN_ID, res?.clan_id);
+								store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
+								const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+								await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
+								setVisible(false);
+							}
+						})
+						.finally(() => {
+							setIsSubmitting(false);
+						});
 				}
-			})
-			.finally(() => {
-				setIsSubmitting(false);
 			});
 	};
 
