@@ -7,7 +7,7 @@ import {
 	useHandlePopupQuickMess,
 	useMessageValue,
 	useReference,
-	useThreads,
+	useThreads
 } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -19,6 +19,7 @@ import {
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAllUsesClan,
+	selectAttachmentByChannelId,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -43,7 +44,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
@@ -60,7 +61,7 @@ import {
 	getRoleList,
 	searchMentionsHashtag,
 	threadError,
-	uniqueUsers,
+	uniqueUsers
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -87,7 +88,7 @@ import {
 	widthMessageViewChat,
 	widthMessageViewChatThread,
 	widthSearchMessage,
-	widthThumbnailAttachment,
+	widthThumbnailAttachment
 } from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
@@ -112,7 +113,7 @@ export type MentionReactInputProps = {
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
 		displayName?: string,
-		clanNick?: string,
+		clanNick?: string
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
@@ -155,7 +156,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmOrChannelId = useMemo(
 		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode],
+		[currentChannel?.channel_id, currentDmId, props.mode]
 	);
 
 	const userProfile = useSelector(selectAllAccount);
@@ -231,13 +232,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
 				userIds: userIds,
-				clanId: currentClanId || '',
+				clanId: currentClanId || ''
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
 			}
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const editorRef = useRef<HTMLInputElement | null>(null);
@@ -249,6 +250,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 
 	const { mentionList, hashtagList, emojiList } = useProcessMention(request?.mentionRaw, roleList);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
+
+	const attachmentNotification = useMemo(() => {
+		if (attachmentFilteredByChannelId !== null) {
+			return {
+				filetype: attachmentFilteredByChannelId && attachmentFilteredByChannelId.files[0].filetype,
+				url: attachmentFilteredByChannelId && attachmentFilteredByChannelId.files[0].url
+			};
+		}
+	}, [attachmentFilteredByChannelId]);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -258,7 +269,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				ej: emojiList,
 				lk: linkList,
 				mk: markdownList,
-				vk: voiceLinkRoomList,
+				vk: voiceLinkRoomList
 			};
 
 			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
@@ -291,11 +302,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
-					[],
+					attachmentNotification ? [attachmentNotification] : [],
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
-					mentionEveryone,
+					mentionEveryone
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
@@ -314,18 +325,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						valueThread?.references,
 						{ nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate },
 						anonymousMessage,
-						mentionEveryone,
+						mentionEveryone
 					);
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
 						mentionList,
-						[],
+						attachmentNotification ? [attachmentNotification] : [],
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
 						anonymousMessage,
-						mentionEveryone,
+						mentionEveryone
 					);
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
@@ -341,8 +352,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
 					id: '',
-					isReset: true,
-				}),
+					isReset: true
+				})
 			);
 		},
 		[
@@ -370,8 +381,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			valueThread?.attachments,
 			valueThread?.references,
 			setOpenThreadMessageState,
-			setRequestInput,
-		],
+			setRequestInput
+		]
 	);
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
@@ -380,7 +391,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
-					subText: item?.category_name ?? '',
+					subText: item?.category_name ?? ''
 				};
 			}) as ChannelsMentionProps[];
 		}
@@ -393,7 +404,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
-					subText: item?.clan_name ?? '',
+					subText: item?.clan_name ?? ''
 				};
 			}) as ChannelsMentionProps[];
 		}
@@ -453,9 +464,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
 						draftMention: lastMessageByUserId.mentions ?? [],
-						draftAttachment: lastMessageByUserId.attachments ?? [],
-					},
-				}),
+						draftAttachment: lastMessageByUserId.attachments ?? []
+					}
+				})
 			);
 		}
 	};
@@ -505,9 +516,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
 						message_sender_clan_nick: getRefMessageReply.clan_nick,
 						message_sender_display_name: getRefMessageReply.display_name,
-						has_attachment: getRefMessageReply.attachments?.length > 0,
-					},
-				]),
+						has_attachment: getRefMessageReply.attachments?.length > 0
+					}
+				])
 			);
 		}
 	}, [getRefMessageReply]);
@@ -544,7 +555,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						? widthMessageViewChatThread
 						: isSearchMessage
 							? widthSearchMessage
-							: widthThumbnailAttachment,
+							: widthThumbnailAttachment
 			);
 			setChatBoxMaxWidth(
 				isShowMemberList
@@ -553,7 +564,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						? maxWidthWithChatThread
 						: isSearchMessage
 							? maxWidthWithSearchMessage
-							: defaultMaxWidth,
+							: defaultMaxWidth
 			);
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
@@ -603,14 +614,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					suggestions: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
 						width: `${!closeMenu ? mentionWidth : '90vw'}`,
-						left: `${!closeMenu ? '-40px' : '-30px'}`,
+						left: `${!closeMenu ? '-40px' : '-30px'}`
 					},
 					control: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
-						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`,
+						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`
 					},
 					maxWidth: '100%',
-					maxHeight: '350px',
+					maxHeight: '350px'
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
