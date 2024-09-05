@@ -4,11 +4,13 @@ import {
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
 	selectEmojiObjSuggestion,
+	selectEmojiRecent,
 	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
+import { ApiUserEmojiUsage } from 'mezon-js/dist/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -31,23 +33,36 @@ export function useEmojiSuggestion() {
 	}
 
 	function convertedEmojiRecent(emojiArr: EmojiStorage[], emojiSource: any) {
-		return emojiArr.map((item: any) => {
-			const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
+		return emojiArr.map((item: EmojiStorage) => {
 			return {
-				id: emojiFound?.id,
-				src: emojiFound?.src,
+				id: item.emojiId || '',
+				src: item.emojiId,
 				category: 'Recent',
-				shortname: emojiFound?.shortname
+				shortname: item.emoji
 			};
 		});
 	}
+
+	function mapEmoji(req: ApiUserEmojiUsage[]): EmojiStorage[] {
+		return req.map((item: ApiUserEmojiUsage) => {
+			return {
+				emoji: item.emoji || '',
+				emojiId: item.emoji_id || '',
+				senderId: item.user_id || '',
+				action: false,
+				messageId: ''
+			};
+		});
+	}
+
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	const emojiRecentData = localStorage.getItem('recentEmojis');
-	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
-	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
+	const emojiRecentData = useSelector(selectEmojiRecent);
+	const emojisRecentDataParse = emojiRecentData || [];
+	//	console.log(mapEmoji(emojisRecentDataParse))
+	const emojiFiltered = filterEmojisByUserId(mapEmoji(emojisRecentDataParse), userId.userId ?? '');
 	const reversedEmojisRecentDataParse = emojiFiltered.reverse();
 
-	const emojiConverted = convertedEmojiRecent(reversedEmojisRecentDataParse, emojiMetadata);
+	const emojiConverted = convertedEmojiRecent(reversedEmojisRecentDataParse, emojiMetadata); //
 	const emojiCombine = [...emojiMetadata, ...emojiConverted];
 	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);

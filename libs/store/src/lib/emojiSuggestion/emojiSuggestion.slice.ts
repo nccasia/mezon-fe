@@ -3,6 +3,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import memoizee from 'memoizee';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ApiUserEmojiUsage } from 'mezon-js/dist/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
@@ -21,6 +22,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	textToSearchEmojiSuggestion: string;
 	addEmojiAction: boolean;
 	shiftPressed: boolean;
+	listRecentEmoji: Array<ApiUserEmojiUsage>;
 }
 
 type UpdateEmojiRequest = {
@@ -51,6 +53,14 @@ const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => 
 	}
 });
 
+const fetchRecentEmojiCached = memoizee((mezon: MezonValueContext) => mezon.client.listUserEmojiUsage(mezon.session), {
+	promise: true,
+	maxAge: LIST_EMOJI_CACHED_TIME,
+	normalizer: (args) => {
+		return args[0].session.username || '';
+	}
+});
+
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, noCache }: FetchEmojiArgs, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 	if (noCache) {
@@ -61,6 +71,18 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, 
 		throw new Error('Emoji list is undefined or null');
 	}
 	return response.emoji_list;
+});
+
+export const fetchRecentEmoji = createAsyncThunk('emoji/fetchRecentEmoji', async ({ noCache }: { noCache?: boolean }, thunkAPI) => {
+	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchRecentEmojiCached.clear();
+	}
+	const response = await fetchRecentEmojiCached(mezon);
+	if (!response) {
+		throw new Error('Emoji list is undefined or null');
+	}
+	return response.user_emoji_usage;
 });
 
 export const createEmojiSetting = createAsyncThunk(
@@ -112,7 +134,8 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
 	addEmojiAction: false,
-	shiftPressed: false
+	shiftPressed: false,
+	listRecentEmoji: []
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -175,6 +198,11 @@ export const emojiSuggestionSlice = createSlice({
 		builder.addCase(deleteEmojiSetting.fulfilled, (state, action) => {
 			emojiSuggestionAdapter.removeOne(state, action.payload?.id ?? '');
 		});
+		builder.addCase(fetchRecentEmoji.fulfilled, (state, action) => {
+			if (action.payload) {
+				state.listRecentEmoji = action.payload;
+			}
+		});
 	}
 });
 
@@ -208,3 +236,5 @@ export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emoj
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
 
 export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiObjPicked);
+
+export const selectEmojiRecent = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.listRecentEmoji);
