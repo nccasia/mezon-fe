@@ -7,7 +7,6 @@ import {
 	selectCurrentClan,
 	selectCurrentVoiceChannel,
 	selectStatusMenu,
-	stickerSettingActions,
 	useAppDispatch
 } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -37,10 +36,6 @@ const ClanLayout = () => {
 			setIsShowMemberList(false);
 		}
 	}, [isShowCreateThread]);
-
-	useEffect(() => {
-		dispatch(stickerSettingActions.fetchStickerByClanId({ clanId: clanId || '' }));
-	}, [clanId, dispatch]);
 
 	return (
 		<MezonPolicyProvider clanId={clanId}>
