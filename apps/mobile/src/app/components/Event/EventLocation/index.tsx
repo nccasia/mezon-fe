@@ -29,7 +29,7 @@ export default function EventLocation({ event }: IEventLocation) {
 			{option === OptionEvent.OPTION_LOCATION && (
 				<View style={styles.inline}>
 					<Icons.LocationIcon height={16} width={16} color={themeValue.text} />
-					<Text style={styles.smallText}>{event.title}</Text>
+					<Text style={styles.smallText}>{event.address}</Text>
 				</View>
 			)}
 

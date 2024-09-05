@@ -9,7 +9,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { IMezonOptionData, MezonInput, MezonOption, MezonSelect } from '../../../temp-ui';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import { style } from './styles';
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
@@ -25,14 +25,14 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 		headerTitle: t('screens.eventType.headerTitle'),
 		headerTitleStyle: {
 			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled,
+			color: themeValue.textDisabled
 		},
 		headerLeft: () => <></>,
 		headerRight: () => (
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
 				<Icons.CloseLargeIcon height={18} width={18} color={themeValue.textStrong} />
 			</TouchableOpacity>
-		),
+		)
 	});
 
 	function handleClose() {
@@ -51,29 +51,30 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 					title: t('fields.channelType.voiceChannel.title'),
 					description: t('fields.channelType.voiceChannel.description'),
 					value: OptionEvent.OPTION_SPEAKER,
+					disabled: !voicesChannel.length,
 					textStyle: {
-						fontWeight: 'bold',
-					},
+						fontWeight: 'bold'
+					}
 				},
 				{
 					title: t('fields.channelType.somewhere.title'),
 					description: t('fields.channelType.somewhere.description'),
 					value: OptionEvent.OPTION_LOCATION,
 					textStyle: {
-						fontWeight: 'bold',
-					},
-				},
+						fontWeight: 'bold'
+					}
+				}
 			] satisfies IMezonOptionData,
-		[],
+		[]
 	);
 
-	const channels = voicesChannel.map((item) => ({
+	const channels = voicesChannel?.map((item) => ({
 		title: item.channel_label,
 		value: item.channel_id,
-		icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />,
+		icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />
 	}));
 
-	const [eventType, setEventType] = useState<OptionEvent>(OptionEvent.OPTION_SPEAKER);
+	const [eventType, setEventType] = useState<OptionEvent>();
 	const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || '');
 	const [location, setLocation] = useState<string>('');
 
@@ -86,7 +87,7 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 			if (location?.trim()?.length === 0) {
 				Toast.show({
 					type: 'error',
-					text1: t('notify.locationBlank'),
+					text1: t('notify.locationBlank')
 				});
 				return;
 			}
@@ -96,7 +97,7 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 			type: eventType,
 			channelId: eventType === OptionEvent.OPTION_SPEAKER ? channelID : null,
 			location: eventType === OptionEvent.OPTION_LOCATION ? location : null,
-			onGoBack,
+			onGoBack
 		});
 	}
 
@@ -115,7 +116,7 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 
 					<MezonOption data={options} onChange={handleEventTypeChange} />
 
-					{eventType === OptionEvent.OPTION_SPEAKER ? (
+					{eventType && eventType === OptionEvent.OPTION_SPEAKER && voicesChannel.length && (
 						<MezonSelect
 							prefixIcon={<Icons.VoiceNormalIcon height={20} width={20} color={themeValue.textStrong} />}
 							title={t('fields.channel.title')}
@@ -123,7 +124,9 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 							onChange={handleChannelIDChange}
 							data={channels}
 						/>
-					) : (
+					)}
+
+					{eventType && eventType === OptionEvent.OPTION_LOCATION && (
 						<MezonInput
 							onTextChange={setLocation}
 							value={location}
@@ -139,7 +142,12 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 			</View>
 
 			<View style={styles.btnWrapper}>
-				<MezonButton title={t('actions.next')} titleStyle={{ fontSize: Fonts.size.h7 }} type="success" onPress={handlePressNext} />
+				<MezonButton
+					title={t('actions.next')}
+					titleStyle={{ fontSize: Fonts.size.h7 }}
+					type={EMezonButtonTheme.SUCCESS}
+					onPress={handlePressNext}
+				/>
 			</View>
 		</View>
 	);

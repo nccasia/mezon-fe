@@ -14,23 +14,23 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.primary,
 			gap: size.s_6,
 			alignItems: 'center',
-			borderColor: colors.border,
+			borderColor: colors.border
 		},
 
 		rounded: {
-			borderRadius: size.s_20,
+			borderRadius: size.s_20
 		},
 
 		containerSuccess: {
-			backgroundColor: Colors.green,
+			backgroundColor: Colors.green
 		},
 
 		containerWarning: {
-			backgroundColor: Colors.green,
+			backgroundColor: Colors.green
 		},
 
 		containerDanger: {
-			backgroundColor: Colors.green,
+			backgroundColor: Colors.green
 		},
 
 		containerTheme: {
@@ -38,26 +38,26 @@ export const style = (colors: Attributes) =>
 		},
 
 		containerMd: {
-			padding: size.s_12,
+			padding: size.s_12
 		},
 
 		containerLg: {
-			padding: size.s_16,
+			padding: size.s_16
 		},
 
 		fluid: {
 			flexBasis: 10,
-			flexGrow: 1,
+			flexGrow: 1
 		},
 
 		border: {
-			backgroundColor: 'transparent',
+			backgroundColor: 'transparent'
 		},
 
 		title: {
 			color: baseColor.white,
 			fontSize: Fonts.size.h7,
-			textAlign: "center",
-			width: "100%"
-		},
+			textAlign: 'center',
+			width: 'auto'
+		}
 	});
