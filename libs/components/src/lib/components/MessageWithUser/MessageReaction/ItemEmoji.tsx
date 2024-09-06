@@ -1,12 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction } from '@mezon/core';
-import {
-	reactionActions,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectEmojiHover,
-	selectUserReactionPanelState
-} from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';

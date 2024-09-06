@@ -33,7 +33,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals,
 	UsersClanEntity
-} from '../types/index';
+} from '../types';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);

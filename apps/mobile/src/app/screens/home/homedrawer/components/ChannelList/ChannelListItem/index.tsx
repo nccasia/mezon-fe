@@ -1,17 +1,7 @@
-import {
-	Icons,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	save
-} from '@mezon/mobile-components';
+import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById } from '@mezon/store';
-import {
-	channelsActions,
-	getStoreAsync,
-	selectCurrentChannelId,
-	selectVoiceChannelMembersByChannelId
-} from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -44,7 +34,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
-	
+
 	const isActive = useMemo(() => {
 		return currentChanelId === props?.data?.id;
 	}, [currentChanelId, props?.data?.id]);
@@ -68,8 +58,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};
 
@@ -85,13 +75,25 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{isUnRead && <View style={styles.dotIsNew} />}
 
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.VoiceLockIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.TextLockIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.VoiceNormalIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 						<Icons.TextIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />

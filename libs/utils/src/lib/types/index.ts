@@ -628,7 +628,7 @@ export enum RoleEveryOne {
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 11
+	FIRST_MESSAGE = 4
 }
 
 export enum ModeResponsive {
@@ -736,7 +736,9 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
-	isMe?: true;
+	isMe?: boolean;
+	code?: number;
+	attachments?: ApiMessageAttachment[];
 };
 
 export type RequestInput = {
@@ -777,7 +779,6 @@ export enum ENotificationTypes {
 
 export type PreSendAttachment = {
 	channelId?: string;
-	messageId?: string;
 	mode?: string;
 	clan_id?: string;
 	files: ApiMessageAttachment[];

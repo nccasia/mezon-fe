@@ -23,7 +23,7 @@ export function useUserPermission() {
 		userPermissionsStatus,
 		isClanOwner,
 		isCanManageThread: hasManageThread || hasAdministrator || isClanOwner,
-		isCanManageChannel: hasManageChannel || hasAdministrator || isClanOwner,
+		isCanManageChannel: hasManageChannel || hasAdministrator || isClanOwner || hasManageClan,
 		isCanManageClan: hasManageClan || hasAdministrator || isClanOwner,
 		isCanDeleteMessage: hasDeleteMessage || hasAdministrator || isClanOwner,
 		isCanSendMessage: hasSendMessage || hasAdministrator || isClanOwner || hasManageChannel || hasManageClan || hasManageThread,

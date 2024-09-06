@@ -2,7 +2,6 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
-	selectAllMessagesByChannelId,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -10,6 +9,7 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
+	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
 	selectOpenModalAttachment,
@@ -20,7 +20,7 @@ import {
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
@@ -33,20 +33,28 @@ type ChannelMessagesProps = {
 	userName?: string;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
-	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
+function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
+	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
+	const anchorRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const firstMessageId = useAppSelector((state) => selectFirstMessageId(state, channelId));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const isJumpingToPresent = useSelector(selectIsJumpingToPresent);
+	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
 	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
 	const isViewingOlderMessages = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const [shouldRenderLoadingBlock, setShouldRenderLoadingBlock] = useState<boolean>(false);
+
+	const onChatRender = useCallback((node: HTMLDivElement | null) => {
+		chatRef.current = node;
+		if (node) {
+			node.scrollTop = node.scrollHeight;
+		}
+	}, []);
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -91,18 +99,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
+	const chatScrollRef = useChatScroll(chatRef, anchorRef, chatRefData, loadMoreMessage);
 
 	const messagesView = useMemo(() => {
-		return messages.map((message) => {
+		return messages.map((messageId) => {
 			return (
 				<MemorizedChannelMessage
 					avatarDM={avatarDM}
 					userName={userName}
-					key={message.id}
-					message={message}
+					key={messageId}
+					messageId={messageId}
 					channelId={channelId}
-					isHighlight={message.id === idMessageNotified}
+					isHighlight={messageId === idMessageNotified}
 					mode={mode}
 					channelLabel={channelLabel ?? ''}
 				/>
@@ -124,8 +132,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	// Jump to present when user is jumping to present
 	useEffect(() => {
 		if (isJumpingToPresent) {
-			chatScrollRef.scrollToBottom().then(() => {
-				dispatch(messagesActions.setIsJumpingToPresent(false));
+			chatScrollRef.scrollToAnchor().then(() => {
+				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
 			});
 		}
 	}, [dispatch, isJumpingToPresent, chatScrollRef]);
@@ -175,22 +183,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	return (
 		<MessageContextMenuProvider>
 			<div
-				className={classNames(
-					'dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full md:[overflow-anchor:none]',
-					{
-						customScrollLightMode: appearanceTheme === 'light'
-					}
-				)}
+				className={classNames('dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
+					customScrollLightMode: appearanceTheme === 'light'
+				})}
 				id="scrollLoading"
-				ref={chatRef}
+				ref={onChatRender}
 			>
-				<div className="flex flex-col min-h-full justify-end md:[overflow-anchor:none]">
+				<div className="flex flex-col min-h-full justify-end">
 					{shouldRenderLoadingBlock && isFetching && (
 						<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 					)}
 					{messagesView}
 					{openModalAttachment && <MessageModalImage />}
 				</div>
+				<div ref={anchorRef} className="anchor"></div>
 			</div>
 		</MessageContextMenuProvider>
 	);
@@ -205,3 +211,7 @@ ChannelMessages.Skeleton = () => {
 		</>
 	);
 };
+
+const MemoizedChannelMessages = memo(ChannelMessages) as unknown as typeof ChannelMessages & { Skeleton: typeof ChannelMessages.Skeleton };
+
+export default MemoizedChannelMessages;

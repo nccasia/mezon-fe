@@ -1,4 +1,4 @@
-import { useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
@@ -304,10 +304,11 @@ function RedDot() {
 }
 
 export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
+	const { navigate } = useAppNavigation();
 	return (
 		<div className="relative leading-5 h-5">
 			<Tooltip content="Help" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button>
+				<button onClick={() => navigate('help')}>
 					<Icons.Help />
 				</button>
 			</Tooltip>

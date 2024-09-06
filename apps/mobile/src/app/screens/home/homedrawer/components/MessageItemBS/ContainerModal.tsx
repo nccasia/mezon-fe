@@ -15,7 +15,6 @@ import {
 } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useImage } from 'apps/mobile/src/app/hooks/useImage';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +22,7 @@ import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'reac
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { useImage } from '../../../../../hooks/useImage';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -37,7 +37,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false  } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '' } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -139,22 +139,28 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
-	const handleActionPinMessage = () => {
+	const handleActionPinMessage = async () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.PinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.PinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionUnPinMessage = () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.UnPinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.UnPinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -424,7 +430,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					})}
 
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
-						<Icons.ReactionIcon color={themeValue.text} />
+						<Icons.ReactionIcon color={themeValue.text} height={size.s_24} width={size.s_24} />
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>
@@ -509,5 +515,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return <View style={[styles.bottomSheetWrapper, { backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }]}>{content}</View>;
+	return (
+		<View
+			style={[
+				styles.bottomSheetWrapper,
+				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
+			]}
+		>
+			{content}
+		</View>
+	);
 });

@@ -11,6 +11,11 @@ export interface GifEntity extends IGif {
 	id: string;
 }
 
+export interface GifCategoriesResponse {
+	locale: string;
+	tags: GifCategoriesEntity[];
+}
+
 export const gifsAdapter = createEntityAdapter<GifCategoriesEntity>({
 	selectId: (emo: GifCategoriesEntity) => emo.id || emo.path || ''
 } as any);
@@ -39,7 +44,7 @@ const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
 const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
 const limit = 30;
 
-export const fetchGifCategories = createAsyncThunk<GifCategoriesEntity[]>('gifs/fetchStatus', async (_, thunkAPI) => {
+export const fetchGifCategories = createAsyncThunk<GifCategoriesResponse>('gifs/fetchStatus', async (_, thunkAPI) => {
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_CATEGORIES ?? '';
 	const categoriesUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
@@ -110,8 +115,8 @@ export const gifsSlice = createSlice({
 			.addCase(fetchGifCategories.pending, (state: GifsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchGifCategories.fulfilled, (state: GifsState, action: PayloadAction<GifCategoriesEntity[]>) => {
-				gifsAdapter.setAll(state, action.payload);
+			.addCase(fetchGifCategories.fulfilled, (state: GifsState, action: PayloadAction<GifCategoriesResponse>) => {
+				gifsAdapter.setAll(state, action.payload.tags);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchGifCategories.rejected, (state: GifsState, action) => {

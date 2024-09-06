@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export function useGifs() {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
-	const dataGifCategories = useSelector(selectAllgifCategory)[0];
+	const dataGifCategories = useSelector(selectAllgifCategory);
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
 	const dataGifsFeartured = useSelector(selectDataGifsFeatured);
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);

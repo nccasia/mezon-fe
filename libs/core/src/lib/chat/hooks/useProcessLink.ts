@@ -36,6 +36,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 							attachment.url &&
 							attachment?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
 							!attachment.url.startsWith('https://cdn.mezon.vn') &&
+							!attachment.url.startsWith('blob:') &&
 							contentPayload?.t &&
 							!contentPayload.t.includes(attachment.url)
 					) ?? [];
@@ -50,7 +51,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 						mentionPayload ?? [],
 						finalAttachments,
 						undefined,
-						true
+						false
 					);
 				}
 			} else if (contentPayload?.lk) {
@@ -79,7 +80,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 								mentionPayload ?? [],
 								combinedAttachments,
 								undefined,
-								!messageEdit ? false : true
+								messageEdit ? false : true
 							);
 						}
 					})

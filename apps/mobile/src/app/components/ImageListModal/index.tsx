@@ -39,7 +39,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
 
 	const initialIndex = useMemo(() => {
-		return allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
+		return allImageList.findIndex((file) => file?.url === imageSelected?.url);
 	}, [allImageList, imageSelected]);
 
 	const formattedImageList = useMemo(() => {

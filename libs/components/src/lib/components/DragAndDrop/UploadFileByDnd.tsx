@@ -37,14 +37,13 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		dispatch(
 			referencesActions.setAtachmentAfterUpload({
 				channelId: currentId,
-				messageId: '',
 				files: filesArray.map((file) => ({
 					filename: file.name,
 					filetype: file.type,
 					size: file.size,
-					url: URL.createObjectURL(file),
-				})),
-			}),
+					url: URL.createObjectURL(file)
+				}))
+			})
 		);
 	};
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;

@@ -1,14 +1,7 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	checkDuplicateNameClan,
-	clansActions,
-	getStoreAsync,
-	selectAllAccount,
-	selectCurrentChannel
-} from '@mezon/store-mobile';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,11 +9,11 @@ import { Image, Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IFile, MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validInput } from '../../../../../utils/validate';
 import { style } from './CreateClanModal.styles';
-import Toast from 'react-native-toast-message';
 
 interface ICreateClanProps {
 	visible: boolean;
@@ -130,8 +123,8 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 						<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
 							{!urlImage ? (
 								<View style={[styles.uploadCreateClan]}>
-									<AddIcon style={styles.addIcon} height={30} width={30} color={Colors.bgButton} />
-									<UploadImage height={20} width={20} color={Colors.bgGrayLight} />
+									<AddIcon style={styles.addIcon} height={size.s_30} width={size.s_30} color={Colors.bgButton} />
+									<UploadImage height={size.s_20} width={size.s_20} color={Colors.bgGrayLight} />
 									<Text style={styles.uploadText}>{t('upload')}</Text>
 								</View>
 							) : (

@@ -21,6 +21,7 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	openModalAttachment: boolean;
 	mode: ChannelStreamMode | undefined;
 	messageId: string;
+	currentAttachment: AttachmentEntity | null;
 }
 
 export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
@@ -67,7 +68,8 @@ export const initialAttachmentState: AttachmentState = attachmentAdapter.getInit
 	attachment: '',
 	openModalAttachment: false,
 	mode: undefined,
-	messageId: ''
+	messageId: '',
+	currentAttachment: null
 });
 
 export const attachmentSlice = createSlice({
@@ -88,6 +90,12 @@ export const attachmentSlice = createSlice({
 		},
 		setMessageId: (state, action) => {
 			state.messageId = action.payload;
+		},
+		setCurrentAttachment: (state, action: PayloadAction<AttachmentEntity | null>) => {
+			state.currentAttachment = action.payload;
+		},
+		removeCurrentAttachment: (state) => {
+			state.currentAttachment = null;
 		}
 	},
 	extraReducers: (builder) => {
@@ -157,6 +165,8 @@ export const selectAllAttachment = createSelector(getAttachmentState, selectAll)
 export const selectAttachmentEntities = createSelector(getAttachmentState, selectEntities);
 
 export const selectAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.attachment);
+
+export const selectCurrentAttachmentShowImage = createSelector(getAttachmentState, (state: AttachmentState) => state.currentAttachment);
 
 export const selectOpenModalAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.openModalAttachment);
 

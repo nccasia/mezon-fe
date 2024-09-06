@@ -17,7 +17,7 @@ export type MessageBoxProps = {
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
 		anonymous?: boolean,
-		mentionEveryone?: boolean,
+		mentionEveryone?: boolean
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[];
@@ -44,14 +44,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					messageId: '',
 					files: [file].map((file) => ({
 						filename: file.name,
 						filetype: file.type,
 						size: file.size,
-						url: URL.createObjectURL(file),
-					})),
-				}),
+						url: URL.createObjectURL(file)
+					}))
+				})
 			);
 		}
 	}, []);
@@ -74,19 +73,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
 							channelId: currentChannelId,
-							messageId: '',
 							files: files.map((file) => ({
 								filename: file.name,
 								filetype: file.type,
 								size: file.size,
-								url: URL.createObjectURL(file),
-							})),
-						}),
+								url: URL.createObjectURL(file)
+							}))
+						})
 					);
 				}
 			}
 		},
-		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
+		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode]
 	);
 
 	const closeMenu = useSelector(selectCloseMenu);

@@ -18,7 +18,7 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 
 	const imageSize = getAspectRatioSize({
 		aspectRatio: resolution.width / resolution.height,
-		width: widthMedia,
+		width: widthMedia
 	});
 
 	const isUploading = !image?.url?.includes('http');
@@ -26,7 +26,7 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 	if (!image.url) {
 		return null;
 	}
-	
+
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
 			<FastImage
@@ -34,8 +34,8 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 					styles.imageMessageRender,
 					{
 						width: imageSize.width,
-						height: imageSize.height,
-					},
+						height: imageSize.height
+					}
 				]}
 				source={{ uri: image?.url }}
 				resizeMode="contain"

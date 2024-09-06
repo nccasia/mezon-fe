@@ -10,12 +10,12 @@ import {
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import MemberProfile from '../../MemberProfile';

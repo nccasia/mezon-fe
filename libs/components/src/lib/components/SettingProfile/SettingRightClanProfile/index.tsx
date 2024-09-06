@@ -1,7 +1,8 @@
 import { selectAllClans, selectCurrentClan } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import SettingUserClanProfileEdit from './settingClanProfileEditting';
+import SettingUserClanProfileEdit from './SettingUserClanProfileEdit';
+
 const SettingRightClan = () => {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
@@ -15,7 +16,7 @@ const SettingRightClan = () => {
 	return (
 		<div className="flex flex-col">
 			<div className="flex flex-col xl:flex-row gap-x-1 text-sm font-normal">
-				<p>Show who you are with different profiles for each of your clans</p>
+				<p className="dark:text-bgLightPrimary text-bgPrimary">Show who you are with different profiles for each of your clans</p>
 				<a href=" " className="text-[#155EEF] text-sm font-normal">
 					Learn more about Clan Profiles
 				</a>

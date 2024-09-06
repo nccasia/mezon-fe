@@ -11,7 +11,6 @@ import {
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	setRecentEmoji,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
 import { baseColor, Colors, Metrics, size, useTheme } from '@mezon/mobile-ui';

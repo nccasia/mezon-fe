@@ -1,34 +1,41 @@
-import { AttachmentEntity } from '@mezon/store';
+import { AttachmentEntity, attachmentActions, useAppDispatch } from '@mezon/store';
 
 type ItemAttachmentProps = {
 	attachment: AttachmentEntity;
-	urlImg: string;
 	previousDate: any;
 	selectedImageRef: React.MutableRefObject<HTMLDivElement | null>;
 	showDate: boolean;
 	setUrlImg: React.Dispatch<React.SetStateAction<string>>;
 	handleDrag: (e: any) => void;
+	index: number;
+	setCurrentIndexAtt: React.Dispatch<React.SetStateAction<number>>;
+	currentIndexAtt: number;
 };
 
 const ItemAttachment = (props: ItemAttachmentProps) => {
-	const { attachment, urlImg, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag } = props;
-	const url = attachment.url;
-	const isSelected = url === urlImg;
+	const { attachment, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag, setCurrentIndexAtt, index, currentIndexAtt } = props;
+	const dispatch = useAppDispatch();
+	const isSelected = index === currentIndexAtt;
+	const handleSelectImage = () => {
+		setUrlImg(attachment.url || '');
+		setCurrentIndexAtt(index);
+		dispatch(attachmentActions.setCurrentAttachment(attachment));
+	};
 	return (
-		<div
-			className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-fit dark:border-white border-colorTextLightMode' : 'border-transparent'}`}
-			ref={isSelected ? selectedImageRef : null}
-		>
-			{showDate && <div className={`dark:text-white text-black mb-1 text-center sbm:block hidden`}>{previousDate}</div>}
-			<div className={isSelected ? 'flex items-center' : 'relative'} onClick={() => setUrlImg(url || '')}>
+		<div className={` w-fit h-fit `} ref={isSelected ? selectedImageRef : null}>
+			{showDate && <div className={`dark:text-white text-black mb-1 text-center`}>{previousDate}</div>}
+			<div
+				className={`rounded-md cursor-pointer ${isSelected ? 'flex items-center border-2 border-white' : 'relative'}`}
+				onClick={handleSelectImage}
+			>
 				<img
-					src={url}
-					alt={url}
-					className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer ${isSelected ? '' : 'overlay'}`}
+					src={attachment.url}
+					alt={attachment.url}
+					className={`size-[88px] max-w-[88px] max-h-[88px] mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
 					onDragStart={handleDrag}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {
-							setUrlImg(url || '');
+							handleSelectImage();
 						}
 					}}
 				/>

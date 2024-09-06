@@ -1,108 +1,71 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useScroll } from './scroll';
 
-// brute force function to execute a function multiple times with a time limit
-// using requestAnimationFrame to ensure smooth execution
-function brushForceCall(fn: () => boolean, totalMs: number) {
-	const startTime = Date.now();
-	let lastTime = startTime;
-	let lastResult = false;
-
-	function loop() {
-		if (Date.now() - startTime > totalMs) {
-			return;
-		}
-
-		const result = fn();
-		if (result) {
-			return;
-		}
-
-		if (lastResult) {
-			lastTime = Date.now();
-		}
-
-		lastResult = result;
-		return requestAnimationFrame(loop);
-	}
-
-	const animationFrameId = loop();
-
-	return {
-		cancel: () => animationFrameId && cancelAnimationFrame(animationFrameId)
-	};
-}
+const ANCHOR_SCROLL_TIMEOUT = 5000;
 
 /**
  * React hook for keeping HTML element scroll at the bottom when content updates (if it is already at the bottom).
  * @param targetRef Reference of scrollable HTML element.
- * @param data Array of some data items displayed in a scrollable HTML element. It should normally come from a state.
+ * @param anchorRef Reference of anchor HTML element. Scroll would be kept at anchor until user scrolls.
  */
 export const useStickyScroll = (
 	targetRef: React.MutableRefObject<Element>,
-	data: IChatScrollData,
+	anchorRef: React.MutableRefObject<Element>,
 	options?: IUseStickyScrollOptions
 ): IUseStickyScrollResponse => {
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
-	const [sticky, setSticky] = useState<boolean>(true);
-	const stickyRef = useRef(sticky);
 	const { setScrollEventHandler } = useScroll(targetRef);
 
-	const { data: messages } = data;
-
-	const lastMessageId = useMemo(() => {
-		return messages.length > 0 ? messages[messages.length - 1]?.id : null;
-	}, [messages]);
-
-	const moveScrollToBottom = useCallback(() => {
+	/**
+	 * Scrolls to anchor.
+	 */
+	const scrollToAnchor = useCallback(() => {
 		return new Promise<boolean>((resolve) => {
-			if (!targetRef.current) {
+			if (!anchorRef.current) {
 				return resolve(false);
 			}
-			targetRef.current.scrollTop = targetRef.current.scrollHeight;
+			anchorRef.current?.scrollIntoView();
 			resolve(true);
 		});
-	}, [targetRef]);
-
-	const updateStuckToBottom = useCallback(() => {
-		if (!targetRef.current) {
-			return;
-		}
-		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
-		const currentlyAtBottom = scrollHeight === scrollTop + clientHeight;
-
-		if (stickyRef.current && !currentlyAtBottom) {
-			setSticky(false);
-		} else if (!stickyRef.current && currentlyAtBottom) {
-			setSticky(true);
-		}
-	}, [targetRef, stickyRef]);
-
-	const handleScroll = useCallback(
-		(e: Event) => {
-			updateStuckToBottom();
-		},
-		[updateStuckToBottom]
-	);
+	}, [anchorRef]);
 
 	useEffect(() => {
-		if (enabled) {
-			setScrollEventHandler(handleScroll);
-		} else {
-			setScrollEventHandler(() => {
-				return;
-			});
+		if (!enabled) {
+			return;
 		}
-	}, [enabled, handleScroll, setScrollEventHandler]);
 
-	/**
-	 * Scrolls to bottom.
-	 */
-	const scrollToBottom = useCallback(async () => {
-		await moveScrollToBottom();
-		setSticky(true);
-		return true;
-	}, [moveScrollToBottom]);
+		if (!targetRef.current || !anchorRef.current) {
+			return;
+		}
+
+		const options = {
+			root: targetRef.current,
+			rootMargin: '0px',
+			threshold: 1.0
+		};
+
+		let intersectTimer: NodeJS.Timeout | null = null;
+		const observer = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					// keep the anchor in view until the user scrolls
+					intersectTimer = setTimeout(() => {
+						observer.disconnect();
+					}, ANCHOR_SCROLL_TIMEOUT);
+				} else {
+					intersectTimer && clearTimeout(intersectTimer);
+					scrollToAnchor();
+				}
+			}
+		}, options);
+
+		setScrollEventHandler(() => {
+			observer.disconnect();
+		});
+
+		observer.observe(anchorRef.current);
+		return () => observer.disconnect();
+	}, [enabled, targetRef, anchorRef, scrollToAnchor, setScrollEventHandler]);
 
 	/**
 	 * Scrolls to message with given id.
@@ -137,24 +100,9 @@ export const useStickyScroll = (
 	 */
 	const disable = () => setEnabled(false);
 
-	useEffect(() => {
-		requestAnimationFrame(() => {
-			scrollToBottom();
-		});
-	}, []);
-
-	// update sticky scroll state when data changes
-	useEffect(() => {
-		stickyRef.current = sticky;
-		if (sticky) {
-			scrollToMessage(lastMessageId);
-		}
-	}, [lastMessageId, stickyRef, sticky, scrollToMessage]);
-
 	return {
 		enabled,
-		sticky,
-		scrollToBottom,
+		scrollToAnchor,
 		scrollToMessage,
 		enable,
 		disable
@@ -206,14 +154,9 @@ export interface IUseStickyScrollResponse {
 	enabled: boolean;
 
 	/**
-	 * True when scroll is stuck to the bottom of target element.
+	 * Scrolls to the anchor element.
 	 */
-	sticky: boolean;
-
-	/**
-	 * Scrolls to bottom of the target element.
-	 */
-	scrollToBottom: () => Promise<boolean>;
+	scrollToAnchor: () => Promise<boolean>;
 
 	/**
 	 * Scrolls to message with given id.

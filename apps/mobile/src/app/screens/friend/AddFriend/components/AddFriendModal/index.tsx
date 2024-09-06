@@ -1,6 +1,6 @@
 import { useAuth, useFriends } from '@mezon/core';
 import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
-import { baseColor, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, requestAddFriendParam, selectStatusSentMobile } from '@mezon/store-mobile';
 import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
 	const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
 		usernames: [],
-		ids: [],
+		ids: []
 	});
 	const [isKeyBoardShow, setIsKeyBoardShow] = useState<boolean>(false);
 	const { t } = useTranslation('friends');
@@ -40,16 +40,16 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 					type: 'success',
 					props: {
 						text2: t('toast.sendAddFriendSuccess'),
-						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-					},
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
 				});
 			} else {
 				Toast.show({
 					type: 'success',
 					props: {
 						text2: t('toast.sendAddFriendFail'),
-						leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-					},
+						leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+					}
 				});
 			}
 			dispatch(friendsActions.setSentStatusMobile(null));
@@ -102,7 +102,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	const resetField = () => {
 		setRequestAddFriend({
 			usernames: [],
-			ids: [],
+			ids: []
 		});
 	};
 
@@ -158,7 +158,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								disabled={!requestAddFriend.usernames[0]?.length}
 								onPress={() => sentFriendRequest()}
 								viewContainerStyle={styles.sendButton}
-								textStyle={{ color: baseColor.white }}
+								textStyle={{ color: baseColor.white, fontSize: size.medium }}
 							>
 								{t('addFriend.sendRequestButton')}
 							</MezonButton>

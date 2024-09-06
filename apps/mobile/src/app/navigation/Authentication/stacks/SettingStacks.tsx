@@ -11,7 +11,8 @@ import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const SettingStacks = ({ }: any) => {
+// eslint-disable-next-line no-empty-pattern
+export const SettingStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
 	const { themeValue } = useTheme();
@@ -27,22 +28,22 @@ export const SettingStacks = ({ }: any) => {
 				headerTitleAlign: 'center',
 				headerTintColor: themeValue.textStrong,
 				headerStyle: {
-					backgroundColor: themeValue.primary,
+					backgroundColor: themeValue.primary
 				},
 				headerTitleStyle: {
 					fontWeight: 'bold',
-					fontSize: Fonts.size.medium,
+					fontSize: Fonts.size.medium
 				},
 				cardStyle: {
-					backgroundColor: "transparent",
-				},
+					backgroundColor: 'transparent'
+				}
 			}}
 		>
 			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.HOME}
 				component={Settings}
 				options={{
-					headerTitle: t('settingStack.settings'),
+					headerTitle: t('settingStack.settings')
 				}}
 			/>
 
@@ -50,7 +51,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.LANGUAGE}
 				component={LanguageSetting}
 				options={{
-					headerTitle: t('settingStack.language'),
+					headerTitle: t('settingStack.language')
 				}}
 			/>
 
@@ -58,7 +59,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.PROFILE}
 				component={ProfileSetting}
 				options={{
-					headerTitle: t('settingStack.profile'),
+					headerTitle: t('settingStack.profile')
 				}}
 			/>
 
@@ -66,7 +67,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.APPEARANCE}
 				component={AppearanceSetting}
 				options={{
-					headerTitle: t('settingStack.appearance'),
+					headerTitle: t('settingStack.appearance')
 				}}
 			/>
 
@@ -74,7 +75,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.ACCOUNT}
 				component={AccountSetting}
 				options={{
-					headerTitle: t('settingStack.account'),
+					headerTitle: t('settingStack.account')
 				}}
 			/>
 
@@ -82,7 +83,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.BLOCKED_USERS}
 				component={BlockedUsers}
 				options={{
-					headerTitle: t('settingStack.blockedUsers'),
+					headerTitle: t('settingStack.blockedUsers')
 				}}
 			/>
 
@@ -91,7 +92,7 @@ export const SettingStacks = ({ }: any) => {
 				component={AppThemeSetting}
 				options={{
 					headerTitle: t('settingStack.appTheme'),
-					gestureEnabled: false,
+					gestureEnabled: false
 				}}
 			/>
 
@@ -99,7 +100,7 @@ export const SettingStacks = ({ }: any) => {
 				name={APP_SCREEN.SETTINGS.SHARING}
 				component={Sharing}
 				options={{
-					headerShown: false,
+					headerShown: false
 				}}
 			/>
 		</Stack.Navigator>

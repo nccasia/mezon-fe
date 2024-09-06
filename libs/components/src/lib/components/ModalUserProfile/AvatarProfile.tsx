@@ -34,7 +34,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"
 				/>
-				<div className="absolute bottom-[6px] right-[20px]">
+				<div className="absolute bottom-2 right-4">
 					<StatusUser
 						isListDm={isListDm}
 						isMemberChannel={isMemberChannel}
@@ -42,6 +42,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 						status={userStatus}
 						userId={userID}
 						isTyping={false}
+						sizeStatusIcon={'w-4 h-4'}
 					/>
 				</div>
 			</div>

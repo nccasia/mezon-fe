@@ -1,5 +1,5 @@
 import { RootState } from '@mezon/store';
-import { Loading } from 'libs/ui/src/lib/Loading/index';
+import { Loading } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 
 interface CreateChannelProps {
@@ -14,7 +14,7 @@ export const CreateChannelButton: React.FC<CreateChannelProps> = ({ checkInputEr
 		<div
 			className="Frame394 absolute border-t border-solid dark:border-borderDefault self-stretch mb-0 pt-3 justify-end items-center gap-4 inline-flex bottom-5 right-5"
 			style={{
-				width: "calc(100% - 40px)"
+				width: 'calc(100% - 40px)'
 			}}
 		>
 			<button onClick={onClickCancel} className="Text dark:text-white text-black hover:underline text-xs leading-normal font-semibold">

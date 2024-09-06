@@ -24,9 +24,9 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const [searchPermissionText, setSearchPermissionText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
-	const clanRole = useSelector(selectRoleByRoleId(roleId));
 	const everyoneRole = useSelector(selectEveryoneRole);
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
@@ -61,9 +61,9 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	);
 
 	const permissionList = useMemo(() => {
-		const allPermission = newRole?.permission_list?.permissions || [];
+		const allPermission = isEditRoleMode ? clanRole?.permission_list?.permissions : newRole?.permission_list?.permissions;
 		return allPermission.map((p) => ({ ...p, disabled: getDisablePermission(p?.slug) }));
-	}, [newRole?.permission_list?.permissions, getDisablePermission]);
+	}, [newRole?.permission_list?.permissions, getDisablePermission, isEditRoleMode, clanRole?.permission_list?.permissions]);
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedPermissions, selectedPermissions);
@@ -215,7 +215,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 								renderItem={({ item }) => {
 									return (
 										<TouchableOpacity
-											onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)}
+											onPress={() => onSelectPermissionChange(!selectedPermissions?.includes(item?.id), item?.id)}
 											disabled={item?.disabled}
 										>
 											<Block
@@ -231,7 +231,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 												</Block>
 
 												<MezonSwitch
-													value={selectedPermissions.includes(item?.id)}
+													value={selectedPermissions?.includes(item?.id)}
 													onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
 													disabled={item?.disabled}
 												/>

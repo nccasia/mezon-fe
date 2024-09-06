@@ -59,6 +59,7 @@
         "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
       },
       "linux": {
+        "icon": "apps/desktop/src/assets/linux-icon.png",
         "category": "Utility",
         "target": "deb",
         "mimeTypes": [
@@ -67,7 +68,13 @@
         "desktop": {
           "exec": "mezonapp %U"
         },
-        "appId": "mezon.ai"
+        "appId": "mezon.ai",
+        "publish": [
+          {
+            "provider": "generic",
+            "url": "https://cdn.mezon.vn/release/"
+          }
+        ]
       },
       "options": {
         "outputPath": "dist/apps/desktop",
@@ -172,6 +179,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
+          "icon": "apps/desktop/src/assets/linux-icon.png",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
@@ -181,7 +189,13 @@
             "exec": "mezonapp %U"
           },
           "appId": "mezon.ai",
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
         }
       }
     },
@@ -234,6 +248,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
+          "icon": "apps/desktop/src/assets/linux-icon.png",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
@@ -243,7 +258,13 @@
             "exec": "mezonapp %U"
           },
           "appId": "mezon.ai",
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "publish": [
+            {
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
+            }
+          ]
         }
       }
     },

@@ -4,6 +4,7 @@ import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurren
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
@@ -39,6 +40,15 @@ export type MemberProfileProps = {
 	hideLongName?: boolean;
 };
 
+export enum ModalType {
+	ProfileItem = 'profileItem',
+	PannelMember = 'pannelMember',
+	UserProfile = 'userProfile'
+}
+
+export const profileElemHeight = 358;
+export const profileElemWidth = 325;
+
 function MemberProfile({
 	avatar,
 	name,
@@ -61,11 +71,9 @@ function MemberProfile({
 	userNameAva,
 	hideLongName
 }: MemberProfileProps) {
-	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
-	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
-	const [positionTop, setPositionTop] = useState(false);
-	const [top, setTop] = useState(0);
-	const [coords, setCoords] = useState<Coords>({
+	const left = useRef(0);
+	const top = useRef(0);
+	const coords = useRef<Coords>({
 		mouseX: 0,
 		mouseY: 0,
 		distanceToBottom: 0
@@ -97,28 +105,39 @@ function MemberProfile({
 		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
 
 		if (event.button === MouseButton.LEFT) {
-			setIsShowUserProfile(!isShowUserProfile);
-			const heightElementShortUserProfileMin = 313;
-			setTop(mouseY - 50);
-			if (distanceToBottom < heightElementShortUserProfileMin) {
-				setPositionTop(true);
+			// handle show profile item
+			const rect = panelRef.current?.getBoundingClientRect() as DOMRect;
+			const distanceToBottom = windowHeight - rect.bottom;
+			if (distanceToBottom < profileElemHeight) {
+				top.current = rect.top - profileElemHeight;
+			} else {
+				top.current = rect.top;
+			}
+			left.current = rect.left - profileElemWidth;
+
+			if (modalState.current.profileItem) {
+				closeModal(ModalType.ProfileItem);
+			} else {
+				resetModalState();
+				openProfileItem();
 			}
 		}
 
 		if (event.button === MouseButton.RIGHT) {
-			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
-			setIsShowPanel(!isShowPanel);
+			coords.current = { mouseX: adjustedMouseX, mouseY, distanceToBottom };
+			if (modalState.current.pannelMember) {
+				closeModal(ModalType.PannelMember);
+			} else {
+				resetModalState();
+				openPanelMember();
+			}
 		}
-	};
-
-	const handleClosePannelMember = () => {
-		setIsShowPanel(false);
 	};
 
 	const handleClickRemoveMember = () => {
 		setOpenModalRemoveMember(true);
-		setIsShowPanel(false);
-		setIsShowUserProfile(false);
+		closeModal(ModalType.ProfileItem);
+		closeModal(ModalType.PannelMember);
 	};
 
 	const handleRemoveMember = async () => {
@@ -131,15 +150,15 @@ function MemberProfile({
 	};
 
 	const handleClickOutSide = () => {
-		setIsShowUserProfile(false);
-		setIsShowPanel(false);
+		closeModal(ModalType.ProfileItem);
+		closeModal(ModalType.PannelMember);
 	};
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
 	useEscapeKey(() => {
-		setIsShowUserProfile(false);
-		setIsShowPanel(false);
+		closeModal(ModalType.ProfileItem);
+		closeModal(ModalType.PannelMember);
 	});
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
@@ -162,20 +181,86 @@ function MemberProfile({
 	const subNameRef = useRef<HTMLInputElement>(null);
 	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth, [subNameRef]);
 
-	const handleOpenProfileModal = () => {
-		setIsOpenProfileModal(true);
-	};
-
-	const handleCloseProfileModal = () => {
-		setIsOpenProfileModal(false);
-	};
-
 	const isOwnerClanOrGroup = useMemo(() => {
 		return (
 			(dataMemberCreate?.createId || currentClan?.creator_id) &&
 			(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id
 		);
 	}, [currentClan?.creator_id, dataMemberCreate, user?.user?.id]);
+
+	const modalState = useRef({
+		profileItem: false,
+		pannelMember: false,
+		userProfile: false
+	});
+
+	const [openProfileItem, closeProfileItem] = useModal(() => {
+		if (!listProfile) return;
+		modalState.current.profileItem = true;
+		return (
+			<div
+				className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
+				style={{
+					top: `${top.current}px`,
+					left: `${left.current}px`
+				}}
+				onMouseDown={(e) => e.stopPropagation()}
+				onClick={(e) => e.stopPropagation()}
+			>
+				<ShortUserProfile
+					userID={user?.user?.id || ''}
+					mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
+					avatar={avatar}
+					name={name}
+				/>
+			</div>
+		);
+	});
+
+	const [openPanelMember, closePanelMember] = useModal(() => {
+		if (isHiddenAvatarPanel) return;
+		modalState.current.pannelMember = true;
+		return (
+			<PanelMember
+				coords={coords.current}
+				onClose={() => closeModal(ModalType.PannelMember)}
+				member={user}
+				onRemoveMember={handleClickRemoveMember}
+				directMessageValue={directMessageValue}
+				name={name}
+				isMemberDMGroup={dataMemberCreate ? true : false}
+				dataMemberCreate={dataMemberCreate}
+				isMemberChannel={isMemberChannel}
+				onOpenProfile={openUserProfile}
+			/>
+		);
+	});
+
+	const [openUserProfile, closeUserProfile] = useModal(() => {
+		modalState.current.userProfile = true;
+		return <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={() => closeModal(ModalType.UserProfile)} />;
+	});
+
+	const closeModal = (modalType: ModalType) => {
+		switch (modalType) {
+			case ModalType.ProfileItem:
+				closeProfileItem();
+				break;
+			case ModalType.PannelMember:
+				closePanelMember();
+				break;
+			case ModalType.UserProfile:
+				closeUserProfile();
+				break;
+		}
+		modalState.current[modalType] = false;
+	};
+
+	const resetModalState = () => {
+		closeModal(ModalType.ProfileItem);
+		closeModal(ModalType.PannelMember);
+		closeModal(ModalType.UserProfile);
+	};
 
 	return (
 		<div className="relative group">
@@ -270,35 +355,6 @@ function MemberProfile({
 					)}
 				</div>
 			</div>
-			{isShowPanel && !isHiddenAvatarPanel && (
-				<PanelMember
-					coords={coords}
-					onClose={handleClosePannelMember}
-					member={user}
-					onRemoveMember={handleClickRemoveMember}
-					directMessageValue={directMessageValue}
-					name={name}
-					isMemberDMGroup={dataMemberCreate ? true : false}
-					dataMemberCreate={dataMemberCreate}
-					isMemberChannel={isMemberChannel}
-					onOpenProfile={handleOpenProfileModal}
-				/>
-			)}
-			{isShowUserProfile && listProfile ? (
-				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed md:right-[245px] right-auto left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
-					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
-					onMouseDown={(e) => e.stopPropagation()}
-					onClick={(e) => e.stopPropagation()}
-				>
-					<ShortUserProfile
-						userID={user?.user?.id || ''}
-						mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
-						avatar={avatar}
-						name={name}
-					/>
-				</div>
-			) : null}
 
 			{openModalRemoveMember && (
 				<ModalRemoveMemberClan
@@ -308,8 +364,6 @@ function MemberProfile({
 					onRemoveMember={handleRemoveMember}
 				/>
 			)}
-
-			{isOpenProfileModal && <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />}
 		</div>
 	);
 }

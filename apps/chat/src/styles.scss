@@ -783,3 +783,14 @@ input:-webkit-autofill:active {
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 }
+
+#scrollLoading {
+	overflow-anchor: none;
+	& * {
+		overflow-anchor: none;
+	}
+	& > .anchor {
+		overflow-anchor: auto;
+		height: 1px;
+	}
+}

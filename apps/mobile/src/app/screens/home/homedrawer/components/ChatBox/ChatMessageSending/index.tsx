@@ -3,7 +3,7 @@ import { useChatSending, useDirectMessages } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAttachmentByChannelId } from '@mezon/store';
-import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
+import { referencesActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -166,7 +166,13 @@ export const ChatMessageSending = memo(
 					] as Array<ApiMessageRef>)
 				: undefined;
 			dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
-
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId,
+					files: []
+				})
+			);
+			clearInputAfterSendMessage();
 			const sendMessageAsync = async () => {
 				if (type === EMessageActionType.EditMessage) {
 					await onEditMessage(
@@ -205,7 +211,6 @@ export const ChatMessageSending = memo(
 
 			InteractionManager.runAfterInteractions(() => {
 				setTimeout(() => {
-					clearInputAfterSendMessage();
 					sendMessageAsync().catch((error) => {
 						console.log('Error sending message:', error);
 					});

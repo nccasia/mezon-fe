@@ -12,9 +12,9 @@ type MessageAttachmentProps = {
 	mode: ChannelStreamMode;
 };
 
-const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
+const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMessageWithUser) => {
 	const videos: ApiMessageAttachment[] = [];
-	const images: ApiMessageAttachment[] = [];
+	const images: (ApiMessageAttachment & { create_time?: string })[] = [];
 	const documents: ApiMessageAttachment[] = [];
 
 	attachments.forEach((attachment) => {
@@ -29,7 +29,12 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 			attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1 ||
 			attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)
 		) {
-			images.push(attachment);
+			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
+				...attachment,
+				sender_id: message.sender_id,
+				create_time: message.create_time
+			};
+			images.push(resultAttach);
 		} else {
 			documents.push(attachment);
 		}
@@ -37,14 +42,13 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	return { videos, images, documents };
 };
 
-const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: string; onContextMenu: any; mode: ChannelStreamMode }> = ({
+const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMessageWithUser; onContextMenu: any; mode: ChannelStreamMode }> = ({
 	attachments,
-	messageId,
+	message,
 	onContextMenu,
 	mode
 }) => {
-	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
-
+	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments, message), [attachments]);
 	return (
 		<>
 			{videos.length > 0 && (
@@ -63,7 +67,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
 							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-								<MessageImage messageId={messageId} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
+								<MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
 							</div>
 						);
 					})}
@@ -83,7 +87,7 @@ const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentPr
 	}, [message.attachments]);
 	if (!validateAttachment) return null;
 
-	return <Attachments mode={mode} messageId={message.id} attachments={validateAttachment ?? []} onContextMenu={onContextMenu} />;
+	return <Attachments mode={mode} message={message} attachments={validateAttachment ?? []} onContextMenu={onContextMenu} />;
 };
 
 export default MessageAttachment;

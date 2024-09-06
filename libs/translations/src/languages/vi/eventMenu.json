@@ -8,6 +8,10 @@
       "reportEvent": "Báo cáo sự kiện",
       "copyEventLink": "Sao chép liên kết sự kiện",
       "copyEventID": "Sao chép ID sự kiện"
+    },
+    "confirm": {
+        "title": "Hủy sự kiện",
+        "content": "Bạn có chắc muốn hủy sự kiện này không?"
     }
   }
   

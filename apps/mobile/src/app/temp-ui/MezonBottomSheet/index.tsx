@@ -20,20 +20,20 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 	const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = 'sm' } = props;
 	const themeValue = useTheme().themeValue;
 	const styles = useMemo(() => style(themeValue), [themeValue]);
-	
+
 	const renderHeader = useCallback(() => {
 		if (title || headerLeft || headerRight) {
 			return (
 				<View style={styles.header}>
-					<View style={[styles.section, styles.sectionLeft]}>{headerLeft}</View>
-					<Text style={[styles.section, styles.sectionTitle, titleSize === 'md' ? styles.titleMD : {}]}>{title}</Text>
-					<View style={[styles.section, styles.sectionRight]}>{headerRight}</View>
+					<View style={[styles.sectionLeft]}>{headerLeft}</View>
+					<Text style={[styles.sectionTitle, titleSize === 'md' ? styles.titleMD : {}]}>{title}</Text>
+					<View style={[styles.sectionRight]}>{headerRight}</View>
 				</View>
 			);
 		}
 		return null;
 	}, [title, headerLeft, headerRight, styles, titleSize]);
-	
+
 	return (
 		<OriginalBottomSheet
 			{...props}

@@ -2,7 +2,7 @@ import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
 import { ContenSubmitEventProps, fileTypeImage } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSelector } from 'react-redux';
@@ -29,14 +29,36 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
-	const frequencies = [
-		'Does not repeat',
-		'Weekly on Friday',
-		'Every other Friday',
-		'Monthly on the first Friday',
-		'Annually on 03 May',
-		'Every weekday (Monday to Friday)',
-	];
+	const startDate = contentSubmit.selectedDateStart.getDate();
+	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const startMonth = months[contentSubmit.selectedDateStart.getMonth()];
+	const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	const startDayOfWeek = weekdays[contentSubmit.selectedDateStart.getDay()];
+
+	const getWeekdayOccurrence = (date: Date) => {
+		const dayOfMonth = date.getDate();
+		const dayOfWeek = date.getDay();
+		const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+		const offset = (dayOfWeek - firstDayOfMonth + 7) % 7;
+		const occurrence = Math.floor((dayOfMonth - 1 - offset) / 7) + 1;
+		return occurrence;
+	};
+	const occurrence = ['First', 'Second', 'Third', 'Fourth'];
+	const weekdayOccurrence = occurrence[getWeekdayOccurrence(contentSubmit.selectedDateStart) - 1];
+
+	const frequencies = useMemo(() => {
+		const options = [
+			'Does not repeat',
+			`Weekly on ${startDayOfWeek}`,
+			`Every other ${startDayOfWeek}`,
+			`Monthly on the ${weekdayOccurrence} ${startDayOfWeek}`,
+			`Annually on ${startDate} ${startMonth}`
+		];
+		if (startDayOfWeek !== 'Sunday' && startDayOfWeek !== 'Saturday') {
+			options.push('Every weekday (Monday to Friday)');
+		}
+		return options;
+	}, [startDate, startDayOfWeek, startMonth, weekdayOccurrence]);
 
 	const handleDateChangeStart = (date: Date) => {
 		setContentSubmit((prev) => ({ ...prev, selectedDateStart: date }));
@@ -185,11 +207,13 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					name="frequency"
 					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 				>
-					{frequencies.map((frequency) => (
-						<option key={frequency} value={frequency}>
-							{frequency}
-						</option>
-					))}
+					{frequencies.map((frequency) => {
+						return (
+							<option key={frequency} value={frequency}>
+								{frequency}
+							</option>
+						);
+					})}
 				</select>
 				{errorStart && <p className="text-[#e44141] text-xs font-thin">The start time must be in the future.</p>}
 				{errorEnd && <p className="text-[#e44141] text-xs font-thin">The end time must be bigger than start time.</p>}
@@ -209,16 +233,16 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterDescription}</p>
 				</div>
 			</div>
-			<div className="mb-4">
+			<div className="mb-4 cursor-default">
 				<h3 className="uppercase text-[11px] font-semibold">Cover Image</h3>
-				<label>
+				<label className="w-fit block">
 					<div
-						className="text-white font-medium bg-bgSelectItem hover:bg-bgSelectItemHover rounded px-4 py-2 my-2 w-fit"
+						className="text-white font-medium bg-bgSelectItem hover:bg-bgSelectItemHover rounded px-4 py-2 my-2 w-fit cursor-pointer"
 						onChange={(e) => handleFile(e)}
 					>
 						Upload Image
 					</div>
-					<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
+					<input type="file" hidden onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 " />
 				</label>
 				{contentSubmit.logo && <img src={contentSubmit.logo} alt="logo" className="max-h-[180px] rounded w-full object-cover" />}
 			</div>

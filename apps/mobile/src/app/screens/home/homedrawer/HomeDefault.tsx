@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RootState,
@@ -192,17 +192,17 @@ const HomeDefaultHeader = React.memo(
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
-							<Icons.ArrowLargeLeftIcon width={20} height={20} color={themeValue.textStrong} />
+							<Icons.ArrowLargeLeftIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
+									<Icons.ThreadPlusIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
+									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : (
-									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />
+									<Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								)}
 								<View>
 									<View style={styles.threadHeaderBox}>
@@ -223,14 +223,14 @@ const HomeDefaultHeader = React.memo(
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
 						{statusMute === ENotificationActive.OFF ? (
-							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />
+							<Icons.BellSlashIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 						) : (
-							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />
+							<Icons.BellIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 						)}
 					</TouchableOpacity>
 				) : (
 					<TouchableOpacity style={styles.iconBell} onPress={() => navigateToSearchPage()}>
-						<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
+						<Icons.MagnifyingIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 					</TouchableOpacity>
 				)}
 			</View>

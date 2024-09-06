@@ -18,7 +18,7 @@ import { style } from './styles';
 
 export enum ETypeCustomUserStatus {
 	Save = 'Save',
-	Close = 'Close',
+	Close = 'Close'
 }
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
@@ -53,7 +53,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const firstFriendImageList = useMemo(() => {
 		return friendList?.slice?.(0, 5)?.map((friend) => ({
 			avatarUrl: friend?.user?.avatar_url,
-			username: friend?.user?.username || friend?.user?.display_name,
+			username: friend?.user?.username || friend?.user?.display_name
 		}));
 	}, [friendList]);
 
@@ -65,15 +65,15 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
 	};
 
-	const handleCustomUserStatus = (customStatus: string = '', type: ETypeCustomUserStatus) => {
+	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus) => {
 		userStatusBottomSheetRef?.current?.dismiss();
 		setIsVisibleAddStatusUserModal(false);
 		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
 	};
 
-  const showUserStatusBottomSheet = () =>{
-    userStatusBottomSheetRef?.current?.present();
-  }
+	const showUserStatusBottomSheet = () => {
+		userStatusBottomSheetRef?.current?.present();
+	};
 
 	return (
 		<View style={styles.container}>
@@ -84,10 +84,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					</TouchableOpacity>
 				</View>
 
-				<TouchableOpacity
-					onPress={showUserStatusBottomSheet}
-					style={styles.viewImageProfile}
-				>
+				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
 						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
 					) : (
@@ -109,10 +106,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity
-						style={styles.viewInfo}
-						onPress={showUserStatusBottomSheet}
-					>
+					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
 						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
 						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
@@ -163,7 +157,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.textTitle}>{t('yourFriend')}</Text>
 
 					<MezonAvatar avatarUrl="" username="" height={size.s_30} width={size.s_30} stacks={firstFriendImageList} />
-					<Icons.ChevronSmallRightIcon width={size.s_18} height={size.s_18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
+					<Icons.ChevronSmallRightIcon
+						width={size.s_18}
+						height={size.s_18}
+						style={{ marginLeft: size.s_4 }}
+						color={themeValue.textStrong}
+					/>
 				</TouchableOpacity>
 			</ScrollView>
 			<AddStatusUserModal

@@ -44,6 +44,7 @@ import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
+import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
@@ -216,7 +217,8 @@ const persistedNotiReactMsgReducer = persistReducer(
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
-		storage
+		storage,
+		blacklist: ['subPanelActive']
 	},
 	gifsStickerEmojiReducer
 );
@@ -276,7 +278,8 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer,
-	adminApplication: adminApplicationReducer
+	adminApplication: adminApplicationReducer,
+	systemMessages: systemMessageReducer
 };
 
 let storeInstance = configureStore({

@@ -13,6 +13,7 @@ import { IChatScrollData, IUseStickyScrollOptions, useStickyScroll } from './sti
  */
 export const useChatScroll = (
 	targetRef: React.MutableRefObject<Element>,
+	anchorRef: React.MutableRefObject<Element>,
 	data: IChatScrollData,
 	loadMoreCb: ILoadMoreCb,
 	options?: IUseChatScrollOptions
@@ -28,10 +29,9 @@ export const useChatScroll = (
 		disable: disableStickyScroll,
 		enable: enableStickyScroll,
 		enabled: stickyScrollEnabled,
-		scrollToBottom,
-		scrollToMessage,
-		sticky
-	} = useStickyScroll(targetRef, data, options?.stickyScroll ?? {});
+		scrollToAnchor,
+		scrollToMessage
+	} = useStickyScroll(targetRef, anchorRef, options?.stickyScroll ?? {});
 
 	return {
 		reverseInfiniteScrollEnabled,
@@ -40,8 +40,7 @@ export const useChatScroll = (
 		disableReverseInfiniteScroll,
 		enableStickyScroll,
 		disableStickyScroll,
-		sticky,
-		scrollToBottom,
+		scrollToAnchor,
 		scrollToMessage,
 		updateLoadMoreCb
 	};
@@ -66,11 +65,6 @@ export interface IUseChatScrollOptions {
  * Flags and methods provided by useChatScroll hook.
  */
 export interface IUseChatScrollReturn {
-	/**
-	 * True when scroll is stuck to the bottom of target element.
-	 */
-	sticky: boolean;
-
 	/**
 	 * Indicates whether reverse infinite scroll behavior is enabled.
 	 */
@@ -104,7 +98,7 @@ export interface IUseChatScrollReturn {
 	/**
 	 * Scrolls to bottom of the target element.
 	 */
-	scrollToBottom: () => Promise<boolean>;
+	scrollToAnchor: () => Promise<boolean>;
 
 	/**
 	 * scrollToMessage id

@@ -2,6 +2,7 @@ import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
+	formatContentEditMessage,
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
@@ -268,9 +269,21 @@ export const ChatBoxBottomBar = memo(
 
 		const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
 			const { type, targetMessage } = messageAction;
+			let dataEditMessageFormatted;
 			switch (type) {
 				case EMessageActionType.EditMessage:
-					handleTextInputChange(targetMessage.content.t);
+					dataEditMessageFormatted = formatContentEditMessage(targetMessage);
+					if (dataEditMessageFormatted?.emojiPicked?.length) {
+						dataEditMessageFormatted?.emojiPicked?.forEach((emoji) => {
+							dispatch(
+								emojiSuggestionActions.setSuggestionEmojiObjPicked({
+									shortName: emoji?.shortName,
+									id: emoji?.emojiid
+								})
+							);
+						});
+					}
+					handleTextInputChange(dataEditMessageFormatted?.formatContentDraft);
 					break;
 				case EMessageActionType.CreateThread:
 					dispatch(threadsActions.setOpenThreadMessageState(true));
@@ -343,7 +356,6 @@ export const ChatBoxBottomBar = memo(
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: currentChannel?.id,
-						messageId: '',
 						files: [
 							{
 								filename: attachment.filename,

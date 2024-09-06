@@ -131,7 +131,7 @@ const SettingRightUser = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="bg-bgTertiary rounded-[3px] w-full px-4 py-2 mt-2 focus:outline-none font-normal text-sm tracking-wide"
+							className="dark:bg-bgTertiary bg-[#F0F0F0] dark:text-white text-black rounded-[3px] w-full px-4 py-2 mt-2 focus:outline-none font-normal text-sm tracking-wide"
 							placeholder={valueDisplayName || name}
 							value={valueDisplayName}
 							maxLength={32}
@@ -183,9 +183,9 @@ const SettingRightUser = ({
 			(valueDisplayName !== currentDisplayName && flags) ||
 			(flagsRemoveAvartar !== false && flags) ||
 			(editAboutUser !== aboutMe && flags) ? (
-				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
+				<div className="flex flex-row gap-2 dark:bg-bgTertiary bg-white shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p className="text-[15px]">Careful - you have unsaved changes!</p>
+						<p className="text-[15px] dark:text-bgLightPrimary text-bgPrimary">Careful - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button

@@ -186,13 +186,13 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
-			<div className="flex flex-wrap gap-4 gap-x-4">
+			<div className="flex flex-wrap gap-2 gap-y-2 w-full">
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
 						<div
-							onClick={() => goToAppDetailPage(value.id)}
+							onClick={() => goToAppDetailPage(value.id as string)}
 							key={index}
-							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
+							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px] applicationItemSmallSort' : 'w-[206px] applicationItemLargeSort'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
 						>
 							{value.applogo ? (
 								<img src={value.applogo} alt="" className="aspect-square object-cover rounded-md w-full" />

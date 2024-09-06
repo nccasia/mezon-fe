@@ -1,10 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import {
-	RootState,
-	selectAllEventManagement,
-} from '@mezon/store-mobile';
+import { RootState, selectAllEventManagement } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
@@ -176,10 +173,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet
-				ref={bottomSheetEventRef}
-				heightFitContent={allEventManagement?.length === 0}
-			>
+			<MezonBottomSheet ref={bottomSheetEventRef} heightFitContent={allEventManagement?.length === 0}>
 				<EventViewer handlePressEventCreate={handlePressEventCreate} />
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>

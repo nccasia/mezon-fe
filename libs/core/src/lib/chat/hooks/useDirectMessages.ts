@@ -1,8 +1,9 @@
 import { directActions, messagesActions, selectDirectById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { handleUploadFile, useMezon } from '@mezon/transport';
+import { IMessageSendPayload, fetchAndCreateFiles } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChatMessages } from './useChatMessages';
 import { useChatSending } from './useChatSending';
@@ -22,10 +23,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { lastMessage } = useChatMessages({ channelId });
 	const channel = useSelector(selectDirectById(channelId));
 
-	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
-	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
-	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
-
 	const sendDirectMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -33,9 +30,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
-			setContentPayload(content);
-			setMentionPayload(mentions);
-			setAttachmentPayload(attachments);
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -44,7 +38,29 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('0', channel.id, mode, !channel.channel_private, content, mentions, attachments, references, false, false);
+			let uploadedFiles: ApiMessageAttachment[] = [];
+			if (attachments && attachments.length > 0) {
+				const createdFiles = await fetchAndCreateFiles(attachments);
+
+				const uploadPromises = createdFiles.map((file, index) => {
+					return handleUploadFile(client, session, '0', channel.id, file.name, file, index);
+				});
+
+				uploadedFiles = await Promise.all(uploadPromises);
+			}
+
+			await socket.writeChatMessage(
+				'0',
+				channel.id,
+				mode,
+				!channel.channel_private,
+				content,
+				mentions,
+				uploadedFiles,
+				references,
+				false,
+				false
+			);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
@@ -65,23 +81,20 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { updateImageLinkMessage } = useChatSending({ channelId, mode });
 
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
-
 	useEffect(() => {
-		if (newMessageUpdateImage.clan_id === '0') {
+		if (newMessageUpdateImage.mode !== ChannelStreamMode.STREAM_MODE_CHANNEL && newMessageUpdateImage.isMe) {
 			processLink(
 				newMessageUpdateImage.clan_id!,
 				newMessageUpdateImage.channel_id!,
 				newMessageUpdateImage.mode!,
-				contentPayload,
-				mentionPayload,
-				attachmentPayload,
+				newMessageUpdateImage.content,
+				newMessageUpdateImage.mentions,
+				newMessageUpdateImage.attachments,
 				newMessageUpdateImage.message_id
 			);
 		}
-		setContentPayload({});
-		setMentionPayload([]);
-		setAttachmentPayload([]);
 	}, [newMessageUpdateImage.message_id]);
+
 	return useMemo(
 		() => ({
 			client,

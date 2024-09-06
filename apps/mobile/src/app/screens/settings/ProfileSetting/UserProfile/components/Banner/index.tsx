@@ -27,31 +27,35 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 
 	const openAvatarBS = () => {
 		avatarBSRef?.current?.present();
-	}
+	};
 
 	const removeAvatar = () => {
-		onLoad && onLoad(defaultAvatar || "");
+		onLoad && onLoad(defaultAvatar || '');
 		avatarBSRef?.current?.dismiss();
-	}
+	};
 
 	const pickAvatar = () => {
 		avatarPickerRef?.current?.openSelector();
 		avatarBSRef?.current?.dismiss();
-	}
+	};
 
-	const menu = useMemo(() => ({
-		items: [
-			{
-				title: 'Change Avatar',
-				onPress: () => pickAvatar()
-			},
-			{
-				title: 'Remove Avatar',
-				textStyle: { color: baseColor.redStrong },
-				onPress: () => removeAvatar()
-			}
-		]
-	}) satisfies IMezonMenuSectionProps, [])
+	const menu = useMemo(
+		() =>
+			({
+				items: [
+					{
+						title: 'Change Avatar',
+						onPress: () => pickAvatar()
+					},
+					{
+						title: 'Remove Avatar',
+						textStyle: { color: baseColor.redStrong },
+						onPress: () => removeAvatar()
+					}
+				]
+			}) satisfies IMezonMenuSectionProps,
+		[]
+	);
 
 	return (
 		<View>
@@ -70,8 +74,8 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 			<View style={styles.avatarContainer}>
 				<MezonImagePicker
 					ref={avatarPickerRef}
-					width={100}
-					height={100}
+					width={size.s_100}
+					height={size.s_100}
 					defaultValue={avatar || ''}
 					alt={alt}
 					rounded
@@ -85,11 +89,7 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 				<View style={[styles.onLineStatus]}></View>
 			</View>
 
-			<MezonBottomSheet
-				heightFitContent
-				title='Avatar'
-				ref={avatarBSRef}
-			>
+			<MezonBottomSheet heightFitContent title="Avatar" ref={avatarBSRef}>
 				<View style={{ padding: size.s_20 }}>
 					<MezonMenu menu={[menu]} />
 				</View>

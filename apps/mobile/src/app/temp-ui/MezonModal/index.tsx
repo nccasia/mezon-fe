@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
+import { ArrowLeftIcon, Icons, IS_TABLET } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
 import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
@@ -44,7 +44,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 		visibleBackButton = false,
 		rightBtnText,
 		onClickRightBtn,
-		containerStyle,
+		containerStyle
 	} = props;
 
 	const setVisible = (value: boolean) => {
@@ -71,27 +71,27 @@ export const MezonModal = (props: IMezonModalProps) => {
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 								{visibleBackButton ? (
 									<Pressable onPress={() => onBack && onBack()}>
-										<ArrowLeftIcon />
+										<ArrowLeftIcon height={size.s_20} width={size.s_20} />
 									</Pressable>
 								) : (
 									<View />
 								)}
 								<Pressable onPress={() => setVisible(false)}>
-									<Icons.CloseIcon color={themeValue.textStrong} />
+									<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
 								</Pressable>
 							</View>
 						) : (
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 								<View style={styles.headerContent}>
 									<Pressable onPress={() => setVisible(false)}>
-										<Icons.CloseIcon color={themeValue.textStrong} />
+										<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
 									</Pressable>
 									{isTitleString ? (
 										<Text style={[styles.textTitle, titleStyle]}>{title}</Text>
 									) : (
 										<View style={titleStyle}>{title}</View>
 									)}
-									<Block width={size.s_60}>
+									<Block width={IS_TABLET ? size.s_30 : size.s_60}>
 										{rightBtnText ? (
 											<Pressable onPress={() => onClickRightBtn()}>
 												<Text style={styles.confirm}>{rightBtnText}</Text>

@@ -9,5 +9,6 @@ export enum EMimeTypes {
 	gif = 'image/gif',
 	jpg = 'mage/jpg',
 	webp = 'image/webp',
-	tenor = 'tenor.com'
+	tenor = 'tenor.com',
+	cdnmezon = 'cdn.mezon.vn/stickers'
 }

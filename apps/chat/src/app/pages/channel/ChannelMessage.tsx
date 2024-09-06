@@ -8,10 +8,10 @@ import {
 } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
-	MessagesEntity,
 	selectChannelDraftMessage,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
+	selectMessageEntityById,
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
@@ -22,7 +22,7 @@ import MessageInput from './MessageInput';
 
 type MessageProps = {
 	channelId: string;
-	message: MessagesEntity;
+	messageId: string;
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
@@ -30,13 +30,13 @@ type MessageProps = {
 	userName?: string;
 };
 
-export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
+export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
+	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-	const messageId = useMemo(() => message.id, [message.id]);
 
 	const isEditing = useMemo(() => {
 		if (channelDraftMessage.message_id === messageId) {
@@ -105,16 +105,4 @@ ChannelMessage.Skeleton = () => (
 	</div>
 );
 
-const propsAreEqual = (prevProps: MessageProps, nextProps: MessageProps) => {
-	return (
-		prevProps.message.id === nextProps.message.id &&
-		prevProps.message.update_time === nextProps.message.update_time &&
-		prevProps.avatarDM === nextProps.avatarDM &&
-		prevProps.userName === nextProps.userName &&
-		prevProps.channelId === nextProps.channelId &&
-		prevProps.mode === nextProps.mode &&
-		prevProps.channelLabel === nextProps.channelLabel
-	);
-};
-
-export const MemorizedChannelMessage = memo(ChannelMessage, propsAreEqual);
+export const MemorizedChannelMessage = memo(ChannelMessage);

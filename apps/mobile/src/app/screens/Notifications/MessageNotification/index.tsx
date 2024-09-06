@@ -6,7 +6,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text } from 'react-native';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { RenderTextMarkdownContent } from '../../home/homedrawer/constants';
+import { RenderTextMarkdownContent } from '../../home/homedrawer/components';
 import { styles } from './MessageNotification.styles';
 
 interface IMessageNotificationProps {

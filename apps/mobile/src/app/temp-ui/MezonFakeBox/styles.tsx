@@ -12,24 +12,24 @@ export const style = (colors: Attributes) =>
 			gap: Metrics.size.l,
 			paddingHorizontal: Metrics.size.m,
 			paddingVertical: Metrics.size.l,
-			borderRadius: 10,
+			borderRadius: 10
 		},
 		textBox: {
 			color: colors.textStrong,
 			flex: 1,
 			flexGrow: 1,
 			flexBasis: 10,
-			fontSize: Fonts.size.h7,
+			fontSize: Fonts.size.h7
 		},
 
 		sectionTitle: {
 			color: colors.textStrong,
-			fontSize: 11,
+			fontSize: Fonts.size.small,
 			fontWeight: '600',
-			marginBottom: Fonts.size.s_10,
+			marginBottom: Fonts.size.s_10
 		},
 		titleUppercase: {
 			fontSize: Fonts.size.h7,
-			textTransform: "uppercase"
+			textTransform: 'uppercase'
 		}
 	});

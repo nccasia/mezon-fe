@@ -34,7 +34,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
-				sendDirectMessage(content, mentions, [], references);
+				sendDirectMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}

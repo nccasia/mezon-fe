@@ -130,7 +130,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			try {
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
-				store.dispatch(appActions.setIsFromFCMMobile(true));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 				await store.dispatch(
 					directActions.joinDirectMessage({
@@ -142,7 +141,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					})
 				);
 
-				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {

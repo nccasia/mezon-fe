@@ -23,18 +23,18 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 		headerTitle: t('screens.eventDetails.headerTitle'),
 		headerTitleStyle: {
 			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled,
+			color: themeValue.textDisabled
 		},
 		headerLeft: () => (
 			<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
-				<Icons.ArrowLargeLeftIcon height={18} width={18} color={themeValue.textStrong} />
+				<Icons.ArrowLargeLeftIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
 			</TouchableOpacity>
 		),
 		headerRight: () => (
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
-				<Icons.CloseLargeIcon height={18} width={18} color={themeValue.textStrong} />
+				<Icons.CloseLargeIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
 			</TouchableOpacity>
-		),
+		)
 	});
 
 	function handleClose() {
@@ -52,30 +52,30 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 		() => [
 			{
 				title: t('fields.eventFrequency.noRepeat'),
-				value: 0,
+				value: 0
 			},
 			{
 				title: t('fields.eventFrequency.weeklyOn', { name: getDayName(startTime, language) }),
-				value: 1,
+				value: 1
 			},
 			{
 				title: t('fields.eventFrequency.everyOther', { name: getDayName(startTime, language) }),
-				value: 2,
+				value: 2
 			},
 			{
 				title: t('fields.eventFrequency.monthlyOn', { name: getDayWeekName(startTime, language) }),
-				value: 3,
+				value: 3
 			},
 			{
 				title: t('fields.eventFrequency.annuallyOn', { name: getDayYearName(startTime, language) }),
-				value: 4,
+				value: 4
 			},
 			{
 				title: t('fields.eventFrequency.everyWeekday'),
-				value: 5,
-			},
+				value: 5
+			}
 		],
-		[startTime],
+		[startTime]
 	);
 
 	function handleFrequencyChange(value: number) {
@@ -85,11 +85,10 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 	function handlePressNext() {
 		const now = new Date();
 
-		if (startTime.getTime() <= now.getTime() ||
-			(type == OptionEvent.OPTION_LOCATION && startTime.getTime() >= endTime.getTime())) {
+		if (startTime.getTime() <= now.getTime() || (type == OptionEvent.OPTION_LOCATION && startTime.getTime() >= endTime.getTime())) {
 			Toast.show({
 				type: 'error',
-				text1: t('notify.time'),
+				text1: t('notify.time')
 			});
 			return;
 		}
@@ -97,7 +96,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 		if (eventTitle?.trim()?.length === 0) {
 			Toast.show({
 				type: 'error',
-				text1: t('notify.titleBlank'),
+				text1: t('notify.titleBlank')
 			});
 			return;
 		}
@@ -111,7 +110,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 			startTime,
 			endTime,
 			frequency: eventFrequency,
-			onGoBack: onGoBack,
+			onGoBack: onGoBack
 		});
 	}
 

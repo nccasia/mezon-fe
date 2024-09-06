@@ -2,7 +2,7 @@ import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 type IMessageAvatarProps = {
@@ -27,31 +27,43 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 		avatarSender,
 		generalAvatar,
 		clanAvatar,
-		userClanAvatar,
+		userClanAvatar
 	);
 
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const popupRef = useRef<HTMLDivElement | null>(null);
 	const [positionBottom, setPositionBottom] = useState(false);
 	const [positionTop, setPositionTop] = useState(0);
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+
+	const handleMouseClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
-			setIsShowPanelChannel(!isShowPanelChannel);
+			setIsShowPanelChannel((prev) => !prev);
+			setIsLoading(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
-			const distanceToBottom = windowHeight - clickY;
-			const heightElementShortUserProfileMin = 313;
-			setPositionTop(clickY - 50);
-			if (distanceToBottom < heightElementShortUserProfileMin) {
-				setPositionBottom(true);
-			}
+
+			requestAnimationFrame(() => {
+				if (popupRef.current) {
+					const popupHeight = popupRef.current.getBoundingClientRect().height;
+					const distanceToBottom = windowHeight - clickY;
+
+					if (distanceToBottom < popupHeight) {
+						setPositionBottom(true);
+						setPositionTop(clickY - popupHeight);
+					} else {
+						setPositionBottom(false);
+						setPositionTop(clickY - 50);
+					}
+					setIsLoading(false);
+				}
+			});
 		}
-	};
+	}, []);
+
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-	const handleDefault = (e: any) => {
-		e.stopPropagation();
-	};
 
 	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
@@ -85,21 +97,24 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					isAnonymous={isAnonymous}
 				/>
 			</div>
-			{isShowPanelChannel ? (
-				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed left-5 sbm:left-0 md:left-[409px] `}
-					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
-					onMouseDown={handleDefault}
-				>
-					<ShortUserProfile
-						userID={senderId}
-						message={message}
-						mode={mode}
-						avatar={userClanAvatar || pendingUserAvatar}
-						name={userClanNickname || userDisplayName || username}
-					/>
-				</div>
-			) : null}
+			<div className="relative">
+				{isShowPanelChannel && (
+					<div
+						ref={popupRef}
+						className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 fixed left-5 sbm:left-0 md:left-[409px] transition-opacity duration-300 ease-in-out ${isLoading ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
+						style={{ top: !positionBottom ? `${positionTop}px` : 'unset', bottom: positionBottom ? '64px' : 'unset' }}
+						onMouseDown={(e) => e.stopPropagation()}
+					>
+						<ShortUserProfile
+							userID={senderId}
+							message={message}
+							mode={mode}
+							avatar={userClanAvatar || pendingUserAvatar}
+							name={userClanNickname || userDisplayName || username}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };

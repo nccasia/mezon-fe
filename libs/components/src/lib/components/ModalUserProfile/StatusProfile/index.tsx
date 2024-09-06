@@ -25,7 +25,7 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 					dismissOnClick={true}
 					renderTrigger={() => (
 						<div>
-							<ItemStatus children="Online" dropdown startIcon={<Icons.OnlineStatus className="w-5" />} />
+							<ItemStatus children="Online" dropdown startIcon={<Icons.OnlineStatus />} />
 						</div>
 					)}
 					label=""

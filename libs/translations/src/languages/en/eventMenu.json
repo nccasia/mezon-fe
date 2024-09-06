@@ -8,5 +8,9 @@
         "reportEvent": "Report Event",
         "copyEventLink": "Copy Event Link",
         "copyEventID": "Copy Event ID"
+    },
+    "confirm": {
+        "title": "Cancel Event",
+        "content": "Are you sure you want to cancel this event?"
     }
 }

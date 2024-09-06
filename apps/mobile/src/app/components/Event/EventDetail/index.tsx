@@ -15,9 +15,10 @@ import { style } from './styles';
 
 interface IEventDetailProps {
 	event: EventManagementEntity;
+	eventDetailRef?: any;
 }
 
-export default function EventDetail({ event }: IEventDetailProps) {
+export default function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
@@ -45,20 +46,11 @@ export default function EventDetail({ event }: IEventDetailProps) {
 					<View style={styles.inline}>
 						<Icons.BellIcon height={16} width={16} color={themeValue.text} />
 						<Text style={styles.smallText}>{event?.user_ids?.length}</Text>
-						<Text style={styles.smallText}>{
-							event?.user_ids?.length > 1
-								? "people are interested"
-								: "person is interested"}
-						</Text>
+						<Text style={styles.smallText}>{event?.user_ids?.length > 1 ? 'people are interested' : 'person is interested'}</Text>
 					</View>
 
 					<View style={styles.inline}>
-						<MezonAvatar
-							avatarUrl={userCreate?.user?.avatar_url}
-							username={userCreate?.user?.username}
-							height={20}
-							width={20}
-						/>
+						<MezonAvatar avatarUrl={userCreate?.user?.avatar_url} username={userCreate?.user?.username} height={20} width={20} />
 						<Text style={styles.smallText}>Created by</Text>
 						<Text style={[styles.smallText, styles.highlight]}>{userCreate?.user?.username}</Text>
 					</View>
@@ -69,14 +61,20 @@ export default function EventDetail({ event }: IEventDetailProps) {
 
 			<View style={styles.inline}>
 				{/* <MezonButton title="End event" fluid /> */}
-				<MezonButton icon={<Icons.CheckmarkLargeIcon height={16} width={16} color={themeValue.text} />} title="Interested" fluid border titleStyle={{ color: themeValue.text }} />
+				<MezonButton
+					icon={<Icons.CheckmarkLargeIcon height={16} width={16} color={themeValue.text} />}
+					title="Interested"
+					fluid
+					border
+					titleStyle={{ color: themeValue.text }}
+				/>
 				{/* <MezonButton title="Start event" fluid type="success" /> */}
 				<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
 				<MezonButton icon={<Icons.MoreVerticalIcon height={20} width={20} color={themeValue.text} />} onPress={handlePress} />
 			</View>
 
 			<MezonBottomSheet ref={menuBottomSheet}>
-				<EventMenu event={event} />
+				<EventMenu event={event} eventDetailRef={eventDetailRef} />
 			</MezonBottomSheet>
 		</View>
 	);

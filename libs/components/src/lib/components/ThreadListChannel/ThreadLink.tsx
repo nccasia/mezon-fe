@@ -1,15 +1,8 @@
-import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import {
-	referencesActions,
-	selectCloseMenu,
-	selectCountNotifyByChannelId,
-	selectCurrentChannel,
-	selectIsUnreadChannelById,
-	useAppDispatch
-} from '@mezon/store';
+import { useOnClickOutside } from '@mezon/core';
+import { selectCountNotifyByChannelId, selectIsUnreadChannelById } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
@@ -20,17 +13,14 @@ import PanelChannel from '../PanelChannel';
 type ThreadLinkProps = {
 	thread: IChannel;
 	isFirstThread: boolean;
+	isActive: boolean;
+	handleClick: (thread: IChannel) => void;
 };
 
-const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
-	const dispatch = useAppDispatch();
-	const { toChannelPage } = useAppNavigation();
-	const { currentURL } = useAppParams();
+const ThreadLink = ({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps) => {
 	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
-	const currentChanel = useSelector(selectCurrentChannel);
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-	const { setIsShowCreateThread } = useThreads();
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
@@ -41,11 +31,9 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 		distanceToBottom: 0
 	});
 
-	const channelPath = toChannelPage(thread.channel_id as string, thread.clan_id || '');
+	const channelPath = `/chat/clans/${thread.clan_id}/channels/${thread.channel_id}`;
 
-	const active = currentURL === channelPath;
-
-	const state = active ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
+	const state = isActive ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -65,20 +53,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
-	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
-
-	const { setTurnOffThreadMessage } = useThreads();
-	const handleClick = (thread: IChannel) => {
-		dispatch(referencesActions.setOpenEditMessageState(false));
-		if (currentChanel?.channel_id === thread.parrent_id) {
-			setIsShowCreateThread(false, thread.parrent_id);
-		}
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
-	};
 
 	return (
 		<div
@@ -100,10 +74,9 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			<Link
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${active || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
-				onClick={(e) => {
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
+				onClick={() => {
 					handleClick(thread);
-					setTurnOffThreadMessage();
 				}}
 			>
 				{thread.channel_label}
@@ -141,4 +114,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	);
 };
 
-export default ThreadLink;
+export default memo(ThreadLink, (next, curr) => {
+	return next.isActive === curr.isActive && next.isFirstThread === curr.isFirstThread && next.thread === curr.thread;
+});

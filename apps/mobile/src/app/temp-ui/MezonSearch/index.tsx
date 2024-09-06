@@ -16,7 +16,15 @@ interface MezonInputProps {
 	isShowCancel?: boolean;
 }
 
-export default function MezonSearch({ onChangeText, onFocusText, onCancelButton, hasBackground, type = 'medium', value, isShowCancel = false }: MezonInputProps) {
+export default function MezonSearch({
+	onChangeText,
+	onFocusText,
+	onCancelButton,
+	hasBackground,
+	type = 'medium',
+	value,
+	isShowCancel = false
+}: MezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const inputRef = useRef(null);
@@ -28,13 +36,13 @@ export default function MezonSearch({ onChangeText, onFocusText, onCancelButton,
 
 		timeoutRef.current = setTimeout(() => {
 			inputRef.current?.focus();
-		}, 100);	
+		}, 100);
 	};
 
 	const handleCancelPress = () => {
-		onChangeText('')
-		onCancelButton && onCancelButton()
-	}
+		onChangeText('');
+		onCancelButton && onCancelButton();
+	};
 
 	useEffect(() => {
 		return () => {
@@ -46,13 +54,13 @@ export default function MezonSearch({ onChangeText, onFocusText, onCancelButton,
 		<View style={styles.container}>
 			<View style={[styles.inputWrapper, { backgroundColor: hasBackground ? themeValue.primary : themeValue.secondary }]}>
 				<Icons.MagnifyingIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
-				<TextInput 
+				<TextInput
 					ref={inputRef}
-					style={styles.input} 
-					placeholderTextColor={themeValue.text} 
+					style={styles.input}
+					placeholderTextColor={themeValue.text}
 					placeholder={t('search')}
-					value={value} 
-					onChangeText={onChangeText} 
+					value={value}
+					onChangeText={onChangeText}
 					onFocus={onFocusText}
 				/>
 				{!!value?.length && (
@@ -61,12 +69,12 @@ export default function MezonSearch({ onChangeText, onFocusText, onCancelButton,
 					</Pressable>
 				)}
 			</View>
-			
-			{isShowCancel &&
+
+			{isShowCancel && (
 				<TouchableOpacity onPress={handleCancelPress}>
 					<Text style={styles.textCancel}>Cancel</Text>
 				</TouchableOpacity>
-			}
+			)}
 		</View>
 	);
 }

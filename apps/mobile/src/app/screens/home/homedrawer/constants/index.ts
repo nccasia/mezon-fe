@@ -1,3 +1,2 @@
-export * from './inviteToChannel'
-export * from './message'
-export * from './markdown'
+export * from './inviteToChannel';
+export * from './message';

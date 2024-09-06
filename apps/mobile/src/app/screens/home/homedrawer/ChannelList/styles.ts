@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			width: '82%',
 			borderTopLeftRadius: 20,
 			overflow: 'hidden',
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.secondary
 		},
 		channelListSearch: {
 			width: '100%',
@@ -28,12 +28,12 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_6,
 			gap: 10,
 			flexDirection: 'row',
-			justifyContent: 'space-between',
+			justifyContent: 'space-between'
 		},
 		channelListSearchInput: {
 			height: size.s_34,
 			padding: 0,
-			flex: 1,
+			flex: 1
 		},
 		inviteIconWrapper: {
 			alignItems: 'center',
@@ -41,7 +41,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: 50,
 			backgroundColor: colors.primary,
 			width: size.s_40,
-			height:  size.s_40,
+			height: size.s_40
 		},
 		searchBox: {
 			backgroundColor: colors.primary,
@@ -57,10 +57,10 @@ export const style = (colors: Attributes) =>
 		},
 		placeholderSearchBox: {
 			color: colors.text,
-			fontSize: size.s_14,
+			fontSize: size.s_14
 		},
 		titleEvent: {
 			fontSize: size.s_14,
 			color: colors.textStrong
-		},
+		}
 	});

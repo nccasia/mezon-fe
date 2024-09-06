@@ -1,22 +1,22 @@
-import { size, useTheme } from "@mezon/mobile-ui";
-import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
-import { ErrorInput } from "../../components/ErrorInput";
-import { validInput } from "../../utils/validate";
-import { style } from "./styles";
+import { size, useTheme } from '@mezon/mobile-ui';
+import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ErrorInput } from '../../components/ErrorInput';
+import { validInput } from '../../utils/validate';
+import { style } from './styles';
 
 interface IMezonInputProps {
 	placeHolder?: string;
 	label?: string;
-	titleStyle?: StyleProp<TextStyle>,
-	titleUppercase?: boolean
+	titleStyle?: StyleProp<TextStyle>;
+	titleUppercase?: boolean;
 	textarea?: boolean;
 	value: string;
 	onTextChange?: (value: string) => void;
-	maxCharacter?: number,
-	inputWrapperStyle?: StyleProp<ViewStyle>,
-	showBorderOnFocus?: boolean,
+	maxCharacter?: number;
+	inputWrapperStyle?: StyleProp<ViewStyle>;
+	showBorderOnFocus?: boolean;
 	errorMessage?: string;
 	onFocus?: () => void;
 	onBlur?: () => void;
@@ -25,7 +25,8 @@ interface IMezonInputProps {
 	disabled?: boolean;
 }
 
-export default function MezonInput({ placeHolder,
+export default function MezonInput({
+	placeHolder,
 	label,
 	textarea,
 	value,
@@ -40,7 +41,8 @@ export default function MezonInput({ placeHolder,
 	titleStyle,
 	postfixIcon,
 	prefixIcon,
-	disabled = false }: IMezonInputProps) {
+	disabled = false
+}: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const ref = useRef<TextInput>(null);
@@ -79,9 +81,7 @@ export default function MezonInput({ placeHolder,
 
 	return (
 		<View style={styles.container}>
-			{label &&
-				<Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
-			}
+			{label && <Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>}
 			<View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
 				<View style={styles.inputBox}>
 					{prefixIcon}
@@ -104,7 +104,7 @@ export default function MezonInput({ placeHolder,
 
 					{!textarea && value?.length > 0 && !disabled && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
-							<CircleXIcon height={18} width={18} color={themeValue.text} />
+							<CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 						</TouchableOpacity>
 					)}
 				</View>

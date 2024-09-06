@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { selectCurrentChannelId, selectDmGroupCurrentId, selectTypingUserIdsByChannelId } from '@mezon/store';
-import { OfflineStatus, OnlineStatus } from 'libs/ui/src/lib/Icons';
+import { OfflineStatus } from 'libs/ui/src/lib/Icons';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,10 +14,11 @@ type StatusUserProps = {
 	directMessageValue?: directMessageValueProps;
 	userId?: string;
 	isTyping?: boolean;
+	sizeStatusIcon?: string;
 };
 
 const StatusUser = memo((props: StatusUserProps) => {
-	const { status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId = '', isTyping = true } = props;
+	const { status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId = '', isTyping = true, sizeStatusIcon } = props;
 	const currentDMChannelID = useSelector(selectDmGroupCurrentId);
 	const currentChannelID = useSelector(selectCurrentChannelId);
 	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
@@ -56,7 +57,7 @@ const StatusUser = memo((props: StatusUserProps) => {
 			{isTyping && checkTypingUser ? (
 				<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
 			) : (
-				!checkDmGroup && (status ? <OnlineStatus /> : <OfflineStatus />)
+				!checkDmGroup && (status ? <Icons.OnlineStatus defaultSize={sizeStatusIcon} /> : <OfflineStatus defaultSize={sizeStatusIcon} />)
 			)}
 		</span>
 	);

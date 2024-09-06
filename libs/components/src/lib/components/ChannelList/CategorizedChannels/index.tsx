@@ -1,8 +1,16 @@
-import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
-import { categoriesActions, channelsActions, defaultNotificationCategoryActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
+import { useAuth, useCategory, useEscapeKey, useOnClickOutside, UserRestrictionZone, useUserRestriction } from '@mezon/core';
+import {
+	categoriesActions,
+	channelsActions,
+	defaultNotificationCategoryActions,
+	selectCategoryIdSortChannel,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import CategorySetting from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
@@ -14,17 +22,39 @@ type CategorizedChannelsProps = {
 	category: ICategoryChannel;
 };
 
+export interface IChannelLinkPermission {
+	hasAdminPermission: boolean;
+	hasClanPermission: boolean;
+	hasChannelManagePermission: boolean;
+	isClanOwner: boolean;
+}
+
 const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) => {
-	const [hasManageChannelPermission, { isClanOwner }] = useClanRestriction([EPermission.manageChannel]);
-	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const [isShowPanelCategory, setIsShowPanelCategory] = useState<boolean>(false);
+	const { userProfile } = useAuth();
+	const currentClan = useSelector(selectCurrentClan);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
+	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
+	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
+	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+
+	const permissions = useMemo(
+		() => ({
+			hasAdminPermission,
+			hasClanPermission,
+			hasChannelManagePermission,
+			isClanOwner
+		}),
+		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
+	);
+
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
 		distanceToBottom: 0
 	});
+	const [isShowPanelCategory, setIsShowPanelCategory] = useState<boolean>(false);
 	const [showModal, setShowModal] = useState(false);
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
 	const [isShowCategoryChannels, setIsShowCategoryChannels] = useState<boolean>(true);
@@ -32,7 +62,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
 
-	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
+	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -148,12 +178,18 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 							return categoryIsOpen || channel?.unread;
 						})
 						.map((channel: IChannel) => {
-							return <ChannelListItem key={channel.id} channel={channel as ChannelThreads} />;
+							return (
+								<ChannelListItem
+									isActive={currentChannelId === channel.id}
+									key={channel.id}
+									channel={channel as ChannelThreads}
+									permissions={permissions}
+								/>
+							);
 						})}
 				</div>
 			)}
 		</div>
 	);
 };
-
 export default CategorizedChannels;

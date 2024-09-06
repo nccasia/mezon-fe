@@ -20,7 +20,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageClanNicknameSenderRef,
 		messageDisplayNameSenderRef,
 		messageIdRef,
-		hasAttachmentInMessageRef,
+		hasAttachmentInMessageRef
 	} = useMessageParser(message);
 
 	const dispatch = useAppDispatch();
@@ -41,7 +41,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageClanNicknameSenderRef ?? '',
 		messageDisplayNameSenderRef ?? '',
 		messageUsernameSenderRef ?? '',
-		senderIdMessageRef ?? '',
+		senderIdMessageRef ?? ''
 	);
 
 	return (

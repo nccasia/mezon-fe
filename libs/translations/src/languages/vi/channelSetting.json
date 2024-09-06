@@ -73,5 +73,20 @@
     },
     "toast": {
         "updated": "Cập nhật thành công"
+    },
+    "channelPermission": {
+        "title": "Quyền truy cập",
+        "basicView": "Cơ bản",
+        "advancedView": "Nâng cao",
+        "roles": "Vai trò",
+        "members": "Thành viên",
+        "edit": "Chỉnh sửa",
+        "done": "Hoàn tất",
+        "addRole": "Thêm vai trò",
+        "addMember": "Thêm thành viên",
+        "privateChannel": "Kênh riêng tư",
+        "basicViewDescription": "Khi bạn chuyển kênh sang chế độ riêng tư, chỉ những thành viên và vai trò được chọn mới có thể xem kênh này",
+        "addMemberAndRoles": "Thêm thành viên hoặc vai trò",
+        "whoCanAccess": "Ai có thể truy cập"
     }
 }

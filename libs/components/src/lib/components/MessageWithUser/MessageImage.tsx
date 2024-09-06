@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
 export type MessageImage = {
-	readonly attachmentData: ApiMessageAttachment;
+	readonly attachmentData: ApiMessageAttachment & { create_time?: string };
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode?: ChannelStreamMode;
 	messageId?: string;
@@ -30,6 +30,13 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		dispatch(attachmentActions.setMode(mode));
 		setOpenModalAttachment(true);
 		setAttachment(url);
+		dispatch(
+			attachmentActions.setCurrentAttachment({
+				id: attachmentData.message_id as string,
+				uploader: attachmentData.sender_id,
+				create_time: attachmentData.create_time
+			})
+		);
 
 		// if there is currentDmGroupId is fetch for DM
 		if ((currentClanId && currentChannelId) || currentDmGroupId) {
@@ -42,7 +49,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	};
 	const imgStyle = {
 		width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
-		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
+		height: isDimensionsValid ? `${attachmentData.height}%` : undefined
 	};
 
 	const [imageError, setImageError] = useState(false);
@@ -59,7 +66,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
 			}
 		},
-		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow],
+		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow]
 	);
 
 	if (imageError || !attachmentData.url) {
@@ -69,7 +76,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		<div className="relative inline-block">
 			<img
 				onContextMenu={handleContextMenu}
-				className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
+				className={`w-[150px] h-[150px] aspect-auto object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
 				src={attachmentData.url?.toString()}
 				alt={attachmentData.url}
 				onClick={() => handleClick(attachmentData.url || '')}

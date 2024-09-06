@@ -63,7 +63,8 @@ export async function handleUploadFile(
 	currentClanId: string,
 	currentChannelId: string,
 	filename: string,
-	file: File
+	file: File,
+	index?: number
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -76,7 +77,7 @@ export async function handleUploadFile(
 			}
 			const shortFileType = getFileType(fileType);
 
-			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, false, index);
 			const buf = await file?.arrayBuffer();
 
 			resolve(uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename));
@@ -109,7 +110,7 @@ export async function handleUploadFileMobile(
 					console.log('Failed to read file data.');
 					return;
 				}
-				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
 				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename));
 			}
 		} catch (error) {
@@ -123,13 +124,14 @@ export function createUploadFilePath(
 	session: Session,
 	currentClanId: string,
 	currentChannelId: string,
-	filename: string
+	filename: string,
+	isMobile: boolean,
+	index?: number
 ): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
-
 	// Append milliseconds timestamp to filename
 	const ms = new Date().getMilliseconds();
-	filename = ms + filename;
+	filename = isMobile ? ms + filename : ms + '_' + index + filename;
 	filename = filename.replace(/[^a-zA-Z0-9.]/g, '_');
 	// Ensure valid clan and channel IDs
 	if (!currentClanId) {

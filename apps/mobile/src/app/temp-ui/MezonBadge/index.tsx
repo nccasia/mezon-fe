@@ -13,8 +13,6 @@ export default function MezonBadge({ title, type }: MezonBadgeProps) {
 		if (type === 'success') return styles.containerSuccess;
 		else if (type === 'warning') return styles.containerWarning;
 		else if (type === 'danger') return styles.containerDanger;
-		else {
-		}
 	}
 
 	return (

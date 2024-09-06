@@ -1,4 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectAllEventManagement } from '@mezon/store-mobile';
@@ -10,7 +11,6 @@ import EventDetail from './EventDetail';
 import EventItem from './EventItem';
 import EventMember from './EventMember';
 import { style } from './styles';
-import { useUserPermission } from '@mezon/core';
 
 export default function EventViewer({ handlePressEventCreate }: { handlePressEventCreate: () => void }) {
 	// const { dismiss } = useBottomSheetModal()
@@ -34,7 +34,7 @@ export default function EventViewer({ handlePressEventCreate }: { handlePressEve
 				<View style={[styles.section, styles.sectionRight]}>
 					{isCanManageEvent && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
-							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
+							<Text style={[styles.emptyText, { color: baseColor.blurple, fontWeight: 'bold' }]}>Create</Text>
 						</TouchableOpacity>
 					)}
 				</View>
@@ -57,7 +57,7 @@ export default function EventViewer({ handlePressEventCreate }: { handlePressEve
 
 			<MezonBottomSheet ref={bottomSheetDetail}>
 				<MezonTab
-					views={[<EventDetail event={currentEvent} />, <EventMember event={currentEvent} />]}
+					views={[<EventDetail event={currentEvent} eventDetailRef={bottomSheetDetail} />, <EventMember event={currentEvent} />]}
 					titles={['Event Info', 'Interested']}
 				/>
 			</MezonBottomSheet>

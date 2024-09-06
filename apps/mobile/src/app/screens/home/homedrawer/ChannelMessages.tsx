@@ -61,8 +61,8 @@ const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAct
 
 	const jumpToRepliedMessage = useCallback(
 		(messageId: string) => {
-			const indexToJump = messages.findIndex((message) => message.id === messageId);
-			if (indexToJump !== -1 && flatListRef.current) {
+			const indexToJump = messages?.findIndex?.((message) => message.id === messageId);
+			if (indexToJump !== -1 && flatListRef.current && indexToJump > 0) {
 				flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
 			}
 		},

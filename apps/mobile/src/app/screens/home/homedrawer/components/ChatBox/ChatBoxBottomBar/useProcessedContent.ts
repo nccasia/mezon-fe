@@ -12,7 +12,7 @@ const useProcessedContent = (inputText: string) => {
 
 	useEffect(() => {
 		const processInput = () => {
-			const resultString = inputText.replace(/[[]<>]/g, '');
+			const resultString = inputText.replace(/[[\]<>]/g, '');
 			const { emojis, links, markdowns, voiceRooms } = processText(resultString, emojiObjPicked);
 			emojiList.current = emojis;
 			linkList.current = links;

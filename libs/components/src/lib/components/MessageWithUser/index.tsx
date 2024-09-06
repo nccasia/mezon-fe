@@ -1,13 +1,5 @@
 import { useAuth } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectCurrentChannelId,
-	selectDmGroupCurrentId,
-	selectIdMessageRefReply,
-	selectIdMessageToJump,
-	selectJumpPinMessageId,
-	selectUploadingStatus
-} from '@mezon/store';
+import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId, selectUploadingStatus } from '@mezon/store';
 import { EUploadingStatus } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
@@ -57,8 +49,8 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
-	const idMessageToJump = useSelector(selectIdMessageToJump);
+	// const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
+	// const idMessageToJump = useSelector(selectIdMessageToJump);
 
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;

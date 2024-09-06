@@ -1,10 +1,5 @@
-import { useChatSending } from '@mezon/core';
-import { referencesActions, selectAttachmentByChannelId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { referencesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EUploadingStatus, failAttachment, fetchAndCreateFiles } from '@mezon/utils';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -12,105 +7,7 @@ export type FileSelectionButtonProps = {
 };
 
 function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
-	const { sessionRef, clientRef } = useMezon();
-	const session = sessionRef.current;
-	const client = clientRef.current;
 	const dispatch = useAppDispatch();
-
-	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(currentChannelId));
-
-	const newMessage = useSelector(selectNewMesssageUpdateImage);
-
-	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
-
-	useEffect(() => {
-		if (
-			attachmentFilteredByChannelId?.messageId !== '' &&
-			attachmentFilteredByChannelId !== null &&
-			attachmentFilteredByChannelId.files.length > 0 &&
-			client &&
-			session
-		) {
-			dispatch(
-				referencesActions.setAtachmentAfterUpload({
-					channelId: currentChannelId,
-					messageId: '',
-					files: []
-				})
-			);
-			fetchAndCreateFiles(attachmentFilteredByChannelId.files).then((createdFiles) => {
-				const promises = createdFiles?.map((file) => {
-					return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
-				});
-
-				Promise.all(promises)
-					.then((results) => {
-						updateImageLinkMessage(
-							newMessage.clan_id,
-							newMessage.channel_id ?? '',
-							newMessage.mode,
-							newMessage.content,
-							newMessage.message_id,
-							newMessage.mentions,
-							results,
-							undefined,
-							true
-						);
-					})
-					.then(() => {
-						dispatch(
-							referencesActions.setUploadingStatus({
-								channelId: currentChannelId,
-								messageId: attachmentFilteredByChannelId?.messageId ?? '',
-								statusUpload: EUploadingStatus.SUCCESSFULLY,
-								count: attachmentFilteredByChannelId?.files?.length
-							})
-						);
-					})
-					.catch((error) => {
-						updateImageLinkMessage(
-							newMessage.clan_id,
-							newMessage.channel_id ?? '',
-							newMessage.mode,
-							newMessage.content,
-							newMessage.message_id,
-							newMessage.mentions,
-							[failAttachment],
-							undefined,
-							true
-						);
-						dispatch(
-							referencesActions.setUploadingStatus({
-								channelId: currentChannelId,
-								messageId: attachmentFilteredByChannelId?.messageId ?? '',
-								statusUpload: EUploadingStatus.ERROR,
-								count: attachmentFilteredByChannelId?.files?.length
-							})
-						);
-						console.error('Error uploading files:', error);
-					});
-				dispatch(
-					referencesActions.setUploadingStatus({
-						channelId: currentChannelId,
-						messageId: attachmentFilteredByChannelId?.messageId ?? '',
-						statusUpload: EUploadingStatus.LOADING,
-						count: attachmentFilteredByChannelId?.files?.length
-					})
-				);
-			});
-		}
-	}, [attachmentFilteredByChannelId?.messageId, currentChannelId]);
-
-	useEffect(() => {
-		if (newMessage.isMe && attachmentFilteredByChannelId?.files.length > 0) {
-			dispatch(
-				referencesActions.updateAttachmentMessageId({
-					channelId: currentChannelId,
-					messageId: newMessage.message_id ?? ''
-				})
-			);
-		}
-	}, [newMessage]);
 
 	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
@@ -118,7 +15,6 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					messageId: '',
 					files: fileArr.map((file) => ({
 						filename: file.name,
 						filetype: file.type,

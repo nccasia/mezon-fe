@@ -1,6 +1,6 @@
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import MezonBottomSheet from '../MezonBottomSheet';
@@ -31,14 +31,14 @@ export default function MezonSelect({ data, onChange, ...props }: IMezonSelectPr
 		bottomSheetRef?.current?.present();
 	}
 
-    return (
-	    <View>
-	        <MezonFakeInputBox
-	            {...props}
-	            postfixIcon={<Icons.ChevronSmallDownIcon height={20} width={20} color={themeValue.text} />}
-	            value={currentContent}
-	            onPress={handlePress}
-	        />
+	return (
+		<View>
+			<MezonFakeInputBox
+				{...props}
+				postfixIcon={<Icons.ChevronSmallDownIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
+				value={currentContent}
+				onPress={handlePress}
+			/>
 
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={props.title}>
 				<View style={styles.bsContainer}>

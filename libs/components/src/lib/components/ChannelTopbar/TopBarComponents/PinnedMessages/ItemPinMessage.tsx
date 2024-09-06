@@ -23,7 +23,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { jumpToMessage } = useJumpToMessage({
 		channelId: pinMessage?.channel_id || '',
 		messageID: pinMessage.message_id || '',
-		clanId: currentClanID || '',
+		clanId: currentClanID || ''
 	});
 	const handleJumpMess = () => {
 		dispatch(pinMessageActions.setJumpPinMessageId(pinMessage.message_id));
@@ -35,7 +35,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	return (
 		<div
 			key={pinMessage.id}
-			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-gray-700 border-gray-300 group/item-pinMess"
+			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
 		>
 			<div className="flex items-start gap-2">
 				<MemberProfile

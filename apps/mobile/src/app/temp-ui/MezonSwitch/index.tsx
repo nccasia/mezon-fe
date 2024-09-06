@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { SwitchProps, TouchableOpacity, View } from 'react-native';
 import { style } from './styles';
 
@@ -15,6 +15,10 @@ export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff, 
 	const [isEnabled, setIsEnabled] = useState(value);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+
+	useEffect(() => {
+		if (value !== isEnabled) setIsEnabled(value);
+	}, [value]);
 
 	const toggleSwitch = () => {
 		onValueChange && onValueChange(!isEnabled);

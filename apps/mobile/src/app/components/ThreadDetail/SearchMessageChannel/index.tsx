@@ -1,5 +1,5 @@
 import { useAuth, useChannels, useFriends } from '@mezon/core';
-import { debounce, EOpenSearchChannelFrom } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, debounce } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
@@ -44,7 +44,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	const handleSearchText = useCallback(
 		debounce((text) => setSearchText(text), 300),
-		[],
+		[]
 	);
 
 	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
@@ -88,8 +88,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						user: {
 							username: itemDM?.usernames ?? '',
 							avatar_url: itemDM?.channel_avatar?.[0] ?? '',
-							id: itemDM?.user_id?.[0] ?? '',
-						},
+							id: itemDM?.user_id?.[0] ?? ''
+						}
 					};
 				})
 			: [];
@@ -104,8 +104,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						user: {
 							username: itemFriend?.user.username ?? '',
 							avatar_url: itemFriend?.user?.avatar_url ?? '',
-							id: itemFriend?.id ?? '',
-						},
+							id: itemFriend?.id ?? ''
+						}
 					};
 				})
 			: [];
@@ -119,8 +119,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						user: {
 							username: itemUserClan?.user?.username ?? '',
 							avatar_url: itemUserClan?.user?.avatar_url ?? '',
-							id: itemUserClan?.id ?? '',
-						},
+							id: itemUserClan?.id ?? ''
+						}
 					};
 				})
 			: [];
@@ -131,7 +131,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 				const friend = friendsMap.get(itemDM.id);
 				return friend ? { ...itemDM, displayName: friend?.displayName || itemDM?.displayName } : itemDM;
 			}),
-			...listUserClanSearch,
+			...listUserClanSearch
 		];
 		return removeDuplicatesById(listSearch?.filter((item) => item.id !== accountId));
 	}, [accountId, friends, listDM, usersClan]);
@@ -152,12 +152,12 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		return [
 			{
 				title: t('members'),
-				quantitySearch: searchText && listMemberSearch?.length,
+				quantitySearch: searchText && listMemberSearch?.length
 			},
 			{
 				title: t('channels'),
-				quantitySearch: searchText && listChannelSearch?.length,
-			},
+				quantitySearch: searchText && listChannelSearch?.length
+			}
 		];
 	}, [listChannelSearch, listMemberSearch, searchText, t]);
 	return (

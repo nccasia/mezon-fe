@@ -1447,3 +1447,14 @@ export const Sticker = ({ width = 24, height = 24, color = 'white', ...props }: 
 		/>
 	</Svg>
 );
+
+export function BravePermission({ width = 20, height = 20, color = 'white', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 28 32" fill={'none'} {...props}>
+			<Path
+				d="M27.2 7.132L14.677.175a1.392 1.392 0 00-1.353 0L.803 7.132a1.39 1.39 0 00-.715 1.214C.088 9.312.247 32 14.001 32c13.755 0 13.913-22.687 13.913-23.653 0-.505-.274-.97-.715-1.214zM14 8.346a3.478 3.478 0 11.001 6.956 3.478 3.478 0 010-6.956zM8.784 22.261c0-3.201 2.016-5.217 5.217-5.217 3.202 0 5.218 2.015 5.218 5.217H8.784z"
+				fill={color}
+			/>
+		</Svg>
+	);
+}

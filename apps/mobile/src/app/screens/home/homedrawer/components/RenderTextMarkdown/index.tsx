@@ -10,9 +10,9 @@ import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
-import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
-import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
-import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
+import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
+import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
+import { MentionUser } from '../MarkdownFormatText/MentionUser';
 
 interface ElementToken {
 	s?: number;
@@ -181,6 +181,7 @@ export type IMarkdownProps = {
 	mode?: number;
 	isHiddenHashtag?: boolean;
 	directMessageId?: string;
+	isOpenLink?: boolean;
 };
 
 /**
@@ -332,11 +333,6 @@ export const formatBlockCode = (text: string, isMessageReply: boolean) => {
 	return text?.replace?.(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 };
 
-export const removeBlockCode = (text: string) => {
-	const regex = /(`{1,3})(.*?)\1/g;
-	return text?.replace?.(regex, '$2');
-};
-
 export const RenderTextMarkdownContent = React.memo(
 	({
 		content,
@@ -348,7 +344,8 @@ export const RenderTextMarkdownContent = React.memo(
 		isMessageReply,
 		mode,
 		isHiddenHashtag,
-		directMessageId
+		directMessageId,
+		isOpenLink = true
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -451,33 +448,35 @@ export const RenderTextMarkdownContent = React.memo(
 				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
-					if (url.startsWith(TYPE_MENTION.userRoleMention)) {
-						onMention && onMention(url.replace('@role', '@'));
-						return false;
+					if (isOpenLink) {
+						if (url.startsWith(TYPE_MENTION.userRoleMention)) {
+							onMention && onMention(url.replace('@role', '@'));
+							return false;
+						}
+						if (url.startsWith(TYPE_MENTION.userMention)) {
+							onMention && onMention(url);
+							return false;
+						}
+						if (url.startsWith(TYPE_MENTION.hashtag)) {
+							const urlFormat = url.replace(/##voice%22|#%22|%22/g, '');
+							const dataChannel = urlFormat.split('_');
+							const payloadChannel = {
+								type: Number(dataChannel?.[0] || 1),
+								id: dataChannel?.[1],
+								channel_id: dataChannel?.[1],
+								clan_id: dataChannel?.[2],
+								status: Number(dataChannel?.[3] || 1),
+								meeting_code: dataChannel?.[4] || ''
+							};
+							onChannelMention && onChannelMention(payloadChannel);
+							return false;
+						}
+						// Note: return false to prevent default
+						return true;
 					}
-					if (url.startsWith(TYPE_MENTION.userMention)) {
-						onMention && onMention(url);
-						return false;
-					}
-					if (url.startsWith(TYPE_MENTION.hashtag)) {
-						const urlFormat = url.replace(/##voice%22|#%22|%22/g, '');
-						const dataChannel = urlFormat.split('_');
-						const payloadChannel = {
-							type: Number(dataChannel?.[0] || 1),
-							id: dataChannel?.[1],
-							channel_id: dataChannel?.[1],
-							clan_id: dataChannel?.[2],
-							status: Number(dataChannel?.[3] || 1),
-							meeting_code: dataChannel?.[4] || ''
-						};
-						onChannelMention && onChannelMention(payloadChannel);
-						return false;
-					}
-					// Note: return false to prevent default
-					return true;
 				}}
 			>
-				{contentRender}
+				{formatBlockCode(contentRender?.trim(), isMessageReply)}
 			</Markdown>
 		);
 

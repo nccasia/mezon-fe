@@ -76,7 +76,7 @@ export const fetchDeleteRole = createAsyncThunk(
 	async ({ roleId, clanId }: FetchMembersRolePayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateRoleDelete(mezon.session, roleId, { clan_id: clanId });
+			const response = await mezon.client.deleteRole(mezon.session, roleId, clanId);
 			thunkAPI.dispatch(rolesClanActions.remove(roleId));
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);

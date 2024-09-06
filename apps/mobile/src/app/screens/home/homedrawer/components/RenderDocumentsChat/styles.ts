@@ -11,15 +11,15 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			borderRadius: size.s_6,
 			flexDirection: 'row',
-			backgroundColor: colors.primary,
+			backgroundColor: colors.primary
 		},
 		fileName: {
 			fontSize: size.small,
-			color: colors.text,
+			color: colors.text
 		},
 		typeFile: {
 			fontSize: size.small,
 			color: Colors.textGray,
-			textTransform: 'uppercase',
-		},
+			textTransform: 'uppercase'
+		}
 	});

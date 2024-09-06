@@ -11,7 +11,7 @@ import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useProcessLink } from './useProcessLink';
@@ -30,6 +30,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
+	const currentDmOrChannelId = useMemo(
+		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? channelId : directMessageId),
+		[channelId, directMessageId, mode]
+	);
+
 	const dispatch = useAppDispatch();
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -46,10 +51,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		isPublic = !channel.channel_private;
 	}
 
-	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
-	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
-	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
-
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -59,10 +60,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			anonymous?: boolean,
 			mentionEveryone?: boolean
 		) => {
-			setContentPayload(content);
-			setMentionPayload(mentions);
-			setAttachmentPayload(attachments);
-
 			await dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
@@ -148,10 +145,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, isPublic]
 	);
+
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageUpdateImage.clan_id && newMessageUpdateImage.clan_id !== '0') {
+		if (newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL && newMessageUpdateImage.isMe) {
 			processLink(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.clan_id!,
@@ -159,15 +157,12 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				newMessageUpdateImage.channel_id!,
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.mode!,
-				contentPayload,
-				mentionPayload,
-				attachmentPayload,
+				newMessageUpdateImage.content,
+				newMessageUpdateImage.mentions,
+				newMessageUpdateImage.attachments,
 				newMessageUpdateImage.message_id
 			);
 		}
-		setContentPayload({});
-		setMentionPayload([]);
-		setAttachmentPayload([]);
 	}, [newMessageUpdateImage.message_id]);
 
 	return useMemo(

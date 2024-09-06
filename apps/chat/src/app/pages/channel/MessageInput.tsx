@@ -52,10 +52,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 
-	const attachmentsOnMessage = useMemo(() => {
-		return message.attachments;
-	}, [message.attachments]);
-
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojis
@@ -170,7 +166,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
+
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
 		setChannelDraftMessage(
 			channelId,
