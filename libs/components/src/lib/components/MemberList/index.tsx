@@ -1,7 +1,7 @@
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectMemberIdsByChannelId,
@@ -21,7 +21,7 @@ function MemberList() {
 
 const MemberListContent = memo(
 	({ currentChannel, listMemberIds }: { currentChannel: ChannelsEntity | null; listMemberIds: string[] }) => {
-		const usersClan = useSelector(selectAllUsesClan);
+		const usersClan = useSelector(selectAllUserClans);
 		const closeMenu = useSelector(selectCloseMenu);
 		const members = currentChannel?.channel_private
 			? usersClan.filter((item) => listMemberIds.includes(currentChannel?.id + item.id))
