@@ -38,7 +38,6 @@ export const fetchSystemMessageByClanId = createAsyncThunk('systemMessages/fetch
 export const createSystemMessage = createAsyncThunk('systemMessages/createSystemMessage', async (newMessage: ApiSystemMessageRequest, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response: ApiSystemMessage = await mezon.client.createSystemMessage(mezon.session, newMessage);
-	thunkAPI.dispatch(fetchSystemMessages());
 	return response;
 });
 
@@ -47,7 +46,6 @@ export const updateSystemMessage = createAsyncThunk(
 	async ({ clanId, channelId }: { clanId: string; channelId: MezonUpdateSystemMessageBody }, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, channelId);
-		thunkAPI.dispatch(fetchSystemMessages());
 		return response;
 	}
 );
@@ -55,7 +53,6 @@ export const updateSystemMessage = createAsyncThunk(
 export const deleteSystemMessage = createAsyncThunk('systemMessages/deleteSystemMessage', async (clanId: string, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	await mezon.client.deleteSystemMessage(mezon.session, clanId);
-	thunkAPI.dispatch(fetchSystemMessages());
 });
 
 export const systemMessageSlice = createSlice({

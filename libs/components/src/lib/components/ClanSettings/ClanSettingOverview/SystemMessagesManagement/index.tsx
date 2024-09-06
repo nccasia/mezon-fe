@@ -1,5 +1,6 @@
 import {
 	ChannelsEntity,
+	createSystemMessage,
 	fetchSystemMessageByClanId,
 	selectAllChannels,
 	selectCurrentClanId,
@@ -23,20 +24,20 @@ const SystemMessagesManagement = () => {
 
 	const dispatch = useAppDispatch();
 
-	useEffect(() => {
-		if (currentClanId) {
-			const fetchMessage = async () => {
-				try {
-					const resultAction = await dispatch(fetchSystemMessageByClanId(currentClanId));
-					const message = unwrapResult(resultAction);
-					setSystemMessage(message);
-				} catch (err) {
-					console.error('Failed to fetch system message:', err);
-				}
-			};
+	const fetchSystemMessage = async () => {
+		if (!currentClanId) return;
 
-			fetchMessage();
+		try {
+			const resultAction = await dispatch(fetchSystemMessageByClanId(currentClanId));
+			const message = unwrapResult(resultAction);
+			setSystemMessage(message);
+		} catch (err) {
+			console.error('Failed to fetch system message:', err);
 		}
+	};
+
+	useEffect(() => {
+		fetchSystemMessage();
 	}, [currentClanId, dispatch]);
 
 	useEffect(() => {
@@ -50,17 +51,32 @@ const SystemMessagesManagement = () => {
 		}
 	}, [systemMessage, channelsList, currentClanId]);
 
-	const handleSelectChannel = (channel: ChannelsEntity) => {
+	const handleSelectChannel = async (channel: ChannelsEntity) => {
 		setSelectedChannel(channel);
-		if (currentClanId) {
+		if (systemMessage && Object.keys(systemMessage).length > 0) {
+			if (currentClanId) {
+				const request = {
+					clanId: currentClanId,
+					channelId: {
+						channel_id: channel.channel_id
+					}
+				};
+				dispatch(updateSystemMessage(request));
+			}
+		} else {
 			const request = {
-				clanId: currentClanId,
-				channelId: {
-					channel_id: channel.channel_id
-				}
+				channel_id: channel.channel_id,
+				clan_id: channel.clan_id
 			};
-
-			dispatch(updateSystemMessage(request));
+			try {
+				const resultAction = await dispatch(createSystemMessage(request));
+				const newMessage = unwrapResult(resultAction);
+				setSystemMessage(newMessage);
+				console.log('systemMessage1:', systemMessage);
+				await fetchSystemMessage();
+			} catch (err) {
+				console.error('Failed to create system message:', err);
+			}
 		}
 	};
 
