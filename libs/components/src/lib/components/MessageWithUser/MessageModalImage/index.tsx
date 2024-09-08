@@ -5,7 +5,7 @@ import {
 	selectAttachmentPhoto,
 	selectCurrentAttachmentShowImage,
 	selectCurrentChannel,
-	selectMemberById,
+	selectMemberClanByUserId,
 	selectMessageIdAttachment,
 	selectModeAttachment,
 	selectOpenModalAttachment
@@ -271,7 +271,7 @@ const MessageModalImage = () => {
 
 const SenderUser = () => {
 	const attachment = useSelector(selectCurrentAttachmentShowImage);
-	const user = useSelector(selectMemberById(attachment?.uploader as string));
+	const user = useSelector(selectMemberClanByUserId(attachment?.uploader as string));
 
 	return (
 		<div className="flex gap-2 overflow-hidden">

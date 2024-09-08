@@ -93,3 +93,11 @@ export const selectMemberClanByGoogleId = (googleId: string) =>
 	createSelector(selectAllUserClans, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);
 	});
+
+export const selectMembersClanByUserIds = (userIds: string[]) =>
+	createSelector(selectAllUserClans, (members) => {
+		return members.filter((member) => {
+			const userId = member?.user?.id;
+			return userId && userIds.includes(userId);
+		});
+	});

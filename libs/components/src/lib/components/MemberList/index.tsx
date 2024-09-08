@@ -4,7 +4,8 @@ import {
 	selectAllUserClans,
 	selectCloseMenu,
 	selectCurrentChannel,
-	selectMemberIdsByChannelId,
+	selectMemberIdByChannelId,
+	selectMembersClanByUserIds,
 	useAppSelector
 } from '@mezon/store';
 import { memo } from 'react';
@@ -15,26 +16,24 @@ export type MemberListProps = { className?: string };
 
 function MemberList() {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(currentChannel?.id as string)(state));
-	return <MemberListContent currentChannel={currentChannel} listMemberIds={listMemberIds} />;
+	const memberIds = useAppSelector((state) => selectMemberIdByChannelId(currentChannel?.id as string)(state)) as string[];
+	return <MemberListContent currentChannel={currentChannel} memberIds={memberIds} />;
 }
 
 const MemberListContent = memo(
-	({ currentChannel, listMemberIds }: { currentChannel: ChannelsEntity | null; listMemberIds: string[] }) => {
+	({ currentChannel, memberIds }: { currentChannel: ChannelsEntity | null; memberIds: string[] }) => {
 		const usersClan = useSelector(selectAllUserClans);
+		const membersClanByUserIds = useSelector(selectMembersClanByUserIds(memberIds));
 		const closeMenu = useSelector(selectCloseMenu);
-		const members = currentChannel?.channel_private
-			? usersClan.filter((item) => listMemberIds.includes(currentChannel?.id + item.id))
-			: usersClan;
+
+		const members = currentChannel?.channel_private ? membersClanByUserIds : usersClan;
+
 		const onlineMembers = (members as ChannelMembersEntity[])
-			.filter((item) => {
-				return item.user?.online;
-			})
+			.filter((item) => item.user?.online)
 			.map((item) => ({ ...item, channelId: currentChannel?.id }));
+
 		const offlineMembers = (members as ChannelMembersEntity[])
-			.filter((item) => {
-				return !item.user?.online;
-			})
+			.filter((item) => !item.user?.online)
 			.map((item) => ({ ...item, channelId: currentChannel?.id }));
 
 		return (
@@ -60,7 +59,7 @@ const MemberListContent = memo(
 		);
 	},
 	(prev, next) => {
-		return prev.currentChannel?.channel_private === next.currentChannel?.channel_private && prev.listMemberIds === next.listMemberIds;
+		return prev.currentChannel?.channel_private === next.currentChannel?.channel_private && prev.memberIds === next.memberIds;
 	}
 );
 

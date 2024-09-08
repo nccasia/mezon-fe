@@ -5,7 +5,7 @@ import {
 	selectAllChannels,
 	selectChannelById,
 	selectCurrentClanId,
-	selectMemberById,
+	selectMemberClanByUserId,
 	selectTheme,
 	settingClanStickerActions,
 	updateWebhookBySpecificId,
@@ -38,7 +38,8 @@ const convertDate = (isoDateString: string): string => {
 
 const WebhookItemModal = ({ webhookItem, currentChannel }: IWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
-	const webhookOwner = useSelector(selectMemberById(webhookItem.creator_id as string));
+	const webhookOwner = useSelector(selectMemberClanByUserId(webhookItem.creator_id as string));
+
 	return (
 		<div className="dark:bg-[#2b2d31] bg-bgLightMode p-[20px] border dark:border-black rounded-md mb-[20px]">
 			<div className="flex gap-[20px] items-center">
