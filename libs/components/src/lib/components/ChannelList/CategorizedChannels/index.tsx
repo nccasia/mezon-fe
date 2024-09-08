@@ -120,7 +120,12 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	return (
 		<div>
 			{category.category_name && (
-				<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
+				<div
+					className="flex flex-row px-2 relative gap-1 border border-green-500"
+					onMouseDown={handleMouseClick}
+					ref={panelRef}
+					role={'button'}
+				>
 					<button
 						onClick={() => {
 							handleToggleCategory();

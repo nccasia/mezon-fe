@@ -11,7 +11,6 @@ function NavLinkComponent({ active, children }: NavLinkProps) {
 		dispatch(threadsActions.setOpenThreadMessageState(false));
 		dispatch(threadsActions.setValueThread(null));
 	};
-
 	return (
 		<div className="group block relative rounded-3xl">
 			<div className="flex absolute -left-2 items-center h-full">

@@ -164,7 +164,10 @@ function MyApp() {
 	}, [totalClanNotify, totalUnreadDM]);
 
 	return (
-		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
+		<div
+			className="border border-yellow-300 flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond"
+			onClick={handleClick}
+		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
 				className={`w-[72px] overflow-y-auto py-4 px-3 dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar flex flex-col items-center ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
