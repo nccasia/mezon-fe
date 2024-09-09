@@ -1,6 +1,15 @@
 import { Icons } from '@mezon/components';
 import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
-import { channelMembersActions, RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectTheme, selectUserChannelById, useAppDispatch } from '@mezon/store';
+import {
+	RolesClanEntity,
+	selectAllRolesClan,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	selectTheme,
+	selectUserChannelById,
+	useAppDispatch,
+	usersClanActions
+} from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -13,7 +22,7 @@ type RoleUserProfileProps = {
 const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
 	const item = role.creator_id !== userId;
 	return item ?? false;
-}
+};
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -59,7 +68,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 
 	const filteredListRoleBySearch = useMemo(() => {
 		return activeRolesWithoutUserRoles?.filter((role) => {
-        return role.slug !== 'everyone' && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
+			return role.slug !== 'everyone' && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
 
@@ -69,52 +78,55 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
-		await dispatch(channelMembersActions.addRoleIdUser({
-			id: roleId, 
-			channelId: currentChannelId, 
-			userId: userById?.user?.id,
-		}));
+		await dispatch(
+			usersClanActions.addRoleIdUser({
+				id: roleId,
+				channelId: currentChannelId,
+				userId: userById?.user?.id
+			})
+		);
 	};
 
 	const deleteRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
-		await dispatch(channelMembersActions.removeRoleIdUser({
-			id: roleId, 
-			channelId: currentChannelId, 
-			userId: userById?.user?.id,
-		}));
+		await dispatch(
+			usersClanActions.removeRoleIdUser({
+				id: roleId,
+				channelId: currentChannelId,
+				userId: userById?.user?.id
+			})
+		);
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2 flex flex-wrap gap-2">
-				{userRolesClan.map((role, index) => 
+				{userRolesClan.map((role, index) => (
 					<span
 						key={`${role.id}_${index}`}
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
 						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-							{ hasPermissionEditRole ? 
-							<Tooltip
-								content="Remove role"
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								className="dark:!text-white !text-black"
-							>
-								<Icons.IconRemove className="text-transparent size-2" />
-							</Tooltip>:
-							<div className="size-2 bg-white rounded-full"></div>
-							}
+							{hasPermissionEditRole ? (
+								<Tooltip
+									content="Remove role"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+									className="dark:!text-white !text-black"
+								>
+									<Icons.IconRemove className="text-transparent size-2" />
+								</Tooltip>
+							) : (
+								<div className="size-2 bg-white rounded-full"></div>
+							)}
 						</button>
-						<span className="text-xs font-medium">
-							{role.title}
-						</span>
+						<span className="text-xs font-medium">{role.title}</span>
 					</span>
-				)}
+				))}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
 					<div className="relative" onClick={handModalAddRole}>
 						<Tooltip
@@ -125,7 +137,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							className="dark:text-white text-black"
 						>
 							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300 items-center">
-								<Icons.Plus className="size-5"/>
+								<Icons.Plus className="size-5" />
 								<p className="text-xs m-0 font-medium">Add Role</p>
 							</button>
 						</Tooltip>

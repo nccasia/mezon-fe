@@ -60,7 +60,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
-	const membersInClan = useSelector(selectAllChannelMembers);
+	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')

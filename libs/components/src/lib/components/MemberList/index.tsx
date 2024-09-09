@@ -2,6 +2,7 @@ import {
 	ChannelMembersEntity,
 	ChannelsEntity,
 	selectAllUserClans,
+	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectMemberIdsByChannelId,
@@ -14,18 +15,28 @@ import ListMember from './listMember';
 export type MemberListProps = { className?: string };
 
 function MemberList() {
-	const currentChannel = useSelector(selectCurrentChannel);
+	const currentChannel = useAppSelector(selectCurrentChannel);
+	const parrentChannel = useAppSelector(selectChannelById(currentChannel?.parrent_id as string));
 	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(currentChannel?.id as string)(state));
-	return <MemberListContent currentChannel={currentChannel} listMemberIds={listMemberIds} />;
+	return <MemberListContent currentChannel={currentChannel} parrentChannel={parrentChannel} listMemberIds={listMemberIds} />;
 }
 
 const MemberListContent = memo(
-	({ currentChannel, listMemberIds }: { currentChannel: ChannelsEntity | null; listMemberIds: string[] }) => {
+	({
+		currentChannel,
+		listMemberIds,
+		parrentChannel
+	}: {
+		currentChannel: ChannelsEntity | null;
+		parrentChannel: ChannelsEntity | null;
+		listMemberIds: string[];
+	}) => {
 		const usersClan = useSelector(selectAllUserClans);
 		const closeMenu = useSelector(selectCloseMenu);
-		const members = currentChannel?.channel_private
-			? usersClan.filter((item) => listMemberIds.includes(currentChannel?.id + item.id))
-			: usersClan;
+		const members =
+			currentChannel?.channel_private || parrentChannel?.channel_private
+				? usersClan.filter((item) => listMemberIds.includes(item.id))
+				: usersClan;
 		const onlineMembers = (members as ChannelMembersEntity[])
 			.filter((item) => {
 				return item.user?.online;

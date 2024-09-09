@@ -1,16 +1,13 @@
-import {
-	useAppNavigation,
-	useDirect,
-	useEscapeKey,
-	useMemberCustomStatus,
-	useOnClickOutside,
-	useSettingFooter
-} from '@mezon/core';
+import { useAppNavigation, useDirect, useEscapeKey, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
 	ChannelMembersEntity,
-	notificationActions, selectCurrentChannelId, selectCurrentUserId, selectDmGroupCurrentId,
+	notificationActions,
+	selectCurrentChannelId,
+	selectCurrentUserId,
+	selectDmGroupCurrentId,
 	selectFriendStatus,
-	selectMemberByUserId, selectMembersByChannelId, selectModeResponsive,
+	selectMembersByChannelId,
+	selectModeResponsive,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -21,13 +18,13 @@ import { useSelector } from 'react-redux';
 import { OpenModalProps } from '../ModalUserProfile';
 import AvatarProfile from '../ModalUserProfile/AvatarProfile';
 import GroupIconBanner from '../ModalUserProfile/StatusProfile/groupIconBanner';
+import ItemPanel from '../PanelChannel/ItemPanel';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AboutMe from './AboutMe';
 import Activity from './Activity';
 import MutualFriends from './MutualFriends';
 import MutualServers from './MutualServers';
 import ProfileTabs, { typeTab } from './ProfileTabs';
-import ItemPanel from "../PanelChannel/ItemPanel";
 
 type UserProfileModalInnerProps = {
 	openModal: boolean;
@@ -38,7 +35,7 @@ type UserProfileModalInnerProps = {
 
 const initOpenModal = {
 	openFriend: false,
-	openOption: false,
+	openOption: false
 };
 
 const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfileModalInnerProps) => {
@@ -47,8 +44,10 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const modeResponsive = useAppSelector(selectModeResponsive);
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const currentDmId = useAppSelector(selectDmGroupCurrentId);
-	const channelMembers = useAppSelector(selectMembersByChannelId(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId))
-	const userById = channelMembers.find(member => member?.user?.id === userId) as ChannelMembersEntity;
+	const channelMembers = useAppSelector(
+		selectMembersByChannelId((modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string)
+	);
+	const userById = channelMembers.find((member) => member?.user?.id === userId) as ChannelMembersEntity;
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const userCustomStatus = useMemberCustomStatus(userId || '');
 	const [openGroupIconBanner, setGroupIconBanner] = useState<OpenModalProps>(initOpenModal);
@@ -58,12 +57,12 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const isSelf = currentUserId === userId;
-	const [isOPenEditOption, setIsOPenEditOption] = useState (false);
+	const [isOPenEditOption, setIsOPenEditOption] = useState(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
 	const displayAvatar = userById?.clan_avatar || userById?.user?.avatar_url;
-	const displayUsername = userById?.clan_nick || userById?.user?.display_name || userById?.user?.username
-	
+	const displayUsername = userById?.clan_nick || userById?.user?.display_name || userById?.user?.username;
+
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
@@ -96,38 +95,38 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	}, [userById?.user?.avatar_url]);
 
 	useOnClickOutside(userProfileRef, () => onClose?.());
-	
+
 	const handleOpenEditOption = () => {
-		setIsOPenEditOption(!isOPenEditOption)
-	}
-	
+		setIsOPenEditOption(!isOPenEditOption);
+	};
+
 	useOnClickOutside(panelRef, () => setIsOPenEditOption(false));
-	
+
 	useEscapeKey(() => {
-		if(isOPenEditOption) {
-			setIsOPenEditOption(false)
+		if (isOPenEditOption) {
+			setIsOPenEditOption(false);
 		} else if (onClose) {
 			onClose();
 		}
 	});
-	
+
 	const handleOpenUserProfileSetting = () => {
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
 		setIsShowSettingFooterStatus(true);
 		if (onClose) {
-			onClose ();
+			onClose();
 		}
-	}
-	
+	};
+
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
 		setIsShowSettingFooterStatus(true);
 		if (onClose) {
-			onClose ();
+			onClose();
 		}
-	}
-	
+	};
+
 	return (
 		<div className="w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black">
 			<div
@@ -155,7 +154,7 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 							customStatus={userCustomStatus}
 							styleAvatar="w-[120px] h-[120px] rounded-full"
 						/>
-						{isSelf ?
+						{isSelf ? (
 							<div className="flex items-end pr-4">
 								<button
 									onClick={handleOpenEditOption}
@@ -163,7 +162,6 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 								>
 									<Icons.PenEdit className="text-bgLightPrimary" />
 									<span className="text-sm text-bgLightPrimary font-semibold one-line">Edit Profile</span>
-									
 								</button>
 								{isOPenEditOption && (
 									<div
@@ -171,13 +169,13 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 										className={`absolute left-[calc(100%_+_10px)] top-[38px] dark:bg-bgSearchHover bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] mr-2 w-fit shadow-lg outline-none`}
 									>
 										{modeResponsive === ModeResponsive.MODE_CLAN && (
-											<ItemPanel children="Edit Clan Profile" onClick={handleOpenClanProfileSetting}/>
+											<ItemPanel children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />
 										)}
-										<ItemPanel children="Edit Main Profile" onClick={handleOpenUserProfileSetting}/>
+										<ItemPanel children="Edit Main Profile" onClick={handleOpenUserProfileSetting} />
 									</div>
 								)}
 							</div>
-							:
+						) : (
 							<div className="flex items-end pr-4">
 								<button
 									onClick={() => directMessageWithUser(userId || '')}
@@ -187,7 +185,7 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 									<span className="text-sm text-bgLightPrimary font-semibold">Message</span>
 								</button>
 							</div>
-						}
+						)}
 					</div>
 				</div>
 				<div className="dark:bg-bgProfileBody bg-bgLightPrimary pt-[60px] pb-4 px-4 rounded-b-md w-full flex-1">

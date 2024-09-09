@@ -23,9 +23,10 @@ type ChannelMessagesProps = {
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
+	isDM?: boolean;
 };
 
-const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -166,7 +167,7 @@ const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAct
 			{/*	</TouchableOpacity>*/}
 			{/*)}*/}
 
-			<MessageUserTyping channelId={channelId} />
+			<MessageUserTyping channelId={channelId} isDM={isDM} />
 		</View>
 	);
 });

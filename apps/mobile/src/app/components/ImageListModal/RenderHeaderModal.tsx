@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { Platform, TouchableOpacity } from 'react-native';
@@ -18,7 +18,7 @@ interface IRenderFooterModalProps {
 export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const uploader = useSelector(selectMemberByUserId(imageSelected?.uploader || ''));
+	const uploader = useSelector(selectMemberClanByUserId(imageSelected?.uploader || ''));
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const handleDownloadImage = async () => {
 		if (!imageSelected?.url) {

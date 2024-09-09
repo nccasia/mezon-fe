@@ -1,4 +1,4 @@
-import { selectMemberByUserId } from '@mezon/store';
+import { selectMemberClanByUserId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 type InterestedDetailProps = {
@@ -7,7 +7,7 @@ type InterestedDetailProps = {
 
 const InterestedDetail = (props: InterestedDetailProps) => {
 	const { userID } = props;
-	const userCreate = useSelector(selectMemberByUserId(userID || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(userID || ''));
 
 	return (
 		<div className="p-4 space-y-1 dark:text-zinc-300 text-colorTextLightMode text-base font-semibold max-h-[250px] h-[250px] hide-scrollbar overflow-auto">

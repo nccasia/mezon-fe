@@ -6,11 +6,11 @@ type ChannelTypingProps = {
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	isDM?: boolean;
 };
 
-export function ChannelTyping({ channelId, mode, isPublic }: ChannelTypingProps) {
-	const { typingUsers } = useChatTypings({ channelId, mode, isPublic });
-
+export function ChannelTyping({ channelId, mode, isPublic, isDM }: ChannelTypingProps) {
+	const { typingUsers } = useChatTypings({ channelId, mode, isPublic, isDM });
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
 			return (

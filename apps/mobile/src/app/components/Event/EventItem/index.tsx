@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectChannelById, selectMemberByUserId } from '@mezon/store-mobile';
+import { EventManagementEntity, selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -19,7 +19,7 @@ interface IEventItemProps {
 export default function EventItem({ event, onPress, showActions = true }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
 	const channelVoice = useSelector(selectChannelById(event?.channel_id));
 	// const channelFirst = useSelector(selectChannelFirst);

@@ -1,4 +1,4 @@
-import { directActions, messagesActions, selectChannelById, selectCurrentUserId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, selectAllAccount, selectChannelById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -38,7 +38,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 		return !parent?.channel_private;
 	}, [parent?.channel_private]);
 
-	const currentUserId = useSelector(selectCurrentUserId);
+	const userProfile = useSelector(selectAllAccount);
+	const currentUserId = userProfile?.user?.id || '';
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	const dispatch = useAppDispatch();
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -67,7 +68,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					references,
 					anonymous,
 					mentionEveryone,
-					senderId: currentUserId
+					senderId: currentUserId,
+					avatar: userProfile?.user?.avatar_url
 				})
 			);
 			if (mode !== ChannelStreamMode.STREAM_MODE_CHANNEL) {

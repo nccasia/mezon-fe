@@ -15,11 +15,11 @@ function Homepage() {
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
-	let linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.60-win-x64.exe';
+	let linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-win-x64.exe';
 	if (navigator.userAgent.includes('Mac')) {
-		linkDownload = 'https://cdn.mezon.vn/release/Mezon-1.1.60-arm64-mac.zip';
+		linkDownload = 'https://cdn.mezon.vn/release/Mezon-1.1.61-arm64-mac.zip';
 	} else if (navigator.userAgent.includes('Linux')) {
-		linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.60-linux-amd64.deb';
+		linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-linux-amd64.deb';
 	}
 
 	return (

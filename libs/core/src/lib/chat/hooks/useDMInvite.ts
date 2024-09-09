@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 export function useDMInvite(channelID?: string) {
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
-	const rawMembers = useSelector(selectMembersByChannelId(channelID));
+	const rawMembers = useSelector(selectMembersByChannelId(channelID as string));
 	const usersClan = useSelector(selectAllUserClans);
 	const allChannels = useSelector(selectAllChannels);
 	const isChannelPrivate = allChannels.find((channel) => channel.channel_id === channelID)?.channel_private === 1;

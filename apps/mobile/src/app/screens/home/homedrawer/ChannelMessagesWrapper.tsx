@@ -22,9 +22,10 @@ type ChannelMessagesProps = {
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 	isPublic?: boolean;
+	isDM?: boolean;
 };
 
-const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }: ChannelMessagesProps) => {
+const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, isDM }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { socketRef } = useMezon();
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
@@ -119,6 +120,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }
 				onOpenImage={onOpenImage}
 				onMessageAction={onMessageAction}
 				setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
+				isDM={isDM}
 			/>
 
 			<View>

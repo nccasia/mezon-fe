@@ -223,6 +223,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
 								isPublic={false}
+								isDM={true}
 							/>
 						</View>
 					</PanGestureHandler>

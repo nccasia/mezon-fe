@@ -1,7 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -312,7 +312,7 @@ const MemberReact = React.memo((props: { userId: string; onSelectUserId: (userId
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userId, onSelectUserId } = props;
-	const user = useSelector(selectMemberByUserId(userId || ''));
+	const user = useSelector(selectMemberClanByUserId(userId || ''));
 	const showUserInformation = () => {
 		onSelectUserId(user.user?.id);
 	};

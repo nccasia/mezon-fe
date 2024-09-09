@@ -1,5 +1,5 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
-import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -29,12 +29,26 @@ export type ItemEventManagementProps = {
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, isReviewEvent, setOpenModalDetail } =
-		props;
+	const {
+		topic,
+		voiceChannel,
+		titleEvent,
+		option,
+		address,
+		logo,
+		logoRight,
+		start,
+		end,
+		event,
+		createTime,
+		checkUserCreate,
+		isReviewEvent,
+		setOpenModalDetail
+	} = props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
-	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
 
@@ -45,7 +59,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 
 	const isSameDay = useMemo(() => {
@@ -112,12 +126,12 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							animation="duration-500"
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						>
-							<AvatarImage 
+							<AvatarImage
 								alt={userCreate?.user?.username || ''}
 								userName={userCreate?.user?.username}
 								className="min-w-6 min-h-6 max-w-6 max-h-6"
 								src={userCreate?.user?.avatar_url}
-								classNameText='text-[9px] pt-[3px]'
+								classNameText="text-[9px] pt-[3px]"
 							/>
 						</Tooltip>
 					)}

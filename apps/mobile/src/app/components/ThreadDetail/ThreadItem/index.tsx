@@ -1,7 +1,7 @@
 import { AngleRightIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberByUserId } from '@mezon/store-mobile';
-import { IChannel, convertTimeMessage } from '@mezon/utils';
+import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberClanByUserId } from '@mezon/store-mobile';
+import { IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -17,7 +17,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const navigation = useNavigation();
-	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
+	const user = useSelector(selectMemberClanByUserId(thread?.last_sent_message?.sender_id as string)) as unknown as IChannelMember;
 
 	const { username } = useMessageSender(user);
 	const handleNavigateThread = async (thread?: IChannel) => {

@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { EventManagementEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
@@ -10,7 +10,9 @@ interface IEventMemberProps {
 }
 
 const renderAvatar = (id: string, index: number) => {
-	const user = useSelector(selectMemberByUserId(id || ''));
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const user = useSelector(selectMemberClanByUserId(id || ''));
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -26,16 +28,11 @@ const renderAvatar = (id: string, index: number) => {
 			/>
 			<Text style={styles.text}>{user?.user?.display_name}</Text>
 		</View>
-
 	);
 };
 
 export default function EventMember({ event }: IEventMemberProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	return (
-		<View style={styles.container}>
-			{event?.user_ids?.map((uid, index) => renderAvatar(uid, index))}
-		</View>
-	);
+	return <View style={styles.container}>{event?.user_ids?.map((uid, index) => renderAvatar(uid, index))}</View>;
 }

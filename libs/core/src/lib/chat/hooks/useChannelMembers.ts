@@ -7,7 +7,7 @@ export type useChannelMembersOptions = {
 };
 
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
-	const members = useSelector(selectMembersByChannelId(channelId));
+	const members = useSelector(selectMembersByChannelId(channelId as string));
 
 	return useMemo(
 		() => ({

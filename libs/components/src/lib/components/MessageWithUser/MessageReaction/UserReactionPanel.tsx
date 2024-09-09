@@ -1,6 +1,13 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import {
+	reactionActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDirectById,
+	selectMemberClanByUserId
+} from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -157,7 +164,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
-	const user = useSelector(selectMemberByUserId(sender.sender_id));
+	const user = useSelector(selectMemberClanByUserId(sender.sender_id));
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">

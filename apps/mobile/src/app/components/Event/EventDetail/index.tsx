@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectClanById, selectMemberByUserId } from '@mezon/store-mobile';
+import { EventManagementEntity, selectClanById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { useRef } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ interface IEventDetailProps {
 export default function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const clans = useSelector(selectClanById(event?.clan_id || ''));
 	const menuBottomSheet = useRef<BottomSheetModal>(null);
 

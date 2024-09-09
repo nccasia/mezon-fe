@@ -133,28 +133,11 @@ const persistedThreadReducer = persistReducer(
 	threadsReducer
 );
 
-const transformchannelmembersError = createTransform<MessagesState, MessagesState>(
-	(inboundState) => {
-		return inboundState;
-	},
-	(outboundState, key) => {
-		if (key === 'memberChannels') {
-			return {
-				...outboundState,
-				memberChannels: {}
-			};
-		}
-		return outboundState;
-	},
-	{ whitelist: ['memberChannels'] }
-);
-
 const persistedChannelMembersReducer = persistReducer(
 	{
 		key: 'channelmembers',
 		storage,
-		blacklist: ['onlineStatusUser'],
-		transforms: [transformchannelmembersError]
+		blacklist: ['onlineStatusUser']
 	},
 	channelMembersReducer
 );

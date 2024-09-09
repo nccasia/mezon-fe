@@ -1,4 +1,4 @@
-import { selectMemberByUserId } from '@mezon/store';
+import { selectMemberClanByUserId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function AvatarComponent({ id, url }: Props) {
-	const user = useSelector(selectMemberByUserId(id));
+	const user = useSelector(selectMemberClanByUserId(id));
 	return (
 		<img
 			src={url ? url : user?.user?.avatar_url}
@@ -18,6 +18,6 @@ export function AvatarComponent({ id, url }: Props) {
 	);
 }
 export function NameComponent({ id, name }: Props) {
-	const user = useSelector(selectMemberByUserId(id));
+	const user = useSelector(selectMemberClanByUserId(id));
 	return <p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{name ? name : user?.user?.username}</p>;
 }

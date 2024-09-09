@@ -20,6 +20,7 @@ import {
 	notificationActions,
 	pinMessageActions,
 	reactionActions,
+	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -27,6 +28,7 @@ import {
 	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
+	useAppSelector,
 	usersClanActions,
 	voiceActions
 } from '@mezon/store';
@@ -84,6 +86,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const modeResponsive = useSelector(selectModeResponsive);
+	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -158,13 +161,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const onlineStatus = channelStreamPresence.joins.map((join) => {
 					return { userId: join.user_id, status: true };
 				});
-				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
 			}
 			if (channelStreamPresence.leaves.length > 0) {
 				const offlineStatus = channelStreamPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, status: false };
 				});
-				dispatch(channelMembersActions.setManyStatusUser(offlineStatus));
+				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
 			}
 		},
 		[dispatch]
@@ -248,7 +251,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClanId({ userId: id, clanId: user.clan_id }));
+					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(usersClanActions.remove(id));
 				}
 			});
 		},
@@ -301,6 +305,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
 				return;
 			}
+			dispatch(
+				usersClanActions.add({
+					...userJoinClan,
+					id: userJoinClan?.user?.user_id
+				})
+			);
 			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
 		},
 		[dispatch]
@@ -309,7 +319,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
 			dispatch(
-				channelMembersActions.updateUserChannel({
+				usersClanActions.updateUserChannel({
 					userId: ClanProfileUpdates.user_id,
 					clanId: ClanProfileUpdates.clan_id,
 					clanNick: ClanProfileUpdates.clan_nick,

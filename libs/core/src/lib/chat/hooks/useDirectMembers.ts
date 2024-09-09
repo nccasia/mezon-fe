@@ -7,7 +7,7 @@ export type useDirectMembersOptions = {
 };
 
 export function useDirectMembers({ channelId }: useDirectMembersOptions = {}) {
-	const rawMembers = useSelector(selectMembersByChannelId(channelId));
+	const rawMembers = useSelector(selectMembersByChannelId(channelId as string));
 
 	const members = useMemo(() => {
 		if (!rawMembers) {

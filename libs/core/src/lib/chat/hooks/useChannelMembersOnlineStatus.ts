@@ -8,7 +8,7 @@ export type UseChannelMembersOnlineStatusOptions = {
 };
 
 export function useChannelMembersOnlineStatus({ channelId }: UseChannelMembersOnlineStatusOptions = {}) {
-	const rawMembers = useSelector(selectMembersByChannelId(channelId));
+	const rawMembers = useSelector(selectMembersByChannelId(channelId as string));
 	const { userId } = useAuth();
 
 	const [onlineMembers, offlineMembers] = useMemo(() => {

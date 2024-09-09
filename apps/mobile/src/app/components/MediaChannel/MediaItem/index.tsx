@@ -1,5 +1,5 @@
 import { Block } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { AttachmentEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -16,7 +16,7 @@ interface IMediaItemProps {
 const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 	const checkIsVideo = useMemo(() => isVideo(data?.url), [data?.url]);
 	const checkIsImage = useMemo(() => isImage(data?.url), [data?.url]);
-	const uploader = useSelector(selectMemberByUserId(data?.uploader || ''));
+	const uploader = useSelector(selectMemberClanByUserId(data?.uploader || ''));
 	const handlePress = useCallback(() => {
 		onPress(data);
 	}, [onPress, data]);
@@ -32,7 +32,7 @@ const MediaItem = React.memo(({ data, onPress }: IMediaItemProps) => {
 						console.log('load error', err);
 					}}
 					source={{
-						uri: data?.url,
+						uri: data?.url
 					}}
 					useNativeControls={false}
 					resizeMode={ResizeMode.CONTAIN}

@@ -86,11 +86,11 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					alt={username ?? ''}
 					userName={username}
 					src={
-						mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+						(mode === ChannelStreamMode.STREAM_MODE_CHANNEL
 							? pendingClanAvatar
 								? pendingClanAvatar
 								: pendingUserAvatar
-							: pendingUserAvatar
+							: pendingUserAvatar) || avatarSender
 					}
 					className="min-w-10 min-h-10"
 					classNameText="font-semibold"

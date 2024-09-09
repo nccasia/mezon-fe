@@ -1,5 +1,5 @@
 import { useAppNavigation, useDirect, useFormatDate, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
+import { selectAllAccount, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -60,8 +60,7 @@ const ModalUserProfile = ({
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '');
-	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	const memberById = useSelector(selectMemberById(userID ?? ''));
+	const userById = useSelector(selectMemberClanByUserId(userID ?? '')) as ChannelMembersEntity;
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
 
@@ -137,7 +136,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={avatar || memberById?.user?.avatar_url}
+				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}

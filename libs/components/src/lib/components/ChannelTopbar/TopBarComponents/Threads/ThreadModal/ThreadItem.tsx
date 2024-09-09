@@ -1,6 +1,6 @@
 import { useAppNavigation, useChatMessages } from '@mezon/core';
-import { ChannelsEntity, selectMemberByUserId } from '@mezon/store';
-import { convertTimeMessage } from '@mezon/utils';
+import { ChannelsEntity, selectMemberClanByUserId } from '@mezon/store';
+import { IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ type ThreadItemProps = {
 const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
+	const user = useSelector(selectMemberClanByUserId(thread?.last_sent_message?.sender_id as string)) as IChannelMember;
 	const { avatarImg, username } = useMessageSender(user);
 	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
 

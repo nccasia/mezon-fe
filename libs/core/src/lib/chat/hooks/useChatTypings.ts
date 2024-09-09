@@ -15,12 +15,13 @@ interface UseChatTypingsOptions {
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	isDM?: boolean;
 }
 
-export function useChatTypings({ channelId, mode, isPublic }: UseChatTypingsOptions) {
+export function useChatTypings({ channelId, mode, isPublic, isDM = false }: UseChatTypingsOptions) {
 	const { userId } = useAuth();
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
-	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds?.filter((userID) => userID !== userId) || []));
+	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds?.filter((userID) => userID !== userId) || [], isDM));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));

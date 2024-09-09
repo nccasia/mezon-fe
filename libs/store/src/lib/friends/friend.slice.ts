@@ -4,7 +4,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import memoize from 'memoizee';
 import { Friend } from 'mezon-js';
 import { toast } from 'react-toastify';
-import { channelMembersActions } from '../channelmembers/channel.members';
+import { usersClanActions } from '../clanMembers/clan.members';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 
 export const FRIEND_FEATURE_KEY = 'friends';
@@ -72,7 +72,7 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 		return { userId: friend.user?.id ?? '', status: friend.user?.online ?? false };
 	});
 	const listFriends = response.friends.map(mapFriendToEntity);
-	thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+	thunkAPI.dispatch(usersClanActions.setManyStatusUser(onlineStatus));
 	return listFriends;
 });
 

@@ -7,7 +7,7 @@ import {
 	useDirect,
 	useFriends,
 	useMessageValue,
-	useSettingFooter,
+	useSettingFooter
 } from '@mezon/core';
 import {
 	selectAllRolesClan,
@@ -15,7 +15,7 @@ import {
 	selectCurrentClan,
 	selectDmGroupCurrent,
 	selectFriendStatus,
-	selectMemberByUserId,
+	selectMemberClanByUserId
 } from '@mezon/store';
 import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -44,14 +44,14 @@ type PanelMemberProps = {
 };
 
 const useCheckRoleAdminMember = (userId: string) => {
-	const userById = useSelector(selectMemberByUserId(userId));
+	const userById = useSelector(selectMemberClanByUserId(userId));
 	const RolesClan = useSelector(selectAllRolesClan);
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 	const hasAdminRole = useMemo(() => {
 		return userRolesClan.some((role) =>
-			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1),
+			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1)
 		);
 	}, [userRolesClan]);
 
@@ -68,7 +68,7 @@ const PanelMember = ({
 	isMemberDMGroup,
 	isMemberChannel,
 	dataMemberCreate,
-	onOpenProfile,
+	onOpenProfile
 }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -99,7 +99,7 @@ const PanelMember = ({
 	const friendInfor = useMemo(() => {
 		return {
 			id: directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '',
-			name: directMessageValue ? name || '' : member?.user?.username || '',
+			name: directMessageValue ? name || '' : member?.user?.username || ''
 		};
 	}, [directMessageValue]);
 
@@ -107,8 +107,8 @@ const PanelMember = ({
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const hasAddFriend = useSelector(
 		selectFriendStatus(
-			directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || '',
-		),
+			directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || ''
+		)
 	);
 	const isOwnerChannel = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
 	const isOwnerClan = useMemo(() => currentClan?.creator_id === member?.user?.id, [currentClan?.creator_id, member?.user?.id]);
@@ -179,7 +179,7 @@ const PanelMember = ({
 				left: isMemberDMGroup ? 'auto' : coords.mouseX,
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
-				boxShadow: 'rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px',
+				boxShadow: 'rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px'
 			}}
 			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-none rounded"
 			onClick={(e) => {
