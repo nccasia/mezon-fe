@@ -52,6 +52,10 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 
+	const userClanNickname = useMemo(() => {
+		return message?.clan_nick;
+	}, [message]);
+
 	const isKicked = useMemo(() => {
 		return !userById;
 	}, [userById]);
@@ -185,7 +189,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						width={80}
 						height={80}
 						avatarUrl={userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
-						username={userById?.clan_nick || user?.display_name || userById?.user?.username}
+						username={userClanNickname || user?.display_name || userById?.user?.username}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
 					/>
@@ -195,7 +199,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 				<View style={[styles.userInfo]}>
 					<Text style={[styles.userName]}>
 						{userById
-							? userById.clan_nick || userById?.user?.display_name || userById?.user?.username
+							? userClanNickname || userById?.user?.display_name || userById?.user?.username
 							: user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					<Text style={[styles.subUserName]}>
