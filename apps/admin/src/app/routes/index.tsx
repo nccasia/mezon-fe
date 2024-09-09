@@ -10,7 +10,9 @@ import RootLayout from '../layouts/RootLayout';
 import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
+import { ReactFlowProvider } from '@xyflow/react';
 import { applicationLoader } from '../loader/applicationLoader';
+import Flows from '../pages/flows';
 import InitialRoutes from './InititalRoutes';
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
@@ -90,6 +92,14 @@ export const Routes = () => {
 										{
 											path: 'installation',
 											element: <Installation />
+										},
+										{
+											path: 'flow',
+											element: (
+												<ReactFlowProvider>
+													<Flows />
+												</ReactFlowProvider>
+											)
 										}
 									]
 								},
