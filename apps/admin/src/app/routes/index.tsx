@@ -1,5 +1,6 @@
 import loadable from '@loadable/component';
 import { selectInitialPath, useAppDispatch } from '@mezon/store';
+import { ReactFlowProvider } from '@xyflow/react';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createBrowserRouter, LoaderFunctionArgs, Navigate, Outlet, RouterProvider } from 'react-router-dom';
@@ -11,7 +12,9 @@ import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
 import { applicationLoader } from '../loader/applicationLoader';
+import Flows from '../pages/flows';
 import InitialRoutes from './InititalRoutes';
+
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
 const TeamsPage = loadable(() => import('../pages/teams'));
@@ -90,6 +93,14 @@ export const Routes = () => {
 										{
 											path: 'installation',
 											element: <Installation />
+										},
+										{
+											path: 'flow',
+											element: (
+												<ReactFlowProvider>
+													<Flows />
+												</ReactFlowProvider>
+											)
 										}
 									]
 								},
