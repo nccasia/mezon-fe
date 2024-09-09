@@ -2,17 +2,17 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel, useAppSelector } from '@mezon/store';
 import { DirectEntity } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../screens/home/homedrawer/components/InviteToChannel';
+import { threadDetailContext } from '../ThreadDetail/MenuThreadDetail';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
 import MemberItem from './MemberItem';
 import style from './style';
@@ -25,7 +25,7 @@ enum EActionButton {
 export const MemberListStatus = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentChannel = useAppSelector(selectCurrentChannel);
+	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channel: currentChannel });
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);

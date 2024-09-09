@@ -12,8 +12,9 @@ export function useChannelMembersOnlineStatus({ channel }: UseChannelMembersOnli
 	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(channel?.id as string)(state));
 	const usersClan = useSelector(selectAllUserClans);
 
-	const rawMembers =
-		channel?.channel_private || parrentChannel?.channel_private ? usersClan.filter((item) => listMemberIds.includes(item.id)) : usersClan;
+	const rawMembers = channel?.channel_private || parrentChannel?.channel_private
+				? usersClan.filter((item) => listMemberIds.includes(item.id))
+				: usersClan;
 	const { userId } = useAuth();
 
 	const [onlineMembers, offlineMembers] = useMemo(() => {
