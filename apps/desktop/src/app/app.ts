@@ -100,6 +100,7 @@ export default class App {
 
 				if (App.mainWindow) {
 					if (App.mainWindow.isMinimized()) App.mainWindow.restore();
+					App.mainWindow.show();
 					App.mainWindow.focus();
 				}
 			});
