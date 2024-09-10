@@ -1,6 +1,6 @@
 import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../../navigation/ScreenTypes';
 import PinMessage from '../../PinMessage';
 import { style } from './styles';
@@ -23,8 +23,8 @@ export default function ChannelPinnedMessageSetting({ navigation, route }: MenuC
 	});
 
 	return (
-		<ScrollView style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<PinMessage currentChannelId={channelId} />
-		</ScrollView>
+		</SafeAreaView>
 	);
 }
