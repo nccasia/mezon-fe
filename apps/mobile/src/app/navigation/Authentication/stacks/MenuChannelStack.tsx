@@ -2,6 +2,7 @@ import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import ChannelSetting from '../../../components/ChannelSetting';
+import ChannelPinnedMessageSetting from '../../../components/ChannelSetting/ChannelPinMessage';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { APP_SCREEN } from '../../ScreenTypes';
@@ -55,6 +56,7 @@ export function MenuChannelStacks({}: any) {
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
+			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PINNED_MESSAGE} component={ChannelPinnedMessageSetting} />
 		</Stack.Navigator>
 	);
 }

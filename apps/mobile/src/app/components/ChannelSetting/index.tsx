@@ -23,7 +23,7 @@ type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
 export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { channelId } = route.params;
+	const { channelId, inviteRef } = route.params;
 	const { t } = useTranslation(['channelSetting']);
 	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
@@ -128,12 +128,24 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelNotifications.pinned'),
 					expandable: true,
-					icon: <Icons.PinIcon color={themeValue.text} />
+					icon: <Icons.PinIcon color={themeValue.text} />,
+					isShow: isChannel,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.CHANNEL_PINNED_MESSAGE,
+							params: {
+								channelId
+							}
+						});
+					}
 				},
 				{
 					title: t('fields.channelNotifications.invite'),
 					expandable: true,
-					icon: <LinkIcon color={themeValue.text} />
+					icon: <LinkIcon color={themeValue.text} />,
+					onPress: () => {
+						inviteRef?.current?.present();
+					}
 				}
 			] satisfies IMezonMenuItemProps[],
 		[]

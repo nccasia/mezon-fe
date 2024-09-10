@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useReference, useUserPermission } from '@mezon/core';
+import { useCategory, useUserPermission } from '@mezon/core';
 import {
 	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -118,7 +118,8 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
 						channelId: channel?.channel_id,
-						isChannel: isChannel
+						isChannel: isChannel,
+						inviteRef: inviteRef
 					}
 				});
 			},
