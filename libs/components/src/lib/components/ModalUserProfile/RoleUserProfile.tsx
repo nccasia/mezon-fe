@@ -5,38 +5,33 @@ import {
 	selectAllRolesClan,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectMemberClanByUserId,
 	selectTheme,
-	selectUserChannelById,
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type RoleUserProfileProps = {
 	userID?: string;
 };
 
-const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
-	const item = role.creator_id !== userId;
-	return item ?? false;
-};
-
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useSelector(selectUserChannelById(userID || '', currentChannelId || ''));
+	const user = useSelector(selectMemberClanByUserId(userID as string));
 	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
-	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
 	const userRolesClan = useMemo(() => {
-		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
-	}, [userById?.role_id, RolesClan]);
+		return user?.role_id ? RolesClan.filter((role) => user?.role_id?.includes(role.id)) : [];
+	}, [user?.role_id, RolesClan]);
+
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
@@ -45,57 +40,36 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return !isRoleInUserRoles;
 	});
 
-	const [positionTop, setPositionTop] = useState(40);
-	const [positionLeft, setPositionLeft] = useState(0);
-	const handModalAddRole = (e: any) => {
-		if (showPopupAddRole) {
-			setShowPopupAddRole(false);
-			return;
-		}
-		setShowPopupAddRole(true);
-		const clickY = e.clientY;
-		const windowHeight = window.innerHeight;
-		const distanceToBottom = windowHeight - clickY;
-		const heightModalAddRole = 180;
-		if (distanceToBottom < heightModalAddRole) {
-			setPositionTop(-50);
-			setPositionLeft(-320);
-		}
-	};
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setSearchTerm(e.target.value);
-	};
-
 	const filteredListRoleBySearch = useMemo(() => {
 		return activeRolesWithoutUserRoles?.filter((role) => {
-			return role.slug !== 'everyone' && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
+			return role.slug !== 'everyone' && !user.role_id?.includes(role.id) && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
 
 	const dispatch = useAppDispatch();
+
 	const addRole = async (roleId: string) => {
-		setShowPopupAddRole(false);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
-		const userIDArray = userById?.user?.id?.split(',');
+		const userIDArray = user?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: roleId,
 				channelId: currentChannelId,
-				userId: userById?.user?.id
+				userId: user?.user?.id
 			})
 		);
 	};
 
 	const deleteRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
-		const userIDArray = userById?.user?.id?.split(',');
+		const userIDArray = user?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
 		await dispatch(
 			usersClanActions.removeRoleIdUser({
 				id: roleId,
 				channelId: currentChannelId,
-				userId: userById?.user?.id
+				userId: user?.user?.id
 			})
 		);
 	};
@@ -128,7 +102,13 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 					</span>
 				))}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
-					<div className="relative" onClick={handModalAddRole}>
+					<Tooltip
+						content={<AddRolesComp addRole={addRole} filteredListRoleBySearch={filteredListRoleBySearch} setSearchTerm={setSearchTerm} />}
+						trigger="click"
+						placement="bottom-start"
+						arrow={false}
+						className="dark:bg-transparent bg-transparent p-0 h-60 w-[300px]"
+					>
 						<Tooltip
 							content="Add roles"
 							trigger="hover"
@@ -137,47 +117,60 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							className="dark:text-white text-black"
 						>
 							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300 items-center">
-								<Icons.Plus className="size-5" />
-								<p className="text-xs m-0 font-medium">Add Role</p>
+								<Icons.Plus className="size-5 select-none" />
+								<p className="text-xs m-0 font-medium select-none">Add Role</p>
 							</button>
 						</Tooltip>
-						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
-							{showPopupAddRole ? (
-								<div className="w-[300px] h-fit dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto rounded border border-slate-300 dark:border-slate-700">
-									<div className="relative">
-										<input
-											type="text"
-											className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond p-2 mb-2"
-											placeholder="Role"
-											onChange={handleInputChange}
-											onClick={(e) => e.stopPropagation()}
-										/>
-										<Icons.Search className="size-5 dark:text-white text-colorTextLightMode absolute right-2 top-2" />
-									</div>
-									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden hide-scrollbar space-y-1">
-										{filteredListRoleBySearch.length > 0 ? (
-											filteredListRoleBySearch.map((role, index) => (
-												<div
-													key={index}
-													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
-													onClick={() => addRole(role.id)}
-												>
-													<div className="size-3 min-w-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
-													{role.title}
-												</div>
-											))
-										) : (
-											<div className="flex flex-col py-4 gap-y-4 items-center">
-												<p className="font-medium dark:text-white text-black">Nope!</p>
-												<p className="font-normal dark:text-zinc-400 text-colorTextLightMode">Did you make a typo?</p>
-											</div>
-										)}
-									</div>
-								</div>
-							) : null}
-						</div>
-					</div>
+					</Tooltip>
 				</UserRestrictionZone>
+			</div>
+		</div>
+	);
+};
+
+const AddRolesComp = ({
+	addRole,
+	filteredListRoleBySearch,
+	setSearchTerm
+}: {
+	addRole: (roleId: string) => void;
+	filteredListRoleBySearch: RolesClanEntity[];
+	setSearchTerm: Dispatch<SetStateAction<string>>;
+}) => {
+	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
+	};
+
+	return (
+		<div className="absolute w-[300px] max-h-60 dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto rounded border border-slate-300 dark:border-slate-700 flex flex-col gap-3">
+			<div className="relative w-full h-9">
+				<input
+					type="text"
+					className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond p-2 mb-2"
+					placeholder="Role"
+					onChange={handleInputChange}
+					onClick={(e) => e.stopPropagation()}
+				/>
+				<Icons.Search className="size-5 dark:text-white text-colorTextLightMode absolute right-2 top-2" />
+			</div>
+			<div className="w-full flex-1 overflow-y-scroll overflow-x-hidden hide-scrollbar space-y-1">
+				{filteredListRoleBySearch.length > 0 ? (
+					filteredListRoleBySearch.map((role, index) => (
+						<div
+							key={index}
+							className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
+							onClick={() => addRole(role.id)}
+						>
+							<div className="size-3 min-w-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
+							{role.title}
+						</div>
+					))
+				) : (
+					<div className="flex flex-col py-4 gap-y-4 items-center">
+						<p className="font-medium dark:text-white text-black">Nope!</p>
+						<p className="font-normal dark:text-zinc-400 text-colorTextLightMode">Did you make a typo?</p>
+					</div>
+				)}
 			</div>
 		</div>
 	);
