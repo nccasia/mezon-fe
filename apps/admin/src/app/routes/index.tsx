@@ -13,6 +13,7 @@ import { authLoader } from '../loader/authLoader';
 // Pages
 import { applicationLoader } from '../loader/applicationLoader';
 import Flows from '../pages/flows';
+import Flow from '../pages/flows/Flow';
 import InitialRoutes from './InititalRoutes';
 
 const Login = loadable(() => import('../pages/login'));
@@ -96,9 +97,21 @@ export const Routes = () => {
 										},
 										{
 											path: 'flow',
+											element: <Flows />
+										},
+										{
+											path: 'add-flow',
 											element: (
 												<ReactFlowProvider>
-													<Flows />
+													<Flow />
+												</ReactFlowProvider>
+											)
+										},
+										{
+											path: 'flow/:flowId',
+											element: (
+												<ReactFlowProvider>
+													<Flow />
 												</ReactFlowProvider>
 											)
 										}

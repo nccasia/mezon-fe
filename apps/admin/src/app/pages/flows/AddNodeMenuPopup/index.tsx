@@ -2,7 +2,7 @@ import { Accordion, CustomFlowbiteTheme } from 'flowbite-react';
 import MenuItem from './MenuItem';
 
 interface AddNodeMenuPopupProps {
-	onAddNode?: (nodeType: string) => void;
+	onChangeNodeType: (nodeType: string) => void;
 }
 
 const customTheme: CustomFlowbiteTheme['accordion'] = {
@@ -18,7 +18,7 @@ const customTheme: CustomFlowbiteTheme['accordion'] = {
 	}
 };
 
-const AddNodeMenuPopup = ({ onAddNode }: AddNodeMenuPopupProps) => {
+const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
 	return (
 		<div className="text-sm text-gray-500 dark:text-gray-400 w-[350px]">
 			<div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
@@ -29,24 +29,32 @@ const AddNodeMenuPopup = ({ onAddNode }: AddNodeMenuPopupProps) => {
 			<div className="p-2 max-h-[400px] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:[width:3px] [&::-webkit-scrollbar-thumb]:bg-red-500 transition-all">
 				<Accordion collapseAll theme={customTheme}>
 					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Agents</Accordion.Title>
+						<Accordion.Title theme={customTheme.title}>Command Builder</Accordion.Title>
 						<Accordion.Content theme={customTheme.content}>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
+								imageUrl="https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg"
+								title="Command Input"
+								description="Wrapper around OpenAI large language model that use the Chat endpoint"
+							/>
+							<MenuItem
+								nodeType="defaultCustom"
+								onChangeNodeType={onChangeNodeType}
+								imageUrl="https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg"
+								title="Command Output"
+								description="Wrapper around OpenAI large language model that use the Chat endpoint"
+							/>
+							<MenuItem
+								nodeType="defaultCustom"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
@@ -57,21 +65,29 @@ const AddNodeMenuPopup = ({ onAddNode }: AddNodeMenuPopupProps) => {
 						<Accordion.Title theme={customTheme.title}>Cache</Accordion.Title>
 						<Accordion.Content theme={customTheme.content}>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
@@ -82,21 +98,29 @@ const AddNodeMenuPopup = ({ onAddNode }: AddNodeMenuPopupProps) => {
 						<Accordion.Title theme={customTheme.title}>Chains</Accordion.Title>
 						<Accordion.Content theme={customTheme.content}>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
 							/>
 							<MenuItem
+								nodeType="command"
+								onChangeNodeType={onChangeNodeType}
 								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
 								title="ChatOpenAI"
 								description="Wrapper around OpenAI large language model that use the Chat endpoint"
