@@ -4,7 +4,8 @@
     "voiceCall": "Gọi thoại",
     "videoCall": "Gọi video",
     "addFriend": "Thêm bạn",
-    "pending": "Chờ đợi"
+    "pending": "Chờ đợi",
+    "removeFriend": "Xóa bạn"
   },
   "aboutMe": {
     "headerTitle": "VỀ TÔI",
@@ -27,6 +28,7 @@
     "copiedUserName": "Đã sao chép '{{username}}'"
   },
   "incomingFriendRequest": "Yêu cầu kết bạn",
+  "sendAddFriendSuccess": "Yêu cầu kết bạn đã được gửi",
   "accept": "Đồng ý",
   "ignore": "Bỏ qua"
 }
