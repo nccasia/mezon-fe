@@ -115,6 +115,10 @@ export const markdownStyles = (colors: Attributes) =>
 			width: size.s_40,
 			height: size.s_40
 		},
+		emojiInMessageContain: {
+			height: size.s_16,
+			width: size.s_20
+		},
 		editedText: {
 			fontSize: size.small,
 			color: colors.textDisabled
@@ -218,11 +222,15 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 		}
 
 		if (content?.startsWith(':')) {
-			return <FastImage 
-						source={{ uri: payload }} 
-						style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage: styles.iconEmojiInMessage} 
-						resizeMode={'contain'} 
-					/>;
+			return (
+				<View style={!isOnlyContainEmoji && styles.emojiInMessageContain}>
+					<FastImage
+						source={{ uri: payload }}
+						style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage : [styles.iconEmojiInMessage]}
+						resizeMode={'contain'}
+					/>
+				</View>
+			);
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
