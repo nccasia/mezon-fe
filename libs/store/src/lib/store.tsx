@@ -31,6 +31,7 @@ import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
+import { recentEmojiSuggestionReducer } from './emojiRecent/emojiRecent.slide';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
@@ -258,6 +259,14 @@ const persistedsettingClanStickerReducer = persistReducer(
 	settingStickerReducer
 );
 
+const persistedRecentEmojiSuggestionReducer = persistReducer(
+	{
+		key: 'recentEmojiSuggestion',
+		storage
+	},
+	recentEmojiSuggestionReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -306,7 +315,8 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	adminApplication: adminApplicationReducer,
-	systemMessages: systemMessageReducer
+	systemMessages: systemMessageReducer,
+	recentEmojiSuggestion: persistedRecentEmojiSuggestionReducer
 };
 
 let storeInstance = configureStore({

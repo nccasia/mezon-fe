@@ -299,6 +299,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 	};
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
+	console.log(emojisByCategoryName);
 	return (
 		<div>
 			<button
