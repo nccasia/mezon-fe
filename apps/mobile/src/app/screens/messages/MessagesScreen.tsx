@@ -1,9 +1,18 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { directActions, DirectEntity, getStoreAsync, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
+import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import {
+	DirectEntity,
+	RootState,
+	directActions,
+	getStoreAsync,
+	selectAllClans,
+	selectDirectsOpenlist,
+	selectTypingUserIdsByChannelId
+} from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
+import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -140,6 +149,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const searchInputRef = useRef(null);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -153,9 +163,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		if (state === 'active') {
 			try {
 				const store = await getStoreAsync();
-				await store.dispatch(
-					directActions.fetchDirectMessage({ noCache: true })
-				);
+				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
 				console.log('error messageLoaderBackground', error);
 			}
@@ -201,6 +209,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		setDirectMessageSelected(directMessage);
 	}, []);
 
+	const clearTextInput = () => {
+		if (searchInputRef.current) {
+			searchInputRef.current.clear();
+			setSearchText('');
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
@@ -214,11 +229,17 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.searchMessage}>
 				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
+					ref={searchInputRef}
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
+				{!!searchText?.length && (
+					<Pressable onPress={clearTextInput}>
+						<CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+					</Pressable>
+				)}
 			</View>
 			{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
 				<UserEmptyMessage
