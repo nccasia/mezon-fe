@@ -2,29 +2,9 @@
 import { Icons } from '@mezon/ui';
 import { Handle, Position } from '@xyflow/react';
 import Ajv, { JSONSchemaType } from 'ajv';
-import { HTMLFieldProps, connectField } from 'uniforms';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
-import { AutoField, AutoForm } from 'uniforms-semantic';
-
-type CustomFormFieldProps = HTMLFieldProps<string, HTMLDivElement> & {
-	label?: string;
-};
-
-function InputField({ onChange, value, label }: CustomFormFieldProps) {
-	return (
-		<div className="ImageField">
-			{label && <label className="block">{label}</label>}
-			<input
-				className="mt-1 block w-full px-3 py-2 border-[1px] focus:border-[1px] focus:border-gray-500 focus-visible:border-0 focus:ring-0 focus-within:ring-0 focus:ring-transparent rounded-lg"
-				// onChange={({ target: { value } }) => {
-				// 	onChange(value);
-				// }}
-				value={value || ''}
-			/>
-		</div>
-	);
-}
-connectField<CustomFormFieldProps>(InputField);
+import { AutoForm, SubmitField } from 'uniforms-semantic';
+import CustomTextField from '../../../../components/InputField/CustomTextField';
 
 type FormData = {
 	commandName: string;
@@ -45,8 +25,8 @@ const CommandNode = ({ data }: CommandNodeProps) => {
 		title: 'Guest',
 		type: 'object',
 		properties: {
-			commandName: { type: 'string', uniforms: { component: InputField, label: 'Command Name', name: 'commandName' } },
-			commandCode: { type: 'string', uniforms: { component: InputField, label: 'Command Code', name: 'commandCode' } }
+			commandName: { type: 'string', uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName' } },
+			commandCode: { type: 'string', uniforms: { component: CustomTextField, label: 'Command Code', name: 'commandCode' } }
 		},
 		required: ['commandName', 'commandCode']
 	};
@@ -96,30 +76,11 @@ const CommandNode = ({ data }: CommandNodeProps) => {
 						<span className="text-sm">example input 2 </span>
 						<span className="text-red-600 ml-2">*</span>
 					</div>
-					<AutoForm schema={bridge} onSubmit={console.log}>
-						<AutoField name="commandName" />
-						<AutoField name="commandCode" />
+					<AutoForm schema={bridge} onSubmit={() => console.log('submit')}>
+						<CustomTextField name="commandName" label="Command Name" />
+						<CustomTextField name="commandCode" label="Command Code" />
+						<SubmitField className="!hidden" />
 					</AutoForm>
-					{/* <div className="mt-2">
-						<label htmlFor="command" className="text-sm">
-							Command
-						</label>
-						<input
-							type="text"
-							id="command"
-							className="w-full px-2 py-[6px] border-[1px] focus:border-[1px] focus:border-gray-500 focus-visible:border-0 focus:ring-0 focus-within:ring-0 focus:ring-transparent rounded-lg"
-						/>
-					</div>
-					<div className="mt-2">
-						<label htmlFor="command" className="text-sm">
-							Command
-						</label>
-						<input
-							type="text"
-							id="command"
-							className="w-full px-2 py-[6px] border-[1px] focus:border-[1px] focus:border-gray-500 focus-visible:border-0 focus:ring-0 focus-within:ring-0 focus:ring-transparent rounded-lg"
-						/>
-					</div> */}
 				</div>
 			</div>
 			<div className="mt-1">

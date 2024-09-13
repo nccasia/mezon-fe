@@ -14,11 +14,13 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
+import FlowChatPopup from '../FlowChat';
 import CommandNode from '../nodes/CommandNode';
 import DefaultNode from '../nodes/DefaultNode';
+import SaveFlowModal from './SaveFlowModal';
 
 const nodeTypes = {
 	command: CommandNode,
@@ -36,13 +38,14 @@ const getId = () => `dndnode_${id++}`;
 const Flow = () => {
 	const navigate = useNavigate();
 	const reactFlowWrapper = useRef(null);
+	const [openModalSaveFlow, setOpenModalSaveFlow] = React.useState(false);
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const [nodeType, setNodeType] = React.useState('default');
 	const { screenToFlowPosition } = useReactFlow();
 
 	// handle drag, drop and connect nodes
-	const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), []);
+	const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 	const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = 'move';
@@ -52,8 +55,19 @@ const Flow = () => {
 		(type: string) => {
 			setNodeType(type);
 		},
-		[nodeType]
+		[setNodeType]
 	);
+
+	const handleDeleteNode = useCallback(
+		(nodeId: string) => {
+			// remove node in list nodes
+			setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+			// remove edges connect to this node
+			setEdges((eds) => eds.filter((e: { source: string; target: string }) => e.source !== nodeId && e.target !== nodeId));
+		},
+		[setNodes, setEdges]
+	);
+
 	const handleCopyNode = useCallback(
 		(nodeId: string) => {
 			const node = nodes.find((n) => n.id === nodeId);
@@ -70,16 +84,7 @@ const Flow = () => {
 			};
 			setNodes([...nodes, newNode]);
 		},
-		[nodes, setNodes]
-	);
-	const handleDeleteNode = useCallback(
-		(nodeId: string) => {
-			// remove node in list nodes
-			setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-			// remove edges connect to this node
-			setEdges((eds) => eds.filter((e: { source: string; target: string }) => e.source !== nodeId && e.target !== nodeId));
-		},
-		[nodes, edges]
+		[nodes, setNodes, handleDeleteNode]
 	);
 
 	const onDrop = useCallback(
@@ -103,12 +108,31 @@ const Flow = () => {
 			setNodes([...nodes, newNode]);
 			// setNodes((nds) => nds.concat(newNode));
 		},
-		[screenToFlowPosition, nodeType, nodes, handleDeleteNode, handleCopyNode]
+		[screenToFlowPosition, nodeType, nodes, handleDeleteNode, handleCopyNode, setNodes]
 	);
 
 	const handleClickBackButton = () => {
 		navigate(-1);
 	};
+
+	useEffect(() => {
+		// handle delete node when press delete key
+		const onKeyUp = (event: KeyboardEvent) => {
+			if (event.key === 'Delete') {
+				const selectedNodes = document.querySelectorAll('.selected');
+				if (selectedNodes.length) {
+					selectedNodes.forEach((node) => {
+						const nodeId = node.id;
+						handleDeleteNode(nodeId);
+					});
+				}
+			}
+		};
+		document.addEventListener('keyup', onKeyUp);
+		return () => {
+			document.removeEventListener('keyup', onKeyUp);
+		};
+	}, [nodes, edges, handleDeleteNode]);
 	return (
 		<div
 			ref={reactFlowWrapper}
@@ -123,7 +147,15 @@ const Flow = () => {
 						>
 							<Icons.LeftArrowIcon className="w-full" />
 						</button>
-						<div className="text-[24px] font-semibold ml-[20px] pl-[10px] border-l-[1px] border-l-gray-300">Initial Flow</div>
+						<div className="flex items-center text-[24px] font-semibold ml-[20px] pl-[10px] border-l-[1px] border-l-gray-300">
+							<span>Initial Flow</span>
+							<button
+								onClick={() => setOpenModalSaveFlow(true)}
+								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200"
+							>
+								<Icons.PenEdit />
+							</button>
+						</div>
 					</div>
 					<div className="rightbox flex items-center gap-2">
 						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 border-[1px] transition-all active:bg-blue-200">
@@ -158,15 +190,17 @@ const Flow = () => {
 					</Popover>
 				</Panel>
 				<Panel position="top-right">
-					{/* <Popover content={<AddNodeMenuPopup onChangeNodeType={handleChangeNodeType} />} trigger="click"> */}
-					<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
-						<Icons.IconChat className="w-6 h-6" />
-					</button>
-					{/* </Popover> */}
+					<Popover content={<FlowChatPopup />} trigger="click">
+						<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
+							<Icons.IconChat className="w-6 h-6" />
+						</button>
+					</Popover>
 				</Panel>
 				<Controls />
 				<Background className="dark:bg-bgPrimary bg-bgLightPrimary text-gray-500 dark:text-gray-100" variant={BackgroundVariant.Dots} />
 			</ReactFlow>
+
+			<SaveFlowModal title="Save Flow" open={openModalSaveFlow} onClose={() => setOpenModalSaveFlow(false)} />
 		</div>
 	);
 };

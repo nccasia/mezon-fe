@@ -62,69 +62,21 @@ const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
 						</Accordion.Content>
 					</Accordion.Panel>
 					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Cache</Accordion.Title>
+						<Accordion.Title theme={customTheme.title}>Chat Models</Accordion.Title>
 						<Accordion.Content theme={customTheme.content}>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
+							<p className="mb-2 text-gray-500 dark:text-gray-400">
+								Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons,
+								dropdowns, modals, navbars, and more.
+							</p>
 						</Accordion.Content>
 					</Accordion.Panel>
 					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Chains</Accordion.Title>
+						<Accordion.Title theme={customTheme.title}>Chat Models</Accordion.Title>
 						<Accordion.Content theme={customTheme.content}>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
+							<p className="mb-2 text-gray-500 dark:text-gray-400">
+								Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons,
+								dropdowns, modals, navbars, and more.
+							</p>
 						</Accordion.Content>
 					</Accordion.Panel>
 					<Accordion.Panel theme={customTheme}>

@@ -5,8 +5,6 @@ const Flows = () => {
 	const { applicationId } = useParams();
 	const navigate = useNavigate();
 	const handleGoToAddFlowPage = () => {
-		// Navigate to add flow page
-		//http://localhost:4200/applications/1831890438810767360/add-flow
 		navigate(`/applications/${applicationId}/add-flow`);
 	};
 	return (
