@@ -36,11 +36,7 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 
 					<View style={[styles.inline, styles.infoRight]}>
 						<View style={styles.avatar}>
-							<FastImage
-								source={{ uri: userCreate?.user?.avatar_url }}
-								style={{ width: '100%', height: '100%' }}
-								resizeMode="contain"
-							/>
+							<FastImage source={{ uri: userCreate?.user?.avatar_url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
 						</View>
 						<View style={styles.inline}>
 							<Icons.GroupIcon height={size.s_10} width={size.s_10} color={themeValue.text} />
