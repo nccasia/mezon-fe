@@ -181,7 +181,7 @@ type MenuClanStackParamList = {
 		frequency: number;
 		onGoBack?: () => void;
 	};
-	[APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
+	[APP_SCREEN.MENU_CLAN.SETTINGS]: { inviteRef: React.MutableRefObject<any> };
 	[APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.EMOJI_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.STICKER_SETTING]: undefined;
