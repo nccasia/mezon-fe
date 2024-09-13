@@ -91,8 +91,8 @@ const Flow = () => {
 		(event: React.DragEvent<HTMLDivElement>) => {
 			event.preventDefault();
 			const position = screenToFlowPosition({
-				x: event.clientX,
-				y: event.clientY
+				x: event.clientX + 50,
+				y: event.clientY + 50
 			});
 			const newNode = {
 				id: getId(),
@@ -143,7 +143,7 @@ const Flow = () => {
 					<div className="flex items-center gap-2">
 						<button
 							onClick={handleClickBackButton}
-							className="w-[40px] h-[40px] ml-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 border-[1px] transition-all active:bg-blue-200"
+							className="w-[40px] h-[40px] ml-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
 						>
 							<Icons.LeftArrowIcon className="w-full" />
 						</button>
@@ -151,17 +151,17 @@ const Flow = () => {
 							<span>Initial Flow</span>
 							<button
 								onClick={() => setOpenModalSaveFlow(true)}
-								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200"
+								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500"
 							>
 								<Icons.PenEdit />
 							</button>
 						</div>
 					</div>
 					<div className="rightbox flex items-center gap-2">
-						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 border-[1px] transition-all active:bg-blue-200">
+						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
 							<Icons.IconTick />
 						</button>
-						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 border-[1px] transition-all active:bg-blue-200">
+						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
 							<Icons.SettingProfile className="w-4 h-4" />
 						</button>
 					</div>

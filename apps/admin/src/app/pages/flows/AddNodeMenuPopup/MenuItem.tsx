@@ -12,7 +12,7 @@ const MenuItem = ({ title, description, imageUrl, nodeType, onChangeNodeType }: 
 	};
 	return (
 		<div
-			className="menu-item cursor-move p-2 mt-1 mb-1 radius-md rounded-2xl hover:bg-gray-50 shadow-md transition-all"
+			className="menu-item cursor-move p-2 mt-1 mb-1 radius-md rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-600 shadow-md transition-all active:scale-95"
 			onDragStart={onDragStart}
 			draggable
 		>

@@ -54,7 +54,7 @@ const SaveFlowModal = ({ open, onClose, title }: SaveFlowModalProps) => {
 		<Modal confirmButton={confirmSave} titleConfirm="Save" title={title} showModal={open} onClose={onClose}>
 			<div className="p-4">
 				<AutoForm schema={bridge} onSubmit={(data) => console.log(data)}>
-					<CustomTextField name="flowName" label="Command Name" />
+					<CustomTextField name="flowName" label="Flow Name" />
 					<CustomTextField name="description" label="Description" />
 					<SubmitField className="!hidden" />
 				</AutoForm>

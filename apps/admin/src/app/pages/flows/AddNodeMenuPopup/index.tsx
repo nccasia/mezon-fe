@@ -19,6 +19,57 @@ const customTheme: CustomFlowbiteTheme['accordion'] = {
 };
 
 const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
+	const nodeMenu = [
+		{
+			title: 'Command Builder',
+			childrens: [
+				{
+					title: 'Command Input',
+					nodeType: 'command',
+					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+					onChangeNodeType: onChangeNodeType,
+					imageUrl:
+						'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
+				},
+				{
+					title: 'Command Output',
+					nodeType: 'defaultCustom',
+					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+					onChangeNodeType: onChangeNodeType,
+					imageUrl:
+						'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
+				},
+				{
+					title: 'ChatOpenAI',
+					nodeType: 'defaultCustom',
+					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+					onChangeNodeType: onChangeNodeType,
+					imageUrl:
+						'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
+				},
+				{
+					title: 'ChatOpenAI',
+					nodeType: 'command',
+					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+					onChangeNodeType: onChangeNodeType,
+					imageUrl:
+						'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
+				}
+			]
+		},
+		{
+			title: 'Chat Models',
+			childrens: null
+		},
+		{
+			title: 'Chat Models',
+			childrens: null
+		},
+		{
+			title: 'Chat Models',
+			childrens: null
+		}
+	];
 	return (
 		<div className="text-sm text-gray-500 dark:text-gray-400 w-[350px]">
 			<div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
@@ -28,66 +79,27 @@ const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
 			</div>
 			<div className="p-2 max-h-[400px] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:[width:3px] [&::-webkit-scrollbar-thumb]:bg-red-500 transition-all">
 				<Accordion collapseAll theme={customTheme}>
-					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Command Builder</Accordion.Title>
-						<Accordion.Content theme={customTheme.content}>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg"
-								title="Command Input"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="defaultCustom"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg"
-								title="Command Output"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="defaultCustom"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-							<MenuItem
-								nodeType="command"
-								onChangeNodeType={onChangeNodeType}
-								imageUrl="https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg"
-								title="ChatOpenAI"
-								description="Wrapper around OpenAI large language model that use the Chat endpoint"
-							/>
-						</Accordion.Content>
-					</Accordion.Panel>
-					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Chat Models</Accordion.Title>
-						<Accordion.Content theme={customTheme.content}>
-							<p className="mb-2 text-gray-500 dark:text-gray-400">
-								Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons,
-								dropdowns, modals, navbars, and more.
-							</p>
-						</Accordion.Content>
-					</Accordion.Panel>
-					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Chat Models</Accordion.Title>
-						<Accordion.Content theme={customTheme.content}>
-							<p className="mb-2 text-gray-500 dark:text-gray-400">
-								Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons,
-								dropdowns, modals, navbars, and more.
-							</p>
-						</Accordion.Content>
-					</Accordion.Panel>
-					<Accordion.Panel theme={customTheme}>
-						<Accordion.Title theme={customTheme.title}>Chat Models</Accordion.Title>
-						<Accordion.Content theme={customTheme.content}>
-							<p className="mb-2 text-gray-500 dark:text-gray-400">
-								Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons,
-								dropdowns, modals, navbars, and more.
-							</p>
-						</Accordion.Content>
-					</Accordion.Panel>
+					{nodeMenu.map((item, index) => (
+						<Accordion.Panel key={index} theme={customTheme}>
+							<Accordion.Title theme={customTheme.title}>{item.title}</Accordion.Title>
+							{item.childrens !== null ? (
+								<Accordion.Content theme={customTheme.content}>
+									{item.childrens?.map((child, index) => (
+										<MenuItem
+											key={index}
+											nodeType={child.nodeType}
+											onChangeNodeType={child.onChangeNodeType}
+											imageUrl={child.imageUrl}
+											title={child.title}
+											description={child.description}
+										/>
+									))}
+								</Accordion.Content>
+							) : (
+								<></>
+							)}
+						</Accordion.Panel>
+					))}
 				</Accordion>
 			</div>
 		</div>
