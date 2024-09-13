@@ -14,18 +14,13 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CommandNode from '../nodes/CommandNode';
 import DefaultNode from '../nodes/DefaultNode';
 import SaveFlowModal from './SaveFlowModal';
-
-const nodeTypes = {
-	command: CommandNode,
-	defaultCustom: DefaultNode
-};
 
 const initialNodes: Node[] = [
 	// { id: '1', position: { x: 0, y: 0 }, data: { label: 'Command Node' }, type: 'command' },
@@ -70,22 +65,37 @@ const Flow = () => {
 
 	const handleCopyNode = useCallback(
 		(nodeId: string) => {
-			const node = nodes.find((n) => n.id === nodeId);
-			if (!node) return;
-			const newNode = {
-				...node,
-				id: getId(),
-				position: { x: node.position.x + 50, y: node.position.y + 50 },
-				data: {
-					...node.data,
-					onCopy: () => handleCopyNode(newNode.id),
-					onDelete: () => handleDeleteNode(newNode.id)
-				}
-			};
-			setNodes([...nodes, newNode]);
+			setNodes((nds) => {
+				const nodeToCopy = nds.find((node) => node.id === nodeId);
+				if (!nodeToCopy) return nds;
+
+				const id = getId();
+				const newNode = {
+					...nodeToCopy,
+					id, // Tạo id mới cho node sao chép
+					position: {
+						x: nodeToCopy.position.x + 50, // Di chuyển vị trí node mới
+						y: nodeToCopy.position.y + 50
+					},
+					data: {
+						...nodeToCopy.data,
+						id
+					}
+				};
+
+				return [...nds, newNode]; // Thêm node mới vào danh sách nodes
+			});
 		},
 		[nodes, setNodes, handleDeleteNode]
 	);
+	console.log('nodes', nodes);
+
+	const nodeTypes = useMemo(() => {
+		return {
+			command: (props: any) => <CommandNode {...props} onCopy={handleCopyNode} onDelete={handleDeleteNode} />,
+			defaultCustom: DefaultNode
+		};
+	}, []);
 
 	const onDrop = useCallback(
 		(event: React.DragEvent<HTMLDivElement>) => {
@@ -94,19 +104,18 @@ const Flow = () => {
 				x: event.clientX + 50,
 				y: event.clientY + 50
 			});
+			const id = getId();
 			const newNode = {
-				id: getId(),
+				id,
 				type: nodeType,
 				position,
 				data: {
 					label: `${nodeType} node`,
-					onCopy: () => handleCopyNode(newNode.id),
-					onDelete: () => handleDeleteNode(newNode.id)
+					id
 				}
 			};
 
 			setNodes([...nodes, newNode]);
-			// setNodes((nds) => nds.concat(newNode));
 		},
 		[screenToFlowPosition, nodeType, nodes, handleDeleteNode, handleCopyNode, setNodes]
 	);

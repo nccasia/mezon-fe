@@ -15,12 +15,12 @@ interface CommandNodeProps {
 	data: {
 		label: string;
 		id: string;
-		onDelete: () => void;
-		onCopy: () => void;
 	};
+	onDelete: (id: string) => void;
+	onCopy: (id: string) => void;
 }
 
-const CommandNode = ({ data }: CommandNodeProps) => {
+const CommandNode = ({ data, onCopy, onDelete }: CommandNodeProps) => {
 	const schema: JSONSchemaType<FormData> = {
 		title: 'Guest',
 		type: 'object',
@@ -95,10 +95,10 @@ const CommandNode = ({ data }: CommandNodeProps) => {
 			{/* Node actions */}
 			<div className="absolute top-0 right-[-60px] rounded-md flex-col gap-[10px] shadow-lg p-2  bg-slate-50 dark:bg-gray-600 hidden group-hover:flex">
 				<div className="bg-transparent absolute left-[-50px] w-[50px] h-[100px]"></div>
-				<button onClick={data.onCopy} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
+				<button onClick={() => onCopy(data.id)} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
 					<Icons.CopyIcon />
 				</button>
-				<button onClick={data.onDelete} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md text-sm">
+				<button onClick={() => onDelete(data.id)} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md text-sm">
 					<Icons.DeleteMessageRightClick />
 				</button>
 				<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
