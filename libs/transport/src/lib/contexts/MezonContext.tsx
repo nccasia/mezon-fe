@@ -13,6 +13,7 @@ type MezonContextProviderProps = {
 	children: React.ReactNode;
 	mezon: CreateMezonClientOptions;
 	connect?: boolean;
+	isFromMobile?: boolean;
 };
 
 type Sessionlike = {
@@ -37,7 +38,7 @@ export type MezonContextValue = {
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
-const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect }) => {
+const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect, isFromMobile = false }) => {
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<Session | null>(null);
 	const socketRef = React.useRef<Socket | null>(null);
@@ -215,8 +216,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						resolve(socket);
 					} catch (error) {
 						failCount++;
-						const retryTime =
-							Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
+						const retryTime = isFromMobile
+							? 0
+							: Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
 						await new Promise((res) => setTimeout(res, retryTime));
 						await retry();
 					}
@@ -225,7 +227,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				await retry();
 			});
 		},
-		[createSocket]
+		[createSocket, isFromMobile]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
