@@ -39,32 +39,18 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				thread.parrent_id as string,
 				thread.channel_id as string,
 				mode,
-				!currentChannel?.channel_private,
-				parent ? !parent.channel_private : false,
+				thread ? !thread.channel_private : false,
+				currentChannel ? !currentChannel.channel_private : false,
 				{ t: content.t },
 				mentions,
 				attachments,
 				references
 			);
-			if (content.contentThread) {
-				await socket.writeChatMessage(
-					currentClanId,
-					thread.parrent_id as string,
-					thread.channel_id as string,
-					mode,
-					!currentChannel?.channel_private,
-					parent ? !parent.channel_private : false,
-					{ t: content.contentThread },
-					[],
-					[],
-					undefined
-				);
-			}
 
 			const timestamp = Date.now() / 1000;
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, mode, currentChannel?.channel_private, dispatch, channelId]
+		[sessionRef, clientRef, socketRef, currentClanId, mode, currentChannel, dispatch, channelId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -75,7 +61,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 					parentId: currentChannel?.parrent_id || '',
 					channelId,
 					mode,
-					isPublic: !currentChannel?.channel_private,
+					isPublic: currentChannel ? !currentChannel.channel_private : false,
 					isParentPublic: parent ? !parent.channel_private : false
 				})
 			);
@@ -99,7 +85,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				currentChannel?.parrent_id || '',
 				channelId,
 				mode,
-				!currentChannel?.channel_private,
+				currentChannel ? !currentChannel.channel_private : false,
 				parent ? !parent.channel_private : false,
 				messageId,
 				editMessage

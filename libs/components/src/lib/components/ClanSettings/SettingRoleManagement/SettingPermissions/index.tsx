@@ -37,13 +37,6 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
 
-	const classNameInputCheckbox = `peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
-	bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
-	after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
-	hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-	focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-200
-	disabled:after:bg-slate-300 disabled:checked:hover:bg-slate-200 disabled:checked:after:hover:bg-slate-300`;
-
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 
 	useEffect(() => {
@@ -98,7 +91,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 					{searchResults.map((permission) => (
 						<li
 							key={permission.id}
-							className={`flex items-center justify-between ${hasPermissionEdit && clickRole !== EVERYONE_ROLE_ID ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+							className={`flex items-center justify-between ${hasPermissionEdit && clickRole !== EVERYONE_ROLE_ID ? 'cursor-pointer' : 'cursor-not-allowed '}`}
 						>
 							<span className="font-normal">{permission.title}</span>
 							<label>
@@ -110,7 +103,12 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 											handlePermissionToggle(permission.id);
 										}
 									}}
-									className={classNameInputCheckbox}
+									className={`peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
+									bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+									after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+									${clickRole !== EVERYONE_ROLE_ID ? 'hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600' : ''}
+									focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed 
+									`}
 									disabled={hiddenPermissionAdmin(permission.slug) || !hasPermissionEdit || clickRole === EVERYONE_ROLE_ID}
 								/>
 							</label>

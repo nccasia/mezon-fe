@@ -1,7 +1,8 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectCurrentChannelId, selectDirectsOpenlist, selectUserChannelById } from '@mezon/store-mobile';
+import { useAppSelector } from '@mezon/store';
+import { selectAllRolesClan, selectDirectsOpenlist, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -39,9 +40,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useSelector(selectUserChannelById(userId || user?.id || '', currentChannelId || ''));
-
+	const userById = useAppSelector(selectMemberClanByUserId(userId || user?.id));
 	const userStatus = useMemberStatus(userId || user?.id);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { color } = useMixImageColor(userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url);
@@ -182,8 +181,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			<View style={[styles.backdrop, { backgroundColor: userById || user?.avatar_url ? color : Colors.titleReset }]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
-						width={80}
-						height={80}
+						width={size.s_80}
+						height={size.s_80}
 						avatarUrl={userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
 						username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 						userStatus={userStatus}

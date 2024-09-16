@@ -164,7 +164,10 @@ const colors = {
 	bgToggleOffBtn: '#c3c3c3',
 	charcoalBlack: '#1e1f22',
 	mentionBg: 'rgba(60, 66, 112, 0.5)',
-	darkGray: '#333333'
+	darkGray: '#333333',
+	persianRed: '#DA373C',
+	outerSpace: '#404249',
+	jungleGreen: '#23A559'
 };
 
 export { colors, darkThemeColor, lightThemeColor };

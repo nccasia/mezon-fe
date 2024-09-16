@@ -10,7 +10,7 @@
         <!-- enforce status bar style as the example app doesn't support dark mode -->
         <item name="darkContentBarsStyle">true</item>
         <item name="bootSplashBackground">@color/bootsplash_background</item>
-        <item name="bootSplashLogo">@drawable/bootsplash_logo</item>
+        <item name="bootSplashLogo">@drawable/bootsplash_inset</item>
         <item name="postBootSplashTheme">@style/AppTheme</item>
     </style>
 

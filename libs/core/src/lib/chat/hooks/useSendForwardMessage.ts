@@ -1,9 +1,12 @@
+import { toastActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageWithUser } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 
 export function useSendForwardMessage() {
 	const { clientRef, sessionRef, socketRef } = useMezon();
+	const dispatch = useAppDispatch();
 
 	const client = clientRef.current;
 
@@ -18,18 +21,41 @@ export function useSendForwardMessage() {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(
-				clanid,
-				'0',
-				channel_id,
-				mode,
-				isPublic,
-				false,
-				message.content,
-				message.mentions,
-				message.attachments,
-				message.references
-			);
+			try {
+				let type = ChannelType.CHANNEL_TYPE_TEXT;
+				if (mode === ChannelStreamMode.STREAM_MODE_DM) {
+					type = ChannelType.CHANNEL_TYPE_DM;
+				} else if (mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+					type = ChannelType.CHANNEL_TYPE_GROUP;
+				}
+				await socket.joinChat(clanid, '0', channel_id, type, isPublic, false);
+				await socket.writeChatMessage(
+					clanid,
+					'0',
+					channel_id,
+					mode,
+					isPublic,
+					false,
+					message.content,
+					message.mentions,
+					message.attachments,
+					message.references
+				);
+
+				dispatch(
+					toastActions.addToast({
+						type: 'success',
+						message: 'Message forwarded successfully'
+					})
+				);
+			} catch (e) {
+				dispatch(
+					toastActions.addToast({
+						type: 'error',
+						message: 'Failed to forward message'
+					})
+				);
+			}
 		},
 		[sessionRef, clientRef, socketRef]
 	);

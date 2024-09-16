@@ -18,4 +18,4 @@ export function getBasicAppInfo() {
 	};
 }
 
-export const IS_TABLET = DeviceInfo.isTablet();
+export const IS_TABLET = DeviceInfo?.isTablet() || false;

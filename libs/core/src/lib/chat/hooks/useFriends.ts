@@ -2,18 +2,19 @@ import {
 	friendsActions,
 	requestAddFriendParam,
 	selectAllFriends,
-	selectCurrentChannelId,
-	selectMembersByChannelId,
-	useAppDispatch
+	selectDmGroupCurrentId,
+	selectGrouplMembers,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useFriends() {
 	const friends = useSelector(selectAllFriends);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const groupDmMember = useSelector(selectMembersByChannelId(currentChannelId || ''));
-
+	const currentDM = useSelector(selectDmGroupCurrentId);
+	const groupDmMember = useAppSelector((state) => selectGrouplMembers(state, currentDM as string));
+	const numberMemberInDmGroup = useMemo(() => groupDmMember.length, [groupDmMember]);
 	const dispatch = useAppDispatch();
 
 	const quantityPendingRequest = useMemo(() => {
@@ -76,7 +77,7 @@ export function useFriends() {
 			if (isAddMember) {
 				return friends.filter((friend) => {
 					if (friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm)) {
-						if (!Object.values(groupDmMember)?.some((user) => user.user?.id === friend.id)) {
+						if (!Object.values(groupDmMember)?.some((user) => user.id === friend.id)) {
 							return friend;
 						}
 					}
@@ -98,7 +99,8 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
-			filteredFriends
+			filteredFriends,
+			numberMemberInDmGroup
 		}),
 		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends]
 	);

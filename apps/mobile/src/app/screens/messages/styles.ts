@@ -47,7 +47,8 @@ export const style = (colors: Attributes) =>
 			borderRadius: 40,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
-			flexDirection: 'row'
+			flexDirection: 'row',
+			justifyContent: 'space-between'
 		},
 
 		searchInput: {
@@ -57,7 +58,8 @@ export const style = (colors: Attributes) =>
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
 			paddingHorizontal: size.s_12,
-			fontSize: size.medium
+			fontSize: size.medium,
+			flex: 1
 		},
 
 		statusTyping: {
@@ -145,7 +147,9 @@ export const style = (colors: Attributes) =>
 		},
 
 		channelLabel: {
-			fontSize: size.s_14,
+			fontSize: size.s_15,
+			color: colors.white,
+			fontWeight: '500',
 			flex: 1
 		},
 		avatarWrapper: {

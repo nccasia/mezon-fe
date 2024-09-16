@@ -251,7 +251,9 @@ export const setupNotificationListeners = async (navigation) => {
 	await notifee.createChannel({
 		id: 'default',
 		name: 'mezon',
-		importance: AndroidImportance.HIGH
+		importance: AndroidImportance.HIGH,
+		vibration: true,
+		vibrationPattern: [300, 500]
 	});
 
 	if (IS_ANDROID) {

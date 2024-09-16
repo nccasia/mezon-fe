@@ -1,6 +1,6 @@
 import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
+import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
@@ -64,7 +64,7 @@ export const deleteCategory = createAsyncThunk(
 	async ({ clanId, categoryId }: { clanId: string; categoryId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId);
+			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId);
 			if (response) {
 				thunkAPI.dispatch(fetchCategories({ clanId }));
 				thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
@@ -75,6 +75,33 @@ export const deleteCategory = createAsyncThunk(
 		}
 	}
 );
+
+export const updateCategoriesOrder = createAsyncThunk(
+	'categories/updateCategoriesOrder',
+	async ({ clan_id, categories }: ApiUpdateCategoryOrderRequest, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateCategoryOrder(mezon.session, {
+				clan_id: clan_id,
+				categories: categories
+			});
+			thunkAPI.dispatch(fetchCategories({ clanId: clan_id || '' }));
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
+
+export const deleteCategoriesOrder = createAsyncThunk('categories/deleteCategoriesOrder', async (clanId: string, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteCategoryOrder(mezon.session, clanId);
+		thunkAPI.dispatch(fetchCategories({ clanId: clanId }));
+		console.log(response);
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const updateCategory = createAsyncThunk('categories/updateCategory', async ({ clanId, request }: updatCategoryPayload, thunkAPI) => {
 	try {
@@ -171,7 +198,15 @@ export const categoriesReducer = categoriesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory, updateCategory, deleteCategory };
+export const categoriesActions = {
+	...categoriesSlice.actions,
+	fetchCategories,
+	createNewCategory,
+	updateCategory,
+	deleteCategory,
+	updateCategoriesOrder,
+	deleteCategoriesOrder
+};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

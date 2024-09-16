@@ -8,7 +8,7 @@ import {
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectUserClanProfileByClanID,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { RouteProp } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -25,7 +25,7 @@ import { style } from './styles';
 
 export enum EProfileTab {
 	UserProfile,
-	ClanProfile,
+	ClanProfile
 }
 
 export interface IUserProfileValue {
@@ -69,24 +69,24 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		username: '',
 		imgUrl: '',
 		displayName: '',
-		aboutMe: '',
+		aboutMe: ''
 	});
 	const [currentUserProfileValue, setCurrentUserProfileValue] = useState<IUserProfileValue>({
 		username: '',
 		imgUrl: '',
 		displayName: '',
-		aboutMe: '',
+		aboutMe: ''
 	});
 
 	const [originClanProfileValue, setOriginClanProfileValue] = useState<IClanProfileValue>({
 		username: '',
 		imgUrl: '',
-		displayName: '',
+		displayName: ''
 	});
 	const [currentClanProfileValue, setCurrentClanProfileValue] = useState<IClanProfileValue>({
 		username: '',
 		imgUrl: '',
-		displayName: '',
+		displayName: ''
 	});
 
 	useEffect(() => {
@@ -95,7 +95,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			username,
 			imgUrl: avatar_url,
 			displayName: display_name,
-			aboutMe: about_me,
+			aboutMe: about_me
 		};
 		setOriginUserProfileValue(initialValue);
 		setCurrentUserProfileValue(initialValue);
@@ -107,12 +107,12 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 
 	useEffect(() => {
 		const { username, about_me } = userProfile?.user || {};
-		const { nick_name, avartar } = userClansProfile || {};
+		const { nick_name } = userClansProfile || {};
 		const initialValue = {
 			username,
-			imgUrl: avartar,
+			imgUrl: userClansProfile?.avatar,
 			displayName: nick_name,
-			aboutMe: about_me,
+			aboutMe: about_me
 		};
 		setOriginClanProfileValue(initialValue);
 		setCurrentClanProfileValue(initialValue);
@@ -138,13 +138,13 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 						channelId: currentChannelId || '',
 						channelType: ChannelType.CHANNEL_TYPE_TEXT,
 						noCache: true,
-						repace: true,
-					}),
+						repace: true
+					})
 				);
 			}
 			Toast.show({
 				type: 'info',
-				text1: t('updateProfileSuccess'),
+				text1: t('updateProfileSuccess')
 			});
 			navigation.goBack();
 		}
@@ -158,7 +158,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			if (response) {
 				Toast.show({
 					type: 'info',
-					text1: t('updateClanProfileSuccess'),
+					text1: t('updateClanProfileSuccess')
 				});
 				navigation.goBack();
 			}
@@ -177,7 +177,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			<TouchableOpacity onPress={() => handleBack()} style={styles.backArrow}>
 				<Icons.CloseSmallBoldIcon color={themeValue.text} />
 			</TouchableOpacity>
-		),
+		)
 	});
 
 	const handleBack = () => {
@@ -192,14 +192,14 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			[
 				{
 					text: t('changedAlert.keepEditing'),
-					style: 'cancel',
+					style: 'cancel'
 				},
 				{
 					text: t('changedAlert.discard'),
-					onPress: () => navigation.goBack(),
-				},
+					onPress: () => navigation.goBack()
+				}
 			],
-			{ cancelable: false },
+			{ cancelable: false }
 		);
 	};
 
@@ -232,7 +232,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 					{
 						text: t('changedAlert.keepEditing'),
 						style: 'cancel',
-						onPress: () => resolve(false),
+						onPress: () => resolve(false)
 					},
 					{
 						text: t('changedAlert.discard'),
@@ -248,10 +248,10 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 								default:
 									break;
 							}
-						},
-					},
+						}
+					}
 				],
-				{ cancelable: false },
+				{ cancelable: false }
 			);
 		});
 	};
@@ -270,16 +270,13 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 				pageIndex={tab}
 				onChange={handleTabChange}
 				views={[
-					<UserProfile
-						userProfileValue={currentUserProfileValue}
-						setCurrentUserProfileValue={setCurrentUserProfileValue}
-					/>,
+					<UserProfile userProfileValue={currentUserProfileValue} setCurrentUserProfileValue={setCurrentUserProfileValue} />,
 					<ServerProfile
 						clanProfileValue={currentClanProfileValue}
 						isClanProfileNotChanged={isClanProfileNotChanged}
 						setCurrentClanProfileValue={setCurrentClanProfileValue}
 						onSelectedClan={(clan) => setSelectedClan(clan)}
-					/>,
+					/>
 				]}
 			/>
 		</View>

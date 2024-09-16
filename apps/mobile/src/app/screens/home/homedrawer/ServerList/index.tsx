@@ -3,7 +3,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import LogoMezon from '../../../../../assets/svg/logoMezon.svg';
+import LogoMezonDark from '../../../../../assets/svg/logoMezonDark.svg';
+import LogoMezonLight from '../../../../../assets/svg/logoMezonLight.svg';
 import { SeparatorWithLine } from '../../../../components/Common';
 import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
 import { ListClanPopup } from '../components/ListClanPopup';
@@ -11,7 +12,7 @@ import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
 import { style } from './styles';
 
 const ServerList = React.memo(() => {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { quantityPendingRequest } = useFriends();
 	const navigation = useNavigation<any>();
@@ -23,7 +24,7 @@ const ServerList = React.memo(() => {
 	return (
 		<View style={styles.wrapperServerList}>
 			<TouchableOpacity style={{ alignSelf: 'center' }} onPress={() => navigateToDM()}>
-				<LogoMezon width={50} height={50} />
+				{theme === 'light' ? <LogoMezonLight width={50} height={50} /> : <LogoMezonDark width={50} height={50} />}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>
 						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>

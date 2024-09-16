@@ -30,11 +30,13 @@ import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
+import { directMetaReducer } from './direct/directmeta.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
+import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
@@ -128,7 +130,8 @@ const persistedChannelReducer = persistReducer(
 const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
-		storage
+		storage,
+		blacklist: ['isShowCreateThread']
 	},
 	threadsReducer
 );
@@ -178,7 +181,8 @@ const persistedRolesClanReducer = persistReducer(
 const persistedEventMngtReducer = persistReducer(
 	{
 		key: 'eventmanagement',
-		storage
+		storage,
+		blacklist: ['ongoingEvent']
 	},
 	eventManagementReducer
 );
@@ -248,6 +252,14 @@ const persistedChannelMetaReducer = persistReducer(
 	channelMetaReducer
 );
 
+const persistedsettingClanStickerReducer = persistReducer(
+	{
+		key: 'settingSticker',
+		storage
+	},
+	settingStickerReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -256,6 +268,7 @@ const reducer = {
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
 	channelmeta: persistedChannelMetaReducer,
+	settingSticker: persistedsettingClanStickerReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
@@ -271,6 +284,7 @@ const reducer = {
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
+	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	notificationsetting: notificationSettingReducer,
@@ -294,9 +308,9 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
-	settingSticker: settingStickerReducer,
 	adminApplication: adminApplicationReducer,
-	systemMessages: systemMessageReducer
+	systemMessages: systemMessageReducer,
+	giveCoffee: giveCoffeeReducer
 };
 
 let storeInstance = configureStore({

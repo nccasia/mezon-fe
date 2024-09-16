@@ -1,8 +1,8 @@
 import { MezonContextValue } from '@mezon/transport';
 import storage from '@react-native-async-storage/async-storage';
-import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
+import { Middleware, ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
-import { persistReducer, persistStore } from 'redux-persist';
+import { createTransform, persistReducer, persistStore } from 'redux-persist';
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
 import { authReducer } from './auth/auth.slice';
@@ -18,7 +18,7 @@ import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
 import { inviteReducer } from './invite/invite.slice';
-import { messagesReducer } from './messages/messages.slice';
+import { MessagesState, messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
 import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
@@ -30,6 +30,7 @@ import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
+import { directMetaReducer } from './direct/directmeta.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -44,6 +45,7 @@ import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
+import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
@@ -81,11 +83,28 @@ const persistedEmojiSuggestionReducer = persistReducer(
 	emojiSuggestionReducer
 );
 
+const transformJumpingError = createTransform<MessagesState, MessagesState>(
+	(inboundState) => {
+		return inboundState;
+	},
+	(outboundState, key) => {
+		if (key === 'isJumpingToPresent') {
+			return {
+				...outboundState,
+				isJumpingToPresent: {}
+			};
+		}
+		return outboundState;
+	},
+	{ whitelist: ['isJumpingToPresent'] }
+);
+
 const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending']
+		blacklist: ['typingUsers', 'isSending'],
+		transforms: [transformJumpingError]
 	},
 	messagesReducer
 );
@@ -110,7 +129,8 @@ const persistedChannelReducer = persistReducer(
 const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
-		storage
+		storage,
+		blacklist: ['isShowCreateThread']
 	},
 	threadsReducer
 );
@@ -160,7 +180,8 @@ const persistedRolesClanReducer = persistReducer(
 const persistedEventMngtReducer = persistReducer(
 	{
 		key: 'eventmanagement',
-		storage
+		storage,
+		blacklist: ['ongoingEvent']
 	},
 	eventManagementReducer
 );
@@ -216,7 +237,8 @@ const persistedNotiReactMsgReducer = persistReducer(
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
-		storage
+		storage,
+		blacklist: ['subPanelActive']
 	},
 	gifsStickerEmojiReducer
 );
@@ -229,6 +251,14 @@ const persistedChannelMetaReducer = persistReducer(
 	channelMetaReducer
 );
 
+const persistedsettingClanStickerReducer = persistReducer(
+	{
+		key: 'settingSticker',
+		storage
+	},
+	settingStickerReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -237,6 +267,7 @@ const reducer = {
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
 	channelmeta: persistedChannelMetaReducer,
+	settingSticker: persistedsettingClanStickerReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
@@ -252,6 +283,7 @@ const reducer = {
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
+	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	notificationsetting: notificationSettingReducer,
@@ -275,8 +307,8 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
-	settingSticker: settingStickerReducer,
-	adminApplication: adminApplicationReducer
+	adminApplication: adminApplicationReducer,
+	systemMessages: systemMessageReducer
 };
 
 let storeInstance = configureStore({
@@ -288,6 +320,25 @@ let storeCreated = false;
 export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
+
+const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
+	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
+	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
+		const { channelIdLastFetch, channelMessages } = action.payload || {};
+
+		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
+			// Limit the channelMessages to only include messages for the last fetched channelId
+			action.payload = {
+				...action.payload,
+				channelMessages: {
+					[channelIdLastFetch]: channelMessages[channelIdLastFetch]
+				}
+			};
+		}
+	}
+	// Pass the action to the next middleware or reducer
+	return next(action);
+};
 
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
 	const store = configureStore({
@@ -302,7 +353,7 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 				},
 				immutableCheck: false,
 				serializableCheck: false
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware, limitDataMiddleware)
 	});
 	storeInstance = store;
 	storeCreated = true;

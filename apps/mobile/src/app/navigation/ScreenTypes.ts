@@ -1,5 +1,5 @@
-import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
-import { DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
+import { EOpenSearchChannelFrom, ICategoryChannelOption } from '@mezon/mobile-components';
+import { ChannelsEntity, DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -83,7 +83,9 @@ export const APP_SCREEN = {
 		STACK: 'ROUTES.MENU_CHANNEL.STACk',
 		SETTINGS: 'ROUTES.MENU_CHANNEL.SETTINGS',
 		SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
-		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION'
+		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
+		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
+		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES'
 	},
 
 	SETTINGS: {
@@ -145,6 +147,13 @@ type MenuChannelStackParamList = {
 	[APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION]: {
 		channelId: string;
 	};
+	[APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY]: {
+		channel: ChannelsEntity;
+	};
+	[APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES]: {
+		channelId: string;
+		roleId: string;
+	};
 };
 
 type MenuClanStackParamList = {
@@ -191,7 +200,7 @@ type MenuClanStackParamList = {
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES]: undefined;
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL]: {
-		notifyChannelCategorySetting: NotiChannelCategorySettingEntity;
+		notifyChannelCategorySetting: NotiChannelCategorySettingEntity | ICategoryChannelOption;
 	};
 	[APP_SCREEN.MENU_CLAN.CATEGORY_SETTING]: {
 		categoryId: string;

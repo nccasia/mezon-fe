@@ -1,5 +1,5 @@
 import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
-import { selectChannelById, selectCurrentChannel, selectDirectById } from '@mezon/store';
+import { selectChannelById, selectCurrentChannel, selectDirectById, useAppSelector } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -20,7 +20,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 	const userId = useAuth();
 
 	const [channelID, setChannelID] = useState('');
-	const direct = useSelector(selectDirectById(directId || ''));
+	const direct = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
@@ -45,7 +45,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			1,
 			userId.userId ?? '',
 			false,
-			!currentChannel?.channel_private,
+			currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 	}, [emojiId, emojiShortCode, activeMode, messageId, channelID, currentChannel]);

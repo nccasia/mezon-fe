@@ -8,6 +8,7 @@ import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import NotificationSoundSetting from './NotificationSoundSetting';
+import CategoryOrderSetting from './OrderCategorySetting';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
@@ -48,6 +49,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <NotificationSoundSetting />;
 			case ItemSetting.STICKERS:
 				return <SettingSticker />;
+			case ItemSetting.CATEGORY_ORDER:
+				return <CategoryOrderSetting />;
 		}
 	};
 	const dispatch = useAppDispatch();

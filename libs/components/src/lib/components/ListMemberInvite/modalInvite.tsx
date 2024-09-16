@@ -1,10 +1,10 @@
 import { useEscapeKey, useInvite } from '@mezon/core';
-import { selectChannelById, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
-import Modal from '../../../../../ui/src/lib/Modal';
 
 const expireAfter = ['30 minutes', '1 hour', '6 hours', '12 hours', '1 day', '7 days', 'Never'];
 
@@ -14,7 +14,7 @@ export type ModalParam = {
 	onClose: () => void;
 	open: boolean;
 	// url:string;
-	channelID: string;
+	channelID?: string;
 	confirmButton?: () => void;
 };
 
@@ -25,13 +25,13 @@ const ModalInvite = (props: ModalParam) => {
 	const [urlInvite, setUrlInvite] = useState('');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
-
-	const { onClose, channelID } = props;
-	const channel = useSelector(selectChannelById(channelID));
+	const firstChannel = useSelector(selectChannelFirst);
+	const { onClose } = props;
+	const channel = useSelector(selectChannelById(firstChannel.channel_id || ''));
 	const clan = useSelector(selectCurrentClan);
 
 	const handleOpenInvite = () => {
-		createLinkInviteUser(currentClanId ?? '', props.channelID ?? '', 10).then((res) => {
+		createLinkInviteUser(currentClanId ?? '', firstChannel.channel_id ?? '', 10).then((res) => {
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
 			}
@@ -74,28 +74,25 @@ const ModalInvite = (props: ModalParam) => {
 				props.onClose();
 			}}
 			showModal={props.open}
-			confirmButton={() => handleCopyToClipboard(urlInvite)}
-			titleConfirm="Copy"
 			hasChannel={channel}
 			classSubTitleBox="ml-[0px] cursor-default"
 			borderBottomTitle="border-b "
+			isInviteModal={true}
 		>
 			<div>
-				<ListMemberInvite url={urlInvite} channelID={props.channelID} />
+				<ListMemberInvite url={urlInvite} channelID={firstChannel.channel_id} />
 				<div className="relative ">
-					<p className="pt-4 pb-1 text-[20px] mb-12px cursor-default">
-						<span>Or, send a clan invite link to a friend</span>
-					</p>
+					<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">Or, send a clan invite link to a friend</p>
 					<input
 						type="text"
-						className="w-full h-11 border border-solid border-black dark:bg-black bg-bgLightModeSecond rounded-[5px] px-[16px] py-[13px] text-[14px] "
+						className="w-full h-11 border border-solid dark:border-none dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
 						value={urlInvite}
 						readOnly
 					/>
 					<button
 						className="absolute right-0 bottom-0 mb-1 text-white font-semibold text-sm px-8 py-1.5
-        shadow hover:text-fuchsia-500 outline-none focus:outline-none ease-linear transition-all duration-150
-        bg-primary text-[16px] leading-6 rounded mr-[8px]"
+        				shadow outline-none focus:outline-none ease-linear transition-all duration-150
+        			  bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
 						onClick={() => {
 							handleCopyToClipboard(urlInvite);
 							onClose();
@@ -106,7 +103,7 @@ const ModalInvite = (props: ModalParam) => {
 				</div>
 				<p className="pt-1 text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
 					<span className="cursor-default dark:text-white text-black">Your invite link expires in {expire} </span>
-					<span className="text-blue-300 cursor-pointer hover:underline" onClick={() => setModalEdit(true)}>
+					<span className="dark:text-blue-300 text-blue-600 cursor-pointer hover:underline" onClick={() => setModalEdit(true)}>
 						Edit invite link.
 					</span>
 				</p>

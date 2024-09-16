@@ -81,7 +81,9 @@ export function useThreads() {
 	}, [threadChannel]);
 
 	const threadChannelOnline = useMemo(() => {
-		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) <= 30);
+		return threadChannel.filter(
+			(thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) <= 30 || !thread.last_sent_message
+		);
 	}, [threadChannel]);
 
 	const threadCurrentChannel = useMemo(() => {

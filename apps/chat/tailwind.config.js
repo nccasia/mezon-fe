@@ -180,6 +180,12 @@ module.exports = {
         '.hide-scrollbar::-webkit-scrollbar': {
           display: 'none',
         },
+        '.overflow-anchor-none': {
+          'overflow-anchor': 'none'
+        },
+        '.overflow-anchor-auto': {
+          'overflow-anchor': 'auto'
+        }
       };
       addUtilities(newUtilities, ['responsive', 'hover']);
     }),

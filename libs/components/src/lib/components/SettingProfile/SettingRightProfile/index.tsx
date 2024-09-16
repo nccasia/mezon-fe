@@ -5,6 +5,7 @@ import SettingRightUser from '../SettingRightUserProfile';
 
 type SettingRightProfileProps = {
 	menuIsOpen: boolean;
+	isDM: boolean;
 };
 
 enum EActiveType {
@@ -12,7 +13,7 @@ enum EActiveType {
 	CLAN_SETTING = 'CLAN_SETTING'
 }
 
-const SettingRightProfile = ({ menuIsOpen }: SettingRightProfileProps) => {
+const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => {
 	const { userProfile } = useAuth();
 	const [activeType, setActiveType] = useState<EActiveType>(EActiveType.USER_SETTING);
 
@@ -54,6 +55,7 @@ const SettingRightProfile = ({ menuIsOpen }: SettingRightProfileProps) => {
 						avatar={userProfile?.user?.avatar_url || ''}
 						currentDisplayName={userProfile?.user?.display_name || ''}
 						aboutMe={userProfile?.user?.about_me || ''}
+						isDM={isDM}
 					/>
 				) : (
 					<SettingRightClan />

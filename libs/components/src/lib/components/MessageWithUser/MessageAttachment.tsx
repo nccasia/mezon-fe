@@ -66,7 +66,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; message: IMes
 					{images.map((image, index) => {
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
-							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
+							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'h-auto'}  `}>
 								<MessageImage messageId={message.id} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
 							</div>
 						);

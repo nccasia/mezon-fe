@@ -1,5 +1,5 @@
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, Text, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import { messagesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
@@ -38,14 +38,14 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 	return (
 		<View style={styles.aboveMessage}>
 			<View style={styles.iconReply}>
-				<ReplyIcon width={34} height={30} />
+				<ReplyIcon width={size.s_34} height={size.s_30} />
 			</View>
 			<Pressable onPress={onPressAvatar} style={styles.repliedMessageWrapper}>
 				<MezonAvatar
 					avatarUrl={messageReferences?.mesages_sender_avatar}
 					username={messageReferences?.message_sender_username}
-					height={20}
-					width={20}
+					height={size.s_20}
+					width={size.s_20}
 				/>
 				<View style={styles.replyContentWrapper}>
 					<Text style={styles.replyDisplayName}>
@@ -57,7 +57,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 					{messageReferences?.has_attachment ? (
 						<>
 							<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
-							<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
+							<AttachmentImageIcon width={size.s_12} height={size.s_12} color={Colors.textGray} />
 						</>
 					) : (
 						<RenderTextMarkdownContent

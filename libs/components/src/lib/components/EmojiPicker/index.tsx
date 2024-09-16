@@ -85,7 +85,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const { directId } = useAppParams();
 	const [channelID, setChannelID] = useState('');
-	const direct = useSelector(selectDirectById(directId || ''));
+	const direct = useAppSelector((state) => selectDirectById(state, directId));
 
 	useEffect(() => {
 		if (direct !== undefined) {
@@ -109,7 +109,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
-				!currentChannel?.channel_private,
+				currentChannel ? !currentChannel.channel_private : false,
 				parent ? !parent.channel_private : false
 			);
 			setSubPanelActive(SubPanelName.NONE);

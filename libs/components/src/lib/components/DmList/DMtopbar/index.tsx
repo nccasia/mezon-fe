@@ -1,4 +1,4 @@
-import { useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
+import { useEscapeKey, useMenu, useOnClickOutside } from '@mezon/core';
 import {
 	DirectEntity,
 	appActions,
@@ -30,7 +30,6 @@ export type ChannelTopbarProps = {
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
-	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -68,9 +67,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
 						}
 						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
-						status={userStatus}
+						status={currentDmGroup?.is_online?.some(Boolean)}
 						isHideStatus={true}
-						isHideIconStatus={false}
+						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
 						key={currentDmGroup?.channel_id}
 						isHiddenAvatarPanel={true}
 					/>

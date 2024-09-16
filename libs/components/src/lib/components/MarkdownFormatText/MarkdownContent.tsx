@@ -28,7 +28,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
-	const origin = window.location.origin + '/invite/';
+	const origin = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/';
 
 	const onClickLink = useCallback(
 		(url: string) => {

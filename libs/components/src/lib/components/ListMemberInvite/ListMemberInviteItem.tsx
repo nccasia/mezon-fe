@@ -44,7 +44,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 		setIsInviteSent(isSent);
 	}, [isSent]);
 	return dmGroup ? (
-		<ItemInviteDM 
+		<ItemInviteDM
 			channelID={dmGroup.channel_id}
 			type={Number(dmGroup.type)}
 			avatar={dmGroup.channel_avatar?.at(0)}
@@ -54,7 +54,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			userName={dmGroup.usernames}
 		/>
 	) : (
-		<ItemInviteUser 
+		<ItemInviteUser
 			userId={user?.id}
 			avatar={user?.user?.avatar_url}
 			displayName={user?.user?.display_name}
@@ -74,10 +74,10 @@ type ItemInviteDMProps = {
 	isInviteSent?: boolean;
 	userName?: string;
 	onHandle: () => void;
-}
+};
 
 const ItemInviteDM = (props: ItemInviteDMProps) => {
-	const {channelID='', type='', avatar='', label='', isInviteSent=false, userName='', onHandle=()=>{}} = props;
+	const { channelID = '', type = '', avatar = '', label = '', isInviteSent = false, userName = '', onHandle } = props;
 	return (
 		<div key={channelID} className="flex items-center justify-between h-14">
 			<AvatarImage
@@ -86,7 +86,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				className="min-w-10 min-h-10 max-w-10 max-h-10"
 				src={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : avatar}
 			/>
-			<p style={{ marginRight: 'auto' }} className="pl-[10px] max-w-full overflow-hidden text truncate">
+			<p style={{ marginRight: 'auto' }} className="px-[10px] flex-1 overflow-hidden text truncate">
 				{label}
 			</p>
 			<button
@@ -94,15 +94,15 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				disabled={isInviteSent}
 				className={
 					isInviteSent
-						? 'bg-gray-400 text-gray-700 cursor-not-allowed border border-solid border-gray-400 rounded-[5px] py-[5px] px-[10px]'
-						: 'font-sans font-normal text-[16px] bg-blue-200 hover:text-blue-300 text-blue-700 border border-solid border-green-500 rounded-[5px] py-[5px] px-[29px]'
+						? 'dark:text-[#9c9ea0] text-[#a1a8ef] rounded-[5px] py-[5px] px-[10px] cursor-not-allowed font-semibold'
+						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary dark:hover:bg-green-700 hover:bg-green-700 text-textLightTheme hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-md py-[5px] px-[18px]'
 				}
 			>
 				{isInviteSent ? 'Sent' : 'Invite'}
 			</button>
 		</div>
-	)
-}
+	);
+};
 
 type ItemInviteUserProps = {
 	userId?: string;
@@ -111,18 +111,13 @@ type ItemInviteUserProps = {
 	userName?: string;
 	isInviteSent?: boolean;
 	onHandle?: () => void;
-}
+};
 
 const ItemInviteUser = (props: ItemInviteUserProps) => {
-	const {userId='', avatar='', displayName='', userName='', isInviteSent=false, onHandle=()=>{}} = props;
+	const { userId = '', avatar = '', displayName = '', userName = '', isInviteSent = false, onHandle } = props;
 	return (
 		<div key={userId} className="flex items-center justify-between h-14">
-			<AvatarImage
-				alt={userName}
-				userName={userName}
-				className="min-w-10 min-h-10 max-w-10 max-h-10"
-				src={avatar}
-			/>
+			<AvatarImage alt={userName} userName={userName} className="min-w-10 min-h-10 max-w-10 max-h-10" src={avatar} />
 			<p style={{ marginRight: 'auto' }} className="pl-[10px]">
 				{displayName}
 			</p>
@@ -131,12 +126,12 @@ const ItemInviteUser = (props: ItemInviteUserProps) => {
 				disabled={isInviteSent}
 				className={
 					isInviteSent
-						? 'bg-gray-400 text-gray-700 cursor-not-allowed border border-solid border-gray-400 rounded-[5px] py-[5px] px-[10px]'
-						: 'font-sans font-normal text-[16px] bg-blue-200 hover:text-blue-300 text-blue-700 border border-solid border-green-500 rounded-[5px] py-[5px] px-[29px]'
+						? 'dark:text-[#9c9ea0] text-[#a1a8ef] rounded-[5px] py-[5px] px-[10px] cursor-not-allowed font-semibold'
+						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary dark:hover:bg-green-700 hover:bg-green-700 text-textLightTheme hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-md py-[5px] px-[18px]'
 				}
 			>
 				{isInviteSent ? 'Sent' : 'Invite'}
 			</button>
 		</div>
-	)
-}
+	);
+};

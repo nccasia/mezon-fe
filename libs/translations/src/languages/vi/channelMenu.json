@@ -1,49 +1,55 @@
 {
   "menu": {
-    "watchMenu": {
-      "title": "",
-      "markAsRead": "Đánh dấu là Đã đọc"
-    },
-    "inviteMenu": {
-      "title": "",
-      "invite": "Mời",
-      "favorite": "Yêu thích",
-      "copyLink": "Sao chép liên kết"
-    },
-    "notification": {
-      "title": "",
-      "muteCategory": "Tắt thông báo channel",
-      "muteThread": "Tắt thông báo Thread",
-      "notification": "Cài đặt thông báo"
-    },
-    "organizationMenu": {
-      "title": "",
-      "edit": "Chỉnh sửa kênh",
-      "deleteChannel": "Xoá Channel",
-      "duplicateChannel": "Nhân bản channel"
-    },
-    "devMode": {
-      "title": "Chế độ phát triển",
-      "copyChannelID": "Sao chép Channel ID"
-    },
-    "manageThreadMenu": {
-      "editThread": "Chỉnh sửa Thread",
-      "deleteThread": "Xoá Thread"
-    }
+      "watchMenu": {
+          "title": "",
+          "markAsRead": "Đánh dấu đã đọc"
+      },
+      "inviteMenu": {
+          "title": "",
+          "invite": "Mời",
+          "favorite": "Yêu thích",
+          "copyLink": "Sao chép liên kết"
+      },
+      "notification": {
+          "title": "",
+          "muteChannel": "Tắt thông báo kênh",
+          "unMuteChannel": "Bật thông báo kênh",
+          "muteThread": "Tắt thông báo chủ đề",
+          "unMuteThread": "Bật thông báo chủ đề",
+          "notification": "Cài đặt thông báo"
+      },
+      "thread": {
+          "title": "",
+          "threads": "Chủ đề"
+      },
+      "organizationMenu": {
+          "title": "",
+          "edit": "Chỉnh sửa kênh",
+          "deleteChannel": "Xóa kênh",
+          "duplicateChannel": "Nhân bản danh mục"
+      },
+      "devMode": {
+          "title": "Chế độ phát triển",
+          "copyChannelID": "Sao chép ID kênh"
+      },
+      "manageThreadMenu": {
+          "editThread": "Chỉnh sửa chủ đề",
+          "deleteThread": "Xóa chủ đề"
+      }
   },
   "notify": {
-    "serverIDCopied": "Đã sao chép Channel ID"
+      "serverIDCopied": "Đã sao chép ID kênh"
   },
   "modalConfirm": {
-    "thread": {
-        "title": "Xoá Thread {{threadName}}",
-        "content": "Bạn có chắc muốn xoá Thread này không?",
-        "confirmText": "Có"
-    },
-    "channel": {
-        "title": "Xoá Channel {{channelName}}",
-        "content": "Bạn có chắc muốn xoá Channel này không?",
-        "confirmText": "Có"
-    }
-}
+      "thread": {
+          "title": "Xóa chủ đề {{threadName}}",
+          "content": "Bạn có chắc chắn muốn xóa chủ đề này không?",
+          "confirmText": "Có"
+      },
+      "channel": {
+          "title": "Xóa kênh {{channelName}}",
+          "content": "Bạn có chắc chắn muốn xóa kênh này không?",
+          "confirmText": "Có"
+      }
+  }
 }

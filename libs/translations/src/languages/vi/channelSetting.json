@@ -75,6 +75,9 @@
         "updated": "Cập nhật thành công"
     },
     "channelPermission": {
+        "permissionOverrides": "Ghi đè quyền",
+        "save": "Save",
+        "generalChannelPermission": "QUYỀN TỔNG QUÁT KÊNH",
         "title": "Quyền truy cập",
         "basicView": "Cơ bản",
         "advancedView": "Nâng cao",
@@ -87,6 +90,35 @@
         "privateChannel": "Kênh riêng tư",
         "basicViewDescription": "Khi bạn chuyển kênh sang chế độ riêng tư, chỉ những thành viên và vai trò được chọn mới có thể xem kênh này",
         "addMemberAndRoles": "Thêm thành viên hoặc vai trò",
-        "whoCanAccess": "Ai có thể truy cập"
+        "whoCanAccess": "Ai có thể truy cập",
+        "warningModal": {
+            "publicChannelTitle": "Mở kênh này cho tất cả mọi người?",
+            "privateChannelTitle": "Chuyển kênh này thành riêng tư?",
+            "publicChannelContent": "{{channelLabel}} sẽ có sẵn cho tất cả các thành viên",
+            "privateChannelContent": "{{channelLabel}} sẽ trở thành riêng tư và chỉ hiển thị cho các thành viên và vai trò được chọn",
+            "confirm": "Đồng ý"
+        },
+        "warningChangeSettingModal": {
+            "title": "Bạn có các cài đặt chưa được lưu",
+            "content": "Bạn có muốn lưu các thay đổi không?",
+            "confirm": "Có, Lưu"
+        },
+        "description": {
+            "viewChannel": "Cho phép thành viên xem kênh này theo mặc định. Vô hiệu hóa điều này cho @everyone sẽ làm cho kênh này trở thành riêng tư.",
+            "manageChannel": "Cho phép thành viên thay đổi tên kênh, mô tả, và cài đặt văn bản của kênh này. Họ cũng có thể xóa kênh.",
+            "manageThread": "Cho phép thành viên đổi tên, xóa, đóng và bật chế độ chậm cho các luồng trong kênh này. Họ cũng có thể xem các luồng riêng tư.",
+            "sendMessage": "Cho phép thành viên gửi tin nhắn trong kênh này.",
+            "deleteMessage": "Cho phép thành viên xóa tin nhắn trong kênh này."
+        },
+        "bottomSheet": {
+            "addMembersOrRoles": "Thêm thành viên hoặc vai trò",
+            "add": "Thêm",
+            "roles": "VAI TRÒ",
+            "members": "THÀNH VIÊN"
+        }
+    },
+    "changeCategory": {
+        "title": "Thay đổi Category",
+        "label": "CHUYỂN TỪ {{currentChannel}} TỚI"
     }
 }

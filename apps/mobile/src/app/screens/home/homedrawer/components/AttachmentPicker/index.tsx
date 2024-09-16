@@ -36,7 +36,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const getFullFileName = useCallback(
 		(fileName: string) => {
 			const session = sessionRef.current;
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName)?.filePath;
+			return createUploadFilePath(session, currentClanId, currentChannelId, fileName, true)?.filePath;
 		},
 		[currentChannelId, currentClanId, sessionRef],
 	);

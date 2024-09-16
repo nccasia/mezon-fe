@@ -5,7 +5,11 @@ import { EUserSettings } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-const Setting = () => {
+interface settingProps {
+	isDM: boolean;
+}
+
+const Setting = ({ isDM }: settingProps) => {
 	const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
 	const [currentSetting, setCurrentSetting] = useState<string>(isShowSettingFooter?.initTab || EUserSettings.ACCOUNT);
 	const handleSettingItemClick = (settingName: string) => {
@@ -39,7 +43,7 @@ const Setting = () => {
 						{currentSetting === EUserSettings.ACCOUNT && (
 							<SettingAccount menuIsOpen={menuIsOpen} onSettingProfile={handleSettingItemClick} />
 						)}
-						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} />}
+						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} isDM={isDM} />}
 						{currentSetting === EUserSettings.APPEARANCE && <SettingAppearance menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={closeSetting} />
 

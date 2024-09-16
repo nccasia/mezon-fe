@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import DetailItemEvent from '../DetailItemEvent';
 import ModalCreate from './ModalCreate';
 import StartEventModal from './StartEvent';
@@ -6,12 +6,13 @@ import StartEventModal from './StartEvent';
 export type EventModalProps = {
 	numberEventManagement: number;
 	onClose: () => void;
+	openModalDetail: boolean;
+	setOpenModalDetail: Dispatch<SetStateAction<boolean>>;
 };
 
 const EventModal = (props: EventModalProps) => {
-	const { numberEventManagement, onClose } = props;
+	const { numberEventManagement, onClose, openModalDetail, setOpenModalDetail } = props;
 	const [openModal, setOpenModal] = useState(false);
-	const [openModalDetail, setOpenModalDetail] = useState(false);
 
 	const handleModalDetail = useCallback((status: boolean) => {
 		setOpenModalDetail(status);

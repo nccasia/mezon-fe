@@ -56,7 +56,13 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, 
 	if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
 		await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
 	} else {
-		const firstChannelText = dataChannel?.find?.((channel: { type: ChannelType }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT);
+		const dataChannelSort = dataChannel?.sort((a: any, b: any) => {
+			if (a.category_name && b.category_name) {
+				return a.category_name.localeCompare(b.category_name);
+			}
+			return 0;
+		});
+		const firstChannelText = dataChannelSort?.find?.((channel: { type: ChannelType }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT);
 		if (firstChannelText) {
 			const firstChannelId = firstChannelText?.channel_id;
 			const firstClanId = firstChannelText?.clan_id;

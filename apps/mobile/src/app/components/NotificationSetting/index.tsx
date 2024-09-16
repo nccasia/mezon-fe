@@ -1,15 +1,17 @@
+import { IOptionsNotification, notifyLabels } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	notifiReactMessageActions,
 	notificationSettingActions,
 	selectCurrentChannelId,
+	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiReactMessage,
-	selectCurrentChannelNotificatonSelected,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
+import { ChannelThreads, ENotificationTypes } from '@mezon/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -18,22 +20,8 @@ import { useSelector } from 'react-redux';
 import { MezonRadioButton } from '../../temp-ui';
 import FilterCheckbox from './FilterCheckbox/FilterCheckbox';
 import { style } from './NotificationSetting.styles';
-import { NotificationType } from 'mezon-js';
 
-export const enum ENotificationType {
-	CATEGORY_DEFAULT = 'Use Category Default',
-	ALL_MESSAGE = 'ALL',
-	NOTHING_MESSAGE = 'NOTHING',
-	MENTION_MESSAGE = 'MENTION',
-}
-
-export const notifyLabels: Record<number, string> = {
-  [NotificationType.ALL_MESSAGE]: "All",
-  [NotificationType.MENTION_MESSAGE]: 'Only @mention',
-  [NotificationType.NOTHING_MESSAGE]: 'Nothing'
-};
-
-export default function NotificationSetting() {
+export default function NotificationSetting({ channel }: { channel?: ChannelThreads }) {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['notificationSetting']);
 	const styles = style(themeValue);
@@ -42,39 +30,37 @@ export default function NotificationSetting() {
 			id: 0,
 			label: t('bottomSheet.labelOptions.categoryDefault'),
 			isChecked: false,
-			value: undefined,
+			value: ENotificationTypes.DEFAULT
 		},
 		{
 			id: 1,
 			label: t('bottomSheet.labelOptions.allMessage'),
 			isChecked: false,
-			value: NotificationType.ALL_MESSAGE,
+			value: ENotificationTypes.ALL_MESSAGE
 		},
-    {
+		{
 			id: 2,
 			label: t('bottomSheet.labelOptions.mentionMessage'),
 			isChecked: false,
-			value: NotificationType.MENTION_MESSAGE,
+			value: ENotificationTypes.MENTION_MESSAGE
 		},
 		{
 			id: 3,
 			label: t('bottomSheet.labelOptions.notThingMessage'),
 			isChecked: false,
-			value: NotificationType.NOTHING_MESSAGE,
-		},
-
+			value: ENotificationTypes.NOTHING_MESSAGE
+		}
 	];
-	const [radioBox, setRadioBox] = useState(optionNotifySetting);
-	const [isChecked, setIsChecked] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const [radioBox, setRadioBox] = useState<IOptionsNotification[]>(optionNotifySetting);
+	const [isChecked, setIsChecked] = useState<boolean>(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const notifyReactMessage = useSelector(selectNotifiReactMessage);
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [defaultNotifyName, setDefaultNotifyName] = useState('');
-	const dispatch = useAppDispatch();
-
 	useEffect(() => {
 		setIsChecked(notifyReactMessage?.id !== '0');
 		setRadioBox(radioBox.map((item) => item && { ...item, isChecked: getNotificationChannelSelected?.notification_setting_type === item.value }));
@@ -94,27 +80,32 @@ export default function NotificationSetting() {
 		if (notifyOptionSelected?.length) {
 			const notifyOptionSettingSelected = notifyOptionSelected.find((option) => option.isChecked);
 			if (
-				[NotificationType.ALL_MESSAGE, NotificationType.MENTION_MESSAGE, NotificationType.NOTHING_MESSAGE].includes(
-					notifyOptionSettingSelected?.value,
+				[ENotificationTypes.ALL_MESSAGE, ENotificationTypes.MENTION_MESSAGE, ENotificationTypes.NOTHING_MESSAGE].includes(
+					notifyOptionSettingSelected?.value
 				)
 			) {
 				const body = {
-					channel_id: currentChannelId || '',
+					channel_id: channel?.channel_id || currentChannelId || '',
 					notification_type: notifyOptionSettingSelected?.value || 0,
-					clan_id: currentClanId || '',
+					clan_id: currentClanId || ''
 				};
 				dispatch(notificationSettingActions.setNotificationSetting(body));
 			} else {
-				dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClanId || '' }));
+				dispatch(
+					notificationSettingActions.deleteNotiChannelSetting({
+						channel_id: channel?.channel_id || currentChannelId || '',
+						clan_id: currentClanId || ''
+					})
+				);
 			}
 		}
 	};
 	const handleCheckboxPress = () => {
 		setIsChecked(!isChecked);
 		if (!isChecked) {
-			dispatch(notifiReactMessageActions.setNotifiReactMessage({ channel_id: currentChannelId || '' }));
+			dispatch(notifiReactMessageActions.setNotifiReactMessage({ channel_id: channel?.channel_id || currentChannelId || '' }));
 		} else {
-			dispatch(notifiReactMessageActions.deleteNotifiReactMessage({ channel_id: currentChannelId || '' }));
+			dispatch(notifiReactMessageActions.deleteNotifiReactMessage({ channel_id: channel?.channel_id || currentChannelId || '' }));
 		}
 	};
 
@@ -126,15 +117,8 @@ export default function NotificationSetting() {
 					<Text style={styles.labelOption}>{t('bottomSheet.labelOptions.reactionMessage')}</Text>
 					<MezonRadioButton checked={isChecked} />
 				</TouchableOpacity>
-				{radioBox.map((item) => (
-					<FilterCheckbox
-						id={item.id}
-						label={item.label}
-						key={`${item.id}`}
-						isChecked={item.isChecked}
-						defaultNotifyName={defaultNotifyName}
-						onCheckboxPress={handleRadioBoxPress}
-					/>
+				{radioBox?.map((item) => (
+					<FilterCheckbox item={item} key={`${item.id}`} defaultNotifyName={defaultNotifyName} onCheckboxPress={handleRadioBoxPress} />
 				))}
 			</View>
 		</View>

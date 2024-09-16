@@ -56,7 +56,12 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						</span>
 					</div>
 					<div className="leading-6">
-						<MessageLine content={JSON.parse(pinMessage.content || '')} isJumMessageEnabled={false} isTokenClickAble={false} />
+						<MessageLine
+							isEditted={false}
+							content={JSON.parse(pinMessage.content || '')}
+							isJumMessageEnabled={false}
+							isTokenClickAble={false}
+						/>
 					</div>
 					{message.attachments?.length ? <ListPinAttachment attachments={message.attachments} /> : <></>}
 				</div>
@@ -83,13 +88,14 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					contentString={contentString}
 					handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
 					closeModal={() => setOpenModalDelPin(false)}
+					attachments={message?.attachments ? message.attachments : []}
 				/>
 			)}
 		</div>
 	);
 };
 
-const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
+export const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
 	const gridClass = useMemo(() => {
 		let classGridParent = '';
 		let classGridChild = '';

@@ -75,10 +75,11 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 	const window = App.BrowserWindow.getFocusedWindow();
 	dialog
 		.showMessageBox(window, {
+			icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
 			type: 'info',
 			buttons: ['Download', 'Cancel'],
 			title: 'Updates available',
-			message: `There is a new update for the app ${info.version}!! Do you want to download??`
+			message: `The current version is ${app.getVersion()}. There is a new update for the app ${info.version}. Do you want to download?`
 		})
 		.then((result) => {
 			if (result.response === 0) {
@@ -89,6 +90,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 
 autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
+		icon: 'apps/desktop/src/assets/desktop-taskbar-256x256.ico',
 		title: 'No update',
 		body: `The current version (${info.version}) is the latest.`
 	}).show();
@@ -101,11 +103,17 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 			type: 'info',
 			buttons: ['Install now', 'Cancel'],
 			title: 'Mezon install',
-			message: `Install mezon version ${info.version} now.`
+			message: `The current version is ${app.getVersion()}. Install ${info.version} now.`
 		})
 		.then((result) => {
 			if (result.response === 0) {
-				autoUpdater.quitAndInstall();
+				setTimeout(() => {
+					const windows = App.BrowserWindow.getAllWindows();
+					windows.forEach((window) => {
+						window.removeAllListeners('close');
+					});
+					autoUpdater.quitAndInstall();
+				}, 10000);
 			}
 		});
 });

@@ -1,6 +1,12 @@
-import { EOptionOverridesType, optionNotification } from '@mezon/mobile-components';
+import { ENotificationActive, ENotificationChannelId, EOptionOverridesType, optionNotification } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { defaultNotificationCategoryActions, notificationSettingActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import {
+	defaultNotificationCategoryActions,
+	notificationSettingActions,
+	selectCurrentChannelNotificatonSelected,
+	selectCurrentClanId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
@@ -22,6 +28,21 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 	}, [notifyChannelCategorySetting]);
 
 	useEffect(() => {
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: notifyChannelCategorySetting?.id || '' }));
+	}, []);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+
+	const isUnmute = useMemo(() => {
+		return (
+			getNotificationChannelSelected?.active === ENotificationActive.ON || getNotificationChannelSelected.id === ENotificationChannelId.Default
+		);
+	}, [getNotificationChannelSelected]);
+
+	const optionsNotificationSetting = useMemo(() => {
+		return optionNotification?.map((option) => ({ ...option, disabled: !isUnmute }));
+	}, [isUnmute]);
+
+	useEffect(() => {
 		setSelectedOption(notifyChannelCategorySetting?.notification_setting_type);
 	}, [notifyChannelCategorySetting?.notification_setting_type]);
 
@@ -32,8 +53,8 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
 					category_id: notifyChannelCategorySetting?.id,
 					notification_type: value,
-					clan_id: currentClanId || '',
-				}),
+					clan_id: currentClanId || ''
+				})
 			);
 		}
 		if (title === 'channel') {
@@ -41,8 +62,8 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 				notificationSettingActions.setNotificationSetting({
 					channel_id: notifyChannelCategorySetting?.id,
 					notification_type: value,
-					clan_id: currentClanId || '',
-				}),
+					clan_id: currentClanId || ''
+				})
 			);
 		}
 	};
@@ -53,13 +74,13 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 			dispatch(
 				defaultNotificationCategoryActions.deleteDefaultNotificationCategory({
 					category_id: notifyChannelCategorySetting?.id,
-					clan_id: currentClanId,
-				}),
+					clan_id: currentClanId
+				})
 			);
 		}
 		if (title === 'channel') {
 			dispatch(
-				notificationSettingActions.deleteNotiChannelSetting({ channel_id: notifyChannelCategorySetting?.id, clan_id: currentClanId || '' }),
+				notificationSettingActions.deleteNotiChannelSetting({ channel_id: notifyChannelCategorySetting?.id, clan_id: currentClanId || '' })
 			);
 		}
 	};
@@ -69,16 +90,19 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 			{notifyChannelCategorySetting?.type !== EOptionOverridesType.Category && (
 				<Block>
 					<MuteClanNotificationBS
+						isUnmute={isUnmute}
+						notificationChannelSelected={getNotificationChannelSelected}
 						currentChannel={notifyChannelCategorySetting}
 						description={t('clanNotificationSettingDetail.muteChannelSubText')}
 					/>
-					{/* <Text style={styles.description}>
-						{t('clanNotificationSettingDetail.youHaveMuted')}
-						<Text style={styles.duration}> 8/8, 2:28 pm </Text>
-					</Text> */}
 				</Block>
 			)}
-			<MezonOption onChange={handleNotificationChange} value={selectedOption} title={'Clan Notifications Setting'} data={optionNotification} />
+			<MezonOption
+				onChange={handleNotificationChange}
+				value={selectedOption}
+				title={'Clan Notifications Setting'}
+				data={optionsNotificationSetting}
+			/>
 			{!!selectedOption && (
 				<TouchableOpacity
 					onPress={() => {

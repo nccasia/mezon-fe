@@ -30,6 +30,8 @@ type ModalUserProfileProps = {
 	name?: string;
 	status?: boolean;
 	user?: ChannelMembersEntity;
+	isDM?: boolean;
+	userStatusProfile?: string;
 };
 
 export type OpenModalProps = {
@@ -54,12 +56,14 @@ const ModalUserProfile = ({
 	mode,
 	avatar,
 	positionType,
-	name
+	name,
+	isDM,
+	userStatusProfile
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const userCustomStatus = useMemberCustomStatus(userID || '');
+	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
 	const userById = useSelector(selectMemberClanByUserId(userID ?? '')) as ChannelMembersEntity;
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
@@ -139,10 +143,11 @@ const ModalUserProfile = ({
 				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
-				customStatus={userCustomStatus}
+				customStatus={userStatusProfile ? userStatusProfile : userCustomStatus}
 				isAnonymous={checkAnonymous}
 				userID={userID}
 				positionType={positionType}
+				isFooterProfile={isFooterProfile}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -168,7 +173,7 @@ const ModalUserProfile = ({
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 					{isFooterProfile ? (
-						<StatusProfile userById={userById} />
+						<StatusProfile userById={userById} isDM={isDM} />
 					) : (
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}

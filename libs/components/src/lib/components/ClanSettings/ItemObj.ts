@@ -17,6 +17,7 @@ export const ItemSetting = {
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
 	APP_DIRECTORY: 'app-directory',
+	CATEGORY_ORDER: 'category-order'
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -24,49 +25,51 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+	
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [
 	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
-	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' },
+	{ id: ItemSetting.APP_DIRECTORY, name: 'App Directory' }
 ];
 
 export const sideBarListItem: ListSideBarProps[] = [
 	{
 		title: '',
-		listItem: listItemSetting,
+		listItem: listItemSetting
 	},
 	{
 		title: 'Apps',
-		listItem: listItemSettingApp,
-	},
+		listItem: listItemSettingApp
+	}
 ];
 
 export const listItemSettingClanPermission: ItemObjProps[] = [
 	{ id: ItemSetting.OVERVIEW, name: 'Overview' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
-	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
 ];
 
 export const sideBarListItemClanPermission: ListSideBarProps[] = [
 	{
 		title: '',
-		listItem: listItemSettingClanPermission,
+		listItem: listItemSettingClanPermission
 	},
 	{
 		title: 'Apps',
-		listItem: listItemSettingApp,
-	},
+		listItem: listItemSettingApp
+	}
 ];
 
 export const categorySettingItem = {
 	OVERVIEW: 'overview',
-	PERMISSIONS: 'permissions',
+	PERMISSIONS: 'permissions'
 };
 
 export const categorySettingList = [
 	{ id: categorySettingItem.OVERVIEW, name: 'Overview' },
-	{ id: categorySettingItem.PERMISSIONS, name: 'Permissions' },
+	{ id: categorySettingItem.PERMISSIONS, name: 'Permissions' }
 ];

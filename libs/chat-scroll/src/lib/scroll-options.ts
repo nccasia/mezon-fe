@@ -3,5 +3,5 @@ export const SCROLL_DEFAULT_OPTIONS: IScrollOptions = {
 };
 
 export interface IScrollOptions {
-	debounce?: number;
+	debounce?: number | null;
 }

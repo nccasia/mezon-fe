@@ -50,7 +50,14 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 						<p>Are you sure you want to delete this message?</p>
 					</div>
 					<div className="p-4">
-						<MessageWithUser message={mess} isMessNotifyMention={true} mode={mode} isMention={true} isShowFull={true} />
+						<MessageWithUser
+							allowDisplayShortProfile={false}
+							message={mess}
+							isMessNotifyMention={true}
+							mode={mode}
+							isMention={true}
+							isShowFull={true}
+						/>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">

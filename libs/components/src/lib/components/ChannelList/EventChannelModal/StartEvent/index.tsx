@@ -15,8 +15,9 @@ type StartEventModalProps = {
 const StartEventModal = (props: StartEventModalProps) => {
 	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement } = props;
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+
 	return (
 		<>
 			<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
@@ -41,11 +42,7 @@ const StartEventModal = (props: StartEventModalProps) => {
 
 			{allEventManagement.length !== 0 ? (
 				<div className="dark:bg-[#313339] bg-white h-fit min-h-80 max-h-[80vh]  overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col">
-					<ListEventManagement
-						allEventManagement={allEventManagement}
-						checkUserCreate={isClanOwner}
-						onOpenDetailItem={onOpenDetailItem}
-					/>
+					<ListEventManagement allEventManagement={allEventManagement} checkUserCreate={isClanOwner} onOpenDetailItem={onOpenDetailItem} />
 				</div>
 			) : (
 				<div className="dark:bg-[#313339] bg-white h-80 flex justify-center items-center">

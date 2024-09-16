@@ -34,7 +34,7 @@ export const fetchPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchPermissionRoleChannel',
 	async ({ channelId, roleId }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.GetPermissionByRoleIdChannelId(roleId, channelId);
+		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId);
 		if (!response?.permission_role_channel) {
 			return [];
 		}

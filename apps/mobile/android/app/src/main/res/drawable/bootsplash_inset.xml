@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/bootsplash_logo"
+    android:insetLeft="7dp"
+    android:insetRight="7dp"
+    android:insetTop="7dp"
+    android:insetBottom="7dp" />

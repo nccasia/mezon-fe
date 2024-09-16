@@ -79,11 +79,11 @@ const MessageText = ({
 
 	return (
 		<>
-			{' '}
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
 					<div className="w-full">
 						<MessageLine
+							isEditted={showEditted}
 							isHideLinkOneImage={checkOneLinkImage}
 							isTokenClickAble={true}
 							isSearchMessage={isSearchMessage}
@@ -93,11 +93,6 @@ const MessageText = ({
 							mode={mode}
 						/>
 					</div>
-					{showEditted && (
-						<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-							(edited)
-						</p>
-					)}
 				</div>
 			) : null}
 		</>

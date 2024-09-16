@@ -32,7 +32,8 @@ export const style = (colors: Attributes) =>
 		titleServer: {
 			color: colors.text,
 			fontWeight: 'bold',
-			fontSize: size.s_15
+			fontSize: size.s_15, 
+			flexShrink: 1
 		},
 
 		infoHeader: {

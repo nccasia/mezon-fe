@@ -5,7 +5,8 @@ import {
 	selectChannelById,
 	selectDirectById,
 	selectIdMessageRefEdit,
-	selectOpenEditMessageState
+	selectOpenEditMessageState,
+	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -24,7 +25,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [message.attachments]);
 
 	const selectedChannel = useSelector(selectChannelById(channelId));
-	const selectedDirect = useSelector(selectDirectById(channelId));
+	const selectedDirect = useAppSelector((state) => selectDirectById(state, channelId));
 
 	const currentDirectOrChannel = useMemo(() => {
 		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {

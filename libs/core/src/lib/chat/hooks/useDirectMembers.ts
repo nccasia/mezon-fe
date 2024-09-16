@@ -1,13 +1,12 @@
-import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { ChannelMembersEntity, selectAllChannelMembers, useAppSelector } from '@mezon/store';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export type useDirectMembersOptions = {
 	channelId?: string | null;
 };
 
 export function useDirectMembers({ channelId }: useDirectMembersOptions = {}) {
-	const rawMembers = useSelector(selectMembersByChannelId(channelId as string));
+	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
 
 	const members = useMemo(() => {
 		if (!rawMembers) {

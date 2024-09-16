@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { View } from 'react-native';
 import MezonClanAvatar from '../MezonClanAvatar';
@@ -19,7 +19,7 @@ interface IMezonAvatarProps {
 }
 const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 	const { themeValue } = useTheme();
-	const { avatarUrl, username, width = 40, height = 40, userStatus, isBorderBoxImage, stacks, isShow = true } = props;
+	const { avatarUrl, username, width = size.s_40, height = size.s_40, userStatus, isBorderBoxImage, stacks, isShow = true } = props;
 	const styles = style(themeValue, height, width, stacks?.length);
 
 	if (!isShow) return (

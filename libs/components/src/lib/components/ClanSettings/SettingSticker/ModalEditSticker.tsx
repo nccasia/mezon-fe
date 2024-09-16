@@ -1,3 +1,4 @@
+import { useEscapeKey } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
@@ -57,6 +58,11 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
+			if (e.target.files[0]?.size > limitSize) {
+				setOpenModal(true);
+				return;
+			}
+
 			const srcPreview = URL.createObjectURL(e.target.files[0]);
 			setEditingGraphic({
 				...editingGraphic,
@@ -110,10 +116,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			setOpenModalType(true);
 			return;
 		}
-		if (file.size > limitSize) {
-			setOpenModal(true);
-			return;
-		}
+
 		const category = isSticker ? 'Among Us' : 'Custom';
 		const id = Snowflake.generate();
 		const path = (isSticker ? 'stickers/' : 'emojis/') + id + '.webp';
@@ -155,6 +158,8 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 	const validateSaveChange = useMemo(() => {
 		return !(editingGraphic.fileName && editingGraphic.shortname && editingGraphic.shortname !== graphic?.shortname);
 	}, [editingGraphic.fileName, editingGraphic.shortname, graphic?.shortname]);
+
+	useEscapeKey(handleCloseModal);
 
 	return (
 		<>

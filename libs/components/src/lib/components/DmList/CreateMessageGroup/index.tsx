@@ -1,13 +1,13 @@
 import { useAppNavigation, useFriends } from '@mezon/core';
 import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
+import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
-import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 
 type CreateMessageGroupProps = {
 	isOpen: boolean;
@@ -28,10 +28,12 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 	const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 	const boxRef = useRef<HTMLDivElement | null>(null);
 
-	const { filteredFriends } = useFriends();
+	const { filteredFriends, numberMemberInDmGroup } = useFriends();
 
-	const listFriends = filteredFriends(searchTerm.trim().toUpperCase(),currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM)
-
+	const listFriends = filteredFriends(
+		searchTerm.trim().toUpperCase(),
+		currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM
+	);
 
 	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
@@ -58,8 +60,8 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 				channelId: currentDM?.channel_id as string,
 				clanId: currentDM?.clan_id as string,
 				userIds: listAdd.user_ids ?? [],
-				channelType: currentDM?.type,
-			}),
+				channelType: currentDM?.type
+			})
 		);
 		onClose();
 	};
@@ -72,7 +74,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
-			user_ids: listGroupDM,
+			user_ids: listGroupDM
 		};
 		if (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			handleAddMemberToGroupChat(bodyCreateDmGroup);
@@ -137,7 +139,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 
 		boxRef.current.scroll({
 			top: Math.min(newScrollTop, maxScrollTop),
-			behavior: 'smooth',
+			behavior: 'smooth'
 		});
 
 		setIdActive(newItem.id ?? '');
@@ -157,7 +159,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 
 		boxRef.current.scroll({
 			top: Math.min(Math.max(newScrollTop, 0), maxScrollTop),
-			behavior: 'smooth',
+			behavior: 'smooth'
 		});
 
 		setIdActive(newItem.id ?? '');
@@ -177,13 +179,18 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 			setIdActive(listFriends[0].id);
 		}
 	}, [searchTerm]);
-  const numberCanAdd = useMemo(()=>{
-    if(currentDM?.type !== ChannelType.CHANNEL_TYPE_GROUP){
-      return friends.length > GROUP_CHAT_MAXIMUM_MEMBERS ? GROUP_CHAT_MAXIMUM_MEMBERS : friends.length;
-    }
-    const numberMemberInDM = (friends.length - listFriends.length);
-    return numberMemberInDM < GROUP_CHAT_MAXIMUM_MEMBERS ? (GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDM > listFriends.length ? listFriends.length : GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDM ) : 0;
-  },[friends])
+
+	const numberCanAdd = useMemo(() => {
+		if (currentDM?.type !== ChannelType.CHANNEL_TYPE_GROUP) {
+			return friends.length > GROUP_CHAT_MAXIMUM_MEMBERS ? GROUP_CHAT_MAXIMUM_MEMBERS : friends.length;
+		}
+
+		return numberMemberInDmGroup < GROUP_CHAT_MAXIMUM_MEMBERS
+			? GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDmGroup > listFriends.length
+				? listFriends.length
+				: GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDmGroup
+			: 0;
+	}, [friends]);
 	return (
 		<div
 			onMouseDown={(e) => e.stopPropagation()}
@@ -235,6 +242,10 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 											value={friend.id}
 											checked={selectedFriends.includes(friend?.id || '')}
 											onChange={handleCheckboxChange}
+											disabled={
+												numberMemberInDmGroup === GROUP_CHAT_MAXIMUM_MEMBERS ||
+												selectedFriends.length === GROUP_CHAT_MAXIMUM_MEMBERS
+											}
 											className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
 										/>
 										<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />

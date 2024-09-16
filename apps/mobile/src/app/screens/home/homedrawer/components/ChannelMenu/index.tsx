@@ -1,6 +1,8 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useReference, useUserPermission } from '@mezon/core';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useCategory, useUserPermission } from '@mezon/core';
 import {
+	ENotificationActive,
+	ENotificationChannelId,
 	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
@@ -9,10 +11,18 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, selectCurrentClan, threadsActions, useAppDispatch } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	getStoreAsync,
+	notificationSettingActions,
+	selectCurrentChannelNotificatonSelected,
+	selectCurrentClan,
+	threadsActions,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { MutableRefObject, useMemo, useState } from 'react';
+import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -23,10 +33,11 @@ import { style } from './styles';
 interface IChannelMenuProps {
 	inviteRef: MutableRefObject<any>;
 	channel: ChannelThreads;
+	notifySettingRef: MutableRefObject<BottomSheetModal>;
 }
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
-export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
+export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IChannelMenuProps) {
 	const { t } = useTranslation(['channelMenu']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -36,7 +47,16 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const dispatch = useAppDispatch();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 	const { categorizedChannels } = useCategory();
+	useEffect(() => {
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
+	}, []);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 
+	const isChannelUnmute = useMemo(() => {
+		return (
+			getNotificationChannelSelected?.active === ENotificationActive.ON || getNotificationChannelSelected?.id === ENotificationChannelId.Default
+		);
+	}, [getNotificationChannelSelected]);
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);
 	}, [channel?.threads]);
@@ -81,15 +101,44 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		// },
 	];
 
+	const muteOrUnMuteChannel = (active: ENotificationActive) => {
+		const body = {
+			channel_id: channel?.channel_id || '',
+			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+			clan_id: currentClan?.clan_id || '',
+			active
+		};
+		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+	};
+
 	const notificationMenu: IMezonMenuItemProps[] = [
 		{
-			title: isChannel ? t('menu.notification.muteCategory') : t('menu.notification.muteThread'),
-			onPress: () => reserve(),
-			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />
+			title: isChannel
+				? `${isChannelUnmute ? t('menu.notification.muteChannel') : t('menu.notification.unMuteChannel')}`
+				: `${isChannelUnmute ? t('menu.notification.muteThread') : t('menu.notification.unMuteThread')}`,
+			onPress: () => {
+				if (!isChannelUnmute) {
+					muteOrUnMuteChannel(ENotificationActive.ON);
+				} else {
+					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+						screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
+						params: { currentChannel: channel }
+					});
+				}
+				dismiss();
+			},
+			icon: isChannelUnmute ? (
+				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
+			) : (
+				<Icons.BellSlashIcon color={themeValue.textStrong} />
+			)
 		},
 		{
 			title: t('menu.notification.notification'),
-			onPress: () => reserve(),
+			onPress: () => {
+				notifySettingRef?.current?.present();
+				dismiss();
+			},
 			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />
 		}
 	];

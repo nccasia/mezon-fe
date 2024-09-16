@@ -3,7 +3,7 @@ import { useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo } from 'react';
-import { FlatList, Pressable } from 'react-native';
+import { FlatList, LayoutAnimation, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
 import { EMessageActionType } from '../../screens/home/homedrawer/enums';
@@ -34,7 +34,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 			if (keyword === null || !listMentions.length) {
 				return [];
 			}
-
+			LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
 			const mentionSearchText = keyword?.toLocaleLowerCase();
 
 			const filterMatchedMentions = (mentionData: MentionDataProps) => {
@@ -98,6 +98,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directMessageId || ''));
 	const listChannelsMention = useMemo(() => {
 		let channelsMention = [];
+		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
 		if ([ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
 			channelsMention = commonChannelDms;
 		} else {
@@ -149,9 +150,14 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const dispatch = useAppDispatch();
 
-	if (!keyword) {
-		return;
-	}
+	const formattedEmojiList = useMemo(() => {
+		if (!keyword) {
+			return [];
+		}
+		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
+		return emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20);
+	}, [keyword, emojiListPNG]);
+
 	const handleEmojiSuggestionPress = (emoji: any) => {
 		const emojiItemName = `:${emoji?.shortname?.split?.(':')?.join('')}:`;
 		onSelect({
@@ -170,7 +176,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
+			data={formattedEmojiList}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
 					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />

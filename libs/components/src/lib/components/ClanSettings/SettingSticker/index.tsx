@@ -1,8 +1,8 @@
 import { useEscapeKey } from '@mezon/core';
-import { selectAllStickerSuggestion, selectCurrentClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClanId, selectStickerByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
 import ModalSticker, { EGraphicType } from './ModalEditSticker';
@@ -11,8 +11,9 @@ import SettingStickerItem from './SettingStickerItem';
 const SettingSticker = () => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
 	const [editSticker, setEditSticker] = useState<ClanSticker | null>(null);
-	const listSticker = useSelector(selectAllStickerSuggestion);
 	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const listSticker = useSelector(selectStickerByClanId(currentClanId));
+
 	const dispatch = useAppDispatch();
 	const handleUpdateSticker = (sticker: ClanSticker) => {
 		setEditSticker(sticker);
@@ -29,9 +30,6 @@ const SettingSticker = () => {
 		setShowModalSticker(true);
 		dispatch(settingClanStickerActions.openModalInChild());
 	};
-	useEffect(() => {
-		dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId }));
-	}, []);
 
 	useEscapeKey(handleCloseModal);
 

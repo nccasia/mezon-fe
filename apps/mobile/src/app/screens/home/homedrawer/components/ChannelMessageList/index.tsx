@@ -1,23 +1,23 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, useAppDispatch, channelMetaActions } from '@mezon/store';
-import React, { useCallback } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { channelMetaActions, MessagesEntity, useAppDispatch } from '@mezon/store';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { style } from './styles';
+import { FlashList } from '@shopify/flash-list';
 
 interface IChannelListMessageProps {
-	flatListRef: React.RefObject<FlatList<MessagesEntity>>;
+	flatListRef: React.RefObject<FlashList<MessagesEntity>>;
 	messages: MessagesEntity[];
 	handleScroll: (event) => void;
 	renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
 	onLoadMore: (direction: ELoadMoreDirection) => void;
 	isLoadMore: boolean;
-	hasMoreMessage: boolean;
 }
 
 const ChannelListMessage = React.memo(
-	({ flatListRef, messages, handleScroll, renderItem, onLoadMore, isLoadMore, hasMoreMessage }: IChannelListMessageProps) => {
+	({ flatListRef, messages, handleScroll, renderItem, onLoadMore, isLoadMore }: IChannelListMessageProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
@@ -37,40 +37,45 @@ const ChannelListMessage = React.memo(
 			);
 		};
 
+		const isCannotLoadMore = useMemo(() => {
+			const lastMessage = messages?.[messages?.length - 1];
+			
+			return lastMessage?.sender_id === '0' && !lastMessage?.content?.t && lastMessage?.username === 'system';
+		}, [messages?.[messages?.length - 1]])
+		
 		return (
-			<FlatList
+			<FlashList
 				ref={flatListRef}
 				inverted
+				showsVerticalScrollIndicator={false}
 				data={messages || []}
 				onScroll={handleScroll}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
-				removeClippedSubviews={true}
+				removeClippedSubviews={false}
 				keyExtractor={keyExtractor}
 				onEndReached={
-					messages?.length
+					messages?.length && !isCannotLoadMore
 						? () => {
 								onLoadMore(ELoadMoreDirection.top);
 							}
 						: undefined
 				}
 				onEndReachedThreshold={0.1}
-				initialNumToRender={20}
-				maxToRenderPerBatch={10}
-				windowSize={21}
+				estimatedItemSize={100}
 				scrollEventThrottle={60}
 				viewabilityConfig={{
 					itemVisiblePercentThreshold: 50,
 					minimumViewTime: 500
 				}}
 				// ListHeaderComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
-				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
+				ListFooterComponent={isLoadMore && !isCannotLoadMore ? <ViewLoadMore /> : null}
 			/>
 		);
 	},
 	(prev, curr) => {
-		return prev.hasMoreMessage === curr.hasMoreMessage && prev.isLoadMore === curr.isLoadMore && isEqual(prev.messages, curr.messages);
+		return prev.isLoadMore === curr.isLoadMore && isEqual(prev.messages, curr.messages);
 	}
 );
 

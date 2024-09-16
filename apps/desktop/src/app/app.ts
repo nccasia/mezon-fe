@@ -16,7 +16,7 @@ export default class App {
 	// be closed automatically when the JavaScript object is garbage collected.
 	static mainWindow: Electron.BrowserWindow;
 	static application: Electron.App;
-	static BrowserWindow;
+	static BrowserWindow: typeof Electron.BrowserWindow;
 
 	public static isDevelopmentMode() {
 		const isEnvironmentSet: boolean = 'ELECTRON_IS_DEV' in process.env;
@@ -51,6 +51,11 @@ export default class App {
 	private static onActivate() {
 		if (App.mainWindow === null) {
 			App.onReady();
+		}
+
+		// reopen window after soft quit on macos
+		if (process.platform === 'darwin' && !App.mainWindow?.isVisible()) {
+			App.mainWindow?.show();
 		}
 	}
 
@@ -95,6 +100,7 @@ export default class App {
 
 				if (App.mainWindow) {
 					if (App.mainWindow.isMinimized()) App.mainWindow.restore();
+					App.mainWindow.show();
 					App.mainWindow.focus();
 				}
 			});

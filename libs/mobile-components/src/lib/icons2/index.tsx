@@ -1458,3 +1458,11 @@ export function BravePermission({ width = 20, height = 20, color = 'white', ...p
 		</Svg>
 	);
 }
+
+export function SlashIcon({ width = 20, height = 20, color = 'white', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 16 24" fill="none" {...props}>
+			<Path d="M16 .64L13.026 0 0 23.36l2.974.64L16 .64z" fill={color} />
+		</Svg>
+	);
+}

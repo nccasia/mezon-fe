@@ -130,9 +130,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 					errorMessage={t('fields.channelName.errorMessage')}
 					placeHolder={t('fields.channelName.placeholder')}
 				/>
-
-				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} />
-
+				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
 				<MezonMenu menu={menuPrivate} />
 			</ScrollView>
 		</View>

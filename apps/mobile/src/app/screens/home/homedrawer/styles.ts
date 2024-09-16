@@ -693,5 +693,37 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	iconBell: {
 		paddingRight: size.s_14,
+	},
+	friendActions:{
+		flexDirection: 'row',
+		gap: size.s_10,
+	},
+	addFriendButton: {
+		backgroundColor: Colors.green,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: size.s_12,
+		paddingVertical: size.s_6,
+		borderRadius: size.s_16
+	},
+	deleteFriendButton: {
+		backgroundColor: Colors.vividScarlet,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: size.s_12,
+		paddingVertical: size.s_6,
+		borderRadius: size.s_16
+	},
+	blockButton: {
+		backgroundColor: colors.channelNormal,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: size.s_12,
+		paddingVertical: size.s_6,
+		borderRadius: size.s_16
+	},
+	buttonText: {
+		fontSize: size.s_14,
+		color: Colors.white
 	}
 });

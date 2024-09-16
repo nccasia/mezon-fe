@@ -1,7 +1,6 @@
 import { useCategory, useEscapeKey } from '@mezon/core';
 import { channelsActions, selectCurrentClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { ICategoryChannel } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -39,11 +38,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 				<Events />
 			</div>
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
-			<div
-				className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ${channelCurrentType === ChannelType.CHANNEL_TYPE_VOICE ? 'pb-[230px]' : 'pb-[120px]'}`}
-			>
-				{memoizedCategorizedChannels}
-			</div>
+			<div className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide`}>{memoizedCategorizedChannels}</div>
 		</div>
 	);
 }

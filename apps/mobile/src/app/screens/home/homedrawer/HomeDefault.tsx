@@ -1,12 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RootState,
 	channelMembersActions,
 	selectAllClans,
-	selectChannelsEntities,
+	selectChannelById,
 	selectCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -32,6 +32,7 @@ const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
@@ -125,13 +126,16 @@ const HomeDefault = React.memo((props: any) => {
 				navigation={props.navigation}
 				currentChannel={currentChannel}
 				onOpenDrawer={onOpenDrawer}
+				parentChannelLabel={parent?.channel_label || ''}
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
+						parentId={currentChannel?.parrent_id}
 						clanId={currentChannel?.clan_id}
-						isPublic={!currentChannel?.channel_private}
+						isPublic={currentChannel ? !currentChannel?.channel_private : false}
+						isParentPublic={parent ? !parent?.channel_private : false}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					<ChatBox
@@ -155,29 +159,21 @@ const HomeDefaultHeader = React.memo(
 		navigation,
 		currentChannel,
 		openBottomSheet,
-		onOpenDrawer
+		onOpenDrawer,
+		parentChannelLabel
 	}: {
 		navigation: any;
 		currentChannel: ChannelsEntity;
 		openBottomSheet: () => void;
 		onOpenDrawer: () => void;
+		parentChannelLabel: string;
 	}) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
-		const channelsEntities = useSelector(selectChannelsEntities);
-		const [channelOfThread, setChannelOfThread] = useState<ChannelsEntity>(null);
 		const { statusMute } = useStatusMuteChannel();
-
-		useEffect(() => {
-			if (!currentChannel?.parrent_id) {
-				setChannelOfThread(null);
-				return;
-			}
-			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
-		}, [currentChannel?.parrent_id, channelsEntities]);
 
 		const navigateToSearchPage = () => {
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
@@ -197,7 +193,7 @@ const HomeDefaultHeader = React.memo(
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadPlusIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
@@ -210,9 +206,9 @@ const HomeDefaultHeader = React.memo(
 											{currentChannel?.channel_label}
 										</Text>
 									</View>
-									{channelOfThread?.channel_label && (
+									{!!parentChannelLabel && (
 										<Text style={styles.channelHeaderLabel} numberOfLines={1}>
-											{channelOfThread?.channel_label}
+											{parentChannelLabel}
 										</Text>
 									)}
 								</View>

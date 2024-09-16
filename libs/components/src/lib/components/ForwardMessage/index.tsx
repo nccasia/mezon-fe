@@ -43,7 +43,8 @@ type ObjectSend = {
 	id: string;
 	type: number;
 	clanId?: string;
-	channel_label?: string;
+	channelLabel?: string;
+	isPublic: boolean;
 };
 const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const appearanceTheme = useSelector(selectTheme);
@@ -84,12 +85,13 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const handleCloseModal = () => {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
-	const handleToggle = (id: string, type: number, clanId?: string, channel_label?: string) => {
+	const handleToggle = (id: string, type: number, isPublic: boolean, clanId?: string, channelLabel?: string) => {
 		const existingIndex = selectedObjectIdSends.findIndex((item) => item.id === id && item.type === type);
 		if (existingIndex !== -1) {
 			setSelectedObjectIdSends((prevItems) => [...prevItems.slice(0, existingIndex), ...prevItems.slice(existingIndex + 1)]);
 		} else {
-			setSelectedObjectIdSends((prevItems) => [...prevItems, { id, type, clanId, channel_label }]);
+			console.log('ispulic', isPublic);
+			setSelectedObjectIdSends((prevItems) => [...prevItems, { id, type, clanId, channelLabel, isPublic }]);
 		}
 	};
 
@@ -112,6 +114,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		}
 
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
+			console.log('--', selectedObjectIdSend.type);
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
 					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, message);
@@ -126,7 +129,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
-						!currentChannel?.channel_private,
+						currentChannel ? !currentChannel.channel_private : false,
 						message
 					);
 				}
@@ -138,6 +141,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
+			console.log('ooo', selectedObjectIdSend);
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -147,7 +151,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
-					!currentChannel?.channel_private,
+					selectedObjectIdSend.isPublic,
 					selectedMessage
 				);
 			}
@@ -231,10 +235,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 				icon: '#',
 				type: item?.type ?? '',
 				clanId: item?.clan_id ?? '',
-				channel_label: item?.channel_label ?? '',
+				channelLabel: item?.channel_label ?? '',
 				lastSentTimeStamp: item.last_sent_message?.timestamp_seconds,
 				typeSearch: TypeSearch.Channel_Type,
-				prioritizeName: item?.channel_label ?? ''
+				prioritizeName: item?.channel_label ?? '',
+				isPublic: item ? !item.channel_private : false
 			};
 		});
 		return list;

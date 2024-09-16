@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
+// eslint-disable-next-line @typescript-eslint/no-absolute-imports
 import { EAddFriendBy, EAddFriendWays } from '../../../enum';
 import { style } from './styles';
 

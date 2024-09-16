@@ -1,4 +1,12 @@
-import { messagesActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, useAppDispatch } from '@mezon/store';
+import {
+	messagesActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDirectById,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
@@ -15,7 +23,7 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { directId } = useAppParams();
 	const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
-	const direct = useSelector(selectDirectById(directId || (isDM && channelId) || ''));
+	const direct = useAppSelector((state) => selectDirectById(state, directId || (isDM && channelId) || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(channel?.parrent_id || ''));

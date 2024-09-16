@@ -5,13 +5,16 @@ import { FixedSizeList as List } from 'react-window';
 import MemberItem from './MemberItem';
 
 type ListMemberProps = {
-	lisMembers: ({ offlineSeparate: boolean } | ChannelMembersEntity)[];
+	lisMembers: ({ offlineSeparate: boolean } | { onlineSeparate: boolean } | ChannelMembersEntity)[];
 	offlineCount?: number;
+	onlineCount?: number;
 };
 
+const heightTopBar = 60;
+
 const ListMember = (props: ListMemberProps) => {
-	const { lisMembers, offlineCount } = props;
-	const [height, setHeight] = useState(window.innerHeight);
+	const { lisMembers, offlineCount, onlineCount } = props;
+	const [height, setHeight] = useState(window.innerHeight - heightTopBar);
 
 	useEffect(() => {
 		const handleResize = () => setHeight(window.innerHeight);
@@ -22,8 +25,12 @@ const ListMember = (props: ListMemberProps) => {
 	const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
 		const user = lisMembers[index];
 		return (
-			<div style={style} className="flex items-center">
-				{'offlineSeparate' in user ? (
+			<div style={style} className="flex items-center px-4">
+				{'onlineSeparate' in user ? (
+					<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+						Member - {onlineCount}
+					</p>
+				) : 'offlineSeparate' in user ? (
 					<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 						Offline - {offlineCount}
 					</p>
@@ -35,6 +42,7 @@ const ListMember = (props: ListMemberProps) => {
 						listProfile={true}
 						isOffline={!user?.user?.online}
 						positionType={MemberProfileType.MEMBER_LIST}
+						isDM={false}
 					/>
 				)}
 			</div>
@@ -42,7 +50,7 @@ const ListMember = (props: ListMemberProps) => {
 	};
 
 	return (
-		<List height={height} itemCount={lisMembers.length} itemSize={58} width={'100%'} className="custom-member-list">
+		<List height={height} itemCount={lisMembers.length} itemSize={48} width={'100%'} className="custom-member-list thread-scroll">
 			{Row}
 		</List>
 	);

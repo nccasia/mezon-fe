@@ -1,5 +1,6 @@
 import { IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EEventStatus } from 'libs/components/src/lib/components/ChannelList/EventChannelModal/ModalCreate/itemEventManagement';
 import memoize from 'memoizee';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -8,6 +9,7 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
+	status?: string;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
@@ -61,6 +63,19 @@ type CreateEventManagementyload = {
 	logo: string;
 };
 
+export type EventManagementOnGogoing = {
+	address: string;
+	channel_id: string;
+	clan_id: string;
+	description: string;
+	end_time: Date;
+	event_id: string;
+	event_status: string;
+	logo: string;
+	start_time: Date;
+	title: string;
+};
+
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
@@ -109,12 +124,14 @@ export interface EventManagementState extends EntityState<EventManagementEntity,
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
+	ongoingEvent: EventManagementOnGogoing | null;
 }
 
 export const initialEventManagementState: EventManagementState = eventManagementAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	chooseEvent: null
+	chooseEvent: null,
+	ongoingEvent: null
 });
 
 export const eventManagementSlice = createSlice({
@@ -129,6 +146,25 @@ export const eventManagementSlice = createSlice({
 		},
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
+		},
+		updateStatusEvent: (state, action) => {
+			eventManagementAdapter.updateOne(state, {
+				id: action.payload.event_id,
+				changes: {
+					status: action.payload.event_status
+				}
+			});
+
+			if (action.payload.event_status === EEventStatus.ONGOING && state.ongoingEvent === null) {
+				state.ongoingEvent = action.payload;
+			}
+
+			if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
+				state.ongoingEvent = null;
+			}
+		},
+		clearOngoingEvent: (state, action) => {
+			state.ongoingEvent = null;
 		}
 	},
 	extraReducers: (builder) => {
@@ -168,3 +204,5 @@ export const selectEventManagementEntities = createSelector(getEventManagementSt
 export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
+
+export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);

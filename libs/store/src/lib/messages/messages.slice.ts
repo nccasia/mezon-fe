@@ -1,10 +1,8 @@
-import { handleUploadFile } from '@mezon/transport';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
 	Direction_Mode,
 	EMessageCode,
-	EMimeTypes,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -13,7 +11,8 @@ import {
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
-	fetchAndCreateFiles
+	getMobileUploadedAttachments,
+	getWebUploadedAttachments
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -73,11 +72,13 @@ export interface MessagesEntity extends IMessageWithUser {
 	hideEditted?: boolean;
 }
 
-export type UserTypingState = {
-	userId: string;
-	channelId: string;
-	isTyping: boolean;
+export interface UserTypingState {
+	id: string;
 	timeAt: number;
+}
+
+export type ChannelTypingState = {
+	users: UserTypingState[];
 };
 
 export type FetchMessageParam = {
@@ -90,7 +91,7 @@ export interface MessagesState {
 	error?: string | null;
 	isSending?: boolean;
 	unreadMessagesEntries?: Record<string, string>;
-	typingUsers?: Record<string, UserTypingState>;
+	typingUsers?: Record<string, ChannelTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
 	openOptionMessageState: boolean;
 	firstMessageId: Record<string, string>;
@@ -424,6 +425,7 @@ type SendMessagePayload = {
 	isPublic: boolean;
 	isParentPublic: boolean;
 	avatar?: string;
+	isMobile?: boolean;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -441,7 +443,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		isParentPublic,
 		clanId,
 		senderId,
-		avatar
+		avatar,
+		isMobile = false
 	} = payload;
 	const id = Date.now().toString();
 
@@ -460,22 +463,11 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			let uploadedFiles: ApiMessageAttachment[] = [];
 			// Check if there are attachments
 			if (attachments && attachments.length > 0) {
-				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
-				const nonDirectAttachments = attachments.filter(
-					(att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon)
-				);
-
-				if (nonDirectAttachments.length > 0) {
-					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
-					const uploadPromises = createdFiles.map((file, index) => {
-						return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
-					});
-
-					const uploadedNonDirectFiles = await Promise.all(uploadPromises);
-					uploadedFiles = [...uploadedFiles, ...uploadedNonDirectFiles];
+				if (isMobile) {
+					uploadedFiles = await getMobileUploadedAttachments({ attachments, channelId, clanId, client, session });
+				} else {
+					uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
 				}
-
-				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
 			}
 
 			const res = await socket.writeChatMessage(
@@ -521,7 +513,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			channel_id: channelId,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
-			content: content,
+			content,
+			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
 			username: '',
@@ -584,7 +577,7 @@ export const updateTypingUsers = createAsyncThunk(
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
 		// after 30 seconds recalculate typing users
 		await sleep(TYPING_TIMEOUT + 100);
-		thunkAPI.dispatch(messagesActions.recheckTypingUsers());
+		thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
 	}
 );
 
@@ -736,7 +729,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hideEditted,
+							hideEditted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});
@@ -834,25 +827,35 @@ export const messagesSlice = createSlice({
 			};
 		},
 		setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
-			state.typingUsers = {
-				...state.typingUsers,
-				[buildTypingUserKey(action.payload.channelId, action.payload.userId)]: {
-					channelId: action.payload.channelId,
-					isTyping: action.payload.isTyping,
-					timeAt: Date.now(),
-					userId: action.payload.userId
-				}
-			};
-		},
-		recheckTypingUsers: (state) => {
-			const now = Date.now();
-			const typingUsers = { ...state.typingUsers };
-			for (const key in typingUsers) {
-				if (now - typingUsers[key].timeAt > TYPING_TIMEOUT) {
-					delete typingUsers[key];
-				}
+			const { channelId, userId } = action.payload || {};
+			const found = state.typingUsers?.[channelId]?.users?.find((user) => user.id === userId);
+			if (found) {
+				found.timeAt = Date.now();
+				return;
 			}
-			state.typingUsers = typingUsers;
+
+			const user = {
+				id: userId,
+				timeAt: Date.now()
+			};
+
+			if (!state.typingUsers?.[channelId]) {
+				state.typingUsers = {};
+				state.typingUsers[channelId] = {
+					users: []
+				};
+			}
+
+			state.typingUsers[channelId].users.push(user);
+		},
+		recheckTypingUsers: (state, action) => {
+			const { channelId, userId } = action.payload || {};
+			if (!channelId) return;
+			const typingUsers = state?.typingUsers?.[channelId];
+			if (typingUsers?.users?.some((item) => item.id === userId)) {
+				const now = Date.now();
+				typingUsers.users = typingUsers.users.filter((item) => now - item.timeAt < TYPING_TIMEOUT);
+			}
 		},
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
@@ -935,8 +938,8 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state, action) => {
-				const channelId = action?.meta?.arg?.channel_id;
+			.addMatcher(isAnyOf(sendMessage.fulfilled, sendMessage.rejected), (state, action) => {
+				const channelId = action?.meta?.arg?.channelId;
 				state.isJumpingToPresent[channelId] = true;
 			});
 	}
@@ -981,6 +984,8 @@ export const messagesActions = {
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
 
+export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
+
 export const selectAllMessages = createSelector(getMessagesState, (messageState) => {
 	const res: MessagesEntity[] = [];
 	Object.values(messageState.channelMessages || {}).forEach((item) => {
@@ -1014,21 +1019,12 @@ export const selectMessagesEntities = createSelector(getMessagesState, (messageS
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
-export const selectMessageByChannelId = (channelId?: string | null) =>
-	createSelector(getMessagesState, (messagesState) => {
-		const messages = channelId && messagesState.channelMessages[channelId] ? Object.values(messagesState.channelMessages[channelId]) : [];
-		return messages.slice().sort(orderMessageByDate);
-	});
-
-export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
-	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.filter((message) => message.sender_id === senderId);
-	});
-
-export const selectLastMessageByChannelId = (channelId?: string | null) =>
-	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.shift();
-	});
+export const selectMessagesEntityById = createSelector(
+	[getMessagesState, getChannelIdAsSecondParam, (_, channelId) => channelId],
+	(messagesState, channelId) => {
+		return messagesState.channelMessages[channelId]?.entities;
+	}
+);
 
 export const selectUnreadMessageEntries = createSelector(getMessagesState, (state) => state.unreadMessagesEntries);
 
@@ -1039,28 +1035,13 @@ export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
 
 export const selectTypingUsers = createSelector(getMessagesState, (state) => state.typingUsers);
 
-export const selectTypingUsersList = createSelector(selectTypingUsers, (typingUsers) => {
-	return typingUsers && Object.values(typingUsers);
+export const selectTypingUsersById = createSelector([getMessagesState, (_state, channelId: string) => channelId], (state, channelId) => {
+	return state?.typingUsers?.[channelId];
 });
 
-export const selectTypingUserIds = createSelector(selectTypingUsersList, (typingUsers) => {
-	return typingUsers?.map((u) => u.userId);
+export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersById], (typingUsers) => {
+	return typingUsers?.users;
 });
-
-export const selectTypingUserIdsByChannelId = (channelId: string) =>
-	createSelector(selectTypingUsersList, (typingUsers) => {
-		return typingUsers?.filter((user) => user.channelId === channelId).map((u) => u.userId);
-	});
-
-export const selectTypingUsersListByChannelId = (channelId: string) =>
-	createSelector(selectTypingUsersList, (typingUsers) => {
-		return typingUsers?.filter((user) => user.channelId === channelId);
-	});
-
-export const selectTypingUserById = (userId: string) =>
-	createSelector(selectTypingUsers, (typingUsers) => {
-		return typingUsers?.[userId];
-	});
 
 export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
 export const selectParamByChannelId = (channelId: string) =>
@@ -1114,8 +1095,6 @@ export const createCachedSelector = createSelectorCreator({
 	argsMemoize: weakMapMemoize
 });
 
-export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
-
 export const selectMessageParamsByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param[channelId];
@@ -1145,6 +1124,16 @@ export const selectAllMessagesByChannelId = createCachedSelector([getMessagesSta
 
 export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState?.channelMessages[channelId]?.ids || emptyArray;
+});
+
+export const selectMessagesByChannel = createSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState?.channelMessages?.[channelId];
+});
+
+export const selectLastMessageByChannelId = createSelector([selectMessagesByChannel], (channelMessages) => {
+	if (!channelMessages?.ids?.length) return null;
+	const { ids, entities } = channelMessages;
+	return entities[ids[ids.length - 1]];
 });
 
 export const selectMessageEntityById = createCachedSelector(

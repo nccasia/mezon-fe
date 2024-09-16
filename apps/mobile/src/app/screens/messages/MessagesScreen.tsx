@@ -2,13 +2,22 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
+import { selectIsUnreadDMById, useAppSelector } from '@mezon/store';
+import {
+	DirectEntity,
+	RootState,
+	directActions,
+	getStoreAsync,
+	selectAllClans,
+	selectDirectsOpenlist,
+	selectTypingUserIdsByChannelId
+} from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AppState, FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
@@ -28,7 +37,8 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
-	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
+	const hasUserTyping = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessage?.channel_id));
+	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
 	const redirectToMessageDetail = () => {
@@ -54,7 +64,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage]} numberOfLines={1}>
+				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]} numberOfLines={1}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 					{'attachment '}
@@ -65,7 +75,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		return (
 			<View style={styles.contentMessage}>
-				<Text style={[styles.defaultText, styles.lastMessage]}>
+				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
 				{!!content && (
@@ -73,6 +83,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 						isOpenLink={false}
 						isHiddenHashtag={true}
 						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+						isUnReadChannel={isUnReadChannel}
 					/>
 				)}
 			</View>
@@ -140,6 +151,26 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const searchInputRef = useRef(null);
+
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, []);
+
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'active') {
+			try {
+				const store = await getStoreAsync();
+				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			} catch (error) {
+				console.log('error messageLoaderBackground', error);
+			}
+		}
+	};
 
 	const sortDM = (a, b) => {
 		const timestampA = parseFloat(a.last_sent_message?.timestamp_seconds || '0');
@@ -180,6 +211,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		setDirectMessageSelected(directMessage);
 	}, []);
 
+	const clearTextInput = () => {
+		if (searchInputRef?.current) {
+			searchInputRef.current.clear();
+			setSearchText('');
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
@@ -193,11 +231,17 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.searchMessage}>
 				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
+					ref={searchInputRef}
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
+				{!!searchText?.length && (
+					<Pressable onPress={clearTextInput}>
+						<Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+					</Pressable>
+				)}
 			</View>
 			{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
 				<UserEmptyMessage

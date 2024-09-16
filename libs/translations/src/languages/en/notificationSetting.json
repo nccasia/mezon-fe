@@ -1,6 +1,9 @@
 {
   "bottomSheet": {
     "title": "Notification Settings",
+    "muteUntil": "You have muted this channel until",
+    "unMute": "Unmute",
+    "mute": "Mute",
     "labelOptions": {
       "reactionMessage": "Reaction Message",
       "categoryDefault": "Use Category Default",
@@ -21,6 +24,6 @@
       "forTwentyFourHours": "For 24 Hours",
       "untilTurnItBackOn": "Until turn it back on"
     },
-    "description": "You are receiving notifications from all messages in this clan, but you can override it here"
+    "description": "You are receiving notifications from all messages in this clan, but you can override it here",
   }
 }

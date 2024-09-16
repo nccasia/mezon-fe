@@ -6,6 +6,7 @@ import {
 	MessagesEntity,
 	directActions,
 	gifsStickerEmojiActions,
+	giveCoffeeActions,
 	messagesActions,
 	pinMessageActions,
 	reactionActions,
@@ -176,11 +177,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
-				clanId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
+				clanId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
 				parentId: currentChannel?.parrent_id ?? '',
-				channelId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
+				channelId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
-				isPublic: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+				isPublic: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
 				isParentPublic: parrent ? !parrent.channel_private : false,
 				mode: activeMode as number
 			})
@@ -325,6 +326,32 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'Add Reaction', // lable
 				() => console.log('add reaction'),
 				<Icons.RightArrowRightClick />
+			);
+		});
+
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'giveAcoffee', // id
+				'Give A Coffee', // lable
+
+				async () => {
+					try {
+						if (userId !== message.sender_id) {
+							dispatch(
+								giveCoffeeActions.updateGiveCoffee({
+									channel_id: message.channel_id,
+									clan_id: message.clan_id,
+									message_ref_id: message.id,
+									receiver_id: message.sender_id,
+									sender_id: userId,
+									token_count: 1
+								})
+							);
+						}
+					} catch (error) {
+						console.error('Failed to give cofffee message', error);
+					}
+				}
 			);
 		});
 
@@ -519,6 +546,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [
 		dispatch,
 		messageId,
+		message,
 		enableViewReactionItem,
 		enableEditMessageItem,
 		enableCreateThreadItem,

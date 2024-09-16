@@ -30,19 +30,17 @@ export const ChatMessageLeftArea = memo(
 		const styles = style(themeValue);
 		const navigation = useNavigation<any>();
 		return (
-			<Block flexDirection="row" gap={size.s_6}>
+			<Block flexDirection="row">
 				{isAvailableSending && !isShowAttachControl ? (
 					<TouchableOpacity style={[styles.btnIcon]} onPress={() => setIsShowAttachControl(!isShowAttachControl)}>
 						<Icons.ChevronSmallLeftIcon width={size.s_22} height={size.s_22} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				) : (
 					<>
-						<Block style={styles.btnIcon}>
-							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
-						</Block>
+						<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						{isShowCreateThread && (
 							<TouchableOpacity
-								style={[styles.btnIcon]}
+								style={[styles.btnIcon, { marginLeft: size.s_6 }]}
 								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}
 							>
 								<Icons.ThreadPlusIcon width={size.s_22} height={size.s_22} color={themeValue.textStrong} />

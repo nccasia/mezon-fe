@@ -121,9 +121,11 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
+								parentId: thread.parrent_id as string,
 								channelId: thread.channel_id as string,
 								channelType: thread.type as number,
-								isPublic: !thread.channel_private
+								isPublic: !thread.channel_private,
+								isParentPublic: currentChannel ? !currentChannel.channel_private : false
 							})
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
@@ -164,7 +166,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	return (
 		<KeyboardAvoidingView style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
-				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
+				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }}>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
 							<View style={{ marginHorizontal: 20 }}>

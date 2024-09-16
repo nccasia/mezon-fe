@@ -37,9 +37,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { createDirectMessageWithUser } = useDirect();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
-	const listUserInClan = useSelector(selectAllUsersByUser)
+	const listUserInClan = useSelector(selectAllUsersByUser);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1);
+	const listDM = dmGroupChatList.filter(
+		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
+	);
 
 	const dispatch = useAppDispatch();
 	const [idActive, setIdActive] = useState('');
@@ -59,7 +61,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
-						type: ChannelType.CHANNEL_TYPE_DM,
+						type: ChannelType.CHANNEL_TYPE_DM
 					};
 				})
 			: [];
@@ -72,16 +74,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
-						typeChat: TypeSearch.Dm_Type,
+						typeChat: TypeSearch.Dm_Type
 					};
 				})
 			: [];
-		const listSearch = [
-			...listDMSearch,
-			...listGroupSearch,
-		];
+		const listSearch = [...listDMSearch, ...listGroupSearch];
 		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
-		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, listUserInClan);
+		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, listUserInClan as any);
 		return addPropsIntoSearchList;
 	}, [accountId, listDM, listGroup, listUserInClan]);
 
@@ -100,7 +99,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
-				meeting_code: item.meeting_code,
+				meeting_code: item.meeting_code
 			};
 		});
 		return list;
@@ -110,7 +109,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const list = listUserInClan.map((item) => {
 			return {
 				id: item?.id ?? '',
-				prioritizeName: item?.display_name ??  "",
+				prioritizeName: item?.display_name ?? '',
 				name: item?.username ?? '',
 				avatarUser: item?.avatar_url ?? '',
 				displayName: item?.display_name ?? '',
@@ -131,8 +130,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					directActions.joinDirectMessage({
 						directMessageId: user.idDM,
 						channelName: '',
-						type: user?.type ?? ChannelType.CHANNEL_TYPE_DM,
-					}),
+						type: user?.type ?? ChannelType.CHANNEL_TYPE_DM
+					})
 				);
 				if (result) {
 					navigate(toDmGroupPageFromMainApp(user.idDM, user?.type ?? ChannelType.CHANNEL_TYPE_DM));
@@ -146,21 +145,21 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			}
 			onClose();
 		},
-		[createDirectMessageWithUser, navigate, onClose, toDmGroupPageFromMainApp],
+		[createDirectMessageWithUser, navigate, onClose, toDmGroupPageFromMainApp]
 	);
 
 	const handleSelectChannel = useCallback(
 		async (channel: any) => {
 			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				const directChannel = toChannelPage(channel.id, channel.clanId);
-				navigate(directChannel);
+				const channelUrl = toChannelPage(channel.id, channel.clanId);
+				navigate(channelUrl, { state: { focusChannel: { id: channel?.id, parentId: channel?.parrent_id } } });
 			} else {
 				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 				window.open(urlVoice, '_blank', 'noreferrer');
 			}
 			onClose();
 		},
-		[navigate, onClose, toChannelPage],
+		[navigate, onClose, toChannelPage]
 	);
 
 	const handleSelect = useCallback(
@@ -171,7 +170,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				await handleSelectMem(item);
 			}
 		},
-		[handleSelectMem, handleSelectChannel],
+		[handleSelectMem, handleSelectChannel]
 	);
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -220,11 +219,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
 
 	// Define a function to get the list to use based on the search text
-	const getListToUse = (
-		normalizeSearchText: string,
-		channelSearchSorted: SearchItemProps[],
-		totalListsSorted: SearchItemProps[],
-	) => {
+	const getListToUse = (normalizeSearchText: string, channelSearchSorted: SearchItemProps[], totalListsSorted: SearchItemProps[]) => {
 		if (normalizeSearchText.startsWith('#')) {
 			return channelSearchSorted;
 		}
@@ -285,7 +280,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 		boxRef.current.scroll({
 			top: Math.min(newScrollTop, maxScrollTop),
-			behavior: 'smooth',
+			behavior: 'smooth'
 		});
 
 		setIdActive(newItem.id ?? '');
@@ -305,7 +300,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 		boxRef.current.scroll({
 			top: Math.min(Math.max(newScrollTop, 0), maxScrollTop),
-			behavior: 'smooth',
+			behavior: 'smooth'
 		});
 
 		setIdActive(newItem.id ?? '');
@@ -367,7 +362,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={totalListMembersSorted.slice(0,50)}
+										listSearch={totalListMembersSorted.slice(0, 50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText}

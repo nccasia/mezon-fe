@@ -40,8 +40,12 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 			</div>
 			<p className="font-semibold dark:text-white text-textPrimaryLight">{sticker.shortname}</p>
 			<div className="flex items-end justify-center gap-1">
-				<img className="w-4 h-4 rounded-full select-none" src={dataAuthor.user?.avatar_url} alt="" />
-				<p className="dark:text-white text-textPrimaryLight max-w-20 truncate">{dataAuthor.user?.username}</p>
+				<img
+					className="w-4 h-4 rounded-full select-none object-cover"
+					src={dataAuthor?.user?.avatar_url ?? process.env.NX_LOGO_MEZON}
+					alt=""
+				/>
+				<p className="dark:text-white text-textPrimaryLight max-w-20 truncate">{dataAuthor?.user?.username}</p>
 			</div>
 			{hasDeleteOrEditPermission && (
 				<div className="group-hover:flex absolute flex-col right-[-12px] top-[-12px] gap-1 hidden select-none">

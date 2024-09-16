@@ -1,54 +1,33 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
-
-const UI_STABILITY_TIMEOUT = 1000;
+import { useCallback } from 'react';
+import { useAnchor } from './anchor';
 
 /**
  * React hook for keeping HTML element scroll at the bottom when content updates (if it is already at the bottom).
- * @param targetRef Reference of scrollable HTML element.
- * @param anchorRef Reference of anchor HTML element. Scroll would be kept at anchor until user scrolls.
+ * @param containerRef Reference of scrollable HTML element.
+ * @param contentRef Reference of anchor HTML element. Scroll would be kept at anchor until user scrolls.
  */
 export const useStickyScroll = (
-	targetRef: React.MutableRefObject<Element>,
-	anchorRef: React.MutableRefObject<Element>,
-	options?: IUseStickyScrollOptions
+	containerRef: React.MutableRefObject<Element>,
+	contentRef: React.MutableRefObject<Element>
 ): IUseStickyScrollResponse => {
-	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
+	const anchorRef = useAnchor(containerRef, contentRef);
 
 	/**
-	 * Scrolls to anchor.
+	 * Scrolls] to bottom
 	 */
-	const scrollToAnchor = useCallback(() => {
+	const scrollToBottom = useCallback(() => {
 		return new Promise<boolean>((resolve) => {
 			// ensure view rendered before scrolling
+			const element = containerRef.current;
+			if (!element) {
+				return resolve(false);
+			}
 			setTimeout(() => {
-				if (!anchorRef.current) {
-					return resolve(false);
-				}
-				anchorRef.current?.scrollIntoView();
+				containerRef.current.scrollTo(0, Number.MAX_SAFE_INTEGER);
 				resolve(true);
 			}, 0);
 		});
-	}, [anchorRef]);
-
-	const scrollToAnchorImmediately = useCallback(() => {
-		requestAnimationFrame(() => {
-			anchorRef.current?.scrollIntoView();
-		});
-	}, [anchorRef]);
-
-	useLayoutEffect(() => {
-		let shouldSCroll = true;
-		let scrollTimeoutId: NodeJS.Timeout | null = null;
-		if (targetRef.current && shouldSCroll) {
-			scrollToAnchorImmediately();
-		}
-		scrollTimeoutId && clearTimeout(scrollTimeoutId);
-		// assume 1s for the ui is stable
-		scrollTimeoutId = setTimeout(() => {
-			shouldSCroll = false;
-		}, UI_STABILITY_TIMEOUT);
-		return () => scrollTimeoutId && clearTimeout(scrollTimeoutId);
-	}, [targetRef, scrollToAnchorImmediately]);
+	}, [containerRef]);
 
 	/**
 	 * Scrolls to message with given id.
@@ -60,7 +39,7 @@ export const useStickyScroll = (
 				scrollTimeoutId && clearTimeout(scrollTimeoutId);
 				scrollTimeoutId = setTimeout(() => {
 					requestAnimationFrame(() => {
-						const messageElement = targetRef.current.querySelector(`#msg-${id}`);
+						const messageElement = containerRef.current.querySelector(`#msg-${id}`);
 						if (messageElement) {
 							messageElement.scrollIntoView({ behavior: 'instant' });
 							return resolve(true);
@@ -70,22 +49,21 @@ export const useStickyScroll = (
 				}, 0);
 			});
 		},
-		[targetRef]
+		[containerRef]
 	);
 
 	/**
 	 * Enables sticky scroll behavior.
 	 */
-	const enable = () => setEnabled(true);
+	const enable = () => anchorRef.current?.enable();
 
 	/**
 	 * Disables sticky scroll behavior.
 	 */
-	const disable = () => setEnabled(false);
+	const disable = () => anchorRef.current?.disable();
 
 	return {
-		enabled,
-		scrollToAnchor,
+		scrollToBottom,
 		scrollToMessage,
 		enable,
 		disable
@@ -113,33 +91,13 @@ export interface IChatScrollData {
 }
 
 /**
- * Accepted options for customizing useStickyScroll hook.
- */
-export interface IUseStickyScrollOptions {
-	/**
-	 * Defines whether sticky scroll behavior is enabled initially.
-	 */
-	enabled?: boolean;
-
-	/**
-	 * Defines sticky scroll threshold.
-	 */
-	threshold?: number;
-}
-
-/**
  * Flags and methods provided by useStickyScroll hook.
  */
 export interface IUseStickyScrollResponse {
 	/**
-	 * True when sticky scroll behavior is enabled.
-	 */
-	enabled: boolean;
-
-	/**
 	 * Scrolls to the anchor element.
 	 */
-	scrollToAnchor: () => Promise<boolean>;
+	scrollToBottom: () => Promise<boolean>;
 
 	/**
 	 * Scrolls to message with given id.

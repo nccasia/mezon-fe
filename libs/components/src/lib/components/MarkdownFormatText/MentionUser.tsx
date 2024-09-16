@@ -1,55 +1,68 @@
-import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllRolesClan, selectCurrentChannelId, selectMemberChannels, useAppSelector } from '@mezon/store';
-import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable @nx/enforce-module-boundaries */
+import { useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
+import { MouseButton, getNameForPrioritize } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
 type ChannelHashtagProps = {
-	tagName: string;
-	tagUserId: string;
+	tagUserName?: string;
+	tagUserId?: string;
 	mode?: number;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	tagRoleName?: string;
+	tagRoleId?: string;
 };
 
-const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
-	const panelRef = useRef<HTMLAnchorElement>(null);
+enum MentionType {
+	HERE = 'HERE',
+	ROLE_EXIST = 'ROLE_EXIST',
+	USER_EXIST = 'USER_EXIST'
+}
+
+type UserProfilePopupProps = {
+	userID: string;
+	channelId?: string;
+	mode?: number;
+	positionLeft: number;
+	positionTop: number;
+	positionBottom: boolean;
+	isDm?: boolean;
+};
+
+const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const memberChannels = useAppSelector((state) => selectMemberChannels(currentChannelId as string)(state));
-	const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
-	const [foundUser, setFoundUser] = useState<any>(null);
-	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-		e.stopPropagation();
-		e.preventDefault();
-	};
-
-	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = getRoleList(rolesInClan);
-
-	const matchingRole = useMemo(() => {
-		return roleList.find((role) => `@${role.roleName}` === tagName);
-	}, [tagName]);
-
-	const [userRemoveChar, setUserRemoveChar] = useState('');
-	const username = tagName.slice(1);
-
-	//TODO: fix it
-
-	useEffect(() => {
-		if (checkLastChar(username)) {
-			setUserRemoveChar(username.slice(0, -1));
-		} else {
-			setUserRemoveChar(username);
+	const displayToken = useMemo(() => {
+		if (tagRoleId) {
+			return {
+				display: tagRoleName,
+				type: MentionType.ROLE_EXIST
+			};
 		}
-		const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
-		if (user) {
-			setFoundUser(user);
-		} else {
-			setFoundUser(null);
+
+		if (tagUserName === '@here') {
+			return {
+				display: '@here',
+				type: MentionType.HERE
+			};
 		}
-	}, [tagName, userRemoveChar, mode, usersInChannel, memberChannels]);
+
+		if (tagUserId && tagUserName !== '@here') {
+			return {
+				display: tagUserName,
+				type: MentionType.USER_EXIST
+			};
+		}
+	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
+
+	const panelRef = useRef<HTMLButtonElement>(null);
+
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
+	const channelId = isDM ? currentDirectId : currentChannelId;
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -57,7 +70,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 	const [positionLeft, setPositionLeft] = useState(0);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === MouseButton.LEFT && tagName !== '@here') {
+		if (event.button === MouseButton.LEFT && tagUserName !== '@here') {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -83,55 +96,90 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 			}
 		}
 	};
+
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	useEscapeKey(() => setIsShowPanelChannel(false));
 
 	return (
 		<>
 			{showProfileUser && (
-				<div
-					className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
-					style={{
-						left: `${positionLeft}px`,
-						top: positionBottom ? '' : `${positionTop}px`,
-						bottom: positionBottom ? '64px' : ''
-					}}
-					onMouseDown={(e) => e.stopPropagation()}
-				>
-					<ShortUserProfile
-						userID={foundUser.user.id}
-						mode={mode}
-						avatar={foundUser?.clan_avatar}
-						name={foundUser?.clan_nick || foundUser?.user?.display_name || foundUser?.user?.username}
-					/>
-				</div>
+				<UserProfilePopup
+					userID={tagUserId ?? ''}
+					channelId={channelId ?? ''}
+					mode={mode}
+					positionLeft={positionLeft}
+					positionTop={positionTop}
+					positionBottom={positionBottom}
+					isDm={isDM}
+				/>
 			)}
-
-			{foundUser !== null || tagName === '@here' ? (
-				<>
-					<Link
-						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => { }}
-						ref={panelRef}
-						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => { }}
-						style={{ textDecoration: 'none' }}
-						to={''}
-						className={`font-medium px-0.1 rounded-sm
-				${tagName === '@here' ? 'cursor-text' : isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-
+			{displayToken?.type === MentionType.ROLE_EXIST && (
+				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`${displayToken.display}`}</span>
+			)}
+			{displayToken?.type === MentionType.HERE && (
+				<span
+					className={`font-medium px-0.1 rounded-sm 'cursor-text'
+					${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
+	
+					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+				>
+					{displayToken.display}
+				</span>
+			)}
+			{displayToken?.type === MentionType.USER_EXIST && (
+				<button
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
+					ref={panelRef}
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					style={{ textDecoration: 'none' }}
+					className={`font-medium px-0.1 rounded-sm
+				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
-					>
-						{foundUser?.clan_nick || foundUser?.user?.display_name || foundUser?.user?.username || '@here'}
-					</Link>
-					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
-				</>
-			) : matchingRole ? (
-				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`@${matchingRole.roleName}`}</span>
-			) : (
-				<span>{tagName}</span>
+				>
+					{displayToken.display}
+				</button>
 			)}
 		</>
 	);
 };
 
 export default memo(MentionUser);
+
+const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, positionBottom, isDm }: UserProfilePopupProps) => {
+	const getUserByUserId = useAppSelector((state) =>
+		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
+	)[0];
+	const prioritizeName = getNameForPrioritize(
+		getUserByUserId.clan_nick ?? '',
+		getUserByUserId.user?.display_name ?? '',
+		getUserByUserId.user?.username ?? ''
+	);
+	const prioritizeAvt = getUserByUserId.clan_avatar ? getUserByUserId.clan_avatar : getUserByUserId.user?.avatar_url;
+
+	const updatedUserByUserId = {
+		...getUserByUserId,
+		prioritizeName,
+		prioritizeAvt
+	};
+
+	return (
+		<div
+			className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
+			style={{
+				left: `${positionLeft}px`,
+				top: positionBottom ? '' : `${positionTop}px`,
+				bottom: positionBottom ? '64px' : ''
+			}}
+			onMouseDown={(e) => e.stopPropagation()}
+		>
+			<ShortUserProfile
+				isDM={isDm}
+				userID={userID}
+				mode={mode}
+				avatar={updatedUserByUserId.prioritizeAvt}
+				name={updatedUserByUserId.prioritizeName}
+			/>
+		</div>
+	);
+};

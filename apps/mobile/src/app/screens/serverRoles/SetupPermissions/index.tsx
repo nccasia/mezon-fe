@@ -50,7 +50,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		(slug: string) => {
 			switch (slug) {
 				case EPermission.administrator:
-					return !isClanOwner;
+					return !isClanOwner || !isCanEditRole;
 				case EPermission.manageClan:
 					return (!isClanOwner && !userPermissionsStatus.hasAdministrator) || !isCanEditRole;
 				default:

@@ -16,6 +16,7 @@ export type ModalProps = {
 	borderBottomTitle?: string;
 	classNameWrapperChild?: string;
 	hasChannel?: IChannel;
+	isInviteModal?: boolean;
 };
 
 const Modal = (props: ModalProps) => {
@@ -31,13 +32,14 @@ const Modal = (props: ModalProps) => {
 		subTitleBox,
 		classSubTitleBox,
 		classNameWrapperChild,
-		hasChannel
+		hasChannel,
+		isInviteModal
 	} = props;
 	return (
 		showModal && (
 			<>
 				<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
-					<div className={`relative w-full max-w-[684px] sm:h-auto ${classNameBox}`}>
+					<div className={`relative w-full ${isInviteModal ? 'max-w-[480px]' : 'max-w-[684px]'} sm:h-auto ${classNameBox}`}>
 						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full dark:bg-bgPrimary bg-bgLightModeSecond  outline-none focus:outline-none h-full sm:h-auto">
 							<div className={`flex items-start justify-between p-4 border-solid dark:border-borderDefault border-b rounded-t`}>
 								<div>

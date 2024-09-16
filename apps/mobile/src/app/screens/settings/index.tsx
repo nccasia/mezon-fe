@@ -120,7 +120,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('accountSettings.QRScan'),
 			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
 		},
-	] satisfies IMezonMenuItemProps[], []);
+	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
 	const PaymentMenu = useMemo(() => [
 		{
@@ -141,7 +141,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('paymentSettings.restoreSubscription'),
 			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
 		},
-	] satisfies IMezonMenuItemProps[], []);
+	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
 	const AppMenu = useMemo(() => [
 		// {
@@ -207,7 +207,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		// 	title: t('appSettings.advanced'),
 		// 	icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 		// },
-	] satisfies IMezonMenuItemProps[], []);
+	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
 	const SupportMenu = useMemo(() => [
 		{
@@ -228,7 +228,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('supportSettings.acknowledgement'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	] satisfies IMezonMenuItemProps[], []);
+	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
 	const WhatsNew = useMemo(() => [
 		{
@@ -237,7 +237,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('whatsNew.whatsNew'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	] satisfies IMezonMenuItemProps[], []);
+	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
 	const LogOut = useMemo(() => [
 		{
@@ -279,7 +279,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		  return menu;
 		}
 		return filteredMenu;
-	}, [filteredMenu]);
+	}, [filteredMenu, themeValue.textStrong]);
 
 	const debouncedHandleSearchChange = useCallback(
 		debounce((text) =>{ 

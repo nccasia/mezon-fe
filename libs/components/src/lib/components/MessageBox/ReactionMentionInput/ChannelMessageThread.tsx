@@ -11,6 +11,7 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 	return (
 		<div className="mb-3">
 			<MessageWithUser
+				allowDisplayShortProfile={true}
 				message={message}
 				isMessNotifyMention={true}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}

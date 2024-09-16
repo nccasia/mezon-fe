@@ -1,7 +1,9 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { MessagesEntity } from '@mezon/store-mobile';
-import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
+import { RefObject } from 'react';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
 export interface IReplyBottomSheet {
@@ -54,12 +56,14 @@ export interface IMessageReactionProps {
 }
 
 export interface IDetailReactionBottomSheet {
+	bottomSheetRef: RefObject<BottomSheetModal>;
 	allReactionDataOnOneMessage: EmojiDataOptionals[];
 	emojiSelectedId: string | null;
 	userId: string | null;
 	onClose: () => void;
-	emojiListPNG?: IEmoji[];
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
+	onShowUserInformation?: (userId: string) => void;
+	channelId?: string;
 }
 export interface IPayloadThreadSendMessage {
 	content: IMessageSendPayload;

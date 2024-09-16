@@ -16,7 +16,8 @@
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings",
-        "threadSetting": "Thread Settings"
+        "threadSetting": "Thread Settings",
+        "permissionOverrides": "Permission Overrides"
     },
     "settingStack": {
         "settings": "Settings",

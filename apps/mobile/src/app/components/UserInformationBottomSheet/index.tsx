@@ -19,12 +19,15 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 	const bottomSheetRef = useRef(null);
 	const snapPoints = ['60%'];
 	useEffect(() => {
-		const showUserInfoBottomSheetListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
-			isHiddenBottomSheet && bottomSheetRef.current?.close();
-		});
+		const showUserInfoBottomSheetListener = DeviceEventEmitter.addListener(
+			ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET,
+			({ isHiddenBottomSheet }) => {
+				isHiddenBottomSheet && bottomSheetRef.current?.close();
+			}
+		);
 		return () => {
 			showUserInfoBottomSheetListener.remove();
-		}
+		};
 	}, []);
 
 	useEffect(() => {

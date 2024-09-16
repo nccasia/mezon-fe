@@ -21,6 +21,12 @@ export enum EOptionOverridesType {
 	Category,
 	Channel
 }
+export interface ICategoryChannelOption {
+	id: string;
+	label: string;
+	title: string;
+	type: EOptionOverridesType;
+}
 
 export type CategoryChannelItemProps = {
 	typePreviousIcon: ChannelType | EOptionOverridesType;
@@ -30,7 +36,7 @@ export type CategoryChannelItemProps = {
 	notificationStatus?: number;
 	categoryChannelId: string;
 	stylesItem?: ViewStyle;
-	data?: NotiChannelCategorySettingEntity;
+	data?: NotiChannelCategorySettingEntity | ICategoryChannelOption;
 };
 
 export const notificationType = {

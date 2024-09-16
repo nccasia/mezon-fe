@@ -16,6 +16,10 @@
           "url": "https://cdn.mezon.vn/release/"
         }
       ],
+      "asarUnpack": [
+        "./node_modules/macos-notification-state/build/Release//*.node",
+        "./node_modules/windows-focus-assist/build/Release//*.node"
+      ],
       "mac": {
         "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "mezon.ai",
@@ -105,6 +109,16 @@
             "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
             "input": "./",
             "output": "./"
+          },
+          {
+            "glob": "apps/desktop/index.html",
+            "input": "./",
+            "output": "./"
+          },
+          {
+            "glob": "apps/desktop/package.json",
+            "input": "./",
+            "output": "./"
           }
         ]
       },
@@ -169,7 +183,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
@@ -238,7 +252,7 @@
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [

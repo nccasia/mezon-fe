@@ -1,7 +1,7 @@
 import { useAppParams } from '@mezon/core';
-import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { ChannelMembersEntity, selectGrouplMembers, useAppSelector } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { useSelector } from 'react-redux';
+import { memo } from 'react';
 import MemberItem from '../../MemberList/MemberItem';
 
 export type MemberListProps = {
@@ -16,16 +16,26 @@ export type DataMemberCreate = {
 
 function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	const { directId } = useAppParams();
-	const rawMembers = useSelector(selectMembersByChannelId(directId as string));
+	const rawMembers = useAppSelector((state) => selectGrouplMembers(state, directId as string));
+
+	const memberGroups = rawMembers.sort((a, b) => {
+		const nameA = a.user?.display_name?.toLowerCase() || a.user?.username?.toLowerCase() || '';
+		const nameB = b.user?.display_name?.toLowerCase() || b.user?.username?.toLowerCase() || '';
+		return nameA.localeCompare(nameB);
+	});
+
 	const dataMemberCreate: DataMemberCreate = { createId: createId || '' };
+	//đây là dm
 	return (
-		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">
-			<div>
-				<p className="mb-3 text-[#AEAEAE] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">MEMBER</p>
+		<div className="self-stretch w-full h-[268px] flex-col justify-start items-start flex pt-[16px] pb-[16px] ml-2 mr-1 gap-[24px]">
+			<div className="w-full">
+				<p className="mb-3 ml-2 text-[#AEAEAE] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+					MEMBER - {memberGroups.length}
+				</p>
 				{
 					<div className="flex flex-col gap-4 text-[#AEAEAE]">
-						{rawMembers.map((user: ChannelMembersEntity) => (
-							<div key={user.id}>
+						{memberGroups.map((user: ChannelMembersEntity) => (
+							<div key={user.id} className="p-2 rounded dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
 								<MemberItem
 									user={user}
 									name={user.user?.display_name || user.user?.username}
@@ -33,6 +43,8 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 									listProfile={true}
 									dataMemberCreate={dataMemberCreate}
 									directMessageId={directMessageId}
+									isOffline={!user.user?.online}
+									isDM={true}
 								/>
 							</div>
 						))}
@@ -43,4 +55,4 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	);
 }
 
-export default MemberListGroupChat;
+export default memo(MemberListGroupChat);

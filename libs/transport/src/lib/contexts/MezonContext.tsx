@@ -4,10 +4,16 @@ import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
 
+const MAX_WEBSOCKET_FAILS = 8;
+const MIN_WEBSOCKET_RETRY_TIME = 3000;
+const MAX_WEBSOCKET_RETRY_TIME = 300000;
+const JITTER_RANGE = 2000;
+
 type MezonContextProviderProps = {
 	children: React.ReactNode;
 	mezon: CreateMezonClientOptions;
 	connect?: boolean;
+	isFromMobile?: boolean;
 };
 
 type Sessionlike = {
@@ -32,7 +38,7 @@ export type MezonContextValue = {
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
-const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect }) => {
+const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect, isFromMobile = false }) => {
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<Session | null>(null);
 	const socketRef = React.useRef<Socket | null>(null);
@@ -189,20 +195,39 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return Promise.resolve(null);
 			}
 
-			return new Promise(function (resolve) {
-				const interval = setInterval(async () => {
-					const socket = await createSocket();
-					const newSession = await clientRef?.current?.sessionRefresh(new Session(session.token, session.refresh_token, session.created));
-					const recsession = await socket.connect(newSession || session, true);
-					await socket.joinClanChat(clanId);
-					socketRef.current = socket;
-					sessionRef.current = recsession;
-					resolve(socket);
-					clearInterval(interval);
-				}, 5000);
+			// eslint-disable-next-line no-async-promise-executor
+			return new Promise(async (resolve, reject) => {
+				let failCount = 0;
+
+				const retry = async () => {
+					if (failCount >= MAX_WEBSOCKET_FAILS) {
+						return reject('Cannot reconnect to the socket. Please restart the app.');
+					}
+
+					try {
+						const socket = await createSocket();
+						const newSession = await clientRef?.current?.sessionRefresh(
+							new Session(session.token, session.refresh_token, session.created)
+						);
+						const recsession = await socket.connect(newSession || session, true);
+						await socket.joinClanChat(clanId);
+						socketRef.current = socket;
+						sessionRef.current = recsession;
+						resolve(socket);
+					} catch (error) {
+						failCount++;
+						const retryTime = isFromMobile
+							? 0
+							: Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
+						await new Promise((res) => setTimeout(res, retryTime));
+						await retry();
+					}
+				};
+
+				await retry();
 			});
 		},
-		[createSocket]
+		[createSocket, isFromMobile]
 	);
 
 	const value = React.useMemo<MezonContextValue>(

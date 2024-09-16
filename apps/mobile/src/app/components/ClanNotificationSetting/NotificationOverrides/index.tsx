@@ -19,7 +19,7 @@ const NotificationOverrides = () => {
 				id: category.id,
 				label: category.category_name,
 				title: 'category',
-				type: EOptionOverridesType.Category,
+				type: EOptionOverridesType.Category
 			},
 			...category.channels
 				.filter((channel) => channel.type !== 4)
@@ -27,8 +27,8 @@ const NotificationOverrides = () => {
 					id: channel.id,
 					label: channel.channel_label,
 					title: 'channel',
-					type: EOptionOverridesType.Channel,
-				})),
+					type: EOptionOverridesType.Channel
+				}))
 		]);
 	}, [categorizedChannels]);
 
@@ -70,7 +70,7 @@ const NotificationOverrides = () => {
 					</Block>
 				</Block>
 				<ScrollView>
-					{(filteredOptions?.length > 0)
+					{filteredOptions?.length > 0
 						? filteredOptions?.map((item) => (
 								<CategoryChannelItem
 									categoryLabel={item?.label}

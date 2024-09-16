@@ -17,6 +17,8 @@ type MessageContextMenuContextValue = {
 	posShowMenu: string;
 	setImageURL: (url: string) => void;
 	imageSrc: string;
+	allUserIdsInChannel: string[];
+	allRolesInClan: string[];
 };
 
 export type MessageContextMenuProps = {
@@ -36,10 +38,20 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	setImageURL: () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 	},
-	imageSrc: ''
+	imageSrc: '',
+	allUserIdsInChannel: [],
+	allRolesInClan: []
 });
 
-export const MessageContextMenuProvider = ({ children }: { children: React.ReactNode }) => {
+export const MessageContextMenuProvider = ({
+	children,
+	allUserIdsInChannel,
+	allRolesInClan
+}: {
+	children: React.ReactNode;
+	allUserIdsInChannel: string[];
+	allRolesInClan: string[];
+}) => {
 	const messageIdRef = useRef<string>('');
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
 	const [activeMode, setActiveMode] = useState<ChannelStreamMode>(ChannelStreamMode.STREAM_MODE_CHANNEL);
@@ -96,9 +108,11 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 			setPositionShow,
 			posShowMenu,
 			setImageURL,
-			imageSrc
+			imageSrc,
+			allUserIdsInChannel,
+			allRolesInClan
 		}),
-		[showMessageContextMenu, setPositionShow, posShowMenu, setImageURL, imageSrc]
+		[showMessageContextMenu, setPositionShow, posShowMenu, setImageURL, imageSrc, allUserIdsInChannel, allRolesInClan]
 	);
 
 	return (

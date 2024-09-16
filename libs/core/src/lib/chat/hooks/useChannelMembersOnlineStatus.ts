@@ -1,6 +1,5 @@
-import { selectMembersByChannelId } from '@mezon/store';
+import { selectAllChannelMembers, useAppSelector } from '@mezon/store';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 
 export type UseChannelMembersOnlineStatusOptions = {
@@ -8,7 +7,7 @@ export type UseChannelMembersOnlineStatusOptions = {
 };
 
 export function useChannelMembersOnlineStatus({ channelId }: UseChannelMembersOnlineStatusOptions = {}) {
-	const rawMembers = useSelector(selectMembersByChannelId(channelId as string));
+	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
 	const { userId } = useAuth();
 
 	const [onlineMembers, offlineMembers] = useMemo(() => {

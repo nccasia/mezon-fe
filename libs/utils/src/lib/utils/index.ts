@@ -1,3 +1,4 @@
+import { handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -10,19 +11,20 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
-import { ApiMessageAttachment, ApiMessageRef, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { Client, Session } from 'mezon-js';
+import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { TIME_COMBINE } from '../constant';
+import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EMarkdownType,
+	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
-	ILineMention,
 	ILinkOnMessage,
 	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
@@ -31,8 +33,7 @@ import {
 	IMessageWithUser,
 	MentionDataProps,
 	SearchItemProps,
-	SenderInfoOptionals,
-	UsersClanEntity
+	SenderInfoOptionals
 } from '../types';
 
 export const convertTimeString = (dateString: string) => {
@@ -86,21 +87,15 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
+export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null) => {
+	const getListId = mentions
+		.map((item) => item.user_id)
+		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
+	const uniqueUserIds = Array.from(new Set(getListId));
+	const memUserIds = userChannels?.map((member) => member?.user?.id);
+	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
 
-export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity[], userChannels: ChannelMembersEntity[]) => {
-	const userMentions = Array.from(new Set(mentions.map((user) => user.matchedText)));
-
-	const userMentionsFormat = userMentions.map((user) => user.substring(1));
-
-	const usersNotInChannels = userMentionsFormat.filter(
-		(username) => !userChannels.map((user) => user.user).some((user) => user?.username === username)
-	);
-
-	const userInClans = userClans.map((clan) => clan.user);
-
-	const userIds = userInClans.filter((user) => usersNotInChannels.includes(user?.username as string)).map((user) => user?.id as string);
-
-	return userIds;
+	return userIdsNotInChannel;
 };
 
 export const convertTimeMessage = (timestamp: number) => {
@@ -345,7 +340,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 		);
 	});
 
-export function findClanAvatarByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanAvatarByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_avatar;
@@ -354,7 +349,7 @@ export function findClanAvatarByUserId(userId: string, data: ChannelUserListChan
 	return '';
 }
 
-export function findClanNickByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanNickByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_nick;
@@ -363,7 +358,7 @@ export function findClanNickByUserId(userId: string, data: ChannelUserListChanne
 	return '';
 }
 
-export function findDisplayNameByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findDisplayNameByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.user.display_name;
@@ -372,7 +367,7 @@ export function findDisplayNameByUserId(userId: string, data: ChannelUserListCha
 	return '';
 }
 
-export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
+export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ClanUserListClanUser[]): SearchItemProps[] {
 	return data.map((item) => {
 		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
 		const clanNickFinding = item?.clanNick;
@@ -472,7 +467,7 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 				result += `#[${contentInElement.slice(1)}](${element.channelid})`;
 				break;
 			case ETokenMessage.EMOJIS:
-				result += `[${contentInElement}](${element.emojiid})`;
+				result += `::[${contentInElement}](${element.emojiid})`;
 				break;
 			case ETokenMessage.LINKS:
 				result += `${contentInElement}`;
@@ -669,6 +664,63 @@ export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | nul
 	return createdFiles;
 }
 
+export async function getWebUploadedAttachments(payload: {
+	attachments: ApiMessageAttachment[];
+	client: Client;
+	session: Session;
+	clanId: string;
+	channelId: string;
+}): Promise<ApiMessageAttachment[]> {
+	const { attachments, client, session, clanId, channelId } = payload;
+	if (!attachments || attachments?.length === 0) {
+		return [];
+	}
+	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
+	if (nonDirectAttachments.length > 0) {
+		const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
+		const uploadPromises = createdFiles.map((file, index) => {
+			return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
+		});
+
+		return await Promise.all(uploadPromises);
+	}
+
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+}
+
+export async function getMobileUploadedAttachments(payload: {
+	attachments: ApiMessageAttachment[];
+	client: Client;
+	session: Session;
+	clanId: string;
+	channelId: string;
+}): Promise<ApiMessageAttachment[]> {
+	const { attachments, client, session, clanId, channelId } = payload;
+	if (!attachments || attachments?.length === 0) {
+		return [];
+	}
+	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
+	if (nonDirectAttachments.length > 0) {
+		const uploadPromises = nonDirectAttachments.map(async (att) => {
+			// const fileData = await RNFS.readFile(att?.url || '', 'base64');
+			const fileData = att;
+			const formattedFile = {
+				type: att?.filetype,
+				uri: att?.url,
+				size: att?.size,
+				fileData
+			};
+			return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);
+		});
+		return await Promise.all(uploadPromises);
+	}
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+}
+
 export const blankReferenceObj: ApiMessageRef = {
 	message_id: '',
 	message_ref_id: '',
@@ -683,4 +735,20 @@ export const blankReferenceObj: ApiMessageRef = {
 	channel_id: '',
 	mode: 0,
 	channel_label: ''
+};
+
+export const getBottomPopupClass = (hasAttachment: boolean, messageRefId: string) => {
+	if (hasAttachment && messageRefId !== '' && messageRefId !== undefined) {
+		return 'bottom-[370px]';
+	}
+	if (hasAttachment && (messageRefId === undefined || messageRefId === '')) {
+		return 'bottom-[320px]';
+	}
+	if (!hasAttachment && messageRefId !== undefined && messageRefId !== '') {
+		return 'bottom-[127px]';
+	}
+	if (!hasAttachment && (messageRefId === undefined || messageRefId === '')) {
+		return 'bottom-[76px]';
+	}
+	return '';
 };

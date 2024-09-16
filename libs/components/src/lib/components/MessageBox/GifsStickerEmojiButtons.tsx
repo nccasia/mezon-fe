@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAppParams, useGifs, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, referencesActions, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { reactionActions, referencesActions, useAppDispatch } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { memo, useCallback } from 'react';
 
@@ -40,8 +40,7 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmo
 			setSubPanelActive(SubPanelName.STICKERS);
 			setShowCategories(true);
 			setValueInputSearch('');
-			// if there is currentDmGroupId is fetch for DM
-			dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
+
 			dispatch(reactionActions.setReactionRightState(false));
 			dispatch(reactionActions.setReactionBottomState(false));
 			if (subPanelActive === SubPanelName.STICKERS) {

@@ -72,6 +72,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<div>
 									{' '}
 									<MessageLine
+										isEditted={false}
 										isTokenClickAble={false}
 										isJumMessageEnabled={true}
 										onClickToMessage={getIdMessageToJump}

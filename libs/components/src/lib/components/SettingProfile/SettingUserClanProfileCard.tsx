@@ -9,12 +9,13 @@ export type Profilesform = {
 export type propProfilesform = {
 	profiles: Profilesform;
 	currentDisplayName?: string;
+	isDM?: boolean;
 };
 const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const { userProfile } = useAuth();
 	const { profiles, currentDisplayName } = props;
 	const checkUrl = profiles.urlImage === undefined || profiles.urlImage === '';
-	const userCustomStatus = useMemberCustomStatus(userProfile?.user?.id || '');
+	const { userCustomStatus } = useMemberCustomStatus(userProfile?.user?.id || '', props.isDM);
 	const [color, setColor] = useState<string>('#323232');
 
 	useEffect(() => {
@@ -31,7 +32,13 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 	return (
 		<div className="dark:bg-black bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative">
 			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]" style={{ backgroundColor: color }}></div>
-			<AvatarProfile avatar={profiles.urlImage} username={userProfile?.user?.username} userToDisplay={true} customStatus={userCustomStatus} />
+			<AvatarProfile
+				avatar={profiles.urlImage}
+				username={userProfile?.user?.username}
+				userToDisplay={true}
+				customStatus={userCustomStatus}
+				userID={userProfile?.user?.id}
+			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-[#e2e2e2] dark:text-white text-black w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
 					<div className="w-[300px]">

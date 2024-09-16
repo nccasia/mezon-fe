@@ -106,7 +106,7 @@ export const themeColors: ThemeColor = {
 		charcoal: '#f2f3f5',
 		jet: '#ecedef',
 		channelUnread: '#000000',
-		channelNormal: '#535353',
+		channelNormal: '#6c7077',
 		midnightBlue: '#d1e0ff',
 		textLink: '#3297ff',
 		reactionBg: '#e5e7eb',

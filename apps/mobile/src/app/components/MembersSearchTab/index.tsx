@@ -28,7 +28,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: listMemberSearch?.length > 0 ? themeValue.primary : themeValue.secondary }]}>
 			{listMemberSearch?.length > 0 ? (
 				<ScrollView
 					keyboardDismissMode={'interactive'}

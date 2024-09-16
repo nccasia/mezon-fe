@@ -46,14 +46,13 @@ import {
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
-	ILineMention,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadValue,
-	UsersClanEntity,
 	blankReferenceObj,
 	filterEmptyArrays,
 	focusToElement,
@@ -64,7 +63,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -124,7 +123,7 @@ export type MentionReactInputProps = {
 	readonly mode?: number;
 };
 
-function MentionReactInput(props: MentionReactInputProps): ReactElement {
+const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
@@ -138,7 +137,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { members } = useChannelMembers({ channelId: currentChannelId });
+	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
@@ -151,6 +150,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const [undoHistory, setUndoHistory] = useState<string[]>([]);
+	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
 	const currentDmOrChannelId = useMemo(
 		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
@@ -191,9 +192,33 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { trackEnterPress } = useEnterPressTracker();
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { key, ctrlKey, shiftKey } = event;
+		const { key, ctrlKey, shiftKey, metaKey } = event;
 		const isEnterKey = key === 'Enter';
 		const isComposing = event.nativeEvent.isComposing;
+
+		if ((ctrlKey || metaKey) && (key === 'z' || key === 'Z')) {
+			event.preventDefault();
+			if (undoHistory.length > 0) {
+				const previousValue = undoHistory[undoHistory.length - 1];
+				setRedoHistory((prevRedoHistory) => [request.valueTextInput, ...prevRedoHistory]);
+				setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(0, prevUndoHistory.length - 1));
+				setRequestInput({
+					...request,
+					valueTextInput: previousValue
+				});
+			}
+		} else if ((ctrlKey || metaKey) && (key === 'y' || key === 'Y')) {
+			event.preventDefault();
+			if (redoHistory.length > 0) {
+				const nextValue = redoHistory[0];
+				setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request.valueTextInput]);
+				setRedoHistory((prevRedoHistory) => prevRedoHistory.slice(1));
+				setRequestInput({
+					...request,
+					valueTextInput: nextValue
+				});
+			}
+		}
 
 		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
@@ -222,9 +247,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const addMemberToChannel = useCallback(
-		async (currentChannel: ChannelsEntity | null, mentions: ILineMention[], userClans: UsersClanEntity[], members: ChannelMembersEntity[]) => {
-			const userIds = uniqueUsers(mentions, userClans, members);
+	const addMemberToPrivateThread = useCallback(
+		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[], membersOfChild: ChannelMembersEntity[] | null) => {
+			if (!currentChannel?.channel_private) return;
+
+			const userIds = uniqueUsers(mentions, membersOfChild);
+
 			const body = {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
@@ -294,6 +322,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
+			addMemberToPrivateThread(currentChannel, mentionList, membersOfChild);
 
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
@@ -305,7 +334,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					anonymousMessage,
 					mentionEveryone
 				);
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(
@@ -340,7 +368,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mentionEveryone
 					);
 				}
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
@@ -370,17 +397,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props,
 			threadCurrentChannel,
 			openThreadMessageState,
-			// getRefMessageReply,
 			dataReferences,
 			dispatch,
 			setSubPanelActive,
 			isPrivate,
 			mentionEveryone,
-			addMemberToChannel,
+			addMemberToPrivateThread,
 			currentChannel,
 			mentions,
 			usersClan,
-			members,
+			membersOfChild,
 			currentChannelId,
 			valueThread?.content.t,
 			valueThread?.mentions,
@@ -419,6 +445,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
+		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
+		setRedoHistory([]);
 		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
 		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
@@ -455,7 +483,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		} else if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})${' '}`);
+				textFieldEdit.insert(input, `::[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -595,7 +623,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
-				placeholder="Write your thoughs here..."
+				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={{
@@ -670,7 +698,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[__display__](__id__)"
+					markup="::[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
@@ -687,7 +715,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
-}
+});
 
 export default MentionReactInput;
 

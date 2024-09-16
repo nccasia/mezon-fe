@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) => StyleSheet.create({
 	cameraPicker: {
 		width: '32%',
-		backgroundColor: colors.secondaryLight,
+		backgroundColor: colors.border,
 		borderRadius: size.s_6,
 		margin: size.s_2,
 		alignItems: 'center',

@@ -15,6 +15,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
+import { fetchListChannelsByUser } from './channelUser.slice';
 import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
@@ -123,6 +124,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+			thunkAPI.dispatch(fetchListChannelsByUser());
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({

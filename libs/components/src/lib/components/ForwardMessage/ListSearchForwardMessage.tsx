@@ -8,7 +8,7 @@ type ListSearchForwardMessageProps = {
 	listSearch: any[];
 	searchText: string;
 	selectedObjectIdSends: any[];
-	handleToggle: (id: string, type: number, clanId?: string, channel_label?: string) => void;
+	handleToggle: (id: string, type: number, isPublic: boolean, clanId?: string, channelLabel?: string) => void;
 };
 
 const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
@@ -32,7 +32,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 							name={item.prioritizeName}
 							searchText={searchText}
 							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.idDM)}
-							handleToggle={() => handleToggle(item.idDM, item.typeChat || 0)}
+							handleToggle={() => handleToggle(item.idDM, item.typeChat || 0, false)}
 							userName={item.userName}
 							hiddenSubText={item.typeChat === ChannelType.CHANNEL_TYPE_GROUP}
 						/>
@@ -43,7 +43,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 							subText={item.subText}
 							searchText={searchText}
 							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.id)}
-							handleToggle={() => handleToggle(item.id, item.type || 0, item.clanId, item.channel_label || '')}
+							handleToggle={() => handleToggle(item.id, item.type || 0, item.isPublic, item.clanId, item.channelLabel || '')}
 						/>
 					)}
 				</div>
@@ -75,10 +75,10 @@ const ItemDm = (props: ItemDmProps) => {
 					avatarUrl={avatar}
 					showAvatar
 					valueHightLight={searchText}
-					subText={hiddenSubText ? "" : userName}
+					subText={hiddenSubText ? '' : userName}
 					wrapSuggestItemStyle="gap-x-1"
 					subTextStyle="text-[13px]"
-					emojiId="" // TODO:
+					emojiId=""
 				/>
 			</div>
 			<Checkbox className="w-4 h-4 focus:ring-transparent" id={`checkbox-item-${id}`} checked={checked} onChange={handleToggle} />
@@ -107,7 +107,7 @@ const ItemChannel = (props: ItemChannelProps) => {
 					valueHightLight={searchText}
 					subTextStyle="uppercase"
 					isOpenSearchModal
-					emojiId="" //TODO:
+					emojiId=""
 				/>
 			</div>
 			<Checkbox className="w-4 h-4 focus:ring-transparent" id={`checkbox-item-${id}`} checked={checked} onChange={handleToggle} />

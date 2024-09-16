@@ -55,7 +55,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 			<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
 			<div className="flex flex-col w-[420px] h-full">
 				<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
-					<h3 className="select-none">{`${totalResult < 1 ? "No Results" : `${totalResult} Results`}`}</h3>
+					<h3 className="select-none">{`${totalResult < 1 ? 'No Results' : `${totalResult} Results`}`}</h3>
 					<div className="flex flex-row gap-2">
 						<button className="px-1 h-8 min-w-12 text-base text-textLightTheme dark:text-textPrimary font-medium rounded bg-buttonLightTertiary dark:bg-buttonSearch hover:bg-buttonLightTertiaryHover dark:hover:bg-buttonSearchHover">
 							New
@@ -86,6 +86,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 												className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full"
 											>
 												<MessageWithUser
+													allowDisplayShortProfile={false}
 													message={searchMessage as IMessageWithUser}
 													mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 													isSearchMessage={true}
@@ -110,17 +111,17 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 										pages: {
 											previous: {
 												base: 'h-7 ml-0 mr-1 flex items-center justify-center rounded font-semibold border border-none bg-bgLightSecondary px-3 py-2 leading-tight text-textLightTheme hover:bg-buttonLightTertiaryHover enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-bgSecondary600 enabled:dark:hover:text-white',
-												icon: 'h-5 w-5',
+												icon: 'h-5 w-5'
 											},
 											next: {
 												base: 'h-7 ml-1 flex items-center justify-center rounded font-semibold border border-none bg-bgLightSecondary px-3 py-2 leading-tight text-textLightTheme hover:bg-buttonLightTertiaryHover enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-bgSecondary600 enabled:dark:hover:text-white',
-												icon: 'h-5 w-5',
+												icon: 'h-5 w-5'
 											},
 											selector: {
 												base: 'w-7 h-7 mx-1 flex items-center justify-center rounded-full font-semibold border border-none bg-bgLightSecondary py-2 leading-tight text-textLightTheme enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white',
-												active: 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 dark:border-none dark:bg-bgSelectItem dark:text-white',
-											},
-										},
+												active: 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 dark:border-none dark:bg-bgSelectItem dark:text-white'
+											}
+										}
 									}}
 								/>
 							)}

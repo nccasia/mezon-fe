@@ -23,12 +23,12 @@ function convertContentToObject(notify: any) {
 				mentions: notify.content.mentions ? JSON.parse(notify.content.mentions) : null,
 				reactions: notify.content.reactions ? JSON.parse(notify.content.reactions) : null,
 				references: notify.content.references ? JSON.parse(notify.content.references) : null,
-				attachments: notify.content.attachments ? JSON.parse(notify.content.attachments) : null,
+				attachments: notify.content.attachments ? JSON.parse(notify.content.attachments) : null
 			};
 
 			return {
 				...notify,
-				content: parsedContent,
+				content: parsedContent
 			};
 		} catch (error) {
 			return notify;
@@ -110,8 +110,14 @@ function MentionTabContent({ message }: IMentionTabContent) {
 				/>
 
 				<div className="h-full">
-					<MessageHead message={message} isCombine={true} isShowFull={true} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
-					<MessageLine content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
+					<MessageHead
+						allowDisplayShortProfile={false}
+						message={message}
+						isCombine={true}
+						isShowFull={true}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+					<MessageLine isEditted={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>
 			</div>

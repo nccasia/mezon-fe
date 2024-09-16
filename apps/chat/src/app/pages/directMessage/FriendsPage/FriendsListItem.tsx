@@ -1,5 +1,5 @@
 import { Icons, MemberProfile } from '@mezon/components';
-import { useAppNavigation, useDirect, useFriends, useMemberStatus } from '@mezon/core';
+import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
 import { FriendsEntity } from '@mezon/store';
 import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -11,7 +11,6 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
 	const { acceptFriend, blockFriend, deleteFriend, unBlockFriend } = useFriends();
-	const userStatus = useMemberStatus(friend.user?.id || '');
 
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
@@ -49,7 +48,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
 						userNameAva={friend?.user?.username ?? ''}
-						status={userStatus}
+						status={friend.user?.online}
 						isHideStatus={friend.state !== 0 ? true : false}
 						isHideIconStatus={friend.state !== 0 ? true : false}
 						isHideAnimation={true}
@@ -58,6 +57,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList h-10'}
 						positionType={MemberProfileType.LIST_FRIENDS}
 						customStatus={(friend.user?.metadata as MetaDateStatusUser).status ?? ''}
+						isDM={true}
 					/>
 				</div>
 				<div onClick={(e) => e.stopPropagation()}>

@@ -76,6 +76,9 @@
         "updated": "Update successfully"
     },
     "channelPermission": {
+        "permissionOverrides": "Permission Overrides",
+        "save": "Save",
+        "generalChannelPermission": "GENERAL CHANNEL PERMISSION",
         "title": "Permissions",
         "basicView": "Basic View",
         "advancedView": "Advanced View",
@@ -88,6 +91,35 @@
         "privateChannel": "Private Channel",
         "basicViewDescription": "By making a channel private, only select members and roles will be able to view this channel",
         "addMemberAndRoles": "Add members or roles",
-        "whoCanAccess": "Who can access"
+        "whoCanAccess": "Who can access",
+        "warningModal": {
+            "publicChannelTitle": "Make this channel open to everyone?",
+            "privateChannelTitle": "Make this channel private?",
+            "publicChannelContent": "{{channelLabel}} will become available to all members",
+            "privateChannelContent": "{{channelLabel}} will become private and visible to select members and roles",
+            "confirm": "Yes"
+        },
+        "warningChangeSettingModal": {
+            "title": "You have unsaved settings",
+            "content": "Do you want to save the changes?",
+            "confirm": "Yes, Save"
+        },
+        "description": {
+            "viewChannel": "Allows members to view this channel by default. Disabling this for @everyone will make this channel private.",
+            "manageChannel": "Allows members to change this channel's name, description, and text settings. They can also delete the channel.",
+            "manageThread": "Allows members to rename, delete, close, and turn on slow mode for threads in this channel. They can also view private threads.",
+            "sendMessage": "Allows members to send messages in this channel",
+            "deleteMessage": "Allows members to delete messages in this channel"
+        },
+        "bottomSheet": {
+            "addMembersOrRoles": "Add members or roles",
+            "add": "Add",
+            "roles": "ROLES",
+            "members": "MEMBERS"
+        }
+    },
+    "changeCategory": {
+        "title": "Change Category",
+        "label": "MOVE FROM {{currentChannel}} TO"
     }
 }

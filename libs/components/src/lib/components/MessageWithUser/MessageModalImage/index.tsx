@@ -1,10 +1,11 @@
-import { useAttachments } from '@mezon/core';
+import { useAppParams, useAttachments } from '@mezon/core';
 import {
 	attachmentActions,
 	selectAttachment,
 	selectAttachmentPhoto,
 	selectCurrentAttachmentShowImage,
 	selectCurrentChannel,
+	selectDmGroupCurrent,
 	selectMemberClanByUserId,
 	selectMessageIdAttachment,
 	selectModeAttachment,
@@ -17,7 +18,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageContextMenuProps, useMessageContextMenu } from '../../ContextMenu';
 import ListAttachment from './listAttachment';
-
 export const MAX_SCALE_IMAGE = 5;
 
 const MessageModalImage = () => {
@@ -151,7 +151,10 @@ const MessageModalImage = () => {
 		setDragging(false);
 	};
 
+	const { directId } = useAppParams();
+
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDM = useSelector(selectDmGroupCurrent(directId as string));
 
 	const handleRotateImg = (direction: 'LEFT' | 'RIGHT') => {
 		if (direction === 'LEFT') {
@@ -178,7 +181,7 @@ const MessageModalImage = () => {
 	return (
 		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-nonebg-black text-colorTextLightMode select-none">
 			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
-				<div className="text-textDarkTheme">{currentChannel?.channel_label}</div>
+				<div className="text-textDarkTheme">{currentDM?.channel_label || currentChannel?.channel_label}</div>
 				<div onClick={closeModal} className="w-4 absolute right-2 top-2 cursor-pointer">
 					<Icons.MenuClose className="text-white w-full" />
 				</div>

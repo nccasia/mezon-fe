@@ -31,6 +31,7 @@ export type MessageWithUserProps = {
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
 	isSearchMessage?: boolean;
+	allowDisplayShortProfile: boolean;
 };
 
 function MessageWithUser({
@@ -44,7 +45,8 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
-	isSearchMessage
+	isSearchMessage,
+	allowDisplayShortProfile
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -88,7 +90,10 @@ function MessageWithUser({
 	}, [message]);
 
 	const checkMessageHasReply = useMemo(() => {
-		return message.references && message.references?.length !== 0 && message.references[0].message_ref_id !== undefined;
+		if (message.references && message.references.length > 0) {
+			return message.references[0]?.message_ref_id !== undefined;
+		}
+		return false;
 	}, [message.references]);
 
 	const checkMessageIncludeMention = useMemo(() => {
@@ -137,6 +142,7 @@ function MessageWithUser({
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
 									<MessageAvatar
+										allowDisplayShortProfile={allowDisplayShortProfile}
 										message={message}
 										isCombine={isCombine}
 										isEditing={isEditing}
@@ -144,7 +150,13 @@ function MessageWithUser({
 										mode={mode}
 									/>
 									<div className="w-full relative h-full">
-										<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
+										<MessageHead
+											allowDisplayShortProfile={allowDisplayShortProfile}
+											message={message}
+											isCombine={isCombine}
+											isShowFull={isShowFull}
+											mode={mode}
+										/>
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 												{isEditing && editor}

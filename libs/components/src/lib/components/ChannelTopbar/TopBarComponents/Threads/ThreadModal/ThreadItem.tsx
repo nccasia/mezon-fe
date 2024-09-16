@@ -1,6 +1,6 @@
-import { useAppNavigation, useChatMessages } from '@mezon/core';
-import { ChannelsEntity, selectMemberClanByUserId } from '@mezon/store';
-import { convertTimeMessage, IChannelMember } from '@mezon/utils';
+import { useAppNavigation } from '@mezon/core';
+import { ChannelsEntity, selectLastMessageIdByChannelId, selectMemberClanByUserId, selectMessageEntityById, useAppSelector } from '@mezon/store';
+import { IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,9 +17,13 @@ type ThreadItemProps = {
 const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const user = useSelector(selectMemberClanByUserId(thread?.last_sent_message?.sender_id as string)) as IChannelMember;
+
+	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread.channel_id as string));
+	const message = useAppSelector((state) =>
+		selectMessageEntityById(state, thread.channel_id as string, messageId || thread?.last_sent_message?.id)
+	);
+	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
 	const { avatarImg, username } = useMessageSender(user);
-	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
 
 	const getRandomElements = (array: (string | undefined)[], count: number) => {
 		const result = [];
@@ -44,11 +48,16 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 	}, [avatarMembers]);
 
 	const timeMessage = useMemo(() => {
-		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
-			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
+		if (message && message.create_time_seconds) {
+			const lastTime = convertTimeMessage(message.create_time_seconds);
 			return lastTime;
+		} else {
+			if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
+				const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
+				return lastTime;
+			}
 		}
-	}, [thread]);
+	}, [message, thread]);
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
 		navigate(toChannelPage(channelId, clanId));
@@ -64,31 +73,25 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
 					<p className="text-base font-semibold leading-5 dark:text-white text-black one-line">{thread?.channel_label}</p>
-					{thread?.last_sent_message ? (
-						<div className="flex flex-row items-center h-6">
-							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
-							<span className="w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">
-								{user?.user?.display_name ?? username}:&nbsp;
-							</span>
-							<div className="overflow-hidden max-w-[140px]">
-								<ThreadModalContent messages={messages} thread={thread} />
-							</div>
-							<div className="overflow-x-hidden">
-								<p className="text-xs font-medium leading-4 ml-2">
-									<span className="truncate dark:text-white text-colorTextLightMode">•&nbsp;{timeMessage}</span>
-								</p>
-							</div>
+					<div className="flex flex-row items-center h-6">
+						<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
+						<span className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">
+							{user?.user?.display_name ?? username}:&nbsp;
+						</span>
+						<div className="overflow-hidden max-w-[140px]">
+							<ThreadModalContent message={message} thread={thread} />
 						</div>
-					) : (
-						<div className="flex flex-row items-center">
-							<span className="text-sm font-medium leading-4 mr-2">No recent messages</span>
+						<div className="overflow-x-hidden">
+							<p className="text-xs font-medium leading-4 ml-2">
+								<span className="truncate dark:text-white text-colorTextLightMode">•&nbsp;{timeMessage}</span>
+							</p>
 						</div>
-					)}
+					</div>
 				</div>
 				<div className="w-[120px]">
 					{avatarMembers && (
 						<Avatar.Group className="flex gap-3 justify-end items-center">
-							{previewAvatarList?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
+							{previewAvatarList?.map((avatar, index) => <Avatar key={index} img={avatar} rounded size="xs" />)}
 							{avatarMembers && avatarMembers.length > 5 && (
 								<Avatar.Counter
 									total={avatarMembers?.length - 5 > 50 ? 50 : avatarMembers?.length - 5}

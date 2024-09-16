@@ -291,7 +291,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					/>
 					<Mention
 						trigger=":"
-						markup="[__display__](__id__)"
+						markup="::[__display__](__id__)"
 						data={queryEmojis}
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;

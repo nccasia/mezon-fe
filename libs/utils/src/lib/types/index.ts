@@ -32,7 +32,6 @@ import {
 	ApiSearchMessageDocument,
 	ApiSystemMessage,
 	ApiUser,
-	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
@@ -138,7 +137,7 @@ export type IPSystemMessage = ApiSystemMessage & {
 	id: string;
 };
 
-export type IChannelMember = ChannelUserListChannelUser & {
+export type IChannelMember = ClanUserListClanUser & {
 	id: string;
 	channelId?: string;
 	userChannelId?: string;

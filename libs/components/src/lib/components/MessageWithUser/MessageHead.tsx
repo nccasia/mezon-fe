@@ -11,9 +11,10 @@ type IMessageHeadProps = {
 	isCombine: boolean;
 	isShowFull?: boolean;
 	mode?: number;
+	allowDisplayShortProfile: boolean;
 };
 
-const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
+const MessageHead = ({ message, isCombine, isShowFull, mode, allowDisplayShortProfile }: IMessageHeadProps) => {
 	const { messageTime } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -31,7 +32,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 		usernameSender ?? '',
 		userClanNickname ?? '',
 		userDisplayName ?? '',
-		username ?? '',
+		username ?? ''
 	);
 
 	const nameShowed = useShowName(clanNick ? clanNick : (pendingClannick ?? ''), pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
@@ -98,13 +99,13 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
-			{isShowPanelChannel && (
+			{isShowPanelChannel && allowDisplayShortProfile && (
 				<div
 					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
 						left: `20px`,
 						top: positionBottom ? '' : `${positionTop}px`,
-						bottom: positionBottom ? '64px' : '',
+						bottom: positionBottom ? '64px' : ''
 					}}
 					onMouseDown={handleDefault}
 					role="button"

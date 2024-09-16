@@ -49,7 +49,7 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes) =>
+export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
 	StyleSheet.create({
 		heading1: {
 			fontWeight: 'bold'
@@ -70,7 +70,7 @@ export const markdownStyles = (colors: Attributes) =>
 			fontWeight: 'bold'
 		},
 		body: {
-			color: colors.textStrong,
+			color: isUnReadChannel ? colors.white : colors.text,
 			fontSize: size.medium
 		},
 		paragraph: {
@@ -110,6 +110,14 @@ export const markdownStyles = (colors: Attributes) =>
 		iconEmojiInMessage: {
 			width: size.s_20,
 			height: size.s_20
+		},
+		onlyIconEmojiInMessage: {
+			width: size.s_40,
+			height: size.s_40
+		},
+		emojiInMessageContain: {
+			height: size.s_16,
+			width: size.s_20
 		},
 		editedText: {
 			fontSize: size.small,
@@ -182,13 +190,15 @@ export type IMarkdownProps = {
 	isHiddenHashtag?: boolean;
 	directMessageId?: string;
 	isOpenLink?: boolean;
+	isOnlyContainEmoji?: boolean;
+	isUnReadChannel?: boolean;
 };
 
 /**
  * custom render if you need
  * react-native-markdown-display/src/lib/renderRules.js to see more
  */
-export const renderRulesCustom = {
+export const renderRulesCustom = (isOnlyContainEmoji) => ({
 	heading1: (node, children, parent, styles) => {
 		return (
 			<View key={node.key} style={styles._VIEW_SAFE_heading1}>
@@ -213,7 +223,15 @@ export const renderRulesCustom = {
 		}
 
 		if (content?.startsWith(':')) {
-			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />;
+			return (
+				<View style={!isOnlyContainEmoji && styles.emojiInMessageContain}>
+					<FastImage
+						source={{ uri: payload }}
+						style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage : [styles.iconEmojiInMessage]}
+						resizeMode={'contain'}
+					/>
+				</View>
+			);
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
@@ -282,7 +300,7 @@ export const renderRulesCustom = {
 			</Text>
 		);
 	}
-};
+});
 
 /**
  * helper for markdown
@@ -345,7 +363,9 @@ export const RenderTextMarkdownContent = React.memo(
 		mode,
 		isHiddenHashtag,
 		directMessageId,
-		isOpenLink = true
+		isOpenLink = true,
+		isOnlyContainEmoji,
+		isUnReadChannel = false
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -446,8 +466,8 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
-				rules={renderRulesCustom}
+				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {
 						if (url.startsWith(TYPE_MENTION.userRoleMention)) {

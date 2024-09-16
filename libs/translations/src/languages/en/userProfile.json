@@ -4,7 +4,8 @@
     "voiceCall": "VoiceCall",
     "videoCall": "VideoCall",
     "addFriend": "Add Friend",
-    "pending": "Pending"
+    "pending": "Pending",
+    "removeFriend": "Remove Friend"
   },
   "aboutMe": {
     "headerTitle": "ABOUT ME",
@@ -27,6 +28,7 @@
     "copiedUserName": "Copied '{{username}}'"
   },
   "incomingFriendRequest": "INCOMING FRIEND REQUEST",
+  "sendAddFriendSuccess": "Friend Request Sent",
   "accept": "Accept",
   "ignore": "Ignore"
 }

@@ -12,8 +12,10 @@
         },
         "notification": {
             "title": "",
-            "muteCategory": "Mute Channel",
+            "muteChannel": "Mute Channel",
+            "unMuteChannel": "Unmute Channel",
             "muteThread": "Mute Thread",
+            "unMuteThread": "Unmute Thread",
             "notification": "Notification Settings"
         },
         "thread": {

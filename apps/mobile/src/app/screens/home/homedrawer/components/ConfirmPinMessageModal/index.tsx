@@ -10,7 +10,6 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import UseMentionList from '../../../../../../app/hooks/useUserMentionList';
 import { SeparatorWithLine } from '../../../../../components/Common';
 import MessageItem from '../../MessageItem';
 import { EMessageActionType } from '../../enums';
@@ -29,7 +28,6 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 	const { params } = route;
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('message');
-	const listMentions = UseMentionList(params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '');
 
 	const onConfirm = async () => {
 		switch (type) {
@@ -37,8 +35,8 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 				dispatch(
 					pinMessageActions.deleteChannelPinMessage({
 						channel_id: params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '',
-						message_id: message.id,
-					}),
+						message_id: message.id
+					})
 				);
 				break;
 			case EMessageActionType.PinMessage:
@@ -51,8 +49,8 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 			type: 'success',
 			props: {
 				text2: EMessageActionType.PinMessage === type ? t('pinSuccess') : t('unpinSuccess'),
-				leadingIcon: <CheckIcon color={Colors.green} />,
-			},
+				leadingIcon: <CheckIcon color={Colors.green} />
+			}
 		});
 		onClose();
 	};

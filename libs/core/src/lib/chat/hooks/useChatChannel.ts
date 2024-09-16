@@ -1,3 +1,4 @@
+import { ChannelStreamMode } from 'mezon-js';
 import { useMemo } from 'react';
 import { useChannelMembers } from './useChannelMembers';
 import { useThreads } from './useThreads';
@@ -5,13 +6,13 @@ import { useThreads } from './useThreads';
 export function useChatChannel(channelId: string) {
 	const { threads } = useThreads();
 
-	const { members } = useChannelMembers({ channelId });
+	const { membersOfChild } = useChannelMembers({ channelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL });
 
 	return useMemo(
 		() => ({
-			members,
+			membersOfChild,
 			threads
 		}),
-		[members, threads]
+		[membersOfChild, threads]
 	);
 }

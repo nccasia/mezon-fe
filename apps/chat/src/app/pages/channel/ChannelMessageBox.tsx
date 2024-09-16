@@ -1,9 +1,9 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectDataReferences } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
+import { referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj, getBottomPopupClass } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -23,6 +23,13 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+
+	const hasAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files.length > 0;
+	}, [attachmentFilteredByChannelId]);
+
+	const bottomPopup = getBottomPopupClass(hasAttachment, dataReferences.message_ref_id ?? '');
 
 	const handleSend = useCallback(
 		(
@@ -73,7 +80,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
+					className={` ${bottomPopup}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
@@ -98,3 +105,6 @@ ChannelMessageBox.Skeleton = () => {
 		</div>
 	);
 };
+
+const MemoizedChannelMessageBox = memo(ChannelMessageBox) as unknown as typeof ChannelMessageBox & { Skeleton: typeof ChannelMessageBox.Skeleton };
+export default MemoizedChannelMessageBox;

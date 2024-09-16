@@ -42,6 +42,10 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		return isEqual(originSettingValue, currentSettingValue);
 	}, [originSettingValue, currentSettingValue]);
 
+	const currentCategoryName = useMemo(() => {
+		return channel?.category_name
+	}, [channel?.category_name])
+
 	navigation.setOptions({
 		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
 		headerRight: () => (
@@ -89,11 +93,20 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: isChannel ? t('fields.channelCategory.title') : t('fields.ThreadCategory.title'),
 					expandable: true,
+					previewValue: currentCategoryName,
 					icon: <Icons.FolderPlusIcon color={themeValue.text} />,
-					isShow: isChannel
+					isShow: isChannel,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY,
+							params: {
+								channel
+							}
+						});
+					}
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[currentCategoryName]
 	);
 
 	const permissionMenu = useMemo(
@@ -178,7 +191,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					bottomDescription: ''
 				}
 			] satisfies IMezonMenuSectionProps[],
-		[]
+		[currentCategoryName]
 	);
 
 	const bottomMenu = useMemo(() => [{ items: webhookMenu }, { items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);

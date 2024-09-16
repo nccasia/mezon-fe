@@ -30,7 +30,7 @@ const SettingListRole = (props: closeEditRole) => {
 	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
 		if (!isChange || isNewRole) {
-			if(isNewRole) handleUpdateUser();
+			if (isNewRole) handleUpdateUser();
 			const activeRole = RolesClan.find((role) => role.id === roleId);
 			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
 
@@ -48,19 +48,19 @@ const SettingListRole = (props: closeEditRole) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 
 	const containerRef = useRef<HTMLDivElement>(null);
-    const newRoleRef = useRef<HTMLDivElement>(null);
+	const newRoleRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setClickedRole(clickRole);
-	}, [clickRole])
+	}, [clickRole]);
 
-    useEffect(() => {
-        if (isNewRole && newRoleRef.current) {
+	useEffect(() => {
+		if (isNewRole && newRoleRef.current) {
 			dispatch(setSelectedPermissions([]));
-            newRoleRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
-        }
-    }, [clickedRole, dispatch, isNewRole]);
-	
+			newRoleRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
+		}
+	}, [clickedRole, dispatch, isNewRole]);
+
 	return (
 		<div className="w-1/3 pr-3 flex flex-col mb-20">
 			<div className="font-semibold mb-4 flex cursor-pointer" onClick={() => handleClose()}>
@@ -71,16 +71,16 @@ const SettingListRole = (props: closeEditRole) => {
 					BACK
 				</div>
 			</div>
-			<div 
+			<div
 				ref={containerRef}
 				className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			>
 				{activeRoles.map((role) => (
 					<div key={role.id}>
-						<ItemRole title={role.title || ''} onHandle={() => handleRoleClick(role.id)} isChoose={clickedRole === role.id}/>
+						<ItemRole title={role.title || ''} onHandle={() => handleRoleClick(role.id)} isChoose={clickedRole === role.id} />
 					</div>
 				))}
-				{isNewRole && <ItemRole ref={newRoleRef} title={nameRoleNew ?? 'New Role'} isChoose/>}
+				{isNewRole && <ItemRole ref={newRoleRef} title={nameRoleNew ?? 'New Role'} isChoose />}
 			</div>
 		</div>
 	);
@@ -92,20 +92,19 @@ type ItemRoleProps = {
 	title: string;
 	isChoose?: boolean;
 	onHandle?: () => void;
-}
+};
 
-const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>((props, ref) => {
-	const {title, isChoose, onHandle=()=>{}} = props;
+const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>(({ title, isChoose, onHandle }, ref) => {
 	return (
 		<div ref={ref} onClick={onHandle}>
-			<button 
-				className={`w-full py-1.5 px-[10px] text-[15px] bg-transparent dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded dark:text-textDarkTheme text-textLightTheme
-					${isChoose ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''}
+			<button
+				className={`w-full py-1.5 px-[10px] text-[15px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded dark:text-textDarkTheme text-textLightTheme
+					${isChoose ? 'dark:bg-[#4e5058] bg-bgLightModeButton' : ''}
 				`}
 			>
 				<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
 				<span className="one-line">{title}</span>
 			</button>
 		</div>
-	)
-})
+	);
+});

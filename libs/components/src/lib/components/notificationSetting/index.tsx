@@ -1,21 +1,21 @@
-import {useCategory, useEscapeKey} from '@mezon/core';
+import { useCategory, useEscapeKey } from '@mezon/core';
 import {
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
 	notificationSettingActions,
 	selectAllchannelCategorySetting,
+	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationClan,
 	selectTheme,
-	selectCurrentChannelNotificatonSelected,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
+import { Modal } from '@mezon/ui';
 import { ThemeApp } from '@mezon/utils';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Creatable from 'react-select/creatable';
-import Modal from '../../../../../ui/src/lib/Modal';
 import { notificationTypesList } from '../PanelChannel';
 export type ModalParam = {
 	onClose: () => void;
@@ -26,65 +26,65 @@ export type ModalParam = {
 export const customStyles = {
 	control: (provided: any) => ({
 		...provided,
-		backgroundColor: 'black',
+		backgroundColor: 'black'
 	}),
 	menu: (provided: any) => ({
 		...provided,
-		backgroundColor: 'bg-[#36393e]',
+		backgroundColor: 'bg-[#36393e]'
 	}),
 	option: (provided: any, state: any) => ({
 		...provided,
 		backgroundColor: state.isFocused ? '#36393e' : '#1f2023',
-		color: 'white',
+		color: 'white'
 	}),
 	multiValue: (provided: any) => ({
 		...provided,
-		backgroundColor: '#1f2023',
+		backgroundColor: '#1f2023'
 	}),
 	multiValueLabel: (provided: any) => ({
 		...provided,
-		color: 'black',
+		color: 'black'
 	}),
 	multiValueRemove: (provided: any) => ({
 		...provided,
 		color: 'red',
 		':hover': {
 			backgroundColor: '#36393e',
-			color: 'white',
-		},
-	}),
+			color: 'white'
+		}
+	})
 };
 
 export const lightCustomStyles = {
 	control: (provided: any) => ({
 		...provided,
-		backgroundColor: 'white',
+		backgroundColor: 'white'
 	}),
 	menu: (provided: any) => ({
 		...provided,
-		backgroundColor: 'bg-[#d5d6d7]',
+		backgroundColor: 'bg-[#d5d6d7]'
 	}),
 	option: (provided: any, state: any) => ({
 		...provided,
 		backgroundColor: state.isFocused ? 'white' : '#e8e9e9',
-		color: 'black',
+		color: 'black'
 	}),
 	multiValue: (provided: any) => ({
 		...provided,
-		backgroundColor: '#c5c6c7',
+		backgroundColor: '#c5c6c7'
 	}),
 	multiValueLabel: (provided: any) => ({
 		...provided,
-		color: 'black',
+		color: 'black'
 	}),
 	multiValueRemove: (provided: any) => ({
 		...provided,
 		color: 'red',
 		':hover': {
 			backgroundColor: '#cecfd0',
-			color: 'white',
-		},
-	}),
+			color: 'white'
+		}
+	})
 };
 
 const ModalNotificationSetting = (props: ModalParam) => {
@@ -121,15 +121,15 @@ const ModalNotificationSetting = (props: ModalParam) => {
 		{
 			id: category.id,
 			label: category.category_name,
-			title: 'category',
+			title: 'category'
 		},
 		...category.channels
 			.filter((channel) => channel.type !== 4)
 			.map((channel) => ({
 				id: channel.id,
 				label: `# ${channel.channel_label}`,
-				title: 'channel',
-			})),
+				title: 'channel'
+			}))
 	]);
 	const [selectedOption, setSelectedOption] = useState(null);
 	const handleChange = (newValue: any) => {
@@ -139,8 +139,8 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
 					category_id: newValue.id,
 					notification_type: defaultNotificationClan?.notification_setting_type,
-					clan_id: currentClanId || '',
-				}),
+					clan_id: currentClanId || ''
+				})
 			);
 		}
 		if (newValue.title === 'channel') {
@@ -149,16 +149,16 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					notificationSettingActions.setNotificationSetting({
 						channel_id: newValue.id,
 						notification_type: defaultNotificationClan?.notification_setting_type,
-						clan_id: currentClanId || '',
-					}),
+						clan_id: currentClanId || ''
+					})
 				);
 			} else {
 				dispatch(
 					notificationSettingActions.setNotificationSetting({
 						channel_id: newValue.id,
 						notification_type: notificatonSelected?.notification_setting_type,
-						clan_id: currentClanId || '',
-					}),
+						clan_id: currentClanId || ''
+					})
 				);
 			}
 		}
@@ -170,8 +170,8 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
 					category_id: channelCategoryId,
 					notification_type: notificationType,
-					clan_id: currentClanId || '',
-				}),
+					clan_id: currentClanId || ''
+				})
 			);
 		}
 		if (title === 'channel') {
@@ -179,8 +179,8 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				notificationSettingActions.setNotificationSetting({
 					channel_id: channelCategoryId,
 					notification_type: notificationType,
-					clan_id: currentClanId || '',
-				}),
+					clan_id: currentClanId || ''
+				})
 			);
 		}
 	};
@@ -193,9 +193,9 @@ const ModalNotificationSetting = (props: ModalParam) => {
 			dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: id, clan_id: currentClanId || '' }));
 		}
 	};
-	
-	useEscapeKey(onCloseModal)
-	
+
+	useEscapeKey(onCloseModal);
+
 	return (
 		<Modal
 			title="Notification Setting"
@@ -253,8 +253,8 @@ const ModalNotificationSetting = (props: ModalParam) => {
 										CHANNEL OR CATEGORY
 									</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">ALL</th>
-									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">NOTHING</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">MENTIONS</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">NOTHING</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">Mute</th>
 								</tr>
 							</thead>
@@ -275,7 +275,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 														handleDefaultNotificationChange(
 															notificationType.value,
 															channelCategorySetting.id,
-															channelCategorySetting.channel_category_title || '',
+															channelCategorySetting.channel_category_title || ''
 														)
 													}
 												/>
@@ -288,7 +288,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 												onClick={() =>
 													handleRemoveOverride(
 														channelCategorySetting.channel_category_title || '',
-														channelCategorySetting.id || '',
+														channelCategorySetting.id || ''
 													)
 												}
 											>

@@ -4,6 +4,7 @@ import {
 	RootState,
 	channelsActions,
 	createNewChannel,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -68,8 +69,11 @@ const ThreadBox = () => {
 								isParentPublic: currentChannel ? !currentChannel.channel_private : false
 							})
 						);
+						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
 						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
+				} else {
+					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);
 				}
 			} else {
 				console.error('Session is not available');

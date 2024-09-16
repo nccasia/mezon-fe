@@ -16,7 +16,8 @@
     },
     "menuChannelStack": {
         "channelSetting": "Cài Đặt Kênh",
-        "threadSetting": "Cài đặt Thread"
+        "threadSetting": "Cài đặt Thread",
+        "permissionOverrides": "Ghi đè quyền"
     },
     "settingStack": {
         "settings": "Cài Đặt",

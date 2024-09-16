@@ -2141,7 +2141,7 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	);
 };
 
-export const Location: React.FC<IconProps> = () => {
+export const Location: React.FC<IconProps> = ({ defaultFill }) => {
 	return (
 		<svg
 			aria-hidden="true"
@@ -2151,7 +2151,7 @@ export const Location: React.FC<IconProps> = () => {
 			height="20"
 			fill="none"
 			viewBox="0 0 24 24"
-			className="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode"
+			className={`w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode ${defaultFill}`}
 		>
 			<path
 				fill="currentColor"

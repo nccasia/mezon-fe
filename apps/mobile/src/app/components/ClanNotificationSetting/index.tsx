@@ -8,7 +8,6 @@ import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../temp-ui';
 import CategoryChannel from './CategoryChannel';
 import { style } from './ClanNotificationSetting.styles';
-import MuteClanNotificationBS from './MuteClanNotificationBS';
 
 type ClanNotificationSettingScreen = typeof APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING;
 const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotificationSettingScreen>) => {
@@ -23,7 +22,7 @@ const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotific
 			<Pressable style={{ padding: 20 }} onPress={handleClose}>
 				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
 			</Pressable>
-		),
+		)
 	});
 	const handleClose = () => {
 		navigation.goBack();
@@ -33,41 +32,41 @@ const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotific
 		{
 			title: t('suppressOption.suppressEveryone'),
 			component: <MezonSwitch />,
-			onPress: () => reserve(),
+			onPress: () => reserve()
 		},
 		{
 			title: t('suppressOption.suppressAllRole'),
 			component: <MezonSwitch />,
-			onPress: () => reserve(),
+			onPress: () => reserve()
 		},
 		{
 			title: t('suppressOption.suppressHighlights'),
 			component: <MezonSwitch />,
-			onPress: () => reserve(),
-		},
+			onPress: () => reserve()
+		}
 	];
 
 	const muteEventMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('muteEventOptions.muteNewEvents'),
 			component: <MezonSwitch />,
-			onPress: () => reserve(),
+			onPress: () => reserve()
 		},
 		{
 			title: t('muteEventOptions.mobilePushNotifications'),
 			component: <MezonSwitch />,
-			onPress: () => reserve(),
-		},
+			onPress: () => reserve()
+		}
 	];
 
 	const generalMenu: IMezonMenuSectionProps[] = [
 		{
 			items: suppressMenu,
-			bottomDescription: t('suppressOption.subText'),
+			bottomDescription: t('suppressOption.subText')
 		},
 		{
-			items: muteEventMenu,
-		},
+			items: muteEventMenu
+		}
 	];
 
 	const notificationOverridesMenu: IMezonMenuSectionProps[] = [
@@ -76,16 +75,15 @@ const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotific
 				{
 					title: t('notificationOverrides.addChannelsAllCategory'),
 					onPress: () => handleOverridesNotification(),
-					icon: <PlusIcon height={16} width={16} color={themeValue.text} />,
-				},
+					icon: <PlusIcon height={16} width={16} color={themeValue.text} />
+				}
 			],
-			title: t('notificationOverrides.title'),
-		},
+			title: t('notificationOverrides.title')
+		}
 	];
 
 	const handleNotificationClanChange = (value: number) => {
-    if(value)
-		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClanId, notification_type: value }));
+		if (value) dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClanId, notification_type: value }));
 	};
 
 	const handleOverridesNotification = () => {
@@ -94,7 +92,6 @@ const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotific
 
 	return (
 		<ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: size.s_50 }}>
-			<MuteClanNotificationBS description={t('muteClan')} />
 			<MezonOption
 				value={defaultNotificationClan?.notification_setting_type}
 				onChange={handleNotificationClanChange}

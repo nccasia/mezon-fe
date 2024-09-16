@@ -11,10 +11,11 @@ export type MemberItemProps = {
 	dataMemberCreate?: DataMemberCreate;
 	directMessageId?: string;
 	name?: string;
+	isDM: boolean;
 };
 
-function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name }: MemberItemProps) {
-	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
+function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM }: MemberItemProps) {
+	const userCustomStatus = useMemberCustomStatus(user.user?.id || '', isDM);
 
 	return (
 		<MemberProfile

@@ -59,13 +59,17 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 
 	useEffect(() => {
 		let scrollHandlerTimeoutId: NodeJS.Timeout;
-
-		const handler = (event: Event) => {
-			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
-			scrollHandlerTimeoutId = setTimeout(() => {
-				scrollEventHandlerRef.current(event);
-			}, options?.debounce);
-		};
+		let handler: (event: Event) => void;
+		if (Number.isInteger(options?.debounce)) {
+			handler = (event: Event) => {
+				scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
+				scrollHandlerTimeoutId = setTimeout(() => {
+					scrollEventHandlerRef.current(event);
+				}, options?.debounce as number);
+			};
+		} else {
+			handler = scrollEventHandlerRef.current;
+		}
 
 		const el = targetRef.current;
 

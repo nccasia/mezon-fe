@@ -83,6 +83,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 			{!mess.isFirst && (
 				<div className="fullBoxText relative group ">
 					<MessageWithUser
+						allowDisplayShortProfile={true}
 						message={mess as IMessageWithUser}
 						mode={mode}
 						isEditing={isEditing}

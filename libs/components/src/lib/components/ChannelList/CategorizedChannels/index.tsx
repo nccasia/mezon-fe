@@ -10,13 +10,14 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import CategorySetting from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
 import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';
-import ChannelListItem from '../ChannelListItem';
+import ChannelListItem, { ChannelListItemRef } from '../ChannelListItem';
 
 type CategorizedChannelsProps = {
 	category: ICategoryChannel;
@@ -61,7 +62,8 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
-
+	const location = useLocation();
+	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -116,6 +118,16 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
 
 	useEscapeKey(() => setIsShowPanelCategory(false));
+
+	useEffect(() => {
+		const focusChannel = location.state?.focusChannel ?? {};
+		const { id, parentId } = focusChannel as { id: string; parentId: string };
+		if (id && parentId && parentId !== '0') {
+			channelRefs.current[parentId]?.scrollIntoThread(id);
+		} else if (id) {
+			channelRefs.current[id]?.scrollIntoChannel();
+		}
+	}, [location]);
 
 	return (
 		<div>
@@ -180,6 +192,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						.map((channel: IChannel) => {
 							return (
 								<ChannelListItem
+									ref={(component) => (channelRefs.current[channel.id] = component)}
 									isActive={currentChannelId === channel.id}
 									key={channel.id}
 									channel={channel as ChannelThreads}

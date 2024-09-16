@@ -14,7 +14,7 @@ if (Platform.OS === 'android') {
 export function useAnimatedState<T>(
 	initialValue: T,
 	config: ConfigAnimated = {
-		duration: 300,
+		duration: 200,
 		creationProp: 'opacity',
 		type: 'easeInEaseOut'
 	}

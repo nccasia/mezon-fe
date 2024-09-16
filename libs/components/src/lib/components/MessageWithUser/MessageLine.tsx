@@ -1,9 +1,10 @@
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
 type MessageLineProps = {
 	mode?: number;
@@ -14,6 +15,7 @@ type MessageLineProps = {
 	isHideLinkOneImage?: boolean;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	isEditted: boolean;
 };
 
 const MessageLine = ({
@@ -24,23 +26,11 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isTokenClickAble,
-	isHideLinkOneImage
+	isHideLinkOneImage,
+	isEditted
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-	// const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
-
-	// useEffect(() => {
-	// 	const handleResize = () => {
-	// 		setMaxWidth(window.innerWidth - 600);
-	// 	};
-
-	// 	window.addEventListener('resize', handleResize);
-
-	// 	return () => {
-	// 		window.removeEventListener('resize', handleResize);
-	// 	};
-	// }, []);
 	return (
 		<div
 			onClick={
@@ -61,7 +51,7 @@ const MessageLine = ({
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
-				// parentWidth={maxWidth}
+				isEditted={isEditted}
 			/>
 		</div>
 	);
@@ -79,6 +69,7 @@ interface RenderContentProps {
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
+	isEditted: boolean;
 }
 
 interface ElementToken {
@@ -102,7 +93,8 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isHideLinkOneImage
+		isHideLinkOneImage,
+		isEditted
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -118,6 +110,7 @@ const RenderContent = memo(
 			...lkm,
 			...vkm
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		const { allUserIdsInChannel, allRolesInClan } = useMessageContextMenu();
 
 		let lastindex = 0;
 		const content = useMemo(() => {
@@ -146,22 +139,54 @@ const RenderContent = memo(
 					);
 				}
 
-				if (element.kindOf === ETokenMessage.MENTIONS) {
-					formattedContent.push(
-						<MentionUser
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-							tagName={contentInElement ?? ''}
-							tagUserId={element.user_id ? element.user_id : (element.role_id ?? '')}
-							mode={mode}
-						/>
-					);
+				if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
+					if (allUserIdsInChannel.indexOf(element.user_id) !== -1) {
+						formattedContent.push(
+							<MentionUser
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								tagUserName={contentInElement ?? ''}
+								tagUserId={element.user_id}
+								mode={mode}
+							/>
+						);
+					} else {
+						formattedContent.push(
+							<PlainText
+								isSearchMessage={false}
+								key={`userDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								text={contentInElement ?? ''}
+							/>
+						);
+					}
 				}
-
+				if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
+					if (allRolesInClan.indexOf(element.role_id) !== -1) {
+						formattedContent.push(
+							<MentionUser
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								key={`roleMention-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								tagRoleName={contentInElement ?? ''}
+								tagRoleId={element.role_id}
+								mode={mode}
+							/>
+						);
+					} else {
+						formattedContent.push(
+							<PlainText
+								isSearchMessage={false}
+								key={`roleDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								text={contentInElement ?? ''}
+							/>
+						);
+					}
+				}
 				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
+							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s) ? true : false}
 							key={`emoji-${index}-${s}-${element.emojiid}`}
 							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
@@ -232,6 +257,17 @@ const RenderContent = memo(
 				formattedContent.push(<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
 			}
 
+			if (isEditted) {
+				formattedContent.push(
+					<p
+						key={`edited-status-${lastindex}-end`}
+						className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]"
+					>
+						(edited)
+					</p>
+				);
+			}
+
 			return formattedContent;
 		}, [elements, t, mode]);
 
@@ -243,7 +279,6 @@ const RenderContent = memo(
 								whiteSpace: 'nowrap',
 								overflow: 'hidden',
 								textOverflow: 'ellipsis'
-								// maxWidth: parentWidth
 							}
 						: {
 								whiteSpace: 'pre-line'

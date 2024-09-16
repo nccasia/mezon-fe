@@ -2,7 +2,7 @@ import { channelsActions, useAppDispatch } from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
 import { IChannel, ValidateSpecialCharacters } from '@mezon/utils';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type OverviewChannelProps = {
@@ -20,6 +20,11 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
 	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
+	const isThread = channel.parrent_id !== '0';
+	const label = useMemo(() => {
+		return isThread ? 'thread' : 'channel';
+	}, [isThread]);
+
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTopic(e.target.value);
 		setCountCharacterTopic(1024 - e.target.value.length);
@@ -47,7 +52,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: channelLabel,
-			category_id: channel.category_id,
+			category_id: channel.category_id
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 	};
@@ -64,7 +69,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="dark:text-white text-black text-[15px]">
 				<h3 className="mb-4 font-bold text-xl">Overview</h3>
-				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Channel name</p>
+				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">{label} name</p>
 				<InputField
 					type="text"
 					placeholder={channelLabel}
@@ -75,14 +80,14 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 				/>
 				{checkValidate && (
 					<p className="text-[#e44141] text-xs italic font-thin">
-						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+						Please enter a valid {label} name (max 64 characters, only words, numbers, _ or -).
 					</p>
 				)}
 				<hr className="border-t border-solid dark:border-borderDefault my-10" />
-				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Channel Topic</p>
+				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">{label} Topic</p>
 				<div className="relative">
 					<TextArea
-						placeholder="Let everyone know how to use this channel!"
+						placeholder={`Let everyone know how to use this ${label}!`}
 						className="resize-none h-auto min-h-[87px] w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
 						value={topic}
 						onChange={handleChangeTextArea}

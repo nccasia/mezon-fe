@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	channelMembers,
 	channelMembersActions,
@@ -6,12 +7,15 @@ import {
 	channelsSlice,
 	clansSlice,
 	directActions,
+	directMetaActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
 	fetchMessages,
 	friendsActions,
+	giveCoffeeActions,
 	listChannelsByUserActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
@@ -25,6 +29,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
+	selectMemberClanByUserId,
 	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
@@ -33,7 +38,8 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ModeResponsive, NotificationCode } from '@mezon/utils';
+import { ModeResponsive, NotificationCode, getNameForPrioritize } from '@mezon/utils';
+import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -43,6 +49,7 @@ import {
 	ChannelStreamMode,
 	ChannelType,
 	ChannelUpdatedEvent,
+	ClanDeletedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
@@ -57,8 +64,8 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
-import { ApiMessageReaction } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
@@ -134,9 +141,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
-				dispatch(directActions.updateDMSocket(message));
-				dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-				dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
+				dispatch(directMetaActions.updateDMSocket(message));
+				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
 			} else {
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
@@ -224,8 +231,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({ userId: userID, channelId: user.channel_id }));
+					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(fetchDirectMessage({ noCache: true }));
 						dispatch(
@@ -250,8 +258,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						navigate(`/chat/direct/friends`);
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(
+						channelMembers.actions.removeUserByUserIdAndClan({
+							userId: id,
+							channelIds: channels.map((item) => item.id),
+							clanId: user.clan_id
+						})
+					);
 					dispatch(usersClanActions.remove(id));
 				}
 			});
@@ -269,6 +284,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
@@ -283,6 +299,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					);
 				}
 			} else {
+				if (clanIdActive === userAdds.clan_id) {
+					const members = userAdds?.users
+						.filter((user) => user?.user_id)
+						.map((user) => ({
+							id: user.user_id,
+							user: {
+								...user,
+								avatar_url: user.avatar,
+								id: user.user_id,
+								about_me: user.about_me,
+								display_name: user.display_name,
+								metadata: user.custom_status,
+								username: user.username,
+								create_time: new Date(user.create_time_second * 1000).toISOString()
+							}
+						}));
+					dispatch(usersClanActions.upsertMany(members));
+				}
+
 				dispatch(
 					channelMembersActions.fetchChannelMembers({
 						clanId: userAdds.clan_id || '',
@@ -305,15 +340,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
 				return;
 			}
-			dispatch(
-				usersClanActions.add({
-					...userJoinClan,
-					id: userJoinClan?.user?.user_id
-				})
-			);
-			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
+			if (userJoinClan?.user && clanIdActive === userJoinClan.clan_id) {
+				const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
+				dispatch(
+					usersClanActions.add({
+						...userJoinClan,
+						id: userJoinClan.user.user_id,
+						user: {
+							...userJoinClan.user,
+							avatar_url: userJoinClan.user.avatar,
+							id: userJoinClan.user.user_id,
+							about_me: userJoinClan.user.about_me,
+							display_name: userJoinClan.user.display_name,
+							metadata: userJoinClan.user.custom_status,
+							username: userJoinClan.user.username,
+							create_time: createTime
+						}
+					})
+				);
+			}
 		},
-		[dispatch]
+		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
 
 	const onclanprofileupdated = useCallback(
@@ -374,6 +421,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
+			console.log('------');
+			console.log('e - Reaction:', e);
 			if (e.count > 0) {
 				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}
@@ -385,6 +434,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
 						channelsActions.joinChat({
@@ -402,10 +452,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onclandeleted = useCallback(
+		(clanDelete: ClanDeletedEvent) => {
+			dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
+				navigate(`/chat/direct/friends`);
+				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			}
+		},
+		[currentClanId, dispatch, navigate, userId]
+	);
+
 	const onchanneldeleted = useCallback(
 		(channelDeleted: ChannelDeletedEvent) => {
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 			}
 		},
 		[dispatch]
@@ -431,6 +494,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const oneventcreated = useCallback(
+		(eventCreatedEvent: ApiCreateEventRequest) => {
+			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
+		},
+		[dispatch]
+	);
+	const [receiverId, setReceiverId] = useState('');
+	const receiver = useSelector(selectMemberClanByUserId(receiverId));
+	const [triggerDate, setTriggerDate] = useState<number>(Date.now());
+
+	useEffect(() => {
+		if (receiver) {
+			const name = getNameForPrioritize(receiver?.clan_nick ?? '', receiver.user?.display_name ?? '', receiver.user?.username ?? '');
+
+			const uniqueId = `token_${receiver.id}_${Date.now()}}`;
+			dispatch(
+				toastActions.addToast({
+					message: `+1 token from ${name}`,
+					type: 'success',
+					id: uniqueId
+				})
+			);
+		}
+	}, [receiver, dispatch, triggerDate]);
+	const oncoffeegiven = useCallback(
+		(coffeeEvent: ApiGiveCoffeeEvent) => {
+			dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+			if (userId === coffeeEvent.receiver_id) {
+				setReceiverId(coffeeEvent.sender_id ?? '');
+				setTriggerDate(Date.now());
+			}
+		},
+		[dispatch, userId]
+	);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -459,6 +556,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserclanremoved = onuserclanremoved;
 
+			socket.onclandeleted = onclandeleted;
+
 			socket.onuserchanneladded = onuserchanneladded;
 
 			socket.onuserclanadded = onuserclanadded;
@@ -475,7 +574,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
+			socket.oneventcreated = oneventcreated;
+
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.oncoffeegiven = oncoffeegiven;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -491,31 +594,50 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onpinmessage,
 			onuserchannelremoved,
 			onuserclanremoved,
+			onclandeleted,
 			onuserchanneladded,
 			onuserclanadded,
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
-			onvoiceleaved
+			onvoiceleaved,
+			oneventcreated,
+			oncoffeegiven
 		]
 	);
 
-	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket disconnected', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
+	const handleReconnect = useCallback(
+		async (socketType: string) => {
+			dispatch(toastActions.addToast({ message: socketType, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
+			try {
+				const socket = await reconnect(clanIdActive ?? '');
+				if (!socket) {
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
+					return;
+				}
+				setCallbackEventFn(socket as Socket);
+			} catch (error) {
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', id: 'SOCKET_CONNECTION_WARN' }));
+			}
+		},
+		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
+	);
 
-	const onHeartbeatTimeout = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket hearbeat timeout', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [clanIdActive, dispatch, reconnect, setCallbackEventFn]);
+	const ondisconnect = useCallback(
+		debounce(() => {
+			handleReconnect('Socket disconnected');
+		}, 300),
+		[handleReconnect]
+	);
+
+	const onHeartbeatTimeout = useCallback(
+		debounce(() => {
+			handleReconnect('Socket hearbeat timeout');
+		}, 300),
+		[handleReconnect]
+	);
 
 	useEffect(() => {
 		const socket = socketRef.current;
@@ -544,11 +666,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onclandeleted = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserchanneladded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oncoffeegiven = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -560,6 +686,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onpinmessage,
 		onuserchannelremoved,
 		onuserclanremoved,
+		onclandeleted,
 		onuserchanneladded,
 		onuserclanadded,
 		onclanprofileupdated,
@@ -573,7 +700,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
-		setCallbackEventFn
+		oneventcreated,
+		setCallbackEventFn,
+		oncoffeegiven
 	]);
 
 	useEffect(() => {

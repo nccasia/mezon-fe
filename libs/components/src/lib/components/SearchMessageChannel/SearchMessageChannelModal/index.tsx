@@ -1,6 +1,6 @@
 import { selectAllUserClans } from '@mezon/store';
 import { UsersClanEntity } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SelectGroup from '../SelectGroup';
 import SelectItem from '../SelectItem';
@@ -12,6 +12,7 @@ type SearchMessageChannelModalProps = {
 	hasKeySearch?: boolean;
 	isShowSearchOptions?: string;
 	onClickSearchOptions: (value: string) => void;
+	theme: string;
 };
 
 const SearchMessageChannelModal = ({
@@ -19,7 +20,8 @@ const SearchMessageChannelModal = ({
 	valueInputSearch,
 	hasKeySearch,
 	isShowSearchOptions,
-	onClickSearchOptions
+	onClickSearchOptions,
+	theme
 }: SearchMessageChannelModalProps) => {
 	const usersClan = useSelector(selectAllUserClans);
 
@@ -34,9 +36,36 @@ const SearchMessageChannelModal = ({
 			: [];
 	}, [usersClan, valueDisplay]);
 
+	const [index, setIndex] = useState(0);
+	const totalOptions = searchOptions.length;
+
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key === 'ArrowDown') {
+			setIndex((prevIndex) => (prevIndex + 1) % totalOptions);
+			e.preventDefault();
+		} else if (e.key === 'ArrowUp') {
+			setIndex((prevIndex) => (prevIndex - 1 + totalOptions) % totalOptions);
+			e.preventDefault();
+		} else if (e.key === 'Enter') {
+			const selectedItem = searchOptions[index];
+			if (selectedItem) {
+				onClickSearchOptions(selectedItem.title);
+			}
+			e.preventDefault();
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown as EventListener);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown as EventListener);
+		};
+	}, [index, totalOptions, onClickSearchOptions]);
+
 	return (
 		<div
-			className={`absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
+			className={`absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch shadow`}
+			tabIndex={0}
 		>
 			{valueDisplay && (
 				<div className="first:mt-0 mt-3 p-3 rounded-t dark:bg-bgSecondary600 border-b border-borderDivider last:border-b-0 last:bottom-b-0">
@@ -56,12 +85,13 @@ const SearchMessageChannelModal = ({
 
 			{!hasKeySearch && !isShowSearchOptions && (
 				<SelectGroup groupName="Search options">
-					{searchOptions.map((searchItem) => (
+					{searchOptions.map((searchItem, idx) => (
 						<SelectItem
-							key={searchItem.title}
+							key={idx}
 							onClick={() => onClickSearchOptions(searchItem.title ?? '')}
 							title={searchItem.title}
 							content={searchItem.content}
+							className={`${index === idx && theme === 'light' ? 'bg-[#EBEBED]' : index === idx && theme === 'dark' ? 'bg-[#282A2E]' : ''}`}
 						/>
 					))}
 				</SelectGroup>

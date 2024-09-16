@@ -34,7 +34,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const handleCreateClan = async () => {
 		const store = await getStoreAsync();
 		const isDuplicate = await store.dispatch(checkDuplicateNameClan(nameClan.trim()));
-		if (isDuplicate) {
+		if (isDuplicate?.payload) {
 			Toast.show({
 				type: 'error',
 				text1: t('duplicateNameMessage')

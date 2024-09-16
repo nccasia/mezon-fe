@@ -23,7 +23,6 @@ import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	// const isMessageRead = useSelector(selectIsMessageRead);
 	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -35,9 +34,6 @@ function useChannelSeen(channelId: string) {
 				clanId: currentChannel?.clan_id ?? ''
 			})
 		);
-		// if (isMessageRead && channelId === currentChannel?.channel_id) {
-		// 	dispatch(notificationActions.setIsMessageRead(false));
-		// }
 	}, [channelId, currentChannel, dispatch]);
 }
 
@@ -62,7 +58,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 				<ChannelTyping
 					channelId={currentChannel?.id}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isPublic={!currentChannel.channel_private}
+					isPublic={currentChannel ? !currentChannel.channel_private : false}
 				/>
 			)}
 			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
@@ -118,7 +114,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
 					>
 						<div
-							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
 							ref={messagesContainerRef}
 						>
 							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />

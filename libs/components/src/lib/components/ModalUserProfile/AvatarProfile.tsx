@@ -1,6 +1,9 @@
 import { useMemberStatus } from '@mezon/core';
+import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelMembersEntity, IUserAccount, MemberProfileType } from '@mezon/utils';
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import StatusUser from '../StatusUser';
 
@@ -13,15 +16,26 @@ type AvatarProfileProps = {
 	styleAvatar?: string;
 	positionType?: string;
 	userID?: string;
+	isFooterProfile?: boolean;
 };
 
-const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvatar, userID, positionType }: AvatarProfileProps) => {
+const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvatar, userID, positionType, isFooterProfile }: AvatarProfileProps) => {
 	const userStatus = useMemberStatus(userID || '');
 	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
 
 	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
 
+	const currentClanId = useSelector(selectCurrentClanId);
+
 	const isListDm = useMemo(() => positionType === MemberProfileType.DM_LIST, [positionType]);
+	const dispatch = useAppDispatch();
+	const handleCustomStatus = () => {
+		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
+	};
+
+	const handleClearCustomStatus = () => {
+		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: '' }));
+	};
 
 	return (
 		<div className=" text-black flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
@@ -52,10 +66,28 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 					<div className="dark:bg-bgPrimary bg-white w-[12px] h-[12px] rounded-full shadow-md"></div>
 					<div className="relative flex-1">
 						<div className="dark:bg-bgPrimary bg-white w-[20px] h-[20px] rounded-full absolute top-[-11px] left-[16px] shadow-md"></div>
-						<div className="absolute dark:bg-bgPrimary bg-white px-[16px] py-[12px] flex items-center justify-center rounded-[12px] w-fit max-w-full shadow-lg">
-							<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-all overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
-								{customStatus}
-							</span>
+						<div className="absolute w-fit max-w-full shadow-lg rounded-[12px] group">
+							<div className="relative dark:bg-bgPrimary bg-white px-[16px] py-[12px] w-fit max-w-full rounded-[12px] flex items-center justify-center">
+								<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-words overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
+									{customStatus}
+								</span>
+								{isFooterProfile && (
+									<div className="absolute -top-4 right-1 hidden group-hover:flex gap-[1px] dark:text-[#d1d4d6] text-[#303236] rounded-full bg-white dark:bg-bgPrimary border dark:border-[#1e1e1e] p-[2px] shadow-md">
+										<div
+											onClick={handleCustomStatus}
+											className="pl-2 pr-1 py-1 w-fit hover:bg-bgLightModeButton dark:hover:bg-[#25272a] rounded-l-full"
+										>
+											<Icons.EditMessageRightClick defaultSize="w-4 h-4" />
+										</div>
+										<div
+											onClick={handleClearCustomStatus}
+											className="pl-1 pr-2 py-1 w-fit hover:bg-bgLightModeButton dark:hover:bg-[#25272a] rounded-r-full text-red-600"
+										>
+											<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
+										</div>
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
 				</div>

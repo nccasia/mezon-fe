@@ -9,7 +9,7 @@ import {
 	selectTheme,
 	useAppDispatch,
 	userClanProfileActions,
-	voiceActions,
+	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
@@ -27,9 +27,10 @@ export type FooterProfileProps = {
 	avatar: string;
 	userId?: string;
 	channelCurrent?: ChannelsEntity | null;
+	isDM: boolean;
 };
 
-function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterProfileProps) {
+function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
@@ -37,7 +38,8 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
 	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
-	const userCustomStatus = useMemberCustomStatus(userId || '');
+	/// TODo dây có custom r
+	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 
 	const profileRef = useRef<HTMLDivElement | null>(null);
@@ -99,7 +101,9 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							customStatus={userCustomStatus || userStatusProfile}
 						/>
 					</div>
-					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} avatar={avatar} name={name} />}
+					{showModalFooterProfile && (
+						<ModalFooterProfile userId={userId ?? ''} avatar={avatar} name={name} isDM={isDM} userStatusProfile={userStatusProfile} />
+					)}
 				</div>
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />

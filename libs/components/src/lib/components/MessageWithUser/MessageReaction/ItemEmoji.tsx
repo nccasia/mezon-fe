@@ -57,7 +57,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
-			!currentChannel?.channel_private,
+			currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 	}

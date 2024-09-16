@@ -1,43 +1,45 @@
-import {
-	ChannelsEntity,
-	fetchSystemMessageByClanId,
-	selectAllChannels,
-	selectCurrentClanId,
-	updateSystemMessage,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { ChannelsEntity, selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { ApiSystemMessage } from 'mezon-js/api.gen';
+import { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js/api.gen';
 import React, { useEffect, useState } from 'react';
 
-const SystemMessagesManagement = () => {
+type SystemMessagesManagementProps = {
+	hasChanges: boolean;
+	systemMessage: ApiSystemMessage | null;
+	onGetCreateSystemMessageRequest: (createSystemMessageRequest: ApiSystemMessageRequest) => void;
+	onGetChannelId: (channelId: string) => void;
+	onGetWelcomeRandom: (welcomeRandom: string) => void;
+	onGetWelcomeSticker: (welcomeSticker: string) => void;
+	onGetBoostMessage: (boostMessage: string) => void;
+	onGetSetupTips: (setupTips: string) => void;
+	onHasChanges: (hasChanges: boolean) => void;
+};
+
+const SystemMessagesManagement = ({
+	hasChanges,
+	systemMessage,
+	onGetCreateSystemMessageRequest,
+	onGetChannelId,
+	onGetWelcomeRandom,
+	onGetWelcomeSticker,
+	onGetBoostMessage,
+	onGetSetupTips,
+	onHasChanges
+}: SystemMessagesManagementProps) => {
 	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
-
-	const [systemMessage, setSystemMessage] = useState<ApiSystemMessage | null>(null);
 	const [selectedChannel, setSelectedChannel] = useState<ChannelsEntity | null>(null);
-
-	const dispatch = useAppDispatch();
-
-	useEffect(() => {
-		if (currentClanId) {
-			const fetchMessage = async () => {
-				try {
-					const resultAction = await dispatch(fetchSystemMessageByClanId(currentClanId));
-					const message = unwrapResult(resultAction);
-					setSystemMessage(message);
-				} catch (err) {
-					console.error('Failed to fetch system message:', err);
-				}
-			};
-
-			fetchMessage();
-		}
-	}, [currentClanId, dispatch]);
+	const [initialChannelId, setInitialChannelId] = useState<string | undefined>(systemMessage?.channel_id ?? '');
+	const [isWelcomeRandom, setIsWelcomeRandom] = useState<boolean>(systemMessage?.welcome_random == '1' ? true : false);
+	const [isWelcomeRandomInitial, setIsWelcomeRandomInitial] = useState<boolean>(systemMessage?.welcome_random == '1' ? true : false);
+	const [isWelcomeSticker, setIsWelcomeSticker] = useState<boolean>(systemMessage?.welcome_sticker == '1' ? true : false);
+	const [isWelcomeStickerInitial, setIsWelcomeStickerInitial] = useState<boolean>(systemMessage?.welcome_sticker == '1' ? true : false);
+	const [isBoostMessage, setIsBoostMessage] = useState<boolean>(systemMessage?.boost_message == '1' ? true : false);
+	const [isBoostMessageInitial, setIsBoostMessageInitial] = useState<boolean>(systemMessage?.boost_message == '1' ? true : false);
+	const [isSetupTips, setIsSetupTips] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
+	const [isSetupTipsInitial, setIsSetupTipsInitial] = useState<boolean>(systemMessage?.setup_tips == '1' ? true : false);
 
 	useEffect(() => {
 		if (systemMessage && channelsList.length > 0) {
@@ -45,23 +47,99 @@ const SystemMessagesManagement = () => {
 				(channel) => channel.clan_id === currentClanId && channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.parrent_id === '0'
 			);
 
+			if (Object.keys(systemMessage).length == 0 && currentClanId && channelsListWithoutVoiceChannel) {
+				const createSystemMessageRequest = {
+					clan_id: currentClanId,
+					channel_id: channelsListWithoutVoiceChannel[0].channel_id,
+					welcome_random: isWelcomeRandom ? '1' : '0',
+					welcome_sticker: isWelcomeSticker ? '1' : '0',
+					boost_message: isBoostMessage ? '1' : '0',
+					setup_tips: isSetupTips ? '1' : '0'
+				};
+				if (createSystemMessageRequest && createSystemMessageRequest.channel_id) {
+					onGetCreateSystemMessageRequest(createSystemMessageRequest);
+				}
+				const systemMessageChannel = channelsListWithoutVoiceChannel.find(
+					(channel) => channel.channel_id === createSystemMessageRequest.channel_id
+				);
+				setSelectedChannel(systemMessageChannel ?? channelsListWithoutVoiceChannel[0]);
+			}
+
 			const systemMessageChannel = channelsListWithoutVoiceChannel.find((channel) => channel.channel_id === systemMessage.channel_id);
 			setSelectedChannel(systemMessageChannel || channelsListWithoutVoiceChannel[0]);
+			setInitialChannelId(systemMessageChannel?.channel_id ?? '');
+			setIsWelcomeRandomInitial(systemMessage?.welcome_random == '1' ? true : false);
+			setIsWelcomeStickerInitial(systemMessage?.welcome_sticker == '1' ? true : false);
+			setIsBoostMessageInitial(systemMessage?.boost_message == '1' ? true : false);
+			setIsSetupTipsInitial(systemMessage?.setup_tips == '1' ? true : false);
+			onGetChannelId(systemMessageChannel?.channel_id ?? '');
 		}
 	}, [systemMessage, channelsList, currentClanId]);
 
-	const handleSelectChannel = (channel: ChannelsEntity) => {
-		setSelectedChannel(channel);
-		if (currentClanId) {
-			const request = {
-				clanId: currentClanId,
-				channelId: {
-					channel_id: channel.channel_id
-				}
-			};
-
-			dispatch(updateSystemMessage(request));
+	useEffect(() => {
+		if (
+			selectedChannel?.channel_id !== initialChannelId ||
+			isWelcomeRandom !== isWelcomeRandomInitial ||
+			isWelcomeSticker !== isWelcomeStickerInitial ||
+			isBoostMessage !== isBoostMessageInitial ||
+			isSetupTips !== isSetupTipsInitial
+		) {
+			onHasChanges(true);
+		} else {
+			onHasChanges(false);
 		}
+	}, [
+		selectedChannel,
+		initialChannelId,
+		isWelcomeRandomInitial,
+		isWelcomeStickerInitial,
+		isBoostMessageInitial,
+		isSetupTipsInitial,
+		isWelcomeRandom,
+		isWelcomeSticker,
+		isBoostMessage,
+		isSetupTips
+	]);
+
+	useEffect(() => {
+		if (hasChanges) return;
+
+		if (initialChannelId) {
+			const resetChannel = channelsList.find((channel) => channel.channel_id === initialChannelId);
+			setSelectedChannel(resetChannel ?? null);
+		}
+
+		handleWelcomeRandomToggle(isWelcomeRandomInitial);
+		handleWelcomeStickerToggle(isWelcomeStickerInitial);
+		handleBoostMessageToggle(isBoostMessageInitial);
+		handleSetupTipsToggle(isSetupTipsInitial);
+	}, [hasChanges, initialChannelId, channelsList, isWelcomeRandomInitial, isWelcomeStickerInitial, isBoostMessageInitial, isSetupTipsInitial]);
+
+	const handleSelectChannel = async (channel: ChannelsEntity) => {
+		setSelectedChannel(channel);
+		if (channel.channel_id) {
+			onGetChannelId(channel.channel_id);
+		}
+	};
+
+	const handleWelcomeRandomToggle = (checked: boolean) => {
+		setIsWelcomeRandom(checked);
+		onGetWelcomeRandom(checked ? '1' : '0');
+	};
+
+	const handleWelcomeStickerToggle = (checked: boolean) => {
+		setIsWelcomeSticker(checked);
+		onGetWelcomeSticker(checked ? '1' : '0');
+	};
+
+	const handleBoostMessageToggle = (checked: boolean) => {
+		setIsBoostMessage(checked);
+		onGetBoostMessage(checked ? '1' : '0');
+	};
+
+	const handleSetupTipsToggle = (checked: boolean) => {
+		setIsSetupTips(checked);
+		onGetSetupTips(checked ? '1' : '0');
 	};
 
 	return (
@@ -94,24 +172,32 @@ const SystemMessagesManagement = () => {
 					)
 					.map((channel) =>
 						channel.channel_id !== selectedChannel?.channel_id ? (
-							<div
+							<Dropdown.Item
 								key={channel.id}
 								className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-1 px-4 text-left cursor-pointer"
 								onClick={() => handleSelectChannel(channel)}
 							>
 								<p># {channel.channel_label ?? ''}</p>
 								<p className="uppercase dark:text-textSecondary text-textSecondary800 ml-5">{channel.category_name}</p>
-							</div>
+							</Dropdown.Item>
 						) : null
 					)}
 			</Dropdown>
 			<p className={'text-xs dark:text-textPrimary text-textPrimaryLight py-2'}>
 				This is the channel we send system event messages to. These can be turned off at any time
 			</p>
-			<ToggleItem label={'Send a random welcome message when someone joins this server.'} value={true} />
-			<ToggleItem label={'Prompt members to reply to welcome messages with a sticker.'} value={true} />
-			<ToggleItem label={'Send a message when someone Boosts this server.'} value={true} />
-			<ToggleItem label={'Send helpful tips for server setup.'} value={true} />
+			<ToggleItem
+				label={'Send a random welcome message when someone joins this server.'}
+				value={isWelcomeRandom}
+				handleToggle={handleWelcomeRandomToggle}
+			/>
+			<ToggleItem
+				label={'Prompt members to reply to welcome messages with a sticker.'}
+				value={isWelcomeSticker}
+				handleToggle={handleWelcomeStickerToggle}
+			/>
+			<ToggleItem label={'Send a message when someone Boosts this server.'} value={isBoostMessage} handleToggle={handleBoostMessageToggle} />
+			<ToggleItem label={'Send helpful tips for server setup.'} value={isSetupTips} handleToggle={handleSetupTipsToggle} />
 		</div>
 	);
 };
@@ -121,7 +207,7 @@ export default SystemMessagesManagement;
 type ToggleItemProps = {
 	label: string;
 	value: boolean;
-	handleToggle?: () => void;
+	handleToggle: (checked: boolean) => void;
 };
 
 const ToggleItem: React.FC<ToggleItemProps> = ({ label, value, handleToggle }) => {
@@ -136,12 +222,11 @@ const ToggleItem: React.FC<ToggleItemProps> = ({ label, value, handleToggle }) =
                bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
                 after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
                  hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-                  focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+                  focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed
                    disabled:bg-slate-200 disabled:after:bg-slate-300"
 					type="checkbox"
-					value={1}
-					id="id-c01"
-					onChange={handleToggle}
+					checked={value}
+					onChange={(e) => handleToggle(e.target.checked)}
 				/>
 			</div>
 		</div>

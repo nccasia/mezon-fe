@@ -35,7 +35,7 @@ import { style } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { clansActions, setSelectedMessage } from '@mezon/store';
-import { ETypeLinkMedia } from '@mezon/utils';
+import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -141,6 +141,10 @@ const MessageItem = React.memo(
 				message?.attachments[0].url === message?.content?.t?.trim()
 			);
 		}, [message?.attachments, message?.content?.t]);
+
+		const isOnlyContainEmoji = useMemo(() => {
+			return isValidEmojiData(message.content);
+		}, [message.content, message.mentions]);
 
 		useEffect(() => {
 			if (props?.messageId) {
@@ -293,7 +297,7 @@ const MessageItem = React.memo(
 		};
 
 		// Message welcome
-		if (message?.sender_id === '0' && !message?.content?.t) {
+		if (message?.sender_id === '0' && !message?.content?.t && message?.username === 'system') {
 			return <WelcomeMessage channelId={props.channelId} />;
 		}
 
@@ -401,6 +405,7 @@ const MessageItem = React.memo(
 									isMessageReply={false}
 									mode={mode}
 									directMessageId={channelId}
+									isOnlyContainEmoji={isOnlyContainEmoji}
 								/>
 							</Block>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}

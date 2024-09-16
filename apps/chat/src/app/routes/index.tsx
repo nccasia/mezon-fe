@@ -1,5 +1,6 @@
 import loadable from '@loadable/component';
-import { LoaderFunctionArgs, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import isElectron from 'is-electron';
+import { LoaderFunctionArgs, RouterProvider, createBrowserRouter, createHashRouter } from 'react-router-dom';
 
 // Layouts
 import AppLayout from '../layouts/AppLayout';
@@ -70,7 +71,7 @@ export const Routes = () => {
 
 	const routes = useMemo(
 		() =>
-			createBrowserRouter([
+			(isElectron() ? createHashRouter : createBrowserRouter)([
 				{
 					path: '',
 					loader: loaderWithStore(appLoader),
@@ -83,11 +84,16 @@ export const Routes = () => {
 							path: '/mezon',
 							element: <InitialRoutes />
 						},
-						{
-							path: '/',
-							loader: loaderWithStore(loginLoader),
-							element: <Homepage />
-						},
+						isElectron()
+							? {
+									path: '/',
+									element: <InitialRoutes />
+								}
+							: {
+									path: '/',
+									loader: loaderWithStore(loginLoader),
+									element: <Homepage />
+								},
 						{
 							path: '/application-directory',
 							element: <AppDirectory />

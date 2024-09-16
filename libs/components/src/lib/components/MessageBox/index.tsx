@@ -4,7 +4,7 @@ import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useA
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, useCallback } from 'react';
+import { Fragment, ReactElement, memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -26,7 +26,7 @@ export type MessageBoxProps = {
 	readonly mode?: number;
 };
 
-function MessageBox(props: MessageBoxProps): ReactElement {
+const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const dispatch = useAppDispatch();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
@@ -91,7 +91,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
-
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			{checkAttachment && (
@@ -144,7 +143,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 		</div>
 	);
-}
+};
 
 MessageBox.Skeleton = () => {
 	return (
@@ -171,4 +170,6 @@ MessageBox.Skeleton = () => {
 	);
 };
 
-export default MessageBox;
+const MemoizedMessageBox = memo(MessageBox) as unknown as typeof MessageBox & { Skeleton: typeof MessageBox.Skeleton };
+
+export default MemoizedMessageBox;

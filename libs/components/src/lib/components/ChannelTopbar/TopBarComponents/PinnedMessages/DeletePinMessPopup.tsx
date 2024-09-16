@@ -1,15 +1,20 @@
-import { PinMessageEntity } from '@mezon/store';
+import { PinMessageEntity, selectMemberClanByUserId } from '@mezon/store';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
+import { ListPinAttachment } from './ItemPinMessage';
 
 type ModalDeletePinMessProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
 	closeModal: () => void;
 	handlePinMessage: () => void;
+	attachments: ApiMessageAttachment[];
 };
 export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
-	const { pinMessage, contentString, closeModal, handlePinMessage } = props;
+	const { pinMessage, contentString, closeModal, handlePinMessage, attachments } = props;
+	const userSender = useSelector(selectMemberClanByUserId(pinMessage.sender_id as string));
 	return (
 		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
@@ -30,15 +35,19 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 							/>
 							<div className="flex flex-col gap-1 text-left">
 								<div>
-									<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
+									<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
+										{userSender.clan_nick ?? userSender.user?.display_name ?? userSender.user?.username}
+									</span>
 								</div>
 								<span>
 									<MessageLine
+										isEditted={false}
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
 										content={JSON.parse(pinMessage.content || '')}
 									/>
 								</span>
+								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}
 							</div>
 						</div>
 					</div>

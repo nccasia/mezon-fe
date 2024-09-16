@@ -5,14 +5,13 @@ import {
 	selectCurrentUserId,
 	selectMemberClanByUserId,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
-import { EPermission, getSrcEmoji, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
+import { EPermission, MAX_FILE_NAME_EMOJI, getSrcEmoji } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '@mezon/ui'
 
 type SettingEmojiItemProp = {
 	emoji: ClanEmoji;
@@ -49,7 +48,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	};
 	const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
 		setNameEmoji(e.target.value);
-	}
+	};
 
 	const handleUpdateEmoji = async () => {
 		if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
@@ -57,11 +56,13 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 				source: emoji.src,
 				shortname: nameEmoji,
 				category: emoji.category,
-        clan_id: clanId as string
-			}
-			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
+				clan_id: clanId as string
+			};
+			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }));
+			setFocus(false);
+			setShowEdit(false);
 		}
-	}
+	};
 	return (
 		<div
 			className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
@@ -84,16 +85,17 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 					>
 						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
 					</div>
-					{
-						showEdit &&
+					{showEdit && (
 						<input
 							className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
 							value={nameEmoji}
 							onChange={(e) => handleChangeEmojiName(e)}
-							onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
+							onKeyDown={(e) => {
+								e.key === 'Enter' && handleUpdateEmoji();
+							}}
 							maxLength={MAX_FILE_NAME_EMOJI}
 						/>
-					}
+					)}
 				</div>
 
 				<div className={'flex-1 flex gap-[6px]  select-none'}>
@@ -104,18 +106,12 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 				</div>
 
 				{showEdit && (
-					<div className={"absolute text-xs font-bold w-6 top-[-12px] right-[-12px]"}>
+					<div className={'absolute text-xs font-bold w-6 top-[-12px] right-[-12px]'}>
 						<button
 							onClick={handleDelete}
 							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%]"
 						>
 							X
-						</button>
-						<button
-							onClick={() => onUpdateEmoji(emoji)}
-							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%] mt-2"
-						>
-							<Icons.PenEdit className={`w-3 h-3 dark:text-textSecondary text-colorTextLightMode`}/>
 						</button>
 					</div>
 				)}

@@ -6,11 +6,11 @@ export const style = (colors: Attributes, height: number, width: number, n = 1) 
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 8,
-		borderRadius: 50,
+		borderRadius: size.s_50,
 		position: 'relative',
 	},
 	boxImage: {
-		borderRadius: 50,
+		borderRadius: size.s_50,
 		overflow: 'hidden',
 	},
 	borderBoxImage: {
@@ -62,7 +62,7 @@ export const style = (colors: Attributes, height: number, width: number, n = 1) 
 
 	imageContainer: {
 		position: 'absolute',
-		borderRadius: 50,
+		borderRadius: size.s_50,
 		overflow: 'hidden',
 	},
 });

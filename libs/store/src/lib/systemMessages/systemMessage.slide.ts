@@ -38,16 +38,14 @@ export const fetchSystemMessageByClanId = createAsyncThunk('systemMessages/fetch
 export const createSystemMessage = createAsyncThunk('systemMessages/createSystemMessage', async (newMessage: ApiSystemMessageRequest, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response: ApiSystemMessage = await mezon.client.createSystemMessage(mezon.session, newMessage);
-	thunkAPI.dispatch(fetchSystemMessages());
 	return response;
 });
 
 export const updateSystemMessage = createAsyncThunk(
 	'systemMessages/updateSystemMessage',
-	async ({ clanId, channelId }: { clanId: string; channelId: MezonUpdateSystemMessageBody }, thunkAPI) => {
+	async ({ clanId, newMessage }: { clanId: string; newMessage: MezonUpdateSystemMessageBody }, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, channelId);
-		thunkAPI.dispatch(fetchSystemMessages());
+		const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, newMessage);
 		return response;
 	}
 );
@@ -83,10 +81,16 @@ export const systemMessageSlice = createSlice({
 				systemMessageAdapter.upsertOne(state, action.payload);
 			})
 			.addCase(createSystemMessage.fulfilled, (state: SystemMessageState, action: PayloadAction<any>) => {
-				systemMessageAdapter.addOne(state, action.payload);
+				const payload = action.payload;
+				if (payload?.id) {
+					systemMessageAdapter.addOne(state, payload);
+				}
 			})
 			.addCase(updateSystemMessage.fulfilled, (state: SystemMessageState, action: PayloadAction<any>) => {
-				systemMessageAdapter.upsertOne(state, action.payload);
+				const payload = action.payload;
+				if (payload?.id) {
+					systemMessageAdapter.upsertOne(state, payload);
+				}
 			})
 			.addCase(deleteSystemMessage.fulfilled, (state: SystemMessageState, action: PayloadAction<any>) => {
 				systemMessageAdapter.removeOne(state, action.payload);

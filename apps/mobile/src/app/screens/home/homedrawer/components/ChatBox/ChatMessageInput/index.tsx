@@ -1,11 +1,11 @@
-import { IS_TABLET } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, selectCurrentClanId } from '@mezon/store';
+import { messagesActions, selectChannelById, selectCurrentClanId } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, TextInput, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { EMessageActionType } from '../../../enums';
@@ -39,9 +39,9 @@ interface IChatMessageInputProps {
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	isShowCreateThread?: boolean;
+	parentId?: string;
 	isPublic?: boolean;
 }
-const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
 
 export const ChatMessageInput = memo(
 	forwardRef(
@@ -69,15 +69,18 @@ export const ChatMessageInput = memo(
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
+				parentId,
 				isPublic
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>
 		) => {
 			const [heightInput, setHeightInput] = useState(size.s_40);
 			const { themeValue } = useTheme();
+			const { t } = useTranslation('message');
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
+			const parent = useSelector(selectChannelById(channelId || ''));
 			const isAvailableSending = useMemo(() => {
 				return text?.length > 0 && text?.trim()?.length > 0;
 			}, [text]);
@@ -93,13 +96,33 @@ export const ChatMessageInput = memo(
 			}, [onSendSuccess, ref]);
 
 			const handleTyping = useCallback(async () => {
-				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode, isPublic }));
+				dispatch(
+					messagesActions.sendTypingUser({
+						clanId: currentClanId || '',
+						parentId: parentId,
+						channelId,
+						mode,
+						isPublic,
+						isParentPublic: parent ? !parent.channel_private : false
+					})
+				);
 			}, [channelId, currentClanId, dispatch, isPublic, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 			const handleDirectMessageTyping = useCallback(async () => {
-				await Promise.all([dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }))]);
+				await Promise.all([
+					dispatch(
+						messagesActions.sendTypingUser({
+							clanId: '0',
+							parentId: parentId,
+							channelId: channelId,
+							mode: mode,
+							isPublic: false,
+							isParentPublic: parent ? !parent.channel_private : false
+						})
+					)
+				]);
 			}, [channelId, dispatch, mode]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
@@ -133,12 +156,12 @@ export const ChatMessageInput = memo(
 			}, [handleDirectMessageTypingDebounced, handleTypingDebounced, mode]);
 
 			return (
-				<Block flex={1} flexDirection="row" justifyContent="flex-end" gap={size.s_10}>
-					<Block alignItems="center">
+				<Block flex={1} flexDirection="row" paddingHorizontal={size.s_6}>
+					<Block alignItems="center" flex={1} justifyContent="center">
 						<TextInput
 							ref={ref}
 							autoFocus={isFocus}
-							placeholder={'Write message here...'}
+							placeholder={t('messageInputPlaceHolder')}
 							placeholderTextColor={themeValue.text}
 							blurOnSubmit={false}
 							onFocus={handleInputFocus}
@@ -148,16 +171,14 @@ export const ChatMessageInput = memo(
 							numberOfLines={3}
 							onChange={() => handleTypingMessage()}
 							{...textInputProps}
-							style={[
-								styles.inputStyle,
-								(text?.length > 0 || !isShowCreateThread) && {
-									width: isShowAttachControl && isShowCreateThread ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput
-								},
-								{ height: Math.max(size.s_40, heightInput) }
-							]}
+							style={[styles.inputStyle, { height: Math.max(size.s_40, heightInput) }]}
 							children={renderTextContent(text)}
 							onContentSizeChange={(e) => {
-								if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
+								if (e.nativeEvent.contentSize.height < size.s_40 * 2) {
+									setHeightInput(e.nativeEvent.contentSize.height);
+								} else {
+									setHeightInput(size.s_40 * 2);
+								}
 							}}
 						/>
 						<View style={styles.iconEmoji}>

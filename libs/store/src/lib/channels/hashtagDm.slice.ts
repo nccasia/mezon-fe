@@ -28,7 +28,7 @@ type fetchHashtagDmArgs = {
 
 export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, directId }: fetchHashtagDmArgs, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const response = await mezon.socketRef.current?.hashtagDMList(userIds, 50);
+	const response = await mezon.socketRef.current?.hashtagDMList(userIds, 500);
 	if (!response?.hashtag_dm) {
 		return [];
 	}

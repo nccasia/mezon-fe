@@ -1,10 +1,9 @@
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { selectAllStickerSuggestion, selectCurrentClan, selectModeResponsive, useAppSelector } from '@mezon/store';
+import { selectAllStickerSuggestion, selectCurrentClan, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, ModeResponsive, SubPanelName } from '@mezon/utils';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useRef, useState } from 'react';
-import { mockCategoryLogo } from './StickerMockData';
 
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
@@ -36,21 +35,20 @@ function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
 	);
 
 	const clanStickers = useAppSelector(selectAllStickerSuggestion);
-	const currentClan = useAppSelector(selectCurrentClan);
-	const modeResponsive = useAppSelector(selectModeResponsive);
-	const categoryLogo = [
-		...(modeResponsive === ModeResponsive.MODE_CLAN ? [{ id: 0, url: currentClan?.logo, type: 'custom' }] : []),
-		...mockCategoryLogo
-	].filter(Boolean);
+	const categoryLogo = clanStickers
+		.map((sticker) => ({
+			id: sticker.clan_id,
+			type: sticker.clan_name,
+			url: sticker.logo
+		}))
+		.filter((sticker, index, self) => index === self.findIndex((s) => s.id === sticker.id));
 
 	const stickers = [
-		...(modeResponsive === ModeResponsive.MODE_CLAN
-			? clanStickers.map((sticker) => ({
-					id: sticker.id,
-					url: sticker.source,
-					type: 'custom'
-				}))
-			: [])
+		...clanStickers.map((sticker) => ({
+			id: sticker.id,
+			url: sticker.source,
+			type: sticker.clan_name
+		}))
 	].filter(Boolean);
 
 	const { setSubPanelActive } = useGifsStickersEmoji();
@@ -90,23 +88,27 @@ function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
 					{categoryLogo.map((avt) => (
 						<button
 							key={avt.id}
-							onClick={(e) => scrollToCategory(e, avt.type)}
+							onClick={(e) => scrollToCategory(e, avt.type || '')}
 							className="flex justify-center items-center max-sm:px-1 w-9 h-9 rounded-lg hover:bg-[#41434A]"
 						>
-							<img
-								src={avt.url}
-								alt={`avt ${avt.id}`}
-								className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
-								role="button"
-							/>
+							{avt.url !== '' ? (
+								<img
+									src={avt.url}
+									alt={`avt ${avt.id}`}
+									className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
+									role="button"
+								/>
+							) : (
+								<div className="dark:text-textDarkTheme text-textLightTheme">{avt?.type?.charAt(0).toUpperCase()}</div>
+							)}
 						</button>
 					))}
 				</div>
 			</div>
 			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar" ref={containerRef}>
 				{categoryLogo.map((avt) => (
-					<div ref={(el) => (categoryRefs.current[avt.type] = el)} key={avt.id}>
-						<CategorizedStickers stickerList={stickers} onClickSticker={handleClickImage} categoryName={avt.type} />
+					<div ref={(el) => (categoryRefs.current[avt.type || ''] = el)} key={avt.id}>
+						<CategorizedStickers stickerList={stickers} onClickSticker={handleClickImage} categoryName={avt.type || ''} />
 					</div>
 				))}
 			</div>

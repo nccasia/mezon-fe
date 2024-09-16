@@ -1,17 +1,20 @@
 import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
+import { MessageContextMenuProvider } from '@mezon/components';
+import { useAuth } from '@mezon/core';
 import {
 	messagesActions,
+	selectAllChannelMemberIds,
+	selectAllRoleIds,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
+	selectLastMessageByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
-	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector
@@ -19,7 +22,7 @@ import {
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
@@ -35,7 +38,6 @@ type ChannelMessagesProps = {
 function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
-	const anchorRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -45,20 +47,24 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
-	const [shouldRenderLoadingBlock, setShouldRenderLoadingBlock] = useState<boolean>(false);
-
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const { userId } = useAuth();
+	const listMessageRef = useRef<HTMLDivElement | null>(null);
 	const onChatRender = useCallback(
 		(node: HTMLDivElement | null) => {
 			chatRef.current = node;
-			if (channelId && node) {
-				node.scrollTop = node.scrollHeight;
+			if (node) {
+				node.scrollTo(0, Number.MAX_SAFE_INTEGER);
 			}
 		},
+		// the function needs to be re-created when channelId changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[channelId]
 	);
 
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
+	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dispatch = useAppDispatch();
-	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
@@ -100,24 +106,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, anchorRef, chatRefData, loadMoreMessage);
-
-	const messagesView = useMemo(() => {
-		return messages.map((messageId) => {
-			return (
-				<MemorizedChannelMessage
-					avatarDM={avatarDM}
-					userName={userName}
-					key={messageId}
-					messageId={messageId}
-					channelId={channelId}
-					isHighlight={messageId === idMessageNotified}
-					mode={mode}
-					channelLabel={channelLabel ?? ''}
-				/>
-			);
-		});
-	}, [messages, channelId, idMessageNotified, mode, channelLabel, avatarDM, userName]);
+	const chatScrollRef = useChatScroll(chatRef, listMessageRef, chatRefData, loadMoreMessage);
 
 	// Jump to message when user is jumping to message
 	useEffect(() => {
@@ -133,7 +122,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	// Jump to present when user is jumping to present
 	useEffect(() => {
 		if (isJumpingToPresent) {
-			chatScrollRef.scrollToAnchor().then(() => {
+			chatScrollRef.scrollToBottom().then(() => {
 				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: false }));
 			});
 		}
@@ -165,39 +154,59 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 		};
 	}, [channelId, dispatch]);
 
-	// render show loading when user can see it
 	useEffect(() => {
-		if (!chatRef.current) {
+		if (userId === lastMessage?.sender_id) {
 			return;
 		}
-		requestAnimationFrame(() => {
-			const scrollTop = chatRef.current?.scrollTop ?? 0;
-			const clientHeight = chatRef.current?.clientHeight ?? 0;
-			if (clientHeight > 0 && scrollTop > clientHeight) {
-				setShouldRenderLoadingBlock(false);
+		const timeoutId = setTimeout(() => {
+			const element = chatRef.current;
+			if (!element) {
 				return;
 			}
-			setShouldRenderLoadingBlock(true);
-		});
-	}, [isFetching]);
+
+			const bottomOffsetToScroll = 100;
+			const isNearBottom = element?.scrollHeight - element?.scrollTop - element?.clientHeight < bottomOffsetToScroll;
+			if (isNearBottom) {
+				element?.scrollTo(0, Number.MAX_SAFE_INTEGER);
+			}
+		}, 100);
+		return () => timeoutId && clearTimeout(timeoutId);
+	}, [lastMessage, userId]);
 
 	return (
-		<MessageContextMenuProvider>
-			<div
-				className={classNames('dark:bg-bgPrimary pb-5 mr-1 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
-					customScrollLightMode: appearanceTheme === 'light'
-				})}
-				id="scrollLoading"
-				ref={onChatRender}
-			>
-				<div className="flex flex-col min-h-full justify-end">
-					{shouldRenderLoadingBlock && isFetching && (
-						<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
+		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
+			<div className="w-full h-full relative">
+				<div
+					id="scrollLoading"
+					className={classNames(
+						'absolute top-0 left-0 bottom-0 right-0 overflow-y-visible overflow-x-hidden overflow-anchor-none dark:bg-bgPrimary bg-bgLightPrimary',
+						{
+							customScrollLightMode: appearanceTheme === 'light'
+						}
 					)}
-					{messagesView}
-					{openModalAttachment && <MessageModalImage />}
+					ref={onChatRender}
+				>
+					<div ref={listMessageRef} className="min-h-[100%] overflow-anchor-none flex flex-col justify-end">
+						{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+						<div className="min-h-0 overflow-hidden">
+							{messages.map((messageId) => {
+								return (
+									<MemorizedChannelMessage
+										avatarDM={avatarDM}
+										userName={userName}
+										key={messageId}
+										messageId={messageId}
+										channelId={channelId}
+										isHighlight={messageId === idMessageNotified}
+										mode={mode}
+										channelLabel={channelLabel ?? ''}
+									/>
+								);
+							})}
+						</div>
+						<div className="h-[20px] w-[1px] pointer-events-none"></div>
+					</div>
 				</div>
-				<div ref={anchorRef} className="anchor"></div>
 			</div>
 		</MessageContextMenuProvider>
 	);

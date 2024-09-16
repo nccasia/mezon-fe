@@ -2,11 +2,11 @@ import { useAppNavigation, useDirect, useEscapeKey, useMemberCustomStatus, useOn
 import {
 	ChannelMembersEntity,
 	notificationActions,
+	selectAllChannelMembers,
 	selectCurrentChannelId,
 	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectFriendStatus,
-	selectMembersByChannelId,
 	selectModeResponsive,
 	useAppDispatch,
 	useAppSelector
@@ -31,6 +31,7 @@ type UserProfileModalInnerProps = {
 	onClose?: () => void;
 	userId?: string;
 	notify?: INotification;
+	isDM?: boolean;
 };
 
 const initOpenModal = {
@@ -38,18 +39,18 @@ const initOpenModal = {
 	openOption: false
 };
 
-const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfileModalInnerProps) => {
+const UserProfileModalInner = ({ openModal, userId, notify, onClose, isDM }: UserProfileModalInnerProps) => {
 	const dispatch = useAppDispatch();
 	const userProfileRef = useRef<HTMLDivElement | null>(null);
 	const modeResponsive = useAppSelector(selectModeResponsive);
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const currentDmId = useAppSelector(selectDmGroupCurrentId);
-	const channelMembers = useAppSelector(
-		selectMembersByChannelId((modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string)
+	const channelMembers = useAppSelector((state) =>
+		selectAllChannelMembers(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string)
 	);
 	const userById = channelMembers.find((member) => member?.user?.id === userId) as ChannelMembersEntity;
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
-	const userCustomStatus = useMemberCustomStatus(userId || '');
+	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [openGroupIconBanner, setGroupIconBanner] = useState<OpenModalProps>(initOpenModal);
 	const [activeTab, setActiveTab] = useState<string>(typeTab.ABOUT_ME);
 	const [color, setColor] = useState<string>('');
@@ -152,6 +153,7 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 							username={displayUsername || notify?.content?.username}
 							userToDisplay={userById}
 							customStatus={userCustomStatus}
+							userID={userId}
 							styleAvatar="w-[120px] h-[120px] rounded-full"
 						/>
 						{isSelf ? (
