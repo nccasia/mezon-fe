@@ -1,7 +1,7 @@
+import { Icons } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import * as Icons from '../../../../../../ui/src/lib/Icons';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { ChannelLableModal } from '../ChannelLabel';
 
 interface ChannelNameModalProps {
@@ -48,10 +48,11 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 		// 2 lines below only get index
 		[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Speaker defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Hashtag defaultSize="w-6 h-6" />
 	};
 
 	useImperativeHandle(ref, () => ({
-		checkInput: () => checkvalidate || checkNameChannel,
+		checkInput: () => checkvalidate || checkNameChannel
 	}));
 
 	useEffect(() => {

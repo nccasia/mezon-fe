@@ -1,6 +1,6 @@
+import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
-import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 interface ChannelTypeProps {
 	type: ChannelType;
@@ -14,10 +14,10 @@ const iconMap = {
 	[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
-	// 2 lines below only get index
+	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_STREAMING]: <i className="fa-light fa-signal-stream w-6 h-6" />
 };
 
 const labelMap = {
@@ -29,6 +29,7 @@ const labelMap = {
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: '',
+	[ChannelType.CHANNEL_TYPE_STREAMING]: ''
 };
 
 const descriptionMap = {
@@ -40,6 +41,7 @@ const descriptionMap = {
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: '',
+	[ChannelType.CHANNEL_TYPE_STREAMING]: ''
 };
 
 export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChange, error, disable }) => {
