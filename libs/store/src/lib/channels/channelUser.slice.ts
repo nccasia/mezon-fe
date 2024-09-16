@@ -30,7 +30,7 @@ export interface ListChannelsByUserRootState {
 export const fetchListChannelsByUser = createAsyncThunk('channelsByUser/fetchListChannelsByUser', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-	const response = await mezon.socketRef.current?.ListChannelByUserId();
+	const response = await mezon.socketRef.current?.listChannelByUserId();
 	if (!response?.channeldesc) {
 		return [];
 	}

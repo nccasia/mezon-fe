@@ -9,12 +9,13 @@ export type Profilesform = {
 export type propProfilesform = {
 	profiles: Profilesform;
 	currentDisplayName?: string;
+	isDM?: boolean;
 };
 const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const { userProfile } = useAuth();
 	const { profiles, currentDisplayName } = props;
 	const checkUrl = profiles.urlImage === undefined || profiles.urlImage === '';
-	const userCustomStatus = useMemberCustomStatus(userProfile?.user?.id || '');
+	const { userCustomStatus } = useMemberCustomStatus(userProfile?.user?.id || '', props.isDM);
 	const [color, setColor] = useState<string>('#323232');
 
 	useEffect(() => {

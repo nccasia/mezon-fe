@@ -31,7 +31,9 @@
             "provider": "generic",
             "url": "https://cdn.mezon.vn/release/"
           }
-        ]
+        ],
+        "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
+        "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
       },
       "win": {
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -52,7 +54,8 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": true
+        "createDesktopShortcut": true,
+        "deleteAppDataOnUninstall": false
       },
       "msi": {
         "additionalWixArgs": [
@@ -108,6 +111,16 @@
             "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
             "input": "./",
             "output": "./"
+          },
+          {
+            "glob": "apps/desktop/index.html",
+            "input": "./",
+            "output": "./"
+          },
+          {
+            "glob": "apps/desktop/package.json",
+            "input": "./",
+            "output": "./"
           }
         ]
       },
@@ -150,7 +163,9 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ]
+          ],
+          "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
+          "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -172,7 +187,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
@@ -220,7 +235,9 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ]
+          ],
+          "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
+          "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -241,7 +258,7 @@
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [

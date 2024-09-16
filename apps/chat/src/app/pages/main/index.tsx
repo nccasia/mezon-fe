@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -18,6 +19,7 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
+	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
 	selectTotalClansNotify,
@@ -47,6 +49,7 @@ function MyApp() {
 	const totalClanNotify = useSelector(selectTotalClansNotify);
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -166,7 +169,10 @@ function MyApp() {
 	}, [totalClanNotify, totalUnreadDM]);
 
 	return (
-		<div className="flex h-screen pl-[72px] overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
+		<div
+			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
+			onClick={handleClick}
+		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
 				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
@@ -198,14 +204,19 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{listUnreadDM.map(
-							(dmGroupChatUnread) =>
-								dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-									<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-										<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-									</SidebarTooltip>
-								)
-						)}
+						{!!listUnreadDM?.length &&
+							listUnreadDM.map(
+								(dmGroupChatUnread) =>
+									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+											<DirectUnreads
+												key={dmGroupChatUnread.id}
+												directMessage={dmGroupChatUnread}
+												countMessUnread={dmGroupChatUnread?.count_mess_unread || 0}
+											/>
+										</SidebarTooltip>
+									)
+							)}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
 					<div className="flex flex-col gap-3 ">
@@ -239,6 +250,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>

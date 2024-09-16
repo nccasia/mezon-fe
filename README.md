@@ -108,7 +108,7 @@ Bad dependencies:
 
 -   `apps` <- `apps` ❌
 -   `libs` <- `apps` ❌
--  `components` <- `apps` ❌
+-   `components` <- `apps` ❌
 -   `ui` <- `components` ❌
 -   `store` <- `components` ❌
 -   `transports` <- `store` ❌
@@ -267,8 +267,8 @@ By default, the error is displayed as toast notification. in case you want to di
 return thunkAPI.rejectWithValue(
 	error,
 	withError({
-		toast: false,
-	}),
+		toast: false
+	})
 );
 
 // toast with custom message
@@ -281,11 +281,15 @@ return thunkAPI.rejectWithValue(
 		toast: {
 			message: 'Custom error message',
 			type: 'error',
-			theme: 'dark',
-		},
-	}),
+			theme: 'dark'
+		}
+	})
 );
 ```
+
+## Building the application
+
+For the `desktop` application, we are using `electron` to build the application. The application's dependencies are managed by the `apps/desktop/package.json` file. When building the application, the dependencies are installed in the `apps/desktop/node_modules` directory.
 
 ## Performance Optimization
 

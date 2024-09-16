@@ -9,7 +9,7 @@ export function useMemberStatus(memberId: string) {
 	return status;
 }
 
-export function useMemberCustomStatus(memberId: string) {
-	const memberStatus = useAppSelector((state) => selectMemberCustomStatusById(state, memberId));
+export function useMemberCustomStatus(memberId: string, isDM?: boolean) {
+	const memberStatus = useAppSelector((state) => selectMemberCustomStatusById(state, memberId, isDM));
 	return memberStatus;
 }

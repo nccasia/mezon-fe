@@ -34,7 +34,7 @@ const App = () => {
 	return (
 		<SafeAreaProvider>
 			<I18nextProvider i18n={i18n}>
-				<MezonContextProvider mezon={mezon} connect={true}>
+				<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
 					<RootNavigation />
 				</MezonContextProvider>
 			</I18nextProvider>

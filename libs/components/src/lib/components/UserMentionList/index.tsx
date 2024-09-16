@@ -1,6 +1,7 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { useChannelMembers } from '@mezon/core';
 import { ChannelMembersEntity, selectAllRolesClan } from '@mezon/store';
-import { EVERYONE_ROLE_ID, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
+import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -23,13 +24,13 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 		const userMentionRaw = membersOfParent;
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
-				id: item?.user?.id ?? '',
+				id: item?.id ?? '',
 				display: getNameForPrioritize(item.clan_nick ?? '', item.user?.display_name ?? '', item.user?.username ?? ''),
 				avatarUrl: item.clan_avatar ? item.clan_avatar : (item?.user?.avatar_url ?? ''),
 				username: item.user?.username
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
-			id: '1775731111020111321',
+			id: ID_MENTION_HERE,
 			display: '@here',
 			avatarUrl: '',
 			username: '@here'

@@ -53,7 +53,6 @@ import {
 	SubPanelName,
 	TITLE_MENTION_HERE,
 	ThreadValue,
-	UsersClanEntity,
 	blankReferenceObj,
 	filterEmptyArrays,
 	focusToElement,
@@ -249,12 +248,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	};
 
 	const addMemberToPrivateThread = useCallback(
-		async (
-			currentChannel: ChannelsEntity | null,
-			mentions: IMentionOnMessage[],
-			userClans: UsersClanEntity[],
-			membersOfChild: ChannelMembersEntity[] | null
-		) => {
+		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[], membersOfChild: ChannelMembersEntity[] | null) => {
 			if (!currentChannel?.channel_private) return;
 
 			const userIds = uniqueUsers(mentions, membersOfChild);
@@ -328,6 +322,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
+			addMemberToPrivateThread(currentChannel, mentionList, membersOfChild);
 
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
@@ -373,7 +368,6 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 						mentionEveryone
 					);
 				}
-				addMemberToPrivateThread(currentChannel, mentionList, usersClan, membersOfChild);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));

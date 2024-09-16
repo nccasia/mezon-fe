@@ -1,8 +1,10 @@
 import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
+import { MessageContextMenuProvider } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	messagesActions,
+	selectAllChannelMemberIds,
+	selectAllRoleIds,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -13,7 +15,6 @@ import {
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
-	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector
@@ -61,8 +62,9 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 		[channelId]
 	);
 
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
+	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dispatch = useAppDispatch();
-	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
@@ -172,7 +174,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	}, [lastMessage, userId]);
 
 	return (
-		<MessageContextMenuProvider>
+		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
 			<div className="w-full h-full relative">
 				<div
 					id="scrollLoading"
@@ -206,7 +208,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 					</div>
 				</div>
 			</div>
-			{openModalAttachment && <MessageModalImage />}
 		</MessageContextMenuProvider>
 	);
 }

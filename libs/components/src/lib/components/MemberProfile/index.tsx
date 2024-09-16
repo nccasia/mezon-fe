@@ -39,6 +39,7 @@ export type MemberProfileProps = {
 	isHiddenAvatarPanel?: boolean;
 	userNameAva?: string;
 	hideLongName?: boolean;
+	isDM?: boolean;
 };
 
 export enum ModalType {
@@ -70,7 +71,8 @@ function MemberProfile({
 	dataMemberCreate,
 	isHiddenAvatarPanel,
 	userNameAva,
-	hideLongName
+	hideLongName,
+	isDM
 }: MemberProfileProps) {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
@@ -197,6 +199,7 @@ function MemberProfile({
 				avatar={avatar}
 				name={name}
 				coords={coords}
+				isDM={isDM}
 			/>
 		);
 	}, [coords]);
@@ -222,7 +225,14 @@ function MemberProfile({
 
 	const [openUserProfile, closeUserProfile] = useModal(() => {
 		modalState.current.userProfile = true;
-		return <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={() => closeModal(ModalType.UserProfile)} />;
+		return (
+			<UserProfileModalInner
+				openModal={isOpenProfileModal}
+				userId={user?.user?.id}
+				onClose={() => closeModal(ModalType.UserProfile)}
+				isDM={isDM}
+			/>
+		);
 	});
 
 	const closeModal = (modalType: ModalType) => {

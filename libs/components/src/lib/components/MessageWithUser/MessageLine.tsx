@@ -1,9 +1,10 @@
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText, useMessageContextMenu } from '../../components';
 
 type MessageLineProps = {
 	mode?: number;
@@ -30,7 +31,6 @@ const MessageLine = ({
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-
 	return (
 		<div
 			onClick={
@@ -110,6 +110,7 @@ const RenderContent = memo(
 			...lkm,
 			...vkm
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		const { allUserIdsInChannel, allRolesInClan } = useMessageContextMenu();
 
 		let lastindex = 0;
 		const content = useMemo(() => {
@@ -138,19 +139,50 @@ const RenderContent = memo(
 					);
 				}
 
-				if (element.kindOf === ETokenMessage.MENTIONS) {
-					formattedContent.push(
-						<MentionUser
-							isTokenClickAble={isTokenClickAble}
-							isJumMessageEnabled={isJumMessageEnabled}
-							key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-							tagName={contentInElement ?? ''}
-							tagUserId={element.user_id ? element.user_id : (element.role_id ?? '')}
-							mode={mode}
-						/>
-					);
+				if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
+					if (allUserIdsInChannel.indexOf(element.user_id) !== -1) {
+						formattedContent.push(
+							<MentionUser
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								tagUserName={contentInElement ?? ''}
+								tagUserId={element.user_id}
+								mode={mode}
+							/>
+						);
+					} else {
+						formattedContent.push(
+							<PlainText
+								isSearchMessage={false}
+								key={`userDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								text={contentInElement ?? ''}
+							/>
+						);
+					}
 				}
-
+				if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
+					if (allRolesInClan.indexOf(element.role_id) !== -1) {
+						formattedContent.push(
+							<MentionUser
+								isTokenClickAble={isTokenClickAble}
+								isJumMessageEnabled={isJumMessageEnabled}
+								key={`roleMention-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								tagRoleName={contentInElement ?? ''}
+								tagRoleId={element.role_id}
+								mode={mode}
+							/>
+						);
+					} else {
+						formattedContent.push(
+							<PlainText
+								isSearchMessage={false}
+								key={`roleDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								text={contentInElement ?? ''}
+							/>
+						);
+					}
+				}
 				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup

@@ -42,6 +42,7 @@ const ListMember = (props: ListMemberProps) => {
 						listProfile={true}
 						isOffline={!user?.user?.online}
 						positionType={MemberProfileType.MEMBER_LIST}
+						isDM={false}
 					/>
 				)}
 			</div>

@@ -15,6 +15,7 @@ export * from './lib/clanMembers/clan.members';
 export * from './lib/clanProfile/clanProfile.slice';
 export * from './lib/clans/clans.slice';
 export * from './lib/direct/direct.slice';
+export * from './lib/direct/directmeta.slice';
 export * from './lib/dragAndDrop/dragAndDrop.slice';
 export * from './lib/emojiSuggestion/emojiSuggestion.slice';
 export * from './lib/errors/errors.slice';

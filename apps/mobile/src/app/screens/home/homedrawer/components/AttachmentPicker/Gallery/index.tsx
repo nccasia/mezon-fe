@@ -2,10 +2,10 @@ import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
-import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
+import { CameraRoll, PhotoIdentifier, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
@@ -46,7 +46,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		if (Number(Platform.Version) >= 33) {
 			return Promise.all([
 				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES),
-				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO),
+				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO)
 			]).then(([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) => hasReadMediaImagesPermission && hasReadMediaVideoPermission);
 		} else {
 			return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
@@ -66,14 +66,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				Alert.alert('Photo Permission', 'App needs access to your photo library', [
 					{
 						text: 'Cancel',
-						style: 'cancel',
+						style: 'cancel'
 					},
 					{
 						text: 'OK',
 						onPress: () => {
 							openAppSettings();
-						},
-					},
+						}
+					}
 				]);
 			}
 
@@ -108,7 +108,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				first: 10,
 				assetType: 'All',
 				...(!!pageInfo && !!after && { after: after }),
-				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
+				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation']
 			});
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
@@ -129,14 +129,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 		const fileName = item?.node?.image?.filename;
 		const isVideo = item?.node?.type?.startsWith?.('video');
-		const isSelected = attachmentFilteredByChannelId?.files.some(file => file.filename === fileName);
+		const isSelected = attachmentFilteredByChannelId?.files.some((file) => file.filename === fileName);
 
 		return (
 			<TouchableOpacity
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						handleRemove(fileName)
+						handleRemove(fileName);
 					} else {
 						handleGalleryPress(item);
 					}
@@ -195,7 +195,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const onOpenCamera = async () => {
 		const options = {
 			durationLimit: 10000,
-			mediaType: 'photo',
+			mediaType: 'photo'
 		};
 
 		ImagePicker.launchCamera(options as CameraOptions, async (response) => {
@@ -211,7 +211,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					name: file?.fileName,
 					type: file?.type,
 					size: file?.fileSize,
-					fileData: file?.uri,
+					fileData: file?.uri
 				};
 
 				onPickGallery(fileFormat);
@@ -226,9 +226,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	};
 
 	const handleRemove = (filename: string) => {
-		const index = attachmentFilteredByChannelId?.files?.findIndex(file => file.filename === filename);
+		const index = attachmentFilteredByChannelId?.files?.findIndex((file) => file.filename === filename);
 		removeAttachmentByIndex(currentChannelId, index);
-	}
+	};
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -239,7 +239,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				numColumns={3}
 				onEndReached={handleLoadMore}
 				onEndReachedThreshold={0.5}
-				ListFooterComponent={() => loading && <Text>Loading...</Text>}
+				ListFooterComponent={() => loading && <ActivityIndicator size="small" color={themeValue.text} />}
 			/>
 		</View>
 	);

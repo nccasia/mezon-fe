@@ -12,7 +12,6 @@ export const style = (colors: Attributes) =>
 		},
 
 		channelListItemActive: {
-			backgroundColor: colors.secondaryLight,
 			borderRadius: size.s_10
 			// borderWidth: 1,
 			// borderColor: colors.border

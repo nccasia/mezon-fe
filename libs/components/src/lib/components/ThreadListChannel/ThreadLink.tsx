@@ -2,7 +2,7 @@ import { useOnClickOutside } from '@mezon/core';
 import { selectCountNotifyByChannelId, selectIsUnreadChannelById } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
-import { memo, useRef, useState } from 'react';
+import React, { memo, useImperativeHandle, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
@@ -17,12 +17,17 @@ type ThreadLinkProps = {
 	handleClick: (thread: IChannel) => void;
 };
 
-const ThreadLink = ({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps) => {
+export type ThreadLinkRef = {
+	scrollToIntoView: (options?: ScrollIntoViewOptions) => void;
+};
+
+const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
 	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
@@ -34,6 +39,12 @@ const ThreadLink = ({ thread, isFirstThread, isActive, handleClick }: ThreadLink
 	const channelPath = `/chat/clans/${thread.clan_id}/channels/${thread.channel_id}`;
 
 	const state = isActive ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
+
+	useImperativeHandle(ref, () => ({
+		scrollToIntoView: (options?: ScrollIntoViewOptions) => {
+			threadLinkRef.current?.scrollIntoView(options);
+		}
+	}));
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -72,6 +83,7 @@ const ThreadLink = ({ thread, isFirstThread, isActive, handleClick }: ThreadLink
 			)}
 
 			<Link
+				ref={threadLinkRef}
 				to={channelPath}
 				key={thread.channel_id}
 				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
@@ -112,8 +124,7 @@ const ThreadLink = ({ thread, isFirstThread, isActive, handleClick }: ThreadLink
 			)}
 		</div>
 	);
-};
-
+});
 export default memo(ThreadLink, (next, curr) => {
 	return next.isActive === curr.isActive && next.isFirstThread === curr.isFirstThread && next.thread === curr.thread;
 });

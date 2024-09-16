@@ -1,4 +1,3 @@
-// @ts-expect-error: Workaround for typing issues with ELoadMoreDirection
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';

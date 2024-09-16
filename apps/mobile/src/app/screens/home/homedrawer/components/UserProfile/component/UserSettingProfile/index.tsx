@@ -133,7 +133,7 @@ const UserSettingProfile = ({
 					{profileSetting?.map((item, index) => {
 						if (!item?.isShow) return <Block />;
 						return (
-							<TouchableOpacity onPress={() => item.action(item.value)} key={index}>
+							<TouchableOpacity onPress={() => item.action(item.value)} key={`${item?.value}_${index}`}>
 								<Block style={styles.option}>
 									{item?.icon}
 									<Text style={styles.textOption}>{item?.label}</Text>
@@ -153,15 +153,17 @@ const UserSettingProfile = ({
 				<KickUserClanModal onRemoveUserClan={handleRemoveUserClans} user={user} />
 			</MezonModal>
 
-			<ManageUserModal
-				visibleKickUserModal={visibleKickUserModal}
-				setVisibleKickUserModal={setVisibleKickUserModal}
-				handleRemoveUserClans={handleRemoveUserClans}
-				visible={visibleManageUserModal}
-				user={user}
-				onclose={handleUserModalClose}
-				profileSetting={profileSetting}
-			/>
+			{visibleManageUserModal && (
+				<ManageUserModal
+					visibleKickUserModal={visibleKickUserModal}
+					setVisibleKickUserModal={setVisibleKickUserModal}
+					handleRemoveUserClans={handleRemoveUserClans}
+					visible={visibleManageUserModal}
+					user={user}
+					onclose={handleUserModalClose}
+					profileSetting={profileSetting}
+				/>
+			)}
 		</Block>
 	);
 };

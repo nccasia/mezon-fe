@@ -194,7 +194,7 @@ export const ChatMessageSending = memo(
 		};
 
 		return (
-			<Block>
+			<Block alignItems="center" justifyContent="center">
 				{(isAvailableSending || !!attachmentDataRef?.length) && (
 					<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 						<Icons.SendMessageIcon width={size.s_18} height={size.s_18} color={baseColor.white} />

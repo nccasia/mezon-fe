@@ -1,12 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId, selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import EventViewer from '../../../../components/Event';
@@ -46,7 +46,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const flashListRef = useRef(null);
-	const channelsPositionRef = useRef<ChannelsPositionRef>({});
+	const channelsPositionRef = useRef<ChannelsPositionRef>();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
@@ -72,9 +72,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		setCurrentPressedChannel(channel);
 	}, []);
 
-	const scrollToItemById = () => {
-		const positionChannel = channelsPositionRef.current[currentChannel?.id];
-		const categoryOffset = categoryOffsetsRef.current[currentChannel?.category_id];
+	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
+		const positionChannel = channelsPositionRef.current[channelId || currentChannel?.id];
+		const categoryOffset = categoryOffsetsRef.current[categoryId || currentChannel?.category_id];
 		const position = positionChannel + categoryOffset?.y;
 		if (position) {
 			flashListRef?.current?.scrollTo({
@@ -86,16 +86,14 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	};
 
 	useEffect(() => {
-		let idTimeOut;
-		if (!hiddenBottomTab && currentClanId && categorizedChannels?.length) {
-			idTimeOut = setTimeout(() => {
-				scrollToItemById();
-			}, 200);
-		}
+		const activeChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (props) => {
+			const { channelId = '', categoryId = '' } = props || {};
+			scrollToItemById({ channelId, categoryId });
+		});
 		return () => {
-			idTimeOut && clearTimeout(idTimeOut);
+			activeChannel.remove();
 		};
-	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, isLoading]);
+	}, [currentClanId, categorizedChannels?.length, channelsPositionRef.current, categoryOffsetsRef.current]);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
@@ -173,8 +171,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<ScrollView ref={flashListRef} scrollEventThrottle={16}>
-					{categorizedChannels?.map((item) => {
+				<ScrollView ref={flashListRef} scrollEventThrottle={16} bounces={false}>
+					{!!categorizedChannels?.length && categorizedChannels?.map((item) => {
 						return renderItemChannelList({ item });
 					})}
 				</ScrollView>

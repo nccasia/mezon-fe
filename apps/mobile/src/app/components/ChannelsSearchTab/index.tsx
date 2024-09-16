@@ -1,4 +1,11 @@
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
+import {
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save,
+	ActionEmitEvent
+} from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
@@ -6,7 +13,7 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Linking, ScrollView, Text, View } from 'react-native';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
 import ChannelItem from '../ChannelItem';
@@ -56,6 +63,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			timeoutRef.current = setTimeout(async () => {
 				requestAnimationFrame(async () => {
 					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelData?.category_id });
 				});
 			}, 0);
 		}

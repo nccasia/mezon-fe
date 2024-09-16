@@ -31,8 +31,7 @@ export const style = (colors: Attributes) =>
 		},
 		iconEmoji: {
 			position: 'absolute',
-			right: 10,
-			top: '20%'
+			right: 10
 		},
 		iconSend: {
 			marginLeft: size.s_6,

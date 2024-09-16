@@ -27,7 +27,7 @@ export enum StatusVoiceChannel {
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
@@ -76,7 +76,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				activeOpacity={1}
 				onPress={() => handleRouteData()}
 				onLongPress={props.onLongPress}
-				style={[styles.channelListLink, isActive && styles.channelListItemActive]}
+				style={[styles.channelListLink, 
+						isActive && styles.channelListItemActive, 
+						isActive && { backgroundColor: theme === 'light' 
+							?  themeValue.secondaryWeight 
+							:  themeValue.secondaryLight
+						}]}
 			>
 				<View style={[styles.channelListItem]}>
 					{isUnRead && <View style={styles.dotIsNew} />}

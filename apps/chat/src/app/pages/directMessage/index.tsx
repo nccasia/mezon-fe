@@ -30,10 +30,11 @@ export default function Direct() {
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
 					userId={userProfile?.user?.id}
+					isDM={true}
 				/>
 			</div>
 			<MainContentDirect />
-			<Setting />
+			<Setting isDM={true} />
 		</>
 	);
 }

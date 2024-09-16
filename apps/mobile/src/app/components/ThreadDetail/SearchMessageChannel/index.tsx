@@ -1,6 +1,6 @@
 import { useAuth, useChannels, useFriends } from '@mezon/core';
-import { EOpenSearchChannelFrom, debounce } from '@mezon/mobile-components';
-import { Block, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { debounce, EOpenSearchChannelFrom } from '@mezon/mobile-components';
+import { baseColor, Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllDirectMessages, selectAllUserClans } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
@@ -56,17 +56,9 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	const listChannelSearch = useMemo(() => {
 		if (!searchText?.length) return listChannels;
-		return listChannels
-			.filter((item) => item?.channel_label?.toUpperCase()?.indexOf(searchText?.toUpperCase()) > -1)
-			.sort((a: any, b: any) => {
-				const indexA = a?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
-				const indexB = b?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
-				if (indexA === -1) return 1;
-				if (indexB === -1) return -1;
-				return indexA - indexB;
-			});
+		return [...listChannels].filter((item) => item?.channel_label?.toUpperCase()?.includes(searchText?.toUpperCase()));
 	}, [listChannels, searchText]);
-
+	
 	const listMember = useMemo(() => {
 		const listDMSearch = !listDM?.length
 			? []
@@ -126,14 +118,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	}, [accountId, friends, listDM, usersClan]);
 
 	const listMemberSearch = useMemo(() => {
-		const upperSearchText = searchText?.toUpperCase().substring(1);
-		return listMember
-			.filter((item: any) => item?.name?.toUpperCase().startsWith(upperSearchText))
-			.sort((a: any, b: any) => {
-				const indexA = a?.name?.toUpperCase().indexOf(upperSearchText);
-				const indexB = b?.name?.toUpperCase().indexOf(upperSearchText);
-				return indexA - indexB;
-			});
+		const upperSearchText = searchText?.toUpperCase();
+		return listMember.filter((item: any) => item?.name?.toUpperCase()?.includes?.(upperSearchText));
 	}, [searchText, listMember]);
 
 	const TabList = useMemo(() => {

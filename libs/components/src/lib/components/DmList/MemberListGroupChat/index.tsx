@@ -25,6 +25,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	});
 
 	const dataMemberCreate: DataMemberCreate = { createId: createId || '' };
+	//đây là dm
 	return (
 		<div className="self-stretch w-full h-[268px] flex-col justify-start items-start flex pt-[16px] pb-[16px] ml-2 mr-1 gap-[24px]">
 			<div className="w-full">
@@ -43,6 +44,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 									dataMemberCreate={dataMemberCreate}
 									directMessageId={directMessageId}
 									isOffline={!user.user?.online}
+									isDM={true}
 								/>
 							</div>
 						))}

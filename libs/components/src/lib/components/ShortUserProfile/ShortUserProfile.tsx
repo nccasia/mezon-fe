@@ -10,9 +10,10 @@ type ShortUserProfilePopup = {
 	positionType?: string;
 	name?: string;
 	coords?: Coords;
+	isDM?: boolean;
 };
 
-const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, coords }: ShortUserProfilePopup) => {
+const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, coords, isDM }: ShortUserProfilePopup) => {
 	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
@@ -52,6 +53,7 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 						positionType={positionType}
 						avatar={avatar}
 						name={name}
+						isDM={isDM}
 					/>
 				</div>
 			</div>

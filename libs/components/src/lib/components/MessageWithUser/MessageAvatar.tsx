@@ -11,9 +11,10 @@ type IMessageAvatarProps = {
 	isEditing?: boolean;
 	isShowFull?: boolean;
 	mode?: number;
+	allowDisplayShortProfile: boolean;
 };
 
-const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
+const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode, allowDisplayShortProfile }: IMessageAvatarProps) => {
 	const { senderId, username, avatarSender, userClanAvatar, userClanNickname, userDisplayName } = useMessageParser(message);
 	const { clanAvatar, generalAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
@@ -98,7 +99,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 				/>
 			</div>
 			<div className="relative">
-				{isShowPanelChannel && (
+				{isShowPanelChannel && allowDisplayShortProfile && (
 					<div
 						ref={popupRef}
 						className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 fixed left-5 sbm:left-0 md:left-[409px] transition-opacity duration-300 ease-in-out ${isLoading ? 'opacity-0 invisible' : 'opacity-100 visible'}`}

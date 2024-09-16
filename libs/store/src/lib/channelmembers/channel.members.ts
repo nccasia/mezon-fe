@@ -20,6 +20,9 @@ export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
 }
+interface IMetadata {
+	status: string;
+}
 
 export interface ChannelMemberAvatar {
 	avatar: string;
@@ -40,6 +43,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 			id: string;
 		}
 	>;
+	dmGroupUsers?: ChannelUserListChannelUser[];
 }
 
 export const mapUserIdToEntity = (userId: string, username: string, online: boolean) => {
@@ -194,7 +198,9 @@ export const initialChannelMembersState: ChannelMembersState = channelMembersAda
 	onlineStatusUser: {},
 	toFollowUserIds: [],
 	customStatusUser: {},
-	memberChannels: {}
+	memberChannels: {},
+	userRemoved: {},
+	userRemovedClan: {}
 });
 
 export type StatusUserArgs = {
@@ -214,6 +220,7 @@ export const channelMembers = createSlice({
 		remove: (state, action: PayloadAction<{ channelId: string; userId: string }>) => {
 			const { channelId, userId } = action.payload;
 			const channelEntity = state.memberChannels[channelId];
+
 			if (channelEntity) {
 				const memberIds = (channelEntity.ids || []).filter((id) => id !== userId);
 				state.memberChannels[channelId].ids = memberIds;
@@ -266,8 +273,9 @@ export const channelMembers = createSlice({
 				state.memberChannels[channelId]?.ids?.push(userId);
 			}
 		},
-		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[] }>) => {
-			const { userId, channelIds } = action.payload;
+		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[]; clanId: string }>) => {
+			const { userId, channelIds, clanId } = action.payload;
+
 			channelIds.forEach((channelId) => {
 				const channelEntity = state.memberChannels[channelId];
 				if (channelEntity) {
@@ -372,8 +380,26 @@ export const selectMemberOnlineStatusById = createSelector(
 );
 
 export const selectMemberCustomStatusById = createSelector(
-	[selectCustomUserStatus, (state, userId: string) => userId],
-	(selectCustomUserStatus, userId) => selectCustomUserStatus?.[userId] || ''
+	[
+		getUsersClanState,
+		selectDirectMessageEntities,
+		(state, userId: string, isDM?: boolean) => {
+			return `${userId},${state?.direct.currentDirectMessageId},${isDM}`;
+		}
+	],
+	(usersClanState, directs, payload) => {
+		const [userId, currentDirectMessageId, isDM] = payload.split(',');
+		const userClan = usersClanState.entities[userId];
+		const userGroup = directs?.[currentDirectMessageId];
+		if (userClan && (isDM === 'false' || 'undefined')) {
+			return (userClan?.user?.metadata as any)?.status || '';
+		}
+		const index = userGroup?.user_id?.findIndex((item) => item === userId) ?? -1;
+		if (index === -1) {
+			return false;
+		}
+		return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+	}
 );
 
 export const selectChannelMemberByUserIds = createSelector(
@@ -498,5 +524,26 @@ export const selectAllChannelMembers = createSelector(
 		}));
 
 		return membersOfChannel;
+	}
+);
+
+export const selectAllChannelMemberIds = createSelector(
+	[
+		getChannelMembersState,
+		getUsersClanState,
+		selectGrouplMembers,
+		(state, channelId: string) => {
+			const channel = state.channels?.entities[channelId];
+			const parentChannel = state.channels?.entities[channel?.parrent_id];
+			const isPrivate = channel?.channel_private || parentChannel?.channel_private || '';
+			const isDm = state.direct?.currentDirectMessageId === channelId || '';
+			return `${channelId},${isPrivate},${isDm}`;
+		}
+	],
+	(channelMembersState, usersClanState, directs, payload) => {
+		const [channelId, isPrivate, isDm] = payload.split(',');
+		if (isDm) return directs.map((dm) => dm.id);
+		const memberIds = isPrivate ? channelMembersState.memberChannels[channelId]?.ids || [] : Object.keys(usersClanState.entities);
+		return memberIds;
 	}
 );

@@ -43,14 +43,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	userAction: {
 		marginTop: size.s_20,
+		gap: size.s_20,
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		alignItems: 'center',
+		// justifyContent: 'space-between',
 	},
 	actionItem: {
 		flexDirection: 'column',
 		alignItems: 'center',
 		padding: size.s_10,
 		gap: size.s_6,
+		backgroundColor: colors.primary,
+		borderRadius: 8,
 	},
 	actionText: {
 		color: colors.text,

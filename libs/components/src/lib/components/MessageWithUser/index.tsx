@@ -142,6 +142,7 @@ function MessageWithUser({
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
 									<MessageAvatar
+										allowDisplayShortProfile={allowDisplayShortProfile}
 										message={message}
 										isCombine={isCombine}
 										isEditing={isEditing}

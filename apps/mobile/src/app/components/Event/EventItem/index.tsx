@@ -39,7 +39,7 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 							<FastImage
 								source={{ uri: userCreate?.user?.avatar_url }}
 								style={{ width: '100%', height: '100%' }}
-								resizeMode="contain"
+								resizeMode="cover"
 							/>
 						</View>
 						<View style={styles.inline}>

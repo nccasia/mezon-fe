@@ -1,4 +1,4 @@
-import { IRolesClan, LoadingStatus } from '@mezon/utils';
+import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -294,7 +294,7 @@ const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
 export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesClanState }): RolesClanState => rootState[ROLES_CLAN_FEATURE_KEY];
 
 export const selectAllRolesClan = createSelector(getRolesClanState, selectAll);
-export const selectEveryoneRole = createSelector(selectAllRolesClan, (state) => state.find((role) => role.slug === 'everyone'));
+export const selectEveryoneRole = createSelector(selectAllRolesClan, (state) => state.find((role) => role?.id === EVERYONE_ROLE_ID));
 export const selectRoleByRoleId = (roleID: string) => createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find((r) => r?.id === roleID));
 
 export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => state.currentRoleId);
@@ -316,3 +316,4 @@ export const selectMembersByRoleID = (roleID: string) => {
 		return roleMembers[roleID];
 	});
 };
+export const selectAllRoleIds = createSelector(selectAllRolesClan, (roles) => roles.map((role) => role.id));

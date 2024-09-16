@@ -57,6 +57,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList h-10'}
 						positionType={MemberProfileType.LIST_FRIENDS}
 						customStatus={(friend.user?.metadata as MetaDateStatusUser).status ?? ''}
+						isDM={true}
 					/>
 				</div>
 				<div onClick={(e) => e.stopPropagation()}>
