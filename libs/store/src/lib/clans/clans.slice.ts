@@ -129,9 +129,17 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateClanName(clan_name);
-		return isDuplicateName?.exist;
+		console.log(mezon);
+
+		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(clan_name, '', 'CLAN');
+		console.log(isDuplicateName);
+
+		if (isDuplicateName?.type == 'CLAN') {
+			return isDuplicateName.exist;
+		}
+		return;
 	} catch (error: any) {
+		console.log('this error', error);
 		Sentry.captureException(error);
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
