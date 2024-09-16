@@ -16,7 +16,6 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_22
 		},
 		inputStyle: {
-			maxHeight: size.s_40 * 2,
 			lineHeight: size.s_20,
 			width: '100%',
 			borderBottomWidth: 0,
@@ -24,7 +23,6 @@ export const style = (colors: Attributes) =>
 			paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
 			paddingRight: size.s_40,
 			fontSize: size.medium,
-			paddingTop: size.s_8,
 			backgroundColor: colors.tertiary,
 			color: colors.textStrong,
 			textAlignVertical: 'center'
