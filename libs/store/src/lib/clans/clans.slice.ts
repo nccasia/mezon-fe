@@ -137,7 +137,6 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 		}
 		return;
 	} catch (error: any) {
-		console.log('this error', error);
 		Sentry.captureException(error);
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
