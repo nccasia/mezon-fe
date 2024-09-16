@@ -31,9 +31,7 @@
             "provider": "generic",
             "url": "https://cdn.mezon.vn/release/"
           }
-        ],
-        "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
-        "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
+        ]
       },
       "win": {
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -163,9 +161,7 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ],
-          "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
-          "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
+          ]
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -235,9 +231,7 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ],
-          "entitlements": "apps/desktop/src/assets/entitlements.mac.plist",
-          "entitlementsInherit": "apps/desktop/src/assets/entitlements.mac.plist"
+          ]
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",

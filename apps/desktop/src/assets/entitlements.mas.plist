@@ -26,10 +26,10 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>UQ8HT4Q2XM.Mattermost.Desktop</string>
+		<string>UQ8HT4Q2XM.mezon.desktop</string>
 	</array>
 	<key>com.apple.application-identifier</key>
-	<string>UQ8HT4Q2XM.Mattermost.Desktop</string>
+	<string>UQ8HT4Q2XM.mezon.desktop</string>
 	<key>com.apple.developer.team-identifier</key>
 	<string>UQ8HT4Q2XM</string>
 	<key>com.apple.security.files.bookmarks.app-scope</key>
