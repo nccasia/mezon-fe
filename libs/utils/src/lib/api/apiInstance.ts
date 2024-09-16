@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = process.env.NX_BACKEND_FLOWISE_URL ?? '';
+const baseURL = process.env.NX_MEZON_FLOW_URL ?? '';
 const apiInstance = axios.create({
 	baseURL,
 	timeout: 5000,
