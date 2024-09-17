@@ -3,6 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import isElectron from 'is-electron';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import GoogleLogin from './GoogleLogin';
 
 interface GoogleButtonLoginProps {
 	mode?: string;
@@ -20,18 +21,15 @@ const GoogleButtonLogin: React.FC<GoogleButtonLoginProps> = ({ mode }) => {
 				navigate('/mezon');
 			}
 		},
-		onError: (errorResponse) => console.log(errorResponse),
+		onError: (errorResponse) => console.log(errorResponse)
 	});
 
 	return (
 		<div className="w-full lg:px-0">
 			{!isElectron() && (
-				<button onClick={googleLogin} className="flex justify-center w-full h-fit p-3 rounded-[4px] bg-[#d1e0ff] relative">
-					<div className="flex items-center w-fit h-fit gap-x-1 p-0">
-						<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />
-						<p className="w-fit h-fit text-base font-medium text-[#155eef] leading-[150%]">Continue with Google</p>
-					</div>
-				</button>
+				<div className="w-5 h-5">
+					<GoogleLogin />
+				</div>
 			)}
 			{isElectron() && (
 				<Link
