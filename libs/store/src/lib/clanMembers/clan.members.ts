@@ -157,3 +157,11 @@ export const selectMemberClanByGoogleId = (googleId: string) =>
 	createSelector(selectAllUserClans, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);
 	});
+
+export const selectMembersClanOnlineCount = createSelector(selectAllUserClans, (members) => {
+	return members.filter((member) => member?.user?.online).length;
+});
+
+export const selectMembersClanCount = createSelector(getUsersClanState, (state) => {
+	return state.ids.length;
+});
