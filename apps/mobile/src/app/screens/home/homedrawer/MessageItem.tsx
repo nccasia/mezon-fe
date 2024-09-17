@@ -25,7 +25,7 @@ import {
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction, RenderTextMarkdownContent } from './components';
@@ -203,7 +203,7 @@ const MessageItem = React.memo(
 			[usersClan, rolesInClan, onMessageAction]
 		);
 
-		const jumpToChannel = async (channelId: string, clanId: string) => {
+		const jumpToChannel = async (channelId: string, clanId: string, channelCateId: string) => {
 			const store = await getStoreAsync();
 			// TODO: do we need to jump to message here?
 			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
@@ -214,12 +214,14 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
+			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
 			try {
 				const type = channel?.type;
 				const channelId = channel?.channel_id;
+				const channelCateId = channel?.category_id;
 				const clanId = channel?.clan_id;
 
 				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
@@ -232,7 +234,7 @@ const MessageItem = React.memo(
 					});
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					await jumpToChannel(channelId, clanId);
+					await jumpToChannel(channelId, clanId, channelCateId);
 				}
 			} catch (error) {
 				console.log(error);
@@ -369,7 +371,7 @@ const MessageItem = React.memo(
 						/>
 						<Pressable
 							style={[styles.rowMessageBox]}
-							delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
 							onLongPress={() => {

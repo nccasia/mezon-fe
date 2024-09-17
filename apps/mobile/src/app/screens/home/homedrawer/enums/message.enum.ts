@@ -4,6 +4,7 @@ export enum EMessageBSToShow {
 }
 
 export enum EMessageActionType {
+	GiveACoffee,
 	EditMessage,
 	ForwardMessage,
 	ForwardAllMessages,

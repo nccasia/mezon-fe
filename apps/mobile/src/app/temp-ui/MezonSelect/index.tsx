@@ -16,7 +16,7 @@ type IMezonSelectProps = Omit<IMezonFakeBoxProps, 'onPress' | 'postfixIcon' | 'v
 export default function MezonSelect({ data, onChange, ...props }: IMezonSelectProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [currentValue, setCurrentValue] = useState(0);
+	const [currentValue, setCurrentValue] = useState(data?.[0]?.value || 0);
 	const [currentContent, setCurrentContent] = useState(data?.[0]?.title || 'unknown');
 	const bottomSheetRef = useRef<BottomSheetModalMethods>();
 

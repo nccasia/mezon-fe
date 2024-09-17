@@ -14,7 +14,6 @@ export * from './lib/chat/hooks/useChannelMembers';
 export * from './lib/chat/hooks/useChannelMembersActions';
 export * from './lib/chat/hooks/useChannelMembersOnlineStatus';
 export * from './lib/chat/hooks/useChannels';
-export * from './lib/chat/hooks/useChatChannel';
 export * from './lib/chat/hooks/useChatMessage';
 export * from './lib/chat/hooks/useChatMessages';
 export * from './lib/chat/hooks/useChatParams';

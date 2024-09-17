@@ -1,15 +1,15 @@
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelMessage, ChannelType } from 'mezon-js';
+import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
 import { clansActions } from '../clans/clans.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { MessagesEntity, messagesActions } from '../messages/messages.slice';
+import { messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
-import { directMetaActions } from './directmeta.slice';
+import { directMetaActions, selectEntitiesDirectMeta } from './directmeta.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -287,10 +287,20 @@ export const selectListDMUnread = createSelector(selectAllDirectMessages, getDir
 
 export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);
 
-export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (directMessages) => {
-	return directMessages.filter((dm) => {
-		return dm?.active === 1;
-	});
+export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {
+	return directMessages
+		.filter((dm) => {
+			return dm?.active === 1;
+		})
+		.map((dm) => {
+			if (!dm?.channel_id) return dm;
+			const found = directMetaEntities?.[dm.channel_id];
+			return {
+				...dm,
+				last_sent_message: { ...dm.last_sent_message, ...found.last_sent_message },
+				last_seen_message: { ...dm.last_seen_message, ...found.last_seen_message }
+			};
+		});
 });
 
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);

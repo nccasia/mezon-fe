@@ -1,9 +1,8 @@
 import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import memoizee from 'memoizee';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -43,20 +42,9 @@ type EmojiObjPickedArgs = {
 	isReset?: boolean;
 };
 
-const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanEmojiByClanId(clanId), {
-	promise: true,
-	maxAge: LIST_EMOJI_CACHED_TIME,
-	normalizer: (args) => {
-		return args[1] + args[0].session.username;
-	}
-});
-
-export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, noCache }: FetchEmojiArgs, thunkAPI) => {
+export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchEmojiCached.clear(mezon, clanId);
-	}
-	const response = await fetchEmojiCached(mezon, clanId);
+	const response = await mezon.socketRef.current?.listClanEmojiByUserId();
 	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');
 	}
@@ -72,7 +60,7 @@ export const createEmojiSetting = createAsyncThunk(
 			if (!res) {
 				return thunkAPI.rejectWithValue({});
 			}
-			thunkAPI.dispatch(fetchEmoji({ clanId: form.clanId, noCache: true }));
+			thunkAPI.dispatch(fetchEmoji());
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
 		}

@@ -31,7 +31,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 				<img
 					src={attachment.url}
 					alt={attachment.url}
-					className={`size-[88px] max-w-[88px] max-h-[88px] mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
+					className={`size-[88px] max-w-[88px] max-h-[88px] max-[480px]:size-16  mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
 					onDragStart={handleDrag}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {

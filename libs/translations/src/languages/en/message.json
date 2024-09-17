@@ -16,7 +16,8 @@
         "polls": "Polls",
         "files": "Files",
         "saveImage": "Save Image",
-        "copyMediaLink": "Copy Media Link"
+        "copyMediaLink": "Copy Media Link",
+        "giveACoffee": "Give A Coffee"
     },
     "chatBox": {
         "replyingTo": "Replying to",

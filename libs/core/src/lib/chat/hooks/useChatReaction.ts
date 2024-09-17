@@ -1,14 +1,12 @@
 import { reactionActions, useAppDispatch } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
-
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
 
 export function useChatReaction() {
 	const dispatch = useAppDispatch();
-
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,

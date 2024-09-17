@@ -17,7 +17,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MutableRefObject, memo, useCallback, useMemo } from 'react';
-import { DeviceEventEmitter, InteractionManager, View } from 'react-native';
+import { DeviceEventEmitter, InteractionManager, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from '../../../types';
@@ -196,9 +196,9 @@ export const ChatMessageSending = memo(
 		return (
 			<Block alignItems="center" justifyContent="center">
 				{(isAvailableSending || !!attachmentDataRef?.length) && (
-					<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
+					<TouchableOpacity activeOpacity={0.8} onPress={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 						<Icons.SendMessageIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
-					</View>
+					</TouchableOpacity>
 				)}
 				{/*{isAvailableSending || !!attachmentDataRef?.length ? (*/}
 				{/*	<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>*/}

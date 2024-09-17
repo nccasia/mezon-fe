@@ -1,8 +1,8 @@
 import { FileIcon } from '@mezon/mobile-components';
-import { Colors, Text, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { Block, Colors, Text, useTheme, verticalScale } from '@mezon/mobile-ui';
 import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { openUrl } from 'react-native-markdown-display';
 import { isImage, isVideo } from '../../../../../utils/helpers';
 import { RenderImageChat } from '../RenderImageChat';
@@ -25,8 +25,10 @@ export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressI
 		return <RenderVideoChat videoURL={document.url} />;
 	}
 
+	const isUploading = !document?.url?.includes('http');
+
 	return (
-		<TouchableOpacity activeOpacity={0.8} onPress={() => openUrl(document.url)} onLongPress={onLongPress}>
+		<TouchableOpacity activeOpacity={0.8} onPress={() => openUrl(document.url)} onLongPress={onLongPress} disabled={isUploading}>
 			<View style={styles.fileViewer}>
 				<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
 				<View style={{ maxWidth: '75%' }}>
@@ -34,6 +36,21 @@ export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressI
 						{document.filename}
 					</Text>
 				</View>
+				{isUploading && (
+					<Block
+						backgroundColor={'rgba(0,0,0,0.5)'}
+						position="absolute"
+						top={0}
+						left={0}
+						right={0}
+						bottom={0}
+						alignItems="flex-end"
+						justifyContent="center"
+						paddingRight={10}
+					>
+						<ActivityIndicator />
+					</Block>
+				)}
 			</View>
 		</TouchableOpacity>
 	);

@@ -382,18 +382,25 @@ export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: C
 }
 
 export function filterListByName(listSearch: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
-	return listSearch.filter((item: SearchItemProps) => {
+	const result = listSearch.filter((item: SearchItemProps) => {
 		if (isSearchByUsername) {
 			const searchName = normalizeString(searchText.slice(1));
+			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
-			return itemName.includes(searchName);
+			const itemPrioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
+
+			return itemName.includes(searchName) || itemDisplayName.includes(searchName) || itemPrioritizeName.includes(searchName);
 		} else {
 			const searchUpper = normalizeString(searchText.startsWith('#') ? searchText.substring(1) : searchText);
 			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
-			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper);
+			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
+
+			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper) || itemDisplayName.includes(searchUpper);
 		}
 	});
+
+	return result;
 }
 
 export function sortFilteredList(filteredList: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
@@ -687,7 +694,7 @@ export async function getWebUploadedAttachments(payload: {
 		return await Promise.all(uploadPromises);
 	}
 
-	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype, filename: link.filename }));
 }
 
 export async function getMobileUploadedAttachments(payload: {
@@ -751,4 +758,57 @@ export const getBottomPopupClass = (hasAttachment: boolean, messageRefId: string
 		return 'bottom-[76px]';
 	}
 	return '';
+};
+
+export const handleShowShortProfile = (
+	ref: React.RefObject<HTMLElement>,
+	WIDTH_PANEL_PROFILE: number,
+	HEIGHT_PANEL_PROFILE: number,
+	setIsShowPanelChannel: (show: boolean) => void,
+	setPosShortProfile: (position: { top: number | string; bottom: number | string; left: number | string; right: number | string }) => void
+) => {
+	setIsShowPanelChannel(true);
+
+	const rect = ref.current?.getBoundingClientRect() || { height: 0, left: 0, right: 0, top: 0, bottom: 0 };
+
+	const heightOfMention = rect.height;
+	const offSetLeftMention = rect.left;
+	const offSetRightMention = rect.right;
+	const offSetTopMention = rect.top;
+	const offSetBottomMention = rect.bottom;
+
+	// Window dimensions
+	const windowHeight = window.innerHeight;
+	const windowWidth = window.innerWidth;
+
+	let topComputed: number | string;
+	let bottomComputed: number | string;
+	let rightComputed: number | string;
+	let leftComputed: number | string;
+
+	// Determine left position
+	if (windowWidth - offSetRightMention > WIDTH_PANEL_PROFILE) {
+		leftComputed = offSetRightMention + 10;
+		rightComputed = 'auto';
+	} else {
+		leftComputed = 'auto';
+		rightComputed = windowWidth - offSetLeftMention + 10;
+	}
+
+	// Determine top position
+	if (windowHeight - offSetBottomMention > HEIGHT_PANEL_PROFILE) {
+		topComputed = offSetTopMention - heightOfMention + 3;
+		bottomComputed = 'auto';
+	} else {
+		topComputed = offSetBottomMention - HEIGHT_PANEL_PROFILE + 3;
+		bottomComputed = 'auto';
+	}
+
+	// Update panel position
+	setPosShortProfile({
+		top: topComputed,
+		bottom: bottomComputed,
+		left: leftComputed,
+		right: rightComputed
+	});
 };

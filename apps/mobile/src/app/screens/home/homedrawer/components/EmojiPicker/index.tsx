@@ -82,7 +82,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		const promises = [];
 		const store = await getStoreAsync();
 		promises.push(
-			store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDirectMessage?.channel_id ? '0' : clanId || '0' }))
+			store.dispatch(settingClanStickerActions.fetchStickerByUserId({ clanId: currentDirectMessage?.channel_id ? '0' : clanId || '0' }))
 		);
 		await Promise.all(promises);
 	}, [clanId, currentDirectMessage?.channel_id]);

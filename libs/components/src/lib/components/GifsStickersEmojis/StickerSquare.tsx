@@ -13,13 +13,20 @@ type ChannelMessageBoxProps = {
 interface ICategorizedStickerProps {
 	stickerList: any[];
 	categoryName: string;
-	onClickSticker: (stickerUrl: string) => void;
+	onClickSticker: (stickerUrl: StickerPanel) => void;
 }
 
 interface IStickerPanelProps {
-	stickerList: any[];
-	onClickSticker: (stickerUrl: string) => void;
+	stickerList: StickerPanel[];
+	onClickSticker: (stickerUrl: StickerPanel) => void;
 }
+
+type StickerPanel = {
+	type: string;
+	url: string;
+	id: string;
+};
+
 function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
 	const handleSend = useCallback(
@@ -56,8 +63,8 @@ function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	const handleClickImage = (imageUrl: string) => {
-		handleSend({ t: '' }, [], [{ url: imageUrl, height: 40, width: 40, filetype: 'image/gif' }], []);
+	const handleClickImage = (image: StickerPanel) => {
+		handleSend({ t: '' }, [], [{ url: image.url, height: 40, width: 40, filetype: 'image/gif', filename: image.id }], []);
 		setSubPanelActive(SubPanelName.NONE);
 	};
 	const scrollToCategory = (event: React.MouseEvent, categoryName: string) => {
@@ -148,13 +155,13 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
 			{stickerList.length > 0 && (
 				<div className="w-auto pb-2 px-2">
 					<div className="grid grid-cols-3 gap-4 max-h-[400px] overflow-y-scroll hide-scrollbar">
-						{stickerList.map((sticker: any) => (
+						{stickerList.map((sticker: StickerPanel) => (
 							<img
 								key={sticker.id}
 								src={sticker.url}
 								alt="sticker"
 								className="w-full h-full aspect-square object-cover cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
-								onClick={() => onClickSticker(sticker.url)}
+								onClick={() => onClickSticker(sticker)}
 								role="button"
 							/>
 						))}

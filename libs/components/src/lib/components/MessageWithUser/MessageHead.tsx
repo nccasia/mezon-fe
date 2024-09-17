@@ -1,6 +1,6 @@
-import { ShortUserProfile } from '@mezon/components';
+import { ModalUserProfile, useMessageContextMenu } from '@mezon/components';
 import { useGetPriorityNameFromUserClan, useOnClickOutside, useShowName } from '@mezon/core';
-import { IMessageWithUser, MouseButton } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, IMessageWithUser, WIDTH_PANEL_PROFILE, handleShowShortProfile } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
@@ -20,8 +20,6 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, allowDisplayShortPr
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const panelRefShort = useRef<HTMLDivElement>(null);
 	const [positionLeft, setPositionLeft] = useState(0);
-	const [positionTop, setPositionTop] = useState(0);
-	const [positionBottom, setPositionBottom] = useState(false);
 
 	const { userClanNickname, userDisplayName, username, senderId, userClanAvatar, avatarSender } = useMessageParser(message);
 	const { clanNick, displayName, usernameSender } = useGetPriorityNameFromUserClan(message.sender_id);
@@ -36,28 +34,18 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, allowDisplayShortPr
 	);
 
 	const nameShowed = useShowName(clanNick ? clanNick : (pendingClannick ?? ''), pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (event.button === MouseButton.LEFT) {
-			setIsShowPanelChannel(!isShowPanelChannel);
-			const clickY = event.clientY;
-			const windowHeight = window.innerHeight;
-			const distanceToBottom = windowHeight - clickY;
-			const elementName = event.currentTarget;
-			if (elementName) {
-				setPositionLeft(elementName.getBoundingClientRect().width + 420);
-				setPositionTop(clickY - 50);
-				setPositionBottom(false);
-			}
-			const heightElementShortUserProfileMin = 313;
-			if (distanceToBottom < heightElementShortUserProfileMin) {
-				setPositionBottom(true);
-			}
-		}
+	const { posShortProfile, setPosShortProfile } = useMessageContextMenu();
+
+	const handleMouseClick = () => {
+		handleShowShortProfile(
+			panelRef,
+			WIDTH_PANEL_PROFILE,
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
+			setIsShowPanelChannel,
+			setPosShortProfile
+		);
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-	const handleDefault = (e: any) => {
-		e.stopPropagation();
-	};
 
 	useEffect(() => {
 		const updatePosition = () => {
@@ -89,7 +77,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, allowDisplayShortPr
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base text-textLightUserName font-medium tracking-normal cursor-pointer break-all username"
+					className="text-base text-textLightUserName font-medium tracking-normal cursor-pointer break-all username hover:underline"
 					ref={panelRef}
 					onMouseDown={handleMouseClick}
 					role="button"
@@ -103,20 +91,23 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, allowDisplayShortPr
 				<div
 					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
-						left: `20px`,
-						top: positionBottom ? '' : `${positionTop}px`,
-						bottom: positionBottom ? '64px' : ''
+						left: posShortProfile.left,
+						top: posShortProfile.top,
+						bottom: posShortProfile.bottom,
+						right: posShortProfile.right
 					}}
-					onMouseDown={handleDefault}
 					role="button"
-					ref={panelRefShort}
+					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile
+					<ModalUserProfile
 						userID={senderId}
+						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 						message={message}
 						mode={mode}
+						positionType={''}
 						avatar={userClanAvatar}
 						name={userClanNickname || userDisplayName || username}
+						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
 					/>
 				</div>
 			)}

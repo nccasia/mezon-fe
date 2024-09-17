@@ -1,13 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, FlatList, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../temp-ui';
@@ -122,6 +122,10 @@ const Notifications = () => {
 				noFetchMembers: false
 			})
 		);
+		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, {
+			channelId: notify?.content?.channel_id,
+			categoryId: notify?.content?.category_id
+		});
 		navigation.dispatch(DrawerActions.closeDrawer());
 	};
 

@@ -6,6 +6,8 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDirectById,
+	selectDmGroupCurrentId,
+	selectMembeGroupByUserId,
 	selectMemberClanByUserId,
 	useAppSelector
 } from '@mezon/store';
@@ -165,7 +167,13 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
-	const user = useSelector(selectMemberClanByUserId(sender.sender_id));
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const isClanView = currentClanId && currentClanId !== '0';
+	const currentDMId = useSelector(selectDmGroupCurrentId);
+	const userClan = useSelector(selectMemberClanByUserId(sender.sender_id));
+	const userDirect = useAppSelector((state) => selectMembeGroupByUserId(state, currentDMId as string, sender.sender_id));
+	const user = isClanView ? userClan : userDirect;
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
@@ -173,7 +181,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 				<AvatarImage className="w-8 h-8" alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
 			</div>
 
-			<NameComponent id={sender.sender_id ?? ''} />
+			<NameComponent id={sender.sender_id ?? ''} name={user?.user?.display_name} />
 			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">

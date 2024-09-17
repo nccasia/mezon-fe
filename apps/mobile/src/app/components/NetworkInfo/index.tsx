@@ -47,10 +47,10 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.3,
 		shadowRadius: 4,
 		borderStartWidth: 5,
-		borderColor: Colors.textRed,
+		borderColor: Colors.textRed
 	},
-	text1: { textAlign: 'left', fontSize: size.small, fontWeight: 'bold', marginBottom: 5 },
-	text2: { textAlign: 'left', fontWeight: '500' },
+	text1: { textAlign: 'left', fontSize: size.medium, fontWeight: 'bold', marginBottom: 5, color: 'black' },
+	text2: { textAlign: 'left', fontSize: size.small, fontWeight: '500', color: 'grey' }
 });
 
 export default NetInfoComp;

@@ -6,6 +6,13 @@ import MessageContextMenu from './MessageContextMenu';
 
 const MESSAGE_CONTEXT_MENU_ID = 'message-context-menu';
 
+type posShortProfileOpt = {
+	top?: number | string;
+	bottom?: number | string;
+	left?: number | string;
+	right?: number | string;
+};
+
 type MessageContextMenuContextValue = {
 	showMessageContextMenu: (
 		event: React.MouseEvent<HTMLElement>,
@@ -19,6 +26,8 @@ type MessageContextMenuContextValue = {
 	imageSrc: string;
 	allUserIdsInChannel: string[];
 	allRolesInClan: string[];
+	posShortProfile: posShortProfileOpt;
+	setPosShortProfile: (pos: posShortProfileOpt) => void;
 };
 
 export type MessageContextMenuProps = {
@@ -40,7 +49,11 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	},
 	imageSrc: '',
 	allUserIdsInChannel: [],
-	allRolesInClan: []
+	allRolesInClan: [],
+	posShortProfile: {},
+	setPosShortProfile: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	}
 });
 
 export const MessageContextMenuProvider = ({
@@ -57,6 +70,7 @@ export const MessageContextMenuProvider = ({
 	const [activeMode, setActiveMode] = useState<ChannelStreamMode>(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	const [posShowMenu, setPosShowMenu] = useState<string>(SHOW_POSITION.NONE);
 	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
+	const [posShortProfile, setPosShortProfile] = useState<posShortProfileOpt>({});
 
 	const { show } = useContextMenu({
 		id: MESSAGE_CONTEXT_MENU_ID
@@ -110,9 +124,21 @@ export const MessageContextMenuProvider = ({
 			setImageURL,
 			imageSrc,
 			allUserIdsInChannel,
-			allRolesInClan
+			allRolesInClan,
+			posShortProfile,
+			setPosShortProfile
 		}),
-		[showMessageContextMenu, setPositionShow, posShowMenu, setImageURL, imageSrc, allUserIdsInChannel, allRolesInClan]
+		[
+			showMessageContextMenu,
+			setPositionShow,
+			posShowMenu,
+			setImageURL,
+			imageSrc,
+			allUserIdsInChannel,
+			allRolesInClan,
+			posShortProfile,
+			setPosShortProfile
+		]
 	);
 
 	return (

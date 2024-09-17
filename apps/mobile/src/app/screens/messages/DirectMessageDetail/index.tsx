@@ -25,14 +25,18 @@ import { style } from './styles';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
+	const mounted = useRef('');
 	useEffect(() => {
 		if (lastMessage) {
+			if (mounted.current === channelId) {
+				return;
+			}
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
-	}, [channelId, dispatch]);
+	}, [channelId, dispatch, lastMessage]);
 }
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {

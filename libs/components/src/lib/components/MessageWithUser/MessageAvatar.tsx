@@ -1,8 +1,8 @@
-import { AvatarImage, ShortUserProfile } from '@mezon/components';
+import { AvatarImage, ModalUserProfile, useMessageContextMenu } from '@mezon/components';
 import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
-import { IMessageWithUser, MouseButton } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, IMessageWithUser, WIDTH_PANEL_PROFILE, handleShowShortProfile } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 type IMessageAvatarProps = {
@@ -30,39 +30,22 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode, allowD
 		clanAvatar,
 		userClanAvatar
 	);
+	const { posShortProfile, setPosShortProfile } = useMessageContextMenu();
 
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const popupRef = useRef<HTMLDivElement | null>(null);
-	const [positionBottom, setPositionBottom] = useState(false);
-	const [positionTop, setPositionTop] = useState(0);
 
-	const handleMouseClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (event.button === MouseButton.LEFT) {
-			setIsShowPanelChannel((prev) => !prev);
-			setIsLoading(true);
-			const clickY = event.clientY;
-			const windowHeight = window.innerHeight;
-
-			requestAnimationFrame(() => {
-				if (popupRef.current) {
-					const popupHeight = popupRef.current.getBoundingClientRect().height;
-					const distanceToBottom = windowHeight - clickY;
-
-					if (distanceToBottom < popupHeight) {
-						setPositionBottom(true);
-						setPositionTop(clickY - popupHeight);
-					} else {
-						setPositionBottom(false);
-						setPositionTop(clickY - 50);
-					}
-					setIsLoading(false);
-				}
-			});
-		}
-	}, []);
+	const handleMouseClick = () => {
+		handleShowShortProfile(
+			panelRef,
+			WIDTH_PANEL_PROFILE,
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
+			setIsShowPanelChannel,
+			setPosShortProfile
+		);
+	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
@@ -101,17 +84,24 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode, allowD
 			<div className="relative">
 				{isShowPanelChannel && allowDisplayShortProfile && (
 					<div
-						ref={popupRef}
 						className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 fixed left-5 sbm:left-0 md:left-[409px] transition-opacity duration-300 ease-in-out ${isLoading ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
-						style={{ top: !positionBottom ? `${positionTop}px` : 'unset', bottom: positionBottom ? '64px' : 'unset' }}
+						style={{
+							left: posShortProfile.left,
+							top: posShortProfile.top,
+							bottom: posShortProfile.bottom,
+							right: posShortProfile.right
+						}}
 						onMouseDown={(e) => e.stopPropagation()}
 					>
-						<ShortUserProfile
+						<ModalUserProfile
 							userID={senderId}
+							classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 							message={message}
 							mode={mode}
+							positionType={''}
 							avatar={userClanAvatar || pendingUserAvatar}
 							name={userClanNickname || userDisplayName || username}
+							isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
 						/>
 					</div>
 				)}

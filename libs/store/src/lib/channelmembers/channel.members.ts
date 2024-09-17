@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
+import { selectAllAccount } from '../account/account.slice';
 import { ChannelsEntity } from '../channels/channels.slice';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
@@ -406,11 +407,12 @@ export const selectChannelMemberByUserIds = createSelector(
 	[
 		selectEntitesUserClans,
 		selectDirectMessageEntities,
+		selectAllAccount,
 		(state, channelId: string, userIds?: string, isDm?: string) => {
 			return `${channelId},${userIds},${isDm}`;
 		}
 	],
-	(usersClanState, directs, payload) => {
+	(usersClanState, directs, currentUser, payload) => {
 		const [channelId, userIds, isDm] = payload.split(',');
 		const users = isDm ? directs : usersClanState;
 		if (!userIds.trim() || !users) return [];
@@ -419,20 +421,32 @@ export const selectChannelMemberByUserIds = createSelector(
 			const userInfo = users[isDm ? channelId : userId];
 			if (!userInfo) return;
 			if (isDm) {
-				const { usernames, channel_label, user_id } = userInfo as DirectEntity;
-				const currentUserIndex = Array.isArray(user_id) && user_id.findIndex((id) => id === userId);
-				const names = channel_label?.split(',');
-				const displayName = currentUserIndex && currentUserIndex !== -1 && names?.[currentUserIndex];
-
+				if (currentUser?.user?.id === userId) {
+					members.push({
+						...currentUser,
+						channelId: channelId,
+						userChannelId: channelId,
+						id: currentUser?.user?.id as string
+					} as ChannelMembersEntity);
+					return;
+				}
+				const { usernames, channel_label, user_id, is_online, channel_avatar } = userInfo as DirectEntity;
+				const currentUserIndex = Array.isArray(user_id) ? user_id.findIndex((id) => id === userId) : -1;
+				if (currentUserIndex === -1) return;
+				const groupDisplayNames = usernames?.split(',');
+				const groupLabels = channel_label?.split(',');
 				members.push({
 					channelId,
 					userChannelId: channelId,
 					user: {
 						...userInfo,
-						username: usernames,
-						display_name: displayName || channel_label
+						id: userId,
+						username: groupDisplayNames?.[currentUserIndex],
+						display_name: groupLabels?.[currentUserIndex],
+						online: is_online?.[currentUserIndex],
+						avatar_url: channel_avatar?.[currentUserIndex]
 					},
-					id: userInfo.id
+					id: userId
 				} as ChannelMembersEntity);
 			} else {
 				members.push({
@@ -447,26 +461,45 @@ export const selectChannelMemberByUserIds = createSelector(
 	}
 );
 
-export const selectGrouplMembers = createSelector([selectDirectById, (state, groupId: string) => groupId], (group, groupId) => {
-	if (!group?.user_id) {
-		return [];
+export const selectGrouplMembers = createSelector(
+	[selectDirectById, selectAllAccount, (state, groupId: string) => groupId],
+	(group, currentUser, groupId) => {
+		if (!group?.user_id) {
+			return [];
+		}
+		const groupLabels = group.channel_label?.split(',');
+		const groupDisplayNames = group.usernames?.split(',');
+		const users = group?.user_id?.map((userId, index) => {
+			return {
+				channelId: groupId,
+				userChannelId: groupId,
+				user: {
+					...group,
+					id: userId,
+					user_id: [userId],
+					avatar_url: group.channel_avatar?.[index],
+					username: groupDisplayNames?.[index],
+					display_name: groupLabels?.[index],
+					online: group.is_online?.[index]
+				},
+				id: userId
+			};
+		}) as ChannelMembersEntity[];
+
+		// push current user login to list users
+		currentUser?.user &&
+			users.push({
+				...currentUser,
+				channelId: groupId,
+				userChannelId: groupId,
+				id: currentUser?.user?.id as string
+			} as ChannelMembersEntity);
+		return users;
 	}
-	const groupLabels = group.channel_label?.split(',');
-	const groupDisplayNames = group.usernames?.split(',');
-	return group?.user_id?.map((userId, index) => {
-		return {
-			channelId: groupId,
-			userChannelId: groupId,
-			user: {
-				...group,
-				avatar_url: group.channel_avatar?.[index],
-				username: groupLabels?.[index],
-				display_name: groupDisplayNames?.[index],
-				online: group.is_online?.[index]
-			},
-			id: userId
-		};
-	}) as ChannelMembersEntity[];
+);
+
+export const selectMembeGroupByUserId = createSelector([selectGrouplMembers, (state, groupId: string, userId: string) => userId], (users, userId) => {
+	return users?.find((item) => item.id === userId);
 });
 
 export const selectMemberStatusById = createSelector(

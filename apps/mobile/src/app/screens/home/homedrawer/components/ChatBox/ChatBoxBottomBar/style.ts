@@ -16,7 +16,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_22
 		},
 		inputStyle: {
-			maxHeight: size.s_40 * 2,
+			maxHeight: size.s_40 * 2.5,
 			lineHeight: size.s_20,
 			width: '100%',
 			borderBottomWidth: 0,

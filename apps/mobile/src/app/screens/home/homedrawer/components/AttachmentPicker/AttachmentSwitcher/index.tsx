@@ -14,7 +14,7 @@ function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
 	const rotation = useRef(new Animated.Value(0)).current; // 0 is initial value for rotation
 	const [mode, setMode] = useState<IModeKeyboardPicker>(_mode);
 	const onPickerPress = () => {
-		if (mode === 'text') {
+		if (mode !== 'attachment') {
 			Keyboard.dismiss();
 			onChange && onChange('attachment');
 			Animated.spring(rotation, {

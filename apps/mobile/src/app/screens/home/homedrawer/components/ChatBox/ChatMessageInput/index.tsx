@@ -168,7 +168,7 @@ export const ChatMessageInput = memo(
 							onBlur={handleInputBlur}
 							multiline={true}
 							spellCheck={false}
-							numberOfLines={3}
+							numberOfLines={4}
 							onChange={() => handleTypingMessage()}
 							{...textInputProps}
 							style={[styles.inputStyle, { height: Math.max(size.s_40, heightInput) }]}

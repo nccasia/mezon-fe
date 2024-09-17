@@ -23,7 +23,7 @@ export const useStickyScroll = (
 				return resolve(false);
 			}
 			setTimeout(() => {
-				containerRef.current.scrollTo(0, Number.MAX_SAFE_INTEGER);
+				containerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER);
 				resolve(true);
 			}, 0);
 		});

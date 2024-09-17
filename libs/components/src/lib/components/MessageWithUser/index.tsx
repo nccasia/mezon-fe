@@ -50,9 +50,6 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	// const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
-	// const idMessageToJump = useSelector(selectIdMessageToJump);
-
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = false;
@@ -137,7 +134,9 @@ function MessageWithUser({
 						<div className="relative rounded-sm overflow-visible">
 							<div className={childDivClass}></div>
 							<div className={parentDivClass}>
-								{checkMessageHasReply && <MessageReply message={message} />}
+								{checkMessageHasReply && (
+									<MessageReply message={message} mode={mode} allowDisplayShortProfile={allowDisplayShortProfile} />
+								)}
 								<div
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>

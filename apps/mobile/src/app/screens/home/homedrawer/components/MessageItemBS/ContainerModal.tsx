@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { giveCoffeeActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -13,7 +13,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -34,7 +34,7 @@ import { style } from './styles';
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
-	const { userProfile } = useAuth();
+	const { userProfile, userId } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '' } = props;
@@ -78,6 +78,33 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
+
+	const handleActionGiveACoffee = () => {
+		onClose();
+		try {
+			if (userId !== message.sender_id) {
+				const coffeeEvent = {
+					channel_id: message.channel_id,
+					clan_id: message.clan_id,
+					message_ref_id: message.id,
+					receiver_id: message.sender_id,
+					sender_id: userId,
+					token_count: 1
+				};
+				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
+				handleReact(
+					mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+					message.id,
+					EMOJI_GIVE_COFFEE.emoji_id,
+					EMOJI_GIVE_COFFEE.emoji,
+					userProfile?.user?.id
+				);
+			}
+		} catch (error) {
+			console.error('Failed to give cofffee message', error);
+		}
+	};
+
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const isDM = useMemo(() => {
@@ -247,6 +274,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
+			case EMessageActionType.GiveACoffee:
+				handleActionGiveACoffee();
+				break;
 			case EMessageActionType.EditMessage:
 				handleActionEditMessage();
 				break;
@@ -328,7 +358,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.Report:
-				return <Icons.FlagIcon color={baseColor.red} height={14} width={14} />;
+				return <Icons.FlagIcon color={baseColor.red} height={size.s_14} width={size.s_14} />;
+			case EMessageActionType.GiveACoffee:
+				return <Icons.GiftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />;
 			default:
 				return <View />;
 		}
@@ -366,7 +398,12 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				? []
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
-		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
+		const frequentActionList = [
+			EMessageActionType.GiveACoffee,
+			EMessageActionType.EditMessage,
+			EMessageActionType.Reply,
+			EMessageActionType.CreateThread
+		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
 		return {

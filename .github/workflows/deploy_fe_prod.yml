@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Install dependencies
         run: |
           echo "Environments"
@@ -18,13 +18,13 @@ jobs:
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
           source ~/.bashrc
-          npm install --no-package-lock | true
+          yarn
       - name: Build
         run: |
           echo "Build"
           rm apps/chat/.env
           mv apps/chat/prod.env apps/chat/.env
-          npm run build:chat
+          yarn build:chat
 
   deploy:
     runs-on: mezon-fe-prod
@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "Clearing /var/www/mezon-fe/"
           rm -rf /var/www/mezon-fe/*
-   
+
       - name: Copy files to www
         run: |
           echo "Copying files to /var/www/mezon-fe/"

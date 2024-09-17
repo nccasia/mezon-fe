@@ -14,7 +14,7 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 	const [mode, setMode] = useState<IModeKeyboardPicker>(_mode);
 
 	const onPickerPress = () => {
-		if (mode === 'text') {
+		if (mode !== 'emoji') {
 			Keyboard.dismiss();
 			onChange && onChange('emoji');
 			setMode('emoji');

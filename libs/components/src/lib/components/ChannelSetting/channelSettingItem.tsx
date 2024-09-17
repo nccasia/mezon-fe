@@ -70,7 +70,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 		>
 			<div className="w-170px flex flex-col">
 				<div className="flex justify-start max-w-[170px]">
-					{renderIcon()}
+					{renderIcon()} &nbsp;
 					<p className="text-[#84ADFF] font-bold text-sm tracking-wider max-w-[160px] overflow-x-hidden text-ellipsis uppercase one-line">
 						{channel.channel_label}
 					</p>
@@ -96,13 +96,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 							handleOnClick={handleButtonClick}
 							selectedButton={selectedButton}
 						/>
-						<ChannelSettingItemButton
-							tabName={EChannelSettingTab.INTEGRATIONS}
-							handleOnClick={handleButtonClick}
-							selectedButton={selectedButton}
-						/>
 					</>
 				)}
+				<ChannelSettingItemButton
+					tabName={EChannelSettingTab.INTEGRATIONS}
+					handleOnClick={handleButtonClick}
+					selectedButton={selectedButton}
+				/>
 				<hr className="border-t border-solid dark:border-borderDefault my-4" />
 				<button
 					className={`p-2 dark:text-red-600 text-red-600 text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgLightModeButton  ' : ''} w-[170px] text-left rounded-[5px]`}

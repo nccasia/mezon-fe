@@ -2,7 +2,7 @@ import { useEscapeKey, useInvite } from '@mezon/core';
 import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
 
@@ -26,17 +26,22 @@ const ModalInvite = (props: ModalParam) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
 	const firstChannel = useSelector(selectChannelFirst);
-	const { onClose } = props;
-	const channel = useSelector(selectChannelById(firstChannel.channel_id || ''));
+	const { onClose, channelID } = props;
+
+	const channel = useSelector(selectChannelById(channelID as string));
 	const clan = useSelector(selectCurrentClan);
 
-	const handleOpenInvite = () => {
-		createLinkInviteUser(currentClanId ?? '', firstChannel.channel_id ?? '', 10).then((res) => {
+	const handleOpenInvite = useCallback(async () => {
+		try {
+			const intiveIdChannel = (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
+			const res = await createLinkInviteUser(currentClanId ?? '', intiveIdChannel, 10);
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
 			}
-		});
-	};
+		} catch {
+			console.log('Error when create invite link');
+		}
+	}, [firstChannel, channelID]);
 
 	useEffect(() => {
 		handleOpenInvite();
@@ -91,8 +96,8 @@ const ModalInvite = (props: ModalParam) => {
 					/>
 					<button
 						className="absolute right-0 bottom-0 mb-1 text-white font-semibold text-sm px-8 py-1.5
-        				shadow outline-none focus:outline-none ease-linear transition-all duration-150
-        			  bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
+								shadow outline-none focus:outline-none ease-linear transition-all duration-150
+								bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
 						onClick={() => {
 							handleCopyToClipboard(urlInvite);
 							onClose();

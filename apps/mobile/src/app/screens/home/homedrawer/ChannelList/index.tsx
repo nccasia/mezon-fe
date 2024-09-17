@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId, selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
@@ -50,7 +50,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
-	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -73,9 +72,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
-		const positionChannel = channelsPositionRef.current[channelId || currentChannel?.id];
-		const categoryOffset = categoryOffsetsRef.current[categoryId || currentChannel?.category_id];
-		const position = positionChannel + categoryOffset?.y;
+		const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
+		const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
+		const position = (positionChannel || 0) + (categoryOffset?.y || 100);
 		if (position) {
 			flashListRef?.current?.scrollTo({
 				x: 0,
@@ -86,12 +85,16 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	};
 
 	useEffect(() => {
+		let timer: NodeJS.Timeout;
 		const activeChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (props) => {
-			const { channelId = '', categoryId = '' } = props || {};
-			scrollToItemById({ channelId, categoryId });
+			const { channelId = '', categoryId = '', timeout = 2000 } = props || {};
+			timer = setTimeout(() => {
+				scrollToItemById({ channelId, categoryId });
+			}, timeout);
 		});
 		return () => {
 			activeChannel.remove();
+			timer && clearTimeout(timer);
 		};
 	}, [currentClanId, categorizedChannels?.length, channelsPositionRef.current, categoryOffsetsRef.current]);
 
@@ -172,9 +175,10 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<ScrollView ref={flashListRef} scrollEventThrottle={16} bounces={false}>
-					{!!categorizedChannels?.length && categorizedChannels?.map((item) => {
-						return renderItemChannelList({ item });
-					})}
+					{!!categorizedChannels?.length &&
+						categorizedChannels?.map((item) => {
+							return renderItemChannelList({ item });
+						})}
 				</ScrollView>
 			</View>
 

@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMenu } from '@mezon/core';
-import { directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
+import { ChannelMembersEntity, directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -78,6 +78,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				isHideAnimation={true}
 				positionType={MemberProfileType.DM_LIST}
 				countMember={(directMessage?.user_id?.length || 0) + 1}
+				user={directMessage as ChannelMembersEntity}
 			/>
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}

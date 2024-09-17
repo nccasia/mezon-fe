@@ -1,6 +1,6 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllMessagesByChannelId, useAppSelector } from '@mezon/store';
 import { messagesActions, RootState, useAppDispatch } from '@mezon/store-mobile';
 import { Direction_Mode } from '@mezon/utils';
@@ -159,7 +159,7 @@ const ChannelMessages = React.memo(
 					onLoadMore={onLoadMore}
 					isLoadMore={isLoadMore.current}
 				/>
-
+				<Block height={size.s_8} />
 				{/*{showScrollToBottomButton && (*/}
 				{/*	<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>*/}
 				{/*		<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />*/}

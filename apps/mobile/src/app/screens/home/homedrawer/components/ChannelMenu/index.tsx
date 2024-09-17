@@ -1,6 +1,7 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useCategory, useUserPermission } from '@mezon/core';
 import {
+	ActionEmitEvent,
 	ENotificationActive,
 	ENotificationChannelId,
 	Icons,
@@ -24,7 +25,7 @@ import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { DeviceEventEmitter, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
@@ -255,13 +256,14 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const handleFocusDefaultChannel = async () => {
 		const firstTextChannel = categorizedChannels[0]?.channels?.filter((channel) => channel?.type === 1)?.[0];
 		if (!firstTextChannel) return;
-		const { clan_id: clanId, channel_id: channelId } = firstTextChannel;
+		const { clan_id: clanId, channel_id: channelId, category_id: channelCateId } = firstTextChannel || {};
 		const store = await getStoreAsync();
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		await Promise.all([
 			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
 		]);
+		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 		if (!channelsCache?.includes(channelId)) {

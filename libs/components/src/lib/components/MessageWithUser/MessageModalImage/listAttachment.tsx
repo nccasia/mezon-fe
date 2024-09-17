@@ -38,8 +38,8 @@ const ListAttachment = (props: ListAttachmentProps) => {
   let previousDate: any;
 
   return (
-    <div className="w-fit h-full bg-[#0B0B0B] text-white flex md:flex-col px-[10px] overflow-y-hidden gap-y-5">
-      <div className="w-fit h-full flex flex-col py-5 overflow-y-scroll gap-y-5 hide-scrollbar items-center">
+    <div className="min-[481px]:w-fit min-[481px]:h-full bg-[#0B0B0B] text-white flex md:flex-col px-[10px] overflow-y-hidden gap-y-5 max-[480px]:overflow-x-hidden">
+      <div className="w-fit h-full flex flex-col py-5 overflow-y-scroll gap-y-5 hide-scrollbar items-center max-[480px]:items-end max-[480px]:flex-row max-[480px]:overflow-x-scroll max-[480px]:overflow-y-auto max-[480px]:py-2 max-[480px]:gap-3">
         {attachments.map((attachment, index) => {
           const currentDate = new Date(attachment.create_time || '').toLocaleDateString();
           const showDate = previousDate !== currentDate;

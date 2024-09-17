@@ -186,7 +186,7 @@ const MessageModalImage = () => {
 					<Icons.MenuClose className="text-white w-full" />
 				</div>
 			</div>
-			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414]">
+			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
 				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative">
 					<img
 						src={urlImg}
@@ -277,7 +277,7 @@ const SenderUser = () => {
 	const user = useSelector(selectMemberClanByUserId(attachment?.uploader as string));
 
 	return (
-		<div className="flex gap-2 overflow-hidden">
+		<div className="flex gap-2 overflow-hidden ">
 			<div className="w-10 aspect-square object-cover overflow-hidden">
 				<img src={user?.clan_avatar ?? user?.user?.avatar_url} alt="user-avatar" className="w-10 rounded-full aspect-square object-cover" />
 			</div>

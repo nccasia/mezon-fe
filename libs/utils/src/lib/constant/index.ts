@@ -67,3 +67,11 @@ export enum EPermissionId {
 }
 
 export const ID_MENTION_HERE = '1775731111020111321';
+
+export const EMOJI_GIVE_COFFEE = {
+	emoji: 'cong1',
+	emoji_id: '7239659508431615752'
+};
+export const HEIGHT_PANEL_PROFILE = 430;
+export const WIDTH_PANEL_PROFILE = 300;
+export const HEIGHT_PANEL_PROFILE_DM = 314;

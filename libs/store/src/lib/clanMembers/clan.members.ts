@@ -151,6 +151,7 @@ export const selectAllUserClans = createSelector(getUsersClanState, selectAll);
 
 export const selectEntitesUserClans = createSelector(getUsersClanState, selectEntities);
 
+// with DM group use selector: selectMembeGroupByUserId
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 
 export const selectMemberClanByGoogleId = (googleId: string) =>

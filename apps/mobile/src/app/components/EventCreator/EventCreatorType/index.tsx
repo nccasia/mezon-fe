@@ -115,7 +115,7 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 
 					<MezonOption data={options} onChange={handleEventTypeChange} />
 
-					{eventType && eventType === OptionEvent.OPTION_SPEAKER && voicesChannel.length && (
+					{eventType && eventType === OptionEvent.OPTION_SPEAKER && !!voicesChannel?.length && (
 						<MezonSelect
 							prefixIcon={<Icons.VoiceNormalIcon height={20} width={20} color={themeValue.textStrong} />}
 							title={t('fields.channel.title')}

@@ -17,7 +17,7 @@ const ListMember = (props: ListMemberProps) => {
 	const [height, setHeight] = useState(window.innerHeight - heightTopBar);
 
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight);
+		const handleResize = () => setHeight(window.innerHeight - heightTopBar);
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);

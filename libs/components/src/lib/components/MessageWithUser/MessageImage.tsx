@@ -1,6 +1,7 @@
 import { useAppParams, useAttachments } from '@mezon/core';
-import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, selectOneStickerInfor, useAppDispatch } from '@mezon/store';
 import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useState } from 'react';
@@ -23,6 +24,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { directId: currentDmGroupId } = useAppParams();
+	const selectSticker = useSelector(selectOneStickerInfor(attachmentData.filename as string));
 
 	const handleClick = (url: string) => {
 		if (isDimensionsValid || checkImage) return;
@@ -72,17 +74,20 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	if (imageError || !attachmentData.url) {
 		return null;
 	}
+
 	return (
 		<div className="relative inline-block">
-			<img
-				onContextMenu={handleContextMenu}
-				className={`max-w-[100%] h-[150px] object-cover object-left-top my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
-				src={attachmentData.url?.toString()}
-				alt={attachmentData.url}
-				onClick={() => handleClick(attachmentData.url || '')}
-				style={imgStyle}
-				onError={handleImageError}
-			/>
+			<Tooltip content={selectSticker?.shortname} className={`${checkImage ? '' : 'hidden'}`}>
+				<img
+					onContextMenu={handleContextMenu}
+					className={`max-w-[100%] h-[150px] object-cover object-left-top my-2 rounded cursor-default`}
+					src={attachmentData.url?.toString()}
+					alt={attachmentData.url}
+					onClick={() => handleClick(attachmentData.url || '')}
+					style={imgStyle}
+					onError={handleImageError}
+				/>
+			</Tooltip>
 		</div>
 	);
 });

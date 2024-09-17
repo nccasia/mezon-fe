@@ -2,7 +2,7 @@ import { Icons } from '@mezon/components';
 import { selectCurrentChannelId, selectDmGroupCurrentId, selectTypingUserIdsByChannelId, useAppSelector } from '@mezon/store';
 import { OfflineStatus } from 'libs/ui/src/lib/Icons';
 import { ChannelType } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { directMessageValueProps } from '../DmList/DMListItem';
 
@@ -26,29 +26,24 @@ const StatusUser = memo((props: StatusUserProps) => {
 	const typingListDMIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessageValue?.dmID || ''));
 	const checkDmGroup = Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP;
 
-	const checkTypingUser = useMemo(() => {
-		switch (true) {
-			case isMemberDMGroup:
-				return typingListMemberDMIds?.some((item) => item.id === userId);
-			case isMemberChannel:
-				return typingListMemberChannelIds?.some((item) => item.id === userId);
+	let checkTypingUser = false;
 
-			case isListDm:
-				return typingListDMIds?.some((item) => directMessageValue?.userId?.includes(item.id));
+	switch (true) {
+		case isMemberDMGroup:
+			checkTypingUser = !!typingListMemberDMIds?.some((item) => item.id === userId);
+			break;
+		case isMemberChannel:
+			checkTypingUser = !!typingListMemberChannelIds?.some((item) => item.id === userId);
+			break;
 
-			default:
-				return false;
-		}
-	}, [
-		isMemberDMGroup,
-		typingListMemberDMIds,
-		userId,
-		isMemberChannel,
-		typingListMemberChannelIds,
-		isListDm,
-		typingListDMIds,
-		directMessageValue?.userId
-	]);
+		case isListDm:
+			checkTypingUser = !!typingListDMIds?.some((item) => directMessageValue?.userId?.includes(item.id));
+			break;
+
+		default:
+			checkTypingUser = false;
+			break;
+	}
 
 	return (
 		<>

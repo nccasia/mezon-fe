@@ -2,7 +2,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { AppState, DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
 import { IModeKeyboardPicker } from './components';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker from './components/BottomKeyboardPicker';
@@ -18,11 +18,17 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const timer = useRef<NodeJS.Timeout | null>(null);
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
 		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef.current?.collapse();
+			if (type === 'attachment') {
+				Keyboard.dismiss();
+			}
+			timer.current = setTimeout(() => {
+				setTypeKeyboardBottomSheet(type);
+				bottomPickerRef.current?.expand();
+			}, 100);
 		} else {
 			setTypeKeyboardBottomSheet('text');
 			bottomPickerRef.current?.forceClose();
@@ -34,28 +40,17 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	}));
 
 	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		return () => {
-			appStateSubscription.remove();
+			timer?.current && clearTimeout(timer.current);
 		};
 	}, []);
-
-	const handleAppStateChange = async (state: string) => {
-		if (state === 'background') {
-			Keyboard.dismiss();
-			setHeightKeyboardShow(0);
-		}
-	};
 
 	return (
 		<>
 			<View
 				style={{
 					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-					backgroundColor: 
-						theme === 'light' ? 
-							themeValue.tertiary : 
-							themeValue.secondary
+					backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.secondary
 				}}
 			/>
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

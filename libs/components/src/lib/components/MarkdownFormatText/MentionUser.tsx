@@ -1,11 +1,12 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
-import { MouseButton, getNameForPrioritize } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_PANEL_PROFILE, getNameForPrioritize, handleShowShortProfile } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
+import { useMessageContextMenu } from '../ContextMenu';
+import ModalUserProfile from '../ModalUserProfile';
 
 type ChannelHashtagProps = {
 	tagUserName?: string;
@@ -27,9 +28,7 @@ type UserProfilePopupProps = {
 	userID: string;
 	channelId?: string;
 	mode?: number;
-	positionLeft: number;
-	positionTop: number;
-	positionBottom: boolean;
+
 	isDm?: boolean;
 };
 
@@ -58,61 +57,36 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
 
-	const panelRef = useRef<HTMLButtonElement>(null);
+	const mentionRef = useRef<HTMLButtonElement>(null);
 
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
 	const channelId = isDM ? currentDirectId : currentChannelId;
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
-	const [positionBottom, setPositionBottom] = useState(false);
-	const [positionTop, setPositionTop] = useState(0);
-	const [positionLeft, setPositionLeft] = useState(0);
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === MouseButton.LEFT && tagUserName !== '@here') {
-			setIsShowPanelChannel(true);
-			const clickY = event.clientY;
-			const windowHeight = window.innerHeight;
-			const distanceToBottom = windowHeight - clickY;
-			const windowWidth = window.innerWidth;
-			const elementTagName = event.target;
-			if (elementTagName instanceof HTMLElement) {
-				const positionRight = elementTagName.getBoundingClientRect().right;
-				const widthElement = elementTagName.offsetWidth;
-				const widthElementShortUserProfileMin = 380;
-				const distanceToRight = windowWidth - positionRight;
-				if (distanceToRight < widthElementShortUserProfileMin) {
-					setPositionLeft(positionRight - widthElement - widthElementShortUserProfileMin);
-				} else {
-					setPositionLeft(positionRight + 20);
-				}
-				setPositionTop(clickY - 50);
-				setPositionBottom(false);
-			}
-			const heightElementShortUserProfileMin = 313;
-			if (distanceToBottom < heightElementShortUserProfileMin) {
-				setPositionBottom(true);
-			}
-		}
+	const { setPosShortProfile } = useMessageContextMenu();
+
+	const handleMouseClick = () => {
+		handleShowShortProfile(
+			mentionRef,
+			WIDTH_PANEL_PROFILE,
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
+			setIsShowPanelChannel,
+			setPosShortProfile
+		);
 	};
 
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	const handleClickOutside = () => {
+		setIsShowPanelChannel(false);
+	};
+	useOnClickOutside(mentionRef, handleClickOutside);
 	useEscapeKey(() => setIsShowPanelChannel(false));
 
 	return (
 		<>
-			{showProfileUser && (
-				<UserProfilePopup
-					userID={tagUserId ?? ''}
-					channelId={channelId ?? ''}
-					mode={mode}
-					positionLeft={positionLeft}
-					positionTop={positionTop}
-					positionBottom={positionBottom}
-					isDm={isDM}
-				/>
-			)}
+			{showProfileUser && <UserProfilePopup userID={tagUserId ?? ''} channelId={channelId ?? ''} mode={mode} isDm={isDM} />}
+
 			{displayToken?.type === MentionType.ROLE_EXIST && (
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`${displayToken.display}`}</span>
 			)}
@@ -129,8 +103,8 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{displayToken?.type === MentionType.USER_EXIST && (
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
-					ref={panelRef}
+					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick() : () => {}}
+					ref={mentionRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
 					className={`font-medium px-0.1 rounded-sm
@@ -146,10 +120,11 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, positionBottom, isDm }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, isDm }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
+	const { posShortProfile } = useMessageContextMenu();
 	const prioritizeName = getNameForPrioritize(
 		getUserByUserId.clan_nick ?? '',
 		getUserByUserId.user?.display_name ?? '',
@@ -165,20 +140,23 @@ const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, 
 
 	return (
 		<div
-			className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
+			className="dark:bg-black bg-gray-200 mt-[20px]  w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
 			style={{
-				left: `${positionLeft}px`,
-				top: positionBottom ? '' : `${positionTop}px`,
-				bottom: positionBottom ? '64px' : ''
+				left: posShortProfile.left,
+				top: posShortProfile.top,
+				bottom: posShortProfile.bottom,
+				right: posShortProfile.right
 			}}
 			onMouseDown={(e) => e.stopPropagation()}
 		>
-			<ShortUserProfile
-				isDM={isDm}
+			<ModalUserProfile
 				userID={userID}
+				classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 				mode={mode}
+				positionType={''}
 				avatar={updatedUserByUserId.prioritizeAvt}
 				name={updatedUserByUserId.prioritizeName}
+				isDM={isDm}
 			/>
 		</div>
 	);

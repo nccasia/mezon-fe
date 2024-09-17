@@ -5,11 +5,13 @@ import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll, PhotoIdentifier, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Linking, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
+import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import { style } from './styles';
+export const { height } = Dimensions.get('window');
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 	currentChannelId: string;
@@ -105,7 +107,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		setLoading(true);
 		try {
 			const res = await CameraRoll.getPhotos({
-				first: 10,
+				first: 30,
 				assetType: 'All',
 				...(!!pageInfo && !!after && { after: after }),
 				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation']
@@ -142,7 +144,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					}
 				}}
 			>
-				<Image source={{ uri: item.node.image.uri }} style={styles.imageGallery} />
+				<Image source={{ uri: item.node.image.uri, cache: 'force-cache' }} style={styles.imageGallery} />
 				{isVideo && (
 					<View style={styles.videoOverlay}>
 						<PlayIcon width={size.s_20} height={size.s_20} />
@@ -237,6 +239,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				renderItem={renderItem}
 				keyExtractor={(item, index) => `${index.toString()}_gallery`}
 				numColumns={3}
+				style={{
+					maxHeight: height * 0.8
+				}}
 				onEndReached={handleLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={() => loading && <ActivityIndicator size="small" color={themeValue.text} />}

@@ -1,10 +1,10 @@
-import { AngleRightIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, AngleRightIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -27,6 +27,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: thread?.category_id });
 	};
 	const timeMessage = useMemo(() => {
 		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {

@@ -36,6 +36,7 @@ import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
 import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
+import { giveCoffeeReducer } from './giveCoffee/giveCoffee.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
@@ -308,7 +309,8 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	adminApplication: adminApplicationReducer,
-	systemMessages: systemMessageReducer
+	systemMessages: systemMessageReducer,
+	giveCoffee: giveCoffeeReducer
 };
 
 let storeInstance = configureStore({

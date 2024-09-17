@@ -25,6 +25,7 @@ export * from './lib/forwardMessage/forwardMessage.slice';
 export * from './lib/friends/friend.slice';
 export * from './lib/giftStickerEmojiPanel/gifs.slice';
 export * from './lib/giftStickerEmojiPanel/gifsStickerEmoji.slice';
+export * from './lib/giveCoffee/giveCoffee.slice';
 export * from './lib/invite/invite.slice';
 export * from './lib/messages/SeenMessagePool';
 export * from './lib/messages/messages.slice';

@@ -1,7 +1,7 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
 import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { OptionEvent } from '@mezon/utils';
+import { EEventStatus, OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -27,13 +27,6 @@ export type ItemEventManagementProps = {
 	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
 };
-
-export enum EEventStatus {
-	UPCOMING = 'UPCOMING',
-	ONGOING = 'ONGOING',
-	COMPLETED = 'COMPLETED',
-	UNKNOWN = 'UNKNOWN'
-}
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const {

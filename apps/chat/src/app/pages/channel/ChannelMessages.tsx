@@ -50,18 +50,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const { userId } = useAuth();
 	const listMessageRef = useRef<HTMLDivElement | null>(null);
-	const onChatRender = useCallback(
-		(node: HTMLDivElement | null) => {
-			chatRef.current = node;
-			if (node) {
-				node.scrollTo(0, Number.MAX_SAFE_INTEGER);
-			}
-		},
-		// the function needs to be re-created when channelId changes
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[channelId]
-	);
-
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const dispatch = useAppDispatch();
@@ -173,6 +161,18 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 		return () => timeoutId && clearTimeout(timeoutId);
 	}, [lastMessage, userId]);
 
+	useEffect(() => {
+		let scrollTimerId: NodeJS.Timeout | null = null;
+		if (channelId) {
+			scrollTimerId = setTimeout(() => {
+				chatScrollRef.scrollToBottom();
+			}, 0);
+		}
+		return () => {
+			scrollTimerId && clearTimeout(scrollTimerId);
+		};
+	}, [channelId, chatScrollRef]);
+
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
 			<div className="w-full h-full relative">
@@ -184,7 +184,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 							customScrollLightMode: appearanceTheme === 'light'
 						}
 					)}
-					ref={onChatRender}
+					ref={chatRef}
 				>
 					<div ref={listMessageRef} className="min-h-[100%] overflow-anchor-none flex flex-col justify-end">
 						{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}

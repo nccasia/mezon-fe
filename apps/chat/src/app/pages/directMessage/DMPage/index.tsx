@@ -1,7 +1,6 @@
 import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat, ModalUserProfile } from '@mezon/components';
 import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
-	directActions,
 	directMetaActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
@@ -23,14 +22,19 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
+	const mounted = useRef('');
 	useEffect(() => {
+		if (mounted.current === channelId) {
+			return;
+		}
 		if (lastMessage) {
+			mounted.current = channelId;
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
-	}, [channelId, dispatch, lastMessage]);
+	}, [dispatch, channelId, lastMessage]);
 }
 export default function DirectMessage() {
 	// TODO: move selector to store

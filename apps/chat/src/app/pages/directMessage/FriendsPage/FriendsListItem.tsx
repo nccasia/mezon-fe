@@ -1,6 +1,6 @@
 import { Icons, MemberProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
-import { FriendsEntity } from '@mezon/store';
+import { ChannelMembersEntity, FriendsEntity } from '@mezon/store';
 import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 
@@ -58,6 +58,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						positionType={MemberProfileType.LIST_FRIENDS}
 						customStatus={(friend.user?.metadata as MetaDateStatusUser).status ?? ''}
 						isDM={true}
+						user={friend as ChannelMembersEntity}
 					/>
 				</div>
 				<div onClick={(e) => e.stopPropagation()}>

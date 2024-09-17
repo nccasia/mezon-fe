@@ -1,6 +1,5 @@
-import { IEventManagement, LoadingStatus } from '@mezon/utils';
+import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { EEventStatus } from 'libs/components/src/lib/components/ChannelList/EventChannelModal/ModalCreate/itemEventManagement';
 import memoize from 'memoizee';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';

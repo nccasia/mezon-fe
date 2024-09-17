@@ -228,9 +228,11 @@ function MemberProfile({
 		return (
 			<UserProfileModalInner
 				openModal={isOpenProfileModal}
-				userId={user?.user?.id}
+				userId={user?.user?.id || user?.user_id?.[0]}
+				directId={(user as any)?.channel_id || user?.channelId}
 				onClose={() => closeModal(ModalType.UserProfile)}
 				isDM={isDM}
+				user={user}
 			/>
 		);
 	});

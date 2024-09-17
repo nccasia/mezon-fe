@@ -38,6 +38,8 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 	const tripleBacktick = '```';
 	const httpPrefix = 'http';
 	const googleMeetPrefix = 'https://meet.google.com/';
+	const colon = ':';
+	const space = ' ';
 
 	let i = 0;
 	while (i < inputString.length) {
@@ -46,7 +48,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			const startindex = i;
 			i++;
 			let shortname = '';
-			while (i < inputString.length && inputString[i] !== ':') {
+			while (i < inputString.length && inputString[i] !== colon && inputString[i] !== space) {
 				shortname += inputString[i];
 				i++;
 			}

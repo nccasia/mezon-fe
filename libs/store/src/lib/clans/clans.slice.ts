@@ -1,4 +1,4 @@
-import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
+import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
@@ -129,8 +129,12 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateClanName(clan_name);
-		return isDuplicateName?.exist;
+		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(clan_name, '', TypeCheck.TYPECLAN);
+
+		if (isDuplicateName?.type === TypeCheck.TYPECLAN) {
+			return isDuplicateName.exist;
+		}
+		return;
 	} catch (error: any) {
 		Sentry.captureException(error);
 		const errmsg = await error.json();

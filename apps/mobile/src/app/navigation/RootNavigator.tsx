@@ -21,7 +21,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
@@ -51,7 +51,6 @@ const MyStackComponent = lazy(() => import('./RootStack'));
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const dispatch = useDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
@@ -66,7 +65,7 @@ const NavigationMain = () => {
 		}, 500);
 
 		const timerScrollToActive = setTimeout(async () => {
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
+			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { timeout: 100 });
 		}, 4000);
 		return () => {
 			clearTimeout(timer);
@@ -94,21 +93,6 @@ const NavigationMain = () => {
 			timeout && clearTimeout(timeout);
 		};
 	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
-
-	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', async (state) => {
-			if (state === 'active') {
-				await notifee.cancelAllNotifications();
-			}
-			if (state === 'background') {
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setIsFromFCMMobile(false));
-			}
-		});
-		return () => {
-			appStateSubscription.remove();
-		};
-	}, []);
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
