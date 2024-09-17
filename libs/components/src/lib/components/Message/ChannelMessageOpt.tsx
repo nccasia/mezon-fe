@@ -1,4 +1,3 @@
-import { Icons } from '@mezon/components';
 import { useAuth, useThreads } from '@mezon/core';
 import {
 	gifsStickerEmojiActions,
@@ -6,13 +5,16 @@ import {
 	reactionActions,
 	referencesActions,
 	selectCurrentChannel,
+	selectTheme,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
-import { memo, useCallback, useRef, useState } from 'react';
+import { Tooltip } from 'flowbite-react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
@@ -30,21 +32,39 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
 	const items = useMenuBuilder([reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
+	const appearanceTheme = useSelector(selectTheme);
+	const isLightMode = useMemo(() => {
+		return appearanceTheme === 'light';
+	}, [appearanceTheme]);
 
+	const labelMap: Record<string, string> = {
+		react: 'Add Reaction',
+		reply: 'Reply',
+		thread: 'Create Thread',
+		edit: 'Edit'
+	};
 	return (
 		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit `}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit h-fit `}
 		>
-			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
+			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded relative">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>
 					{items.map((item, index) => (
-						<button
+						<Tooltip
 							key={index}
-							onClick={(e) => (item?.handleItemClick ? item?.handleItemClick(e) : undefined)}
-							className={clx('h-full p-1 cursor-pointer popup-btn', item.classNames)}
+							className="w-full h-full text-center"
+							content={labelMap[item.label] || 'More'}
+							trigger="hover"
+							animation="duration-500"
+							style={isLightMode ? 'light' : 'dark'}
 						>
-							{item.icon}
-						</button>
+							<button
+								onClick={(e) => (item?.handleItemClick ? item?.handleItemClick(e) : undefined)}
+								className={clx('h-full p-1 cursor-pointer popup-btn', item.classNames)}
+							>
+								{item.icon}
+							</button>
+						</Tooltip>
 					))}
 				</div>
 			</div>

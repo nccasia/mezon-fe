@@ -109,10 +109,9 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-						<Icons.SettingProfile
-							className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton"
-							onClick={openSetting}
-						/>
+						<div onClick={openSetting} className="dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton p-2 rounded-md group">
+							<Icons.SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black group-hover:rotate-180 ease-in-out duration-500" />
+						</div>
 					</Tooltip>
 				</div>
 			</button>
