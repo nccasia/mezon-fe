@@ -2,7 +2,6 @@ import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
-import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
 import { clansActions } from '../clans/clans.slice';
@@ -176,18 +175,22 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages }));
-			const fetchChannelMembersResult = await thunkAPI.dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: '',
-					channelId: directMessageId,
-					channelType: ChannelType.CHANNEL_TYPE_TEXT,
-					noCache
-				})
-			);
-			const members = fetchChannelMembersResult.payload as members[];
-			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
-				const userIds = members.map((member) => member?.user_id as string);
-				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
+			// const fetchChannelMembersResult = await thunkAPI.dispatch(
+			// 	channelMembersActions.fetchChannelMembers({
+			// 		clanId: '',
+			// 		channelId: directMessageId,
+			// 		channelType: ChannelType.CHANNEL_TYPE_TEXT,
+			// 		noCache
+			// 	})
+			// );
+
+			const state = thunkAPI.getState();
+			const directMessage = selectDirectById(state, directMessageId);
+
+			// const members = fetchChannelMembersResult.payload as members[];
+			if (type === ChannelType.CHANNEL_TYPE_DM && directMessage?.user_id && directMessage?.user_id.length > 0) {
+				// const userIds = members.map((member) => member?.user_id as string);
+				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userId: directMessage?.user_id[0], directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
