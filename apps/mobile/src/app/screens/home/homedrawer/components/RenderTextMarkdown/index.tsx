@@ -485,7 +485,8 @@ export const RenderTextMarkdownContent = React.memo(
 								channel_id: dataChannel?.[1],
 								clan_id: dataChannel?.[2],
 								status: Number(dataChannel?.[3] || 1),
-								meeting_code: dataChannel?.[4] || ''
+								meeting_code: dataChannel?.[4] || '',
+								category_id: dataChannel?.[5]
 							};
 							onChannelMention && onChannelMention(payloadChannel);
 							return false;

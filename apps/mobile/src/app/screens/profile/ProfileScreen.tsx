@@ -1,8 +1,8 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useFriends, useMemberCustomStatus } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { FriendsEntity, channelMembersActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { CheckIcon, Icons } from '@mezon/mobile-components';
+import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { FriendsEntity, channelMembersActions, selectCurrentClanId, selectUpdateToken, useAppDispatch } from '@mezon/store-mobile';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
@@ -34,6 +34,11 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 	const { dismiss } = useBottomSheetModal();
+	const getTokenSocket = useSelector(selectUpdateToken(user?.userId?? ''));
+  const tokenInWallet = useMemo(() => {
+		const parse = JSON.parse(user?.userProfile?.wallet ?? '').value;
+		return parse;
+	}, [user?.userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
@@ -111,6 +116,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
+					<Block flexDirection='row' alignItems='center' gap={size.s_10} marginTop={size.s_10}>
+              <CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
+              <Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
+          </Block>
 					{userCustomStatus ? (
 						<Block flexDirection="row" alignItems="center" justifyContent="space-between">
 							<TouchableOpacity

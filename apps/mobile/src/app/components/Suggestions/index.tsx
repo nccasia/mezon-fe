@@ -108,7 +108,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			...item,
 			id: item?.channel_id ?? '',
 			display: item?.channel_label ?? '',
-			subText: item?.category_name ?? '',
+			subText: (item?.category_name || item?.clan_name) ?? '',
 			name: item?.channel_label ?? ''
 		}));
 	}, [channels, commonChannelDms, mode]);
