@@ -1,7 +1,8 @@
-import { Icons } from '@mezon/mobile-components';
+import { differenceTime, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
+import { eventManagementActions, EventManagementEntity, selectChannelById, selectMemberClanByUserId, useAppDispatch } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
+import { useEffect, useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
@@ -19,10 +20,24 @@ interface IEventItemProps {
 export default function EventItem({ event, onPress, showActions = true }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const dispatch = useAppDispatch();
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
 	const channelVoice = useSelector(selectChannelById(event?.channel_id));
 	// const channelFirst = useSelector(selectChannelFirst);
+
+	const checkTimeVoice = useMemo(() => {
+		return differenceTime(event?.end_time || '') + 30 < 0;
+	}, [event?.end_time]);
+	const checkTimeLocation = useMemo(() => {
+		return differenceTime(event?.end_time || '') < 0;
+	}, [event?.end_time]);
+
+	useEffect(() => {
+		if ((checkTimeVoice && event?.channel_id) || (checkTimeLocation && event?.address)) {
+			dispatch(eventManagementActions.fetchDeleteEventManagement({ clanId: event.clan_id, eventID: event.id }));
+		}
+	}, [checkTimeLocation, checkTimeVoice, dispatch, event?.address, event?.channel_id, event.clan_id, event.id]);
 
 	function handlePress() {
 		onPress && onPress();
@@ -36,11 +51,7 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 
 					<View style={[styles.inline, styles.infoRight]}>
 						<View style={styles.avatar}>
-							<FastImage
-								source={{ uri: userCreate?.user?.avatar_url }}
-								style={{ width: '100%', height: '100%' }}
-								resizeMode="cover"
-							/>
+							<FastImage source={{ uri: userCreate?.user?.avatar_url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
 						</View>
 						<View style={styles.inline}>
 							<Icons.GroupIcon height={size.s_10} width={size.s_10} color={themeValue.text} />

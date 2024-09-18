@@ -47,9 +47,10 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 		navigation.navigate(APP_SCREEN.HOME);
 	}
 
+	const timeValueStart = convertToLocalTime(startTime);
+	const timeValueEnd = convertToLocalTime(endTime);
+
 	async function handleCreate() {
-		const timeValueStart = convertToLocalTime(startTime);
-		const timeValueEnd = convertToLocalTime(endTime);
 		if (type === OptionEvent.OPTION_SPEAKER) {
 			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueStart, description, '');
 		} else {
@@ -65,7 +66,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 				<EventItem
 					event={{
 						id: '',
-						start_time: startTime.toString(),
+						start_time: timeValueStart,
 						address: location,
 						user_ids: [],
 						creator_id: myUser.userId,

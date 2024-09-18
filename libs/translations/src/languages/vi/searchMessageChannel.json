@@ -7,5 +7,7 @@
   "members": "Thành viên",
   "channels": "Kênh",
   "media": "Phương tiện",
-  "pins": "Ghim"
+  "pins": "Ghim",
+  "events": "Sự kiện đang diễn ra",
+  "detail": "Chi tiết sự kiện"
 }

@@ -82,7 +82,8 @@ export default memo(function MezonDateTimePicker({
 
 			<MezonBottomSheet
 				ref={bottomSheetRef}
-				heightFitContent
+				index={0}
+				snapPoints={['40%']}
 				title={props.title}
 				headerLeft={
 					<TouchableOpacity style={styles.btnHeaderBS} onPress={handleClose}>
