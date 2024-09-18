@@ -1,27 +1,19 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
-import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	RootState,
-	selectAllEventManagement,
-	selectChannelById,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectOngoingEvent
-} from '@mezon/store-mobile';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import EventViewer from '../../../../components/Event';
-import EventDetail from '../../../../components/Event/EventDetail';
-import EventMember from '../../../../components/Event/EventMember';
+import { EventOngoingPanel } from '../../../../components/Event/EventOngoing';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { MezonBottomSheet, MezonTab } from '../../../../temp-ui';
+import { MezonBottomSheet } from '../../../../temp-ui';
 import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
@@ -43,7 +35,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 	const { t } = useTranslation(['searchMessageChannel']);
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const onGoingEvent = useSelector(selectOngoingEvent);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
@@ -61,14 +52,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
-
-	const currentOnGoingEventEntity = useMemo(() => {
-		if (onGoingEvent) {
-			return allEventManagement.find((event) => event.id === onGoingEvent?.event_id);
-		}
-	}, [allEventManagement, onGoingEvent]);
-
-	const channelVoice = useSelector(selectChannelById(currentOnGoingEventEntity?.channel_id));
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -183,28 +166,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
 
-				{currentOnGoingEventEntity && currentClanId === currentOnGoingEventEntity.clan_id && (
-					<View style={styles.onGoingEventPanel}>
-						<View style={styles.titleRow}>
-							<Icons.CalendarIcon height={size.s_16} width={size.s_16} color={baseColor.green} />
-							<Text style={styles.onGoingEventTitle}>{t('events')}</Text>
-						</View>
-						<Text style={styles.titleEvent}>{currentOnGoingEventEntity.title}</Text>
-						<View style={[styles.titleRow, { gap: size.s_4, marginTop: size.s_4 }]}>
-							{currentOnGoingEventEntity?.address ? (
-								<Icons.LocationIcon height={size.s_16} width={size.s_16} color={themeValue.text} />
-							) : (
-								<Icons.VoiceNormalIcon height={size.s_16} width={size.s_16} color={themeValue.text} />
-							)}
-							<Text style={styles.titleEvent}>
-								{currentOnGoingEventEntity?.address ? currentOnGoingEventEntity?.address : channelVoice?.channel_label}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.detailButton} onPress={() => bottomSheetEventDetailRef?.current?.present()}>
-							<Text style={styles.titleEvent}>{t('detail')}</Text>
-						</TouchableOpacity>
-					</View>
-				)}
+				<EventOngoingPanel ref={bottomSheetEventDetailRef} />
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
@@ -242,16 +204,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 			<MezonBottomSheet ref={bottomSheetNotifySettingRef} snapPoints={['50%']}>
 				<NotificationSetting channel={currentPressedChannel} />
-			</MezonBottomSheet>
-
-			<MezonBottomSheet ref={bottomSheetEventDetailRef}>
-				<MezonTab
-					views={[
-						<EventDetail event={currentOnGoingEventEntity} eventDetailRef={bottomSheetEventDetailRef} />,
-						<EventMember event={currentOnGoingEventEntity} />
-					]}
-					titles={['Event Info', 'Interested']}
-				/>
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>
 	);
