@@ -371,7 +371,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUserClans);
 		const currentChannelId = useSelector(selectCurrentChannelId);
-		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
+		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, (directMessageId || currentChannelId) as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
 
