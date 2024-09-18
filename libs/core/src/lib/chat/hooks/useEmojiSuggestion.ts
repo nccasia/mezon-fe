@@ -9,9 +9,14 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
+
+interface EmojiSuggestionProps {
+	isMobile?: boolean;
+}
 
 const filterEmojiData = (emojis: IEmoji[]) => {
 	return emojis.map(({ id, src, shortname, category }) => ({
@@ -22,9 +27,11 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 	}));
 };
 
-export function useEmojiSuggestion() {
+export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = {}) {
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
 	const userId = useAuth();
+	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
+
 	function filterEmojisByUserId(emojis: EmojiStorage[], userId: string): EmojiStorage[] {
 		return emojis.filter((emojiItem) => emojiItem.senderId === userId);
 	}
@@ -40,7 +47,27 @@ export function useEmojiSuggestion() {
 			};
 		});
 	}
-	const emojiRecentData = localStorage.getItem('recentEmojis');
+
+	useEffect(() => {
+		const fetchRecentEmojis = async () => {
+			try {
+				const recentEmojis = await AsyncStorage.getItem('recentEmojis');
+				if (recentEmojis !== null) {
+					setEmojiRecentData(recentEmojis);
+				}
+			} catch (error) {
+				console.error('Error fetching recent emojis:', error);
+			}
+		};
+
+		if (isMobile) {
+			fetchRecentEmojis();
+		} else {
+			const emojiRecentStorage = localStorage.getItem('recentEmojis')
+			setEmojiRecentData(emojiRecentStorage)
+		}
+	}, []);
+
 	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
 	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
 	const reversedEmojisRecentDataParse = emojiFiltered.reverse();

@@ -50,7 +50,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
-	const { reactionMessageDispatch } = useChatReaction();
+	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
