@@ -45,6 +45,134 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
 	);
 
+	const channel = [
+		{
+			clan_id: '1782623378570481664',
+			channel_id: '1782623378604036096',
+			type: 1,
+			channel_label: 'general',
+			channel_private: 0,
+			meeting_code: '',
+			clan_name: '123123',
+			parrent_id: '0',
+			id: '1782623378604036096',
+			status: 0
+		}
+	];
+
+	const gr = [
+		{
+			clan_id: '0',
+			parrent_id: '0',
+			channel_id: '1816730137756962816',
+			category_id: '0',
+			type: 2,
+			creator_id: '1775731911755304960',
+			channel_label: 'hahhaha',
+			channel_private: 1,
+			channel_avatar: [
+				'https://cdn.mezon.vn/0/0/1775731911755305000/21download.jfifJPEG',
+				'https://cdn.mezon.vn/1783358414991134720/0/1775732201627848700/916273854_Van_hoa_Cham_02_21_11_09.WEBP',
+				'https://cdn.mezon.vn/1775732550744936448/1813895345772433408/1788103935005823000/32Comment_Why_8_hours_of_sleep_is_important_for_uoft_students_Sin_Hang_Sophia_Leung_WEB.JPEG',
+				'https://lh3.googleusercontent.com/a/ACg8ocLw3GJyJ7auq2qQea_XBFn3bULlFqc5VoHVipB0jDEYOwPDBA=s96-c',
+				'https://cdn.mezon.vn/1775731152322039808/1820659489792069632/mezon_logo.png',
+				'https://cdn.mezon.vn/1775732550744936448/0/1827918839833170000/194_undefinedScreenshot_2023_04_06_132903.WEBP',
+				'https://lh3.googleusercontent.com/a/ACg8ocJKv5mNvV7aiu3HNyuaG5KQ94xYib1l55f4jvUgXsy6FwU1fiFl=s96-c',
+				'https://cdn.mezon.vn/1816398792639909888/0/1808345368379789300/23createOrder.JPEG'
+			],
+			user_id: [
+				'1775731911755304960',
+				'1775732201627848704',
+				'1788103935005822976',
+				'1813067151733428224',
+				'1775731111020728320',
+				'1827918839833169920',
+				'1831588699511459840',
+				'1808345368379789312'
+			],
+			last_sent_message: {
+				id: '1834075854313885696',
+				timestamp_seconds: 1726112733,
+				sender_id: '1775732201627848704',
+				content: '{"t":"123123"}',
+				attachment: '[]',
+				referece: '[]',
+				mention: '[]'
+			},
+			last_seen_message: {
+				id: '1834075854313885696',
+				timestamp_seconds: 1726299201
+			},
+			is_online: [false, false, false, false, false, false, false, false],
+			active: 1,
+			usernames: 'thuy.nguyenthithu1,an.buihoang,nga.nguyenthi,thanh.tranhuy,thai.phamquoc,thanh.levan,buihoanghiepkk0609,thang.tranhuy,',
+			creator_name: 'dis',
+			create_time_seconds: 1721977192,
+			update_time_seconds: 1723635585,
+			metadata: [
+				'{"status": "vssss"}',
+				'{"status": "Hi"}',
+				"{\"status\": \"What's cookin', Nga DisplayName?What's cookin', Nga DisplayName?What's cookin', Nga DisplayName?What's cookin'ame\"}",
+				'{"status": "hello world!!!"}',
+				'{"status": "hello world!!!!123456"}',
+				'{"status": "hehehehe"}',
+				'{}',
+				'{"status": "hello world!!!"}'
+			],
+			about_me: [
+				'',
+				'123',
+				'gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',
+				'',
+				'sfasdfafadfadfdfs123eeq',
+				'ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt',
+				'',
+				''
+			],
+			id: '1816730137756962816'
+		}
+	];
+
+	const dm = [
+		{
+			clan_id: '0',
+			parrent_id: '0',
+			channel_id: '1816395726142312448',
+			category_id: '0',
+			type: 3,
+			creator_id: '1813062275754364928',
+			channel_label: 'when adding members and roles',
+			channel_private: 1,
+			channel_avatar: ['https://lh3.googleusercontent.com/a/ACg8ocLJZ6if8GTXnk8nTWKM4uBLzqTi2yREu65fCszAtuZ44WfOPIx2=s96-c'],
+			user_id: ['1813062275754364928'],
+			last_sent_message: {
+				id: '1820019021488066560',
+				sender_id: '1775730015049093120',
+				content:
+					'{"t":"@phong.nguyennam <#1805078997189529600>","links":[],"emojis":[],"hashtags":[{"endIndex":39,"channelId":"1805078997189529600","startIndex":17,"channelLable":"#anbui"}],"mentions":[{"userId":"1775730015049093120","endIndex":16,"username":"@phong.nguyennam","startIndex":0}],"markdowns":[],"plainText":"@phong.nguyennam #anbui "}',
+				attachment: '[]',
+				referece: '[]',
+				mention: '[{"user_id":"1775730015049093120","username":"@phong.nguyennam"}]',
+				reaction: '[]'
+			},
+			last_seen_message: {
+				id: '1820019021488066560'
+			},
+			is_online: [false],
+			active: 1,
+			usernames: 'huyetlinh1901,',
+			creator_name: 'when adding members and roles',
+			create_time_seconds: 1721897462,
+			update_time_seconds: 1721897462,
+			metadata: ['{"status": ""}'],
+			about_me: [''],
+			id: '1816395726142312448'
+		}
+	];
+	console.log('listChannels', listChannels);
+	console.log('dmGroupChatList :', dmGroupChatList);
+	console.log('listDM :', listDM);
+
 	const dispatch = useAppDispatch();
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
