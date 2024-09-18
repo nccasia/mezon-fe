@@ -39,7 +39,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
-	const bottomSheetEventDetailRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
@@ -166,7 +165,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
 
-				<EventOngoingPanel ref={bottomSheetEventDetailRef} />
+				<EventOngoingPanel />
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
