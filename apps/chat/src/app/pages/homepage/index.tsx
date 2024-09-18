@@ -1,7 +1,8 @@
 import { Icons } from '@mezon/components';
+import { useAuth } from '@mezon/core';
 import { selectIsLogin } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import DancingRobot from '../../../assets/dancing-robot.gif';
@@ -11,7 +12,7 @@ import SideBar from './sidebar';
 function Homepage() {
 	const isLogin = useSelector(selectIsLogin);
 	const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
-
+	const { loginByGoogle } = useAuth();
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
@@ -21,6 +22,45 @@ function Homepage() {
 	} else if (navigator.userAgent.includes('Linux')) {
 		linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-linux-amd64.deb';
 	}
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const code = urlParams.get('code');
+	useEffect(() => {
+		console.log('code: ', code);
+		loginByGoogle(code ?? '');
+		getOauthGoogleToken(code ?? '');
+	}, [urlParams]);
+	const [tokenData, setTokenData] = useState<any>(null);
+
+	const getOauthGoogleToken = async (code: string) => {
+		try {
+			const body = new URLSearchParams({
+				code,
+				client_id: '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.googleusercontent.com',
+				client_secret: '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',
+				redirect_uri: 'http://localhost:4200',
+				grant_type: 'authorization_code'
+			});
+			console.log(body);
+			const response = await fetch('https://oauth2.googleapis.com/token', {
+				method: 'POST',
+				body: body.toString(),
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to fetch token');
+			}
+
+			const data = await response.json();
+			console.log('Token data:', data);
+			setTokenData(data);
+		} catch (error) {
+			console.error('Error fetching OAuth token:', error);
+		}
+	};
 
 	return (
 		<div className="relative">
