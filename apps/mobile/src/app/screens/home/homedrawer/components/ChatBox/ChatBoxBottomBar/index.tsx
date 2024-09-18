@@ -13,7 +13,6 @@ import {
 	emojiSuggestionActions,
 	referencesActions,
 	selectAllChannels,
-	selectAllHashtagDm,
 	selectCurrentChannel,
 	threadsActions,
 	useAppDispatch
@@ -102,7 +101,6 @@ export const ChatBoxBottomBar = memo(
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
 		const [textChange, setTextChange] = useState<string>('');
-		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
 
 		const isAvailableSending = useMemo(() => {
@@ -234,7 +232,7 @@ export const ChatBoxBottomBar = memo(
 					}
 					if (word?.startsWith('<#') && word?.endsWith('>')) {
 						const channelLabel = word?.slice(2, -1);
-						const channelInfo = getChannelHashtag(listHashtagDm, listChannel, mode, channelLabel);
+						const channelInfo = getChannelHashtag(listChannel, channelLabel);
 						mentionBeforeHashtagCount++;
 						if (channelInfo) {
 							const startindex = convertedHashtag.indexOf(word, indexOfLastHashtag);

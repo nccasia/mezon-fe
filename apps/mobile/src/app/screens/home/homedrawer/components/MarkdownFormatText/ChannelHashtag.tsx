@@ -1,18 +1,19 @@
-import { ChannelsEntity, HashtagDmEntity } from '@mezon/store';
+import { ChannelsEntity, selectHashtagDmById } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useSelector } from 'react-redux';
 
 type IChannelHashtag = {
 	channelHashtagId: string;
 	channelsEntities?: Record<string, ChannelsEntity>;
-	hashtagDmEntities?: Record<string, HashtagDmEntity>;
 	directMessageId?: string;
 	mode?: number;
 };
-export const ChannelHashtag = ({ channelHashtagId, channelsEntities, directMessageId, mode, hashtagDmEntities }: IChannelHashtag) => {
+export const ChannelHashtag = ({ channelHashtagId, channelsEntities, directMessageId, mode }: IChannelHashtag) => {
+	const hashtagDm = useSelector(selectHashtagDmById(channelHashtagId));
 	const getChannelById = (channelHashtagId: string): ChannelsEntity => {
 		let channel: ChannelsEntity;
 		if (directMessageId && [ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
-			channel = hashtagDmEntities[directMessageId + channelHashtagId];
+			channel = hashtagDm;
 		} else {
 			channel = channelsEntities[channelHashtagId];
 		}
