@@ -60,8 +60,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 					navigation.goBack();
 				}}
 			>
-				{openSearchChannelFrom === EOpenSearchChannelFrom.ActionMenu && <AngleLeft width={20} height={20} color={Colors.textGray} />}
-				{openSearchChannelFrom === EOpenSearchChannelFrom.ChannelList && <ArrowLeftIcon width={20} height={20} color={Colors.textGray} />}
+				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
 				<View>

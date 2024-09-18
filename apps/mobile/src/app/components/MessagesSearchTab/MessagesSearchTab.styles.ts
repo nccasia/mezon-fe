@@ -17,7 +17,8 @@ const style = (colors: Attributes) =>
 		groupMessageLabel: {
 			color: colors.text,
 			fontSize: size.label,
-			fontWeight: '600'
+			fontWeight: '600',
+			marginBottom: size.s_10
 		},
 		message: {
 			flexDirection: 'row',

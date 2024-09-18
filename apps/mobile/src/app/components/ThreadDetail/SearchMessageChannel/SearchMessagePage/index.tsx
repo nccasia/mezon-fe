@@ -1,6 +1,13 @@
 import { ACTIVE_TAB } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
-import { DirectEntity, selectAllChannelMembers, selectAllChannelsByUser, selectTotalResultSearchMessage, useAppSelector } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	selectAllChannelMembers,
+	selectAllChannelsByUser,
+	selectMessageSearchByChannelId,
+	selectTotalResultSearchMessage,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects } from '@mezon/utils';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +31,11 @@ export function normalizeString(str: string): string {
 }
 function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
-	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MESSAGES);
+	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const listChannels = useSelector(selectAllChannelsByUser);
 	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.channel_id as string));
 	const totalResult = useSelector(selectTotalResultSearchMessage);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
 
 	const normalizeSearchText = useMemo(() => {
 		return normalizeString(searchText);
@@ -67,16 +75,16 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const TabList = useMemo(() => {
 		return [
 			{
-				title: 'Messages',
-				quantitySearch: totalResult
-			},
-			{
 				title: t('members'),
 				quantitySearch: searchText && membersSearch?.length
 			},
 			{
 				title: t('channels'),
 				quantitySearch: searchText && channelsSearch?.length
+			},
+			{
+				title: t('Messages'),
+				quantitySearch: totalResult
 			}
 		];
 	}, [channelsSearch, membersSearch, searchText, t, totalResult]);
@@ -88,7 +96,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const renderContent = () => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab currentChannel={currentChannel} />;
+				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} />;
 			case ACTIVE_TAB.MEMBER:
 				return <MembersSearchTab listMemberSearch={membersSearch} />;
 			case ACTIVE_TAB.CHANNEL:

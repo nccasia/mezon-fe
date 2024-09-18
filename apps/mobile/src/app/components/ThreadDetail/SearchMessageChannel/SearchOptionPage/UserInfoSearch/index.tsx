@@ -15,7 +15,7 @@ export default function UserInfoSearch({ onSelectUserInfo, userData }: UserInfoS
 	const styles = style(themeValue);
 	return (
 		<TouchableOpacity onPress={() => onSelectUserInfo(userData)} style={styles.userInfoBox}>
-			<MezonAvatar userStatus={true} height={size.s_50} width={size.s_50} username={userData?.display} avatarUrl={userData?.avatarUrl} />
+			<MezonAvatar userStatus={true} height={size.s_40} width={size.s_40} username={userData?.display} avatarUrl={userData?.avatarUrl} />
 			<Block>
 				<Text style={styles.userName}>{userData?.display}</Text>
 				<Text style={styles.subUserName}>{userData?.subDisplay}</Text>

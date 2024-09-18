@@ -1,26 +1,41 @@
 import { useSearchMessages } from '@mezon/core';
 import { GroupedMessages } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, MessagesEntity, SearchMessageEntity, selectMessageSearchByChannelId } from '@mezon/store';
-import { IChannel, SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { MessagesEntity, SearchMessageEntity } from '@mezon/store';
+import { SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
+import EmptySearchPage from '../EmptySearchPage';
 import { SearchMessageChannelContext } from '../ThreadDetail/SearchMessageChannel';
 import style from './MessagesSearchTab.styles';
 
-const MessagesSearchTab = React.memo(({ currentChannel }: { currentChannel: IChannel | DirectEntity }) => {
+const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSearchByChannelId: SearchMessageEntity[] }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const filtersSearch = useContext(SearchMessageChannelContext);
 	const { totalResult, fetchSearchMessages } = useSearchMessages();
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
 	const messagesRef = useRef<SearchMessageEntity[]>([]);
+	const [messages, setMessages] = useState([]);
+
+	useEffect(() => {
+		if (messageSearchByChannelId?.length > 0) {
+			setMessages((prevMessages) => {
+				const existingMessages = new Set(prevMessages.map((msg) => msg?.id));
+				const newMessages = messageSearchByChannelId?.filter((msg) => !existingMessages.has(msg.id));
+				if (newMessages.length > 0) {
+					return [...prevMessages, ...newMessages];
+				}
+				return prevMessages;
+			});
+		} else {
+			setMessages([]);
+		}
+	}, [messageSearchByChannelId]);
 
 	useEffect(() => {
 		if (messageSearchByChannelId?.length > 0) {
@@ -62,7 +77,7 @@ const MessagesSearchTab = React.memo(({ currentChannel }: { currentChannel: ICha
 		}
 
 		return groupedMessages;
-	}, [messagesRef.current]);
+	}, [messages, messageSearchByChannelId]);
 
 	const loadMoreMessages = async () => {
 		if (isLoadingMore || totalResult === messagesRef.current?.length) return;
@@ -91,27 +106,31 @@ const MessagesSearchTab = React.memo(({ currentChannel }: { currentChannel: ICha
 
 	const renderGroupItem = ({ item }) => (
 		<Block>
-			<Text style={styles.groupMessageLabel}>{`# ${item?.label}`}</Text>
+			{!!item?.label && <Text style={styles.groupMessageLabel}>{`# ${item?.label}`}</Text>}
 			{item?.messages?.map(renderMessageItem)}
 		</Block>
 	);
 
 	return (
 		<Block style={styles.container}>
-			<Block height={'100%'} width={'100%'} paddingBottom={size.s_100}>
-				<FlashList
-					showsVerticalScrollIndicator={false}
-					data={searchMessages}
-					keyboardShouldPersistTaps={'handled'}
-					onScrollBeginDrag={Keyboard.dismiss}
-					renderItem={renderGroupItem}
-					estimatedItemSize={100}
-					removeClippedSubviews={true}
-					onEndReached={loadMoreMessages}
-					onEndReachedThreshold={0.5}
-					ListFooterComponent={isLoadingMore && <ViewLoadMore />}
-				/>
-			</Block>
+			{searchMessages?.length ? (
+				<Block height={'100%'} width={'100%'} paddingBottom={size.s_100}>
+					<FlashList
+						showsVerticalScrollIndicator={false}
+						data={searchMessages}
+						keyboardShouldPersistTaps={'handled'}
+						onScrollBeginDrag={Keyboard.dismiss}
+						renderItem={renderGroupItem}
+						estimatedItemSize={100}
+						removeClippedSubviews={true}
+						onEndReached={loadMoreMessages}
+						onEndReachedThreshold={0.5}
+						ListFooterComponent={isLoadingMore && <ViewLoadMore />}
+					/>
+				</Block>
+			) : (
+				<EmptySearchPage />
+			)}
 		</Block>
 	);
 });

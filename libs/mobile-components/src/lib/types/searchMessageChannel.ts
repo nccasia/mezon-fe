@@ -11,9 +11,9 @@ export interface IOptionSearchProps {
 }
 
 export enum ACTIVE_TAB {
-	MESSAGES = 0,
-	MEMBER = 1,
-	CHANNEL = 2
+	MEMBER = 0,
+	CHANNEL = 1,
+	MESSAGES = 2
 }
 
 export interface ITabList {
