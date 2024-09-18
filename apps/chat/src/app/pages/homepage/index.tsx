@@ -41,7 +41,9 @@ function Homepage() {
 				redirect_uri: 'http://localhost:4200',
 				grant_type: 'authorization_code'
 			});
-			console.log(body);
+			console.log('body', body.toString().length);
+			console.log('bodyStringy', JSON.stringify(body));
+
 			const response = await fetch('https://oauth2.googleapis.com/token', {
 				method: 'POST',
 				body: body.toString(),
