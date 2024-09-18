@@ -1,4 +1,6 @@
+import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/ui';
+import { apiInstance } from '@mezon/utils';
 import {
 	addEdge,
 	Background,
@@ -15,22 +17,24 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CommandNode from '../nodes/CommandNode';
 import DefaultNode from '../nodes/DefaultNode';
+import CommandInputNode from '../nodes/InputNode';
+import CommandOutputNode from '../nodes/OutputNode';
 import SaveFlowModal from './SaveFlowModal';
 
 const initialNodes: Node[] = [
 	// { id: '1', position: { x: 0, y: 0 }, data: { label: 'Command Node' }, type: 'command' },
 	// { id: '2', position: { x: 300, y: 0 }, data: { label: 'Default Node' }, type: 'defaultCustom' }
 ];
-
-let id = 0;
-const getId = () => `dndnode_${id++}`;
-
 const Flow = () => {
+	const { flowId, applicationId } = useParams();
+	const { userProfile } = useAuth();
 	const navigate = useNavigate();
 	const reactFlowWrapper = useRef(null);
 	const [openModalSaveFlow, setOpenModalSaveFlow] = React.useState(false);
@@ -38,6 +42,8 @@ const Flow = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const [nodeType, setNodeType] = React.useState('default');
 	const { screenToFlowPosition } = useReactFlow();
+	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
+	const [flowData, setFlowData] = React.useState<any>({});
 
 	// handle drag, drop and connect nodes
 	const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
@@ -62,6 +68,12 @@ const Flow = () => {
 		},
 		[setNodes, setEdges]
 	);
+
+	const getId = () => {
+		const nodeId = uuidv4();
+		return `${nodeId}`;
+		// return `${nodeType}_${nodeId}`;
+	};
 
 	const handleCopyNode = useCallback(
 		(nodeId: string) => {
@@ -88,11 +100,38 @@ const Flow = () => {
 		},
 		[nodes, setNodes, handleDeleteNode]
 	);
-	console.log('nodes', nodes);
 
 	const nodeTypes = useMemo(() => {
 		return {
 			command: (props: any) => <CommandNode {...props} onCopy={handleCopyNode} onDelete={handleDeleteNode} />,
+			commandInput: (props: any) => (
+				<CommandInputNode
+					{...props}
+					onCopy={handleCopyNode}
+					onDelete={handleDeleteNode}
+					ref={(el: HTMLElement | null) => {
+						if (el) {
+							nodeRefs.current[props.data.id] = el;
+						} else {
+							delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
+						}
+					}}
+				/>
+			),
+			commandOutput: (props: any) => (
+				<CommandOutputNode
+					{...props}
+					onCopy={handleCopyNode}
+					onDelete={handleDeleteNode}
+					ref={(el: HTMLElement | null) => {
+						if (el) {
+							nodeRefs.current[props.data.id] = el;
+						} else {
+							delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
+						}
+					}}
+				/>
+			),
 			defaultCustom: DefaultNode
 		};
 	}, []);
@@ -110,7 +149,7 @@ const Flow = () => {
 				type: nodeType,
 				position,
 				data: {
-					label: `${nodeType} node`,
+					label: `${nodeType}`,
 					id
 				}
 			};
@@ -123,6 +162,122 @@ const Flow = () => {
 	const handleClickBackButton = () => {
 		navigate(-1);
 	};
+
+	const handleClickSaveFlow = async () => {
+		const formData: { [key: string]: any } = Object.keys(nodeRefs.current).reduce(
+			(acc, nodeId) => {
+				const nodeRef = nodeRefs.current[nodeId] as { getFormData?: () => any };
+				acc[nodeId] = nodeRef?.getFormData?.(); // Lấy dữ liệu form từ ref
+				return acc;
+			},
+			{} as { [key: string]: any }
+		);
+		const listNodeString: any[] = [];
+		nodes.forEach((node) => {
+			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => ({
+				parameterKey: key,
+				parameterValue: formData[node.id][key]
+			}));
+			const newNode = {
+				// ...node,
+				// data: {
+				// 	...node.data,
+				// 	id: node.id,
+				// 	label: node.data.label,
+				// 	type: node.type,
+				// 	inputParams: [],
+				// 	inputAnchors: [],
+				// 	input: formData[node.id],
+				// 	outputAnchors: [],
+				// 	output: {},
+				// 	selected: node.selected
+				// }
+				id: node.id,
+				nodeType: node.type,
+				nodeName: node.data.label,
+				position: node.position,
+				measured: node.measured,
+				parameters
+			};
+			console.log(newNode);
+			listNodeString.push(newNode);
+		});
+		const listEdgeString: any[] = [];
+		edges.forEach((edge: any) => {
+			const newEdge = {
+				sourceNodeId: edge.source,
+				targetNodeId: edge.target
+			};
+			listEdgeString.push(newEdge);
+		});
+
+		if (!userProfile?.user?.id) {
+			toast.error('User not found');
+			return;
+		}
+		if (!flowData?.flowName) {
+			toast.error('Flow name is required');
+			return;
+		}
+
+		const dataCreate = {
+			userId: userProfile?.user?.id,
+			flowName: flowData?.flowName,
+			description: flowData?.description,
+			isActive: true,
+			connections: listEdgeString,
+			nodes: listNodeString
+		};
+		console.log(dataCreate);
+
+		try {
+			if (flowId) {
+				console.log('update flow');
+				// call api update flow
+			} else {
+				const response: any = await apiInstance.post('/flow/create', dataCreate);
+				console.log(response);
+				toast.success('Save flow success');
+				// navigate to flow detail after create flow
+				navigate(`/applications/${applicationId}/flow/${response.id}`);
+			}
+		} catch (error) {
+			toast.error('Save flow failed');
+		}
+	};
+	useEffect(() => {
+		if (!flowId) return;
+		const getDetailFlow = async () => {
+			const response: any = await apiInstance.get(`/flow/detail?flowId=${flowId}`);
+			console.log(flowId, response);
+			setFlowData({
+				flowName: response.flow?.flowName,
+				description: response.flow?.description
+			});
+			const listNode = response.nodes?.map((node: any) => {
+				return {
+					id: node.id,
+					type: node.nodeType,
+					nodeName: node.nodeName,
+					measured: JSON.parse(node.measured),
+					position: JSON.parse(node.position),
+					data: {
+						label: node.nodeName,
+						id: node.id
+					}
+				};
+			});
+			setNodes(listNode);
+			const listEdge = response.connections?.map((edge: any) => {
+				return {
+					source: edge.sourceNodeId,
+					target: edge.targetNodeId
+				};
+			});
+			setEdges(listEdge);
+		};
+		getDetailFlow();
+	}, [flowId]);
 
 	useEffect(() => {
 		// handle delete node when press delete key
@@ -157,7 +312,7 @@ const Flow = () => {
 							<Icons.LeftArrowIcon className="w-full" />
 						</button>
 						<div className="flex items-center text-[24px] font-semibold ml-[20px] pl-[10px] border-l-[1px] border-l-gray-300">
-							<span>Initial Flow</span>
+							<span>{flowData?.flowName ?? 'Initial Flow'}</span>
 							<button
 								onClick={() => setOpenModalSaveFlow(true)}
 								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500"
@@ -167,7 +322,10 @@ const Flow = () => {
 						</div>
 					</div>
 					<div className="rightbox flex items-center gap-2">
-						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
+						<button
+							onClick={handleClickSaveFlow}
+							className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
+						>
 							<Icons.IconTick />
 						</button>
 						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
@@ -209,8 +367,59 @@ const Flow = () => {
 				<Background className="dark:bg-bgPrimary bg-bgLightPrimary text-gray-500 dark:text-gray-100" variant={BackgroundVariant.Dots} />
 			</ReactFlow>
 
-			<SaveFlowModal title="Save Flow" open={openModalSaveFlow} onClose={() => setOpenModalSaveFlow(false)} />
+			<SaveFlowModal
+				flowData={flowData}
+				changeFlowData={setFlowData}
+				title="Save Flow"
+				open={openModalSaveFlow}
+				onClose={() => setOpenModalSaveFlow(false)}
+			/>
 		</div>
 	);
 };
 export default Flow;
+
+// const nod = {
+// 	"id": "",
+// 	"connections": [
+// 			{
+// 					"sourceNodeId": "commandOutput_2f177c16-f3e6-4850-9251-2a92660de6d0"
+// 			}
+// 	],
+// 	"description": "test command",
+// 	"flowName": "test command",
+// 	"isActive": true,
+// 	"nodes": [
+// 			{
+// 				"id": "commandInput_89c7eef7-3004-47c4-b8a8-e55933694de9",
+// 				"nodeType": "commandInput",
+// 				"nodeName":"commandInput",
+// 				"position":{"x":-36, "y":-20},
+// 				"measured":{"width":250,"height":340},
+// 				"parameters":[
+// 					{
+// 						"parameterKey":"commandName",
+// 						"parameterValue":"xin chao"
+// 					},
+// 					{
+// 						"parameterKey":"commandCode",
+// 						"parameterValue":"hello"
+// 					}
+// 				]
+// 			},
+// 			{
+// 				"id":"commandOutput_2f177c16-f3e6-4850-9251-2a92660de6d0",
+// 				"nodeType":"commandOutput",
+// 				"nodeName":"commandOutput",
+// 				"position":{"x":268, "y":-27},
+// 				"measured":{"width":250, "height":271},
+// 				"parameters":[
+// 					{
+// 						"parameterKey":"commandName",
+// 						"parameterValue":"hi"
+// 					}
+// 				]
+// 			}
+// 	],
+// 	"userId": "1831890355411226624"
+// }

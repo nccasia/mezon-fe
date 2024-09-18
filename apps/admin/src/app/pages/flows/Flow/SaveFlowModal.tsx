@@ -1,5 +1,6 @@
 import { Modal } from '@mezon/ui';
 import Ajv, { JSONSchemaType } from 'ajv';
+import { useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
 import { AutoForm, SubmitField } from 'uniforms-semantic';
 import CustomTextField from '../../../components/InputField/CustomTextField';
@@ -45,15 +46,19 @@ interface SaveFlowModalProps {
 	open: boolean;
 	onClose: () => void;
 	title: string;
+	changeFlowData?: (data: FormData) => void;
+	flowData?: FormData;
 }
-const SaveFlowModal = ({ open, onClose, title }: SaveFlowModalProps) => {
+const SaveFlowModal = ({ open, onClose, title, changeFlowData, flowData }: SaveFlowModalProps) => {
+	const submitBtnRef = useRef<any>(null);
 	const confirmSave = () => {
-		console.log('Save');
+		const data = submitBtnRef.current?.getModel();
+		changeFlowData?.(data);
 	};
 	return (
 		<Modal confirmButton={confirmSave} titleConfirm="Save" title={title} showModal={open} onClose={onClose}>
 			<div className="p-4">
-				<AutoForm schema={bridge} onSubmit={(data) => console.log(data)}>
+				<AutoForm model={flowData} ref={submitBtnRef} schema={bridge}>
 					<CustomTextField name="flowName" label="Flow Name" />
 					<CustomTextField name="description" label="Description" />
 					<SubmitField className="!hidden" />

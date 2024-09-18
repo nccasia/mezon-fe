@@ -25,7 +25,7 @@ const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
 			childrens: [
 				{
 					title: 'Command Input',
-					nodeType: 'command',
+					nodeType: 'commandInput',
 					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
 					onChangeNodeType: onChangeNodeType,
 					imageUrl:
@@ -33,7 +33,7 @@ const AddNodeMenuPopup = ({ onChangeNodeType }: AddNodeMenuPopupProps) => {
 				},
 				{
 					title: 'Command Output',
-					nodeType: 'defaultCustom',
+					nodeType: 'commandOutput',
 					description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
 					onChangeNodeType: onChangeNodeType,
 					imageUrl:
