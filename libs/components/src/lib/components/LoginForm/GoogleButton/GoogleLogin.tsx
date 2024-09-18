@@ -11,7 +11,7 @@ const GoogleLogin: React.FC = () => {
 
 		try {
 			windowGlobal.google.accounts.id.initialize({
-				client_id: '848059125942-6sujlck9t2joksnnmjamn2o0klohmqoi.apps.googleusercontent.com',
+				client_id: '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.googleusercontent.com',
 				ux_mode: 'redirect',
 				login_uri: 'http://localhost:4200/v2/account/authenticate/google' // Ensure this matches your redirect URI in Google Cloud console
 			});
