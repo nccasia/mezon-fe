@@ -37,5 +37,6 @@
       "allMessages": "Tất cả tin nhắn",
       "onlyMentions": "Chỉ @mentions"
     }
-  }
+  },
+  "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ bao gồm chữ, số, _ hoặc -)."
 }

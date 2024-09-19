@@ -37,5 +37,6 @@
             "allMessages": "All Messages",
             "onlyMentions": "Only @mentions"
         }
-    }
+    },
+    "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)."
 }
