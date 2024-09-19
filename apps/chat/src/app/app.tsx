@@ -3,6 +3,7 @@ import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useSettingFooter } from '@mezon/core';
 import { electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { useMemo } from 'react';
@@ -30,9 +31,12 @@ const mezon: CreateMezonClientOptions = {
 
 const AppInitializer = () => {
 	const isLogin = useSelector(selectIsLogin);
+	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	if (isElectron()) {
 		if (isLogin) {
-			electronBridge?.initListeners();
+			electronBridge?.initListeners(() => {
+				setIsShowSettingFooterStatus(true);
+			});
 		} else {
 			electronBridge?.removeAllListeners();
 		}

@@ -1,13 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, hasNonEmptyChannels, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { channelsActions, RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
@@ -50,6 +50,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
+	const dispatch = useDispatch()
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -64,6 +65,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
 		setIsUnKnownChannel(!channel?.channel_id);
+		dispatch(channelsActions.setSelectedChannelId(channel?.channel_id));
 	}, []);
 
 	const handleLongPressThread = useCallback((channel: ChannelThreads) => {

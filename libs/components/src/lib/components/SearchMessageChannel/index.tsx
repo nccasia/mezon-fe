@@ -1,4 +1,3 @@
-import { Icons, UserMentionList } from '@mezon/components';
 import { useSearchMessages, useThreads } from '@mezon/core';
 import {
 	appActions,
@@ -8,13 +7,16 @@ import {
 	selectDmGroupCurrentId,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
 	selectTheme,
 	selectValueInputSearchMessage,
 	useAppDispatch
 } from '@mezon/store';
-import { SearchFilter, searchMentionsHashtag, SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { Icons } from '@mezon/ui';
+import { Platform, SIZE_PAGE_SEARCH, SearchFilter, getPlatform, searchMentionsHashtag } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { KeyboardEvent, memo, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import SearchMessageChannelModal from './SearchMessageChannelModal';
@@ -22,8 +24,9 @@ import SelectGroup from './SelectGroup';
 import darkMentionsInputStyle from './StyleSearchMessagesDark';
 import lightMentionsInputStyle from './StyleSearchMessagesLight';
 
-import { hasKeySearch, searchFieldName } from './constant';
+import UserMentionList from '../UserMentionList';
 import SelectItemUser from './SelectItemUser';
+import { hasKeySearch, searchFieldName } from './constant';
 
 type SearchMessageChannelProps = {
 	mode?: ChannelStreamMode;
@@ -34,18 +37,27 @@ interface ExtendedSuggestionDataItem extends SuggestionDataItem {
 
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
-	const isActive = useSelector(selectIsShowMemberList);
 	const { fetchSearchMessages, currentPage } = useSearchMessages();
+	const { setIsShowCreateThread } = useThreads();
+
+	const isActive = useSelector(selectIsShowMemberList);
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+	const appearanceTheme = useSelector(selectTheme);
 
-	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
+	const channelId = useMemo(
+		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? '')),
+		[mode, currentChannel, currentDmGroupId]
+	);
 
-	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
+	const valueInputSearch = useSelector(selectValueInputSearchMessage(channelId));
+	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));
 
 	const userListData = UserMentionList({
-		channelID: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? ''),
+		channelID: channelId,
 		channelMode: mode
 	});
 
@@ -58,95 +70,136 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		};
 	});
 
-	const { setIsShowCreateThread } = useThreads();
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
 	const [valueDisplay, setValueDisplay] = useState<string>('');
 	const [search, setSearch] = useState<any | undefined>();
+	const [isShowMemberListBefore, setIsShowMemberListBefore] = useState<boolean>(false);
+	const [isShowMemberListDMBefore, setIsShowMemberListDMBefore] = useState<boolean>(false);
+	const [isUseProfileDMBefore, setIsUseProfileDMBefore] = useState<boolean>(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchRef = useRef<HTMLInputElement | null>(null);
 
-	const handleInputClick = () => {
+	const handleInputClick = useCallback(() => {
+		setIsShowMemberListBefore(isActive);
+		setIsShowMemberListDMBefore(isShowMemberListDM);
+		setIsUseProfileDMBefore(isUseProfileDM);
 		setExpanded(true);
 		if (!hasKeySearch(valueInputSearch)) {
 			setIsShowSearchMessageModal(true);
 		}
-	};
+	}, [isActive, isShowMemberListDM, isUseProfileDM, valueInputSearch]);
 
-	const handleOutsideClick = (event: MouseEvent) => {
-		const targetIsOutside = inputRef.current && !inputRef.current.contains(event.target as Node);
+	const handleOutsideClick = useCallback(
+		(event: MouseEvent) => {
+			const targetIsOutside = inputRef.current && !inputRef.current.contains(event.target as Node);
 
-		if (targetIsOutside && !valueInputSearch) {
-			setExpanded(false);
-			setIsShowSearchMessageModal(false);
-			dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
-		}
-		if (targetIsOutside && valueInputSearch) {
-			setExpanded(true);
-			setIsShowSearchMessageModal(false);
-		}
-	};
-
-	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const value = event.target.value;
-		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
-		setValueDisplay(newPlainTextValue);
-		const filter: SearchFilter[] = [];
-		if (mentions.length === 0) {
-			filter.push(
-				{
-					field_name: 'content',
-					field_value: value
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			);
-		}
-		for (const mention of mentions) {
-			const convertMention = mention.display.split(':');
-			filter.push(
-				{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
-				{ field_name: 'channel_id', field_value: currentChannel?.id }
-			);
-		}
-		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
-	};
-
-	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
-		if (valueInputSearch && event.key === 'Enter') {
-			setIsShowSearchMessageModal(false);
-			dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: true }));
-			setIsShowCreateThread(false, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
-			if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
-			if (search) {
-				fetchSearchMessages(search);
+			if (targetIsOutside && !valueInputSearch) {
+				setExpanded(false);
+				setIsShowSearchMessageModal(false);
+				dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: false }));
 			}
-		}
-	};
+			if (targetIsOutside && valueInputSearch) {
+				setExpanded(true);
+				setIsShowSearchMessageModal(false);
+			}
+		},
+		[channelId, valueInputSearch]
+	);
 
-	const handleSearchIcon = () => {
-		searchRef.current?.focus();
-		setExpanded(true);
-	};
+	const handleChange: OnChangeHandlerFunc = useCallback(
+		(event, newValue, newPlainTextValue, mentions) => {
+			const value = event.target.value;
+			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
+			setValueDisplay(newPlainTextValue);
+			const filter: SearchFilter[] = [];
+			// TODO: check logic below code
+			if (mentions.length === 0) {
+				filter.push(
+					{
+						field_name: 'content',
+						field_value: value
+					},
+					{ field_name: 'channel_id', field_value: channelId },
+					{ field_name: 'clan_id', field_value: currentClanId as string }
+				);
+			}
+			for (const mention of mentions) {
+				const convertMention = mention.display.split(':');
+				filter.push(
+					{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
+					{ field_name: 'channel_id', field_value: channelId }
+				);
+			}
+			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
+		},
+		[channelId, currentClanId, search]
+	);
 
-	const handleClose = () => {
-		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value: '' }));
+	const clearSearchInput = useCallback(() => {
+		dispatch(searchMessagesActions.setValueInputSearch({ channelId, value: '' }));
 		setValueDisplay('');
-		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
-		if (!isSearchMessage) dispatch(appActions.setIsShowMemberList(!isActive));
-		searchRef.current?.focus();
-	};
+	}, [channelId]);
 
-	const handleClickSearchOptions = (value: string) => {
-		dispatch(
-			searchMessagesActions.setValueInputSearch({
-				channelId: currentChannel?.id ?? '',
-				value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
-			})
-		);
+	const resetSearchBar = useCallback(() => {
+		dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: false }));
+		dispatch(appActions.setIsShowMemberList(isShowMemberListBefore));
+		dispatch(appActions.setIsShowMemberListDM(isShowMemberListDMBefore));
+		dispatch(appActions.setIsUseProfileDM(isUseProfileDMBefore));
+		setIsShowSearchMessageModal(false);
+		setExpanded(false);
+		searchRef.current?.blur();
+	}, [channelId, isShowMemberListBefore, isShowMemberListDMBefore, isUseProfileDMBefore]);
+
+	const handleKeyDown = useCallback(
+		(event: React.KeyboardEvent<HTMLTextAreaElement> | React.KeyboardEvent<HTMLInputElement>) => {
+			if (valueInputSearch && event.key === 'Enter') {
+				setIsShowSearchMessageModal(false);
+				dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: true }));
+				// TODO: check logic below code
+				setIsShowCreateThread(false, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
+				if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
+				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
+				if (isUseProfileDM) dispatch(appActions.setIsUseProfileDM(!isUseProfileDM));
+				if (search) {
+					fetchSearchMessages(search);
+				}
+			}
+
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				event.stopPropagation();
+				if (valueInputSearch) {
+					clearSearchInput();
+				} else {
+					resetSearchBar();
+				}
+			}
+		},
+		[channelId, currentChannel, search, valueInputSearch, isActive, isShowMemberListDM, isUseProfileDM]
+	);
+
+	const handleClose = useCallback(() => {
+		clearSearchInput();
 		searchRef.current?.focus();
-	};
+		if (isSearchMessage) {
+			resetSearchBar();
+		}
+	}, [isSearchMessage, clearSearchInput, resetSearchBar]);
+
+	const handleClickSearchOptions = useCallback(
+		(value: string) => {
+			dispatch(
+				searchMessagesActions.setValueInputSearch({
+					channelId,
+					value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
+				})
+			);
+			searchRef.current?.focus();
+		},
+		[channelId, valueInputSearch]
+	);
 
 	useEffect(() => {
 		if (search) {
@@ -159,13 +212,35 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		return () => {
 			document.removeEventListener('click', handleOutsideClick);
 		};
-	}, [valueInputSearch]);
+	}, [handleOutsideClick]);
 
-	const appearanceTheme = useSelector(selectTheme);
+	const handleSearchUserMention = useCallback(
+		(search: string, callback: any) => {
+			callback(searchMentionsHashtag(search, userListDataSearchByMention));
+		},
+		[userListDataSearchByMention]
+	);
 
-	const handleSearchUserMention = (search: string, callback: any) => {
-		callback(searchMentionsHashtag(search, userListDataSearchByMention));
-	};
+	const handleSearchFocus = useCallback(
+		(event: KeyboardEvent) => {
+			const platform = getPlatform();
+			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
+			if (event[prefixKey] && (event.key === 'f' || event.key === 'F')) {
+				event.preventDefault();
+				searchRef?.current?.focus();
+				handleInputClick();
+			}
+		},
+		[handleInputClick]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleSearchFocus);
+
+		return () => {
+			document.removeEventListener('keydown', handleSearchFocus);
+		};
+	}, [handleSearchFocus]);
 
 	return (
 		<div className="relative" ref={inputRef}>
@@ -257,7 +332,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			</div>
 			<div className="w-6 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
 				<button
-					onClick={handleSearchIcon}
+					onClick={handleInputClick}
 					className={`${valueInputSearch ? 'z-0 opacity-0 rotate-0' : 'z-10 opacity-100 rotate-90'} w-4 h-4 absolute transition-transform`}
 				>
 					<Icons.Search className="w-4 h-4 dark:text-white text-colorTextLightMode" />

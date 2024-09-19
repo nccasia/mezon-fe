@@ -1,10 +1,28 @@
-import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat, ModalUserProfile } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
+import {
+	DirectMessageBox,
+	DmTopbar,
+	FileUploadByDnD,
+	GifStickerEmojiPopup,
+	MemberListGroupChat,
+	ModalUserProfile,
+	SearchMessageChannelRender
+} from '@mezon/components';
+import {
+	useApp,
+	useAppNavigation,
+	useAppParams,
+	useChatMessages,
+	useDragAndDrop,
+	useGifsStickersEmoji,
+	useSearchMessages,
+	useThreads
+} from '@mezon/core';
 import {
 	directMetaActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
+	selectIsSearchMessage,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectPositionEmojiButtonSmile,
@@ -44,6 +62,7 @@ const DirectMessage = () => {
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+	const isSearchMessage = useSelector(selectIsSearchMessage(directId || ''));
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -222,10 +241,16 @@ const DirectMessage = () => {
 							/>
 						</div>
 					)}
+					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
 		</>
 	);
+};
+
+const SearchMessageChannel = () => {
+	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
 };
 
 export default memo(DirectMessage);

@@ -44,6 +44,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	request: Record<string, RequestInput>;
 	idChannelSelected: Record<string, string>;
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
+	selectedChannelId?: string | null;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -309,6 +310,9 @@ export const channelsSlice = createSlice({
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
 		},
+		setSelectedChannelId: (state, action: PayloadAction<string>) => {
+			state.selectedChannelId = action.payload;
+		},
 		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
 			state.currentVoiceChannelId = action.payload;
 		},
@@ -498,11 +502,17 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
+export const selectSelectedChannelId = createSelector(getChannelsState, (state) => state.selectedChannelId);
+
 export const selectModeResponsive = createSelector(getChannelsState, (state) => state.modeResponsive);
 
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
+	clanId ? clansEntities[clanId] : null
+);
+
+export const selectSelectedChannel = createSelector(selectChannelsEntities, selectSelectedChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null
 );
 

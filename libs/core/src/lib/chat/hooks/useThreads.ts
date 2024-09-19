@@ -1,14 +1,14 @@
 import {
 	selectAllChannels,
 	selectAllThreads,
-	selectCurrentChannel,
-	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
 	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
 	selectNameValueThread,
+	selectSelectedChannel,
+	selectSelectedChannelId,
 	selectValueThread,
 	threadsActions,
 	useAppDispatch
@@ -21,8 +21,8 @@ export function useThreads() {
 	const dispatch = useAppDispatch();
 	const threads = useSelector(selectAllThreads);
 	const channels = useSelector(selectAllChannels);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useSelector(selectSelectedChannel);
+	const currentChannelId = useSelector(selectSelectedChannelId);
 	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
 	const messageThreadError = useSelector(selectMessageThreadError);

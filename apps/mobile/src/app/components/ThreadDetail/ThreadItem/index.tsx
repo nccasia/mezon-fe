@@ -1,6 +1,6 @@
 import { ActionEmitEvent, AngleRightIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberClanByUserId } from '@mezon/store-mobile';
+import { ChannelsEntity, MessagesEntity, channelsActions, getStoreAsync, selectLastMessageIdByChannelId, selectMemberClanByUserId, selectMessageEntityById, useAppSelector } from '@mezon/store-mobile';
 import { IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
@@ -17,7 +17,11 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const navigation = useNavigation();
-	const user = useSelector(selectMemberClanByUserId(thread?.last_sent_message?.sender_id as string)) as unknown as IChannelMember;
+	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread?.channel_id as string));
+	const message = useAppSelector((state) =>
+		selectMessageEntityById(state, thread?.channel_id as string, messageId || thread?.last_sent_message?.id) as MessagesEntity
+	);
+	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
 
 	const { username } = useMessageSender(user);
 	const handleNavigateThread = async (thread?: IChannel) => {
@@ -29,19 +33,26 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: thread?.category_id });
 	};
+	
 	const timeMessage = useMemo(() => {
-		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
-			const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
+		if (message && message.create_time_seconds) {
+			const lastTime = convertTimeMessage(message.create_time_seconds);
 			return lastTime;
+		} else {
+			if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
+				const lastTime = convertTimeMessage(thread.last_sent_message.timestamp_seconds);
+				return lastTime;
+			}
 		}
-	}, [thread]);
-	let lastSentMessage = '';
-	try {
-		const lastSentMessageContent = thread?.last_sent_message?.content ? JSON.parse(thread?.last_sent_message?.content) : {};
-		lastSentMessage = lastSentMessageContent?.t || '';
-	} catch (error) {
-		console.error('JSON parse error:', error);
-	}
+	}, [message, thread]);
+
+	const checkType = useMemo(() => typeof thread.last_sent_message?.content === 'string', [thread.last_sent_message?.content]);
+	const lastSentMessage = useMemo(() => {
+		return (message?.content?.t as string) ??
+			(thread.last_sent_message && checkType
+				? JSON.parse(thread.last_sent_message.content || '{}').t
+				: (thread.last_sent_message?.content as any)?.t || '')
+	}, [message, thread])
 
 	return (
 		<Pressable

@@ -744,22 +744,6 @@ export const blankReferenceObj: ApiMessageRef = {
 	channel_label: ''
 };
 
-export const getBottomPopupClass = (hasAttachment: boolean, messageRefId: string) => {
-	if (hasAttachment && messageRefId !== '' && messageRefId !== undefined) {
-		return 'bottom-[370px]';
-	}
-	if (hasAttachment && (messageRefId === undefined || messageRefId === '')) {
-		return 'bottom-[320px]';
-	}
-	if (!hasAttachment && messageRefId !== undefined && messageRefId !== '') {
-		return 'bottom-[127px]';
-	}
-	if (!hasAttachment && (messageRefId === undefined || messageRefId === '')) {
-		return 'bottom-[76px]';
-	}
-	return '';
-};
-
 export const handleShowShortProfile = (
 	ref: React.RefObject<HTMLElement>,
 	WIDTH_PANEL_PROFILE: number,

@@ -97,8 +97,6 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 						<Icons.TextLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
 						<Icons.TextIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					) : (
-						isThreadPrivate ? 
-						<Icons.ThreadLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
 						<Icons.ThreadIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					)}
 				</View>
