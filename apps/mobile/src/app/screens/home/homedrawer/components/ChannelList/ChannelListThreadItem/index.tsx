@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, selectLastChannelTimestamp } from '@mezon/store';
 import { selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
@@ -48,22 +48,22 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 		>
 			<View style={[styles.threadItem]}>
 				{isActive && <View style={[
-									styles.threadItemActive, 
+									styles.threadItemActive,
 									isFirstThread && styles.threadFirstItemActive,
-									{ backgroundColor: theme === 'light' 
-												?  themeValue.secondaryWeight 
+									{ backgroundColor: theme === 'light'
+												?  themeValue.secondaryWeight
 												:  themeValue.secondaryLight }
-								]} 
+								]}
 							/>}
 				{isFirstThread ? <ShortCornerIcon /> : <LongCornerIcon />}
 				<Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]} numberOfLines={1}>
 					{thread?.channel_label}
 				</Text>
 			</View>
-
+			
 			{numberNotification > 0 && (
-				<View style={styles.channelDotWrapper}>
-					<Text style={styles.channelDot}>{numberNotification}</Text>
+				<View style={[styles.channelDotWrapper, isFirstThread && { top: size.s_8 }]}>
+					<Text style={styles.channelDot}>{12}</Text>
 				</View>
 			)}
 		</TouchableOpacity>
