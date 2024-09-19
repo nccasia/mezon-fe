@@ -96,7 +96,7 @@ export const ThreadHeader = memo(() => {
 			)}
 			{isDMThread && (
 				<TouchableOpacity onPress={openMenu} style={styles.iconMenuHeader}>
-					<OverflowMenuHorizontalIcon />
+					<OverflowMenuHorizontalIcon color={themeValue.white} />
 				</TouchableOpacity>
 			)}
 			<MezonBottomSheet snapPoints={snapPointsMenuCustom} ref={bottomSheetMenuCustom}>

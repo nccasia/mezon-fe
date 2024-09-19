@@ -1,7 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
-import { User } from 'mezon-js';
 import { useState } from 'react';
 import { Keyboard, View } from 'react-native';
 import EmptySearchPage from '../EmptySearchPage';
@@ -10,14 +9,7 @@ import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
 import style from './MembersSearchTab.styles';
 
 type MembersSearchTabProps = {
-	listMemberSearch: {
-		avatarUser: string;
-		displayName: string;
-		id: string;
-		name: string;
-		typeChat?: number;
-		user: User;
-	}[];
+	listMemberSearch: any;
 };
 const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
@@ -42,7 +34,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 									setSelectedUser(user);
 								}}
 								user={item as any}
-								key={`${item?.user?.id}_member_search_${index}}`}
+								key={`${item?.id}_member_search_${index}}`}
 							/>
 						)}
 						estimatedItemSize={100}
@@ -52,7 +44,11 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 			) : (
 				<EmptySearchPage />
 			)}
-			<UserInformationBottomSheet user={selectedUser?.user} userId={selectedUser?.user?.id} onClose={handleCloseUserInfoBS} />
+			<UserInformationBottomSheet
+				user={selectedUser?.user || selectedUser}
+				userId={selectedUser?.user?.id || selectedUser?.id}
+				onClose={handleCloseUserInfoBS}
+			/>
 		</View>
 	);
 };

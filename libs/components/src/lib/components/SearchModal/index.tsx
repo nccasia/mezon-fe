@@ -1,12 +1,14 @@
 import { useAppNavigation, useAuth, useDirect } from '@mezon/core';
 import {
 	DirectEntity,
+	channelsActions,
 	directActions,
 	messagesActions,
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
 	selectAllUsesInAllClansEntities,
 	selectEntitesUserClans,
+	selectPreviousChannels,
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
@@ -40,6 +42,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
 	const allUsesInAllClansEntities = useSelector(selectAllUsesInAllClansEntities);
+	const previousChannels = useSelector(selectPreviousChannels);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
 	const listDM = dmGroupChatList.filter(
 		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
@@ -118,7 +121,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				avatarUser: user?.avatar_url ?? '',
 				displayName: user?.display_name ?? '',
 				lastSentTimeStamp: '0',
-				idDM: '',
+				idDM: undefined,
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
 			});
@@ -128,17 +131,19 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
-			if (user?.idDM) {
-				dispatch(directActions.openDirectMessage({ channelId: user.idDM || '', clanId: '0' }));
+			const foundDirect = listDirectSearch.find((item) => item.id === user.id);
+			if (foundDirect !== undefined) {
+				dispatch(channelsActions.setPreviousChannels({ channelId: foundDirect.idDM || '' }));
+				dispatch(directActions.openDirectMessage({ channelId: foundDirect.idDM || '', clanId: '0' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({
-						directMessageId: user.idDM,
+						directMessageId: foundDirect.idDM ?? '',
 						channelName: '',
-						type: user?.type ?? ChannelType.CHANNEL_TYPE_DM
+						type: foundDirect?.type ?? ChannelType.CHANNEL_TYPE_DM
 					})
 				);
 				if (result) {
-					navigate(toDmGroupPageFromMainApp(user.idDM, user?.type ?? ChannelType.CHANNEL_TYPE_DM));
+					navigate(toDmGroupPageFromMainApp(foundDirect.idDM ?? '', user?.type ?? ChannelType.CHANNEL_TYPE_DM));
 				}
 			} else {
 				const response = await createDirectMessageWithUser(user.id);
@@ -149,7 +154,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			}
 			onClose();
 		},
-		[createDirectMessageWithUser, navigate, onClose, toDmGroupPageFromMainApp]
+		[createDirectMessageWithUser, dispatch, navigate, onClose, toDmGroupPageFromMainApp]
 	);
 
 	const handleSelectChannel = useCallback(
@@ -199,11 +204,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const totalLists = useMemo(() => {
 		const list = listMemberSearch.concat(listChannelSearch);
 		listDirectSearch.forEach((dm) => {
-			if (dm.type === ChannelType.CHANNEL_TYPE_DM && !allUsesInAllClansEntities[dm?.id || '0']) {
+			if (
+				dm.type === ChannelType.CHANNEL_TYPE_DM ||
+				(dm.type === ChannelType.CHANNEL_TYPE_GROUP && !allUsesInAllClansEntities[dm?.id || '0'])
+			) {
 				list.push(dm);
 			}
 		});
-		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		const removeDuplicateList = removeDuplicatesById(list.filter((item) => item?.id !== accountId));
+		const sortedList = removeDuplicateList.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listDirectSearch, listChannelSearch]);
 
@@ -222,21 +231,60 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const totalListsMemberFiltered = useMemo(() => {
 		return filterListByName(listMemberSearch, normalizeSearchText, isSearchByUsername);
 	}, [listMemberSearch, normalizeSearchText, isSearchByUsername]);
+
 	const totalListMembersSorted = useMemo(() => {
 		return sortFilteredList(totalListsMemberFiltered, normalizeSearchText, isSearchByUsername);
 	}, [totalListsMemberFiltered, normalizeSearchText, isSearchByUsername]);
+
 	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
 
+	const listPrevious = useMemo(() => {
+		const previous: SearchItemProps[] = [];
+
+		if (totalListsSorted.length > 0) {
+			for (let i = totalListsSorted.length - 1; i >= 0; i--) {
+				if (previousChannels.includes(totalListsSorted[i]?.channelId || totalListsSorted[i]?.id || '')) {
+					previous.unshift(totalListsSorted[i]);
+					totalListsSorted.splice(i, 1);
+				}
+			}
+		}
+
+		if (listDirectSearch.length > 0) {
+			for (let i = listDirectSearch.length - 1; i >= 0; i--) {
+				const itemDMId = listDirectSearch[i]?.idDM || '';
+				const existsInPrevious = previous.some((item) => item?.id === listDirectSearch[i]?.idDM);
+				if (previousChannels.includes(itemDMId) && !existsInPrevious) {
+					previous.unshift(listDirectSearch[i]);
+					listDirectSearch.splice(i, 1);
+				}
+			}
+		}
+
+		console.log('previous', previous);
+
+		return previous;
+	}, [listDirectSearch, previousChannels, totalListsSorted]);
+
 	// Define a function to get the list to use based on the search text
-	const getListToUse = (normalizeSearchText: string, channelSearchSorted: SearchItemProps[], totalListsSorted: SearchItemProps[]) => {
+	const getListToUse = (
+		normalizeSearchText: string,
+		channelSearchSorted: SearchItemProps[],
+		totalListsSorted: SearchItemProps[],
+		listPrevious: SearchItemProps[]
+	) => {
 		if (normalizeSearchText.startsWith('#')) {
 			return channelSearchSorted;
+		}
+
+		if (!normalizeSearchText) {
+			return [...listPrevious, ...totalListsSorted];
 		}
 		return totalListsSorted;
 	};
 
 	useEffect(() => {
-		const listToUseChecked = getListToUse(normalizeSearchText, channelSearchSorted, totalListsSorted);
+		const listToUseChecked = getListToUse(normalizeSearchText, channelSearchSorted, totalListsSorted, listPrevious);
 		setListToUse(listToUseChecked);
 		setIdActive('');
 	}, [normalizeSearchText]);
@@ -281,9 +329,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const newItem = listToUse[nextIndex];
 
 		if (!boxRef.current || !newItem) return;
-		const boxHeight = boxRef.current.clientHeight;
+		const boxHeight = boxRef.current.clientHeight - 32;
 		const newItemOffset = (ITEM_HEIGHT + 4) * nextIndex;
-		const newScrollTop = newItemOffset + ITEM_HEIGHT - boxHeight;
+		const newScrollTop = newItemOffset + ITEM_HEIGHT - boxHeight + 32;
 		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
 		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
 
@@ -301,9 +349,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 		if (!boxRef.current || !newItem) return;
 
-		const boxHeight = boxRef.current.clientHeight;
+		const boxHeight = boxRef.current.clientHeight - 32;
 		const newItemOffset = (ITEM_HEIGHT + 4) * prevIndex;
-		const newScrollTop = newItemOffset - boxHeight + ITEM_HEIGHT;
+		const newScrollTop = newItemOffset - boxHeight + ITEM_HEIGHT + 32;
 		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
 		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
 
@@ -318,6 +366,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const handleEnter = (listToUse: SearchItemProps[], idActive: string) => {
 		const selectedItem = listToUse.find((item) => item.id === idActive);
 		if (!selectedItem) return;
+
+		console.log('selectedItem', selectedItem);
 
 		if (selectedItem.subText) {
 			handleSelectChannel(selectedItem);
@@ -347,8 +397,22 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				</div>
 				<div
 					ref={boxRef}
-					className={`w-full max-h-[250px]  overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 				>
+					{!normalizeSearchText && listPrevious.length > 0 && (
+						<>
+							<div className="text-xs font-semibold uppercase py-2">Previous channels</div>
+							<ListSearchModal
+								listSearch={listPrevious}
+								itemRef={itemRef}
+								handleSelect={handleSelect}
+								searchText={normalizeSearchText}
+								idActive={idActive}
+								setIdActive={setIdActive}
+							/>
+						</>
+					)}
+					<div className="text-xs font-semibold uppercase py-2">Unread channels</div>
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal

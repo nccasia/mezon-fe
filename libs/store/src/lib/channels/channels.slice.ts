@@ -45,6 +45,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	idChannelSelected: Record<string, string>;
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 	selectedChannelId?: string | null;
+	previousChannels: string[];
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -290,7 +291,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	request: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
-	quantityNotifyChannels: {}
+	quantityNotifyChannels: {},
+	previousChannels: []
 });
 
 export const channelsSlice = createSlice({
@@ -383,6 +385,13 @@ export const channelsSlice = createSlice({
 		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
 			delete state.idChannelSelected[action.payload.clanId];
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+		},
+		setPreviousChannels: (state, action: PayloadAction<{ channelId: string }>) => {
+			state.previousChannels = state.previousChannels.filter((channelId) => channelId !== action.payload.channelId);
+			state.previousChannels.unshift(action.payload.channelId);
+			if (state.previousChannels.length > 3) {
+				state.previousChannels.pop();
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -570,3 +579,5 @@ export const selectIdChannelSelectedByClanId = (clanId: string) =>
 	});
 
 export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
+
+export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);

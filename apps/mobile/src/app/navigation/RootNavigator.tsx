@@ -10,6 +10,7 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -206,6 +207,7 @@ const NavigationMain = () => {
 					}
 				}
 
+				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser()));
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));

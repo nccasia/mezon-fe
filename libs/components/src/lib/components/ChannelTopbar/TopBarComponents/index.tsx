@@ -1,9 +1,9 @@
 import { useAppNavigation, useMenu } from '@mezon/core';
 import { selectChannelById, selectCloseMenu, selectCurrentChannel, selectStatusMenu } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
 	const type = Number(channel?.type);
@@ -26,36 +26,16 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 
 	return (
 		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
-			<div className="absolute flex text-zinc-400 text-lg pb-0">
-				{closeMenu ? (
-					statusMenu ? (
-						<>
-							{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && (
-								<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-							)}
-							{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && (
-								<Icons.HashtagLocked defaultSize="w-6 h-6 " />
-							)}
-							{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary"/>}
-							{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
-						</>
-					) : (
-						<div onClick={() => setStatusMenu(true)} role="button">
-							<Icons.OpenMenu />
-						</div>
-					)
-				) : (
-					<>
-						{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && (
-							<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-						)}
-						{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && (
-							<Icons.HashtagLocked defaultSize="w-6 h-6 " />
-						)}
-						{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" />}
-						{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
-					</>
+			<div className="absolute flex text-zinc-400 gap-2 text-lg pb-0">
+				{!statusMenu && (
+					<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
+						<Icons.OpenMenu />
+					</div>
 				)}
+				{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
+				{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
+				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
+				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
 			<p

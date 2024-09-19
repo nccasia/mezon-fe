@@ -1,6 +1,7 @@
 import { GoogleButtonLogin, LoginForm, QRSection, TitleSection } from '@mezon/components';
-import { useAppNavigation } from '@mezon/core';
+import { useAppNavigation, useAuth } from '@mezon/core';
 import { selectIsLogin } from '@mezon/store';
+import { useGoogleOneTapLogin } from '@react-oauth/google';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
@@ -10,6 +11,20 @@ function Login() {
 	const { navigate } = useAppNavigation();
 	const isLogin = useSelector(selectIsLogin);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
+	const { loginByGoogle } = useAuth();
+
+	useGoogleOneTapLogin({
+		onSuccess: async (credentialResponse) => {
+			console.log('credentialResponse', credentialResponse);
+			await loginByGoogle(credentialResponse.credential as string);
+		},
+		onError: () => {
+			console.log('Login Failed');
+		},
+		auto_select: true,
+		cancel_on_tap_outside: false,
+		use_fedcm_for_prompt: true
+	});
 
 	useEffect(() => {
 		if (isLogin) {

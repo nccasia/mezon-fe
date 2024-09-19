@@ -49,7 +49,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 
 	useEffect(() => {
 		setSearchResults(membersNotInRoles);
-	}, [clickRole, memberRoles]);
+	}, [clickRole, memberRoles, membersNotInRoles]);
 
 	const handleUserToggle = (permissionId: string) => {
 		setSelectedUsers((prevPermissions) => {

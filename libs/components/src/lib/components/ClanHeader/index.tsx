@@ -42,19 +42,14 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentClan = useSelector(selectCurrentClan);
 	const navigate = useNavigate();
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
-	));
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const [isShowModalPanelClan, setIsShowModalPanelClan] = useState<boolean>(false);
 	const hasChildModal = useSelector(hasGrandchildModal);
-	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => (
-		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
-	));
-	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
+	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => <ModalNotificationSetting onClose={closeNotiSettingModal} open={true} />);
 
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
 	const toggleLeaveClanPopup = () => {

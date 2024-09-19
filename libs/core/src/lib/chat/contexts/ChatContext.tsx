@@ -23,7 +23,9 @@ import {
 	messagesActions,
 	notificationActions,
 	pinMessageActions,
+	policiesActions,
 	reactionActions,
+	rolesClanActions,
 	selectChannelById,
 	selectChannelsByClanId,
 	selectCurrentChannel,
@@ -148,10 +150,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 				dispatch(directMetaActions.updateDMSocket(message));
-				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+
+				if (currentDirectId !== message?.channel_id) {
+					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
+					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+				}
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 				}
@@ -279,6 +284,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						})
 					);
 					dispatch(usersClanActions.remove(id));
+					dispatch(rolesClanActions.updateRemoveUserRole(id));
 				}
 			});
 		},
@@ -613,9 +619,58 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setTriggerDate(Date.now());
 		}
 	}, []);
-	// todo: Thái mai làm
-	const onroleevent = useCallback((coffeeEvent: RoleEvent) => {
-		console.log('coffeeEvent: ', coffeeEvent);
+
+	const onroleevent = useCallback((roleEvent: RoleEvent) => {
+		const handleRoleEvent = async () => {
+			if (roleEvent.status === 0) {
+				if (userId !== roleEvent.user_id) {
+					dispatch(
+						rolesClanActions.add({
+							id: roleEvent.role.id || '',
+							clan_id: roleEvent.role.clan_id,
+							creator_id: roleEvent.role.creator_id,
+							title: roleEvent.role.title,
+							permission_list: roleEvent.role.permission_list,
+							role_user_list: roleEvent.role.role_user_list,
+							active: roleEvent.role.active
+						})
+					);
+					if (roleEvent?.role?.role_user_list?.role_users) {
+						const userExists = roleEvent.role.role_user_list.role_users.some((user) => user.id === userId);
+						if (userExists) {
+							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						}
+						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+					}
+				}
+			} else if (roleEvent.status === 1) {
+				if (userId !== roleEvent.user_id) {
+					if (roleEvent?.role?.role_user_list?.role_users) {
+						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+					}
+					if (roleEvent.role.permission_list?.permissions || roleEvent.role.role_user_list?.role_users) {
+						const isUserResult = await dispatch(
+							rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
+						).unwrap();
+						if (isUserResult) {
+							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						}
+					}
+					dispatch(rolesClanActions.update(roleEvent.role));
+				}
+			} else if (roleEvent.status === 2) {
+				if (userId !== roleEvent.user_id) {
+					const isUserResult = await dispatch(
+						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
+					).unwrap();
+					if (isUserResult) {
+						dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+					}
+					dispatch(rolesClanActions.remove(roleEvent.role.id || ''));
+				}
+			}
+		};
+		handleRoleEvent();
 	}, []);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {

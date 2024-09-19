@@ -1,7 +1,7 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, selectHashtagDmEntities, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities } from '@mezon/store-mobile';
+import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
+import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
@@ -373,7 +373,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const currentChannelId = useSelector(selectCurrentChannelId);
 		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
-		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
+		const hashtagDmEntities = useAppSelector(selectHashtagDmEntities);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
@@ -413,10 +413,10 @@ export const RenderTextMarkdownContent = React.memo(
 					} else {
 						formattedContent += ChannelHashtag({
 							channelHashtagId: element.channelid,
-							channelsEntities,
-							hashtagDmEntities,
 							mode,
-							directMessageId
+							directMessageId,
+							channelsEntities,
+							hashtagDmEntities
 						});
 					}
 				}
@@ -446,7 +446,7 @@ export const RenderTextMarkdownContent = React.memo(
 					if (!voiceChannelFound) {
 						formattedContent += formatBlockCode(contentInElement, isMessageReply);
 					} else {
-						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
+						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
 					}
 				}
 				// eslint-disable-next-line react-hooks/exhaustive-deps

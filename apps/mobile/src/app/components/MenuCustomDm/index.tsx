@@ -1,22 +1,26 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity } from '@mezon/store-mobile';
+import { DirectEntity, directActions, useAppDispatch } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon, PencilIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMenu, reserve } from '../../temp-ui';
 import CustomGroupDm from './CustomGroupDm';
 import style from './MenuCustomDm.styles';
 
-const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChannel | DirectEntity, channelLabel: string }) => {
+const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChannel | DirectEntity; channelLabel: string }) => {
 	const { t } = useTranslation(['menuCustomDM']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetCustomGroup = useRef<BottomSheetModal>(null);
 	const { dismiss } = useBottomSheetModal();
+	const dispatch = useAppDispatch();
+	const navigation = useNavigation<any>();
 
 	const menuSetting: IMezonMenuItemProps[] = [
 		{
@@ -27,27 +31,27 @@ const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChann
 			onPress: () => {
 				bottomSheetCustomGroup.current?.present();
 				dismiss();
-			},
+			}
 		},
 		{
 			title: t('inviteLinks'),
 			expandable: false,
 			icon: <LinkIcon color={themeValue.text}></LinkIcon>,
 			textStyle: styles.label,
-			onPress: () => reserve(),
+			onPress: () => reserve()
 		},
 		{
 			title: t('leaveGroup'),
 			expandable: false,
 			icon: <CircleXIcon width={size.s_22} height={size.s_22} color={themeValue.text}></CircleXIcon>,
 			textStyle: styles.label,
-			onPress: () => reserve(),
-		},
+			onPress: () => reserve()
+		}
 	];
 	const generalMenu: IMezonMenuSectionProps[] = [
 		{
-			items: menuSetting,
-		},
+			items: menuSetting
+		}
 	];
 
 	const closeDm: IMezonMenuSectionProps[] = [
@@ -58,10 +62,14 @@ const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChann
 					expandable: false,
 					icon: <CircleXIcon width={size.s_18} height={size.s_18} color={themeValue.text}></CircleXIcon>,
 					textStyle: styles.label,
-					onPress: () => reserve(),
-				},
-			],
-		},
+					onPress: async () => {
+						dismiss();
+						await dispatch(directActions.closeDirectMessage({ channel_id: currentChannel?.channel_id }));
+						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+					}
+				}
+			]
+		}
 	];
 
 	return (

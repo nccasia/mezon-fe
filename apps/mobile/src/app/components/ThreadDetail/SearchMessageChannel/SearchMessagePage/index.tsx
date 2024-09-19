@@ -2,11 +2,10 @@ import { ACTIVE_TAB } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
-	selectAllChannelMembers,
 	selectAllChannelsByUser,
+	selectAllUsersByUser,
 	selectMessageSearchByChannelId,
-	selectTotalResultSearchMessage,
-	useAppSelector
+	selectTotalResultSearchMessage
 } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects } from '@mezon/utils';
 import React, { useMemo, useState } from 'react';
@@ -33,44 +32,27 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const listChannels = useSelector(selectAllChannelsByUser);
-	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.channel_id as string));
 	const totalResult = useSelector(selectTotalResultSearchMessage);
+	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
-
-	const normalizeSearchText = useMemo(() => {
-		return normalizeString(searchText);
-	}, [searchText]);
 
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;
 		return (
 			listChannels?.filter((channel) => {
-				return normalizeString(channel?.channel_label).includes(normalizeSearchText);
+				return channel?.channel_label?.toLowerCase().includes(searchText?.toLowerCase());
 			}) || []
 		).sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'channel_label'));
 	}, [listChannels, searchText]);
 
-	const listMembers = useMemo(() => {
-		return rawMembers?.map((itemUserClan) => ({
-			id: itemUserClan?.id ?? '',
-			name: itemUserClan?.user?.username ?? '',
-			avatarUser: itemUserClan?.user?.avatar_url ?? '',
-			displayName: itemUserClan?.user?.username ?? '',
-			user: {
-				username: itemUserClan?.user?.username ?? '',
-				avatar_url: itemUserClan?.user?.avatar_url ?? '',
-				id: itemUserClan?.id ?? ''
-			}
-		}));
-	}, [rawMembers]);
 	const membersSearch = useMemo(() => {
-		if (!searchText) return listMembers;
-		return (
-			listMembers?.filter((member) => {
-				return normalizeString(member?.user?.username)?.includes(normalizeSearchText);
-			}) || []
-		);
-	}, [listMembers, searchText]);
+		if (!searchText) return allUsesInAllClans;
+		return allUsesInAllClans
+			?.filter((member) => {
+				return member?.username?.toLowerCase()?.includes(searchText?.toLowerCase());
+			})
+			.sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'display_name'));
+	}, [allUsesInAllClans, searchText]);
 
 	const TabList = useMemo(() => {
 		return [

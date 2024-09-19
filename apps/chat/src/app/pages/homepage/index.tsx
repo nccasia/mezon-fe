@@ -43,17 +43,6 @@ function Homepage() {
 							<div className="uppercase font-bold tracking-wide text-[20px]">Mezon</div>
 						</Link>
 					)}
-					<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
-						<a href={linkDownload} target="_blank" rel="noreferrer" className="hover:underline cursor-pointer">
-							Download
-						</a>
-						<div className="hover:underline cursor-pointer">Nitro</div>
-						<div className="hover:underline cursor-pointer">Discover</div>
-						<div className="hover:underline cursor-pointer">Safety</div>
-						<div className="hover:underline cursor-pointer">Support</div>
-						<div className="hover:underline cursor-pointer">Blog</div>
-						<div className="hover:underline cursor-pointer">Careers</div>
-					</div>
 					<div className="flex gap-2 w-fit">
 						{isLogin ? (
 							<Link

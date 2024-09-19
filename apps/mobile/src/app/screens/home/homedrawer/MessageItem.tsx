@@ -25,7 +25,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -39,6 +39,7 @@ import { clansActions, setSelectedMessage } from '@mezon/store';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
@@ -86,12 +87,14 @@ const MessageItem = React.memo(
 		const message: MessagesEntity = props?.message;
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const navigation = useNavigation<any>();
+		const [showHighlightReply, setShowHighlightReply] = useState(false);
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
 		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
+		const timeoutRef = useRef<NodeJS.Timeout>(null);
 		const hasInternet = useSelector(selectHasInternetMobile);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
@@ -116,10 +119,6 @@ const MessageItem = React.memo(
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
-
-		const checkMessageTargetToMoved = useMemo(() => {
-			return idMessageToJump === message?.id;
-		}, [idMessageToJump, message?.id]);
 
 		const isMessageReplyDeleted = useMemo(() => {
 			return !messageReferences && message?.references && message?.references?.length;
@@ -153,6 +152,19 @@ const MessageItem = React.memo(
 				markMessageAsSeen(message);
 			}
 		}, [markMessageAsSeen, message, props.messageId]);
+
+		useEffect(() => {
+			if (idMessageToJump === message?.id) {
+				setShowHighlightReply(true);
+				timeoutRef.current = setTimeout(() => {
+					setShowHighlightReply(false);
+					dispatch(messagesActions.setIdMessageToJump(null));
+				}, 3000);
+			}
+			return () => {
+				timeoutRef.current && clearTimeout(timeoutRef.current);
+			};
+		}, [idMessageToJump]);
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -340,7 +352,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageMention,
-						checkMessageTargetToMoved && styles.highlightMessageReply
+						showHighlightReply && styles.highlightMessageReply
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (

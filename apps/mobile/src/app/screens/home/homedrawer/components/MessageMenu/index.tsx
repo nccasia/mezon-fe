@@ -2,8 +2,9 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentUserId, useAppSelector } from '@mezon/store';
-import { DirectEntity, deleteChannel, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
+import { DirectEntity, deleteChannel, directActions, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from 'apps/mobile/src/app/temp-ui';
+import { ChannelType } from 'mezon-js';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
@@ -24,7 +25,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const { dismiss } = useBottomSheetModal();
 
 	const isGroup = useMemo(() => {
-		return messageInfo?.channel_avatar?.length > 1;
+		return Number(messageInfo?.type) === ChannelType.CHANNEL_TYPE_GROUP;
 	}, [messageInfo?.channel_avatar]);
 
 	const lastOne = useMemo(() => {
@@ -49,7 +50,10 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			isShow: !isGroup
 		},
 		{
-			onPress: () => reserve(),
+			onPress: async () => {
+				await dispatch(directActions.closeDirectMessage({ channel_id: messageInfo?.channel_id }));
+				dismiss();
+			},
 			title: t('menu.closeDm'),
 			isShow: !isGroup
 		}

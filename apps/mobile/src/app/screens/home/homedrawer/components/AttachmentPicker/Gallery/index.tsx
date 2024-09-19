@@ -3,13 +3,13 @@ import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll, PhotoIdentifier, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
-import { IFile } from 'apps/mobile/src/app/temp-ui';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Linking, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import { IFile } from '../../../../../../temp-ui';
 import { style } from './styles';
 export const { height } = Dimensions.get('window');
 interface IProps {
@@ -26,6 +26,12 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
 	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
+
+	const isDisableSelectAttachment = useMemo(() => {
+		if (!attachmentFilteredByChannelId) return false;
+		const { files } = attachmentFilteredByChannelId;
+		return files?.length >= 10;
+	}, [attachmentFilteredByChannelId]);
 
 	useEffect(() => {
 		checkAndRequestPermissions();
@@ -124,7 +130,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const renderItem = ({ item }) => {
 		if (item?.isUseCamera) {
 			return (
-				<TouchableOpacity style={styles.cameraPicker} onPress={onOpenCamera}>
+				<TouchableOpacity style={[styles.cameraPicker]} onPress={onOpenCamera}>
 					<CameraIcon color={themeValue.text} width={size.s_24} height={size.s_24} />
 				</TouchableOpacity>
 			);
@@ -132,10 +138,10 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		const fileName = item?.node?.image?.filename;
 		const isVideo = item?.node?.type?.startsWith?.('video');
 		const isSelected = attachmentFilteredByChannelId?.files.some((file) => file.filename === fileName);
-
+		const disabled = isDisableSelectAttachment && !isSelected;
 		return (
 			<TouchableOpacity
-				style={styles.itemGallery}
+				style={[styles.itemGallery, disabled && styles.disable]}
 				onPress={() => {
 					if (isSelected) {
 						handleRemove(fileName);
@@ -143,6 +149,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 						handleGalleryPress(item);
 					}
 				}}
+				disabled={disabled}
 			>
 				<Image source={{ uri: item.node.image.uri, cache: 'force-cache' }} style={styles.imageGallery} />
 				{isVideo && (

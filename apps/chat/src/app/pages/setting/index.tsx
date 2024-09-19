@@ -31,7 +31,6 @@ const Setting = ({ isDM }: settingProps) => {
 	}, [isShowSettingFooter?.initTab]);
 
 	useEscapeKey(closeSetting);
-
 	return (
 		<div>
 			{isShowSettingFooter?.status ? (
@@ -49,18 +48,18 @@ const Setting = ({ isDM }: settingProps) => {
 
 						{menuIsOpen ? (
 							<Icons.ArrowLeftCircleActive
-								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400"
+								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50"
 								onClick={handleMenuBtn}
 							/>
 						) : (
 							<Icons.ArrowLeftCircle
-								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400"
+								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50"
 								onClick={handleMenuBtn}
 							/>
 						)}
 
 						<div className="flex sbm:hidden absolute right-4 top-4" onClick={closeSetting}>
-							<Icons.CloseIcon className="dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400" />
+							<Icons.CloseIcon className="dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50" />
 						</div>
 					</div>
 				</div>

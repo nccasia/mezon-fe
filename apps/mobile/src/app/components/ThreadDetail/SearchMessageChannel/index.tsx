@@ -103,6 +103,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 					onChangeText={handleSearchText}
 					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
+					currentChannel={currentChannel}
 				/>
 				{isSearchMessagePage ? (
 					<SearchMessagePage currentChannel={currentChannel} searchText={searchText} />
