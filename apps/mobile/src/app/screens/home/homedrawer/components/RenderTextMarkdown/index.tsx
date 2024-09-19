@@ -1,6 +1,6 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
+import { selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
@@ -371,7 +371,8 @@ export const RenderTextMarkdownContent = React.memo(
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUserClans);
 		const currentChannelId = useSelector(selectCurrentChannelId);
-		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
+		const currentDmId = useSelector(selectDmGroupCurrentId);
+		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentDmId || currentChannelId as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 
 		if (isMessageReply) {
