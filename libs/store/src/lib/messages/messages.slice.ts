@@ -110,6 +110,8 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
+	numberMessageReplyUnread: Record<string, number>;
+	numberMessageContainMentionUnread: Record<string, number>[];
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -632,7 +634,9 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
-	channelIdLastFetch: ''
+	channelIdLastFetch: '',
+	numberMessageReplyUnread: {},
+	numberMessageContainMentionUnread: []
 };
 
 export type SetCursorChannelArgs = {
@@ -685,6 +689,8 @@ export const messagesSlice = createSlice({
 				});
 			}
 			const channelEntity = state.channelMessages[channelId];
+			console.log('action.payload', action.payload);
+
 			switch (code) {
 				case 0: {
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
@@ -719,7 +725,67 @@ export const messagesSlice = createSlice({
 							}
 						}
 					}
-
+					if (!isMe) {
+						const mr = {
+							id: '1836701323081289728',
+							avatar: 'https://cdn.mezon.vn/1775732550744936448/1775791967452532736/1775730015049093000/312Screenshot_2023_10_08_022006.WEBP',
+							channel_id: '1775732550778490880',
+							mode: 2,
+							channel_label: '',
+							clan_id: '1775732550744936448',
+							code: 0,
+							create_time: '2024-09-19T09:38:14.000Z',
+							message_id: '1836701323081289728',
+							sender_id: '1775730015049093120',
+							update_time: '2024-09-19T09:38:14.000Z',
+							clan_logo: 'https://cdn.mezon.vn/1775732550744936448/1775732550778490880/1716858320014New_Project__1_.png',
+							category_name: '',
+							username: 'phong.nguyennam',
+							clan_nick: '',
+							clan_avatar: '',
+							display_name: 'Nguyễn Nam Phong',
+							content: {
+								t: 'hdhdhddh asdsadsad'
+							},
+							mentions: [],
+							attachments: [],
+							references: [],
+							hide_editted: true,
+							is_public: true,
+							isFirst: false,
+							creationTime: '2024-09-19T09:38:14.000Z',
+							date: '9/19/2024, 4:38:14 PM',
+							isAnonymous: false,
+							user: {
+								name: 'phong.nguyennam',
+								username: 'phong.nguyennam',
+								id: '1775730015049093120'
+							},
+							lastSeen: false,
+							create_time_seconds: 1726738694,
+							isMe: true,
+							isCurrentChannel: true,
+							isStartedMessageGroup: true,
+							isStartedMessageOfTheDay: false
+						};
+						const newMessageRec = action.payload;
+						//checkMessageToCountNumberReplyUnread
+						if (newMessageRec?.references && newMessageRec.references.length > 0) {
+							const messageRepSenderId = newMessageRec.references[0].message_sender_id;
+							if (messageRepSenderId === newMessageRec.user?.id) {
+								state.numberMessageReplyUnread[newMessageRec.user?.id ?? ''] = +1;
+							}
+						}
+						if (newMessageRec?.mentions && newMessageRec.mentions.length > 0) {
+							const mentions = newMessageRec.mentions;
+							const mentionsUserIds = new Set(mentions.map((item) => item.user_id));
+							mentions.forEach((mention) => {
+								if (mention.user_id && mentionsUserIds.has(mention.user_id)) {
+									state.numberMessageContainMentionUnread[mention.user_id] = 1;
+								}
+							});
+						}
+					}
 					break;
 				}
 				case 1: {

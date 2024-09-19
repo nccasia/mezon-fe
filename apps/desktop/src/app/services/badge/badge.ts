@@ -73,6 +73,7 @@ export class WindowBadge implements IBadge {
 	}
 
 	private onBadgeCountUpdate = (event: IpcMainEvent, badgeNumber: number) => {
+		console.log('event: ', event);
 		if (this.mainWindow) {
 			this.setBadgeCount(badgeNumber);
 		}

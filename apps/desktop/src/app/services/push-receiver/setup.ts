@@ -29,6 +29,7 @@ let started = false;
 
 // To be call from the main process
 function setup(webContents: Electron.WebContents) {
+	console.log('webContents: ', webContents);
 	// Will be called by the renderer process
 	ipcMain.on(START_NOTIFICATION_SERVICE, async (_, senderId: string) => {
 		// Retrieve saved credentials
@@ -67,6 +68,8 @@ function setup(webContents: Electron.WebContents) {
 
 // Will be called on new notification
 function onNotificationFactory(webContents: Electron.WebContents) {
+	console.log('webContents: ', webContents);
+
 	return ({ notification, persistentId }) => {
 		const persistentIds = electronStore.get('persistentIds') || [];
 		// Update persistentId
