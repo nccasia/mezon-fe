@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { selectAllUserClans, useAppSelector } from '@mezon/store-mobile';
-import { UsersClanEntity } from '@mezon/utils';
+import { UsersClanEntity, normalizeString } from '@mezon/utils';
 import { useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
@@ -19,6 +19,15 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
 	const memberFilterBSRef = useRef<BottomSheetModal>();
 	const [selectedUser, setSelectedUser] = useState<UsersClanEntity>();
 	const [isShowManagementUserModal, setShowManagementUserModal] = useState(false);
+	const [searchText, setSearchText] = useState<string>('');
+
+	const listFilterClanMembers = useMemo(() => {
+		return usersClan?.filter?.((user) =>
+			user?.user?.display_name ? normalizeString(user?.user?.display_name)?.includes(searchText ? normalizeString(searchText) : '') : false
+		);
+	}, [searchText, usersClan]);
+
+	console.log('listFilterClanMembers', listFilterClanMembers.length);
 
 	const menuContext = useMemo(
 		() =>
@@ -58,12 +67,16 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
 		setShowManagementUserModal(true);
 	}
 
+	const handleChangeSearchText = (value: string) => {
+		setSearchText(value);
+	};
+
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }}>
 			<View style={styles.container}>
-				<MezonSearch />
+				<MezonSearch onChangeText={handleChangeSearchText} />
 				<ScrollView contentContainerStyle={styles.userList}>
-					{usersClan?.map((item, index) => (
+					{listFilterClanMembers?.map((item, index) => (
 						<UserItem
 							key={item.id}
 							userID={item.id}
