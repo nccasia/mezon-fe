@@ -86,6 +86,11 @@ export type FetchMessageParam = {
 	hasMore?: boolean;
 };
 
+export type MentionReplyArg = {
+	channelId?: string;
+	count?: number;
+};
+
 export interface MessagesState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -110,8 +115,7 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
-	numberMessageReplyUnread: Record<string, number>;
-	numberMessageContainMentionUnread: Record<string, number>[];
+	numberMentionAndReplyUnread: Record<string, MentionReplyArg>[];
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -635,8 +639,7 @@ export const initialMessagesState: MessagesState = {
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
 	channelIdLastFetch: '',
-	numberMessageReplyUnread: {},
-	numberMessageContainMentionUnread: []
+	numberMentionAndReplyUnread: []
 };
 
 export type SetCursorChannelArgs = {
@@ -726,64 +729,55 @@ export const messagesSlice = createSlice({
 						}
 					}
 					if (!isMe) {
-						const mr = {
-							id: '1836701323081289728',
-							avatar: 'https://cdn.mezon.vn/1775732550744936448/1775791967452532736/1775730015049093000/312Screenshot_2023_10_08_022006.WEBP',
-							channel_id: '1775732550778490880',
-							mode: 2,
-							channel_label: '',
-							clan_id: '1775732550744936448',
-							code: 0,
-							create_time: '2024-09-19T09:38:14.000Z',
-							message_id: '1836701323081289728',
-							sender_id: '1775730015049093120',
-							update_time: '2024-09-19T09:38:14.000Z',
-							clan_logo: 'https://cdn.mezon.vn/1775732550744936448/1775732550778490880/1716858320014New_Project__1_.png',
-							category_name: '',
-							username: 'phong.nguyennam',
-							clan_nick: '',
-							clan_avatar: '',
-							display_name: 'Nguyễn Nam Phong',
-							content: {
-								t: 'hdhdhddh asdsadsad'
-							},
-							mentions: [],
-							attachments: [],
-							references: [],
-							hide_editted: true,
-							is_public: true,
-							isFirst: false,
-							creationTime: '2024-09-19T09:38:14.000Z',
-							date: '9/19/2024, 4:38:14 PM',
-							isAnonymous: false,
-							user: {
-								name: 'phong.nguyennam',
-								username: 'phong.nguyennam',
-								id: '1775730015049093120'
-							},
-							lastSeen: false,
-							create_time_seconds: 1726738694,
-							isMe: true,
-							isCurrentChannel: true,
-							isStartedMessageGroup: true,
-							isStartedMessageOfTheDay: false
-						};
 						const newMessageRec = action.payload;
-						//checkMessageToCountNumberReplyUnread
-						if (newMessageRec?.references && newMessageRec.references.length > 0) {
-							const messageRepSenderId = newMessageRec.references[0].message_sender_id;
-							if (messageRepSenderId === newMessageRec.user?.id) {
-								state.numberMessageReplyUnread[newMessageRec.user?.id ?? ''] = +1;
+
+						const getUpdatedState = (message: ChannelMessage): Record<string, MentionReplyArg> => {
+							// Collect unique user ids from mentions and references
+							const userIdsSet = new Set<string>();
+
+							// Safely add user_ids from mentions if it's an array
+							if (Array.isArray(message?.mentions)) {
+								message.mentions.forEach((mention: ApiMessageMention) => {
+									userIdsSet.add(mention?.user_id ?? '');
+								});
 							}
-						}
-						if (newMessageRec?.mentions && newMessageRec.mentions.length > 0) {
-							const mentions = newMessageRec.mentions;
-							const mentionsUserIds = new Set(mentions.map((item) => item.user_id));
-							mentions.forEach((mention) => {
-								if (mention.user_id && mentionsUserIds.has(mention.user_id)) {
-									state.numberMessageContainMentionUnread[mention.user_id] = 1;
-								}
+
+							// Safely add message_sender_ids from references if it's an array
+							if (Array.isArray(message?.references)) {
+								message.references.forEach((reference: ApiMessageRef) => {
+									userIdsSet.add(reference.message_sender_id ?? '');
+								});
+							}
+
+							// Convert the Set to an array
+							const userIdsArray = Array.from(userIdsSet);
+
+							// Initialize a new state object
+							const updatedState: Record<string, MentionReplyArg> = {};
+
+							// Iterate over each unique userId in the array
+							userIdsArray.forEach((userId) => {
+								if (!userId) return; // Skip empty userId
+
+								updatedState[userId] = {
+									channelId: message.channel_id,
+									count: 1
+								};
 							});
+
+							return updatedState;
+						};
+
+						const counted = getUpdatedState(newMessageRec);
+
+						console.log('counted :', counted);
+
+						if (state.numberMentionAndReplyUnread[newMessageRec?.user?.id]) {
+							// If the channelId exists, update the count
+							state.numberMentionAndReplyUnread[channelId].count = count;
+						} else {
+							// If the channelId does not exist, add a new entry
+							state.numberMentionAndReplyUnread[channelId] = { channelId, count };
 						}
 					}
 					break;
