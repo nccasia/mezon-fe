@@ -35,13 +35,21 @@ export const useStickyScroll = (
 	const scrollToMessage = useCallback(
 		(id: string) => {
 			let scrollTimeoutId: NodeJS.Timeout | null = null;
+			let highlightTimeoutId: NodeJS.Timeout | null = null;
 			return new Promise<boolean>((resolve) => {
 				scrollTimeoutId && clearTimeout(scrollTimeoutId);
 				scrollTimeoutId = setTimeout(() => {
 					requestAnimationFrame(() => {
 						const messageElement = containerRef.current.querySelector(`#msg-${id}`);
 						if (messageElement) {
-							messageElement.scrollIntoView({ behavior: 'instant' });
+							messageElement.scrollIntoView({ behavior: 'instant', block: 'center' });
+							messageElement.classList.add('hight-light');
+							if (highlightTimeoutId) {
+								clearTimeout(highlightTimeoutId);
+							}
+							highlightTimeoutId = setTimeout(() => {
+								messageElement.classList.remove('hight-light');
+							}, 1000);
 							return resolve(true);
 						}
 						return resolve(false);

@@ -344,6 +344,11 @@ input:-webkit-autofill:active {
 	}
 }
 .message-container {
+	&.hight-light {
+		background-color: #eab3081a;
+		outline: 3px solid #eab3081a;
+	}
+
 	&.is-sending {
 		opacity: 0.6;
 	}

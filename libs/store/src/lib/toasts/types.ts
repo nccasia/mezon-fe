@@ -2,7 +2,7 @@ export interface Toast {
 	id: string;
 	message?: string;
 	position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-	autoClose?: number; // milliseconds
+	autoClose?: number | false; // milliseconds
 	hideProgressBar?: boolean;
 	closeOnClick?: boolean;
 	pauseOnHover?: boolean;
@@ -16,7 +16,7 @@ export type ToastPayload = {
 	message?: string;
 	type?: 'success' | 'error' | 'info' | 'warning' | 'default';
 	position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-	autoClose?: number;
+	autoClose?: number | false;
 	hideProgressBar?: boolean;
 	closeOnClick?: boolean;
 	pauseOnHover?: boolean;

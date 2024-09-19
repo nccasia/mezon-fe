@@ -18,7 +18,7 @@ const addToast = createAsyncThunk(
 			id,
 			message: payload.message,
 			position: payload.position || 'top-right',
-			autoClose: payload.autoClose || 3000,
+			autoClose: payload.autoClose ?? 3000,
 			hideProgressBar: payload.hideProgressBar || false,
 			closeOnClick: payload.closeOnClick || true,
 			pauseOnHover: payload.pauseOnHover || true,
