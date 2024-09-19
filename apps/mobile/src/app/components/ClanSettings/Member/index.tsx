@@ -4,6 +4,7 @@ import { selectAllUserClans, useAppSelector } from '@mezon/store-mobile';
 import { UsersClanEntity, normalizeString } from '@mezon/utils';
 import { useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
+import { useThrottledCallback } from 'use-debounce';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import UserSettingProfile from '../../../screens/home/homedrawer/components/UserProfile/component/UserSettingProfile';
 import { IMezonMenuContextItemProps, MezonBottomSheet, MezonSearch } from '../../../temp-ui';
@@ -26,8 +27,6 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
 			user?.user?.display_name ? normalizeString(user?.user?.display_name)?.includes(searchText ? normalizeString(searchText) : '') : false
 		);
 	}, [searchText, usersClan]);
-
-	console.log('listFilterClanMembers', listFilterClanMembers.length);
 
 	const menuContext = useMemo(
 		() =>
@@ -67,9 +66,9 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
 		setShowManagementUserModal(true);
 	}
 
-	const handleChangeSearchText = (value: string) => {
+	const handleChangeSearchText = useThrottledCallback((value: string) => {
 		setSearchText(value);
-	};
+	});
 
 	return (
 		<KeyboardAvoidingView style={{ flex: 1 }}>
