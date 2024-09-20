@@ -165,16 +165,22 @@ function MyApp() {
 
 	const allMentionAndReply = useSelector(selectNumberMentionAndReplyUnread);
 	console.log('allMentionAndReply: ', allMentionAndReply);
-	const totalCountMentionAndReply = allMentionAndReply.reduce((total, item) => {
-		return total + (item.count ?? 0);
-	}, 0);
-	console.log('totalCountMentionAndReply: ', totalCountMentionAndReply);
+
+	const getCountByUserId = (userId: string) => {
+		return allMentionAndReply.reduce((acc, { userId: id, count }) => {
+			if (id === userId) {
+				acc += count ?? 0;
+			}
+			return acc;
+		}, 0);
+	};
+	console.log('totalUnreadDM: ', totalUnreadDM);
 
 	useEffect(() => {
 		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalCountMentionAndReply + totalUnreadDM);
+			electronBridge?.setBadgeCount(getCountByUserId(userId ?? '') + totalUnreadDM);
 		}
-	}, [totalClanNotify, totalUnreadDM]);
+	}, [totalUnreadDM, getCountByUserId(userId ?? '')]);
 
 	return (
 		<div

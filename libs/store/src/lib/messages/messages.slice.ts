@@ -728,41 +728,39 @@ export const messagesSlice = createSlice({
 							}
 						}
 					}
-					if (isMe === false) {
-						const newMessageRec = action.payload;
+					console.log('isMe', isMe);
+					const newMessageRec = action.payload;
+					const getUpdatedState = (message: ChannelMessage): MentionReplyArg => {
+						const userIdsSet = new Set<string>();
+
+						if (Array.isArray(message?.mentions)) {
+							message.mentions.forEach((mention: ApiMessageMention) => {
+								userIdsSet.add(mention?.user_id ?? '');
+							});
+						}
+
+						if (Array.isArray(message?.references)) {
+							message.references.forEach((reference: ApiMessageRef) => {
+								userIdsSet.add(reference.message_sender_id ?? '');
+							});
+						}
+
+						const userIdsArray = Array.from(userIdsSet);
+
+						if (userIdsArray.length > 0) {
+							return {
+								userId: userIdsArray[0],
+								channelId: message.channel_id,
+								count: userIdsArray.length
+							};
+						}
+
+						return {};
+					};
+					if (isMe === false && newMessageRec.mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 						console.log('newMessageRec: ', newMessageRec);
-
-						const getUpdatedState = (message: ChannelMessage): MentionReplyArg => {
-							const userIdsSet = new Set<string>();
-
-							if (Array.isArray(message?.mentions)) {
-								message.mentions.forEach((mention: ApiMessageMention) => {
-									userIdsSet.add(mention?.user_id ?? '');
-								});
-							}
-
-							if (Array.isArray(message?.references)) {
-								message.references.forEach((reference: ApiMessageRef) => {
-									userIdsSet.add(reference.message_sender_id ?? '');
-								});
-							}
-
-							const userIdsArray = Array.from(userIdsSet);
-
-							if (userIdsArray.length > 0) {
-								return {
-									userId: userIdsArray[0],
-									channelId: message.channel_id,
-									count: userIdsArray.length
-								};
-							}
-
-							return {};
-						};
-
 						const counted = getUpdatedState(newMessageRec);
 						console.log('counted: -1', counted);
-
 						if (counted.userId && counted.channelId && counted.count) {
 							console.log('counted: -2', counted);
 
