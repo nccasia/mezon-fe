@@ -138,7 +138,6 @@ export const categoriesSlice = createSlice({
 		},
 		setShowCategory: (state, action: PayloadAction<{ categoryId: string; isShowCategory: boolean }>) => {
 			if (action.payload.categoryId) {
-				console.log(action.payload);
 				state.showCategories[action.payload.categoryId] = action.payload.isShowCategory;
 			}
 		}
