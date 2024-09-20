@@ -4242,10 +4242,9 @@ export function MacIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function DollarIcon(props: React.HTMLAttributes<SVGElement>) {
+export function DollarIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg
-			fill="#000000"
 			height="800px"
 			width="800px"
 			version="1.1"
@@ -4255,6 +4254,7 @@ export function DollarIcon(props: React.HTMLAttributes<SVGElement>) {
 			viewBox="0 0 64 64"
 			enableBackground="new 0 0 64 64"
 			xmlSpace="preserve"
+			fill={fill}
 			{...props}
 		>
 			<g id="US-coin">

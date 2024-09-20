@@ -6,6 +6,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectCurrentChannel,
+	selectTheme,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -59,6 +60,7 @@ export default memo(ChannelMessageOpt);
 function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleItemClick = useCallback(async () => {
 		try {
@@ -83,7 +85,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
 				'giveacoffee',
 				'Give a coffee',
 				handleItemClick,
-				<Icons.DollarIcon className="dark:text-textSecondary text-colorTextLightMode w-5 h-5" />
+				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
 			);
 		});
 	});
