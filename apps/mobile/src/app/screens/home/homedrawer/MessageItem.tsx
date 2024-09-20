@@ -160,6 +160,8 @@ const MessageItem = React.memo(
 					setShowHighlightReply(false);
 					dispatch(messagesActions.setIdMessageToJump(null));
 				}, 3000);
+			} else {
+				setShowHighlightReply(false);
 			}
 			return () => {
 				timeoutRef.current && clearTimeout(timeoutRef.current);

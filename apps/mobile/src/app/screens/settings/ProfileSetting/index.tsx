@@ -103,7 +103,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 
 	useEffect(() => {
 		if (profileTab) setTab(profileTab);
-	}, [profileTab]);
+	}, []);
 
 	useEffect(() => {
 		const { username, about_me } = userProfile?.user || {};

@@ -15,7 +15,6 @@ function Login() {
 
 	useGoogleOneTapLogin({
 		onSuccess: async (credentialResponse) => {
-			console.log('credentialResponse', credentialResponse);
 			await loginByGoogle(credentialResponse.credential as string);
 		},
 		onError: () => {

@@ -5,6 +5,7 @@ import { useAnchor } from './anchor';
  * React hook for keeping HTML element scroll at the bottom when content updates (if it is already at the bottom).
  * @param containerRef Reference of scrollable HTML element.
  * @param contentRef Reference of anchor HTML element. Scroll would be kept at anchor until user scrolls.
+ * @deprecated use AnchorScroll component instead
  */
 export const useStickyScroll = (
 	containerRef: React.MutableRefObject<Element>,

@@ -123,7 +123,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction]
+			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, messages]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {

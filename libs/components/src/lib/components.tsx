@@ -75,4 +75,5 @@ export { default as UserMentionList } from './components/UserMentionList';
 export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
+export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
 export * from './components/ThumbnailAttachmentRender';

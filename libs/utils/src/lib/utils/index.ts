@@ -35,6 +35,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
+export { mergeRefs } from './mergeRefs';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);

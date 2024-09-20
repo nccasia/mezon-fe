@@ -27,7 +27,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	return (
 		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
 			<div className="absolute flex text-zinc-400 gap-2 text-lg pb-0">
-				{!statusMenu && (
+				{!statusMenu && closeMenu && (
 					<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
 						<Icons.OpenMenu />
 					</div>

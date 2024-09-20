@@ -261,8 +261,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			}
 		}
 
-		console.log('previous', previous);
-
 		return previous;
 	}, [listDirectSearch, previousChannels, totalListsSorted]);
 
@@ -367,8 +365,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const selectedItem = listToUse.find((item) => item.id === idActive);
 		if (!selectedItem) return;
 
-		console.log('selectedItem', selectedItem);
-
 		if (selectedItem.subText) {
 			handleSelectChannel(selectedItem);
 			dispatch(messagesActions.setIsFocused(true));
@@ -401,7 +397,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				>
 					{!normalizeSearchText && listPrevious.length > 0 && (
 						<>
-							<div className="text-xs font-semibold uppercase py-2">Previous channels</div>
+							<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2 ">Previous channels</div>
 							<ListSearchModal
 								listSearch={listPrevious}
 								itemRef={itemRef}
@@ -412,7 +408,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							/>
 						</>
 					)}
-					<div className="text-xs font-semibold uppercase py-2">Unread channels</div>
+					<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Unread channels</div>
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal

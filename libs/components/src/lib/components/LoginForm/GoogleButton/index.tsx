@@ -13,16 +13,9 @@ const GoogleButtonLogin: React.FC<GoogleButtonLoginProps> = ({ mode }) => {
 	const navigate = useNavigate();
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
-		ux_mode: 'popup',
-		onSuccess: async ({ code }) => {
-			await loginByGoogle(code);
-			if (mode !== 'dev') {
-				navigate('/mezon');
-			}
-		},
-		onError: (errorResponse) => console.log(errorResponse),
+		ux_mode: 'redirect',
+		redirect_uri: `https://${process.env.NX_CHAT_APP_API_HOST}:${process.env.NX_CHAT_APP_API_PORT}${process.env.NX_CHAT_APP_API_ENDPOINT_LOGIN}`
 	});
-
 	return (
 		<div className="w-full lg:px-0">
 			{!isElectron() && (
