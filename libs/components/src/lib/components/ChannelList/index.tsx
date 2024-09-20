@@ -1,5 +1,5 @@
 import { useCategory, useEscapeKey } from '@mezon/core';
-import { channelsActions, selectCurrentClan, selectTheme, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectCurrentClan, selectShowCategories, selectTheme, useAppDispatch } from '@mezon/store';
 import { ICategoryChannel } from '@mezon/utils';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,10 +14,13 @@ function ChannelList() {
 	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
+	const showCategories = useSelector(selectShowCategories);
 
 	const memoizedCategorizedChannels = useMemo(() => {
-		return categorizedChannels.map((category: ICategoryChannel) => <CategorizedChannels key={category.id} category={category} />);
-	}, [categorizedChannels]);
+		return categorizedChannels.map((category: ICategoryChannel) =>
+			!showCategories?.[category.category_id ?? ''] ? <CategorizedChannels key={category.id} category={category} /> : null
+		);
+	}, [categorizedChannels, showCategories]);
 
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 

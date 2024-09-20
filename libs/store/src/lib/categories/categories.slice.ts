@@ -23,6 +23,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	error?: string | null;
 	currentCategoryId?: string | null;
 	sortChannelByCategoryId: Record<string, boolean>;
+	showCategories: Record<string, boolean>;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
@@ -117,7 +118,8 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	loadingStatus: 'not loaded',
 	categories: [],
 	error: null,
-	sortChannelByCategoryId: {}
+	sortChannelByCategoryId: {},
+	showCategories: {}
 });
 
 export const categoriesSlice = createSlice({
@@ -132,6 +134,12 @@ export const categoriesSlice = createSlice({
 		setCategoryIdSortChannel: (state, action: PayloadAction<SortChannel>) => {
 			if (action.payload.categoryId) {
 				state.sortChannelByCategoryId[action.payload.categoryId] = action.payload.isSortChannelByCategoryId;
+			}
+		},
+		setShowCategory: (state, action: PayloadAction<{ categoryId: string; isShowCategory: boolean }>) => {
+			if (action.payload.categoryId) {
+				console.log(action.payload);
+				state.showCategories[action.payload.categoryId] = action.payload.isShowCategory;
 			}
 		}
 	},
@@ -241,3 +249,5 @@ export const selectCurrentCategory = createSelector(selectCategoriesEntities, se
 export const selectDefaultCategory = createSelector(selectAllCategories, (categories) => categories[0]);
 
 export const selectCategoriesIds = createSelector(getCategoriesState, (entities) => entities.ids);
+
+export const selectShowCategories = createSelector(getCategoriesState, (state) => state.showCategories);

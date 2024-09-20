@@ -129,19 +129,9 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		}
 	}, [location]);
 
-	const isShowCategoryName = useMemo(() => {
-		if (userProfile?.user?.id === category.creator_id && category.channels.length === 0 && category.category_name) {
-			return true;
-		} else if (category.category_name && category.channels.length > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}, [category, userProfile]);
-
 	return (
 		<div>
-			{isShowCategoryName && (
+			{category.category_name && (
 				<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
 					<button
 						onClick={() => {
