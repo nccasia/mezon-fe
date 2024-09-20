@@ -14,6 +14,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_VOICE;
 	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT;
+	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const channelParent = useSelector(selectChannelById(channel?.parrent_id ? (channel.parrent_id as string) : ''));
 	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
@@ -26,15 +27,18 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 
 	return (
 		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
-			<div className="absolute flex text-zinc-400 gap-2 text-lg pb-0">
-				{!statusMenu && closeMenu && (
+			<div className="absolute flex text-zinc-400 text-lg pb-0">
+				{closeMenu && !statusMenu && (
 					<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
 						<Icons.OpenMenu />
 					</div>
 				)}
-				{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
+
+				{isPrivate === ChannelStatusEnum.isPrivate && (isChannelVoice || isChannelStream) && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
 				{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
-				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
+				{isPrivate === undefined && (isChannelVoice || isChannelStream) && (
+					<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+				)}
 				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
