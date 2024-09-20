@@ -50,7 +50,8 @@ export const style = (colors: Attributes) =>
 		},
 		titleWrapper: {
 			flexDirection: 'column',
-			gap: Metrics.size.s
+			gap: Metrics.size.s,
+			flex: 1
 		},
 		actionWrapper: {
 			flexDirection: 'row',
@@ -60,7 +61,7 @@ export const style = (colors: Attributes) =>
 			minWidth: '100%'
 		},
 		memberText: {
-			color: Colors.white,
+			color: colors.white,
 			fontSize: Fonts.size.h7
 		}
 	});

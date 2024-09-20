@@ -135,7 +135,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 					</View>
 				)}
 				<View style={styles.titleWrapper}>
-					<Text style={styles.serverName}>{messageInfo?.channel_label || messageInfo?.usernames}</Text>
+					<Text style={styles.serverName} numberOfLines={2}>{messageInfo?.channel_label || messageInfo?.usernames}</Text>
 					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id.length + 1} members</Text>}
 				</View>
 			</View>
