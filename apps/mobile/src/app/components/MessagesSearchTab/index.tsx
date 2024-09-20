@@ -5,7 +5,7 @@ import { MessagesEntity, SearchMessageEntity } from '@mezon/store';
 import { SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
 import EmptySearchPage from '../EmptySearchPage';
@@ -19,7 +19,6 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 	const { totalResult, fetchSearchMessages } = useSearchMessages();
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const messagesRef = useRef<SearchMessageEntity[]>([]);
 	const [messages, setMessages] = useState([]);
 
 	useEffect(() => {
@@ -37,16 +36,6 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 		}
 	}, [messageSearchByChannelId]);
 
-	useEffect(() => {
-		if (messageSearchByChannelId?.length > 0) {
-			const existingMessages = new Set(messagesRef.current?.map((msg) => msg?.id));
-			const newMessages = messageSearchByChannelId?.filter((msg) => !existingMessages.has(msg.id));
-			messagesRef.current = [...messagesRef.current, ...newMessages];
-		} else {
-			messagesRef.current = [];
-		}
-	}, [messageSearchByChannelId]);
-
 	const ViewLoadMore = () => {
 		return (
 			<View style={styles.loadMoreChannelMessage}>
@@ -60,7 +49,7 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 		let currentGroup: SearchMessageEntity[] = [];
 		let currentLabel: string | null | undefined = null;
 
-		messagesRef.current?.forEach((message) => {
+		messages?.forEach((message) => {
 			const label = message?.channel_label ?? '';
 			if (label !== currentLabel) {
 				if (currentGroup?.length > 0) {
@@ -80,7 +69,7 @@ const MessagesSearchTab = React.memo(({ messageSearchByChannelId }: { messageSea
 	}, [messages, messageSearchByChannelId]);
 
 	const loadMoreMessages = async () => {
-		if (isLoadingMore || totalResult === messagesRef.current?.length) return;
+		if (isLoadingMore || totalResult === messages?.length) return;
 		setIsLoadingMore(true);
 		const payload = {
 			filters: filtersSearch,

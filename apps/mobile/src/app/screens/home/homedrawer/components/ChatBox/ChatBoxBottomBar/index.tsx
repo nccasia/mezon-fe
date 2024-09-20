@@ -44,7 +44,7 @@ import useProcessedContent from './useProcessedContent';
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
-		allowedSpacesCount: 0,
+		allowedSpacesCount: Infinity,
 		isInsertSpaceAfterMention: true
 	},
 	hashtag: {

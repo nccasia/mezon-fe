@@ -21,13 +21,6 @@ interface ISearchMessagePageProps {
 	searchText: string;
 }
 
-export function normalizeString(str: string): string {
-	if (!str?.length) return;
-	return str
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toUpperCase();
-}
 function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);

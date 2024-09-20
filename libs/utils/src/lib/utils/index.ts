@@ -273,11 +273,12 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 	}
 }
 
-export function normalizeString(str: string): string {
-	return str
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toUpperCase();
+export function normalizeString(str: string): string | undefined {
+	if (str?.length)
+		return str
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toUpperCase();
 }
 
 export function searchMentionsHashtag(searchValue: string, list: MentionDataProps[]) {

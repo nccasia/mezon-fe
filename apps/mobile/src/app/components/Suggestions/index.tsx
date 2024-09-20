@@ -1,6 +1,6 @@
 import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion } from '@mezon/store';
 import { selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
-import { MentionDataProps } from '@mezon/utils';
+import { MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { FlatList, LayoutAnimation, Pressable } from 'react-native';
@@ -23,7 +23,6 @@ export interface MentionSuggestionsProps {
 const Suggestions: FC<MentionSuggestionsProps> = memo(
 	({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue, channelMode }) => {
 		const listMentions = UseMentionList(channelId || '', channelMode);
-
 		useEffect(() => {
 			if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
 				onAddMentionMessageAction(listMentions);
@@ -38,13 +37,19 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 			const mentionSearchText = keyword?.toLocaleLowerCase();
 
 			const filterMatchedMentions = (mentionData: MentionDataProps) => {
-				return mentionData?.display?.toLocaleLowerCase()?.includes(mentionSearchText);
+				return (
+					normalizeString(mentionData?.display)?.toLocaleLowerCase()?.includes(mentionSearchText) ||
+					normalizeString(mentionData?.username)?.toLocaleLowerCase()?.includes(mentionSearchText)
+				);
 			};
 
-			return listMentions.filter(filterMatchedMentions).map((item) => ({
-				...item,
-				name: item?.display
-			}));
+			return listMentions
+				.filter(filterMatchedMentions)
+				.sort((a, b) => compareObjects(a, b, mentionSearchText, 'display', 'display'))
+				.map((item) => ({
+					...item,
+					name: item?.display
+				}));
 		}, [keyword, listMentions]);
 
 		if (keyword == null) {
