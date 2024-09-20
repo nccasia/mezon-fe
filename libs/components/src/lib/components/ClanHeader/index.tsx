@@ -172,6 +172,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
+									<label className="relative inline-block h-5 w-10 cursor-pointer rounded-full bg-gray-900 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-[#1976D2]">
+										<input type="checkbox" checked={true} onChange={() => console.log('ok')} className="peer sr-only" />
+										<span className="absolute inset-y-0 start-0 m-1 size-3 rounded-full ring-[3px] ring-inset ring-white transition-all peer-checked:start-6 bg-gray-900 peer-checked:w-1 peer-checked:bg-white peer-checked:ring-transparent"></span>
+									</label>
 									{!isClanOwner && (
 										<button
 											onClick={toggleLeaveClanPopup}

@@ -162,6 +162,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const isLightMode = useMemo(() => {
 			return appearanceTheme === 'light';
 		}, [appearanceTheme]);
+
 		return (
 			<div
 				ref={panelRef}
