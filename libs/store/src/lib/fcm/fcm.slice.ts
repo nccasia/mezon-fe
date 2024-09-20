@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 const REGIS_FCM_TOKEN_CACHED_TIME = 1000 * 60 * 3;
 
@@ -10,7 +10,7 @@ type FcmDeviceTokenPayload = {
 	platform?: string;
 };
 
-export const registFcmDeviceTokenCached = memoize(
+export const registFcmDeviceTokenCached = memoizeAndTrack(
 	(mezon: MezonValueContext, tokenId: string, deviceId: string, platform: string) =>
 		mezon.client.registFCMDeviceToken(mezon.session, tokenId, deviceId, platform || ''),
 	{

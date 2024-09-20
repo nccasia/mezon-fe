@@ -46,6 +46,8 @@ import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
+import { channelsStreamReducer } from './stream/channelsStream.slice';
+import { usersStreamReducer } from './stream/usersStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
@@ -260,6 +262,14 @@ const persistedsettingClanStickerReducer = persistReducer(
 	settingStickerReducer
 );
 
+const persistednotificationReducer = persistReducer(
+	{
+		key: 'notification',
+		storage
+	},
+	notificationReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -297,8 +307,10 @@ const reducer = {
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
-	notification: notificationReducer,
+	notification: persistednotificationReducer,
 	voice: voiceReducer,
+	usersstream: usersStreamReducer,
+	channelsstream: channelsStreamReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

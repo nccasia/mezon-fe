@@ -31,8 +31,8 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 				style={[
 					styles.imageMessageRender,
 					{
-						width: (!imageSize?.height && !isUploading) ? widthMedia : imageSize.width * 0.8,
-						height: (!imageSize?.height && !isUploading) ? heightMedia : imageSize.height * 0.8,
+						width: !imageSize?.height && !isUploading ? widthMedia : imageSize.width * 0.8,
+						height: !imageSize?.height && !isUploading ? heightMedia : imageSize.height * 0.8,
 						opacity: isUploading ? 0.5 : 1
 					}
 				]}
@@ -45,9 +45,9 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 				}
 				source={{
 					uri: image?.url,
-					priority: FastImage.priority.high,
+					priority: FastImage.priority.high
 				}}
-				resizeMode={(!imageSize?.height && !isUploading) ? 'cover' : 'contain'}
+				resizeMode={!imageSize?.height && !isUploading ? 'cover' : 'contain'}
 			/>
 		</TouchableOpacity>
 	);

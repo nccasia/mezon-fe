@@ -1,5 +1,13 @@
 import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
-import { channelsActions, notificationSettingActions, selectCloseMenu, threadsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	channelsActions,
+	notificationActions,
+	notificationSettingActions,
+	selectCloseMenu,
+	threadsActions,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
@@ -98,6 +106,8 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setCoords({ mouseX, mouseY, distanceToBottom });
 				setIsShowPanelChannel((s) => !s);
 			}
+
+			dispatch(notificationActions.removeNotificationsByChannelId(channel.channel_id ?? ''));
 		};
 
 		useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -188,15 +198,17 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							<div className="relative mt-[-5px]">
-								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-								)}
+								{isPrivate === ChannelStatusEnum.isPrivate &&
+									(channel.type === ChannelType.CHANNEL_TYPE_VOICE || channel.type === ChannelType.CHANNEL_TYPE_STREAMING) && (
+										<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+									)}
 								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 									<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
-								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-									<Icons.Speaker defaultSize="w-5 5-5 dark:text-channelTextLabel" />
-								)}
+								{isPrivate === undefined &&
+									(channel.type === ChannelType.CHANNEL_TYPE_VOICE || channel.type === ChannelType.CHANNEL_TYPE_STREAMING) && (
+										<Icons.Speaker defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+									)}
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}

@@ -45,6 +45,7 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 		[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
 		// 2 lines below only get index
 		[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Speaker defaultSize="w-6 h-6" />

@@ -17,6 +17,7 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -158,6 +159,13 @@ const NavigationMain = () => {
 						clanId: currentClanId ?? '',
 						channelId: '',
 						channelType: ChannelType.CHANNEL_TYPE_VOICE
+					})
+				),
+				store.dispatch(
+					usersStreamActions.fetchStreamChannelMembers({
+						clanId: currentClanId ?? '',
+						channelId: '',
+						channelType: ChannelType.CHANNEL_TYPE_STREAMING
 					})
 				)
 			];

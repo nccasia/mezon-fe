@@ -1,6 +1,8 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
+		"resolveJsonModule": true,
+    	"esModuleInterop": true,
 		"rootDir": ".",
 		"sourceMap": true,
 		"declaration": false,
@@ -31,6 +33,7 @@
 			"@mezon/ui": ["libs/ui/src/index.ts"],
 			"@mezon/utils": ["libs/utils/src/index.ts"],
 			"@mezon/chat-scroll": ["libs/chat-scroll/src/index.ts"],
+			"@mezon/package-js": ["package.json"],
 			"react": ["./node_modules/@types/react"]
 		}
 	},

@@ -1,7 +1,6 @@
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { selectAllAccount } from '../account/account.slice';
@@ -9,6 +8,7 @@ import { ChannelsEntity } from '../channels/channels.slice';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
@@ -57,7 +57,7 @@ export interface ChannelMemberRootState {
 
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
-const fetchChannelMembersCached = memoize(
+const fetchChannelMembersCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) => {
 		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 2000, '');
 		return { ...response, time: Date.now() };

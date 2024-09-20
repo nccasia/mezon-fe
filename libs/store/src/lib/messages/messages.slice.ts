@@ -27,11 +27,11 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -135,7 +135,7 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 
 export const TYPING_TIMEOUT = 3000;
 
-export const fetchMessagesCached = memoize(
+export const fetchMessagesCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) => {
 		const response = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
 		return { ...response, time: Date.now() };
@@ -172,7 +172,6 @@ export const fetchMessages = createAsyncThunk(
 		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
 		if (noCache) {
 			fetchMessagesCached.clear(mezon, channelId, messageId, direction);
 		}

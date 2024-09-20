@@ -22,16 +22,10 @@ type Sessionlike = {
 	created: boolean;
 };
 
-export enum SocketStatus {
-	CONNECT_SUCCESS = 200,
-	CONNECT_FAILURE = 500
-}
-
 export type MezonContextValue = {
 	clientRef: React.MutableRefObject<Client | null>;
 	sessionRef: React.MutableRefObject<Session | null>;
 	socketRef: React.MutableRefObject<Socket | null>;
-	socketStatus: React.MutableRefObject<SocketStatus | null>;
 	createClient: () => Promise<Client>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
@@ -39,7 +33,7 @@ export type MezonContextValue = {
 	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
-	reconnect: (clanId: string) => Promise<unknown>;
+	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -48,7 +42,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<Session | null>(null);
 	const socketRef = React.useRef<Socket | null>(null);
-	const socketStatus = React.useRef<SocketStatus | null>(SocketStatus.CONNECT_FAILURE);
 
 	const createSocket = useCallback(async () => {
 		if (!clientRef.current) {
@@ -67,7 +60,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const authenticateEmail = useCallback(
 		async (email: string, password: string) => {
-			socketStatus.current = SocketStatus.CONNECT_FAILURE;
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
@@ -83,7 +75,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
-			socketStatus.current = SocketStatus.CONNECT_SUCCESS;
 
 			return session;
 		},
@@ -92,7 +83,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const authenticateGoogle = useCallback(
 		async (token: string) => {
-			socketStatus.current = SocketStatus.CONNECT_FAILURE;
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
@@ -108,7 +98,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
-			socketStatus.current = SocketStatus.CONNECT_SUCCESS;
 
 			return session;
 		},
@@ -139,7 +128,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const logOutMezon = useCallback(async () => {
-		socketStatus.current = SocketStatus.CONNECT_FAILURE;
 		if (socketRef.current) {
 			socketRef.current.ondisconnect = () => {
 				console.log('loged out');
@@ -157,7 +145,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const authenticateDevice = useCallback(
 		async (username: string) => {
-			socketStatus.current = SocketStatus.CONNECT_FAILURE;
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
@@ -166,7 +153,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
-			socketStatus.current = SocketStatus.CONNECT_SUCCESS;
 
 			return session;
 		},
@@ -175,7 +161,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const refreshSession = useCallback(
 		async (session: Sessionlike) => {
-			socketStatus.current = SocketStatus.CONNECT_FAILURE;
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
@@ -188,7 +173,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(newSession, true);
 			sessionRef.current = session2;
-			socketStatus.current = SocketStatus.CONNECT_SUCCESS;
 			return newSession;
 		},
 		[clientRef, socketRef]
@@ -196,7 +180,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const reconnect = React.useCallback(
 		async (clanId: string) => {
-			socketStatus.current = SocketStatus.CONNECT_FAILURE;
 			if (!clientRef.current) {
 				return Promise.resolve(null);
 			}
@@ -229,7 +212,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
-						socketStatus.current = SocketStatus.CONNECT_SUCCESS;
 						resolve(socket);
 					} catch (error) {
 						failCount++;
@@ -241,10 +223,26 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					}
 				};
 
-				await retry();
+				!socketRef.current?.isOpen() && (await retry());
 			});
 		},
 		[createSocket, isFromMobile]
+	);
+
+	const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+	const reconnectWithTimeout = React.useCallback(
+		(clanId: string) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+			return new Promise((resolve, reject) => {
+				timeoutRef.current = setTimeout(() => {
+					reconnect(clanId).then(resolve).catch(reject);
+				}, 500);
+			});
+		},
+		[reconnect]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
@@ -260,8 +258,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			refreshSession,
 			createSocket,
 			logOutMezon,
-			reconnect,
-			socketStatus
+			reconnectWithTimeout
 		}),
 		[
 			clientRef,
@@ -275,8 +272,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			refreshSession,
 			createSocket,
 			logOutMezon,
-			reconnect,
-			socketStatus
+			reconnectWithTimeout
 		]
 	);
 

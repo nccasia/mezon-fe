@@ -224,6 +224,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return sortFilteredList(totalListsFiltered, normalizeSearchText, isSearchByUsername);
 	}, [totalListsFiltered, normalizeSearchText, isSearchByUsername]);
 
+	const totalListSortedWithoutPreviousList = useMemo(() => {
+		return [...totalListsSorted];
+	}, [totalListsSorted]);
+
 	const channelSearchSorted = useMemo(() => {
 		return totalListsSorted.filter((item) => item.typeChat === TypeSearch.Channel_Type);
 	}, [totalListsSorted]);
@@ -241,11 +245,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const listPrevious = useMemo(() => {
 		const previous: SearchItemProps[] = [];
 
-		if (totalListsSorted.length > 0) {
-			for (let i = totalListsSorted.length - 1; i >= 0; i--) {
-				if (previousChannels.includes(totalListsSorted[i]?.channelId || totalListsSorted[i]?.id || '')) {
-					previous.unshift(totalListsSorted[i]);
-					totalListsSorted.splice(i, 1);
+		if (totalListSortedWithoutPreviousList.length > 0) {
+			for (let i = totalListSortedWithoutPreviousList.length - 1; i >= 0; i--) {
+				if (previousChannels.includes(totalListSortedWithoutPreviousList[i]?.channelId || totalListSortedWithoutPreviousList[i]?.id || '')) {
+					previous.unshift(totalListSortedWithoutPreviousList[i]);
+					totalListSortedWithoutPreviousList.splice(i, 1);
 				}
 			}
 		}
@@ -408,11 +412,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							/>
 						</>
 					)}
-					<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Unread channels</div>
+					{!normalizeSearchText && (
+						<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Unread channels</div>
+					)}
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal
-								listSearch={totalListsSorted.slice(0, 50)}
+								listSearch={normalizeSearchText ? totalListsSorted.slice(0, 50) : totalListSortedWithoutPreviousList.slice(0, 50)}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
 								searchText={normalizeSearchText}

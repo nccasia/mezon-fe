@@ -134,6 +134,16 @@ export const notificationSlice = createSlice({
 			state.isMessageRead = action.payload;
 		},
 
+		removeNotificationsByChannelId: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+
+			const remainingNotifications = state.entities
+				? Object.values(state.entities).filter((notification) => notification?.content?.channel_id !== channelId)
+				: [];
+
+			notificationAdapter.setAll(state, remainingNotifications as any);
+		},
+
 		setNotiListUnread(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
 			const ids = storedIds ? JSON.parse(storedIds) : [];

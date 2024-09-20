@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+	appActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
+	channelsStreamActions,
 	clansSlice,
 	directActions,
 	directMetaActions,
@@ -40,11 +42,11 @@ import {
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
-import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -67,6 +69,10 @@ import {
 	StickerDeleteEvent,
 	StickerUpdateEvent,
 	StreamPresenceEvent,
+	StreamingEndedEvent,
+	StreamingJoinedEvent,
+	StreamingLeavedEvent,
+	StreamingStartedEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -93,7 +99,7 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const { socketRef, reconnect } = useMezon();
+	const { socketRef, reconnectWithTimeout } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId, channelId, clanId } = useAppParams();
@@ -130,6 +136,50 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
 			dispatch(voiceActions.remove(voice.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchanneljoined = useCallback(
+		(user: StreamingJoinedEvent) => {
+			if (user) {
+				dispatch(
+					usersStreamActions.add({
+						...user
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelleaved = useCallback(
+		(user: StreamingLeavedEvent) => {
+			dispatch(usersStreamActions.remove(user.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelstarted = useCallback(
+		(channel: StreamingStartedEvent) => {
+			if (channel) {
+				dispatch(
+					channelsStreamActions.add({
+						id: channel.channel_id,
+						channel_id: channel.channel_id,
+						clan_id: channel.clan_id,
+						is_streaming: channel.is_streaming,
+						streaming_url: channel.streaming_url !== '' ? `${channel.streaming_url}&user_id=${userId}` : channel.streaming_url
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelended = useCallback(
+		(channel: StreamingEndedEvent) => {
+			dispatch(usersStreamActions.remove(channel.channel_id));
 		},
 		[dispatch]
 	);
@@ -383,8 +433,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
 			if (userId !== stickerCreated.creator_id) {
-				console.log('stickerCreated: ', stickerCreated);
-
 				dispatch(
 					stickerSettingActions.add({
 						category: stickerCreated.category,
@@ -678,6 +726,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onvoiceleaved = onvoiceleaved;
 
+			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onstreamingchannelleaved = onstreamingchannelleaved;
+
+			socket.onstreamingchannelstarted = onstreamingchannelstarted;
+
+			socket.onstreamingchannelended = onstreamingchannelended;
+
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
@@ -757,6 +813,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
+			onstreamingchanneljoined,
+			onstreamingchannelleaved,
+			onstreamingchannelstarted,
+			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent
@@ -764,11 +824,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const handleReconnect = useCallback(
-		async (socketType: string) => {
+		async (socketType: string, forceReconnect = false) => {
+			if (socketRef.current?.isOpen() && !forceReconnect) return;
 			dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
-				const socket = await reconnect(clanIdActive ?? '');
+				const socket = await reconnectWithTimeout(clanIdActive ?? '');
 				if (!socket) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					return;
@@ -776,7 +837,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				if (window && navigator) {
 					if (navigator.onLine) {
-						window.location.reload();
+						dispatch(appActions.refreshApp());
 					} else {
 						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					}
@@ -787,22 +848,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 			}
 		},
-		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
+		[dispatch, clanIdActive, reconnectWithTimeout, setCallbackEventFn]
 	);
 
-	const ondisconnect = useCallback(
-		debounce(() => {
-			handleReconnect('Socket disconnected, attempting to reconnect...');
-		}, 300),
-		[handleReconnect]
-	);
+	const ondisconnect = useCallback(() => {
+		handleReconnect('Socket disconnected, attempting to reconnect...');
+	}, [handleReconnect]);
 
-	const onHeartbeatTimeout = useCallback(
-		debounce(() => {
-			handleReconnect('Socket hearbeat timeout, attempting to reconnect...');
-		}, 300),
-		[handleReconnect]
-	);
+	const onHeartbeatTimeout = useCallback(() => {
+		handleReconnect('Socket hearbeat timeout, attempting to reconnect...', true);
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		const socket = socketRef.current;
@@ -871,6 +926,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socketRef,
 		onvoicejoined,
 		onvoiceleaved,
+		onstreamingchanneljoined,
+		onstreamingchannelleaved,
+		onstreamingchannelstarted,
+		onstreamingchannelended,
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,

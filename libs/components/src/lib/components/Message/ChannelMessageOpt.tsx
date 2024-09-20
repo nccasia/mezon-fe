@@ -1,7 +1,7 @@
-import { Icons } from '@mezon/components';
 import { useAuth, useThreads } from '@mezon/core';
 import {
 	gifsStickerEmojiActions,
+	giveCoffeeActions,
 	messagesActions,
 	reactionActions,
 	referencesActions,
@@ -9,6 +9,7 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
@@ -29,7 +30,8 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 	const reactMenu = useReactMenuBuilder(message);
 	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
-	const items = useMenuBuilder([reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
+	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message);
+	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
 
 	return (
 		<div
@@ -53,6 +55,39 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 };
 
 export default memo(ChannelMessageOpt);
+
+function useGiveACoffeeMenuBuilder(message: IMessageWithUser) {
+	const dispatch = useAppDispatch();
+	const { userId } = useAuth();
+
+	const handleItemClick = useCallback(async () => {
+		try {
+			dispatch(
+				giveCoffeeActions.updateGiveCoffee({
+					channel_id: message.channel_id,
+					clan_id: message.clan_id,
+					message_ref_id: message.id,
+					receiver_id: message.sender_id,
+					sender_id: userId,
+					token_count: 1
+				})
+			);
+		} catch (error) {
+			console.error('Failed to give cofffee message', error);
+		}
+	}, []);
+
+	return useMenuBuilderPlugin((builder) => {
+		builder.when(userId !== message.sender_id, (builder) => {
+			builder.addMenuItem(
+				'giveacoffee',
+				'Give a coffee',
+				handleItemClick,
+				<Icons.DollarIcon className="dark:text-textSecondary text-colorTextLightMode w-5 h-5" />
+			);
+		});
+	});
+}
 
 // Menu items plugins
 // maybe should be moved to separate files

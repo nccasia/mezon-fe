@@ -21,13 +21,10 @@ import {
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme,
-	selectTotalClansNotify,
-	selectTotalUnreadDM
+	selectTheme
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -46,8 +43,6 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const totalClanNotify = useSelector(selectTotalClansNotify);
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -161,12 +156,6 @@ function MyApp() {
 	}, []);
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
-
-	useEffect(() => {
-		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
-		}
-	}, [totalClanNotify, totalUnreadDM]);
 
 	return (
 		<div

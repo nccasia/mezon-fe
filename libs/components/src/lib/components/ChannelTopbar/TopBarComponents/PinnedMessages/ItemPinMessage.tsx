@@ -1,8 +1,8 @@
-import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
-import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId, selectMessageByMessageId } from '@mezon/store';
+import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { PinMessageEntity, messagesActions, pinMessageActions, selectMessageByMessageId, useAppDispatch } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
 import { ModalDeletePinMess } from './DeletePinMessPopup';
@@ -19,18 +19,15 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || '');
 
-	const currentClanID = useSelector(selectCurrentClanId);
-	const dispatch = useDispatch();
-	const { jumpToMessage } = useJumpToMessage({
-		channelId: pinMessage?.channel_id || '',
-		messageID: pinMessage.message_id || '',
-		clanId: currentClanID || ''
-	});
+	const dispatch = useAppDispatch();
+
 	const handleJumpMess = () => {
 		dispatch(pinMessageActions.setJumpPinMessageId(pinMessage.message_id));
 		onClose();
-		dispatch(messagesActions.setIdMessageToJump(pinMessage.message_id));
-		jumpToMessage();
+
+		if (pinMessage.message_id && pinMessage.channel_id) {
+			dispatch(messagesActions.jumpToMessage({ messageId: pinMessage.message_id ?? '', channelId: pinMessage.channel_id ?? '' }));
+		}
 	};
 
 	const message = useSelector(selectMessageByMessageId(pinMessage.message_id as string));
