@@ -87,6 +87,7 @@ export type FetchMessageParam = {
 };
 
 export type MentionReplyArg = {
+	userId?: string;
 	channelId?: string;
 	count?: number;
 };
@@ -115,7 +116,7 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
-	numberMentionAndReplyUnread: Record<string, MentionReplyArg>[];
+	numberMentionAndReplyUnread: MentionReplyArg[];
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -692,7 +693,6 @@ export const messagesSlice = createSlice({
 				});
 			}
 			const channelEntity = state.channelMessages[channelId];
-			console.log('action.payload', action.payload);
 
 			switch (code) {
 				case 0: {
@@ -728,56 +728,52 @@ export const messagesSlice = createSlice({
 							}
 						}
 					}
-					if (!isMe) {
+					if (isMe === false) {
 						const newMessageRec = action.payload;
+						console.log('newMessageRec: ', newMessageRec);
 
-						const getUpdatedState = (message: ChannelMessage): Record<string, MentionReplyArg> => {
-							// Collect unique user ids from mentions and references
+						const getUpdatedState = (message: ChannelMessage): MentionReplyArg => {
 							const userIdsSet = new Set<string>();
 
-							// Safely add user_ids from mentions if it's an array
 							if (Array.isArray(message?.mentions)) {
 								message.mentions.forEach((mention: ApiMessageMention) => {
 									userIdsSet.add(mention?.user_id ?? '');
 								});
 							}
 
-							// Safely add message_sender_ids from references if it's an array
 							if (Array.isArray(message?.references)) {
 								message.references.forEach((reference: ApiMessageRef) => {
 									userIdsSet.add(reference.message_sender_id ?? '');
 								});
 							}
 
-							// Convert the Set to an array
 							const userIdsArray = Array.from(userIdsSet);
 
-							// Initialize a new state object
-							const updatedState: Record<string, MentionReplyArg> = {};
-
-							// Iterate over each unique userId in the array
-							userIdsArray.forEach((userId) => {
-								if (!userId) return; // Skip empty userId
-
-								updatedState[userId] = {
+							if (userIdsArray.length > 0) {
+								return {
+									userId: userIdsArray[0],
 									channelId: message.channel_id,
-									count: 1
+									count: userIdsArray.length
 								};
-							});
+							}
 
-							return updatedState;
+							return {};
 						};
 
 						const counted = getUpdatedState(newMessageRec);
+						console.log('counted: -1', counted);
 
-						console.log('counted :', counted);
+						if (counted.userId && counted.channelId && counted.count) {
+							console.log('counted: -2', counted);
 
-						if (state.numberMentionAndReplyUnread[newMessageRec?.user?.id]) {
-							// If the channelId exists, update the count
-							state.numberMentionAndReplyUnread[channelId].count = count;
-						} else {
-							// If the channelId does not exist, add a new entry
-							state.numberMentionAndReplyUnread[channelId] = { channelId, count };
+							const existingIndex = state.numberMentionAndReplyUnread.findIndex(
+								(item) => item.userId === counted.userId && item.channelId === counted.channelId
+							);
+							if (existingIndex !== -1) {
+								state.numberMentionAndReplyUnread[existingIndex].count! += counted.count!;
+							} else {
+								state.numberMentionAndReplyUnread.push(counted);
+							}
 						}
 					}
 					break;
@@ -1425,3 +1421,11 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 
 	return false;
 };
+
+export const selectNumberMentionAndReplyUnread = createSelector(getMessagesState, (state) => state.numberMentionAndReplyUnread);
+
+export const selectCountByUserIdAndChannelId = (channelId: string, userId: string) =>
+	createSelector(selectNumberMentionAndReplyUnread, (all) => {
+		const found = all.find((item) => item.channelId === channelId && item.userId === userId);
+		return found ? found.count : 0;
+	});

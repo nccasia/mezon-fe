@@ -19,6 +19,7 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
+	selectNumberMentionAndReplyUnread,
 	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
@@ -162,9 +163,16 @@ function MyApp() {
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
+	const allMentionAndReply = useSelector(selectNumberMentionAndReplyUnread);
+	console.log('allMentionAndReply: ', allMentionAndReply);
+	const totalCountMentionAndReply = allMentionAndReply.reduce((total, item) => {
+		return total + (item.count ?? 0);
+	}, 0);
+	console.log('totalCountMentionAndReply: ', totalCountMentionAndReply);
+
 	useEffect(() => {
 		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
+			electronBridge?.setBadgeCount(totalCountMentionAndReply + totalUnreadDM);
 		}
 	}, [totalClanNotify, totalUnreadDM]);
 

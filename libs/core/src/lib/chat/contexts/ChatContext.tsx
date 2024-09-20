@@ -136,6 +136,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			console.log('message: ', message);
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
