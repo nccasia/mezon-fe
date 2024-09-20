@@ -5,6 +5,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
+	channelsStreamActions,
 	clansSlice,
 	directActions,
 	directMetaActions,
@@ -40,6 +41,7 @@ import {
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -67,6 +69,10 @@ import {
 	StickerDeleteEvent,
 	StickerUpdateEvent,
 	StreamPresenceEvent,
+	StreamingEndedEvent,
+	StreamingJoinedEvent,
+	StreamingLeavedEvent,
+	StreamingStartedEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -130,6 +136,50 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
 			dispatch(voiceActions.remove(voice.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchanneljoined = useCallback(
+		(user: StreamingJoinedEvent) => {
+			if (user) {
+				dispatch(
+					usersStreamActions.add({
+						...user
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelleaved = useCallback(
+		(user: StreamingLeavedEvent) => {
+			dispatch(usersStreamActions.remove(user.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelstarted = useCallback(
+		(channel: StreamingStartedEvent) => {
+			if (channel) {
+				dispatch(
+					channelsStreamActions.add({
+						id: channel.channel_id,
+						channel_id: channel.channel_id,
+						clan_id: channel.clan_id,
+						is_streaming: channel.is_streaming,
+						streaming_url: channel.streaming_url !== '' ? `${channel.streaming_url}&user_id=${userId}` : channel.streaming_url
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelended = useCallback(
+		(channel: StreamingEndedEvent) => {
+			dispatch(usersStreamActions.remove(channel.channel_id));
 		},
 		[dispatch]
 	);
@@ -678,6 +728,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onvoiceleaved = onvoiceleaved;
 
+			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onstreamingchannelleaved = onstreamingchannelleaved;
+
+			socket.onstreamingchannelstarted = onstreamingchannelstarted;
+
+			socket.onstreamingchannelended = onstreamingchannelended;
+
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
@@ -757,6 +815,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
+			onstreamingchanneljoined,
+			onstreamingchannelleaved,
+			onstreamingchannelstarted,
+			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent
@@ -871,6 +933,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socketRef,
 		onvoicejoined,
 		onvoiceleaved,
+		onstreamingchanneljoined,
+		onstreamingchannelleaved,
+		onstreamingchannelstarted,
+		onstreamingchannelended,
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,

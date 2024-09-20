@@ -10,6 +10,7 @@ import { Outlet } from 'react-router-dom';
 const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -38,7 +39,9 @@ const ChannelLayout = () => {
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (
 				<>
-					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
+					<div
+						className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'} ${isChannelStream ? 'justify-center items-center mx-4' : ''}`}
+					>
 						<Outlet />
 					</div>
 					{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (

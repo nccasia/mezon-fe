@@ -1098,15 +1098,9 @@ export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
-export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
+export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '', isWhite = false }) => {
 	return (
 		<svg
-			onClick={handleClick}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -1125,15 +1119,9 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
+export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
 	return (
 		<svg
-			onClick={handleClick}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -1226,15 +1214,9 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
+export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
 	return (
 		<svg
-			onClick={handleClick}
 			x="0"
 			y="0"
 			aria-hidden="true"

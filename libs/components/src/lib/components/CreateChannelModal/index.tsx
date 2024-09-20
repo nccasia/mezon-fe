@@ -1,4 +1,4 @@
-import {useAppNavigation, useEscapeKey} from '@mezon/core';
+import { useAppNavigation, useEscapeKey } from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelType } from 'mezon-js';
@@ -55,7 +55,7 @@ export const CreateNewChannelModal = () => {
 			type: channelType,
 			channel_label: channelName,
 			channel_private: isPrivate,
-			category_id: currentCategory?.category_id,
+			category_id: currentCategory?.category_id
 		};
 
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
@@ -63,7 +63,7 @@ export const CreateNewChannelModal = () => {
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
 
-		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_VOICE) {
+		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
 			navigate(channelPath);
 		}
@@ -107,7 +107,7 @@ export const CreateNewChannelModal = () => {
 		const isValid = InputRef.current?.checkInput();
 		setIsInputError(isValid ?? false);
 	}, []);
-	
+
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	return (
@@ -143,9 +143,15 @@ export const CreateNewChannelModal = () => {
 										onChange={onChangeChannelType}
 										error={isErrorType}
 									/>
-									<ChannelTypeComponent
+									{/* <ChannelTypeComponent
 										disable={true}
 										type={ChannelType.CHANNEL_TYPE_FORUM}
+										onChange={onChangeChannelType}
+										error={isErrorType}
+									/> */}
+									<ChannelTypeComponent
+										disable={false}
+										type={ChannelType.CHANNEL_TYPE_STREAMING}
 										onChange={onChangeChannelType}
 										error={isErrorType}
 									/>
@@ -166,7 +172,7 @@ export const CreateNewChannelModal = () => {
 								error={isErrorName}
 								onHandleChangeValue={handleChangeValue}
 							/>
-							{channelType !== ChannelType.CHANNEL_TYPE_VOICE && (
+							{channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
 								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
 							)}
 						</div>

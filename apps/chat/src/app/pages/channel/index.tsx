@@ -9,6 +9,8 @@ import {
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectStatusMenu,
+	selectStreamChannelByChannelId,
+	selectStreamMembersByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
@@ -17,6 +19,7 @@ import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
+import ChannelStream from './ChannelStream';
 import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
@@ -80,6 +83,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(channelId));
+	const channelStream = useSelector(selectStreamChannelByChannelId(channelId));
 
 	useChannelSeen(currentChannel?.id || '');
 
@@ -97,7 +102,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
-	return (
+	return currentChannel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+		<ChannelStream key={channelId} hlsUrl={channelStream?.streaming_url} memberJoin={streamChannelMember}></ChannelStream>
+	) : (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			<div

@@ -34,7 +34,11 @@
       },
       "manageThreadMenu": {
           "editThread": "Chỉnh sửa chủ đề",
-          "deleteThread": "Xóa chủ đề"
+          "deleteThread": "Xóa chủ đề",
+          "leaveThread": "Rời chủ đề",
+          "closeThread": "Đóng chủ đề",
+          "lockThread": "Khóa chủ đề",
+          "copyLink": "Sao chép liên kết"
       }
   },
   "notify": {

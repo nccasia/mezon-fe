@@ -164,9 +164,9 @@ function MyApp() {
 
 	useEffect(() => {
 		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
+			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM + quantityPendingRequest);
 		}
-	}, [totalClanNotify, totalUnreadDM]);
+	}, [totalClanNotify, totalUnreadDM, quantityPendingRequest]);
 
 	return (
 		<div

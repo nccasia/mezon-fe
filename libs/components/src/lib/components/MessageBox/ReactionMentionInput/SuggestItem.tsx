@@ -91,11 +91,11 @@ const SuggestItem = ({
 
 				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-					specificChannel?.parrent_id !== '0' && <Icons.ThreadIcon defaultSize="w-5 h-5" />}
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIcon defaultSize="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />}
 
 				{specificChannel?.channel_private === 1 &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-					specificChannel?.parrent_id !== '0' && <Icons.ThreadIconLocker className="w-5 h-5 " />}
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIconLocker className="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />}
 
 				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}

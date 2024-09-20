@@ -31,7 +31,7 @@ import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -570,14 +570,22 @@ type UpdateTypingArgs = {
 	isTyping: boolean;
 };
 
+const typingTimeouts: { [key: string]: NodeJS.Timeout } = {};
+
 export const updateTypingUsers = createAsyncThunk(
 	'messages/updateTypingUsers',
 	async ({ channelId, userId, isTyping }: UpdateTypingArgs, thunkAPI) => {
 		// set user typing to true
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
-		// after 30 seconds recalculate typing users
-		await sleep(TYPING_TIMEOUT + 100);
-		thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
+
+		if (typingTimeouts[userId]) {
+			clearTimeout(typingTimeouts[userId]);
+		}
+
+		typingTimeouts[userId] = setTimeout(() => {
+			thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
+			delete typingTimeouts[userId];
+		}, TYPING_TIMEOUT + 100);
 	}
 );
 
@@ -643,8 +651,6 @@ export type MarkAsSentArgs = {
 	id: string;
 	mess: IMessageWithUser;
 };
-
-export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
@@ -748,11 +754,6 @@ export const messagesSlice = createSlice({
 					...state.unreadMessagesEntries,
 					[action.payload.channel_id]: action.payload.id
 				};
-			}
-			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
-
-			if (state?.typingUsers?.[typingUserKey]) {
-				delete state.typingUsers[typingUserKey];
 			}
 		},
 		setManyLastMessages: (state, action: PayloadAction<ApiChannelMessageHeaderWithChannel[]>) => {

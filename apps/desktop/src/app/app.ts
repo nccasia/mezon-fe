@@ -79,7 +79,7 @@ export default class App {
 			icon: join(__dirname, 'assets', 'linux-icon.png')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
-		App.mainWindow.setMenu(null);
+		App.mainWindow.setMenuBarVisibility(false);
 		App.mainWindow.center();
 
 		const gotTheLock = App.application.requestSingleInstanceLock();

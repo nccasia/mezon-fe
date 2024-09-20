@@ -76,7 +76,7 @@ export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>
 			}, 500);
 		});
 
-		containerRef.current.addEventListener('wheel', disconnectResizeObserver);
+		containerRef.current.addEventListener('wheel', disconnectResizeObserver, { passive: true, once: true });
 
 		const cleanUp = () => {
 			stableTimeoutId && clearTimeout(stableTimeoutId);

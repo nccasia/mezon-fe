@@ -21,8 +21,10 @@
         "./node_modules/windows-focus-assist/build/Release//*.node"
       ],
       "mac": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
         "icon": "apps/desktop/src/assets/mac-icon.png",
-        "appId": "mezon.ai",
+        "appId": "E9Y2J54ZH3.app.mezon.ai",
+        "category": "public.app-category.productivity",
         "target": [
           "default"
         ],
@@ -31,7 +33,16 @@
             "provider": "generic",
             "url": "https://cdn.mezon.vn/release/"
           }
-        ]
+        ],
+        "identity": "Tien Pham (E9Y2J54ZH3)",
+        "hardenedRuntime": true,
+        "entitlements": "./apps/desktop/src/assets/entitlements.mac.plist",
+        "entitlementsInherit": "./apps/desktop/src/assets/entitlements.mac.inherit.plist",
+        "gatekeeperAssess": true,
+        "notarize": {
+          "teamId": "E9Y2J54ZH3"
+        },
+        "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
       },
       "win": {
         "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -151,8 +162,10 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "mac": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "icon": "apps/desktop/src/assets/mac-icon.png",
-          "appId": "mezon.ai",
+          "appId": "E9Y2J54ZH3.app.mezon.ai",
+          "category": "public.app-category.productivity",
           "target": [
             "default"
           ],
@@ -161,7 +174,16 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ]
+          ],
+          "identity": "Tien Pham (E9Y2J54ZH3)",
+          "hardenedRuntime": true,
+          "entitlements": "./apps/desktop/src/assets/entitlements.mac.plist",
+          "entitlementsInherit": "./apps/desktop/src/assets/entitlements.mac.inherit.plist",
+          "gatekeeperAssess": true,
+          "notarize": {
+            "teamId": "E9Y2J54ZH3"
+          },
+          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",
@@ -221,8 +243,10 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "mac": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "icon": "apps/desktop/src/assets/mac-icon.png",
-          "appId": "mezon.ai",
+          "appId": "E9Y2J54ZH3.app.mezon.ai",
+          "category": "public.app-category.productivity",
           "target": [
             "default"
           ],
@@ -231,7 +255,16 @@
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
-          ]
+          ],
+          "identity": "Tien Pham (E9Y2J54ZH3)",
+          "hardenedRuntime": true,
+          "entitlements": "./apps/desktop/src/assets/entitlements.mac.plist",
+          "entitlementsInherit": "./apps/desktop/src/assets/entitlements.mac.inherit.plist",
+          "gatekeeperAssess": true,
+          "notarize": {
+            "teamId": "E9Y2J54ZH3"
+          },
+          "provisioningProfile": "./apps/desktop/src/assets/mezonai.provisionprofile"
         },
         "win": {
           "icon": "apps/desktop/src/assets/desktop-taskbar-256x256.ico",

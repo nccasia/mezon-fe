@@ -77,9 +77,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const isShowForwardAll = () => {
 		if (messagePosition === -1) return false;
 		return (
-			message.isStartedMessageGroup &&
-			messagePosition < convertedAllMessagesEntities.length - 1 &&
-			!convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup
+			message?.isStartedMessageGroup &&
+			messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
+			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
 		);
 	};
 
@@ -408,7 +408,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const isMessageError = message?.isError;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const isHideCreateThread = isDM || !isCanManageThread || currentChannel.parrent_id !== '0';
+		const isHideCreateThread = isDM || !isCanManageThread || currentChannel?.parrent_id !== '0';
+		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
@@ -416,7 +417,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			!isShowForwardAll() && EMessageActionType.ForwardAllMessages,
+			isHideThread && EMessageActionType.ForwardMessage,
+			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,

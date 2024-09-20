@@ -61,7 +61,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 				permissions={permissions}
 			/>
 			{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} />}
-			<UserListVoiceChannel channelID={channel.channel_id ?? ''} />
+			<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} />
 		</Fragment>
 	);
 });

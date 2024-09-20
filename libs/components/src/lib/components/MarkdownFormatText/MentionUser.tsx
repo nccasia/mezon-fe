@@ -1,11 +1,10 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
-import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_PANEL_PROFILE, getNameForPrioritize, handleShowShortProfile } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useMessageContextMenu } from '../ContextMenu';
 import ModalUserProfile from '../ModalUserProfile';
 
 type ChannelHashtagProps = {
@@ -28,7 +27,7 @@ type UserProfilePopupProps = {
 	userID: string;
 	channelId?: string;
 	mode?: number;
-
+	positionShortUser: { top: number; left: number } | null;
 	isDm?: boolean;
 };
 
@@ -65,17 +64,26 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 
-	const { setPosShortProfile } = useMessageContextMenu();
+	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 
-	const handleMouseClick = () => {
-		handleShowShortProfile(
-			mentionRef,
-			WIDTH_PANEL_PROFILE,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
-			setIsShowPanelChannel,
-			setPosShortProfile
-		);
-	};
+	const handleOpenShortUser = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+			if (window.innerHeight - e.clientY > heightPanel) {
+				setPositionShortUser({
+					top: e.clientY,
+					left: 366 + e.currentTarget.offsetWidth
+				});
+			} else {
+				setPositionShortUser({
+					top: window.innerHeight - heightPanel,
+					left: 366 + e.currentTarget.offsetWidth
+				});
+			}
+			setIsShowPanelChannel(!showProfileUser);
+		},
+		[tagRoleId]
+	);
 
 	const handleClickOutside = () => {
 		setIsShowPanelChannel(false);
@@ -85,7 +93,15 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 	return (
 		<>
-			{showProfileUser && <UserProfilePopup userID={tagUserId ?? ''} channelId={channelId ?? ''} mode={mode} isDm={isDM} />}
+			{showProfileUser && (
+				<UserProfilePopup
+					userID={tagUserId ?? ''}
+					channelId={channelId ?? ''}
+					mode={mode}
+					isDm={isDM}
+					positionShortUser={positionShortUser}
+				/>
+			)}
 
 			{displayToken?.type === MentionType.ROLE_EXIST && (
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`${displayToken.display}`}</span>
@@ -103,7 +119,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{displayToken?.type === MentionType.USER_EXIST && (
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick() : () => {}}
+					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					ref={mentionRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
@@ -120,11 +136,10 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, isDm }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
-	const { posShortProfile } = useMessageContextMenu();
 	const prioritizeName = getNameForPrioritize(
 		getUserByUserId.clan_nick ?? '',
 		getUserByUserId.user?.display_name ?? '',
@@ -137,17 +152,16 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm }: UserProfilePopupPro
 		prioritizeName,
 		prioritizeAvt
 	};
+	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	return (
 		<div
-			className="dark:bg-black bg-gray-200 mt-[20px]  w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
+			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
 			style={{
-				left: posShortProfile.left,
-				top: posShortProfile.top,
-				bottom: posShortProfile.bottom,
-				right: posShortProfile.right
+				top: `${positionShortUser?.top}px`,
+				left: `${positionShortUser?.left}px`
 			}}
-			onMouseDown={(e) => e.stopPropagation()}
+			ref={panelRef}
 		>
 			<ModalUserProfile
 				userID={userID}

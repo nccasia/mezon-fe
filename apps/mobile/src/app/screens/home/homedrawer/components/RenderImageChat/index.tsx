@@ -27,11 +27,12 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
 			<FastImage
+				fallback={true}
 				style={[
 					styles.imageMessageRender,
 					{
-						width: (!imageSize?.height && !isUploading) ? widthMedia : imageSize.width * 0.8,
-						height: (!imageSize?.height && !isUploading) ? heightMedia : imageSize.height * 0.8,
+						width: !imageSize?.height && !isUploading ? widthMedia : imageSize.width * 0.8,
+						height: !imageSize?.height && !isUploading ? heightMedia : imageSize.height * 0.8,
 						opacity: isUploading ? 0.5 : 1
 					}
 				]}
@@ -42,8 +43,11 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 						</Block>
 					) : null
 				}
-				source={{ uri: image?.url }}
-				resizeMode={(!imageSize?.height && !isUploading) ? 'cover' : 'contain'}
+				source={{
+					uri: image?.url,
+					priority: FastImage.priority.high
+				}}
+				resizeMode={!imageSize?.height && !isUploading ? 'cover' : 'contain'}
 			/>
 		</TouchableOpacity>
 	);

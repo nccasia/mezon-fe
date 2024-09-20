@@ -196,6 +196,27 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 
 	const manageThreadMenu: IMezonMenuItemProps[] = [
 		{
+			title: t('menu.manageThreadMenu.leaveThread'),
+			icon: <Icons.LeaveGroup color={Colors.textRed} />,
+			onPress: () => reserve(),
+			textStyle: {
+				color: Colors.textRed
+			},
+			isShow: isCanManageThread
+		},
+		{
+			title: t('menu.manageThreadMenu.closeThread'),
+			icon: <Icons.CloseSmallBoldIcon color={themeValue.textStrong} />,
+			onPress: () => reserve(),
+			isShow: isCanManageThread
+		},
+		{
+			title: t('menu.manageThreadMenu.lockThread'),
+			icon: <Icons.LockIcon color={themeValue.textStrong} />,
+			onPress: () => reserve(),
+			isShow: isCanManageThread
+		},
+		{
 			title: t('menu.manageThreadMenu.editThread'),
 			icon: <Icons.PencilIcon color={themeValue.textStrong} />,
 			onPress: () => {
@@ -211,14 +232,9 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 			isShow: isCanManageThread
 		},
 		{
-			title: t('menu.manageThreadMenu.deleteThread'),
-			icon: <Icons.CloseSmallBoldIcon color={Colors.textRed} />,
-			onPress: () => {
-				setIsShowModalConfirm(true);
-			},
-			textStyle: {
-				color: Colors.textRed
-			},
+			title: t('menu.manageThreadMenu.copyLink'),
+			icon: <Icons.LinkIcon color={themeValue.textStrong} />,
+			onPress: () => reserve(),
 			isShow: isCanManageThread
 		}
 	];
