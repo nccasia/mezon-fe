@@ -1,13 +1,14 @@
 {
     "name": "@mezon/desktop",
-    "version": "1.1.80",
+    "version": "1.1.81",
     "dependencies": {
         "electron-log": "^5.2.0",
         "electron-store": "8.2.0",
         "electron-updater": "^6.3.4",
         "node-machine-id": "^1.1.12",
         "push-receiver-v2": "^2.2.0",
-        "tslib": "^2.7.0"
+        "tslib": "^2.7.0",
+        "sharp": "^0.33.5"
     },
     "devDependencies": {}
 }
