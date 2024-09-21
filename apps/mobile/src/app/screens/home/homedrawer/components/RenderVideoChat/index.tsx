@@ -42,7 +42,17 @@ export const RenderVideoChat = React.memo(
 					}}
 				/>
 				{isUploading && (
-					<Block position="absolute" top={0} left={0} right={0} bottom={15} width={'100%'} alignItems="center" justifyContent="center">
+					<Block
+						position="absolute"
+						top={0}
+						left={0}
+						right={0}
+						bottom={15}
+						width={videoDimensions.width}
+						height={videoDimensions.height}
+						alignItems="center"
+						justifyContent="center"
+					>
 						<ActivityIndicator />
 					</Block>
 				)}
