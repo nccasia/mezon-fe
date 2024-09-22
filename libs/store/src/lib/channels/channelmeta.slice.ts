@@ -41,6 +41,7 @@ export const channelMetaSlice = createSlice({
 		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
 			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
+				console.log('channel - 2:', channel);
 				channel.lastSeenTimestamp = action.payload.timestamp;
 			}
 		},
@@ -118,7 +119,12 @@ export const selectLastSeenPinMessageChannelById = (channelId: string) =>
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
 		const channel = state?.entities[channelId];
+		console.log('channel :', channel);
+		console.log('channel?.lastSeenTimestamp :', channel?.lastSeenTimestamp);
+		console.log('channel?.lastSentTimestamp :', channel?.lastSentTimestamp);
+
 		// unread last seen timestamp is less than last sent timestamp
+
 		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 	});
 

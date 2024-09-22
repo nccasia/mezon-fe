@@ -11,6 +11,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	channelMetaActions,
 	channelUsersActions,
 	emojiSuggestionActions,
 	messagesActions,
@@ -259,6 +260,20 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
+				const timestamp = Date.now() / 1000;
+
+				dispatch(
+					channelMetaActions.setChannelLastSeenTimestamp({
+						channelId: currentChannel?.channel_id ?? '',
+						timestamp: 0
+					})
+				);
+				dispatch(
+					channelMetaActions.setChannelLastSentTimestamp({
+						channelId: currentChannel?.channel_id ?? '',
+						timestamp: 1
+					})
+				);
 			}
 		},
 		[dispatch]

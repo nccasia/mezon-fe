@@ -25,6 +25,7 @@ export type ThreadLinkRef = {
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
 	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
+	console.log('isUnReadChannel :', isUnReadChannel);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 

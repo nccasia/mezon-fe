@@ -14,6 +14,7 @@ export type ListThreadChannelRef = {
 };
 
 const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChannelProps>(({ threads }: ThreadListChannelProps, ref) => {
+	console.log('threads :', threads);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 
