@@ -1,4 +1,4 @@
-import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useFriends, useMemberCustomStatus } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
@@ -33,11 +33,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const userCustomStatus = useMemberCustomStatus(user?.userProfile?.user?.id || '');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
-	const { dismiss } = useBottomSheetModal();
-	const getTokenSocket = useSelector(selectUpdateToken(user?.userId?? ''));
-  const tokenInWallet = useMemo(() => {
-		const parse = JSON.parse(user?.userProfile?.wallet ?? '').value;
-		return parse;
+	const getTokenSocket = useSelector(selectUpdateToken(user?.userId ?? ''));
+	const tokenInWallet = useMemo(() => {
+		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet)?.value : 0;
 	}, [user?.userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
@@ -116,10 +114,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
-					<Block flexDirection='row' alignItems='center' gap={size.s_10} marginTop={size.s_10}>
-              <CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
-              <Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
-          </Block>
+					<Block flexDirection="row" alignItems="center" gap={size.s_10} marginTop={size.s_10}>
+						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
+						<Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
+					</Block>
 					{userCustomStatus ? (
 						<Block flexDirection="row" alignItems="center" justifyContent="space-between">
 							<TouchableOpacity

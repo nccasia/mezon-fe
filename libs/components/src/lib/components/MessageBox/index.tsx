@@ -1,6 +1,6 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectPermissionByChannelId, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -31,7 +31,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const appearanceTheme = useSelector(selectTheme);
-	const listPermissionRoleChannel = useSelector(selectPermissionByChannelId(currentChannelId || ''));
+	//const listPermissionRoleChannel = useSelector(selectPermissionByChannelId(currentChannelId || ''));
 
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 

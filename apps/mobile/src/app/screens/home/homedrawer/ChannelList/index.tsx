@@ -13,13 +13,13 @@ import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../../temp-ui';
-import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
+import { ChannelListContext } from '../Reusables';
 import { style } from './styles';
 
 export type ChannelsPositionRef = {
@@ -50,7 +50,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
-	const dispatch = useDispatch()
+	const dispatch = useDispatch();
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -73,32 +73,28 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		setCurrentPressedChannel(channel);
 	}, []);
 
-	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
-		const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
-		const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
-		const position = (positionChannel || 0) + (categoryOffset?.y || 100);
-		if (position) {
-			flashListRef?.current?.scrollTo({
-				x: 0,
-				y: position,
-				animated: true
-			});
-		}
-	};
-
 	useEffect(() => {
 		let timer: NodeJS.Timeout;
 		const activeChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (props) => {
 			const { channelId = '', categoryId = '', timeout = 2000 } = props || {};
 			timer = setTimeout(() => {
-				scrollToItemById({ channelId, categoryId });
+				const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
+				const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
+				const position = (positionChannel || 0) + (categoryOffset?.y || 100);
+				if (position) {
+					flashListRef?.current?.scrollTo({
+						x: 0,
+						y: position,
+						animated: true
+					});
+				}
 			}, timeout);
 		});
 		return () => {
 			activeChannel.remove();
 			timer && clearTimeout(timer);
 		};
-	}, [currentClanId, categorizedChannels?.length, channelsPositionRef.current, categoryOffsetsRef.current]);
+	}, [currentChannel, currentClanId, categorizedChannels.length]);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {

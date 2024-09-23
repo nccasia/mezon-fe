@@ -258,26 +258,24 @@ export const setupNotificationListeners = async (navigation) => {
 		vibrationPattern: [300, 500]
 	});
 
-	if (IS_ANDROID) {
-		messaging()
-			.getInitialNotification()
-			.then(async (remoteMessage) => {
-				console.log('Notification caused app to open from quit state:');
-				if (remoteMessage) {
-					const store = await getStoreAsync();
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-					store.dispatch(appActions.setLoadingMainMobile(true));
-					store.dispatch(appActions.setIsFromFCMMobile(true));
-					if (remoteMessage?.notification?.title) {
-						processNotification({
-							notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
-							navigation,
-							time: 600
-						});
-					}
+	messaging()
+		.getInitialNotification()
+		.then(async (remoteMessage) => {
+			console.log('Notification caused app to open from quit state:');
+			if (remoteMessage) {
+				const store = await getStoreAsync();
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				store.dispatch(appActions.setLoadingMainMobile(true));
+				store.dispatch(appActions.setIsFromFCMMobile(true));
+				if (remoteMessage?.notification?.title) {
+					processNotification({
+						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
+						navigation,
+						time: 600
+					});
 				}
-			});
-	}
+			}
+		});
 
 	messaging().onNotificationOpenedApp(async (remoteMessage) => {
 		processNotification({

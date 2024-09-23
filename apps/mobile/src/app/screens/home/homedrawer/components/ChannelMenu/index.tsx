@@ -167,8 +167,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
-						channelId: channel?.channel_id,
-						isChannel: isChannel
+						channelId: channel?.channel_id
 					}
 				});
 			},
@@ -224,8 +223,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
-						channelId: channel?.channel_id,
-						isChannel: isChannel
+						channelId: channel?.channel_id
 					}
 				});
 			},
@@ -236,7 +234,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 			icon: <Icons.LinkIcon color={themeValue.textStrong} />,
 			onPress: () => reserve(),
 			isShow: isCanManageThread
-		},
+		}
 	];
 
 	const mainChannelMenu: IMezonMenuSectionProps[] = [
