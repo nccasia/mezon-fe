@@ -1,38 +1,65 @@
-import { InputField } from '@mezon/ui';
-import { ValidateSpecialCharacters } from '@mezon/utils';
+import { useAppDispatch } from '@mezon/store';
+import { checkDuplicateCategory } from '@mezon/store-mobile';
+import { Icons, InputField } from '@mezon/ui';
+import { DEBOUNCE_TYPING_TIME, ValidateSpecialCharacters } from '@mezon/utils';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Modal } from 'flowbite-react';
 import { useState } from 'react';
-import { Icons } from '@mezon/ui';
+import { useDebouncedCallback } from 'use-debounce';
 
 type ModalCreateCategoryProps = {
+	clanId: string;
 	openCreateCate: boolean;
 	onClose: () => void;
 	onCreateCategory: (nameCate: string) => void;
 };
 
-const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
+enum EValidateListMessageCategory {
+	INVALID_NAME = 'Please enter a valid clan name (max 64 characters, only words, numbers, _ or -)',
+	DUPLICATE_NAME = 'The category name already exists. Please enter another name.',
+	VALIDATED = 'VALIDATED'
+}
+
+const ModalCreateCategory = ({ clanId, openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
 	const [nameCate, setNameCate] = useState('');
-	const [checkValidate, setCheckValidate] = useState(true);
+	const [checkValidate, setCheckValidate] = useState<EValidateListMessageCategory | null>(EValidateListMessageCategory.INVALID_NAME);
+	const dispatch = useAppDispatch()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameCate(value);
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value) && value !== '') {
-			setCheckValidate(false);
+		setCheckValidate(null);
+		if (value) {
+		  debouncedSetCategoryName(value)
 		} else {
-			setCheckValidate(true);
+		  debouncedSetCategoryName.cancel();
+		  setCheckValidate(EValidateListMessageCategory.INVALID_NAME);
 		}
-	};
+	  };
 
 	const handleCreateCate = () => {
 		onCreateCategory(nameCate);
 		setNameCate('');
 	};
   
-  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.checked ? 1 : 0;
-  };
+	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.checked ? 1 : 0;
+	};
+
+	const debouncedSetCategoryName = useDebouncedCallback(async (value: string) => {
+		const regex = ValidateSpecialCharacters();
+		if (regex.test(value)) {
+		  await dispatch(checkDuplicateCategory({clanId: clanId, categoryName: value.trim()})).then(unwrapResult).then(result => {
+			if (result) {
+			  setCheckValidate(EValidateListMessageCategory.DUPLICATE_NAME)
+			  return;
+			}
+			setCheckValidate(EValidateListMessageCategory.VALIDATED)
+		  });
+		  return;
+		}
+		setCheckValidate(EValidateListMessageCategory.INVALID_NAME);
+	  }, DEBOUNCE_TYPING_TIME);
 
 	return (
 		<Modal
@@ -59,11 +86,15 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						value={nameCate}
 					/>
 				</div>
-				{checkValidate && (
+				{checkValidate === EValidateListMessageCategory.INVALID_NAME ? (
 					<p className="text-[#e44141] text-xs italic font-thin">
-						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+						{EValidateListMessageCategory.INVALID_NAME}
 					</p>
-				)}
+				) : checkValidate === EValidateListMessageCategory.DUPLICATE_NAME ? (
+					<p className="text-[#e44141] text-xs italic font-thin">
+						{EValidateListMessageCategory.DUPLICATE_NAME}
+					</p>
+				) : "" }
         <div className="flex flex-row justify-between my-2 items-center">
           <div className='flex flex-row items-center'>
             <Icons.LockIcon/>
@@ -85,15 +116,15 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
           </div>
         </div>
         <p className='dark:text-textSecondary text-textSecondary800 text-sm'>By making a category private, only select members and roles will be able to view this category. Synced channels in this  category will automatically match to this setting</p>
-			</Modal.Body>
+		</Modal.Body>
 			<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
 				<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">Cancel</button>
 				<button
-					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
+					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate !== EValidateListMessageCategory.VALIDATED ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={handleCreateCate}
-					disabled={checkValidate}
+					disabled={checkValidate !== EValidateListMessageCategory.VALIDATED}
 				>
-					Create Category
+					Create
 				</button>
 			</div>
 		</Modal>

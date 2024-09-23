@@ -211,7 +211,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				/>
 			)}
 
-			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />
+			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} clanId={ currentClanId || ""}/>
 		</>
 	);
 }

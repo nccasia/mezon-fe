@@ -1,12 +1,16 @@
+import { checkDuplicateChannelName, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ValidateSpecialCharacters } from '@mezon/utils';
+import { DEBOUNCE_TYPING_TIME, ValidateSpecialCharacters } from '@mezon/utils';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { ChannelLableModal } from '../ChannelLabel';
 
 interface ChannelNameModalProps {
 	type: ChannelType;
 	channelNameProps: string;
+	categoryId:string;
 	onChange: (value: string) => void;
 	onCheckValidate: (check: boolean) => void;
 	onHandleChangeValue: () => void;
@@ -17,26 +21,48 @@ export type ChannelNameModalRef = {
 	checkInput: () => boolean;
 };
 
+enum EValidateListMessageChannelLabel {
+	INVALID_NAME = 'Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)',
+	DUPLICATE_NAME = 'The channel name already exists. Please enter another name.',
+	VALIDATED = 'VALIDATED'
+}
+
+
 export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
 	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, error } = props;
-	const [checkvalidate, setCheckValidate] = useState(true);
+	const [checkvalidate, setCheckValidate] = useState<EValidateListMessageChannelLabel | null>(EValidateListMessageChannelLabel.INVALID_NAME);
 	const [checkNameChannel, setCheckNameChannel] = useState(true);
+	const dispath = useAppDispatch()
+
+	const debouncedSetCategoryName = useDebouncedCallback(async (value: string) => {
+		const regex = ValidateSpecialCharacters();
+		if (regex.test(value)) {
+		  await dispath(checkDuplicateChannelName({categoryId: props.categoryId, channelLabel: value.trim()})).then(unwrapResult).then(result => {
+			if (result) {
+			  setCheckValidate(EValidateListMessageChannelLabel.DUPLICATE_NAME)
+			  onCheckValidate(false);
+			  return;
+			}
+			setCheckValidate(EValidateListMessageChannelLabel.VALIDATED)
+			onCheckValidate(true);
+		  });
+		  return;
+		}
+		setCheckValidate(EValidateListMessageChannelLabel.INVALID_NAME);
+		onCheckValidate(false)
+	  }, DEBOUNCE_TYPING_TIME);
+
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		onChange(value);
 		if (value === '') {
 			setCheckNameChannel(true);
+
 		} else {
 			setCheckNameChannel(false);
 		}
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value)) {
-			setCheckValidate(false);
-			onCheckValidate(true);
-		} else {
-			setCheckValidate(true);
-			onCheckValidate(false);
-		}
+		debouncedSetCategoryName(value)
 	};
 
 	const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
@@ -51,9 +77,9 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 	};
 
 	useImperativeHandle(ref, () => ({
-		checkInput: () => checkvalidate || checkNameChannel
+		checkInput: () => checkvalidate !== EValidateListMessageChannelLabel.VALIDATED
 	}));
-
+	
 	useEffect(() => {
 		onHandleChangeValue();
 	}, [checkvalidate, checkNameChannel, onHandleChangeValue]);
@@ -76,9 +102,9 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 					</div>
 				</div>
 			</div>
-			{checkvalidate || checkNameChannel ? (
+			{checkvalidate !== EValidateListMessageChannelLabel.VALIDATED ? (
 				<p className="text-[#e44141] text-xs italic font-thin">
-					Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+					{checkvalidate}
 				</p>
 			) : null}
 		</div>

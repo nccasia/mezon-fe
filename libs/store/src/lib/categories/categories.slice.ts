@@ -1,8 +1,9 @@
-import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
+import { ICategory, LoadingStatus, SortChannel, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
 /*
@@ -112,6 +113,28 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 		return thunkAPI.rejectWithValue([]);
 	}
 });
+
+type CheckDuplicateCategoryPayload = {
+	categoryName: string;
+	clanId: string;
+}
+
+export const checkDuplicateCategory = createAsyncThunk('channels/duplicateNameThread', async (payload: CheckDuplicateCategoryPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI))
+		const isDuplicate =  await mezon.socketRef.current?.checkDuplicateName(payload.categoryName, payload.clanId, TypeCheck.TYPECATEGORY) 
+	
+		if (isDuplicate?.type === TypeCheck.TYPECATEGORY) {
+			return isDuplicate.exist
+		}
+
+		return;
+	} catch (error: any) {
+		 Sentry.captureException(error);
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message)
+	}
+})
 
 export const initialCategoriesState: CategoriesState = categoriesAdapter.getInitialState({
 	loadingStatus: 'not loaded',

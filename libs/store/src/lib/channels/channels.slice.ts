@@ -1,4 +1,4 @@
-import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
+import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput, TypeCheck } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
@@ -204,6 +204,28 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		return thunkAPI.rejectWithValue([]);
 	}
 });
+
+type CheckDuplicateChannelPayload = {
+	channelLabel: string;
+	categoryId: string;
+}
+
+export const checkDuplicateChannelName = createAsyncThunk('channels/duplicateNameChannel', async (payload : CheckDuplicateChannelPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI))
+		const isDuplicate =  await mezon.socketRef.current?.checkDuplicateName(payload.channelLabel, payload.categoryId, TypeCheck.TYPECHANNEL) 
+	
+		if (isDuplicate?.type === TypeCheck.TYPECHANNEL) {
+			return isDuplicate.exist
+		}
+
+		return;
+	} catch (error: any) {
+		Sentry.captureException(error);
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message)
+	}
+})
 
 type fetchChannelsArgs = {
 	clanId: string;
