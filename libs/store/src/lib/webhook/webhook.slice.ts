@@ -2,6 +2,7 @@ import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { ApiWebhook, ApiWebhookCreateRequest, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
+import { toast } from 'react-toastify';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const INTEGRATION_WEBHOOK = 'integrationWebhook';
@@ -62,7 +63,7 @@ export const generateWebhook = createAsyncThunk(
 			const response = await mezon.client.generateWebhookLink(mezon.session, data.request);
 			if (response) {
 				thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
-				alert(`Generated ${response.hook_name} successfully !`);
+				toast.success(`Generated ${response.hook_name} successfully !`);
 			} else {
 				thunkAPI.rejectWithValue({});
 			}

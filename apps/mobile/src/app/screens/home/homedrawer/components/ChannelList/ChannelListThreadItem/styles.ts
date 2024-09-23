@@ -59,7 +59,8 @@ export const style = (colors: Attributes) =>
 			right: size.s_18,
 			justifyContent: 'center',
 			alignItems: 'center',
-			borderRadius: size.s_18
+			borderRadius: size.s_18,
+			top: Platform.OS === 'android' ? size.s_18 : size.s_14
 		},
 
 		channelDot: {

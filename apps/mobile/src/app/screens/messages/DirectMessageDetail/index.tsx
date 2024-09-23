@@ -110,7 +110,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					directMessageId: directMessageId,
 					type: dmType,
 					noCache: true,
-					isFetchingLatestMessages: true
+					isFetchingLatestMessages: true,
+					isClearMessage: true
 				})
 			)
 		]);
@@ -161,7 +162,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }));
+				store.dispatch(
+					messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true, isClearMessage: true })
+				);
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {

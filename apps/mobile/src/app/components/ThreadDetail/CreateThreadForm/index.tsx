@@ -14,6 +14,7 @@ import {
 	channelsActions,
 	createNewChannel,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -130,7 +131,10 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
 						await sendMessageThread(content, mentions, attachments, references, thread);
+						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
 					}
+				} else {
+					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);
 				}
 			} else {
 				console.error('Session is not available');

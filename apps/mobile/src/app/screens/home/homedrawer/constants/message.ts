@@ -5,6 +5,11 @@ import { IMessageAction } from '../types';
 export const getMessageActions = (t: TFunction): IMessageAction[] => {
 	return [
 		{
+			id: 17,
+			title: t('message:actions.resend'),
+			type: EMessageActionType.ResendMessage
+		},
+		{
 			id: 1,
 			title: t('message:actions.forward'),
 			type: EMessageActionType.ForwardMessage

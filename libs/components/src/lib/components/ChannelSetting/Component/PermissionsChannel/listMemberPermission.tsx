@@ -1,6 +1,6 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useCheckOwnerForUser } from '@mezon/core';
-import { channelUsersActions, selectAllAccount, selectAllChannelMembers, useAppDispatch, useAppSelector } from '@mezon/store';
+import { channelUsersActions, selectAllAccount, selectAllUserChannel, useAppDispatch } from '@mezon/store';
 import { IChannel, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useLayoutEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,8 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const { channel } = props;
 	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
-	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channel.id));
+
+	const rawMembers = useSelector(selectAllUserChannel);
 	const [memberList, setMemberList] = useState<any[]>();
 
 	const deleteMember = async (userId: string) => {

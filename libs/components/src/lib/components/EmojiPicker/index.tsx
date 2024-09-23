@@ -206,9 +206,11 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
 				max-sm:w-full max-sbm:w-11 dark:bg-bgTertiary bg-bgLightModeSecond pt-1
 				px-1 md:items-start h-[25rem] pb-1 rounded max-sbm:flex-col
-				${!props.isReaction && 'md:ml-2 mb-2'}`}
+				${!props.isReaction && 'md:ml-2 mb-2'}
+        overflow-y-scroll
+        hide-scrollbar`}
 			>
-				<div className="w-9 h-9 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
+				<div className="w-9 h-9 py-2 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
 				<hr className=" bg-gray-200 border w-full max-sm:h-full max-sm:w-[1px] max-sm:hidden" />
@@ -216,7 +218,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					return (
 						<button
 							key={index}
-							className={`w-9 h-9 max-sm:px-1 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
+							className={`w-9 h-9 py-2 max-sm:px-1 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
 							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}

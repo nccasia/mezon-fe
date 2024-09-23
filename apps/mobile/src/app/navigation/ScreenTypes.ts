@@ -143,6 +143,7 @@ type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
 		openSearchChannelFrom: EOpenSearchChannelFrom;
+		currentChannel: IChannel | DirectEntity;
 	};
 	[APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION]: {
 		channelId: string;

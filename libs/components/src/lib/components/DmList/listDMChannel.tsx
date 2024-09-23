@@ -1,5 +1,7 @@
+import { selectTheme } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { FixedSizeList as List } from 'react-window';
 import DMListItem from './DMListItem';
 
@@ -11,6 +13,7 @@ const heightAroundComponent = 230;
 
 const ListDMChannel = (props: ListDMChannelProps) => {
 	const { listDM } = props;
+	const appearanceTheme = useSelector(selectTheme);
 
 	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent);
 
@@ -29,7 +32,13 @@ const ListDMChannel = (props: ListDMChannelProps) => {
 	};
 
 	return (
-		<List height={height} itemCount={listDM.length} itemSize={56} width={'100%'} className="thread-scroll">
+		<List
+			height={height}
+			itemCount={listDM.length}
+			itemSize={56}
+			width={'100%'}
+			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+		>
 			{Row}
 		</List>
 	);

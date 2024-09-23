@@ -68,11 +68,14 @@ export { default as SearchMessageChannelRender } from './components/SearchMessag
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';
 export * from './components/SettingProfile';
+export { getColorAverageFromURL } from './components/SettingProfile/AverageColor';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
+export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
 export * from './components/ThumbnailAttachmentRender';

@@ -10,12 +10,14 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -101,12 +103,6 @@ const NavigationMain = () => {
 		}
 	}, [isLoggedIn, hasInternet]);
 
-	useEffect(() => {
-		if (currentClanId) {
-			switchClanLoader();
-		}
-	}, [currentClanId]);
-
 	const refreshMessageInitApp = useCallback(async () => {
 		const store = await getStoreAsync();
 		if (currentChannelId) {
@@ -164,6 +160,13 @@ const NavigationMain = () => {
 						channelId: '',
 						channelType: ChannelType.CHANNEL_TYPE_VOICE
 					})
+				),
+				store.dispatch(
+					usersStreamActions.fetchStreamChannelMembers({
+						clanId: currentClanId ?? '',
+						channelId: '',
+						channelType: ChannelType.CHANNEL_TYPE_STREAMING
+					})
 				)
 			];
 			await Promise.all(promise);
@@ -176,10 +179,6 @@ const NavigationMain = () => {
 		}
 	}, [currentChannelId]);
 
-	const switchClanLoader = async () => {
-		const store = await getStoreAsync();
-		await Promise.all([store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }))]);
-	};
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		try {
@@ -216,9 +215,11 @@ const NavigationMain = () => {
 					}
 				}
 
+				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser()));
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
+				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji()));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {

@@ -16,7 +16,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_22
 		},
 		inputStyle: {
-			maxHeight: size.s_40 * 2.5,
+			maxHeight: size.s_40 * 3,
 			lineHeight: size.s_20,
 			width: '100%',
 			borderBottomWidth: 0,
@@ -25,6 +25,7 @@ export const style = (colors: Attributes) =>
 			paddingRight: size.s_40,
 			fontSize: size.medium,
 			paddingTop: size.s_8,
+			paddingBottom: size.s_12,
 			backgroundColor: colors.tertiary,
 			color: colors.textStrong,
 			textAlignVertical: 'center'

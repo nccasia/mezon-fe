@@ -42,10 +42,6 @@ const ChannelMessages = React.memo(
 		const timeOutRef = useRef(null);
 
 		useEffect(() => {
-			if (flatListRef.current) {
-				flatListRef.current.scrollToEnd({ animated: true });
-			}
-
 			return () => {
 				if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 			};
@@ -127,7 +123,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction]
+			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, messages]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {

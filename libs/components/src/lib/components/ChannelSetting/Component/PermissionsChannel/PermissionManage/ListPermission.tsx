@@ -1,4 +1,4 @@
-import { selectAllPermissionRoleChannel, selectPermissionChannel } from '@mezon/store';
+import { PermissionUserEntity, selectAllPermissionRoleChannel } from '@mezon/store';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ItemPermission from './ItemPermission';
@@ -9,11 +9,11 @@ export type ListPermissionHandle = {
 
 type ItemListPermissionProps = {
 	onSelect: (id: string, option: number, active?: boolean) => void;
+	listPermission: PermissionUserEntity[];
 };
 
 const ListPermission = forwardRef<ListPermissionHandle, ItemListPermissionProps>((props, ref) => {
-	const { onSelect } = props;
-	const listPermission = useSelector(selectPermissionChannel);
+	const { onSelect, listPermission } = props;
 	const listPermissionRoleChannel = useSelector(selectAllPermissionRoleChannel);
 	const itemRefs = useRef<{ [key: string]: { reset: () => void } }>({});
 

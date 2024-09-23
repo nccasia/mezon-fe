@@ -13,6 +13,7 @@ const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
 	[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Forum defaultSize="w-6 h-6" />,
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
@@ -25,6 +26,7 @@ const labelMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
 	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
+	[ChannelType.CHANNEL_TYPE_STREAMING]: 'Stream',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: ''
@@ -36,6 +38,7 @@ const descriptionMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the clan',
 	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
+	[ChannelType.CHANNEL_TYPE_STREAMING]: 'Sharing hobbies activity',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
 	[ChannelType.CHANNEL_TYPE_GROUP]: ''

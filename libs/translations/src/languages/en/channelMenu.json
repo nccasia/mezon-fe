@@ -34,7 +34,11 @@
         },
         "manageThreadMenu": {
             "editThread": "Edit Thread",
-            "deleteThread": "Delete Thread"
+            "deleteThread": "Delete Thread",
+            "leaveThread": "Leave Thread",
+            "closeThread": "Close Thread",
+            "lockThread": "Lock Thread",
+            "copyLink": "Copy Link"
         }
     },
     "notify": {

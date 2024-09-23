@@ -20,7 +20,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { message, openEmojiPicker, mode, preventAction = false, userProfile } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-	const { reactionMessageDispatch } = useChatReaction();
+	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));

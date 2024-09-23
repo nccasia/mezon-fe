@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMenu } from '@mezon/core';
-import { ChannelMembersEntity, directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
+import { ChannelMembersEntity, channelsActions, directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -27,6 +27,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 	const closeMenu = useSelector(selectCloseMenu);
 
 	const joinToChatAndNavigate = async (DMid: string, type: number) => {
+		dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
 		const result = await dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: DMid,
@@ -47,7 +48,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
 		if (directId === currentDmGroupId) {
-			navigate(`/chat/direct`);
+			navigate(`/chat/direct/friends`);
 		}
 	};
 

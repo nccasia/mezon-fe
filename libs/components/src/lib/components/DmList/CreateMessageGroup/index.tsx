@@ -39,9 +39,14 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 		setSelectedFriends((prevSelectedFriends) => {
 			if (prevSelectedFriends.includes(idFriend)) {
 				return prevSelectedFriends.filter((friend) => friend !== idFriend);
-			} else {
-				return [...prevSelectedFriends, idFriend];
 			}
+			if (
+				numberMemberInDmGroup === GROUP_CHAT_MAXIMUM_MEMBERS ||
+				selectedFriends.length === GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDmGroup
+			) {
+				return prevSelectedFriends;
+			}
+			return [...prevSelectedFriends, idFriend];
 		});
 	};
 
@@ -242,10 +247,6 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 											value={friend.id}
 											checked={selectedFriends.includes(friend?.id || '')}
 											onChange={handleCheckboxChange}
-											disabled={
-												numberMemberInDmGroup === GROUP_CHAT_MAXIMUM_MEMBERS ||
-												selectedFriends.length === GROUP_CHAT_MAXIMUM_MEMBERS
-											}
 											className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
 										/>
 										<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />

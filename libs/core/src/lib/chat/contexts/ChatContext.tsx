@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+	appActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
+	channelsStreamActions,
 	clansSlice,
 	directActions,
 	directMetaActions,
@@ -23,7 +25,9 @@ import {
 	messagesActions,
 	notificationActions,
 	pinMessageActions,
+	policiesActions,
 	reactionActions,
+	rolesClanActions,
 	selectChannelById,
 	selectChannelsByClanId,
 	selectCurrentChannel,
@@ -38,11 +42,11 @@ import {
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
-import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -65,6 +69,10 @@ import {
 	StickerDeleteEvent,
 	StickerUpdateEvent,
 	StreamPresenceEvent,
+	StreamingEndedEvent,
+	StreamingJoinedEvent,
+	StreamingLeavedEvent,
+	StreamingStartedEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -91,7 +99,7 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const { socketRef, reconnect } = useMezon();
+	const { socketRef, reconnectWithTimeout } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { directId, channelId, clanId } = useAppParams();
@@ -132,6 +140,50 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const onstreamingchanneljoined = useCallback(
+		(user: StreamingJoinedEvent) => {
+			if (user) {
+				dispatch(
+					usersStreamActions.add({
+						...user
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelleaved = useCallback(
+		(user: StreamingLeavedEvent) => {
+			dispatch(usersStreamActions.remove(user.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelstarted = useCallback(
+		(channel: StreamingStartedEvent) => {
+			if (channel) {
+				dispatch(
+					channelsStreamActions.add({
+						id: channel.channel_id,
+						channel_id: channel.channel_id,
+						clan_id: channel.clan_id,
+						is_streaming: channel.is_streaming,
+						streaming_url: channel.streaming_url !== '' ? `${channel.streaming_url}&user_id=${userId}` : channel.streaming_url
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelended = useCallback(
+		(channel: StreamingEndedEvent) => {
+			dispatch(usersStreamActions.remove(channel.channel_id));
+		},
+		[dispatch]
+	);
+
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			const senderId = message.sender_id;
@@ -148,10 +200,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 				dispatch(directMetaActions.updateDMSocket(message));
-				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+
+				if (currentDirectId !== message?.channel_id) {
+					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
+					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+				}
+				if (mess.isMe) {
+					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
+				}
 			} else {
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
@@ -276,6 +334,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						})
 					);
 					dispatch(usersClanActions.remove(id));
+					dispatch(rolesClanActions.updateRemoveUserRole(id));
 				}
 			});
 		},
@@ -374,8 +433,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstickercreated = useCallback(
 		(stickerCreated: StickerCreateEvent) => {
 			if (userId !== stickerCreated.creator_id) {
-				console.log('stickerCreated: ', stickerCreated);
-
 				dispatch(
 					stickerSettingActions.add({
 						category: stickerCreated.category,
@@ -610,15 +667,72 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setTriggerDate(Date.now());
 		}
 	}, []);
-	// todo: Thái mai làm
-	const onroleevent = useCallback((coffeeEvent: RoleEvent) => {
-		console.log('coffeeEvent: ', coffeeEvent);
+
+	const onroleevent = useCallback((roleEvent: RoleEvent) => {
+		const handleRoleEvent = async () => {
+			if (roleEvent.status === 0) {
+				if (userId !== roleEvent.user_id) {
+					dispatch(
+						rolesClanActions.add({
+							id: roleEvent.role.id || '',
+							clan_id: roleEvent.role.clan_id,
+							creator_id: roleEvent.role.creator_id,
+							title: roleEvent.role.title,
+							permission_list: roleEvent.role.permission_list,
+							role_user_list: roleEvent.role.role_user_list,
+							active: roleEvent.role.active
+						})
+					);
+					if (roleEvent?.role?.role_user_list?.role_users) {
+						const userExists = roleEvent.role.role_user_list.role_users.some((user) => user.id === userId);
+						if (userExists) {
+							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						}
+						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+					}
+				}
+			} else if (roleEvent.status === 1) {
+				if (userId !== roleEvent.user_id) {
+					if (roleEvent?.role?.role_user_list?.role_users) {
+						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
+					}
+					if (roleEvent.role.permission_list?.permissions || roleEvent.role.role_user_list?.role_users) {
+						const isUserResult = await dispatch(
+							rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
+						).unwrap();
+						if (isUserResult) {
+							dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+						}
+					}
+					dispatch(rolesClanActions.update(roleEvent.role));
+				}
+			} else if (roleEvent.status === 2) {
+				if (userId !== roleEvent.user_id) {
+					const isUserResult = await dispatch(
+						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
+					).unwrap();
+					if (isUserResult) {
+						dispatch(policiesActions.fetchPermissionsUser({ clanId: roleEvent.role.clan_id || '' }));
+					}
+					dispatch(rolesClanActions.remove(roleEvent.role.id || ''));
+				}
+			}
+		};
+		handleRoleEvent();
 	}, []);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
 
 			socket.onvoiceleaved = onvoiceleaved;
+
+			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onstreamingchannelleaved = onstreamingchannelleaved;
+
+			socket.onstreamingchannelstarted = onstreamingchannelstarted;
+
+			socket.onstreamingchannelended = onstreamingchannelended;
 
 			socket.onchannelmessage = onchannelmessage;
 
@@ -699,6 +813,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
+			onstreamingchanneljoined,
+			onstreamingchannelleaved,
+			onstreamingchannelstarted,
+			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent
@@ -707,36 +825,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const handleReconnect = useCallback(
 		async (socketType: string) => {
+			if (socketRef.current?.isOpen()) return;
 			dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
-				const socket = await reconnect(clanIdActive ?? '');
+				const socket = await reconnectWithTimeout(clanIdActive ?? '');
 				if (!socket) {
-					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					return;
 				}
-				window.location.reload();
+
+				if (window && navigator) {
+					if (navigator.onLine) {
+						dispatch(appActions.refreshApp());
+					} else {
+						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+					}
+				}
+
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
-				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 			}
 		},
-		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
+		[dispatch, clanIdActive, reconnectWithTimeout, setCallbackEventFn]
 	);
 
-	const ondisconnect = useCallback(
-		debounce(() => {
-			handleReconnect('Socket disconnected, attempting to reconnect...');
-		}, 300),
-		[handleReconnect]
-	);
+	const ondisconnect = useCallback(() => {
+		handleReconnect('Socket disconnected, attempting to reconnect...');
+	}, [handleReconnect]);
 
-	const onHeartbeatTimeout = useCallback(
-		debounce(() => {
-			handleReconnect('Socket hearbeat timeout, attempting to reconnect...');
-		}, 300),
-		[handleReconnect]
-	);
+	const onHeartbeatTimeout = useCallback(() => {
+		handleReconnect('Socket hearbeat timeout, attempting to reconnect...');
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		const socket = socketRef.current;
@@ -805,6 +926,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socketRef,
 		onvoicejoined,
 		onvoiceleaved,
+		onstreamingchanneljoined,
+		onstreamingchannelleaved,
+		onstreamingchannelstarted,
+		onstreamingchannelended,
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,

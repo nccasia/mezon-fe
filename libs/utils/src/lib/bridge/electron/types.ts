@@ -7,7 +7,7 @@ export type MezonElectronAPI = {
 	removeListener: (channel: string, listener: ElectronBridgeHandler) => void;
 	getDeviceId: () => Promise<string>;
 	senderId: (senderId: string) => Promise<string>;
-	setBadgeCount: (badgeCount: number) => void;
+	setBadgeCount: (badgeCount: number | null) => void;
 };
 declare global {
 	interface Window {
@@ -18,5 +18,5 @@ declare global {
 export interface IElectronBridge {
 	initListeners: (callback: ElectronBridgeHandler) => void;
 	removeAllListeners: () => void;
-	setBadgeCount: (badgeCount: number) => void;
+	setBadgeCount: (badgeCount: number | null) => void;
 }

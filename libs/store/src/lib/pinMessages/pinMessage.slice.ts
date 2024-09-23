@@ -1,9 +1,9 @@
 import { IPinMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import memoize from 'memoizee';
 import { ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
 
@@ -28,7 +28,7 @@ type fetchChannelPinMessagesPayload = {
 };
 
 const CHANNEL_PIN_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
-const fetchChannelPinMessagesCached = memoize(
+const fetchChannelPinMessagesCached = memoizeAndTrack(
 	(mezon: MezonValueContext, channelId: string) => mezon.client.pinMessagesList(mezon.session, channelId),
 	{
 		promise: true,

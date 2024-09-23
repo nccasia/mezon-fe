@@ -3,12 +3,12 @@ import { isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelMetaActions, MessagesEntity, useAppDispatch } from '@mezon/store';
 import React, { useCallback, useMemo } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { style } from './styles';
 import { FlashList } from '@shopify/flash-list';
 
 interface IChannelListMessageProps {
-	flatListRef: React.RefObject<FlashList<MessagesEntity>>;
+	flatListRef: React.RefObject<FlatList<MessagesEntity>>;
 	messages: MessagesEntity[];
 	handleScroll: (event) => void;
 	renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
@@ -44,7 +44,7 @@ const ChannelListMessage = React.memo(
 		}, [messages?.[messages?.length - 1]])
 		
 		return (
-			<FlashList
+			<FlatList
 				ref={flatListRef}
 				inverted
 				showsVerticalScrollIndicator={false}
@@ -62,8 +62,7 @@ const ChannelListMessage = React.memo(
 							}
 						: undefined
 				}
-				onEndReachedThreshold={0.1}
-				estimatedItemSize={100}
+				onEndReachedThreshold={0.5}
 				scrollEventThrottle={60}
 				viewabilityConfig={{
 					itemVisiblePercentThreshold: 50,

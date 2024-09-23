@@ -1,5 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
@@ -17,6 +18,7 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 	const dispatch = useAppDispatch();
 	const clans = useSelector(selectAllClans);
 	const navigation = useNavigation<any>();
+	const { themeValue } = useTheme();
 
 	const currentClanName = useMemo(() => {
 		return currentClan?.clan_name
@@ -45,7 +47,7 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 			confirmText={t('deleteClanModal.confirm')}
 			title={t('deleteClanModal.title')}
 			children={(
-				<Text style={styles.contentText}>
+				<Text style={[styles.contentText, { color: themeValue.text }]}>
 					{t('deleteClanModal.description', { currentClan: currentClanName })
 						.split(currentClanName)
 						.reduce((acc, part, index) => {

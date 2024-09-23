@@ -20,7 +20,7 @@ const GoogleButtonLogin: React.FC<GoogleButtonLoginProps> = ({ mode }) => {
 				navigate('/mezon');
 			}
 		},
-		onError: (errorResponse) => console.log(errorResponse),
+		onError: (errorResponse) => console.log(errorResponse)
 	});
 
 	return (

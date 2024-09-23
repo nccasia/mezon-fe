@@ -1,6 +1,7 @@
 import { useClans, useUserPermission } from '@mezon/core';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { useMemo, useState } from 'react';
+import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -12,9 +13,9 @@ import {
 	MezonInput,
 	MezonMenu,
 	MezonOption,
-	MezonSwitch,
-	reserve,
+	reserve
 } from '../../../temp-ui';
+import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
 import { style } from './styles';
 
@@ -25,11 +26,21 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
+	const { t: tClan } = useTranslation(['clan']);
 	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
 	const { isClanOwner } = useUserPermission();
+	const [isCheckValid, setIsCheckValid] = useState<boolean>();
+
+	useEffect(() => {
+		if (clanName === currentClan?.clan_name && banner === (currentClan?.banner || '')) {
+			setIsCheckValid(false)
+			return
+		}
+		setIsCheckValid(validInput(clanName));
+	}, [clanName, banner]);
 
 	const disabled = useMemo(() => {
 		return !isClanOwner;
@@ -41,8 +52,8 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		headerRight: () => {
 			if (disabled) return <View />
 			return (
-				<Pressable onPress={handleSave} disabled={loading}>
-					<Text style={{ ...styles.headerActionTitle, opacity: loading ? 0.5 : 1 }}>{t('header.save')}</Text>
+				<Pressable onPress={handleSave} disabled={loading || !isCheckValid}>
+					<Text style={{ ...styles.headerActionTitle, opacity: loading || !isCheckValid ? 0.5 : 1 }}>{t('header.save')}</Text>
 				</Pressable>
 			)
 		},
@@ -50,13 +61,12 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	async function handleSave() {
 		setLoading(true);
-		const name = clanName?.trim();
-		setClanName(name);
-
-		if (name?.length === 0) {
+		const store = await getStoreAsync();
+		const isDuplicate = await store.dispatch(checkDuplicateNameClan(clanName?.trim()));
+		if (isDuplicate?.payload) {
 			Toast.show({
 				type: 'error',
-				text1: t('toast.notBlank'),
+				text1: tClan('duplicateNameMessage')
 			});
 			setLoading(false);
 			return;
@@ -64,7 +74,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 		await updateClan({
 			banner: banner || (currentClan?.banner ?? ''),
-			clan_name: name || (currentClan?.clan_name ?? ''),
+			clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
 			clan_id: currentClan?.clan_id ?? '',
 			creator_id: currentClan?.creator_id ?? '',
 			logo: currentClan?.logo ?? '',

@@ -179,7 +179,8 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
+					currentChannel
 				}
 			});
 		};

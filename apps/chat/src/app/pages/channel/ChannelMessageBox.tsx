@@ -1,11 +1,13 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj, getBottomPopupClass } from '@mezon/utils';
+import { referencesActions, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
+import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import { ChannelJumpToPresent } from './ChannelJumpToPresent';
 
 export type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription;
@@ -14,6 +16,7 @@ export type ChannelMessageBoxProps = {
 };
 
 export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channel?.channel_id ?? ''));
 	const channelId = useMemo(() => {
 		return channel.channel_id;
 	}, [channel.channel_id]);
@@ -23,14 +26,8 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
 
-	const hasAttachment = useMemo(() => {
-		return attachmentFilteredByChannelId?.files.length > 0;
-	}, [attachmentFilteredByChannelId]);
-
-	const bottomPopup = getBottomPopupClass(hasAttachment, dataReferences.message_ref_id ?? '');
-
+	const chatboxRef = useRef<HTMLDivElement | null>(null);
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -74,18 +71,39 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 	useEscapeKey(handleCloseReplyMessageBox);
 	return (
-		<div className="mx-4 relative" role="button">
+		<div className="mx-4 relative" role="button" ref={chatboxRef}>
 			{isEmojiOnChat && (
 				<div
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={` ${bottomPopup}  right-[2px] absolute `}
+					className={`right-[2px] absolute z-10`}
+					style={{
+						bottom: chatboxRef.current ? `${chatboxRef.current.offsetHeight}px` : ''
+					}}
 				>
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{dataReferences.message_ref_id && <ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} />}
+
+			<div className="absolute bottom-[calc(100%-10px)] left-0 right-0">
+				{isViewingOldMessage && (
+					<div
+						className={classNames(
+							'relative z-0 px-2 py-1 text-sm bg-bgAccent dark:bg-bgDarkAccent rounded-md',
+							dataReferences.message_ref_id ? 'top-[8px]' : ''
+						)}
+					>
+						<ChannelJumpToPresent channelId={channelId ?? ''} className="pb-[10px]" />
+					</div>
+				)}
+				{dataReferences.message_ref_id && (
+					<div className="relative z-1 pb-[4px]">
+						<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
+					</div>
+				)}
+			</div>
+
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}
 				onSend={handleSend}

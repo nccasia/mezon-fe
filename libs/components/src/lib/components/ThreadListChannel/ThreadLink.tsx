@@ -1,5 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
 import { selectCountNotifyByChannelId, selectIsUnreadChannelById } from '@mezon/store';
+import { notificationActions, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
@@ -25,6 +26,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -56,6 +58,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
+		dispatch(notificationActions.removeNotificationsByChannelId(thread.channel_id ?? ''));
 	};
 
 	const handleDeleteChannel = () => {

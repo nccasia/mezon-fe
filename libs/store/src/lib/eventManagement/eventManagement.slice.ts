@@ -1,8 +1,8 @@
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
@@ -14,7 +14,7 @@ export interface EventManagementEntity extends IEventManagement {
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
 
 const EVENT_MANAGEMENT_CACHED_TIME = 1000 * 60 * 3;
-const fetchEventManagementCached = memoize((mezon: MezonValueContext, clanId: string) => mezon.client.listEvents(mezon.session, clanId), {
+const fetchEventManagementCached = memoizeAndTrack((mezon: MezonValueContext, clanId: string) => mezon.client.listEvents(mezon.session, clanId), {
 	promise: true,
 	maxAge: EVENT_MANAGEMENT_CACHED_TIME,
 	normalizer: (args) => {

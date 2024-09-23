@@ -1,12 +1,14 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity } from '@mezon/store-mobile';
+import { directActions, DirectEntity, useAppDispatch } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon, PencilIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMenu, reserve } from '../../temp-ui';
 import CustomGroupDm from './CustomGroupDm';
 import style from './MenuCustomDm.styles';
@@ -17,6 +19,8 @@ const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChann
 	const styles = style(themeValue);
 	const bottomSheetCustomGroup = useRef<BottomSheetModal>(null);
 	const { dismiss } = useBottomSheetModal();
+	const dispatch = useAppDispatch()
+	const navigation = useNavigation<any>();
 
 	const menuSetting: IMezonMenuItemProps[] = [
 		{
@@ -58,7 +62,11 @@ const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChann
 					expandable: false,
 					icon: <CircleXIcon width={size.s_18} height={size.s_18} color={themeValue.text}></CircleXIcon>,
 					textStyle: styles.label,
-					onPress: () => reserve(),
+					onPress: async () => {
+						dismiss()
+						await dispatch(directActions.closeDirectMessage({ channel_id: currentChannel?.channel_id }));
+						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+					},
 				},
 			],
 		},

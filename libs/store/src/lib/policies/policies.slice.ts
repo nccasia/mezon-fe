@@ -1,9 +1,9 @@
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { ApiPermission } from 'mezon-js/api.gen';
 import { ThunkConfigWithError } from '../errors';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 export const POLICIES_FEATURE_KEY = 'policies';
 
 /*
@@ -43,7 +43,7 @@ export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPa
 	}
 );
 const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 3;
-export const fetchPermissionCached = memoize((mezon: MezonValueContext) => mezon.client.getListPermission(mezon.session), {
+export const fetchPermissionCached = memoizeAndTrack((mezon: MezonValueContext) => mezon.client.getListPermission(mezon.session), {
 	promise: true,
 	maxAge: LIST_PERMISSION_CACHED_TIME,
 	normalizer: (args) => {
@@ -125,5 +125,5 @@ export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUs
 });
 
 export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) => {
-	return permissions.filter((permission) => permission.scope === 1);
+	return permissions.filter((permission) => permission.scope === 2);
 });

@@ -31,14 +31,6 @@ const SideBar = ({ sideBarIsOpen, toggleSideBar }: SideBarProps) => {
 							<Icons.MenuClose className="w-[15px]" />
 						</button>
 					</div>
-					<div className="middle px-[16px] gap-[16px] flex flex-col font-semibold pt-[24px]">
-						<div>Download</div>
-						<div>Nitro</div>
-						<div>Safety</div>
-						<div>Support</div>
-						<div>Blog</div>
-						<div>Careers</div>
-					</div>
 				</div>
 				<div className="flex flex-col gap-3 mb-[70px]">
 					<a

@@ -141,11 +141,14 @@ export const ChatMessageSending = memo(
 							ref_type: 0,
 							message_sender_id: targetMessage?.sender_id,
 							message_sender_username: targetMessage?.username,
-							mesages_sender_avatar: targetMessage?.avatar,
+							mesages_sender_avatar: targetMessage.clan_avatar ? targetMessage.clan_avatar : targetMessage.avatar,
 							message_sender_clan_nick: targetMessage?.clan_nick,
 							message_sender_display_name: targetMessage?.display_name,
 							content: JSON.stringify(targetMessage.content),
-							has_attachment: Boolean(targetMessage?.attachments?.length)
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+							channel_id: targetMessage.channel_id ?? '',
+							mode: targetMessage.mode ?? 0,
+							channel_label: targetMessage.channel_label
 						}
 					] as Array<ApiMessageRef>)
 				: undefined;

@@ -6,7 +6,10 @@ import { IScrollOptions, SCROLL_DEFAULT_OPTIONS } from './scroll-options';
  * @private
  * @param targetRef Reference of scrollable HTML element.
  */
-export const useScroll = (targetRef: React.MutableRefObject<Element>, options: IScrollOptions = SCROLL_DEFAULT_OPTIONS): IUseScrollResponse => {
+export const useScroll = <TElement extends Element>(
+	targetRef: React.MutableRefObject<TElement | null>,
+	options: IScrollOptions = SCROLL_DEFAULT_OPTIONS
+): IUseScrollResponse => {
 	const scrollEventHandlerRef = useRef<EventListener>(() => {
 		return;
 	});
@@ -32,13 +35,15 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 		fetching.current = false;
 	}, []);
 
-	const getCurrentScrollHeight = useCallback(() => targetRef.current?.scrollHeight, [targetRef]);
+	const getCurrentScrollHeight = useCallback(() => targetRef.current?.scrollHeight ?? 0, [targetRef]);
 
-	const getScrollTop = useCallback(() => targetRef.current.scrollTop, [targetRef]);
+	const getScrollTop = useCallback(() => targetRef.current?.scrollTop ?? 0, [targetRef]);
 
 	const setScrollTop = useCallback(
 		(offset: number) => {
-			targetRef.current.scrollTop = offset;
+			if (targetRef.current) {
+				targetRef.current.scrollTop = offset;
+			}
 		},
 		[targetRef]
 	);
@@ -46,16 +51,16 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 	const getStoredScrollHeight = useCallback(() => storedScrollHeight.current, []);
 
 	const storeCurrentScrollHeight = useCallback(() => {
-		storedScrollHeight.current = targetRef.current.scrollHeight;
+		storedScrollHeight.current = targetRef.current?.scrollHeight ?? 0;
 	}, [targetRef]);
 
 	const getStoredScrollTop = useCallback(() => storedScrollTop.current, []);
 
 	const storeCurrentScrollTop = useCallback(() => {
-		storedScrollTop.current = targetRef.current.scrollTop;
+		storedScrollTop.current = targetRef.current?.scrollTop ?? 0;
 	}, [targetRef]);
 
-	const getClientHeight = useCallback(() => targetRef.current.clientHeight, [targetRef]);
+	const getClientHeight = useCallback(() => targetRef.current?.clientHeight ?? 0, [targetRef]);
 
 	useEffect(() => {
 		let scrollHandlerTimeoutId: NodeJS.Timeout;
@@ -73,11 +78,11 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 
 		const el = targetRef.current;
 
-		el.addEventListener('scroll', handler);
+		el?.addEventListener('scroll', handler);
 
 		return () => {
 			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
-			el.removeEventListener('scroll', handler);
+			el?.removeEventListener('scroll', handler);
 		};
 	}, [handlerId, targetRef, options]);
 

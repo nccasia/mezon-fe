@@ -8,17 +8,18 @@ import {
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
-	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
+	selectStreamChannelByChannelId,
+	selectStreamMembersByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelJumpToPresent } from './ChannelJumpToPresent';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
+import ChannelStream from './ChannelStream';
 import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
@@ -40,7 +41,6 @@ function useChannelSeen(channelId: string) {
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
 	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
 	const isAlone = useCheckAlonePermission();
 
@@ -54,18 +54,17 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
+			{currentChannel ? (
+				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+			) : (
+				<ChannelMessageBox.Skeleton />
+			)}
 			{currentChannel && (
 				<ChannelTyping
 					channelId={currentChannel?.id}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					isPublic={currentChannel ? !currentChannel.channel_private : false}
 				/>
-			)}
-			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
-			{currentChannel ? (
-				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
-			) : (
-				<ChannelMessageBox.Skeleton />
 			)}
 		</div>
 	);
@@ -84,6 +83,8 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(channelId));
+	const channelStream = useSelector(selectStreamChannelByChannelId(channelId));
 
 	useChannelSeen(currentChannel?.id || '');
 
@@ -101,7 +102,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
-	return (
+	return currentChannel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+		<ChannelStream key={channelId} hlsUrl={channelStream?.streaming_url} memberJoin={streamChannelMember}></ChannelStream>
+	) : (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			<div

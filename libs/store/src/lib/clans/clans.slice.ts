@@ -14,6 +14,8 @@ import { defaultNotificationCategoryActions } from '../notificationSetting/notif
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { channelsStreamActions } from '../stream/channelsStream.slice';
+import { usersStreamActions } from '../stream/usersStream.slice';
 import { voiceActions } from '../voice/voice.slice';
 
 export const CLANS_FEATURE_KEY = 'clans';
@@ -77,6 +79,14 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 				clanId: clanId ?? '',
 				channelId: '',
 				channelType: ChannelType.CHANNEL_TYPE_VOICE
+			})
+		);
+		thunkAPI.dispatch(channelsStreamActions.listStreamChannels({ clanId }));
+		thunkAPI.dispatch(
+			usersStreamActions.fetchStreamChannelMembers({
+				clanId: clanId ?? '',
+				channelId: '',
+				channelType: ChannelType.CHANNEL_TYPE_STREAMING
 			})
 		);
 	}

@@ -1,10 +1,4 @@
-import {
-	Icons,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	save,
-	ActionEmitEvent
-} from '@mezon/mobile-components';
+import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById } from '@mezon/store';
 import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
@@ -12,7 +6,7 @@ import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Linking, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
@@ -61,7 +55,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		} else {
 			navigation.dispatch(DrawerActions.closeDrawer());
 			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-			const channelCateId = thread ? thread?.category_id : props?.data?.category_id;
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
@@ -69,7 +62,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				async () => {
 					requestAnimationFrame(async () => {
 						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-						DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 					});
 				},
 				Platform.OS === 'ios' ? 100 : 10
@@ -84,12 +76,11 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				activeOpacity={1}
 				onPress={() => handleRouteData()}
 				onLongPress={props.onLongPress}
-				style={[styles.channelListLink,
-						isActive && styles.channelListItemActive,
-						isActive && { backgroundColor: theme === 'light'
-							?  themeValue.secondaryWeight
-							:  themeValue.secondaryLight
-						}]}
+				style={[
+					styles.channelListLink,
+					isActive && styles.channelListItemActive,
+					isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
+				]}
 			>
 				<View style={[styles.channelListItem]}>
 					{isUnRead && <View style={styles.dotIsNew} />}

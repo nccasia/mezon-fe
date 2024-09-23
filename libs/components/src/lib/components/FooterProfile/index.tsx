@@ -15,7 +15,7 @@ import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
@@ -130,4 +130,4 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 	);
 }
 
-export default FooterProfile;
+export default memo(FooterProfile);

@@ -1,5 +1,5 @@
 import { ILoadMoreCb, IUseReverseInfiniteScrollOptions, useReverseInfiniteScroll } from './reverse-infinite-scroll';
-import { IChatScrollData, useStickyScroll } from './sticky-scroll';
+import { IChatScrollData } from './sticky-scroll';
 
 /**
  * React hook for making HTML element scroll behaved like chat.
@@ -12,9 +12,8 @@ import { IChatScrollData, useStickyScroll } from './sticky-scroll';
  * It is very important to ensure that this callback does not issue a request if end of data is reached. Otherwise target server might be spammed with requests.
  * @param options Additional options to customize hook behavior.
  */
-export const useChatScroll = (
-	containerRef: React.MutableRefObject<Element>,
-	contentRef: React.MutableRefObject<Element>,
+export const useChatScroll = <TElement extends Element>(
+	containerRef: React.MutableRefObject<TElement | null>,
 	data: IChatScrollData,
 	loadMoreCb: ILoadMoreCb,
 	options?: IUseChatScrollOptions
@@ -26,16 +25,10 @@ export const useChatScroll = (
 		updateLoadMoreCb
 	} = useReverseInfiniteScroll(containerRef, data, loadMoreCb, options?.reverseInfiniteScroll ?? {});
 
-	const { disable: disableStickyScroll, enable: enableStickyScroll, scrollToBottom, scrollToMessage } = useStickyScroll(containerRef, contentRef);
-
 	return {
 		reverseInfiniteScrollEnabled,
 		enableReverseInfiniteScroll,
 		disableReverseInfiniteScroll,
-		enableStickyScroll,
-		disableStickyScroll,
-		scrollToBottom,
-		scrollToMessage,
 		updateLoadMoreCb
 	};
 };
@@ -68,29 +61,6 @@ export interface IUseChatScrollReturn {
 	 * Disables reverse infinite scroll behavior.
 	 */
 	disableReverseInfiniteScroll: () => void;
-
-	/**
-	 * Enables sticky scroll behavior.
-	 */
-	enableStickyScroll: () => void;
-
-	/**
-	 * Disables sticky scroll behavior.
-	 */
-	disableStickyScroll: () => void;
-
-	/**
-	 * Scrolls to bottom of the target element.
-	 */
-	scrollToBottom: () => Promise<boolean>;
-
-	/**
-	 * scrollToMessage id
-	 * @param id
-	 * @param behavior
-	 * @param block
-	 */
-	scrollToMessage: (id: string, behavior?: ScrollBehavior, block?: ScrollLogicalPosition) => Promise<boolean>;
 
 	/**
 	 * Overrides callback for loading more data with a new one.

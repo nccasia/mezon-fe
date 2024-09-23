@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, shell } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
@@ -6,6 +6,7 @@ import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
+import { TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
 import { setupPushReceiver } from './services/push-receiver';
 
@@ -42,6 +43,7 @@ export default class App {
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
+			App.setupMenu();
 			App.setupBadge();
 			App.setupPushReceiver();
 			tray.init(isQuitting);
@@ -77,7 +79,7 @@ export default class App {
 			icon: join(__dirname, 'assets', 'linux-icon.png')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
-		App.mainWindow.setMenu(null);
+		App.mainWindow.setMenuBarVisibility(false);
 		App.mainWindow.center();
 
 		const gotTheLock = App.application.requestSingleInstanceLock();
@@ -209,5 +211,108 @@ export default class App {
 	 */
 	private static setupBadge() {
 		return initBadge(App.application, App.mainWindow);
+	}
+
+	private static setupMenu() {
+		const isMac = process.platform === 'darwin';
+
+		const appMenu: MenuItemConstructorOptions[] = [
+			{
+				label: app.name,
+				submenu: [
+					{ role: 'about' },
+					{ label: 'Check for Updates...', click: () => autoUpdater.checkForUpdates() },
+					{ type: 'separator' },
+					{
+						type: 'normal',
+						label: 'Settings...',
+						accelerator: 'CmdOrCtrl+,',
+						click: () => App.mainWindow.webContents.send(TRIGGER_SHORTCUT, 'CmdOrCtrl+,')
+					},
+					{ type: 'separator' },
+					{ role: 'services' },
+					{ type: 'separator' },
+					{ role: 'hide' },
+					{ role: 'hideOthers' },
+					{ role: 'unhide' },
+					{ type: 'separator' },
+					{ role: 'quit' }
+				]
+			}
+		];
+
+		const template: MenuItemConstructorOptions[] = [
+			// { role: 'appMenu' }
+			...(isMac ? appMenu : []),
+			// { role: 'fileMenu' }
+			{
+				label: 'File',
+				submenu: [isMac ? { role: 'close' } : { role: 'quit' }]
+			},
+			// { role: 'editMenu' }
+			{
+				label: 'Edit',
+				submenu: [
+					{ role: 'undo' },
+					{ role: 'redo' },
+					{ type: 'separator' },
+					{ role: 'cut' },
+					{ role: 'copy' },
+					{ role: 'paste' },
+					...(isMac
+						? ([
+								{ role: 'pasteAndMatchStyle' },
+								{ role: 'delete' },
+								{ role: 'selectAll' },
+								{ type: 'separator' },
+								{
+									label: 'Speech',
+									submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+								}
+							] as MenuItemConstructorOptions[])
+						: ([{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }] as MenuItemConstructorOptions[]))
+				]
+			},
+			// { role: 'viewMenu' }
+			{
+				label: 'View',
+				submenu: [
+					{ role: 'reload' },
+					{ role: 'forceReload' },
+					{ role: 'toggleDevTools' },
+					{ type: 'separator' },
+					{ role: 'resetZoom' },
+					{ role: 'zoomIn' },
+					{ role: 'zoomOut' },
+					{ type: 'separator' },
+					{ role: 'togglefullscreen' }
+				]
+			},
+			// { role: 'windowMenu' }
+			{
+				label: 'Window',
+				submenu: [
+					{ role: 'minimize' },
+					{ role: 'zoom' },
+					...(isMac
+						? ([{ type: 'separator' }, { role: 'front' }, { type: 'separator' }, { role: 'window' }] as MenuItemConstructorOptions[])
+						: ([{ role: 'close' }] as MenuItemConstructorOptions[]))
+				]
+			},
+			{
+				role: 'help',
+				submenu: [
+					{
+						label: 'Learn More',
+						click: async () => {
+							await shell.openExternal('https://mezon.ai');
+						}
+					}
+				]
+			}
+		];
+
+		const menu = Menu.buildFromTemplate(template);
+		Menu.setApplicationMenu(menu);
 	}
 }

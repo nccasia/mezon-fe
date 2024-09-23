@@ -2,6 +2,7 @@ import { channelMembersActions, clansActions, directActions, useAppDispatch } fr
 import { RemoveChannelUsers, RemoveClanUsers } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export type UseChannelMembersActionsOptions = {
 	channelId?: string | null;
@@ -9,7 +10,7 @@ export type UseChannelMembersActionsOptions = {
 
 export function useChannelMembersActions() {
 	const dispatch = useAppDispatch();
-
+	const { userId } = useAuth();
 	const removeMemberChannel = useCallback(
 		async ({ channelId, userIds }: RemoveChannelUsers) => {
 			await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
@@ -21,14 +22,18 @@ export function useChannelMembersActions() {
 	const removeMemberClan = useCallback(
 		async ({ clanId, channelId, userIds }: RemoveClanUsers) => {
 			await dispatch(clansActions.removeClanUsers({ clanId, userIds }));
-			await dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: clanId,
-					channelId: channelId,
-					noCache: true,
-					channelType: ChannelType.CHANNEL_TYPE_TEXT
-				})
-			);
+			userIds.forEach((userid) => {
+				if (userid !== userId) {
+					dispatch(
+						channelMembersActions.fetchChannelMembers({
+							clanId: clanId,
+							channelId: channelId,
+							noCache: true,
+							channelType: ChannelType.CHANNEL_TYPE_TEXT
+						})
+					);
+				}
+			});
 		},
 		[dispatch]
 	);
