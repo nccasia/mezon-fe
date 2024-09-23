@@ -5,6 +5,7 @@ export * from './lib/application/applications.slice';
 export * from './lib/attachment/attachments.slice';
 export * from './lib/auth/auth.slice';
 export * from './lib/categories/categories.slice';
+export * from './lib/channelmembers/AllUsersChannelByAddChannel.slice';
 export * from './lib/channelmembers/channel.members';
 export * from './lib/channels/channelUser.slice';
 export * from './lib/channels/channelmeta.slice';

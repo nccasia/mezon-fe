@@ -26,6 +26,7 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
@@ -270,6 +271,14 @@ const persistednotificationReducer = persistReducer(
 	notificationReducer
 );
 
+const persisteduserChannelsReducer = persistReducer(
+	{
+		key: 'allUsersByAddChannel',
+		storage
+	},
+	userChannelsReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -279,6 +288,7 @@ const reducer = {
 	channels: persistedChannelReducer,
 	channelmeta: persistedChannelMetaReducer,
 	settingSticker: persistedsettingClanStickerReducer,
+	allUsersByAddChannel: persisteduserChannelsReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,

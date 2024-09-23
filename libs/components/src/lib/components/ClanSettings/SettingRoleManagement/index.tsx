@@ -56,7 +56,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 
 	const handleUpdateUser = async (hasChangeRole?: boolean) => {
 		if (isCreateNewRole) {
-			const respond = await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
+			const respond = await createRole(currentClan?.id || '', nameRole, addUsers, addPermissions);
 			if (!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
 		} else {
 			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);

@@ -10,6 +10,7 @@ import {
 } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
@@ -23,6 +24,7 @@ import {
 	selectStatusMenu,
 	selectTheme
 } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -157,6 +159,11 @@ function MyApp() {
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
+	const dispatch = useAppDispatch();
+	const handleClickToJoinClan = () => {
+		dispatch(clansActions.joinClan({ clanId: '0' }));
+	};
+
 	return (
 		<div
 			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
@@ -183,6 +190,7 @@ function MyApp() {
 											width={48}
 											height={48}
 											className="clan w-full aspect-square object-cover"
+											onClick={handleClickToJoinClan}
 										/>
 										{quantityPendingRequest !== 0 && (
 											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">

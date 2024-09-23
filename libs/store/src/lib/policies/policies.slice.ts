@@ -125,5 +125,5 @@ export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUs
 });
 
 export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) => {
-	return permissions.filter((permission) => permission.scope === 1);
+	return permissions.filter((permission) => permission.scope === 2);
 });

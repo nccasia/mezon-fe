@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectAttachmentByChannelId, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { referencesActions, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -26,11 +26,6 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
-
-	const hasAttachment = useMemo(() => {
-		return attachmentFilteredByChannelId?.files.length > 0;
-	}, [attachmentFilteredByChannelId]);
 
 	const chatboxRef = useRef<HTMLDivElement | null>(null);
 	const handleSend = useCallback(

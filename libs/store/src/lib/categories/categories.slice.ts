@@ -119,7 +119,7 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	categories: [],
 	error: null,
 	sortChannelByCategoryId: {},
-	showEmptyCategory: true
+	showEmptyCategory: false
 });
 
 export const categoriesSlice = createSlice({

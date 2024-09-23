@@ -98,16 +98,12 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
-		// 		old logic: if (Date.now() - response.time < 100) {
 		if (!response.channel_users) {
 			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
-
-		//TODO:remove
-		// thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
 
 		thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members: response.channel_users }));
 		return response.channel_users;

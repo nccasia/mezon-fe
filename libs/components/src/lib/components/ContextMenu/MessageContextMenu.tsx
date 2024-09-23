@@ -21,6 +21,7 @@ import {
 	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
+	selectTheme,
 	setIsForwardAll,
 	setSelectedMessage,
 	threadsActions,
@@ -96,6 +97,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
+	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = () => {
 		if (messagePosition === -1) return false;
@@ -351,7 +353,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					} catch (error) {
 						console.error('Failed to give cofffee message', error);
 					}
-				}
+				},
+				<Icons.DollarIcon className="w-5 h-5" fill={`${appearanceTheme === 'dark' ? '#B5BAC1' : '#060607'}`} />
 			);
 		});
 

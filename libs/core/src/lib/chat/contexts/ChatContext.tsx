@@ -824,8 +824,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const handleReconnect = useCallback(
-		async (socketType: string, forceReconnect = false) => {
-			if (socketRef.current?.isOpen() && !forceReconnect) return;
+		async (socketType: string) => {
+			if (socketRef.current?.isOpen()) return;
 			dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
@@ -856,7 +856,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [handleReconnect]);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		handleReconnect('Socket hearbeat timeout, attempting to reconnect...', true);
+		handleReconnect('Socket hearbeat timeout, attempting to reconnect...');
 	}, [handleReconnect]);
 
 	useEffect(() => {

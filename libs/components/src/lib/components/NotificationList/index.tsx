@@ -18,13 +18,13 @@ export type NotificationProps = {
 const InboxType = {
 	INDIVIDUAL: 'individual',
 	UNREADS: 'unreads',
-	MENTIONS: 'mentions',
+	MENTIONS: 'mentions'
 };
 
 const tabDataNotify = [
 	{ title: 'For you', value: InboxType.INDIVIDUAL },
 	{ title: 'Unreads', value: InboxType.UNREADS },
-	{ title: 'Mentions', value: InboxType.MENTIONS },
+	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
 function NotificationList({ unReadList, onClose }: NotificationProps) {
@@ -45,10 +45,10 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	}, [notification]);
 
 	const notificationItem = sortNotifications.filter(
-		(item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED,
+		(item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED
 	);
 	const notifyMentionItem = sortNotifications.filter(
-		(item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED,
+		(item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED
 	);
 
 	const appearanceTheme = useSelector(selectTheme);
@@ -61,7 +61,6 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 		localStorage.setItem('notiUnread', JSON.stringify([]));
 		dispatch(notificationActions.setStatusNoti());
 	}, []);
-
 	return (
 		<div className="absolute top-8 right-0 z-[99999999] rounded-lg dark:shadow-shadowBorder shadow-shadowInbox w-[480px]">
 			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">

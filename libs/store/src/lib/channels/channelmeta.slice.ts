@@ -13,6 +13,7 @@ export interface ChannelMetaEntity {
 export interface ChannelMetaState extends EntityState<ChannelMetaEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	lastSentChannelId?: string;
 }
 
 const channelMetaAdapter = createEntityAdapter<ChannelMetaEntity>();
@@ -34,6 +35,7 @@ export const channelMetaSlice = createSlice({
 			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
+				state.lastSentChannelId = channel.id;
 			}
 		},
 		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
@@ -125,3 +127,20 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 		const channel = state?.entities?.[channelId];
 		return channel?.lastSeenTimestamp || 0;
 	});
+
+export const selectAnyUnreadChannel = createSelector([getChannelMetaState], (state) => {
+	if (state.lastSentChannelId) {
+		const lastSentChannel = state?.entities?.[state.lastSentChannelId];
+		if (lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
+			return true;
+		}
+	}
+
+	for (let index = 0; index < state?.ids?.length; index++) {
+		const channel = state?.entities?.[state?.ids[index]];
+		if (channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
+			return true;
+		}
+	}
+	return false;
+});

@@ -180,7 +180,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2"
 									>
 										<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
-											Show empty categories
+											Show Empty Categories
 										</li>
 										{/* <div className="flex items-center justify-center h-[18px] w-[18px]"> */}
 										<input

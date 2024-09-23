@@ -17,7 +17,6 @@ export enum TypeChoose {
 const ItemPermission = forwardRef<{ reset: () => void }, ItemPermissionProps>((props, ref) => {
 	const { id, title, active, onSelect } = props;
 
-	// Khởi tạo `initChoose` dựa trên giá trị `active`
 	const initChoose = useMemo(() => {
 		switch (active) {
 			case true:

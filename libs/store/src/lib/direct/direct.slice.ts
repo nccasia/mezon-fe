@@ -5,7 +5,6 @@ import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDes
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
-import { clansActions } from '../clans/clans.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -191,7 +190,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);
