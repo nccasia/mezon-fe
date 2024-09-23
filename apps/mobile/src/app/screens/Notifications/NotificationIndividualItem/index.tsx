@@ -11,15 +11,14 @@ import { styles as s } from './NotificationIndividualItem.styles';
 function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { avatarImg } = useMessageSender(user as any);
-	const userName = notify?.content?.username;
+	const userName = notify?.content?.username || user?.user?.display_name || user?.user?.username;
 	const messageTimeDifference = getTimeDifferenceDate(notify.create_time);
-
 
 	let notice = notify?.subject;
 
-	if (userName) {
+	if (userName && !notice) {
 		const userNameLenght = userName?.length;
-		notice = notify?.subject?.slice(userNameLenght);
+		notice = notify?.content?.t?.slice(userNameLenght);
 	}
 
 	return (
