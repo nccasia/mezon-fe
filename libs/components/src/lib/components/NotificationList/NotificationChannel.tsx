@@ -1,5 +1,5 @@
 import { useAppParams, useNotification } from '@mezon/core';
-import { notificationActions, useAppDispatch } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import NotificationChannelHeader from './NotificationChannelHeader';
@@ -41,15 +41,15 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 	const handleMarkAsRead = useCallback(
 		(itemUnread: TNotificationChannel) => {
 			const ids = itemUnread.notifications.map((notification) => notification.id);
-			dispatch(notificationActions.setReadNotiStatus(ids));
-			dispatch(notificationActions.setStatusNoti());
+			// dispatch(notificationActions.setReadNotiStatus(ids));
+			// dispatch(notificationActions.setStatusNoti());
 		},
 		[dispatch]
 	);
 
 	const handleDeleteNotification = useCallback(
 		(notification: INotification) => {
-			dispatch(notificationActions.setReadNotiStatus([notification.id]));
+			// dispatch(notificationActions.setReadNotiStatus([notification.id]));
 			deleteNotify(notification.id, clanId ?? '0');
 		},
 		[clanId, deleteNotify, dispatch]

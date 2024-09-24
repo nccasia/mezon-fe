@@ -259,8 +259,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setStatusNoti());
+				// dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
+				// dispatch(notificationActions.setStatusNoti());
 			}
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;

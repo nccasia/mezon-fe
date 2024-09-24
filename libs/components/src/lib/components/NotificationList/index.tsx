@@ -1,5 +1,5 @@
 import { useNotification } from '@mezon/core';
-import { notificationActions, selectTheme } from '@mezon/store';
+import { selectSpecificNotifications, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationCode } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
@@ -36,6 +36,9 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 		setCurrentTabNotify(valueTab);
 	};
 
+	const replyAndMentionNotification = useSelector(selectSpecificNotifications);
+	console.log('replyAndMentionNotification :', replyAndMentionNotification);
+
 	const sortNotifications = useMemo(() => {
 		return notification.sort((a, b) => {
 			const dateA = new Date(a.create_time || '').getTime();
@@ -54,13 +57,15 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const unreadListConverted = useMemo(() => {
-		return notifyMentionItem.filter((item) => unReadList?.includes(item.id));
-	}, [notifyMentionItem, localStorage.getItem('notiUnread')]);
+		return replyAndMentionNotification.filter((item) => unReadList?.includes(item.id));
+	}, [replyAndMentionNotification]);
 
+	console.log('unreadListConverted :', unreadListConverted);
 	const handleMarkAllAsRead = useCallback(() => {
-		localStorage.setItem('notiUnread', JSON.stringify([]));
-		dispatch(notificationActions.setStatusNoti());
+		// localStorage.setItem('notiUnread', JSON.stringify([]));
+		// dispatch(notificationActions.setStatusNoti());
 	}, []);
+
 	return (
 		<div className="absolute top-8 right-0 z-[99999999] rounded-lg dark:shadow-shadowBorder shadow-shadowInbox w-[480px]">
 			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
@@ -85,7 +90,7 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 								);
 							})}
 						</div>
-						{currentTabNotify === InboxType.UNREADS && unreadListConverted.length > 0 && (
+						{currentTabNotify === InboxType.UNREADS && replyAndMentionNotification.length > 0 && (
 							<div className="w-[30%] flex flex-row justify-end items-center">
 								<button onClick={handleMarkAllAsRead} className="w-fit text-xs hover:underline">
 									Mark all as read
@@ -112,8 +117,8 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 
 					{currentTabNotify === InboxType.UNREADS && (
 						<div>
-							{unreadListConverted.length > 0 ? (
-								<NotificationChannel isUnreadTab={true} unreadListConverted={unreadListConverted} />
+							{replyAndMentionNotification.length > 0 ? (
+								<NotificationChannel isUnreadTab={true} unreadListConverted={replyAndMentionNotification} />
 							) : (
 								<EmptyNotification isEmptyUnread />
 							)}

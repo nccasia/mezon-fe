@@ -24,7 +24,7 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingChannel from '../ChannelSetting';
@@ -335,26 +335,26 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 
 	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
 
-	const notiUnreadList = useMemo(() => {
-		return localStorage.getItem('notiUnread');
-	}, [newNotificationStatus]);
+	// const notiUnreadList = useMemo(() => {
+	// 	return localStorage.getItem('notiUnread');
+	// }, [newNotificationStatus]);
 
-	useEffect(() => {
-		const updateNotiUnread = () => {
-			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
-		};
-		updateNotiUnread();
-		const handleStorageChange = (event: StorageEvent) => {
-			if (event.key === 'notiUnread') {
-				updateNotiUnread();
-			}
-		};
-		window.addEventListener('storage', handleStorageChange);
+	// useEffect(() => {
+	// 	const updateNotiUnread = () => {
+	// 		setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
+	// 	};
+	// 	updateNotiUnread();
+	// 	const handleStorageChange = (event: StorageEvent) => {
+	// 		if (event.key === 'notiUnread') {
+	// 			updateNotiUnread();
+	// 		}
+	// 	};
+	// 	window.addEventListener('storage', handleStorageChange);
 
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, [newNotificationStatus]);
+	// 	return () => {
+	// 		window.removeEventListener('storage', handleStorageChange);
+	// 	};
+	// }, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));

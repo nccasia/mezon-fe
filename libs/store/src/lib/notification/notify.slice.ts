@@ -133,17 +133,17 @@ export const notificationSlice = createSlice({
 			state.specificNotifications = remainingNotifications;
 		},
 
-		setNotiListUnread(state, action) {
-			const storedIds = localStorage.getItem('notiUnread');
-			const ids = storedIds ? JSON.parse(storedIds) : [];
-			ids.push(action.payload.id);
-			localStorage.setItem('notiUnread', JSON.stringify(ids));
-		},
+		// setNotiListUnread(state, action) {
+		// 	const storedIds = localStorage.getItem('notiUnread');
+		// 	const ids = storedIds ? JSON.parse(storedIds) : [];
+		// 	ids.push(action.payload.id);
+		// 	localStorage.setItem('notiUnread', JSON.stringify(ids));
+		// },
 
-		setStatusNoti(state) {
-			const ids = localStorage.getItem('notiUnread');
-			state.newNotificationStatus = !state.newNotificationStatus;
-		},
+		// setStatusNoti(state) {
+		// 	const ids = localStorage.getItem('notiUnread');
+		// 	state.newNotificationStatus = !state.newNotificationStatus;
+		// },
 		setAllLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs[]>) => {
 			for (const i of action.payload) {
 				state.lastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
@@ -160,17 +160,17 @@ export const notificationSlice = createSlice({
 			const quantityNotifyClan = countNotifyByClanId(state, action.payload.clanId);
 			state.quantityNotifyClans[action.payload.clanId] = quantityNotifyClan;
 		},
-		setReadNotiStatus(state, action: PayloadAction<string[]>) {
-			const storedIds = localStorage.getItem('notiUnread');
-			const ids = storedIds ? JSON.parse(storedIds) : [];
+		// setReadNotiStatus(state, action: PayloadAction<string[]>) {
+		// 	const storedIds = localStorage.getItem('notiUnread');
+		// 	const ids = storedIds ? JSON.parse(storedIds) : [];
 
-			if (ids && ids?.length > 0) {
-				const updatedIdsList = ids.filter((id: string) => !action.payload.includes(id));
-				localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList));
-			} else {
-				console.log('No unread notification');
-			}
-		},
+		// 	if (ids && ids?.length > 0) {
+		// 		const updatedIdsList = ids.filter((id: string) => !action.payload.includes(id));
+		// 		localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList));
+		// 	} else {
+		// 		console.log('No unread notification');
+		// 	}
+		// },
 		setIsShowInbox(state, action: PayloadAction<boolean>) {
 			state.isShowInbox = action.payload;
 		}

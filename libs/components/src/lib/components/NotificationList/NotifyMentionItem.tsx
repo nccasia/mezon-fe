@@ -60,8 +60,8 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId, clanId: clanId });
 
 	const handleClickJump = useCallback(() => {
-		dispatch(notificationActions.setReadNotiStatus([notify.id]));
-		dispatch(notificationActions.setStatusNoti());
+		// dispatch(notificationActions.setReadNotiStatus([notify.id]));
+		// dispatch(notificationActions.setStatusNoti());
 		dispatch(messagesActions.setIdMessageToJump(messageId));
 		directToMessageById();
 		dispatch(notificationActions.setIsShowInbox(false));
