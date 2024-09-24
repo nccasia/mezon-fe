@@ -4,6 +4,7 @@ export * from './lib/GetInforUserFromId';
 export { default as HighlightMatchBold } from './lib/HighlightBold';
 export { default as HighlightMatch } from './lib/HightlightSearch';
 
+export { default as AlertTitleTextWarning } from './lib/Alert';
 export * as Icons from './lib/Icons';
 export { default as Image } from './lib/Image';
 export { default as InputField } from './lib/Input';

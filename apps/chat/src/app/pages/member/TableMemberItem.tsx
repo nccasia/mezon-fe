@@ -1,7 +1,8 @@
 import { AvatarImage } from '@mezon/components';
-import { useMemberContext } from '@mezon/core';
-import { RolesClanEntity, selectAllRolesClan, selectTheme } from '@mezon/store';
+import { useMemberContext, useRoles } from '@mezon/core';
+import { RolesClanEntity, selectAllRolesClan, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
 import { HighlightMatchBold } from '@mezon/ui';
+import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -23,6 +24,9 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 		const activeRole: RolesClanEntity[] = [];
 		const notUserRole: RolesClanEntity[] = [];
 		RolesClan.map((role) => {
+			if (role.id === EVERYONE_ROLE_ID) {
+				return;
+			}
 			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === userId);
 			if (checkHasRole) {
 				activeRole.push(role);
@@ -30,6 +34,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 				notUserRole.push(role);
 			}
 		});
+
 		return {
 			active: activeRole,
 			notUserRole: notUserRole
@@ -37,6 +42,18 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	}, [userId, RolesClan]);
 
 	const { searchQuery } = useMemberContext();
+	const dispatch = useAppDispatch();
+	const { updateRole } = useRoles();
+
+	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
+		await updateRole(role.clan_id || '', role.id, role.title || '', [userId], [], [], []);
+		await dispatch(
+			usersClanActions.addRoleIdUser({
+				id: role.id,
+				userId: userId
+			})
+		);
+	};
 	return (
 		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
 			<div className="flex-3 p-1">
@@ -87,23 +104,28 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					) : (
 						'-'
 					)}
-					<Tooltip
-						content={
-							<div className="flex flex-col gap-1 max-w-40 max-h-52 overflow-y-auto overflow-x-hidden">
-								{userRolesClan.notUserRole.length > 0 &&
-									userRolesClan.notUserRole.map((role) => (
-										<RoleNameCard roleName={role.title || ''} key={role.id} classNames="cursor-pointer" />
-									))}
-							</div>
-						}
-						trigger="click"
-					>
-						<Tooltip content="Add Role">
-							<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
-								+
-							</span>
+					{userRolesClan.notUserRole.length > 0 && (
+						<Tooltip
+							content={
+								<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+									<div className="flex flex-col gap-1 max-w-40">
+										{userRolesClan.notUserRole.map((role) => (
+											<div className="flex" onClick={() => handleAddRoleMemberList(role)} key={role.id}>
+												<RoleNameCard roleName={role.title || ''} classNames="cursor-pointer h-6" />
+											</div>
+										))}
+									</div>
+								</div>
+							}
+							trigger="click"
+						>
+							<Tooltip content="Add Role">
+								<span className=" inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
+									+
+								</span>
+							</Tooltip>
 						</Tooltip>
-					</Tooltip>
+					)}
 				</span>
 			</div>
 			<div className="flex-3 p-1 text-center">

@@ -15,11 +15,13 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 
 	useEffect(() => {
 		const videoElement = videoRef.current;
+		let hls: Hls | null = null;
+		let retryCount = 0;
+		const maxRetries = 10;
 
 		if (videoElement) {
-			// Check if HLS is supported
 			if (Hls.isSupported()) {
-				const hls = new Hls({
+				hls = new Hls({
 					lowLatencyMode: true,
 					enableWorker: true,
 					maxBufferLength: 30,
@@ -33,17 +35,36 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					// manifestLoadingTimeOut: 15000
 				});
 
-				let retryCount = 0;
-				const maxRetries = 10;
-
-				hls.on(Hls.Events.ERROR, (evt, data) => {
-					if (data.fatal) {
-						if (data?.type === Hls.ErrorTypes.NETWORK_ERROR && retryCount < maxRetries) {
-							console.log('Network error, retrying...');
-							retryCount++;
-							setTimeout(() => {
-								hls.loadSource(src);
-							}, 2000); // Delay 2s before retry
+				hls.on(Hls.Events.ERROR, (event, data) => {
+					console.error(`HLS error detected:`, data);
+					if (data.fatal && hls) {
+						switch (data.type) {
+							case Hls.ErrorTypes.NETWORK_ERROR:
+								if (retryCount < maxRetries) {
+									console.log('Network error, retrying...', retryCount);
+									retryCount++;
+									setTimeout(() => {
+										if (hls) {
+											hls.loadSource(src);
+											hls.attachMedia(videoElement);
+										}
+									}, 2000);
+								} else {
+									console.error('Max retries reached, giving up.');
+								}
+								break;
+							case Hls.ErrorTypes.MEDIA_ERROR:
+								if (hls) {
+									console.warn('Media error, attempting recovery...');
+									hls.recoverMediaError();
+								}
+								break;
+							default:
+								if (hls) {
+									console.error('Fatal error occurred, destroying hls instance.');
+									hls.destroy();
+								}
+								break;
 						}
 					}
 				});
@@ -55,13 +76,8 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 						console.error('Error playing video:', error);
 					});
 				});
-
-				// Clean up when component is unmounted
-				return () => {
-					hls.destroy();
-				};
 			} else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-				// HLS support natively
+				// Native HLS support
 				videoElement.src = src;
 				videoElement.addEventListener('loadedmetadata', () => {
 					videoElement.play().catch((error) => {
@@ -69,7 +85,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					});
 				});
 			} else {
-				// Fallback for other video formats
+				// Fallback if not HLS
 				videoElement.src = src;
 				videoElement.addEventListener('loadedmetadata', () => {
 					videoElement.play().catch((error) => {
@@ -78,6 +94,13 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				});
 			}
 		}
+
+		// Cleanup khi unmount component
+		return () => {
+			if (hls) {
+				hls.destroy();
+			}
+		};
 	}, [src]);
 
 	return (
@@ -117,7 +140,6 @@ function UserListStreamChannel({ memberJoin }: UserListStreamChannelProps) {
 		};
 
 		handleSizeWidth();
-
 		window.addEventListener('resize', handleSizeWidth);
 
 		return () => {
@@ -125,13 +147,11 @@ function UserListStreamChannel({ memberJoin }: UserListStreamChannelProps) {
 		};
 	}, [memberJoin]);
 
-	return displayedMembers.map((item: IChannelMember) => {
-		return (
-			<div key={item.id} className="w-[250px] h-[100px] min-w-[100px] min-h-[100px]">
-				<UserItem user={item} />
-			</div>
-		);
-	});
+	return displayedMembers.map((item: IChannelMember) => (
+		<div key={item.id} className="w-[250px] h-[100px] min-w-[100px] min-h-[100px]">
+			<UserItem user={item} />
+		</div>
+	));
 }
 
 function UserItem({ user }: { user: IChannelMember }) {
@@ -145,28 +165,25 @@ function UserItem({ user }: { user: IChannelMember }) {
 	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
 	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
 
-	const checkUrl = (url: string | undefined) => {
-		if (url !== undefined && url !== '') return true;
-		return false;
-	};
+	const checkUrl = (url: string | undefined) => url !== undefined && url !== '';
 
 	const [color, setColor] = useState<string>('');
 
 	useEffect(() => {
 		const getColor = async () => {
 			if (checkUrl(avatarUrl)) {
-				const url = avatarUrl;
-				const colorImg = await getColorAverageFromURL(url || '');
+				const colorImg = await getColorAverageFromURL(avatarUrl || '');
 				if (colorImg) setColor(colorImg);
 			}
 		};
 
 		getColor();
 	}, [avatarUrl]);
+
 	return (
 		<div
 			className="relative w-full h-full flex p-1 justify-center items-center gap-3 cursor-pointer rounded-lg"
-			style={{ backgroundColor: color ? color : 'grey' }}
+			style={{ backgroundColor: color || 'grey' }}
 		>
 			<div className="w-14 h-14 rounded-full">
 				<div className="w-14 h-14">

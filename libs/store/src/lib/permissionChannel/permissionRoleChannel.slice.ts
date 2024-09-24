@@ -26,26 +26,28 @@ export interface PermissionRoleChannelState extends EntityState<PermissionRoleCh
 
 export const permissionRoleChannelAdapter = createEntityAdapter<PermissionRoleChannelsEntity>();
 
-type fetchMaxPermissionChannelsArgs = {
-	channelId: string;
-	clanId: string;
-};
+// type fetchMaxPermissionChannelsArgs = {
+// 	channelId: string;
+// 	clanId: string;
+// };
 
-export const fetchMaxPermissionRoleChannel = createAsyncThunk(
-	'permissionrolechannel/fetchMaxPermissionRoleChannel',
-	async ({ clanId, channelId }: fetchMaxPermissionChannelsArgs, thunkAPI) => {
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
-			if (response && response.permissions.permissions) {
-				await thunkAPI.dispatch(permissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
-			}
-			return response;
-		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
-		}
-	}
-);
+// export const fetchMaxPermissionRoleChannel = createAsyncThunk(
+// 	'permissionrolechannel/fetchMaxPermissionRoleChannel',
+// 	async ({ clanId, channelId }: fetchMaxPermissionChannelsArgs, thunkAPI) => {
+// 		try {
+// 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+// 			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
+// 			if (response && response.permissions.permissions) {
+// 				await thunkAPI.dispatch(permissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
+// 			}
+// 			console.log("response: ", response);
+
+// 			return response;
+// 		} catch (error) {
+// 			return thunkAPI.rejectWithValue([]);
+// 		}
+// 	}
+// );
 
 type fetchChannelsArgs = {
 	channelId: string;
@@ -156,7 +158,7 @@ export const permissionRoleChannelReducer = permissionRoleChannelSlice.reducer;
 export const permissionRoleChannelActions = {
 	...permissionRoleChannelSlice.actions,
 	fetchPermissionRoleChannel,
-	fetchMaxPermissionRoleChannel,
+	// fetchMaxPermissionRoleChannel,
 	setPermissionRoleChannel
 };
 

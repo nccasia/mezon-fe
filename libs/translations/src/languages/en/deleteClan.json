@@ -3,6 +3,8 @@
     "title": "Delete Server",
     "description": "Are you sure you want to delete {{currentClan}}? This action cannot be undone.",
     "confirm": "Yes",
-    "cancel": "No"
+    "cancel": "No",
+    "titleLeaveClan": "Leave clan",
+    "descriptionLeaveClan": "Are you sure you want to leave {{currentClan}}? You won’t be able to re-join this server unless you are re-invited."
   }
 }

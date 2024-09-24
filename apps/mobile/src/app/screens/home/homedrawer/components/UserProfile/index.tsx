@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';

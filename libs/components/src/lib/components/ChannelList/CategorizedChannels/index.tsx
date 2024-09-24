@@ -97,7 +97,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
-		dispatch(channelsActions.getCurrentCategory(paramCategory));
+		dispatch(channelsActions.setCurrentCategory(paramCategory));
 	};
 
 	const handleOpenCreateChannelModal = (category: ICategoryChannel) => {

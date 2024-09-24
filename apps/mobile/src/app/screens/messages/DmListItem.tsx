@@ -1,4 +1,4 @@
-import { useChatTypings, useMemberStatus } from '@mezon/core';
+import { useChatTypings } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadDMById } from '@mezon/store';
@@ -23,7 +23,8 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
-	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
+	const userStatus = directMessage?.is_online?.some(Boolean);
+
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
@@ -37,7 +38,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.usernames?.split?.(',') || [];
+		const usernameList = directMessage?.channel_label?.split?.(',') || [];
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],

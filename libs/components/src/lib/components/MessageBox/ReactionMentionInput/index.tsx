@@ -120,6 +120,7 @@ export type MentionReactInputProps = {
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;
+	hasPermissionEdit?: boolean;
 };
 
 const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
@@ -645,7 +646,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 					maxWidth: '100%',
 					maxHeight: '350px'
 				}}
-				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
+				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -717,7 +718,13 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
+			{!props.isThread && (
+				<GifStickerEmojiButtons
+					activeTab={SubPanelName.NONE}
+					currentClanId={props.currentClanId}
+					hasPermissionEdit={props.hasPermissionEdit || true}
+				/>
+			)}
 		</div>
 	);
 });

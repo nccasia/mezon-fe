@@ -1,7 +1,7 @@
 import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById } from '@mezon/store';
-import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';

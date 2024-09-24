@@ -131,14 +131,14 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 export const selectAnyUnreadChannel = createSelector([getChannelMetaState], (state) => {
 	if (state.lastSentChannelId) {
 		const lastSentChannel = state?.entities?.[state.lastSentChannelId];
-		if (lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
+		if (lastSentChannel?.lastSeenTimestamp && lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
 			return true;
 		}
 	}
 
 	for (let index = 0; index < state?.ids?.length; index++) {
 		const channel = state?.entities?.[state?.ids[index]];
-		if (channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
+		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
 			return true;
 		}
 	}

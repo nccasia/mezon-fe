@@ -145,7 +145,18 @@ const MessageItem = React.memo(
 
 		const isOnlyContainEmoji = useMemo(() => {
 			return isValidEmojiData(message.content);
-		}, [message.content, message.mentions]);
+		}, [message.content]);
+
+		const isEdited = useMemo(() => {
+			if (message?.update_time) {
+				const updateDate = new Date(message?.update_time);
+				const createDate = new Date(message?.create_time);
+				return updateDate > createDate;
+			} else if (message.hideEditted === false && !!message?.content?.t) {
+				return true;
+			}
+			return false;
+		}, [message?.update_time, message.hideEditted, message?.content?.t, message?.create_time]);
 
 		useEffect(() => {
 			if (props?.messageId) {
@@ -162,6 +173,7 @@ const MessageItem = React.memo(
 				}, 3000);
 			} else {
 				setShowHighlightReply(false);
+				timeoutRef.current && clearTimeout(timeoutRef.current);
 			}
 			return () => {
 				timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -415,7 +427,7 @@ const MessageItem = React.memo(
 										mentions: message.mentions,
 										...(checkOneLinkImage ? { t: '' } : {})
 									}}
-									isEdited={message.hideEditted === false && !!message?.content?.t}
+									isEdited={isEdited}
 									translate={t}
 									onMention={onMention}
 									onChannelMention={onChannelMention}

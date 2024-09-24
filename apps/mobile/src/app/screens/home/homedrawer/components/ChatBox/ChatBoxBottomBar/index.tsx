@@ -253,7 +253,9 @@ export const ChatBoxBottomBar = memo(
 				setText(convertedHashtag);
 			}
 			setIsShowAttachControl(false);
-			saveMessageToCache(text);
+			if (![EMessageActionType.CreateThread].includes(messageAction)) {
+				saveMessageToCache(text);
+			}
 		};
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {

@@ -69,9 +69,9 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 
 	let channelId = null;
 
-	if (path.search(currentChannelId || '')) {
+	if (currentChannelId && RegExp(currentChannelId).test(path)) {
 		channelId = currentChannelId;
-	} else if (path.search(currentDirectId || '')) {
+	} else if (currentDirectId && RegExp(currentDirectId).test(path)) {
 		channelId = currentDirectId;
 	}
 

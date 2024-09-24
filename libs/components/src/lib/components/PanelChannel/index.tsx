@@ -2,7 +2,9 @@ import { useClanRestriction, useEscapeKey } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
+	channelsActions,
 	notificationSettingActions,
+	selectCategoryById,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDefaultNotificationCategory,
@@ -65,6 +67,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -183,6 +186,11 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
 	useEscapeKey(() => setIsShowPanelChannel(false));
 
+	const handleOpenCreateChannelModal = () => {
+		dispatch(channelsActions.setCurrentCategory(currentCategory));
+		dispatch(channelsActions.openCreateNewModalChannel(true));
+	};
+
 	return (
 		<div
 			ref={panelRef}
@@ -269,8 +277,10 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					{isShowManageChannel && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
-							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" />}
-							{channel.type === typeChannel.voice && <ItemPanel children="Create Voice Channel" />}
+							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" onClick={handleOpenCreateChannelModal} />}
+							{channel.type === typeChannel.voice && (
+								<ItemPanel children="Create Voice Channel" onClick={handleOpenCreateChannelModal} />
+							)}
 							<ItemPanel onClick={handleDeleteChannel} children="Delete Channel" danger />
 						</GroupPanels>
 					)}

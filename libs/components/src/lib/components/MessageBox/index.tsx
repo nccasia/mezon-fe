@@ -1,10 +1,10 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectAllMaxPermissionRoleChannel, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, memo, useCallback } from 'react';
+import { Fragment, ReactElement, memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -31,7 +31,13 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const appearanceTheme = useSelector(selectTheme);
-	//const listPermissionRoleChannel = useSelector(selectPermissionByChannelId(currentChannelId || ''));
+	const listPermissionRoleChannel = useSelector(selectAllMaxPermissionRoleChannel);
+	const [hasPermissionEdit, setHasPermissionEdit] = useState(true);
+	useEffect(() => {
+		if (listPermissionRoleChannel.at(1)?.active !== 1) {
+			setHasPermissionEdit(false);
+		}
+	}, [listPermissionRoleChannel]);
 
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
@@ -122,7 +128,11 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
 				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
-				<FileSelectionButton currentClanId={currentClanId || ''} currentChannelId={currentChannelId || ''} />
+				<FileSelectionButton
+					currentClanId={currentClanId || ''}
+					currentChannelId={currentChannelId || ''}
+					hasPermissionEdit={hasPermissionEdit}
+				/>
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
 					<div
@@ -138,6 +148,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
 							mode={props.mode}
+							hasPermissionEdit={hasPermissionEdit}
 						/>
 					</div>
 				</div>

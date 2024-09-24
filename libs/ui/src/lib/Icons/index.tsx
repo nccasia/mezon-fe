@@ -4285,3 +4285,27 @@ export function DollarIcon({ fill, ...props }: ClassIconProps) {
 		</svg>
 	);
 }
+
+export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
+			<path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M22 5C22 3.89543 21.1046 3 20 3H4C2.89543 3 2 3.89543 2 5V17C2 18.1046 2.89543 19 4 19H20C21.1046 19 22 18.1046 22 17V5ZM10.5145 7.14251C10.2056 6.95715 9.82081 6.9523 9.5073 7.1298C9.19379 7.30731 9 7.63973 9 8V14C9 14.3603 9.19379 14.6927 9.5073 14.8702C9.82081 15.0477 10.2056 15.0429 10.5145 14.8575L15.5145 11.8575C15.8157 11.6768 16 11.3513 16 11C16 10.6487 15.8157 10.3232 15.5145 10.1425L10.5145 7.14251Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M8 20C7.44772 20 7 20.4477 7 21C7 21.5523 7.44772 22 8 22H16C16.5523 22 17 21.5523 17 21C17 20.4477 16.5523 20 16 20H8Z"
+				fill="currentColor"
+			/>
+		</svg>
+	);
+}

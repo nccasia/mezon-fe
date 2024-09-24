@@ -202,7 +202,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directMetaActions.updateDMSocket(message));
 
-				if (currentDirectId !== message?.channel_id) {
+				const isClanView = currentClanId && currentClanId !== '0';
+				const isNotCurrentDirect = isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
+				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
@@ -218,7 +220,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// remove: setChannelLastSentTimestamp for fix re-render currentChannel when receive new message
 			// dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId]
 	);
 
 	const onchannelpresence = useCallback(

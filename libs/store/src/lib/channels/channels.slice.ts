@@ -343,7 +343,7 @@ export const channelsSlice = createSlice({
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
 		},
-		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
+		setCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {

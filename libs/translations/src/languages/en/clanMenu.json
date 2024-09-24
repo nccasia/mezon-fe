@@ -22,6 +22,11 @@
             "leaveServer": "Leave Clan",
             "deleteClan": "Delete Clan"
         },
+        "optionShowEmptyCategories": {
+            "title": "Show Empty Categoties",
+            "show": "Show",
+            "hide": "Hide"
+        },
         "devMode": {
             "title": "Development Mode",
             "copyServerID": "Copy Clan ID",
