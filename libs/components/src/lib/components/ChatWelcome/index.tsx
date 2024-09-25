@@ -126,7 +126,7 @@ type WelComeDmProps = {
 
 const WelComeDm = (props: WelComeDmProps) => {
 	const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
-	const usernameDm = userName.slice(0, -1);
+
 	return (
 		<>
 			<AvatarImage
@@ -141,7 +141,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 					{name}
 				</p>
 			</div>
-			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{usernameDm}</p>}
+			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{userName}</p>}
 			<div className="text-base">
 				<p className={classNameSubtext}>
 					{isDmGroup ? (
@@ -151,7 +151,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 					)}
 				</p>
 			</div>
-			{!isDmGroup && <StatusFriend userName={usernameDm} />}
+			{!isDmGroup && <StatusFriend userName={userName} />}
 		</>
 	);
 };
