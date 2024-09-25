@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { EOpenSearchChannelFrom, hasNonEmptyChannels, Icons, throttle } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, hasNonEmptyChannels, Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -96,19 +96,16 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				animated: true
 			});
 		}
-	}, [selectCategoryOffsets, currentChannel, isCollapseCategory]);
+	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId]);
 
 	useEffect(() => {
 		setIsCollapseCategory(false);
 	}, [currentClanId]);
 
-	const handleLayout = useCallback(
-		throttle((event, item) => {
-			const { y } = event?.nativeEvent?.layout || {};
-			dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: y }));
-		}, 500),
-		[]
-	);
+	const handleLayout = useCallback((event, item) => {
+		const { y } = event?.nativeEvent?.layout || {};
+		if (item) dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: y }));
+	}, []);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
