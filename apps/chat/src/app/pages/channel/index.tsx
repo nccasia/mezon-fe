@@ -31,7 +31,7 @@ function useChannelSeen(channelId: string) {
 		dispatch(
 			notificationActions.setLastSeenTimeStampChannel({
 				channelId,
-				lastSeenTimeStamp: timestamp + TIME_OFFSET,
+				lastSeenTimeStamp: timestamp,
 				clanId: currentChannel?.clan_id ?? ''
 			})
 		);

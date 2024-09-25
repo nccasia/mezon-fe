@@ -1,7 +1,6 @@
-import { selectCountByClanId } from '@mezon/store-mobile';
+import { useNotification } from '@mezon/core';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
-import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import NavLinkComponent from '../NavLink';
 
@@ -13,7 +12,11 @@ export type SidebarClanItemProps = {
 };
 
 const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
-	const numberOfNotifyClan = useSelector(selectCountByClanId(option.clan_id ?? ''));
+	const { filteredNotificationsByClanId } = useNotification('', option.clan_id);
+	const numberOfNotifyClan = filteredNotificationsByClanId.length;
+
+	console.log('filteredNotificationsByClanId: ', filteredNotificationsByClanId);
+
 	const currentClanPath = pathname.split('/channels')[0];
 	const isSameClan = currentClanPath === linkClan;
 	const handleClick = (e: React.MouseEvent) => {

@@ -1,6 +1,6 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAnyUnreadChannel, selectSpecificNotifications, selectTotalUnreadDM } from '@mezon/store';
-import { useAppSelector } from '@mezon/store-mobile';
+import { reactionActions, selectAnyUnreadChannel, selectTotalUnreadDM } from '@mezon/store';
+import { selectSpecificNotifications, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -11,8 +11,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
+
 	const navigate = useNavigate();
-	const allNotify = useSelector(selectSpecificNotifications);
+	const allNotificationUnread = useSelector(selectSpecificNotifications);
 
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
@@ -45,12 +46,15 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
-		if (notificationCount > 0) {
-			document.title = `(${notificationCount}) Mezon`;
-		} else {
-			document.title = 'Mezon';
+		const notificationCount = allNotificationUnread.length + totalUnreadDM + quantityPendingRequest;
+		if (!isElectron()) {
+			if (notificationCount > 0) {
+				document.title = `(${notificationCount}) Mezon`;
+			} else {
+				document.title = 'Mezon';
+			}
 		}
+
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -58,7 +62,7 @@ const GlobalEventListener = () => {
 			}
 			electronBridge?.setBadgeCount(notificationCount);
 		}
-	}, [allNotify.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationUnread.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

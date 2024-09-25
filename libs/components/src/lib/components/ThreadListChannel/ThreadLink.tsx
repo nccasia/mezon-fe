@@ -1,9 +1,9 @@
-import { useOnClickOutside } from '@mezon/core';
+import { useNotification, useOnClickOutside } from '@mezon/core';
 import { selectIsUnreadChannelById } from '@mezon/store';
-import { notificationActions, selectCountByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { notificationActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
-import React, { memo, useImperativeHandle, useRef, useState } from 'react';
+import React, { memo, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
@@ -23,10 +23,16 @@ export type ThreadLinkRef = {
 };
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
-	const numberNotification = useSelector(selectCountByChannelId(thread.id));
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const { filteredNotificationsByChannelId } = useNotification(thread.id);
+
+	const numberNotification = useMemo(() => {
+		return filteredNotificationsByChannelId.length;
+	}, [filteredNotificationsByChannelId, thread.id]);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);

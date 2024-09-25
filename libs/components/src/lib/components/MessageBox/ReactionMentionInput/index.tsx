@@ -14,6 +14,7 @@ import {
 	channelUsersActions,
 	emojiSuggestionActions,
 	messagesActions,
+	notificationActions,
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
@@ -259,7 +260,15 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 				clanId: currentClanId || ''
 			};
 			if (userIds.length > 0) {
+				const timestamp = Date.now() / 1000;
 				await dispatch(channelUsersActions.addChannelUsers(body));
+				dispatch(
+					notificationActions.setLastSeenTimeStampChannel({
+						channelId: currentChannel.channel_id ?? '',
+						lastSeenTimeStamp: timestamp,
+						clanId: currentChannel?.clan_id ?? ''
+					})
+				);
 			}
 		},
 		[dispatch]
