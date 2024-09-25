@@ -45,12 +45,13 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
 }
 
 export function getEmojis(clan_id: string) {
-	const { categoriesEmoji, emojis } = useEmojiSuggestion({ isMobile: true });
+	const { categoriesEmoji, categoryEmoji, emojis } = useEmojiSuggestion({ isMobile: true });
 	const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
 
 	const recentClanEmojis = recentEmojis?.[clan_id] || [];
 	return {
 		categoriesEmoji,
+		categoryEmoji,
 		emojis: [...recentClanEmojis, ...emojis]
 	};
 }

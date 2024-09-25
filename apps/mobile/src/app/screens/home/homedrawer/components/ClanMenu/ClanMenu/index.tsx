@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonOption, reserve } from '../../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonSwitch, reserve } from '../../../../../../../app/temp-ui';
 import DeleteClanModal from '../../../../../../components/DeleteClanModal';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import MezonButtonIcon from '../../../../../../temp-ui/MezonButtonIcon';
@@ -134,6 +134,13 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		}
 	];
 
+	const optionsShowEmptyCategories: IMezonMenuItemProps[] = [
+		{
+			title: t('menu.optionShowEmptyCategories.title'),
+			component: <MezonSwitch onValueChange={handleToggleEmptyCategories} value={showEmptyCategories} />,
+		}
+	]
+
 	const menu: IMezonMenuSectionProps[] = [
 		// {
 		// 	items: watchMenu,
@@ -143,17 +150,9 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		},
 		{
 			items: optionsMenu
-		}
-	];
-
-	const optionData = [
-		{
-			title: t('menu.optionShowEmptyCategories.show'),
-			value: true
 		},
 		{
-			title: t('menu.optionShowEmptyCategories.hide'),
-			value: false
+			items: optionsShowEmptyCategories
 		}
 	];
 
@@ -200,12 +199,6 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 				</ScrollView>
 				<View>
 					<MezonMenu menu={menu} marginVertical={0} />
-					<MezonOption
-						title={t('menu.optionShowEmptyCategories.title')}
-						data={optionData}
-						value={showEmptyCategories}
-						onChange={handleToggleEmptyCategories}
-					/>
 				</View>
 			</View>
 			<DeleteClanModal

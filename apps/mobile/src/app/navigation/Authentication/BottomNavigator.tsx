@@ -7,9 +7,11 @@ import { View } from 'react-native';
 import 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import Notifications from '../../screens/Notifications';
 import HomeScreen from '../../screens/home/HomeScreen';
 import MessagesScreen from '../../screens/messages/MessagesScreen';
+import MessagesScreenTablet from '../../screens/messages/MessagesScreenTablet';
 import ProfileScreen from '../../screens/profile/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
 
@@ -18,6 +20,7 @@ const TabStack = createBottomTabNavigator();
 const BottomNavigator = () => {
 	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 	const { themeValue } = useTheme();
+	const isTabletLandscape = useTabletLandscape();
 
 	return (
 		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
@@ -48,7 +51,7 @@ const BottomNavigator = () => {
 				/>
 				<TabStack.Screen
 					name={APP_SCREEN.MESSAGES.HOME}
-					component={MessagesScreen}
+					component={isTabletLandscape ? MessagesScreenTablet : MessagesScreen}
 					options={{
 						headerShown: false,
 						title: 'Messages',

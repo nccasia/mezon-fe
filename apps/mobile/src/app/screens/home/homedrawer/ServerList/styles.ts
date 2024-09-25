@@ -5,7 +5,7 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		wrapperServerList: {
 			paddingTop: size.s_20,
-			width: '18%',
+			flex: 1
 		},
 
 		badge: {

@@ -1,7 +1,6 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useCategory, useUserPermission } from '@mezon/core';
 import {
-	ActionEmitEvent,
 	ENotificationActive,
 	ENotificationChannelId,
 	Icons,
@@ -25,7 +24,7 @@ import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
@@ -277,8 +276,6 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
 		]);
-		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
-
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 		if (!channelsCache?.includes(channelId)) {
 			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);

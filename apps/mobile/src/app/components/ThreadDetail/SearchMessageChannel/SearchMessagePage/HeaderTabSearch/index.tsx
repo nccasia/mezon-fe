@@ -11,14 +11,19 @@ function HeaderTabSearch({ onPress, tabList, activeTab }: IHeaderTabSearchProps)
 	const { themeValue } = useTheme();
 
 	return (
-		<Block flexDirection={'row'} justifyContent={'flex-start'} alignItems={'center'}>
+		<Block flexDirection={'row'} justifyContent={'flex-start'} alignItems={'center'} borderBottomColor={Colors.borderDim} borderBottomWidth={1}>
 			{tabList?.map((tab: ITabList, index: number) => (
-				<Pressable key={index.toString()} onPress={() => onPress(index)}>
-					<Block padding={size.s_20} paddingRight={0} paddingBottom={size.s_10} paddingVertical={size.s_20}>
-						<Text style={{ color: index === activeTab ? baseColor.blurple : themeValue.text }}>
+				<Pressable key={index.toString()} onPress={() => onPress(tab?.index)}>
+					<Block
+						paddingHorizontal={size.s_20}
+						paddingBottom={size.s_10}
+						paddingVertical={size.s_20}
+						borderBottomColor={Colors.bgViolet}
+						borderBottomWidth={tab?.index === activeTab ? size.s_2 : 0}
+					>
+						<Text style={{ color: tab?.index === activeTab ? baseColor.blurple : themeValue.text }}>
 							{tab.title} {tab?.quantitySearch ? `(${tab?.quantitySearch})` : ''}
 						</Text>
-						{index === activeTab && <Block backgroundColor={Colors.bgViolet} height={size.s_2} top={size.s_8} />}
 					</Block>
 				</Pressable>
 			))}

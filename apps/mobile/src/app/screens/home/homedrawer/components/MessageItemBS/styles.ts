@@ -58,10 +58,12 @@ export const style = (colors: Attributes) =>
 			color: Colors.white
 		},
 		actionText: {
-			color: colors.text
+			color: colors.text,
+			fontSize: size.h8,
 		},
 		warningActionText: {
-			color: Colors.textRed
+			color: Colors.textRed,
+			fontSize: size.h8,
 		},
 		actionIcon: {
 			color: Colors.white

@@ -1,12 +1,12 @@
-import { ActionEmitEvent, ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
+import { ChannelUsersEntity, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, FlatList, Keyboard, Linking, Text, View } from 'react-native';
+import { FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
@@ -69,13 +69,6 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			navigation.navigate('HomeDefault');
 			navigation.dispatch(DrawerActions.closeDrawer());
 			const channelId = channelData?.channel_id;
-
-			timeoutRef.current = setTimeout(async () => {
-				requestAnimationFrame(async () => {
-					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelData?.category_id });
-				});
-			}, 0);
 
 			// Set cache
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);

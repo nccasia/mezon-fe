@@ -24,6 +24,8 @@ type SearchMessageChannelProps = {
 	route: MuteThreadDetailRouteProp;
 };
 
+const Backspace = 'Backspace';
+
 export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
@@ -64,7 +66,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	useEffect(() => {
 		handleSearchMessage();
-	}, [searchText]);
+	}, [searchText, userMention]);
 
 	const handleSearchMessage = () => {
 		const filter: SearchFilter[] = [];
@@ -93,20 +95,31 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			dispatch(searchMessagesActions.fetchListSearchMessage(payload));
 		}
 	};
-
+	const handleKeyPress = (e) => {
+		if (e.nativeEvent.key === Backspace && !searchText?.length) {
+			setUserMention(null);
+			setOptionFilter(null);
+		}
+	};
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
 			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
 				<InputSearchMessageChannel
+					onKeyPress={handleKeyPress}
+					optionFilter={optionFilter}
 					inputValue={searchText}
-					openSearchChannelFrom={openSearchChannelFrom}
 					onChangeText={handleSearchText}
 					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
 					currentChannel={currentChannel}
 				/>
 				{isSearchMessagePage ? (
-					<SearchMessagePage currentChannel={currentChannel} searchText={searchText} />
+					<SearchMessagePage
+						isSearchMessagePage={isSearchMessagePage}
+						userMention={userMention}
+						currentChannel={currentChannel}
+						searchText={searchText}
+					/>
 				) : (
 					<SearchOptionPage
 						optionFilter={optionFilter}
