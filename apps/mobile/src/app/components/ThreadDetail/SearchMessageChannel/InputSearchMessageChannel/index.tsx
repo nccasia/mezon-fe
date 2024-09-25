@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, EOpenSearchChannelFrom, FilterSearchIcon, Icons, IOption, IUerMention } from '@mezon/mobile-components';
+import { ArrowLeftIcon, FilterSearchIcon, Icons, IOption, IUerMention } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, TextInput, View } from 'react-native';
+import { NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import ListOptionSearch from '../ListOptionSearch';
@@ -14,26 +14,25 @@ import { style } from './InputSearchMessageChannel.styles';
 
 type InputSearchMessageChannelProps = {
 	onChangeText: (value: string) => void;
-	openSearchChannelFrom: EOpenSearchChannelFrom;
 	onChangeOptionFilter: (option: IOption) => void;
 	inputValue: string;
 	userMention: IUerMention;
 	currentChannel: IChannel | DirectEntity;
+	optionFilter: IOption;
+	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
 };
 
 const InputSearchMessageChannel = ({
 	onChangeText,
-	openSearchChannelFrom,
 	onChangeOptionFilter,
 	inputValue,
 	userMention,
-	currentChannel
+	optionFilter,
+	onKeyPress
 }: InputSearchMessageChannelProps) => {
 	const [textInput, setTextInput] = useState<string>(inputValue);
-	const [isIconClear, setIsIconClear] = useState<boolean>(false);
 	const [isVisibleToolTip, setIsVisibleToolTip] = useState<boolean>(false);
 	const inputSearchRef = useRef(null);
-	const [optionFilter, setOptionFilter] = useState<IOption>();
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation(['searchMessageChannel']);
 
@@ -54,12 +53,12 @@ const InputSearchMessageChannel = ({
 	};
 
 	useEffect(() => {
-		if (optionFilter && userMention) {
-			const textInput = `${optionFilter?.title} ${userMention?.display} `;
-			setTextInput(textInput);
-			onChangeText(textInput);
+		if (optionFilter || userMention) {
+			setTextInput(' ');
+			onChangeText(' ');
 		}
-	}, [userMention]);
+	}, [userMention, optionFilter]);
+
 	return (
 		<View style={styles.wrapper}>
 			<TouchableOpacity
@@ -73,16 +72,30 @@ const InputSearchMessageChannel = ({
 				<Block marginRight={size.s_6}>
 					<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
 				</Block>
+				{optionFilter?.title || userMention?.display ? (
+					<Block
+						backgroundColor={themeValue.badgeHighlight}
+						borderRadius={size.s_18}
+						paddingHorizontal={size.s_10}
+						paddingVertical={size.s_2}
+						maxWidth={200}
+					>
+						<Text numberOfLines={1} style={styles.textBadgeHighLight}>
+							{`${optionFilter?.title || ''} ${userMention?.display || ''}`}
+						</Text>
+					</Block>
+				) : null}
 				<TextInput
+					onKeyPress={onKeyPress}
 					ref={inputSearchRef}
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
 					placeholderTextColor={themeValue.text}
-					placeholder={t('search')}
+					placeholder={optionFilter?.title || userMention?.display ? '' : t('search')}
 					autoFocus
 				></TextInput>
-				{!!textInput?.length ? (
+				{textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
 						<CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
@@ -97,9 +110,6 @@ const InputSearchMessageChannel = ({
 					<ListOptionSearch
 						onPressOption={(option) => {
 							onChangeOptionFilter(option);
-							setTextInput(option.title);
-							onChangeText(option.title);
-							setOptionFilter(option);
 							if (inputSearchRef.current) {
 								inputSearchRef.current.focus();
 							}

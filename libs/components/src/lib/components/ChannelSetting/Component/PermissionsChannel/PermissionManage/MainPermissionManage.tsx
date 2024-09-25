@@ -4,12 +4,12 @@ import {
 	RolesClanEntity,
 	selectAllPermissionRoleChannel,
 	selectAllRolesClan,
+	selectAllUserChannel,
 	selectAllUserClans,
 	selectPermissionChannel,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -36,11 +36,25 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const permissionsLength = useMemo(() => {
 		return Object.keys(permissions).length;
 	}, [permissions]);
-	const [currentRoleId, setCurrentRoleId] = useState<string>(EVERYONE_ROLE_ID);
+	const [currentRoleId, setCurrentRoleId] = useState<{ id: string; type: number }>();
 	const listPermission = useSelector(selectPermissionChannel);
 	const listPermissionRoleChannel = useSelector(selectAllPermissionRoleChannel);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const rolesInChannel = useSelector(selectRolesByChannelId(channelId));
+	const rawMembers = useSelector(selectAllUserChannel);
+	const combinedArray = [
+		...rolesInChannel.map((role) => ({
+			id: role.id,
+			title: role.title,
+			type: 0
+		})),
+		...rawMembers.map((member) => ({
+			id: member.id,
+			title: member.user?.username,
+			type: 1
+		}))
+	];
+
 	const { maxPermissionId } = useMyRole();
 	const [listRole, setListRole] = useState<RolesClanEntity[]>([]);
 	const dispatch = useAppDispatch();
@@ -86,8 +100,8 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	);
 
 	const handleSelectRole = useCallback(
-		(id: string) => {
-			setCurrentRoleId(id);
+		(id: string, type: number) => {
+			setCurrentRoleId({ id: id, type: type });
 		},
 		[setCurrentRoleId]
 	);
@@ -99,7 +113,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 
 	resetTriggerRef.current = handleReset;
 
-	const handleSave = async (roleId: string, permissionsArray: ApiPermissionUpdate[]) => {
+	const handleSave = async (id: string, permissionsArray: ApiPermissionUpdate[], type: number) => {
 		setPermissions({});
 		const intersection = listPermission.filter((x) => {
 			return !permissionsArray.some((y) => x.id === y.permission_id);
@@ -112,14 +126,27 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 				type: matchingRoleChannel ? (matchingRoleChannel.active ? TypeChoose.Tick : TypeChoose.Remove) : TypeChoose.Or
 			});
 		});
-		await dispatch(
-			permissionRoleChannelActions.setPermissionRoleChannel({
-				channelId: channelId,
-				roleId: roleId || '',
-				permission: permissionsArray,
-				maxPermissionId: maxPermissionId
-			})
-		);
+		if (type === 0) {
+			await dispatch(
+				permissionRoleChannelActions.setPermissionRoleChannel({
+					channelId: channelId,
+					roleId: id || '',
+					permission: permissionsArray,
+					maxPermissionId: maxPermissionId,
+					userId: ''
+				})
+			);
+		} else {
+			await dispatch(
+				permissionRoleChannelActions.setPermissionRoleChannel({
+					channelId: channelId,
+					roleId: '',
+					permission: permissionsArray,
+					maxPermissionId: maxPermissionId,
+					userId: id || ''
+				})
+			);
+		}
 	};
 
 	useEffect(() => {
@@ -137,21 +164,15 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 			});
 		}
 		saveTriggerRef.current = async () => {
-			await handleSave(currentRoleId || '', permissionsArray);
+			await handleSave(currentRoleId?.id || '', permissionsArray, currentRoleId?.type || 0);
 		};
 	}, [permissions, currentRoleId]);
 
-	useEffect(() => {
-		if (listRole.length === 0) {
-			setListRole([...rolesInChannel]);
-		}
-	}, [rolesInChannel, listRole]);
-
 	return (
-		listRole.length > 0 && (
+		combinedArray.length > 0 && (
 			<div className="flex mt-4 gap-x-4">
 				<ListRoleMember
-					listManageInChannel={listRole}
+					listManageInChannel={combinedArray}
 					listManageNotInChannel={rolesNotInChannel}
 					usersClan={usersClan}
 					channelId={channelId}

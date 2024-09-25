@@ -25,6 +25,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	currentCategoryId?: string | null;
 	sortChannelByCategoryId: Record<string, boolean>;
 	showEmptyCategory: boolean;
+	ctrlKSelectedChannelId?: string;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
@@ -164,6 +165,9 @@ export const categoriesSlice = createSlice({
 		},
 		setHideEmptyCategory: (state) => {
 			state.showEmptyCategory = false;
+		},
+		setCtrlKSelectedChannelId: (state, action: PayloadAction<string>) => {
+			state.ctrlKSelectedChannelId = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -274,3 +278,5 @@ export const selectDefaultCategory = createSelector(selectAllCategories, (catego
 export const selectCategoriesIds = createSelector(getCategoriesState, (entities) => entities.ids);
 
 export const selectIsShowEmptyCategory = createSelector(getCategoriesState, (state) => state.showEmptyCategory);
+
+export const selectCtrlKSelectedChannelId = createSelector(getCategoriesState, (state) => state.ctrlKSelectedChannelId);

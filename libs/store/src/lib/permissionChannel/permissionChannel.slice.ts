@@ -34,14 +34,16 @@ export const addChannelUsers = createAsyncThunk(
 	}
 );
 
-type removeChannelUsersPayload = {
+export type removeChannelUsersPayload = {
 	channelId: string;
 	userId: string;
+	clanId?: string;
+	channelType?: number;
 };
 
 export const removeChannelUsers = createAsyncThunk(
 	'channelUsers/removeChannelUsers',
-	async ({ channelId, userId }: removeChannelUsersPayload, thunkAPI) => {
+	async ({ channelId, userId, clanId, channelType }: removeChannelUsersPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const userIds = [userId];
@@ -49,7 +51,16 @@ export const removeChannelUsers = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(channelMembersActions.remove({ channelId, userId }));
+			if (clanId && channelType) {
+				const body = {
+					clanId: clanId,
+					channelId: channelId,
+					noCache: true,
+					channelType: channelType ?? 0,
+					repace: true
+				};
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
+			}
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();

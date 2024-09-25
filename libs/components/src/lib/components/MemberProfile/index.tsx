@@ -274,7 +274,14 @@ function MemberProfile({
 						src={avatar}
 						isAnonymous={isAnonymous}
 					/>
-					{!isHideIconStatus && (
+					{isFooter && (
+						<span
+							className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode rounded-full right-[-4px]`}
+						>
+							<Icons.OnlineStatus />
+						</span>
+					)}
+					{!isFooter && !isHideIconStatus && (
 						<StatusUser
 							isListDm={isListDm}
 							isMemberChannel={isMemberChannel}

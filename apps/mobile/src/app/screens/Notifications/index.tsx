@@ -1,13 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../temp-ui';
@@ -114,19 +114,16 @@ const Notifications = () => {
 	const handleOnPressNotify = async (notify: INotification) => {
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME as never);
-
-		store.dispatch(
-			channelsActions.joinChannel({
-				clanId: notify?.content?.clan_id ?? '',
-				channelId: notify?.content?.channel_id,
-				noFetchMembers: false
-			})
-		);
-		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, {
-			channelId: notify?.content?.channel_id,
-			categoryId: notify?.content?.category_id
+		requestAnimationFrame(async () => {
+			store.dispatch(
+				channelsActions.joinChannel({
+					clanId: notify?.content?.clan_id ?? '',
+					channelId: notify?.content?.channel_id,
+					noFetchMembers: false
+				})
+			);
+			navigation.dispatch(DrawerActions.closeDrawer());
 		});
-		navigation.dispatch(DrawerActions.closeDrawer());
 	};
 
 	const closeBottomSheet = () => {

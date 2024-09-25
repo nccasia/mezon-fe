@@ -21,7 +21,8 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const [showModal, setShowModal] = useState(false);
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageChannel]);
+	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission || hasManageChannelPermission;
 	const isThread = useMemo(() => {
 		return channel.parrent_id !== '0';
 	}, [channel]);

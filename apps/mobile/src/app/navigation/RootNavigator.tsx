@@ -65,13 +65,8 @@ const NavigationMain = () => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		}, 500);
-
-		const timerScrollToActive = setTimeout(async () => {
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { timeout: 100 });
-		}, 4000);
 		return () => {
 			clearTimeout(timer);
-			clearTimeout(timerScrollToActive);
 		};
 	}, []);
 
@@ -245,12 +240,12 @@ const NavigationMain = () => {
 	);
 
 	return (
-		<NavigationContainer>
-			<Suspense fallback={<SplashScreen />}>
+		<Suspense fallback={<SplashScreen />}>
+			<NavigationContainer>
 				<NetInfoComp />
 				{isReadyForUse && <MyStackComponent />}
-			</Suspense>
-		</NavigationContainer>
+			</NavigationContainer>
+		</Suspense>
 	);
 };
 

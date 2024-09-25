@@ -32,6 +32,7 @@ export interface AppState {
 	isFromFcmMobile: boolean;
 	isShowSettingFooter: showSettingFooterProps;
 	isShowPopupQuickMess: boolean;
+	categoryChannelOffsets: { [key: number]: number };
 }
 
 export const initialAppState: AppState = {
@@ -49,7 +50,8 @@ export const initialAppState: AppState = {
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
 	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true },
-	isShowPopupQuickMess: false
+	isShowPopupQuickMess: false,
+	categoryChannelOffsets: {}
 };
 
 export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI) => {
@@ -150,6 +152,12 @@ export const appSlice = createSlice({
 		},
 		setIsShowPopupQuickMess: (state, action) => {
 			state.isShowPopupQuickMess = action.payload;
+		},
+		setCategoryChannelOffsets: (state, action) => {
+			state.categoryChannelOffsets = {
+				...state.categoryChannelOffsets,
+				...action.payload
+			};
 		}
 	}
 });
@@ -194,3 +202,5 @@ export const selectIsFromFCMMobile = createSelector(getAppState, (state: AppStat
 export const selectIsShowSettingFooter = createSelector(getAppState, (state: AppState) => state.isShowSettingFooter);
 
 export const selectIsShowPopupQuickMess = createSelector(getAppState, (state: AppState) => state.isShowPopupQuickMess);
+
+export const selectCategoryChannelOffsets = createSelector(getAppState, (state: AppState) => state.categoryChannelOffsets);

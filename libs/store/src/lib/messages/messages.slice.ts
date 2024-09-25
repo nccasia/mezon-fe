@@ -839,13 +839,15 @@ export const messagesSlice = createSlice({
 				timeAt: Date.now()
 			};
 
-			if (!state.typingUsers?.[channelId]) {
+			if (!state.typingUsers) {
 				state.typingUsers = {};
+			}
+
+			if (!state.typingUsers?.[channelId]) {
 				state.typingUsers[channelId] = {
 					users: []
 				};
 			}
-
 			state.typingUsers[channelId].users.push(user);
 		},
 		recheckTypingUsers: (state, action) => {

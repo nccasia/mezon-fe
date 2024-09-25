@@ -26,39 +26,18 @@ export interface PermissionRoleChannelState extends EntityState<PermissionRoleCh
 
 export const permissionRoleChannelAdapter = createEntityAdapter<PermissionRoleChannelsEntity>();
 
-// type fetchMaxPermissionChannelsArgs = {
-// 	channelId: string;
-// 	clanId: string;
-// };
-
-// export const fetchMaxPermissionRoleChannel = createAsyncThunk(
-// 	'permissionrolechannel/fetchMaxPermissionRoleChannel',
-// 	async ({ clanId, channelId }: fetchMaxPermissionChannelsArgs, thunkAPI) => {
-// 		try {
-// 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-// 			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
-// 			if (response && response.permissions.permissions) {
-// 				await thunkAPI.dispatch(permissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
-// 			}
-// 			console.log("response: ", response);
-
-// 			return response;
-// 		} catch (error) {
-// 			return thunkAPI.rejectWithValue([]);
-// 		}
-// 	}
-// );
-
 type fetchChannelsArgs = {
 	channelId: string;
 	roleId: string;
+	userId: string;
 };
 
 export const fetchPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchPermissionRoleChannel',
-	async ({ channelId, roleId }: fetchChannelsArgs, thunkAPI) => {
+	async ({ channelId, roleId, userId }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId);
+
+		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId, userId);
 		if (!response?.permission_role_channel) {
 			return [];
 		}
@@ -71,22 +50,24 @@ export type SetPermissionRoleChannel = {
 	roleId: string;
 	permission: Array<ApiPermissionUpdate>;
 	maxPermissionId: string;
+	userId: string;
 };
 
 export const setPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/setPermissionRoleChannel',
-	async ({ channelId, roleId, permission, maxPermissionId }: SetPermissionRoleChannel, thunkAPI) => {
+	async ({ channelId, roleId, permission, maxPermissionId, userId }: SetPermissionRoleChannel, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const body = {
 				channel_id: channelId,
 				role_id: roleId,
 				permission_update: permission,
-				max_permission_id: maxPermissionId
+				max_permission_id: maxPermissionId,
+				user_id: userId
 			};
 			const response = await mezon.client.setRoleChannelPermission(mezon.session, body);
 			if (response) {
-				await thunkAPI.dispatch(fetchPermissionRoleChannel({ channelId: channelId, roleId: roleId }));
+				await thunkAPI.dispatch(fetchPermissionRoleChannel({ channelId: channelId, roleId: roleId, userId: userId }));
 			}
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);

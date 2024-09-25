@@ -16,8 +16,6 @@ interface ISeachOptionPageProps {
 	optionFilter: IOption;
 }
 
-const userMentionTextRegex = /:(.*)/;
-
 function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const userListData = UseMentionList(currentChannel?.id, currentChannel?.type);
@@ -38,9 +36,11 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 	const searchUserListByMention = useMemo(() => {
 		if (!searchText) return userListDataSearchByMention;
 
-		const searchTextUserMention = searchText.match(userMentionTextRegex);
+		const searchTextUserMention = searchText;
 		if (searchTextUserMention) {
-			return userListDataSearchByMention?.filter((user) => user.display.toLowerCase().includes(searchTextUserMention[1].toLowerCase()));
+			return userListDataSearchByMention?.filter((user) =>
+				user?.display?.toLowerCase()?.trim().includes(searchTextUserMention?.toLowerCase()?.trim())
+			);
 		}
 		return userListDataSearchByMention;
 	}, [searchText, userListDataSearchByMention]);

@@ -15,6 +15,8 @@ import MessageReaction from './MessageReaction/MessageReaction';
 import MessageReply from './MessageReply/MessageReply';
 import { useMessageParser } from './useMessageParser';
 
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 export type ReactedOutsideOptional = {
 	id: string;
 	emoji?: string;
@@ -56,8 +58,13 @@ function MessageWithUser({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+			if (checkAnonymous) {
+				return;
+			}
 			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
 			if (window.innerHeight - e.clientY > heightPanel) {
 				setPositionShortUser({

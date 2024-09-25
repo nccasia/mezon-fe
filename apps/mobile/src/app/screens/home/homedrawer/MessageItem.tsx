@@ -45,6 +45,7 @@ import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
+import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -242,7 +243,6 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
@@ -459,7 +459,12 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				{/*<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />*/}
+				<NewMessageRedLine
+					channelId={props?.channelId}
+					messageId={props?.messageId}
+					isEdited={message?.hideEditted}
+					isSending={message?.isSending}
+				/>
 			</Animated.View>
 		);
 	},

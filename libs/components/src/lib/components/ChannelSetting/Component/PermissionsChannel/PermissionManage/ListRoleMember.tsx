@@ -8,39 +8,64 @@ import {
 	UsersClanEntity
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EVERYONE_ROLE_ID, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../../AvatarImage/AvatarImage';
 
+type combinedArray = {
+	id: string;
+	title: string | undefined;
+	type: number;
+}[];
+
 type ListRoleMemberProps = {
 	listManageNotInChannel: RolesClanEntity[];
-	listManageInChannel: RolesClanEntity[];
+	listManageInChannel: combinedArray;
 	usersClan: UsersClanEntity[];
 	setListManage?: React.Dispatch<React.SetStateAction<RolesClanEntity[]>>;
 	channelId: string;
-	onSelect: (id: string) => void;
+	onSelect: (id: string, type: number) => void;
 	canChange: boolean;
 };
 
 const ListRoleMember = memo((props: ListRoleMemberProps) => {
 	const { listManageInChannel, usersClan, channelId, onSelect, canChange, listManageNotInChannel } = props;
-	const [selectedItemId, setSelectedItemId] = useState<string | null>(EVERYONE_ROLE_ID);
+	const [selectedItemId, setSelectedItemId] = useState<string | null>(listManageInChannel[0].id);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (listManageInChannel.length > 0) {
-			setSelectedItemId(listManageInChannel[0].id);
-			onSelect(listManageInChannel[0].id);
-			dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: listManageInChannel[0].id }));
+			onSelect(listManageInChannel[0].id, listManageInChannel[0].type);
+			if (listManageInChannel[0].type === 0) {
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({
+						channelId: channelId,
+						roleId: listManageInChannel[0].id,
+						userId: ''
+					})
+				);
+			} else {
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({
+						channelId: channelId,
+						roleId: '',
+						userId: listManageInChannel[0].id
+					})
+				);
+			}
 		}
-	}, [channelId, listManageInChannel]);
+	}, [channelId]);
 
 	const handleItemClick = (item: any) => {
 		if (canChange) {
 			setSelectedItemId(item.id);
-			onSelect(item.id);
-			dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id }));
+			onSelect(item.id, item.type);
+			if (item.type === 0) {
+				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id, userId: '' }));
+			} else {
+				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: '', userId: item.id }));
+			}
 		}
 	};
 

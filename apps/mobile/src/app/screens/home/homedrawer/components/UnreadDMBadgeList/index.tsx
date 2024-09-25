@@ -26,18 +26,22 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 								<Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>
 							</View>
 						)}
-						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{dm?.count_mess_unread || ''}</Text>
-						</View>
+						{dm?.count_mess_unread > 0 && (
+							<View style={styles.badge}>
+								<Text style={styles.badgeText}>{dm?.count_mess_unread || ''}</Text>
+							</View>
+						)}
 					</View>
 				);
 			case ChannelType.CHANNEL_TYPE_GROUP:
 				return (
 					<View style={styles.groupAvatar}>
 						<UserGroupIcon />
-						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
-						</View>
+						{dm?.count_mess_unread > 0 && (
+							<View style={styles.badge}>
+								<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
+							</View>
+						)}
 					</View>
 				);
 			default:

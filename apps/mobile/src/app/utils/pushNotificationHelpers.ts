@@ -1,5 +1,4 @@
 import {
-	ActionEmitEvent,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
@@ -13,7 +12,7 @@ import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
-import { Alert, DeviceEventEmitter, Linking, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
@@ -181,7 +180,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			} else {
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 			}
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId });
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));

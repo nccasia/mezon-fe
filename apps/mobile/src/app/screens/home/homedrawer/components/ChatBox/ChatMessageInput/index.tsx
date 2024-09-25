@@ -106,7 +106,7 @@ export const ChatMessageInput = memo(
 						isParentPublic: parent ? !parent.channel_private : false
 					})
 				);
-			}, [channelId, currentClanId, dispatch, isPublic, mode]);
+			}, [channelId, currentClanId, dispatch, isPublic, mode, parent, parentId]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 

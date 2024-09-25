@@ -60,6 +60,10 @@ const DeleteClanModal = ({
 
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		const indexClanJoin = currentClan?.clan_id === clans[0]?.clan_id ? 1 : 0;
+		if (clans?.length === 1) {
+			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+			return;
+		}
 		if (clans?.[indexClanJoin]) {
 			navigation.navigate(APP_SCREEN.HOME);
 			store.dispatch(clansActions.joinClan({ clanId: clans?.[indexClanJoin]?.clan_id }));
@@ -79,7 +83,7 @@ const DeleteClanModal = ({
 			confirmText={t('deleteClanModal.confirm')}
 			title={isLeaveClan ? t('deleteClanModal.titleLeaveClan') : t('deleteClanModal.title')}
 			children={
-				<Text style={[styles.contentText, { color: themeValue.text }]}>
+				<Text style={[styles.contentText, { color: themeValue.white }]}>
 					{t(isLeaveClan ? 'deleteClanModal.descriptionLeaveClan' : 'deleteClanModal.description', { currentClan: currentClanName })
 						.split(currentClanName)
 						.reduce((acc, part, index) => {

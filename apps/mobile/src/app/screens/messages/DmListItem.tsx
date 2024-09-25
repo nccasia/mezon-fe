@@ -12,24 +12,30 @@ import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { RenderTextMarkdownContent } from '../home/homedrawer/components';
 import { style } from './styles';
 
-export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress }) => {
+export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress; onPress?; directMessageId? }) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const { directMessage, navigation, onLongPress } = props;
+	const { directMessage, navigation, onLongPress, onPress, directMessageId } = props;
 	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
 	const userStatus = directMessage?.is_online?.some(Boolean);
+	const isTabletLandscape = useTabletLandscape();
 
 	const redirectToMessageDetail = () => {
-		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: directMessage?.id }
-		});
+		if (isTabletLandscape) {
+			onPress && onPress(directMessage?.id)
+		} else {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: directMessage?.id }
+			});
+		}
 	};
 
 	const isTypeDMGroup = useMemo(() => {
@@ -89,7 +95,13 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()} onLongPress={onLongPress}>
+		<TouchableOpacity 
+			style={[styles.messageItem, 
+					isTabletLandscape && directMessageId === directMessage?.id && { backgroundColor: themeValue.secondary }
+				]} 
+			onPress={() => redirectToMessageDetail()} 
+			onLongPress={onLongPress}
+		>
 			{isTypeDMGroup ? (
 				<View style={styles.groupAvatar}>
 					<Icons.GroupIcon />

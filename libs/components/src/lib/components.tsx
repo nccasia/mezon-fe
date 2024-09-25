@@ -78,4 +78,6 @@ export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
 export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
+export { default as ModalDeleteMess } from './components/DeleteMessageModal/ModalDeleteMess';
+export { default as useProcessMention } from './components/MessageBox/ReactionMentionInput/useProcessMention';
 export * from './components/ThumbnailAttachmentRender';

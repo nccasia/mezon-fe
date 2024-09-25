@@ -293,3 +293,9 @@ export const selectCountByChannelId = (channelId: string) =>
 		selectSpecificNotifications,
 		(notifications) => notifications.filter((notification) => notification.content.channel_id === channelId).length
 	);
+
+export const selectCountByClanId = (clanId: string) =>
+	createSelector(
+		selectSpecificNotifications,
+		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
+	);

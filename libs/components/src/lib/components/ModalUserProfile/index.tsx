@@ -153,7 +153,7 @@ const ModalUserProfile = ({
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{name || userById?.user?.display_name || userById?.user?.username}
+							{checkAnonymous ? 'Anonymous' : name || userById?.user?.display_name || userById?.user?.username}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
 							{isFooterProfile

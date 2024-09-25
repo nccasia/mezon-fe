@@ -80,7 +80,7 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
@@ -825,30 +825,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		]
 	);
 
+	const timerIdRef = useRef<NodeJS.Timeout | null>(null);
+
 	const handleReconnect = useCallback(
 		async (socketType: string) => {
-			if (socketRef.current?.isOpen()) return;
-			dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
-			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
-			try {
-				const socket = await reconnectWithTimeout(clanIdActive ?? '');
-				if (!socket) {
-					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					return;
-				}
-
-				if (window && navigator) {
-					if (navigator.onLine) {
-						dispatch(appActions.refreshApp());
-					} else {
-						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
-					}
-				}
-
-				setCallbackEventFn(socket as Socket);
-			} catch (error) {
-				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+			if (timerIdRef.current) {
+				clearTimeout(timerIdRef.current);
 			}
+			timerIdRef.current = setTimeout(async () => {
+				if (socketRef.current?.isOpen()) return;
+				dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
+				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
+				try {
+					const socket = await reconnectWithTimeout(clanIdActive ?? '');
+
+					if (socket === 'RECONNECTING') return;
+
+					if (!socket) {
+						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+						return;
+					}
+
+					if (window && navigator) {
+						if (navigator.onLine) {
+							dispatch(appActions.refreshApp());
+						} else {
+							dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+						}
+					}
+
+					setCallbackEventFn(socket as Socket);
+				} catch (error) {
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+				}
+			}, 5000);
 		},
 		[dispatch, clanIdActive, reconnectWithTimeout, setCallbackEventFn]
 	);

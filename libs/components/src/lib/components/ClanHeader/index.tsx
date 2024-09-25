@@ -8,13 +8,13 @@ import {
 	selectIsShowEmptyCategory,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -177,9 +177,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									/>
 									<button
 										onClick={toggleShowEmptyCategory}
-										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2"
+										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2 hover:bg-bgSelectItem group"
 									>
-										<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+										<li className="text-[14px] dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
 											Show Empty Categories
 										</li>
 										{/* <div className="flex items-center justify-center h-[18px] w-[18px]"> */}

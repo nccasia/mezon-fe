@@ -1,18 +1,9 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
-import {
-	RolesClanEntity,
-	UsersClanEntity,
-	getNewAddMembers,
-	getSelectedRoleId,
-	selectAllUserClans,
-	selectCurrentClan,
-	selectTheme,
-	setAddMemberRoles
-} from '@mezon/store';
+import { RolesClanEntity, getSelectedRoleId, selectAllUserClans, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { ThemeApp, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 interface ModalProps {
@@ -22,65 +13,73 @@ interface ModalProps {
 }
 
 export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClose }) => {
-	const { updateRole } = useRoles();
 	const dispatch = useDispatch();
-	const [searchTerm, setSearchTerm] = useState('');
+	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
 	const usersClan = useSelector(selectAllUserClans);
-	const addUsers = useSelector(getNewAddMembers);
+	const selectedRoleId = useSelector(getSelectedRoleId);
 
-	const clickRole = useSelector(getSelectedRoleId);
-	const activeRole = RolesClan.find((role) => role.id === clickRole);
-	const memberRoles = activeRole?.role_user_list?.role_users;
-	const membersNotInRoles = usersClan.filter((member) => {
-		return !memberRoles || !memberRoles.some((roleMember) => roleMember.id === member.id);
-	});
+	const { updateRole } = useRoles();
 
-	const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedUserIds, setSelectedUserIds] = useState<Record<string, boolean>>({});
 
-	useEffect(() => {
-		if (isOpen) {
-			const filteredMemberIds = membersNotInRoles.filter((member) => addUsers.includes(member.id)).map((member) => member.id);
-			setSelectedUsers(filteredMemberIds);
-		}
-	}, [isOpen, memberRoles]);
+	const selectedRole = useMemo(() => {
+		return RolesClan.find((role) => role.id === selectedRoleId);
+	}, [RolesClan, selectedRoleId]);
 
-	const [searchResults, setSearchResults] = useState<UsersClanEntity[]>([]);
-
-	useEffect(() => {
-		setSearchResults(membersNotInRoles);
-	}, [clickRole, memberRoles, membersNotInRoles]);
-
-	const handleUserToggle = (permissionId: string) => {
-		setSelectedUsers((prevPermissions) => {
-			if (prevPermissions.includes(permissionId)) {
-				return prevPermissions.filter((id) => id !== permissionId);
-			} else {
-				return [...prevPermissions, permissionId];
+	const userIdsInSelectedRole = useMemo(() => {
+		return selectedRole?.role_user_list?.role_users?.reduce<Record<string, boolean>>((ids, user) => {
+			if (user.id) {
+				ids[user.id] = true;
 			}
-		});
-	};
+			return ids;
+		}, {});
+	}, [selectedRole]);
 
-	useEffect(() => {
-		const results = membersNotInRoles.filter((member) => {
-			const clanName = member?.clan_nick?.toLowerCase();
-			const displayName = member.user?.display_name?.toLowerCase();
-			const userName = member.user?.username?.toLowerCase();
-			const lowerCaseSearchTerm = searchTerm.toLowerCase();
+	const usersNotInSelectedRole = useMemo(() => {
+		if (!userIdsInSelectedRole) {
+			return [...usersClan];
+		}
+		return usersClan.filter((user) => !userIdsInSelectedRole[user.id]);
+	}, [userIdsInSelectedRole]);
+
+	const displayUsers = useMemo(() => {
+		const lowerCaseSearchTerm = searchTerm.toLowerCase();
+		return usersNotInSelectedRole.filter((user) => {
+			const clanName = user?.clan_nick?.toLowerCase();
+			const displayName = user.user?.display_name?.toLowerCase();
+			const userName = user.user?.username?.toLowerCase();
 			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
 		});
-		setSearchResults(results);
-	}, [searchTerm]);
+	}, [searchTerm, usersNotInSelectedRole]);
 
-	const handleUpdateRole = async () => {
-		if (clickRole === 'New Role') {
-			dispatch(setAddMemberRoles(selectedUsers));
+	const handleUserToggle = useCallback((id: string, checked: boolean) => {
+		setSelectedUserIds((userIds) => {
+			const temp = { ...userIds };
+			if (checked) {
+				return { ...temp, [id]: checked };
+			}
+			delete temp[id];
+			return temp;
+		});
+	}, []);
+
+	const handleUpdateRole = useCallback(async () => {
+		const userIds = Object.keys(selectedUserIds);
+
+		if (selectedRoleId === 'New Role') {
+			dispatch(setAddMemberRoles(userIds));
 		} else {
-			await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', selectedUsers, [], [], []);
+			await updateRole(currentClan?.id ?? '', selectedRoleId, selectedRole?.title ?? '', userIds, [], [], []);
 		}
-	};
+	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 
-	const appearanceTheme = useSelector(selectTheme);
+	useEffect(() => {
+		if (!isOpen) {
+			setSelectedUserIds({});
+		}
+	}, [isOpen]);
 
 	return (
 		isOpen && (
@@ -93,7 +92,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 						<h2 className="text-2xl font-semibold">Add members</h2>
 						<p className="text-contentTertiary text-[16px] mb-4 font-light inline-flex gap-x-2 items-center">
 							<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5" />
-							{activeRole?.title}
+							{selectedRole?.title}
 						</p>
 						<div className="w-full flex mb-3">
 							<InputField
@@ -107,17 +106,17 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 						<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Members</p>
 						<div className="overflow-y-auto">
 							<ul className="flex flex-col gap-y-[5px] max-h-[200px] font-light text-sm ">
-								{searchResults.map((permission) => (
+								{displayUsers.map((user) => (
 									<ItemMemberModal
-										key={permission?.id}
-										id={permission?.id}
-										userName={permission?.user?.username}
-										displayName={permission?.user?.display_name}
-										clanName={permission?.clan_nick}
-										clanAvatar={permission.clan_avatar}
-										avatar={permission?.user?.avatar_url}
-										checked={selectedUsers.includes(permission.id)}
-										onHandle={() => handleUserToggle(permission.id)}
+										key={user?.id}
+										id={user?.id}
+										userName={user?.user?.username}
+										displayName={user?.user?.display_name}
+										clanName={user?.clan_nick}
+										clanAvatar={user.clan_avatar}
+										avatar={user?.user?.avatar_url}
+										checked={Boolean(selectedUserIds[user.id])}
+										onHandle={(checked: boolean) => handleUserToggle(user.id, checked)}
 									/>
 								))}
 							</ul>
@@ -156,11 +155,11 @@ type ItemMemberModalProps = {
 	clanAvatar?: string;
 	avatar?: string;
 	checked: boolean;
-	onHandle: () => void;
+	onHandle: (value: boolean) => void;
 };
 
 const ItemMemberModal = (props: ItemMemberModalProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked, onHandle } = props;
+	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked = false, onHandle } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
@@ -177,7 +176,7 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 					<p className="font-semibold one-line">{namePrioritize}</p>
 					<p className="text-contentTertiary one-line">{userName}</p>
 				</div>
-				<input id={id} type="checkbox" checked={checked} onChange={onHandle} />
+				<input id={id} type="checkbox" checked={checked} onChange={(event) => onHandle(event.target.checked)} />
 			</label>
 		</li>
 	);

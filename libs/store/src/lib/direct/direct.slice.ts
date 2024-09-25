@@ -294,6 +294,7 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, sel
 		.map((dm) => {
 			if (!dm?.channel_id) return dm;
 			const found = directMetaEntities?.[dm.channel_id];
+			if (!found) return dm;
 			return {
 				...dm,
 				last_sent_message: { ...dm.last_sent_message, ...found.last_sent_message },

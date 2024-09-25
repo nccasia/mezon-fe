@@ -33,6 +33,7 @@ export type Attributes = {
 	colorActiveClan: HexColor;
 	textRoleLink: HexColor;
 	darkMossGreen: HexColor;
+	badgeHighlight: HexColor;
 };
 
 type ThemeColor = Record<ThemeModeBase, Attributes>;
@@ -84,7 +85,8 @@ export const themeColors: ThemeColor = {
 		colorAvatarDefault: '#334155FF',
 		colorActiveClan: '#141c2a',
 		textRoleLink: '#009c67',
-		darkMossGreen: '#3c4c43'
+		darkMossGreen: '#3c4c43',
+		badgeHighlight: '#2e2f34'
 	},
 	light: {
 		primary: '#f2f3f5',
@@ -116,6 +118,7 @@ export const themeColors: ThemeColor = {
 		colorAvatarDefault: '#334155FF',
 		colorActiveClan: '#d8e2f0',
 		textRoleLink: '#00b098',
-		darkMossGreen: '#e2f1e5'
+		darkMossGreen: '#e2f1e5',
+		badgeHighlight: '#fff'
 	}
 };

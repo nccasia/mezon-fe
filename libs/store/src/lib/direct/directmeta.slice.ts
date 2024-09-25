@@ -32,10 +32,13 @@ export const initialDirectMetaState: DirectMetaState = directMetaAdapter.getInit
 });
 
 function extractDMMeta(channel: DirectEntity): DMMeta {
+	const lastSeenTimestamp = Number(channel?.last_seen_message?.timestamp_seconds);
+	const lastSentTimestamp = Number(channel?.last_sent_message?.timestamp_seconds);
+
 	return {
 		id: channel.id,
-		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
+		lastSeenTimestamp: isNaN(lastSeenTimestamp) ? lastSentTimestamp : lastSeenTimestamp,
+		lastSentTimestamp: lastSentTimestamp,
 		notifiCount: Number(channel.count_mess_unread || 0)
 	};
 }

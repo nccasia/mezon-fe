@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Icons } from '@mezon/components';
-import { useAppParams, useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useCheckAlonePermission, useClanRestriction, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -15,6 +14,7 @@ import {
 	selectChannelById,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
 	selectMessageByMessageId,
@@ -29,6 +29,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import {
 	ContextMenuItem,
 	EPermission,
@@ -44,6 +45,7 @@ import {
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
+import ModalDeleteMess from '../DeleteMessageModal/ModalDeleteMess';
 import { ModalAddPinMess } from '../PinMessModal';
 import DynamicContextMenu from './DynamicContextMenu';
 import { useMessageContextMenu } from './MessageContextMenuContext';
@@ -64,10 +66,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentDm = useSelector(selectDmGroupCurrent(currentDmId || ''));
 	const modeResponsive = useSelector(selectModeResponsive);
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '')
+		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
+	const currentMessage = useAppSelector(selectMessageByMessageId(messageId));
 	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
@@ -77,6 +81,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkSenderMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
+	const mode = useMemo(() => {
+		if (modeResponsive === ModeResponsive.MODE_CLAN) {
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		}
+
+		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
+			return ChannelStreamMode.STREAM_MODE_DM;
+		}
+
+		return ChannelStreamMode.STREAM_MODE_GROUP;
+	}, [modeResponsive, currentDm?.type]);
 
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
@@ -97,6 +112,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
+	const [isOPenDeleteMessageModal, setIsOPenDeleteMessageModal] = useState<boolean>(false);
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = () => {
@@ -107,12 +123,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			!convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup
 		);
 	};
-
-	// add action
-	const { deleteSendMessage } = useDeleteMessage({
-		channelId: currentChannel?.id || '',
-		mode: activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL
-	});
 
 	const handleReplyMessage = () => {
 		dispatch(
@@ -483,13 +493,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem(
 				'deleteMessage',
 				'Delete Message',
-				async () => {
-					try {
-						await deleteSendMessage(message.id);
-					} catch (error) {
-						console.error('Failed to delete message', error);
-					}
-				},
+				() => setIsOPenDeleteMessageModal(true),
 				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
@@ -578,6 +582,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					handlePinMessage={handlePinMessage}
 					mode={activeMode || 0}
 					channelLabel={currentChannel?.channel_label || ''}
+				/>
+			)}
+			{isOPenDeleteMessageModal && (
+				<ModalDeleteMess
+					mess={currentMessage}
+					closeModal={() => {
+						setIsOPenDeleteMessageModal(false);
+					}}
+					mode={mode}
 				/>
 			)}
 		</>

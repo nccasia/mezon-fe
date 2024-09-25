@@ -1,4 +1,4 @@
-import { IOptionSearchProps, NittroIcon } from '@mezon/mobile-components';
+import { IOptionSearchProps } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { style } from './OptionSearch.styles';
@@ -17,7 +17,7 @@ const OptionSearch = ({ option, onSelect }: IOptionSearchProps) => {
 						{option?.content}
 					</Text>
 				</View>
-				<NittroIcon />
+				{option?.icon}
 			</View>
 		</TouchableOpacity>
 	);

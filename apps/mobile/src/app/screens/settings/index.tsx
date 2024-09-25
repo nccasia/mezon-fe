@@ -7,7 +7,7 @@ import {
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			},
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <Icons.UserCircleIcon color={themeValue.textStrong} />,
+			icon: <Icons.UserCircleIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		// {
 		// 	onPress: () => reserve(),
@@ -118,7 +118,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
+			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
@@ -127,19 +127,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.serverBoost'),
-			icon: <Icons.BoostTier2Icon color={themeValue.textStrong} />,
+			icon: <Icons.BoostTier2Icon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <Icons.GiftIcon color={themeValue.textStrong} />,
+			icon: <Icons.GiftIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
+			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
@@ -158,7 +158,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			},
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong} />,
+			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		// {
 		// 	onPress: () => reserve(),
@@ -175,7 +175,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('appSettings.language'),
 			expandable: true,
 			previewValue: i18n.language,
-			icon: <Icons.LanguageIcon color={themeValue.textStrong} />,
+			icon: <Icons.LanguageIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		// {
 		// 	onPress: () => reserve(),
@@ -214,19 +214,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <Icons.CircleQuestionIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleQuestionIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.uploadLog'),
-			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
@@ -235,7 +235,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />,
 		},
 	] satisfies IMezonMenuItemProps[], [themeValue.textStrong]);
 
@@ -244,7 +244,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => confirmLogout(),
 			title: t('logOut'),
 			textStyle: { color: baseColor.redStrong },
-			icon: <Icons.DoorExitIcon color={baseColor.redStrong} />
+			icon: <Icons.DoorExitIcon color={baseColor.redStrong} width={size.s_24} height={size.s_24} />
 		}
 	] satisfies IMezonMenuItemProps[], []);
 

@@ -1,4 +1,4 @@
-import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -55,9 +55,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 	};
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) as string;
-	const currentChannelId = useSelector(selectCurrentChannelId) as string;
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: currentChannelId, clanId: currentClanId }));
+		dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
 	});
 
 	useEffect(() => {

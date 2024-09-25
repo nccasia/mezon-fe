@@ -10,7 +10,7 @@ import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import { style } from './styles';
 
 interface IChatMessageWrapperProps {
-	handleBack: () => void;
+	handleBack?: () => void;
 	directMessageId: string;
 	isModeDM: boolean;
 	currentClanId: string;

@@ -7,7 +7,7 @@ import TableMember from './TableMember';
 
 const MemberClan = () => {
 	const [currentPage, setCurrentPage] = useState(1);
-	const [pageSize, setPageSize] = useState(5);
+	const [pageSize, setPageSize] = useState(10);
 	const { filteredMembers } = useMemberContext();
 	const totalPages = useMemo(() => {
 		return Math.ceil(filteredMembers.length / pageSize);
@@ -48,21 +48,21 @@ const MemberClan = () => {
 						>
 							<Dropdown.Item
 								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-								onClick={() => handleChangePageSize(3)}
-							>
-								3
-							</Dropdown.Item>
-							<Dropdown.Item
-								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-								onClick={() => handleChangePageSize(5)}
-							>
-								5
-							</Dropdown.Item>
-							<Dropdown.Item
-								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
 								onClick={() => handleChangePageSize(10)}
 							>
 								10
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(50)}
+							>
+								50
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(100)}
+							>
+								100
 							</Dropdown.Item>
 						</Dropdown>
 						members of {filteredMembers.length}

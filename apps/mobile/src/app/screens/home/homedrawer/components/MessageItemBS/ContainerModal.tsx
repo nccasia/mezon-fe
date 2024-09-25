@@ -366,39 +366,39 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const getActionMessageIcon = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.EditMessage:
-				return <Icons.PencilIcon color={themeValue.text} />;
+				return <Icons.PencilIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Reply:
-				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.ForwardMessage:
-				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.ForwardAllMessages:
-				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CreateThread:
-				return <Icons.ThreadIcon color={themeValue.text} />;
+				return <Icons.ThreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyText:
-				return <Icons.CopyIcon color={themeValue.text} />;
+				return <Icons.CopyIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.DeleteMessage:
-				return <Icons.TrashIcon color={baseColor.red} height={20} width={20} />;
+				return <Icons.TrashIcon color={baseColor.red} height={size.s_20} width={size.s_20} />;
 			case EMessageActionType.PinMessage:
-				return <Icons.PinIcon color={themeValue.text} />;
+				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.UnPinMessage:
-				return <Icons.PinIcon color={themeValue.text} />;
+				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.MarkUnRead:
-				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Mention:
-				return <Icons.AtIcon color={themeValue.text} />;
+				return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
-				return <Icons.DownloadIcon color={themeValue.text} />;
+				return <Icons.DownloadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMediaLink:
-				return <Icons.LinkIcon color={themeValue.text} />;
+				return <Icons.LinkIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMessageLink:
-				return <Icons.LinkIcon color={themeValue.text} />;
+				return <Icons.LinkIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Report:
 				return <Icons.FlagIcon color={baseColor.red} height={size.s_14} width={size.s_14} />;
 			case EMessageActionType.GiveACoffee:
 				return <Icons.GiftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />;
 			case EMessageActionType.ResendMessage:
-				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
