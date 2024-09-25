@@ -166,7 +166,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: thread?.category_id });
 	};
 	return (
 		<KeyboardAvoidingView style={styles.createChannelContainer}>

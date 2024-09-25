@@ -1,5 +1,5 @@
 import { useNotification } from '@mezon/core';
-import { selectSpecificNotifications, selectTheme } from '@mezon/store';
+import { directMetaActions, notificationActions, selectSpecificNotifications, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationCode } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
@@ -64,6 +64,10 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	const handleMarkAllAsRead = useCallback(() => {
 		// localStorage.setItem('notiUnread', JSON.stringify([]));
 		// dispatch(notificationActions.setStatusNoti());
+		localStorage.setItem('notiUnread', JSON.stringify([]));
+		dispatch(notificationActions.removeAllNotificattionChannel());
+		dispatch(directMetaActions.removeUnreadAllDm());
+		dispatch(notificationActions.setStatusNoti());
 	}, []);
 
 	return (
@@ -90,13 +94,12 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 								);
 							})}
 						</div>
-						{currentTabNotify === InboxType.UNREADS && replyAndMentionNotification.length > 0 && (
-							<div className="w-[30%] flex flex-row justify-end items-center">
-								<button onClick={handleMarkAllAsRead} className="w-fit text-xs hover:underline">
-									Mark all as read
-								</button>
-							</div>
-						)}
+
+						<div className="w-[30%] flex flex-row justify-end items-center">
+							<button onClick={handleMarkAllAsRead} className="w-fit text-xs hover:underline">
+								Mark all as read
+							</button>
+						</div>
 					</div>
 				</div>
 

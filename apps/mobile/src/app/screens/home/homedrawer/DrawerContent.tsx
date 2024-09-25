@@ -5,6 +5,7 @@ import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/sto
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import ChannelList from './ChannelList';
 import ServerList from './ServerList';
 import UserEmptyClan from './UserEmptyClan';
@@ -46,9 +47,10 @@ const MemoizedChannelList = React.memo(ChannelList, (prevProps, nextProps) => {
 const DrawerContent = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const isTabletLandscape = useTabletLandscape();
 
 	return (
-		<View style={[styles.containerDrawerContent, { backgroundColor: themeValue.primary }]}>
+		<View style={[styles.containerDrawerContent, { backgroundColor: isTabletLandscape ? themeValue.tertiary : themeValue.primary }]}>
 			<ServerList />
 			<ChannelListWrapper />
 		</View>

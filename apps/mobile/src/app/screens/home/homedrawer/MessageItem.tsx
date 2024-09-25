@@ -243,7 +243,6 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {

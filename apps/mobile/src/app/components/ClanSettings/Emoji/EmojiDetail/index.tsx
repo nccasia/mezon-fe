@@ -1,11 +1,11 @@
-import { useAuth } from '@mezon/core';
+import { useClanRestriction } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store-mobile';
-import { getSrcEmoji } from '@mezon/utils';
+import { emojiSuggestionActions, selectCurrentClanId, selectCurrentUserId, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { EPermission, getSrcEmoji } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { forwardRef, Ref, useRef, useState } from 'react';
+import { forwardRef, Ref, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -25,13 +25,19 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	const styles = style(themeValue);
 	const { t } = useTranslation(['clanEmojiSetting']);
 	const dispatch = useAppDispatch();
-	const myUser = useAuth();
 	const clanId = useSelector(selectCurrentClanId);
 	const emojiSrc = item.id ? getSrcEmoji(item.id) : '';
 	const dataAuthor = useSelector(selectMemberClanByUserId(item.creator_id ?? ''));
 	const [emojiName, setEmojiName] = useState(item.shortname?.split(':')?.join(''));
 	const [isFocused, setIsFocused] = useState(false);
 	const textInputRef = useRef<TextInput>(null);
+
+	const currentUserId = useAppSelector(selectCurrentUserId);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+    const hasDeleteOrEditPermission = useMemo(() => {
+		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === item.creator_id;
+	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, item.creator_id]);
 
 	const handleUpdateEmoji = async () => {
 		const request: MezonUpdateClanEmojiByIdBody = {
@@ -48,7 +54,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	};
 
 	const focusTextInput = () => {
-		if (myUser.userId !== item.creator_id) {
+		if (!hasDeleteOrEditPermission) {
 			return;
 		}
 		setIsFocused(true);
@@ -61,7 +67,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 		setIsFocused(false);
 		if (!emojiName) {
 			setEmojiName(item.shortname?.split(':')?.join(''));
-		} else if (myUser.userId !== item.creator_id && emojiName !== item.shortname?.split(':')?.join('')) {
+		} else if (!hasDeleteOrEditPermission && emojiName !== item.shortname?.split(':')?.join('')) {
 			setEmojiName(item.shortname?.split(':')?.join(''));
 			Toast.show({
 				type: 'info',
@@ -88,14 +94,19 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	};
 
 	return (
-		<Swipeable ref={ref} onSwipeableWillOpen={onSwipeOpen} enabled={myUser.userId === item.creator_id} renderRightActions={RightAction}>
+		<Swipeable
+			ref={ref} 
+			onSwipeableWillOpen={onSwipeOpen} 
+			enabled={hasDeleteOrEditPermission} 
+			renderRightActions={RightAction}
+		>
 			<Pressable style={styles.container} onPress={focusTextInput}>
 				<View style={styles.emojiItem}>
 					<FastImage style={styles.emoji} resizeMode={'contain'} source={{ uri: emojiSrc }} />
 					<View style={styles.emojiName}>
 						{!isFocused && <Text style={styles.whiteText}>:</Text>}
 						<TextInput
-							editable={myUser.userId === item.creator_id}
+							editable={hasDeleteOrEditPermission}
 							ref={textInputRef}
 							onBlur={handleBlur}
 							onFocus={handleFocus}

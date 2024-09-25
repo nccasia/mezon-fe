@@ -1,5 +1,13 @@
 import { useAppNavigation, useAppParams, useMenu } from '@mezon/core';
-import { ChannelMembersEntity, channelsActions, directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
+import {
+	ChannelMembersEntity,
+	channelsActions,
+	directActions,
+	directMetaActions,
+	selectCloseMenu,
+	selectIsUnreadDMById,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -47,6 +55,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
+		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: 0 }));
 		if (directId === currentDmGroupId) {
 			navigate(`/chat/direct/friends`);
 		}
@@ -63,7 +72,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 	return (
 		<div
 			key={directMessage.channel_id}
-			className={`group/itemListDm relative text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:bg-black hover:bg-[#E1E1E1] py-2 w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black' : ''}`}
+			className={`group/itemListDm relative  text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:bg-black hover:bg-[#E1E1E1] py-2 w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black' : ''}`}
 			onClick={() => joinToChatAndNavigate(directMessage.channel_id as string, directMessage.type as number)}
 		>
 			<MemberProfile

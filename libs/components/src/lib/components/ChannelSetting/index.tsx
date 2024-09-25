@@ -1,5 +1,5 @@
 import { useEscapeKey } from '@mezon/core';
-import { fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchUserChannels, fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -38,6 +38,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
+		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
 	}, [channel.channel_id, dispatch]);
 
 	const closeMenu = useSelector(selectCloseMenu);

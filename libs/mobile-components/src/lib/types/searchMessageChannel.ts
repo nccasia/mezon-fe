@@ -4,6 +4,7 @@ export interface IOption {
 	title: string;
 	content: string;
 	value: string;
+	icon?: JSX.Element;
 }
 export interface IOptionSearchProps {
 	option: IOption;
@@ -19,6 +20,8 @@ export enum ACTIVE_TAB {
 export interface ITabList {
 	title: string;
 	quantitySearch: number;
+	display: boolean;
+	index?: number;
 }
 
 export interface IUserMention {
@@ -37,15 +40,6 @@ export enum ITypeOptionSearch {
 	AFTER = 'after',
 	PINED = 'pinned'
 }
-export const searchOptions = [
-	{ title: ITypeOptionSearch.FROM, content: 'user', value: 'username' },
-	{ title: ITypeOptionSearch.MENTIONS, content: 'user', value: 'username' },
-	{ title: ITypeOptionSearch.HAS, content: 'link, embed or file', value: 'attachment' },
-	{ title: ITypeOptionSearch.BEFORE, content: 'specific data', value: 'username' },
-	{ title: ITypeOptionSearch.DURING, content: 'specific data', value: 'username' },
-	{ title: ITypeOptionSearch.AFTER, content: 'specific data', value: 'username' },
-	{ title: ITypeOptionSearch.PINED, content: 'true or false', value: 'username' }
-];
 
 export type GroupedMessages = {
 	label: string;

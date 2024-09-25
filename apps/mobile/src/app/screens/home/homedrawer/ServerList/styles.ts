@@ -4,8 +4,12 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		wrapperServerList: {
-			paddingTop: size.s_20,
-			width: '18%',
+			paddingTop: size.s_20
+		},
+
+		wrapperLogo: {
+			alignSelf: 'center',
+			marginHorizontal: size.s_10
 		},
 
 		badge: {
@@ -19,13 +23,13 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			bottom: -size.s_4,
-			right: -size.s_4,
+			right: -size.s_4
 		},
 
 		badgeText: {
 			color: Colors.white,
 			fontWeight: 'bold',
-			fontSize: size.small,
+			fontSize: size.small
 		},
 		wrapperPlusClan: {
 			marginTop: verticalScale(5),
@@ -35,8 +39,8 @@ export const style = (colors: Attributes) =>
 			overflow: 'hidden',
 			alignItems: 'center',
 			justifyContent: 'center',
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.secondary
 		},
 		contentScroll: { alignItems: 'center', paddingBottom: size.s_20 },
-		separatorLine: { width: '60%', marginTop: size.s_10, alignSelf: 'center' },
+		separatorLine: { width: '60%', marginTop: size.s_10, alignSelf: 'center' }
 	});

@@ -15,9 +15,10 @@ interface IChannelListSectionProps {
 	onLongPressChannel: (channel: ChannelThreads) => void;
 	onLongPressThread: (thread: ChannelThreads) => void;
 	channelsPositionRef: ChannelsPositionRef;
+	onPressCollapse: (isCollapse: boolean) => void;
 }
 const ChannelListSection = memo(
-	({ data, onLongPressCategory, onLongPressChannel, onLongPressThread, channelsPositionRef }: IChannelListSectionProps) => {
+	({ data, onLongPressCategory, onLongPressChannel, onLongPressThread, channelsPositionRef, onPressCollapse }: IChannelListSectionProps) => {
 		const styles = style(useTheme().themeValue);
 		const [isCollapsed, setIsCollapsed] = useState(false);
 		const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
@@ -34,6 +35,7 @@ const ChannelListSection = memo(
 
 		const toggleCollapse = useCallback(() => {
 			setIsCollapsed(!isCollapsed);
+			onPressCollapse(!isCollapsed);
 		}, [isCollapsed, setIsCollapsed]);
 
 		const onLongPressHeader = useCallback(() => {

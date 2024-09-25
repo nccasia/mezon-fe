@@ -19,6 +19,7 @@ import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
@@ -174,6 +175,7 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
 		const { statusMute } = useStatusMuteChannel();
+		const isTabletLandscape = useTabletLandscape();
 
 		const navigateToSearchPage = () => {
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
@@ -188,15 +190,17 @@ const HomeDefaultHeader = React.memo(
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
-							<Icons.ArrowLargeLeftIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-						</TouchableOpacity>
+						{!isTabletLandscape && (
+							<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
+								<Icons.ArrowLargeLeftIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+							</TouchableOpacity>
+						)}
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
-								{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)  ? (
+								{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id) ? (
 									<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : !!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-								  <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />

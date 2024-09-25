@@ -9,6 +9,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { MezonAvatar, MezonBottomSheet } from '../../../temp-ui';
 import MenuCustomDm from '../../MenuCustomDm';
@@ -21,6 +22,8 @@ export const ThreadHeader = memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentChannel?.id ?? ''));
 	const bottomSheetMenuCustom = useRef<BottomSheetModal>(null);
+	const isTabletLandscape = useTabletLandscape();
+
 	const snapPointsMenuCustom = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type) ? ['30%'] : ['15%'];
 	}, [currentChannel?.type]);
@@ -41,7 +44,7 @@ export const ThreadHeader = memo(() => {
 	}, [currentChannel?.channel_label, currentChannel?.parrent_id]);
 
 	const handlebackMessageDetail = () => {
-		if (isDMThread) {
+		if (isDMThread && !isTabletLandscape) {
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
 				params: { directMessageId: currentChannel?.id }

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
@@ -26,6 +27,7 @@ export const addChannelUsers = createAsyncThunk(
 				repace: true
 			};
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();
@@ -60,6 +62,7 @@ export const removeChannelUsers = createAsyncThunk(
 					repace: true
 				};
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
+				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			}
 			return response;
 		} catch (error: any) {

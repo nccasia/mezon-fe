@@ -124,6 +124,21 @@ export const notificationSlice = createSlice({
 			state.specificNotifications = remainingNotifications;
 		},
 
+		removeAllNotificattionChannel: (state) => {
+			state.specificNotifications = [];
+		},
+
+		setNotiListUnread(state, action) {
+			const storedIds = localStorage.getItem('notiUnread');
+			const ids = storedIds ? JSON.parse(storedIds) : [];
+			ids.push(action.payload.id);
+			localStorage.setItem('notiUnread', JSON.stringify(ids));
+		},
+
+		setStatusNoti(state) {
+			const ids = localStorage.getItem('notiUnread');
+			state.newNotificationStatus = !state.newNotificationStatus;
+		},
 		setAllLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs[]>) => {
 			for (const i of action.payload) {
 				// state.lastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;

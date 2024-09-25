@@ -26,7 +26,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-			paddingHorizontal: size.s_14,
+			paddingHorizontal: size.s_4,
 			paddingVertical: size.s_10
 		},
 
@@ -46,7 +46,8 @@ export const style = (colors: Attributes) =>
 		},
 
 		clearBtn: {
-			borderRadius: 10
+			borderRadius: 10,
+			zIndex: 100
 		},
 
 		lineCountWrapper: {

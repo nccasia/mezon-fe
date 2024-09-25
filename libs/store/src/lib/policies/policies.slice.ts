@@ -35,11 +35,11 @@ export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPa
 	'policies/fetchPermissionsUser',
 	async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.getPermissionOfUserInTheClan(mezon.session, clanId);
-		if (!response.permissions) {
+		const response = await mezon.client.GetRoleOfUserInTheClan(mezon.session, clanId);
+		if (!response.roles) {
 			return [];
 		}
-		return response.permissions.map(mapPermissionUserToEntity);
+		return response.roles.map(mapPermissionUserToEntity);
 	}
 );
 const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 3;

@@ -4,10 +4,9 @@ import {
 	channelUsersActions,
 	removeChannelUsersPayload,
 	selectAllAccount,
-	selectAllChannelMembers,
+	selectAllUserChannel,
 	selectCurrentClanId,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
 import { IChannel, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
@@ -22,7 +21,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
 
-	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channel.id as string));
+	const rawMembers = useSelector(selectAllUserChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const deleteMember = async (userId: string) => {

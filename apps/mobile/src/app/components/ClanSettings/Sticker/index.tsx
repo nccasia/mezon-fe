@@ -1,7 +1,7 @@
 import { handleUploadEmoticonMobile, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { createSticker, selectAllStickerSuggestion, settingClanStickerActions, useAppDispatch } from '@mezon/store';
-import { selectCurrentClanId, useAppSelector } from '@mezon/store-mobile';
+import { createSticker, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClanId, selectStickerByClanId } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
@@ -21,10 +21,10 @@ export default function StickerSetting() {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const timerRef = useRef<any>(null);
-	const listSticker = useAppSelector(selectAllStickerSuggestion);
-	const availableLeft = useMemo(() => 50 - listSticker?.length, [listSticker]);
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const listSticker = useSelector(selectStickerByClanId(currentClanId));
+	const availableLeft = useMemo(() => 50 - listSticker?.length, [listSticker]);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation(['clanStickerSetting']);
 
@@ -113,6 +113,7 @@ export default function StickerSetting() {
 						rounded={true}
 						containerStyle={styles.btn}
 						onPress={handleUploadSticker}
+						titleStyle={styles.btnTitle}
 					/>
 
 					<Text style={styles.text}>{t('content.description')}</Text>

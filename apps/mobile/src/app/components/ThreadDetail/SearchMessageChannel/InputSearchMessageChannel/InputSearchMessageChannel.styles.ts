@@ -5,6 +5,7 @@ export const style = (colors: Attributes) =>
 		wrapper: {
 			flexDirection: 'row',
 			backgroundColor: Colors.transparent,
+			paddingBottom: size.s_20,
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			paddingHorizontal: size.s_20,
@@ -36,5 +37,6 @@ export const style = (colors: Attributes) =>
 			fontSize: size.label,
 			fontWeight: '600',
 			color: colors.white
-		}
+		},
+		textBadgeHighLight: { color: colors.white, fontSize: size.label, fontWeight: '600', width: '100%' }
 	});

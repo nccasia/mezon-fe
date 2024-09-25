@@ -1,10 +1,19 @@
-import { ActionEmitEvent, AngleRightIcon } from '@mezon/mobile-components';
+import { AngleRightIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, MessagesEntity, channelsActions, getStoreAsync, selectLastMessageIdByChannelId, selectMemberClanByUserId, selectMessageEntityById, useAppSelector } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	MessagesEntity,
+	channelsActions,
+	getStoreAsync,
+	selectLastMessageIdByChannelId,
+	selectMemberClanByUserId,
+	selectMessageEntityById,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
-import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -18,8 +27,8 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const styles = style(themeValue);
 	const navigation = useNavigation();
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread?.channel_id as string));
-	const message = useAppSelector((state) =>
-		selectMessageEntityById(state, thread?.channel_id as string, messageId || thread?.last_sent_message?.id) as MessagesEntity
+	const message = useAppSelector(
+		(state) => selectMessageEntityById(state, thread?.channel_id as string, messageId || thread?.last_sent_message?.id) as MessagesEntity
 	);
 	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
 
@@ -31,9 +40,8 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: thread?.category_id });
 	};
-	
+
 	const timeMessage = useMemo(() => {
 		if (message && message.create_time_seconds) {
 			const lastTime = convertTimeMessage(message.create_time_seconds);
@@ -48,11 +56,13 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 
 	const checkType = useMemo(() => typeof thread.last_sent_message?.content === 'string', [thread.last_sent_message?.content]);
 	const lastSentMessage = useMemo(() => {
-		return (message?.content?.t as string) ??
+		return (
+			(message?.content?.t as string) ??
 			(thread.last_sent_message && checkType
 				? JSON.parse(thread.last_sent_message.content || '{}').t
 				: (thread.last_sent_message?.content as any)?.t || '')
-	}, [message, thread])
+		);
+	}, [message, thread]);
 
 	return (
 		<Pressable

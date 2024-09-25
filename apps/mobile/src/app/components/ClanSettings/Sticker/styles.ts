@@ -1,4 +1,4 @@
-import { Attributes, Fonts, size } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -20,5 +20,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     btn: {
         marginBottom: size.s_20
+    },
+
+    btnTitle: {
+        color: baseColor.white
     }
 });
