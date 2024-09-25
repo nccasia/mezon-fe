@@ -18,7 +18,9 @@ interface CustomNodeProps {
 	data: {
 		label: string;
 		id: string;
-		defaultValue: any;
+		defaultValue: {
+			[key: string]: string;
+		};
 	};
 	label: string;
 	schema: yup.ObjectSchema<any>;

@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import ImageUploadField from '../../../components/ImageUploadField';
+import CodeEditorField from '../../../components/InputField/CodeEditorField';
 import CustomTextField from '../../../components/InputField/CustomTextField';
 
 const NodeTypes = [
@@ -26,7 +27,7 @@ const NodeTypes = [
 		label: 'Command Output',
 		schema: yup.object().shape({
 			message: yup.string(),
-			image: yup.string()
+			image: yup.array()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -74,7 +75,7 @@ const NodeTypes = [
 			properties: {
 				functionName: { type: 'string', uniforms: { component: CustomTextField, label: 'Function Name', name: 'functionName' } },
 				variable: { type: 'string', uniforms: { component: CustomTextField, label: 'Variable', name: 'variable' } },
-				functionBody: { type: 'string', uniforms: { component: CustomTextField, label: 'Function Body', name: 'functionBody' } }
+				functionBody: { type: 'string', uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' } }
 			},
 			required: []
 		},

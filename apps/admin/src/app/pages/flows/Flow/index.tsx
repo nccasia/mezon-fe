@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
 import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flowStore/flowActions';
-import { IEdge, IFlowDataRequest, IParameter } from '../../../types/flowTypes';
+import { IEdge, IFlowDataRequest, INode, INodeType, IParameter } from '../../../types/flowTypes';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
@@ -41,7 +41,7 @@ const Flow = () => {
 	const { screenToFlowPosition } = useReactFlow();
 	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
 	const [flowData, setFlowData] = React.useState<{ flowName: string; description: string }>({
-		flowName: '',
+		flowName: 'Untitle Flow',
 		description: ''
 	});
 	useEffect(() => {
@@ -66,25 +66,28 @@ const Flow = () => {
 	}, []);
 
 	const listNodeType = useMemo(() => {
-		const obj: { [key: string]: any } = {};
+		const obj: { [key: string]: (props: any) => JSX.Element } = {};
 		NodeTypes.forEach((item, index) => {
 			if (!obj[item.type]) {
-				obj[item.type] = (props: any) => (
-					<CustomNode
-						{...props}
-						schema={item.schema}
-						label={item.label}
-						bridgeSchema={item.bridgeSchema}
-						anchors={item.anchors}
-						ref={(el: HTMLElement | null) => {
-							if (el) {
-								nodeRefs.current[props.data.id] = el;
-							} else {
-								delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
-							}
-						}}
-					/>
-				);
+				obj[item.type] = (props) => {
+					console.log('props', props);
+					return (
+						<CustomNode
+							{...props}
+							schema={item.schema}
+							label={item.label}
+							bridgeSchema={item.bridgeSchema}
+							anchors={item.anchors}
+							ref={(el: HTMLElement | null) => {
+								if (el) {
+									nodeRefs.current[props.data.id] = el;
+								} else {
+									delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
+								}
+							}}
+						/>
+					);
+				};
 			}
 		});
 		return obj;
@@ -121,45 +124,63 @@ const Flow = () => {
 	const handleClickSaveFlow = async () => {
 		let checkValidate = true;
 		// get data from all nodes
-		const formData: { [key: string]: any } = Object.keys(nodeRefs.current).reduce(
-			(acc, nodeId) => {
-				const nodeRef = nodeRefs.current[nodeId] as { getFormData?: () => any; checkValidate?: () => any };
-				acc[nodeId] = nodeRef?.getFormData?.();
-
+		const formData: {
+			[key: string]: {
+				[key: string]: string;
+			};
+		} = Object.keys(nodeRefs.current).reduce(
+			(data, nodeId) => {
+				const nodeRef = nodeRefs.current[nodeId] as {
+					getFormData?: () => {
+						[key: string]: string;
+					};
+					checkValidate?: () => {
+						[key: string]: string;
+					};
+				};
+				data[nodeId] = nodeRef?.getFormData?.() ?? {};
 				// check validate of all nodes
 				const check = nodeRef?.checkValidate?.();
 				if (!check) checkValidate = false;
-				return acc;
+				return data;
 			},
-			{} as { [key: string]: any }
+			{} as {
+				[key: string]: {
+					[key: string]: string;
+				};
+			}
 		);
 
 		// check validate of all nodes, if one node is invalid, return
 		if (!checkValidate) return;
-		const listNodeInFlow: any[] = [];
+		const listNodeInFlow: INode[] = [];
 		nodes.forEach((node) => {
 			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => ({
 				parameterKey: key,
 				parameterValue: formData[node.id][key]
 			}));
-			const newNode = {
+			const newNode: INode = {
 				id: node.id,
-				nodeType: node.type,
-				nodeName: node.data.label,
+				nodeType: node.type as INodeType,
+				nodeName: node.type as INodeType,
 				position: node.position,
-				measured: node.measured,
-				parameters
+				measured: { width: node.measured?.width ?? 0, height: node.measured?.height ?? 0 },
+				parameters,
+				data: {
+					id: node.id ?? ''
+				},
+				selected: node.selected ?? false
 			};
 			listNodeInFlow.push(newNode);
 		});
-		const listEdgeInFlow: any[] = [];
-		edges.forEach((edge: any) => {
+		const listEdgeInFlow: IEdge[] = [];
+		edges.forEach((edge: Edge) => {
 			const newEdge = {
 				id: edge.id,
 				sourceNodeId: edge.source,
 				targetNodeId: edge.target,
-				sourceHandleId: edge.sourceHandle,
-				targetHandleId: edge.targetHandle
+				sourceHandleId: edge.sourceHandle ?? '',
+				targetHandleId: edge.targetHandle ?? ''
 			};
 			listEdgeInFlow.push(newEdge);
 		});
@@ -213,8 +234,10 @@ const Flow = () => {
 				flowName: response?.flowName,
 				description: response?.description
 			});
-			const listNode = response.nodes?.map((node: any) => {
-				const params: any = {};
+			const listNode = response.nodes?.map((node: INode) => {
+				const params: {
+					[key: string]: string;
+				} = {};
 				node?.parameters?.forEach((param: IParameter) => {
 					params[param.parameterKey] = param.parameterValue;
 				});
@@ -222,8 +245,8 @@ const Flow = () => {
 					id: node.id,
 					type: node.nodeType,
 					nodeName: node.nodeName,
-					measured: node.measured ? JSON.parse(node.measured) : {},
-					position: node.position ? JSON.parse(node.position) : {},
+					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
+					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
 					data: {
 						label: node.nodeName,
 						id: node.id,
@@ -231,7 +254,6 @@ const Flow = () => {
 					}
 				};
 			});
-			console.log(listNode);
 			flowDispatch(setNodesContext(listNode));
 			const listEdge = response.connections?.map((edge: IEdge) => {
 				return {
@@ -246,7 +268,6 @@ const Flow = () => {
 		};
 		getDetailFlow();
 	}, [flowId, flowDispatch]);
-	console.log(nodes);
 	useEffect(() => {
 		// handle delete node when press delete key
 		const onKeyUp = (event: KeyboardEvent) => {

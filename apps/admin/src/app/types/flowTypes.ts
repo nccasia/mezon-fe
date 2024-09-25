@@ -11,16 +11,18 @@ export type INodeType = 'commandInput' | 'uploadedImage' | 'formatFunction' | 'a
 
 export interface INode {
 	id: string;
-	type: INodeType;
+	nodeType: INodeType;
+	nodeName: string;
 	data: {
-		label: string;
+		label?: string;
 		id: string;
 	};
+	parameters: IParameter[];
 	position: {
 		x: number;
 		y: number;
 	};
-	mesured: {
+	measured: {
 		width: number;
 		height: number;
 	};
