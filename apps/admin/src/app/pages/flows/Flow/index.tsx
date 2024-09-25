@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
 import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flowStore/flowActions';
-import { IEdge, IFlowDataRequest, INode, INodeType, IParameter } from '../../../types/flowTypes';
+import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../types/flowTypes';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
@@ -205,9 +205,10 @@ const Flow = () => {
 
 		try {
 			if (flowId) {
-				const response = await flowService.updateFlow({ ...flowDataSave, flowId });
-				console.log(response);
-				toast.success('Update flow success');
+				toast.info('Api update flow is updating');
+				// const response = await flowService.updateFlow({ ...flowDataSave, flowId });
+				// console.log(response);
+				// toast.success('Update flow success');
 				// call api update flow
 			} else {
 				const response = await flowService.createNewFlow(flowDataSave);
@@ -229,7 +230,7 @@ const Flow = () => {
 
 		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
-			const response = await flowService.getFlowDetail(flowId);
+			const response: IFlowDetail = await flowService.getFlowDetail(flowId);
 			setFlowData({
 				flowName: response?.flowName,
 				description: response?.description
@@ -255,13 +256,13 @@ const Flow = () => {
 				};
 			});
 			flowDispatch(setNodesContext(listNode));
-			const listEdge = response.connections?.map((edge: IEdge) => {
+			const listEdge: Edge[] = response.connections?.map((edge: IEdge) => {
 				return {
-					id: edge.id,
+					id: edge.id ?? '',
 					source: edge.sourceNodeId,
 					target: edge.targetNodeId,
-					sourceHandle: edge.sourceHandleId,
-					targetHandle: edge.targetHandleId
+					sourceHandle: edge.sourceHandleId ?? '',
+					targetHandle: edge.targetHandleId ?? ''
 				};
 			});
 			flowDispatch(setEdgesContext(listEdge));

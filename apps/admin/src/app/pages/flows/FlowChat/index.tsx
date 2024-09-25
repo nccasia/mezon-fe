@@ -5,26 +5,29 @@ import { toast } from 'react-toastify';
 import { apiInstance } from '../../../services/apiInstance';
 
 interface IMessage {
-	message: string;
+	message: {
+		message: string;
+		urlImage?: string[];
+	};
 	type: 'input' | 'output';
 }
 const FlowChatPopup = () => {
 	const { flowId } = useParams();
 	const [input, setInput] = useState('');
 	const [messages, setMessages] = useState<IMessage[]>([]);
-	const handleSubmit = async (e: any) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (!input) {
 			toast.error('Please enter your message');
 			return;
 		}
-		setMessages([...messages, { message: input, type: 'input' }]);
+		setMessages([...messages, { message: { message: input, urlImage: undefined }, type: 'input' }]);
 		setInput('');
 		try {
-			const response: any = await apiInstance.get(`/execution?flowId=${flowId}&input=${input}`);
-			setMessages((prev) => [...prev, { message: response.output, type: 'output' }]);
+			const response: IMessage = await apiInstance.get(`/execution?flowId=${flowId}&input=${input}`);
+			setMessages((prev) => [...prev, { message: response.message, type: 'output' }]);
 		} catch (error) {
-			setMessages((prev) => [...prev, { message: "Sory, I dont't know", type: 'output' }]);
+			setMessages((prev) => [...prev, { message: { message: "Sory, I dont't know", urlImage: undefined }, type: 'output' }]);
 			console.log(error);
 		}
 	};
@@ -42,9 +45,16 @@ const FlowChatPopup = () => {
 				{messages.map((message, index) => (
 					<div
 						key={index}
-						className={`p-2 shadow-inner ${message.type === 'input' ? 'bg-gray-50 dark:bg-gray-600 text-end' : 'bg-gray-100 dark:bg-gray-700'}`}
+						className={`p-2 shadow-inner flex ${message.type === 'input' ? 'bg-gray-50 dark:bg-gray-600 justify-end text-end' : 'bg-gray-100 dark:bg-gray-700 justify-start'}`}
 					>
-						<span>{message.message}</span>
+						<div className="w-[80%]">
+							<span>{message.message.message}</span>
+							<div className="bg-gray-100">
+								{message.message.urlImage?.map((img, index) => (
+									<img key={index} src={img} alt="img" className="max-w-[100%] object-cover ml-1 mb-1" />
+								))}
+							</div>
+						</div>
 					</div>
 				))}
 			</div>

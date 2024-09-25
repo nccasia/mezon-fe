@@ -1,10 +1,19 @@
 export interface IFlow {
 	id: string;
-	name: string;
+	flowName: string;
 	description: string;
 	status: string;
 	createdAt: string;
 	updatedAt: string;
+}
+
+export interface IFlowDetail {
+	id: string;
+	userId: string;
+	flowName: string;
+	description: string;
+	nodes: INode[];
+	connections: IEdge[];
 }
 
 export type INodeType = 'commandInput' | 'uploadedImage' | 'formatFunction' | 'apiLoader' | 'default';

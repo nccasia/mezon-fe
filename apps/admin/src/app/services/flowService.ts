@@ -1,4 +1,4 @@
-import { IFlow, IFlowDataRequest } from '../types/flowTypes';
+import { IFlow, IFlowDataRequest, IFlowDetail } from '../types/flowTypes';
 import { apiInstance } from './apiInstance';
 
 const getAllFlows = async (): Promise<IFlow[]> => {
@@ -11,27 +11,27 @@ const getAllFlows = async (): Promise<IFlow[]> => {
 	}
 };
 
-const getFlowDetail = async (flowId: string): Promise<any> => {
+const getFlowDetail = async (flowId: string): Promise<IFlowDetail> => {
 	try {
-		const flowDetail = await apiInstance.get(`/flow/detail?flowId=${flowId}`);
+		const flowDetail: IFlowDetail = await apiInstance.get(`/flow/detail?flowId=${flowId}`);
 		return flowDetail;
 	} catch (error) {
 		throw (error as any).response?.data;
 	}
 };
 
-const createNewFlow = async (dataCreate: IFlowDataRequest): Promise<any> => {
+const createNewFlow = async (dataCreate: IFlowDataRequest): Promise<IFlowDetail> => {
 	try {
-		const response = await apiInstance.post('/flow/create', dataCreate);
+		const response: IFlowDetail = await apiInstance.post('/flow/create', dataCreate);
 		return response;
 	} catch (error) {
 		throw (error as any).response.data;
 	}
 };
 
-const updateFlow = async (dataUpdate: IFlowDataRequest): Promise<any> => {
+const updateFlow = async (dataUpdate: IFlowDataRequest): Promise<IFlowDetail> => {
 	try {
-		const response = await apiInstance.put('/flow/update', dataUpdate);
+		const response: IFlowDetail = await apiInstance.put('/flow/update', dataUpdate);
 		return response;
 	} catch (error) {
 		throw (error as any).response.data;
