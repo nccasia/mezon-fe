@@ -1,3 +1,4 @@
+import { notificationActions } from '@mezon/store-mobile';
 import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -262,6 +263,7 @@ export const fetchChannels = createAsyncThunk(
 						clanId: channelText.clan_id ?? ''
 					};
 				});
+			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 
 			const lastChannelMessages =
 				response.channeldesc?.map((channel) => ({

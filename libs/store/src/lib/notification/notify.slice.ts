@@ -82,6 +82,19 @@ export const deleteNotify = createAsyncThunk('notification/deleteNotify', async 
 	thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId, noCache: true }));
 	return response;
 });
+export const setAllLastSeenTimeStampChannelThunk = createAsyncThunk(
+	'notification/setAllLastSeenTimeStampChannel',
+	async (payload: LastSeenTimeStampChannelArgs[], thunkAPI) => {
+		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannel(payload));
+	}
+);
+
+export const setLastSeenTimeStampChannelThunk = createAsyncThunk(
+	'notification/setLastSeenTimeStampChannel',
+	async (payload: LastSeenTimeStampChannelArgs, thunkAPI) => {
+		thunkAPI.dispatch(notificationActions.setLastSeenTimeStampChannel(payload));
+	}
+);
 
 export const initialNotificationState: NotificationState = notificationAdapter.getInitialState({
 	loadingStatus: 'not loaded',
