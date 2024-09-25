@@ -26,6 +26,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(channel.id));
 
 	const { filteredNotificationsByChannelId } = useNotification(channel.id);
+	console.log('filteredNotificationsByChannelId :', filteredNotificationsByChannelId);
 	const numberNotification = useMemo(() => {
 		return filteredNotificationsByChannelId.length;
 	}, [filteredNotificationsByChannelId, channel.id]);

@@ -1,9 +1,7 @@
 import {
-	allLastSeenStampChannels,
 	notificationActions,
 	selectAllNotification,
 	selectLastSeenTimeStampByChannelId,
-	selectLastSeenTimeStampByClanId,
 	selectMessageNotified,
 	selectSpecificNotifications,
 	useAppDispatch
@@ -32,27 +30,32 @@ export function useNotification(channelId = '', clanId = '') {
 	);
 
 	const getSpecificNotifications = useSelector(selectSpecificNotifications);
-	const allChannelTimeStamp = useSelector(allLastSeenStampChannels);
-	console.log('allChannelTimeStamp: ', allChannelTimeStamp);
-	const countNoti = getSpecificNotifications.reduce((count, n) => {
-		const channelId = n.content.channel_id;
-		const channelData = allChannelTimeStamp[channelId];
+	// const allChannelTimeStamp = useSelector(allLastSeenStampChannels);
 
-		if (channelData) {
-			// Safely check if create_time is defined
-			const createTime = n.create_time ? new Date(n.create_time).getTime() / 1000 : undefined;
+	// const totalNotiCountClan = useCallback(
+	// 	(clanId: string) => {
+	// 		let count = 0;
 
-			// Compare the create_time with lastSeenTimeStamp if it's valid
-			if (createTime && createTime > channelData.lastSeenTimeStamp) {
-				count++;
-			}
-		}
+	// 		getSpecificNotifications.forEach((notification: any) => {
+	// 			console.log('getSpecificNotifications :', getSpecificNotifications);
+	// 			const { create_time, content } = notification;
+	// 			const { channel_id, clan_id } = content;
 
-		return count;
-	}, 0);
+	// 			const createTimeStamp = new Date(create_time).getTime() / 1000;
 
-	console.log('countNoti', countNoti);
-	console.log('getSpecificNotifications: ', getSpecificNotifications);
+	// 			if (allChannelTimeStamp[channel_id] && clan_id === clanId) {
+	// 				const { lastSeenTimeStamp } = allChannelTimeStamp[channel_id];
+
+	// 				if (createTimeStamp > lastSeenTimeStamp) {
+	// 					count++;
+	// 				}
+	// 			}
+	// 		});
+
+	// 		return count;
+	// 	},
+	// 	[getSpecificNotifications, allChannelTimeStamp]
+	// );
 
 	const getLastSeenTimeStamp = useSelector(selectLastSeenTimeStampByChannelId(channelId ?? ''));
 	const lastSeenTime = getLastSeenTimeStamp ?? 0;
@@ -63,14 +66,7 @@ export function useNotification(channelId = '', clanId = '') {
 		return createTime > lastSeenTime;
 	});
 
-	const getLastSeenTimeStampClan = useSelector(selectLastSeenTimeStampByClanId(clanId ?? ''));
-	const lastSeenTimeClan = getLastSeenTimeStampClan ?? 0;
-	const filteredNotificationsByClanId = getSpecificNotifications.filter((notification) => {
-		if (!notification.create_time) return false;
-		if (notification.content.clan_id !== clanId) return false;
-		const createTime = new Date(notification.create_time).getTime() / 1000;
-		return createTime > lastSeenTimeClan;
-	});
+	console.log('filteredNotificationsByChannelId', filteredNotificationsByChannelId);
 
 	return useMemo(
 		() => ({
@@ -78,9 +74,18 @@ export function useNotification(channelId = '', clanId = '') {
 			deleteNotify,
 			setMessageNotifiedId,
 			idMessageNotified,
-			filteredNotificationsByChannelId,
-			filteredNotificationsByClanId
+			filteredNotificationsByChannelId
+			// filteredNotificationsByClanId,
+			// totalNotiCountClan
 		}),
-		[notification, deleteNotify, setMessageNotifiedId, idMessageNotified, filteredNotificationsByChannelId, filteredNotificationsByClanId]
+		[
+			notification,
+			deleteNotify,
+			setMessageNotifiedId,
+			idMessageNotified,
+			filteredNotificationsByChannelId
+			// filteredNotificationsByClanId,
+			// totalNotiCountClan
+		]
 	);
 }

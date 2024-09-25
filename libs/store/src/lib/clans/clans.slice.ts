@@ -126,6 +126,7 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 			logo: logo ?? ''
 		};
 		const response = await mezon.client.createClanDesc(mezon.session, body);
+
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}

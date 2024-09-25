@@ -27,6 +27,8 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	isShowInbox: boolean;
 	specificNotifications: NotificationEntity[];
 	lastSeenTimeStampClans: Record<string, LastSeenTimeStampChannelArgs>;
+
+	countByClan: Record<string, CountByClanArgs>;
 }
 
 export type QuantityNotifyChannelArgs = {
@@ -36,6 +38,12 @@ export type QuantityNotifyChannelArgs = {
 export type LastSeenTimeStampChannelArgs = {
 	channelId: string;
 	lastSeenTimeStamp: number;
+	clanId: string;
+};
+
+export type CountByClanArgs = {
+	channelId: string;
+	count: number;
 	clanId: string;
 };
 
@@ -96,7 +104,8 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	quantityNotifyClans: {},
 	isShowInbox: false,
 	specificNotifications: [],
-	lastSeenTimeStampClans: {}
+	lastSeenTimeStampClans: {},
+	countByClan: {}
 });
 
 export const notificationSlice = createSlice({
@@ -190,20 +199,33 @@ export const notificationSlice = createSlice({
 					clanId // Set clanId
 				};
 			}
-			if (state.lastSeenTimeStampClans[clanId]) {
-				// If it exists, update the lastSeenTimeStamp property
-				state.lastSeenTimeStampClans[clanId] = {
-					...state.lastSeenTimeStampClans[clanId], // Spread existing properties
-					lastSeenTimeStamp // Update lastSeenTimeStamp
-				};
-			} else {
-				// If it does not exist, create a new entry
-				state.lastSeenTimeStampClans[clanId] = {
-					channelId, // Set channelId
-					lastSeenTimeStamp, // Set lastSeenTimeStamp
-					clanId // Set clanId
-				};
-			}
+
+			// Optionally, calculate and update notification quantities
+			// const quantityNotify = countNotifyByChannelId(state, channelId, lastSeenTimeStamp);
+			// state.quantityNotifyChannels[channelId] = quantityNotify;
+
+			// const quantityNotifyClan = countNotifyByClanId(state, clanId);
+			// state.quantityNotifyClans[clanId] = quantityNotifyClan;
+		},
+
+		setCountByClan: (state, action: PayloadAction<CountByClanArgs>) => {
+			const { channelId, count, clanId } = action.payload;
+
+			// Update the last seen timestamp for the channel
+			// if (state.countByClan[clanId]) {
+			// 	// If it exists, update the lastSeenTimeStamp property
+			// 	state.countByClan[clanId] = {
+			// 		...state.countByClan[channelId], // Spread existing properties
+			// 		lastSeenTimeStamp // Update lastSeenTimeStamp
+			// 	};
+			// } else {
+			// 	// If it does not exist, create a new entry
+			// 	state.lastSeenTimeStampChannels[channelId] = {
+			// 		channelId, // Set channelId
+			// 		lastSeenTimeStamp, // Set lastSeenTimeStamp
+			// 		clanId // Set clanId
+			// 	};
+			// }
 
 			// Optionally, calculate and update notification quantities
 			// const quantityNotify = countNotifyByChannelId(state, channelId, lastSeenTimeStamp);
@@ -446,7 +468,7 @@ const noti = [
 	}
 ];
 
-const b = {
+const channelTimestamp = {
 	'1828730594687717376': {
 		channelId: '1828730594687717376',
 		lastSeenTimeStamp: 1727259710.483,
@@ -463,3 +485,4 @@ const b = {
 		clanId: '1828730594649968640'
 	}
 };
+// tính tổng số noti của channelid trong clan mà noti đó có create_time nhỏ lớn hơn lastSeenTimeStamp

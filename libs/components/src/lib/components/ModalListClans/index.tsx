@@ -1,4 +1,3 @@
-import { useNotification } from '@mezon/core';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { NavLink } from 'react-router-dom';
@@ -9,13 +8,13 @@ export type SidebarClanItemProps = {
 	linkClan: string;
 	active?: boolean;
 	pathname: string;
+	count?: number;
 };
 
-const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
-	const { filteredNotificationsByClanId } = useNotification('', option.clan_id);
-	const numberOfNotifyClan = filteredNotificationsByClanId.length;
-
-	console.log('filteredNotificationsByClanId: ', filteredNotificationsByClanId);
+const SidebarClanItem = ({ option, linkClan, active, pathname, count }: SidebarClanItemProps) => {
+	// const { totalNotiCountClan } = useNotification('', option.clan_id);
+	// const numberOfNotifyClan = totalNotiCountClan(option.clan_id ?? '');
+	// console.log('numberOfNotifyClan :', numberOfNotifyClan);
 
 	const currentClanPath = pathname.split('/channels')[0];
 	const isSameClan = currentClanPath === linkClan;
@@ -46,9 +45,9 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 					)}
 				</NavLinkComponent>
 			</NavLink>
-			{numberOfNotifyClan ? (
+			{count ? (
 				<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
-					{numberOfNotifyClan}
+					{count}
 				</div>
 			) : (
 				<></>
