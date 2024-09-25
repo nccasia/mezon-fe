@@ -118,24 +118,24 @@ export const updateCategory = createAsyncThunk('categories/updateCategory', asyn
 type CheckDuplicateCategoryPayload = {
 	categoryName: string;
 	clanId: string;
-}
+};
 
 export const checkDuplicateCategory = createAsyncThunk('channels/duplicateNameThread', async (payload: CheckDuplicateCategoryPayload, thunkAPI) => {
 	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI))
-		const isDuplicate =  await mezon.socketRef.current?.checkDuplicateName(payload.categoryName, payload.clanId, TypeCheck.TYPECATEGORY) 
-	
-		if (isDuplicate?.type === TypeCheck.TYPECATEGORY) {
-			return isDuplicate.exist
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const checkDuplicateEvent = await mezon.socketRef.current?.checkDuplicateName(payload.categoryName, payload.clanId, TypeCheck.TYPECATEGORY);
+
+		if (checkDuplicateEvent?.type === TypeCheck.TYPECATEGORY) {
+			return checkDuplicateEvent.exist;
 		}
 
 		return;
 	} catch (error: any) {
-		 Sentry.captureException(error);
+		Sentry.captureException(error);
 		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message)
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-})
+});
 
 export const initialCategoriesState: CategoriesState = categoriesAdapter.getInitialState({
 	loadingStatus: 'not loaded',

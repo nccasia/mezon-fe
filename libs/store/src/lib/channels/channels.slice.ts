@@ -211,24 +211,31 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 type CheckDuplicateChannelPayload = {
 	channelLabel: string;
 	categoryId: string;
-}
+};
 
-export const checkDuplicateChannelName = createAsyncThunk('channels/duplicateNameChannel', async (payload : CheckDuplicateChannelPayload, thunkAPI) => {
-	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI))
-		const isDuplicate =  await mezon.socketRef.current?.checkDuplicateName(payload.channelLabel, payload.categoryId, TypeCheck.TYPECHANNEL) 
-	
-		if (isDuplicate?.type === TypeCheck.TYPECHANNEL) {
-			return isDuplicate.exist
+export const checkDuplicateChannelName = createAsyncThunk(
+	'channels/duplicateNameChannel',
+	async (payload: CheckDuplicateChannelPayload, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const checkDuplicateEvent = await mezon.socketRef.current?.checkDuplicateName(
+				payload.channelLabel,
+				payload.categoryId,
+				TypeCheck.TYPECHANNEL
+			);
+
+			if (checkDuplicateEvent?.type === TypeCheck.TYPECHANNEL) {
+				return checkDuplicateEvent.exist;
+			}
+
+			return;
+		} catch (error: any) {
+			Sentry.captureException(error);
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-
-		return;
-	} catch (error: any) {
-		Sentry.captureException(error);
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message)
 	}
-})
+);
 
 type fetchChannelsArgs = {
 	clanId: string;
