@@ -1,4 +1,5 @@
 import {
+	allLastSeenStampChannels,
 	notificationActions,
 	selectAllNotification,
 	selectLastSeenTimeStampByChannelId,
@@ -31,8 +32,28 @@ export function useNotification(channelId = '', clanId = '') {
 	);
 
 	const getSpecificNotifications = useSelector(selectSpecificNotifications);
+	const allChannelTimeStamp = useSelector(allLastSeenStampChannels);
+	console.log('allChannelTimeStamp: ', allChannelTimeStamp);
+	const countNoti = getSpecificNotifications.reduce((count, n) => {
+		const channelId = n.content.channel_id;
+		const channelData = allChannelTimeStamp[channelId];
+
+		if (channelData) {
+			// Safely check if create_time is defined
+			const createTime = n.create_time ? new Date(n.create_time).getTime() / 1000 : undefined;
+
+			// Compare the create_time with lastSeenTimeStamp if it's valid
+			if (createTime && createTime > channelData.lastSeenTimeStamp) {
+				count++;
+			}
+		}
+
+		return count;
+	}, 0);
+
+	console.log('countNoti', countNoti);
 	console.log('getSpecificNotifications: ', getSpecificNotifications);
-	const getAll;
+
 	const getLastSeenTimeStamp = useSelector(selectLastSeenTimeStampByChannelId(channelId ?? ''));
 	const lastSeenTime = getLastSeenTimeStamp ?? 0;
 	const filteredNotificationsByChannelId = getSpecificNotifications.filter((notification) => {

@@ -351,3 +351,115 @@ export const selectLastSeenTimeStampByClanId = (clanId: string) =>
 		const clanData = lastSeenTimeStampClans[clanId];
 		return clanData ? clanData.lastSeenTimeStamp : null;
 	});
+
+const noti = [
+	{
+		code: -9,
+		create_time: '2024-09-22T13:57:52Z',
+		id: '1837853827030585344',
+		persistent: true,
+		sender_id: '1784059393956909056',
+		subject: 'namphongnguyen129(T-368 #pr-14)',
+		content: {
+			code: {},
+			mode: 2,
+			clan_id: '1833046375441371136',
+			content: '{"t":"@Nguyễn Nam Phong "}',
+			mentions: '[{"user_id":"1775730015049093120","e":17}]',
+			username: 'namphongnguyen129',
+			sender_id: '1784059393956909056',
+			channel_id: '1837771419396608000',
+			message_id: '1837853827026391040',
+			references: '[]',
+			attachments: '[]',
+			create_time: '2024-09-22T13:57:52Z',
+			update_time: {
+				seconds: 1727013472
+			},
+			display_name: 'Nam Phong',
+			hide_editted: true,
+			category_name: 'PUBLIC CHANNELS',
+			channel_label: 'pr-14'
+		}
+	},
+	{
+		code: -9,
+		create_time: '2024-09-25T04:32:03Z',
+		id: '1838798597177479168',
+		persistent: true,
+		sender_id: '1784059393956909056',
+		subject: 'namphongnguyen129(KOMU_2 #sd)',
+		content: {
+			code: {},
+			mode: 2,
+			clan_id: '1775732550744936448',
+			content: '{"t":"hi @Nguyễn Nam Phong "}',
+			mentions: '[{"user_id":"1775730015049093120","s":3,"e":20}]',
+			username: 'namphongnguyen129',
+			clan_logo: 'https://cdn.mezon.vn/1775732550744936448/1775732550778490880/1716858320014New_Project__1_.png',
+			is_public: true,
+			sender_id: '1784059393956909056',
+			channel_id: '1838798547944738816',
+			message_id: '1838798597164896256',
+			references: '[]',
+			attachments: '[]',
+			create_time: '2024-09-25T04:32:03Z',
+			update_time: {
+				seconds: 1727238723
+			},
+			display_name: 'Nam Phong',
+			hide_editted: true,
+			category_name: 'projects',
+			channel_label: 'sd'
+		}
+	},
+	{
+		code: -9,
+		create_time: '2024-09-24T15:52:18Z',
+		id: '1838607399582175232',
+		persistent: true,
+		sender_id: '1784059393956909056',
+		subject: 'namphongnguyen129(KOMU_2 #thread1)',
+		content: {
+			code: {},
+			mode: 2,
+			clan_id: '1775732550744936448',
+			content: '{"t":"@Nguyễn Nam Phong "}',
+			mentions: '[{"user_id":"1775730015049093120","e":17}]',
+			username: 'namphongnguyen129',
+			clan_logo: 'https://cdn.mezon.vn/1775732550744936448/1775732550778490880/1716858320014New_Project__1_.png',
+			is_public: true,
+			sender_id: '1784059393956909056',
+			channel_id: '1776072921555406848',
+			message_id: '1838607399573786624',
+			references: '[]',
+			attachments: '[]',
+			create_time: '2024-09-24T15:52:18Z',
+			update_time: {
+				seconds: 1727193138
+			},
+			display_name: 'Nam Phong',
+			hide_editted: true,
+			category_name: 'PUBLIC CHANNELS',
+			channel_label: 'thread1'
+		}
+	}
+];
+
+const b = {
+	'1828730594687717376': {
+		channelId: '1828730594687717376',
+		lastSeenTimeStamp: 1727259710.483,
+		clanId: '1828730594649968640'
+	},
+	'1808030946511818752': {
+		channelId: '1808030946511818752',
+		lastSeenTimeStamp: 1727260247.998,
+		clanId: '1782714213009985536'
+	},
+	'1833046375466536960': {
+		channelId: '1833046375466536960',
+		lastSeenTimeStamp: 1727260329.135,
+		clanId: '1828730594649968640'
+	}
+};

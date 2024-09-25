@@ -64,7 +64,7 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	const handleMarkAllAsRead = useCallback(() => {
 		// localStorage.setItem('notiUnread', JSON.stringify([]));
 		// dispatch(notificationActions.setStatusNoti());
-		localStorage.setItem('notiUnread', JSON.stringify([]));
+		// localStorage.setItem('notiUnread', JSON.stringify([]));
 		dispatch(notificationActions.removeAllNotificattionChannel());
 		dispatch(directMetaActions.removeUnreadAllDm());
 		dispatch(notificationActions.setStatusNoti());
