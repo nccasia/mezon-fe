@@ -5,7 +5,7 @@ import Ajv, { JSONSchemaType } from 'ajv';
 import React, { useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
 import { AutoForm, SubmitField } from 'uniforms-semantic';
-import ImageUploadField from '../../../../components/ImageUploadField';
+import MultiImageUploadField from '../../../../components/ImageUploadField';
 import CustomTextField from '../../../../components/InputField/CustomTextField';
 
 type FormData = {
@@ -27,7 +27,7 @@ const CommandOutputNode = React.forwardRef(({ data, onCopy, onDelete }: CommandO
 		type: 'object',
 		properties: {
 			commandName: { type: 'string', uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName' } },
-			uploadedImage: { type: 'string', uniforms: { component: ImageUploadField } }
+			uploadedImage: { type: 'string', uniforms: { component: MultiImageUploadField } }
 		},
 		required: ['commandName']
 	};
@@ -81,7 +81,7 @@ const CommandOutputNode = React.forwardRef(({ data, onCopy, onDelete }: CommandO
 					</div>
 					<AutoForm ref={formRef} schema={bridge} onSubmit={() => console.log('submit')}>
 						<CustomTextField name="commandName" label="Command Name" />
-						<ImageUploadField name="uploadedImage" />
+						<MultiImageUploadField name="uploadedImage" />
 						<SubmitField className="!hidden" />
 					</AutoForm>
 				</div>
