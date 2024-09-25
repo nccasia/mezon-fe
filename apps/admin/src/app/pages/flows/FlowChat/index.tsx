@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/ui';
-import { apiInstance } from '@mezon/utils';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { apiInstance } from '../../../services/apiInstance';
 
 interface IMessage {
 	message: string;

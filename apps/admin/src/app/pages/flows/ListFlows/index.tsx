@@ -1,6 +1,6 @@
-import { apiInstance } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { apiInstance } from '../../../services/apiInstance';
 
 interface IFlow {
 	id: number;

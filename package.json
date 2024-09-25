@@ -37,6 +37,7 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.24.4",
+    "@codemirror/lang-javascript": "^6.2.2",
     "@hookform/resolvers": "^3.3.4",
     "@loadable/component": "^5.16.3",
     "@react-native-async-storage/async-storage": "^1.23.1",
@@ -48,6 +49,7 @@
     "@types/ajv": "^1.0.0",
     "@types/loadable__component": "^5.13.9",
     "@types/react-infinite-scroller": "^1.2.5",
+    "@uiw/react-codemirror": "^4.23.3",
     "@xyflow/react": "^12.2.1",
     "ajv": "^8.17.1",
     "axios": "^1.7.7",

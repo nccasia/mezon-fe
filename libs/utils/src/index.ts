@@ -1,4 +1,3 @@
-export * from './lib/api';
 export * from './lib/async';
 export * from './lib/bridge';
 export * from './lib/constant';
