@@ -1,4 +1,4 @@
-import { notificationActions } from '@mezon/store-mobile';
+import { notificationActions } from '@mezon/store';
 import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';

@@ -62,6 +62,13 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			setIsShowPanelChannel((s) => !s);
 		}
 		dispatch(notificationActions.removeNotificationsByChannelId(thread.channel_id ?? ''));
+		dispatch(
+			notificationActions.setLastSeenTimeStampChannel({
+				channelId: thread.channel_id ?? '',
+				lastSeenTimeStamp: 0,
+				clanId: thread.clan_id ?? ''
+			})
+		);
 	};
 
 	const handleDeleteChannel = () => {

@@ -243,6 +243,7 @@ export const notificationReducer = notificationSlice.reducer;
 
 export const notificationActions = {
 	...notificationSlice.actions,
+	setAllLastSeenTimeStampChannelThunk,
 	fetchListNotification,
 	deleteNotify
 };
