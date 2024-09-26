@@ -6,7 +6,6 @@ export function useNotification() {
 	const dispatch = useAppDispatch();
 	const notification = useSelector(selectAllNotification);
 	const idMessageNotified = useSelector(selectMessageNotified);
-
 	const deleteNotify = useCallback(
 		(id: string, clanId: string) => {
 			const ids = [id];

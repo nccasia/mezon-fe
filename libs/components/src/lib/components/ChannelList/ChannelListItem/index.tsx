@@ -1,4 +1,5 @@
-import { selectCountByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { useAuth } from '@mezon/core';
+import { selectCountByChannelId, selectFilteredMessages, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import React, { Fragment, memo, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -22,6 +23,7 @@ export type ChannelListItemRef = {
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props: ChannelListItemProp, ref) => {
 	const { channel, isActive, permissions } = props;
+	// console.log('channel: ', channel);
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const numberNotification = useSelector(selectCountByChannelId(channel.id));
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
@@ -34,6 +36,8 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
 	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
 
+	const { userId } = useAuth();
+
 	useImperativeHandle(ref, () => {
 		return {
 			scrollIntoChannel: (options: ScrollIntoViewOptions = { block: 'center' }) => {
@@ -45,6 +49,20 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 		};
 	});
 
+	const getUserByUserId = useAppSelector((state) =>
+		selectFilteredMessages(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
+	)[0];
+
+	// const filteredMessages = useSelector((state) =>
+	// 	selectFilteredMessages(
+	// 		channel.id ?? '',
+	// 		userId ?? '',
+	// 		channel.last_seen_message?.timestamp_seconds ?? 0,
+	// 		channel.last_sent_message?.timestamp_seconds ?? 0
+	// 	)
+	// );
+
+	console.log('filteredMessages: ', filteredMessages);
 	return (
 		<Fragment>
 			<ChannelLink
