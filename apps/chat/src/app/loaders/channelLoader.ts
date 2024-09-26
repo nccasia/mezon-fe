@@ -1,4 +1,4 @@
-import { channelsActions } from '@mezon/store';
+import { channelsActions, notificationActions } from '@mezon/store';
 import { maxPermissionRoleChannelActions } from 'libs/store/src/lib/permissionChannel/maxPermissionRoleChannel.slice';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
@@ -14,6 +14,8 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, messageId: messageId || '' }));
 	dispatch(channelsActions.setPreviousChannels({ channelId: channelId }));
 	dispatch(maxPermissionRoleChannelActions.fetchMaxPermissionRoleChannel({ clanId: clanId ?? '', channelId: channelId }));
+	dispatch(notificationActions.fetchListNotification({ clanId: clanId as string }));
+
 	return null;
 };
 

@@ -2,8 +2,10 @@ import {
 	notificationActions,
 	selectAllNotification,
 	selectLastSeenTimeStampByChannelId,
+	selectMessageByMessageId,
 	selectMessageNotified,
 	selectSpecificNotifications,
+	selectUnreadMessageIdByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
@@ -29,33 +31,12 @@ export function useNotification(channelId = '', clanId = '') {
 		[dispatch]
 	);
 
+	const getMessageIdUnread = useSelector(selectUnreadMessageIdByChannelId(channelId));
+	const getMessageUnread = useSelector(selectMessageByMessageId(getMessageIdUnread ?? ''));
+
+	console.log('getMessageUnread: ', getMessageUnread);
+
 	const getSpecificNotifications = useSelector(selectSpecificNotifications);
-	// const allChannelTimeStamp = useSelector(allLastSeenStampChannels);
-
-	// const totalNotiCountClan = useCallback(
-	// 	(clanId: string) => {
-	// 		let count = 0;
-
-	// 		getSpecificNotifications.forEach((notification: any) => {
-	// 			console.log('getSpecificNotifications :', getSpecificNotifications);
-	// 			const { create_time, content } = notification;
-	// 			const { channel_id, clan_id } = content;
-
-	// 			const createTimeStamp = new Date(create_time).getTime() / 1000;
-
-	// 			if (allChannelTimeStamp[channel_id] && clan_id === clanId) {
-	// 				const { lastSeenTimeStamp } = allChannelTimeStamp[channel_id];
-
-	// 				if (createTimeStamp > lastSeenTimeStamp) {
-	// 					count++;
-	// 				}
-	// 			}
-	// 		});
-
-	// 		return count;
-	// 	},
-	// 	[getSpecificNotifications, allChannelTimeStamp]
-	// );
 
 	const getLastSeenTimeStamp = useSelector(selectLastSeenTimeStampByChannelId(channelId ?? ''));
 	const lastSeenTime = getLastSeenTimeStamp ?? 0;
@@ -65,6 +46,19 @@ export function useNotification(channelId = '', clanId = '') {
 		const createTime = new Date(notification.create_time).getTime() / 1000;
 		return createTime > lastSeenTime;
 	});
+	// useEffect(() => {
+	// 	console.log('filteredNotificationsByChannelId: ', filteredNotificationsByChannelId);
+
+	// 	if (filteredNotificationsByChannelId.length > 0) {
+	// 		dispatch(
+	// 			notificationActions.setCountByClan({
+	// 				channelId: channelId,
+	// 				clanId: filteredNotificationsByChannelId[0].content.clan_id ?? '',
+	// 				notiUnread: filteredNotificationsByChannelId
+	// 			})
+	// 		);
+	// 	}
+	// }, [filteredNotificationsByChannelId]);
 
 	return useMemo(
 		() => ({
@@ -73,17 +67,7 @@ export function useNotification(channelId = '', clanId = '') {
 			setMessageNotifiedId,
 			idMessageNotified,
 			filteredNotificationsByChannelId
-			// filteredNotificationsByClanId,
-			// totalNotiCountClan
 		}),
-		[
-			notification,
-			deleteNotify,
-			setMessageNotifiedId,
-			idMessageNotified,
-			filteredNotificationsByChannelId
-			// filteredNotificationsByClanId,
-			// totalNotiCountClan
-		]
+		[notification, deleteNotify, setMessageNotifiedId, idMessageNotified, filteredNotificationsByChannelId]
 	);
 }
