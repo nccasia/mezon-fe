@@ -66,8 +66,6 @@ export function useNotification(channelId = '', clanId = '') {
 		return createTime > lastSeenTime;
 	});
 
-	console.log('filteredNotificationsByChannelId', filteredNotificationsByChannelId);
-
 	return useMemo(
 		() => ({
 			notification,

@@ -43,7 +43,7 @@ export type LastSeenTimeStampChannelArgs = {
 
 export type CountByClanArgs = {
 	channelId: string;
-	count: number;
+	notiUnread: any;
 	clanId: string;
 };
 
@@ -131,6 +131,12 @@ export const notificationSlice = createSlice({
 				? Object.values(state.specificNotifications).filter((notification) => notification?.content?.channel_id !== channelId)
 				: [];
 			state.specificNotifications = remainingNotifications;
+			// Object.keys(state.countByClan).forEach((clanId) => {
+			// 	if (state.countByClan[clanId]?.channelId === channelId) {
+			// 		// Giảm count đi 1, đảm bảo không giảm dưới 0
+			// 		state.countByClan[clanId].count = Math.max(0, state.countByClan[clanId].count - 1);
+			// 	}
+			// });
 		},
 
 		removeAllNotificattionChannel: (state) => {
@@ -208,31 +214,24 @@ export const notificationSlice = createSlice({
 			// state.quantityNotifyClans[clanId] = quantityNotifyClan;
 		},
 
+		// export type CountByClanArgs = {
+		// 	channelId: string;
+		// 	count: number;
+		// 	clanId: string;
+		// };
+		// 	countByClan: Record<string, CountByClanArgs>;
+
+		// countByClan: {}
+
 		setCountByClan: (state, action: PayloadAction<CountByClanArgs>) => {
-			const { channelId, count, clanId } = action.payload;
+			const { channelId, notiUnread, clanId } = action.payload;
+			console.log(' channelId, count, clanId: ', channelId, notiUnread, clanId);
 
-			// Update the last seen timestamp for the channel
 			// if (state.countByClan[clanId]) {
-			// 	// If it exists, update the lastSeenTimeStamp property
-			// 	state.countByClan[clanId] = {
-			// 		...state.countByClan[channelId], // Spread existing properties
-			// 		lastSeenTimeStamp // Update lastSeenTimeStamp
-			// 	};
+			// 	state.countByClan[clanId].count += count;
 			// } else {
-			// 	// If it does not exist, create a new entry
-			// 	state.lastSeenTimeStampChannels[channelId] = {
-			// 		channelId, // Set channelId
-			// 		lastSeenTimeStamp, // Set lastSeenTimeStamp
-			// 		clanId // Set clanId
-			// 	};
+			// 	state.countByClan[clanId] = { channelId, count, clanId };
 			// }
-
-			// Optionally, calculate and update notification quantities
-			// const quantityNotify = countNotifyByChannelId(state, channelId, lastSeenTimeStamp);
-			// state.quantityNotifyChannels[channelId] = quantityNotify;
-
-			// const quantityNotifyClan = countNotifyByClanId(state, clanId);
-			// state.quantityNotifyClans[clanId] = quantityNotifyClan;
 		},
 
 		setIsShowInbox(state, action: PayloadAction<boolean>) {
@@ -373,6 +372,9 @@ export const selectLastSeenTimeStampByClanId = (clanId: string) =>
 		const clanData = lastSeenTimeStampClans[clanId];
 		return clanData ? clanData.lastSeenTimeStamp : null;
 	});
+export const selectAllCountByClan = createSelector(getNotificationState, (state: NotificationState) => state.countByClan);
+
+export const selectCountByClanId2 = (clanId: string) => createSelector(selectAllCountByClan, (countByClan) => countByClan[clanId] || null);
 
 const noti = [
 	{
