@@ -49,20 +49,10 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 		};
 	});
 
-	const getUserByUserId = useAppSelector((state) =>
-		selectFilteredMessages(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
-	)[0];
+	const filteredMessages = useSelector((state) =>
+		selectFilteredMessages(state, channel.id ?? '', userId ?? '', channel.last_seen_message?.timestamp_seconds ?? 0)
+	);
 
-	// const filteredMessages = useSelector((state) =>
-	// 	selectFilteredMessages(
-	// 		channel.id ?? '',
-	// 		userId ?? '',
-	// 		channel.last_seen_message?.timestamp_seconds ?? 0,
-	// 		channel.last_sent_message?.timestamp_seconds ?? 0
-	// 	)
-	// );
-
-	console.log('filteredMessages: ', filteredMessages);
 	return (
 		<Fragment>
 			<ChannelLink
@@ -73,7 +63,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnReadChannel}
-				numberNotification={numberNotification}
+				numberNotification={filteredMessages.length}
 				channelType={channel?.type}
 				isActive={isActive}
 				permissions={permissions}

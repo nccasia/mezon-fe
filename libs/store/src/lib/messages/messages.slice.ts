@@ -1371,146 +1371,33 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 export const selectFilteredMessages = createSelector(
 	[
 		selectMessagesByChannel,
-		(state, channelId: string, userId: string, lastSeenTimestamp: number, lastSentTimestamp: number) => ({
+		(state, channelId, userId, lastSeenTimestamp) => ({
 			channelId,
 			userId,
-			lastSeenTimestamp,
-			lastSentTimestamp
+			lastSeenTimestamp
 		})
 	],
-	(messages, { channelId, userId, lastSeenTimestamp, lastSentTimestamp }) => {
-		const { entities } = messages;
-		console.log('entities: ', entities);
-		// console.log('selectMessagesByChannel', selectMessagesByChannel);
-		// const messageArray = messages?.ids?.map((id: any) => messages.entities[id]);
-		// console.log('messageArray: ', messageArray);
+	(messages, { channelId, userId, lastSeenTimestamp }) => {
+		const entities = messages?.entities;
+		if (!entities) return [];
 
-		// return entities?.filter((message: any) => {
-		// 	if (!message) return false;
-		// 	// console.log('message', message);
-		// 	// console.log('channelId', channelId);
-		// 	// console.log('userId', userId);
-		// 	// console.log('lastSeenTimestamp', lastSeenTimestamp);
-		// 	// console.log('lastSentTimestamp', lastSentTimestamp);
+		const messageArray = Object.values(entities);
 
-		// 	return (
-		// 		message.channel_id === channelId &&
-		// 		message.sender_id !== userId &&
-		// 		message.update_time_seconds > lastSeenTimestamp &&
-		// 		message.update_time_seconds < lastSentTimestamp
-		// 	);
-		// });
+		const filteredMessages = messageArray.filter((message) => {
+			const date = new Date(message.update_time ?? '');
+			const timestampSeconds = Math.floor(date.getTime() / 1000); // Convert milliseconds to seconds
+			const mentions = message.mentions ?? [];
+			const senderMessageRef = message.references && message?.references[0]?.message_sender_id;
+			const isMentioned = mentions.some((mention) => mention.user_id === userId);
+			const isChannelMatch = message.channel_id === channelId;
+			const isSenderDifferent = message.sender_id !== userId;
+			const isAfterLastSeen = timestampSeconds > lastSeenTimestamp;
+			const isMessageReply = userId === senderMessageRef;
+			const isMentionOrReply = (isMentioned || isMessageReply) && !(isMentioned && isMessageReply);
+			return isChannelMatch && isSenderDifferent && isAfterLastSeen && isMentionOrReply;
+		});
+
+		// console.log('filteredMessages : 2', filteredMessages);
+		return filteredMessages;
 	}
 );
-
-// export const selectLastMessageByChannelId = createSelector([selectMessagesByChannel], (channelMessages) => {
-// 	if (!channelMessages?.ids?.length) return null;
-// 	const { ids, entities } = channelMessages;
-// 	return entities[ids[ids.length - 1]];
-// });
-
-const messsageAll = {
-	ids: ['1831237630486908928', '1831237631707451392', '1831237632860884992'],
-	entities: {
-		'1831237630486908928': {
-			channel_id: '1792463242279260160',
-			code: 0,
-			create_time: '2024-09-04T07:47:28Z',
-			id: '1831237630486908928',
-			sender_id: '1826831939118567424',
-			update_time: '2024-09-04T07:47:28Z',
-			username: 'dat.nguyenquoc',
-			display_name: 'Dat Nguyen Quoc',
-			avatar: 'https://lh3.googleusercontent.com/a/ACg8ocK0euYGXvjWEl8T9qWkX-dg8qWf2C-Yjw46_mJYKGJxLRj6TQ=s96-c',
-			content: {
-				t: '6'
-			},
-			attachments: [],
-			mentions: [],
-			reactions: [],
-			references: [],
-			clan_id: '1775732550744936448',
-			create_time_seconds: 1725436048,
-			update_time_seconds: 1725436048,
-			isFirst: false,
-			creationTime: '2024-09-04T07:47:28.000Z',
-			date: '9/26/2024, 4:27:59 PM',
-			isAnonymous: false,
-			user: {
-				name: 'dat.nguyenquoc',
-				username: 'dat.nguyenquoc',
-				id: '1826831939118567424'
-			},
-			lastSeen: false,
-			isStartedMessageGroup: true,
-			isStartedMessageOfTheDay: true
-		},
-		'1831237631707451392': {
-			channel_id: '1792463242279260160',
-			code: 0,
-			create_time: '2024-09-04T07:47:28Z',
-			id: '1831237631707451392',
-			sender_id: '1826831939118567424',
-			update_time: '2024-09-04T07:47:28Z',
-			username: 'dat.nguyenquoc',
-			display_name: 'Dat Nguyen Quoc',
-			avatar: 'https://lh3.googleusercontent.com/a/ACg8ocK0euYGXvjWEl8T9qWkX-dg8qWf2C-Yjw46_mJYKGJxLRj6TQ=s96-c',
-			content: {
-				t: '7'
-			},
-			attachments: [],
-			mentions: [],
-			reactions: [],
-			references: [],
-			clan_id: '1775732550744936448',
-			create_time_seconds: 1725436048,
-			update_time_seconds: 1725436048,
-			isFirst: false,
-			creationTime: '2024-09-04T07:47:28.000Z',
-			date: '9/26/2024, 4:27:59 PM',
-			isAnonymous: false,
-			user: {
-				name: 'dat.nguyenquoc',
-				username: 'dat.nguyenquoc',
-				id: '1826831939118567424'
-			},
-			lastSeen: false,
-			isStartedMessageGroup: false,
-			isStartedMessageOfTheDay: false
-		},
-		'1831237632860884992': {
-			channel_id: '1792463242279260160',
-			code: 0,
-			create_time: '2024-09-04T07:47:29Z',
-			id: '1831237632860884992',
-			sender_id: '1826831939118567424',
-			update_time: '2024-09-04T07:47:29Z',
-			username: 'dat.nguyenquoc',
-			display_name: 'Dat Nguyen Quoc',
-			avatar: 'https://lh3.googleusercontent.com/a/ACg8ocK0euYGXvjWEl8T9qWkX-dg8qWf2C-Yjw46_mJYKGJxLRj6TQ=s96-c',
-			content: {
-				t: '8'
-			},
-			attachments: [],
-			mentions: [],
-			reactions: [],
-			references: [],
-			clan_id: '1775732550744936448',
-			create_time_seconds: 1725436049,
-			update_time_seconds: 1725436049,
-			isFirst: false,
-			creationTime: '2024-09-04T07:47:29.000Z',
-			date: '9/26/2024, 4:27:59 PM',
-			isAnonymous: false,
-			user: {
-				name: 'dat.nguyenquoc',
-				username: 'dat.nguyenquoc',
-				id: '1826831939118567424'
-			},
-			lastSeen: false,
-			isStartedMessageGroup: false,
-			isStartedMessageOfTheDay: false
-		}
-	},
-	id: '1792463242279260160'
-};
