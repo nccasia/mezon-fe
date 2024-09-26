@@ -165,29 +165,6 @@ export const notificationSlice = createSlice({
 			}
 		},
 
-		// export type LastSeenTimeStampChannelArgs = {
-		// 	channelId: string;
-		// 	lastSeenTimeStamp: number;
-		// 	clanId: string;
-		// };
-
-		// lastSeenTimeStampChannels: Record<string, LastSeenTimeStampChannelArgs>;
-
-		// 	lastSeenTimeStampChannels: Record<string, LastSeenTimeStampChannelArgs>;
-		// 	isShowInbox: boolean;
-		// 	specificNotifications: NotificationEntity[];
-		// }
-
-		// export type QuantityNotifyChannelArgs = {
-		// 	channelId: string;
-		// 	quantityNotify: number;
-		// };
-		// export type LastSeenTimeStampChannelArgs = {
-		// 	channelId: string;
-		// 	lastSeenTimeStamp: number;
-		// 	clanId: string;
-		// };
-
 		setLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs>) => {
 			const { channelId, lastSeenTimeStamp, clanId } = action.payload;
 
@@ -206,23 +183,7 @@ export const notificationSlice = createSlice({
 					clanId // Set clanId
 				};
 			}
-
-			// Optionally, calculate and update notification quantities
-			// const quantityNotify = countNotifyByChannelId(state, channelId, lastSeenTimeStamp);
-			// state.quantityNotifyChannels[channelId] = quantityNotify;
-
-			// const quantityNotifyClan = countNotifyByClanId(state, clanId);
-			// state.quantityNotifyClans[clanId] = quantityNotifyClan;
 		},
-
-		// export type CountByClanArgs = {
-		// 	channelId: string;
-		// 	count: number;
-		// 	clanId: string;
-		// };
-		// 	countByClan: Record<string, CountByClanArgs>;
-
-		// countByClan: {}
 
 		setCountByClan: (state, action: PayloadAction<CountByClanArgs>) => {
 			const { channelId, notiUnread, clanId } = action.payload;
@@ -325,25 +286,6 @@ export const selectNotificationEntities = createSelector(getNotificationState, s
 export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
 
-// export const selectNotificationMentions = createSelector(selectAllNotification, (notifications) =>
-// 	notifications.filter(
-// 		(notification) => notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED
-// 	)
-// );
-// export const selectNotificationMentionsByChannelId = (channelId: string, after = 0) =>
-// 	createSelector(selectNotificationMentions, (notifications) =>
-// 		notifications.filter((notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after)
-// 	);
-
-// export const selectNotificationMentionCountByChannelId = (channelId: string, after = 0) =>
-// 	createSelector(
-// 		selectNotificationMentions,
-// 		(notifications) =>
-// 			notifications.filter(
-// 				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after
-// 			).length
-// 	);
-
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) => {
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
 });
@@ -360,34 +302,207 @@ export const selectTotalClansNotify = createSelector(getNotificationState, (stat
 	return Object.values(state.quantityNotifyClans).reduce((totalNotifyCount, notifyCount) => totalNotifyCount + notifyCount, 0);
 });
 
-// export const selectCountByClanId = (clanId: string) =>
-// 	createSelector(
-// 		selectSpecificNotifications,
-// 		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
-// 	);
-
-export const allLastSeenStampChannels = createSelector(getNotificationState, (state: NotificationState) => state.lastSeenTimeStampChannels);
-
+export const allLastSeenStampChannels = createSelector(getNotificationState, (state: NotificationState) => {
+	const channels = state.lastSeenTimeStampChannels;
+	return Object.values(channels).filter((channel) => channel.channelId && channel.lastSeenTimeStamp !== undefined && channel.clanId);
+});
 export const selectLastSeenTimeStampByChannelId = (channelId: string) =>
 	createSelector(allLastSeenStampChannels, (lastSeenTimeStampChannels) => {
 		if (!lastSeenTimeStampChannels) {
 			return null;
 		}
-		const channelData = lastSeenTimeStampChannels[channelId];
+		const channelData = lastSeenTimeStampChannels[channelId as any];
 		return channelData ? channelData.lastSeenTimeStamp : null;
-	});
-
-export const allLastSeenStampClans = createSelector(getNotificationState, (state: NotificationState) => state.lastSeenTimeStampClans);
-
-export const selectLastSeenTimeStampByClanId = (clanId: string) =>
-	createSelector(allLastSeenStampClans, (lastSeenTimeStampClans) => {
-		if (!lastSeenTimeStampClans) {
-			return null;
-		}
-		const clanData = lastSeenTimeStampClans[clanId];
-		return clanData ? clanData.lastSeenTimeStamp : null;
 	});
 
 export const selectAllCountByClan = createSelector(getNotificationState, (state: NotificationState) => state.countByClan);
 
 export const selectCountByClanId = (clanId: string) => createSelector(selectAllCountByClan, (countByClan) => countByClan[clanId] || null);
+
+export const selectFilteredNotificationsByClan = createSelector(
+	[selectSpecificNotifications, allLastSeenStampChannels, (_, clanId: string) => clanId],
+	(notifications, lastSeenStamps, clanId) => {
+		return notifications.filter((notification) => {
+			// Extract content and check if create_time is defined
+			const { content } = notification;
+			if (!content || !content.clan_id || content.clan_id !== clanId) return false;
+
+			const { create_time, channel_id } = content;
+
+			// Check if create_time is defined and convert to timestamp
+			if (!create_time || !channel_id) return false;
+			const notificationTimestamp = new Date(create_time).getTime() / 1000;
+
+			// Find lastSeenTimeStamp for the corresponding channelId
+			const lastSeenInfo = Object.values(lastSeenStamps).find((stamp) => stamp.channelId === channel_id);
+
+			// If no lastSeenInfo or create_time > lastSeenTimeStamp, keep the notification
+			return !lastSeenInfo || notificationTimestamp > lastSeenInfo.lastSeenTimeStamp;
+		});
+	}
+);
+
+// const selectSpecificNotifications = [
+// 	{
+// 		code: -9,
+// 		create_time: '2024-09-25T15:52:42Z',
+// 		id: '1838969887750361088',
+// 		persistent: true,
+// 		sender_id: '1784059393956909056',
+// 		subject: 'namphongnguyen129(1 #general)',
+// 		content: {
+// 			code: {},
+// 			mode: 2,
+// 			clan_id: '1828730594649968640',
+// 			content: '{"t":"@Nguyễn Nam Phong 123"}',
+// 			mentions: '[{"user_id":"1775730015049093120","e":17}]',
+// 			username: 'namphongnguyen129',
+// 			clan_logo: 'https://cdn.mezon.vn/1822940699390119936/0/1788103935005823000/44froge_fight.gif',
+// 			is_public: true,
+// 			sender_id: '1784059393956909056',
+// 			channel_id: '1828730594687717376',
+// 			message_id: '1838969887746166784',
+// 			references: '[]',
+// 			attachments: '[]',
+// 			create_time: '2024-09-25T15:52:42Z',
+// 			update_time: {
+// 				seconds: 1727279562
+// 			},
+// 			display_name: 'Nam Phong',
+// 			hide_editted: true,
+// 			channel_label: 'general'
+// 		}
+// 	},
+// 	{
+// 		code: -9,
+// 		create_time: '2024-09-25T15:53:06Z',
+// 		id: '1838969988354936832',
+// 		persistent: true,
+// 		sender_id: '1784059393956909056',
+// 		subject: 'namphongnguyen129(1 #general)',
+// 		content: {
+// 			code: {},
+// 			mode: 2,
+// 			clan_id: '1828730594649968640',
+// 			content: '{"t":"@Nguyễn Nam Phong "}',
+// 			mentions: '[{"user_id":"1775730015049093120","e":17}]',
+// 			username: 'namphongnguyen129',
+// 			clan_logo: 'https://cdn.mezon.vn/1822940699390119936/0/1788103935005823000/44froge_fight.gif',
+// 			is_public: true,
+// 			sender_id: '1784059393956909056',
+// 			channel_id: '1828730594687717376',
+// 			message_id: '1838969988350742528',
+// 			references: '[]',
+// 			attachments: '[]',
+// 			create_time: '2024-09-25T15:53:06Z',
+// 			update_time: {
+// 				seconds: 1727279586
+// 			},
+// 			display_name: 'Nam Phong',
+// 			hide_editted: true,
+// 			channel_label: 'general'
+// 		}
+// 	},
+// 	{
+// 		code: -9,
+// 		create_time: '2024-09-25T15:53:44Z',
+// 		id: '1838970148770287616',
+// 		persistent: true,
+// 		sender_id: '1784059393956909056',
+// 		subject: 'namphongnguyen129(1 #general)',
+// 		content: {
+// 			code: {},
+// 			mode: 2,
+// 			clan_id: '1828730594649968640',
+// 			content: '{"t":"hello @Nguyễn Nam Phong "}',
+// 			mentions: '[{"user_id":"1775730015049093120","s":6,"e":23}]',
+// 			username: 'namphongnguyen129',
+// 			clan_logo: 'https://cdn.mezon.vn/1822940699390119936/0/1788103935005823000/44froge_fight.gif',
+// 			is_public: true,
+// 			sender_id: '1784059393956909056',
+// 			channel_id: '1828730594687717376',
+// 			message_id: '1838970148757704704',
+// 			references: '[]',
+// 			attachments: '[]',
+// 			create_time: '2024-09-25T15:53:44Z',
+// 			update_time: {
+// 				seconds: 1727279624
+// 			},
+// 			display_name: 'Nam Phong',
+// 			hide_editted: true,
+// 			channel_label: 'general'
+// 		}
+// 	},
+// 	{
+// 		code: -9,
+// 		create_time: '2024-09-26T04:44:44Z',
+// 		id: '1839164177319464960',
+// 		persistent: true,
+// 		sender_id: '1784059393956909056',
+// 		subject: 'namphongnguyen129(1 #general)',
+// 		content: {
+// 			code: {},
+// 			mode: 2,
+// 			clan_id: '1828730594649968640',
+// 			content: '{"t":"hello @Nguyễn Nam Phong "}',
+// 			mentions: '[{"user_id":"1775730015049093120","s":6,"e":23}]',
+// 			username: 'namphongnguyen129',
+// 			clan_logo: 'https://cdn.mezon.vn/1822940699390119936/0/1788103935005823000/44froge_fight.gif',
+// 			is_public: true,
+// 			sender_id: '1784059393956909056',
+// 			channel_id: '1828730594687717376',
+// 			message_id: '1839164177315270656',
+// 			references: '[]',
+// 			attachments: '[]',
+// 			create_time: '2024-09-26T04:44:44Z',
+// 			update_time: {
+// 				seconds: 1727325884
+// 			},
+// 			display_name: 'Nam Phong',
+// 			hide_editted: true,
+// 			channel_label: 'general'
+// 		}
+// 	}
+// ];
+
+// const allLastSeenStampChannels = {
+// 	'1775820446206267392': {
+// 		channelId: '1775820446206267392',
+// 		lastSeenTimeStamp: 1727316054.911,
+// 		clanId: '1775732550744936448'
+// 	},
+// 	'1775791967452532736': {
+// 		channelId: '1775791967452532736',
+// 		lastSeenTimeStamp: 1727324904.228,
+// 		clanId: '1775732550744936448'
+// 	},
+// 	'1838471988297863168': {
+// 		lastSeenTimeStamp: 1727332087.381
+// 	},
+// 	'1832994424259350528': {
+// 		channelId: '1832994424259350528',
+// 		lastSeenTimeStamp: 1727327543.682,
+// 		clanId: '1782714213009985536'
+// 	},
+// 	'1801426280726401024': {
+// 		channelId: '1801426280726401024',
+// 		lastSeenTimeStamp: 1727325057.851,
+// 		clanId: '1775732550744936448'
+// 	},
+// 	'1813895345772433408': {
+// 		channelId: '1813895345772433408',
+// 		lastSeenTimeStamp: 1727325059.448,
+// 		clanId: '1775732550744936448'
+// 	},
+// 	'1816492250671091712': {
+// 		channelId: '1816492250671091712',
+// 		lastSeenTimeStamp: 1727327532.697,
+// 		clanId: '1775732550744936448'
+// 	},
+// 	'1816492672865538048': {
+// 		channelId: '1816492672865538048',
+// 		lastSeenTimeStamp: 1727331392.425,
+// 		clanId: '1775732550744936448'
+// 	}
+// };
+// viết selector truyền vào clanid, lọc theo clanid đó và lấy những notification có cùng channel nhưng create_time/1000 lớn hơn lastSeenTimeStamp

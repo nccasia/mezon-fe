@@ -1,11 +1,10 @@
 import {
+	allLastSeenStampChannels,
 	notificationActions,
 	selectAllNotification,
 	selectLastSeenTimeStampByChannelId,
-	selectMessageByMessageId,
 	selectMessageNotified,
 	selectSpecificNotifications,
-	selectUnreadMessageIdByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
@@ -31,13 +30,10 @@ export function useNotification(channelId = '', clanId = '') {
 		[dispatch]
 	);
 
-	const getMessageIdUnread = useSelector(selectUnreadMessageIdByChannelId(channelId));
-	const getMessageUnread = useSelector(selectMessageByMessageId(getMessageIdUnread ?? ''));
-
-	console.log('getMessageUnread: ', getMessageUnread);
-
 	const getSpecificNotifications = useSelector(selectSpecificNotifications);
-
+	console.log('getSpecificNotifications: ', getSpecificNotifications);
+	const allChannelStamp = useSelector(allLastSeenStampChannels);
+	console.log('allChannelStamp: ', allChannelStamp);
 	const getLastSeenTimeStamp = useSelector(selectLastSeenTimeStampByChannelId(channelId ?? ''));
 	const lastSeenTime = getLastSeenTimeStamp ?? 0;
 	const filteredNotificationsByChannelId = getSpecificNotifications.filter((notification) => {
@@ -46,19 +42,6 @@ export function useNotification(channelId = '', clanId = '') {
 		const createTime = new Date(notification.create_time).getTime() / 1000;
 		return createTime > lastSeenTime;
 	});
-	// useEffect(() => {
-	// 	console.log('filteredNotificationsByChannelId: ', filteredNotificationsByChannelId);
-
-	// 	if (filteredNotificationsByChannelId.length > 0) {
-	// 		dispatch(
-	// 			notificationActions.setCountByClan({
-	// 				channelId: channelId,
-	// 				clanId: filteredNotificationsByChannelId[0].content.clan_id ?? '',
-	// 				notiUnread: filteredNotificationsByChannelId
-	// 			})
-	// 		);
-	// 	}
-	// }, [filteredNotificationsByChannelId]);
 
 	return useMemo(
 		() => ({

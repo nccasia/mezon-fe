@@ -16,7 +16,6 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId }));
 	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
-	// dispatch(notificationActions.fetchListNotification({ clanId: clanId as string }));
 
 	return {
 		clanId

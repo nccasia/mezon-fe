@@ -1,4 +1,4 @@
-import { selectCountByClanId } from '@mezon/store-mobile';
+import { selectFilteredNotificationsByClan } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -13,8 +13,7 @@ export type SidebarClanItemProps = {
 };
 
 const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
-	const unreadNotiByClan = useSelector(selectCountByClanId(option.clan_id ?? ''));
-	console.log('count: ', unreadNotiByClan);
+	const filteredNotifications = useSelector((state) => selectFilteredNotificationsByClan(state, option.clan_id ?? ''));
 	const currentClanPath = pathname.split('/channels')[0];
 	const isSameClan = currentClanPath === linkClan;
 	const handleClick = (e: React.MouseEvent) => {
@@ -44,9 +43,9 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 					)}
 				</NavLinkComponent>
 			</NavLink>
-			{unreadNotiByClan?.notiUnread?.length > 0 ? (
+			{filteredNotifications.length > 0 ? (
 				<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
-					{unreadNotiByClan?.notiUnread?.length}
+					{filteredNotifications.length}
 				</div>
 			) : (
 				<></>
