@@ -1,6 +1,11 @@
 import { LoadingStatus } from '@mezon/utils';
-import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { createCachedSelector } from '../messages/messages.slice';
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { usersClanActions } from '../clanMembers/clan.members';
+import { clansActions } from '../clans/clans.slice';
+import { directActions } from '../direct/direct.slice';
+import { clearAllMemoizedFunctions } from '../memoize';
+import { createCachedSelector, messagesActions } from '../messages/messages.slice';
+import { RootState } from '../store';
 
 export const APP_FEATURE_KEY = 'app';
 
@@ -27,6 +32,7 @@ export interface AppState {
 	isFromFcmMobile: boolean;
 	isShowSettingFooter: showSettingFooterProps;
 	isShowPopupQuickMess: boolean;
+	categoryChannelOffsets: { [key: number]: number };
 }
 
 export const initialAppState: AppState = {
@@ -44,8 +50,44 @@ export const initialAppState: AppState = {
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
 	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true },
-	isShowPopupQuickMess: false
+	isShowPopupQuickMess: false,
+	categoryChannelOffsets: {}
 };
+
+export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI) => {
+	const state = thunkAPI.getState() as RootState;
+
+	if (!state) {
+		throw Error('refresh app error: state does not init');
+	}
+
+	clearAllMemoizedFunctions();
+
+	const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
+	const currentChannelId = state.channels?.currentChannelId;
+	const currentDirectId = state.direct?.currentDirectMessageId;
+	const currentClanId = state.clans?.currentClanId;
+	const path = window.location.pathname;
+
+	let channelId = null;
+
+	if (currentChannelId && RegExp(currentChannelId).test(path)) {
+		channelId = currentChannelId;
+	} else if (currentDirectId && RegExp(currentDirectId).test(path)) {
+		channelId = currentDirectId;
+	}
+
+	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: channelId, isFetchingLatestMessages: true }));
+
+	thunkAPI.dispatch(clansActions.fetchClans());
+	if (!isClanView) {
+		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+	}
+
+	if (isClanView && currentClanId) {
+		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+	}
+});
 
 export const appSlice = createSlice({
 	name: APP_FEATURE_KEY,
@@ -110,6 +152,12 @@ export const appSlice = createSlice({
 		},
 		setIsShowPopupQuickMess: (state, action) => {
 			state.isShowPopupQuickMess = action.payload;
+		},
+		setCategoryChannelOffsets: (state, action) => {
+			state.categoryChannelOffsets = {
+				...state.categoryChannelOffsets,
+				...action.payload
+			};
 		}
 	}
 });
@@ -119,7 +167,7 @@ export const appSlice = createSlice({
  */
 export const appReducer = appSlice.reducer;
 
-export const appActions = appSlice.actions;
+export const appActions = { ...appSlice.actions, refreshApp };
 
 export const getAppState = (rootState: { [APP_FEATURE_KEY]: AppState }): AppState => rootState[APP_FEATURE_KEY];
 
@@ -154,3 +202,5 @@ export const selectIsFromFCMMobile = createSelector(getAppState, (state: AppStat
 export const selectIsShowSettingFooter = createSelector(getAppState, (state: AppState) => state.isShowSettingFooter);
 
 export const selectIsShowPopupQuickMess = createSelector(getAppState, (state: AppState) => state.isShowPopupQuickMess);
+
+export const selectCategoryChannelOffsets = createSelector(getAppState, (state: AppState) => state.categoryChannelOffsets);

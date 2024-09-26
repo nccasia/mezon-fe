@@ -44,7 +44,7 @@ import useProcessedContent from './useProcessedContent';
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
-		allowedSpacesCount: 0,
+		allowedSpacesCount: Infinity,
 		isInsertSpaceAfterMention: true
 	},
 	hashtag: {
@@ -253,7 +253,9 @@ export const ChatBoxBottomBar = memo(
 				setText(convertedHashtag);
 			}
 			setIsShowAttachControl(false);
-			saveMessageToCache(text);
+			if (![EMessageActionType.CreateThread].includes(messageAction)) {
+				saveMessageToCache(text);
+			}
 		};
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {

@@ -1,11 +1,13 @@
-import { useAppNavigation, useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useEscapeKey, useOnClickOutside, useThreads, useUserRestriction } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
@@ -19,12 +21,13 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel } from '@mezon/utils';
+import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import SettingChannel from '../ChannelSetting';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -54,9 +57,10 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 });
 
 function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
-	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
-	));
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
+		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />,
+		[channel?.channel_id]
+	);
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -81,38 +85,118 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
-
+	const { userProfile } = useAuth();
+	const currentClan = useSelector(selectCurrentClan);
+	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
+	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
+	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
+	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
 			</div>
-			<div className="items-center h-full ml-auto flex">
-				<div className="justify-end items-center gap-2 flex">
-					<div className="hidden sbm:flex">
-						<div className="relative justify-start items-center gap-[15px] flex mr-4">
-							<ThreadButton isLightMode={appearanceTheme === 'light'} />
-							<MuteButton isLightMode={appearanceTheme === 'light'} />
-							<PinButton isLightMode={appearanceTheme === 'light'} />
-							<div onClick={() => setTurnOffThreadMessage()}>
-								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+			{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+				<div className="items-center h-full ml-auto flex">
+					<div className="justify-end items-center gap-2 flex">
+						<div className="hidden sbm:flex">
+							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								<InviteBtn isLightMode={appearanceTheme === 'light'} />
+								{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
+								<ThreadButton isLightMode={appearanceTheme === 'light'} />
+								<MuteButton isLightMode={appearanceTheme === 'light'} />
+								<PinButton isLightMode={appearanceTheme === 'light'} />
+								<div onClick={() => setTurnOffThreadMessage()}>
+									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+								</div>
 							</div>
+							<SearchMessageChannel mode={mode} />
 						</div>
-						<SearchMessageChannel mode={mode} />
-					</div>
-					<div
-						className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
-						id="inBox"
-					>
-						<InboxButton isLightMode={appearanceTheme === 'light'} />
-						<HelpButton isLightMode={appearanceTheme === 'light'} />
-					</div>
-					<div className="sbm:hidden mr-5">
-						<ChannelListButton />
+						<div
+							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+							id="inBox"
+						>
+							<InboxButton isLightMode={appearanceTheme === 'light'} />
+							<HelpButton isLightMode={appearanceTheme === 'light'} />
+						</div>
+						<div className="sbm:hidden mr-5">
+							<ChannelListButton />
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</>
+	);
+}
+
+function ChannelSettingBtn({ isLightMode }: { isLightMode: boolean }) {
+	const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
+	const ChannelSettingRef = useRef<HTMLDivElement | null>(null);
+	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
+	const handleShowChannelSetting = () => {
+		setIsOpenSetting(!isOpenSetting);
+	};
+
+	useOnClickOutside(ChannelSettingRef, () => setIsOpenSetting(false));
+	useEscapeKey(() => setIsOpenSetting(false));
+
+	return (
+		<div className="relative leading-5 h-5" ref={ChannelSettingRef}>
+			<Tooltip
+				className={`${isOpenSetting && 'hidden'}`}
+				content="Channel setting"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowChannelSetting} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.SettingProfile
+						className={`w-6 h-6hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
+					/>
+				</button>
+			</Tooltip>
+			{isOpenSetting && (
+				<SettingChannel
+					onClose={() => {
+						setIsOpenSetting(false);
+					}}
+					channel={currentChannel}
+				/>
+			)}
+		</div>
+	);
+}
+
+function InviteBtn({ isLightMode }: { isLightMode: boolean }) {
+	const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+	const InviteBtnRef = useRef<HTMLDivElement | null>(null);
+	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
+
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
+		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={currentChannel.id} />,
+		[currentChannel?.id]
+	);
+
+	useOnClickOutside(InviteBtnRef, () => setIsOpenModal(false));
+	useEscapeKey(() => setIsOpenModal(false));
+
+	return (
+		<div className="relative leading-5 h-5" ref={InviteBtnRef}>
+			<Tooltip
+				className={`${isOpenModal && 'hidden'}`}
+				content="Invite Friends"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={openInviteChannelModal} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.AddPerson
+						className={`w-6 h-6 hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
+					/>
+				</button>
+			</Tooltip>
+		</div>
 	);
 }
 
@@ -177,16 +261,16 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement | null>(null);
+	const notiRef = useRef<HTMLDivElement | null>(null);
 
 	const handleShowNotificationSetting = () => {
 		setIsShowNotificationSetting(!isShowNotificationSetting);
 	};
 
-	useOnClickOutside(threadRef, () => setIsShowNotificationSetting(false));
+	useOnClickOutside(notiRef, () => setIsShowNotificationSetting(false));
 	useEscapeKey(() => setIsShowNotificationSetting(false));
 	return (
-		<div className="relative leading-5 h-5" ref={threadRef}>
+		<div className="relative leading-5 h-5" ref={notiRef}>
 			<Tooltip
 				className={`${isShowNotificationSetting && 'hidden'} w-[164px]`}
 				content="Notification Settings"
@@ -195,7 +279,11 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell defaultSize="size-6" />}
+					{isMuteBell ? (
+						<Icons.MuteBell isWhite={isShowNotificationSetting} />
+					) : (
+						<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
+					)}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
@@ -205,19 +293,19 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement | null>(null);
+	const pinRef = useRef<HTMLDivElement | null>(null);
 	const handleShowPinMessage = () => {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
 	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
-	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
+	useOnClickOutside(pinRef, () => setIsShowPinMessage(false));
 	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
 	const handleClose = () => setIsShowPinMessage(false);
 	useEscapeKey(handleClose);
 	return (
-		<div className="relative leading-5 h-5" ref={threadRef}>
+		<div className="relative leading-5 h-5" ref={pinRef}>
 			<Tooltip
 				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
 				content="Pinned Messages"
@@ -284,7 +372,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.Inbox defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
+					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>

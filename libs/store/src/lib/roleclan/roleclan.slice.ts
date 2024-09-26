@@ -27,7 +27,9 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 	roles: IRolesClan[];
 }
 
-export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
+export const RolesClanAdapter = createEntityAdapter({
+	selectId: (role: RolesClanEntity) => role.id
+});
 
 type GetRolePayload = {
 	clanId?: string;
@@ -38,7 +40,7 @@ export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.listRoles(clanId || '', 100, 1, '');
+		const response = await mezon.socketRef.current?.listRoles(clanId || '', 500, 1, '');
 		if (!response?.roles?.roles) {
 			return [];
 		}
@@ -89,25 +91,27 @@ export const fetchDeleteRole = createAsyncThunk(
 );
 
 type CreateRolePayload = {
-	clan_id: string;
+	clanId: string;
 	title: string | undefined;
-	add_user_ids: string[];
-	active_permission_ids: string[];
+	addUserIds: string[];
+	activePermissionIds: string[];
+	maxPermissionId: string;
 };
 
 export const fetchCreateRole = createAsyncThunk(
 	'CreatRole/fetchCreateRole',
-	async ({ clan_id, title, add_user_ids, active_permission_ids }: CreateRolePayload, thunkAPI) => {
+	async ({ clanId, title, addUserIds, activePermissionIds, maxPermissionId }: CreateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			active_permission_ids: active_permission_ids || [],
-			add_user_ids: add_user_ids || [],
+			active_permission_ids: activePermissionIds || [],
+			add_user_ids: addUserIds || [],
 			allow_mention: 0,
-			clan_id: clan_id,
+			clan_id: clanId,
 			color: '',
 			description: '',
 			display_online: 0,
-			title: title ?? ''
+			title: title ?? '',
+			max_permission_id: maxPermissionId
 		};
 		const response = await mezon.client.createRole(mezon.session, body);
 		if (!response) {
@@ -118,38 +122,62 @@ export const fetchCreateRole = createAsyncThunk(
 );
 
 type UpdateRolePayload = {
-	role_id: string;
+	roleId: string;
 	title: string | undefined;
-	add_user_ids: string[];
-	active_permission_ids: string[];
-	remove_user_ids: string[];
-	remove_permission_ids: string[];
+	addUserIds: string[];
+	activePermissionIds: string[];
+	removeUserIds: string[];
+	removePermissionIds: string[];
 	clanId: string;
+	maxPermissionId: string;
 };
 
 export const fetchUpdateRole = createAsyncThunk(
 	'UpdateRole/fetchUpdateRole',
-	async ({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids, clanId }: UpdateRolePayload, thunkAPI) => {
+	async (
+		{ roleId, title, addUserIds, activePermissionIds, removeUserIds, removePermissionIds, clanId, maxPermissionId }: UpdateRolePayload,
+		thunkAPI
+	) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			role_id: role_id,
+			role_id: roleId,
 			title: title ?? '',
 			color: '',
 			role_icon: '',
 			description: '',
 			display_online: 0,
 			allow_mention: 0,
-			add_user_ids: add_user_ids || [],
-			active_permission_ids: active_permission_ids || [],
-			remove_user_ids: remove_user_ids || [],
-			remove_permission_ids: remove_permission_ids || [],
-			clan_id: clanId
+			add_user_ids: addUserIds || [],
+			active_permission_ids: activePermissionIds || [],
+			remove_user_ids: removeUserIds || [],
+			remove_permission_ids: removePermissionIds || [],
+			clan_id: clanId,
+			max_permission_id: maxPermissionId
 		};
-		const response = await mezon.client.updateRole(mezon.session, role_id, body);
+		const response = await mezon.client.updateRole(mezon.session, roleId, body);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
+	}
+);
+
+type updatePermission = {
+	roleId: string;
+	userId: string;
+};
+
+export const updatePermissionUserByRoleId = createAsyncThunk(
+	'UpdateRole/updatePermissionUserByRoleId',
+	async ({ roleId, userId }: updatePermission, thunkAPI) => {
+		const state = thunkAPI.getState() as { rolesclan: RolesClanState };
+		const roles = state.rolesclan.entities;
+		const role = roles[roleId];
+		if (role?.role_user_list?.role_users) {
+			const userExists = role.role_user_list.role_users.some((user) => user.id === userId);
+			return userExists;
+		}
+		return false;
 	}
 );
 
@@ -167,6 +195,44 @@ export const RolesClanSlice = createSlice({
 	reducers: {
 		add: RolesClanAdapter.addOne,
 		remove: RolesClanAdapter.removeOne,
+		update: (state, action: PayloadAction<ApiRole>) => {
+			const changes: Partial<{
+				title: string;
+				permission_list: typeof action.payload.permission_list;
+				role_user_list: typeof action.payload.role_user_list;
+			}> = {};
+			changes.title = action.payload.title;
+			if (action.payload.permission_list?.permissions) {
+				changes.permission_list = action.payload.permission_list;
+			}
+			if (action.payload.role_user_list?.role_users) {
+				changes.role_user_list = action.payload.role_user_list;
+			}
+			RolesClanAdapter.updateOne(state, {
+				id: action.payload.id || '',
+				changes: changes
+			});
+		},
+		updateRemoveUserRole: (state, action: PayloadAction<{ userId: string }>) => {
+			const { userId } = action.payload;
+			const roles = Object.values(state.entities);
+			roles.forEach((role) => {
+				if (role && role.role_user_list?.role_users) {
+					const updatedRoleUsers = role.role_user_list.role_users.filter((user) => user.id !== userId);
+					if (updatedRoleUsers.length !== role.role_user_list.role_users.length) {
+						RolesClanAdapter.updateOne(state, {
+							id: role.id,
+							changes: {
+								role_user_list: {
+									...role.role_user_list,
+									role_users: updatedRoleUsers
+								}
+							}
+						});
+					}
+				}
+			});
+		},
 		removeRoleByChannel: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
 			const updatedRoles = Object.values(state.entities).filter((role) => {
@@ -287,7 +353,15 @@ export const getIsShow = (state: RootState) => state.isshow.isShow;
  * Export reducer for store configuration.
  */
 export const RolesClanReducer = RolesClanSlice.reducer;
-export const rolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole, fetchCreateRole, fetchUpdateRole };
+export const rolesClanActions = {
+	...RolesClanSlice.actions,
+	fetchRolesClan,
+	fetchMembersRole,
+	fetchDeleteRole,
+	fetchCreateRole,
+	fetchUpdateRole,
+	updatePermissionUserByRoleId
+};
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
 

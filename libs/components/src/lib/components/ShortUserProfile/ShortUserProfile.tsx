@@ -31,8 +31,6 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 		}
 	}, [coords?.distanceToBottom]);
 
-	console.log(coords?.mouseX);
-
 	return (
 		<div
 			className={`dark:bg-black right-[15] bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}

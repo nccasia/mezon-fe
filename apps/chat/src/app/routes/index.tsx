@@ -24,7 +24,7 @@ import DMRoutes from './DMRoutes';
 // Pages
 import { MemberProvider } from '@mezon/core';
 import { appActions, useAppDispatch } from '@mezon/store';
-import { useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import AppDirectory from '../pages/AppDirectory';
 import ThreadsMain from '../pages/thread';
@@ -50,7 +50,7 @@ const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 
 // Components
-export const Routes = () => {
+export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
 
 	const loaderWithStore = useCallback(
@@ -249,4 +249,4 @@ export const Routes = () => {
 	);
 
 	return <RouterProvider router={routes} />;
-};
+});

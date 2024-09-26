@@ -5,7 +5,8 @@ import {
 	NOTIFICATION_SERVICE_ERROR,
 	NOTIFICATION_SERVICE_STARTED,
 	SENDER_ID,
-	START_NOTIFICATION_SERVICE
+	START_NOTIFICATION_SERVICE,
+	TRIGGER_SHORTCUT
 } from './constants';
 import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI } from './types';
 
@@ -22,17 +23,20 @@ export class ElectronBridge implements IElectronBridge {
 	}
 
 	private hasListeners = false;
+	private shortcutHandler?: () => void;
 
 	private constructor() {
 		// private constructor to prevent instantiation
 	}
 
-	public initListeners() {
+	public initListeners(shortcutHandler: () => void) {
 		if (this.hasListeners) {
 			return;
 		}
+		this.shortcutHandler = shortcutHandler;
 		this.setupSenderId();
 		this.setupPushReceiver();
+		this.setupShortCut();
 		this.hasListeners = true;
 	}
 
@@ -41,10 +45,11 @@ export class ElectronBridge implements IElectronBridge {
 		this.bridge.removeListener(NOTIFICATION_RECEIVED, this.notificationReceivedHandler);
 		this.bridge.removeListener(NOTIFICATION_SERVICE_ERROR, this.notificationErrorhandler);
 		this.bridge.removeListener(FCM_TOKEN_UPDATED, this.tokenUpdatedHandler);
+		this.bridge.removeListener(TRIGGER_SHORTCUT, this.triggerShortcut);
 		this.hasListeners = false;
 	}
 
-	public setBadgeCount(badgeCount: number) {
+	public setBadgeCount(badgeCount: number | null) {
 		this.bridge.setBadgeCount(badgeCount);
 	}
 
@@ -59,6 +64,10 @@ export class ElectronBridge implements IElectronBridge {
 		this.bridge.on(NOTIFICATION_RECEIVED, this.listenerHandlers[NOTIFICATION_RECEIVED]);
 		this.bridge.on(NOTIFICATION_SERVICE_ERROR, this.listenerHandlers[NOTIFICATION_SERVICE_ERROR]);
 		this.bridge.on(FCM_TOKEN_UPDATED, this.listenerHandlers[FCM_TOKEN_UPDATED]);
+	}
+
+	private setupShortCut() {
+		this.bridge.on(TRIGGER_SHORTCUT, this.listenerHandlers[TRIGGER_SHORTCUT]);
 	}
 
 	private notificationServiceStartedHandler = (_: unknown, token: string) => {
@@ -105,11 +114,18 @@ export class ElectronBridge implements IElectronBridge {
 		console.log(token);
 	};
 
+	private triggerShortcut = (_: unknown, name: string) => {
+		if (this.shortcutHandler) {
+			this.shortcutHandler();
+		}
+	};
+
 	private readonly listenerHandlers: Record<string, ElectronBridgeHandler> = {
 		[NOTIFICATION_SERVICE_STARTED]: this.notificationServiceStartedHandler,
 		[NOTIFICATION_RECEIVED]: this.notificationReceivedHandler,
 		[NOTIFICATION_SERVICE_ERROR]: this.notificationErrorhandler,
-		[FCM_TOKEN_UPDATED]: this.tokenUpdatedHandler
+		[FCM_TOKEN_UPDATED]: this.tokenUpdatedHandler,
+		[TRIGGER_SHORTCUT]: this.triggerShortcut
 	};
 }
 

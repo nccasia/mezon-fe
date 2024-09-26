@@ -5,15 +5,16 @@ import {
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentVoiceChannelId,
+	selectIsShowEmptyCategory,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -42,20 +43,15 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentClan = useSelector(selectCurrentClan);
 	const navigate = useNavigate();
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
-	));
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const [isShowModalPanelClan, setIsShowModalPanelClan] = useState<boolean>(false);
 	const hasChildModal = useSelector(hasGrandchildModal);
-	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => (
-		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
-	));
-	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
-
+	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => <ModalNotificationSetting onClose={closeNotiSettingModal} open={true} />);
+	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
 	const toggleLeaveClanPopup = () => {
 		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
@@ -116,6 +112,13 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		navigate('/mezon');
 	};
 
+	const toggleShowEmptyCategory = () => {
+		if (isShowEmptyCategory) {
+			dispatch(categoriesActions.setHideEmptyCategory());
+		} else {
+			dispatch(categoriesActions.setShowEmptyCategory());
+		}
+	};
 	return (
 		<>
 			{type === 'direct' ? (
@@ -172,6 +175,28 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
+									<button
+										onClick={toggleShowEmptyCategory}
+										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2 hover:bg-bgSelectItem group"
+									>
+										<li className="text-[14px] dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+											Show Empty Categories
+										</li>
+										{/* <div className="flex items-center justify-center h-[18px] w-[18px]"> */}
+										<input
+											className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
+							 bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+								after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+								 hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
+									focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+									 disabled:bg-slate-200 disabled:after:bg-slate-300"
+											type="checkbox"
+											checked={isShowEmptyCategory}
+											id="id-c01"
+											onChange={toggleShowEmptyCategory}
+										/>
+										{/* </div> */}
+									</button>
 									{!isClanOwner && (
 										<button
 											onClick={toggleLeaveClanPopup}

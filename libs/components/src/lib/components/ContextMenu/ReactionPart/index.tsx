@@ -14,7 +14,13 @@ const ReactionPart: React.FC<IReactionPart> = ({ emojiList, activeMode, messageI
 			{emojiList
 				.filter((item) => !!item.id)
 				.map((item, index) => (
-					<ReactionItem key={index} emojiShortCode={item.shortname} emojiId={item.id} activeMode={activeMode} messageId={messageId} />
+					<ReactionItem
+						key={index}
+						emojiShortCode={item.shortname || ''}
+						emojiId={item.id || ''}
+						activeMode={activeMode}
+						messageId={messageId}
+					/>
 				))}
 		</div>
 	);

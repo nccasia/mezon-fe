@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
+import { useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
 	notificationActions,
@@ -8,7 +8,6 @@ import {
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
-	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
@@ -16,7 +15,6 @@ import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelJumpToPresent } from './ChannelJumpToPresent';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
@@ -40,11 +38,9 @@ function useChannelSeen(channelId: string) {
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
-	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
-	const isAlone = useCheckAlonePermission();
+	const [canViewChannelAndSendMessage] = useClanRestriction([EPermission.viewChannel, EPermission.sendMessage]);
 
-	if (hasViewChannelPermission && isAlone) {
+	if (canViewChannelAndSendMessage) {
 		return (
 			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
 				You do not have permission to send messages in this channel.
@@ -54,18 +50,17 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
+			{currentChannel ? (
+				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+			) : (
+				<ChannelMessageBox.Skeleton />
+			)}
 			{currentChannel && (
 				<ChannelTyping
 					channelId={currentChannel?.id}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					isPublic={currentChannel ? !currentChannel.channel_private : false}
 				/>
-			)}
-			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
-			{currentChannel ? (
-				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
-			) : (
-				<ChannelMessageBox.Skeleton />
 			)}
 		</div>
 	);
@@ -102,39 +97,41 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [isShowMemberList, setIsShowCreateThread]);
 
 	return (
-		<>
-			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
-				id="mainChat"
-				onDragEnter={handleDragEnter}
-			>
-				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
-					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
-					>
+		currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+			<>
+				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+				<div
+					className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
+					id="mainChat"
+					onDragEnter={handleDragEnter}
+				>
+					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 						<div
-							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
-							ref={messagesContainerRef}
+							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
 						>
-							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							<div
+								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+								ref={messagesContainerRef}
+							>
+								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							</div>
+							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
-						<ChannelMainContentText channelId={currentChannel?.id as string} />
+						{isShowMemberList && (
+							<div
+								onContextMenu={(event) => event.preventDefault()}
+								className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+								id="memberList"
+							>
+								<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+								<MemberList />
+							</div>
+						)}
+						{isSearchMessage && <SearchMessageChannel />}
 					</div>
-					{isShowMemberList && (
-						<div
-							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-							id="memberList"
-						>
-							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-							<MemberList />
-						</div>
-					)}
-					{isSearchMessage && <SearchMessageChannel />}
 				</div>
-			</div>
-		</>
+			</>
+		)
 	);
 };
 

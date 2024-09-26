@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectCurrentClanId, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
+import { rolesClanActions, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -27,7 +27,6 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
-	const currentClanId = useSelector(selectCurrentClanId);
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 	const clanRole = useSelector(selectRoleByRoleId(roleId));
 
@@ -116,7 +115,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			{
 				text: 'Yes',
 				onPress: async () => {
-					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id, clanId: currentClanId }));
+					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id, clanId: clanRole?.clan_id }));
 					if (response?.payload) {
 						// Toast.show({
 						// 	type: 'success',

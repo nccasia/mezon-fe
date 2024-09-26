@@ -2,13 +2,12 @@ import { useAuth } from '@mezon/core';
 import {
 	channelUsersActions,
 	RolesClanEntity,
-	selectAllChannelMembers,
 	selectAllRolesClan,
+	selectAllUserChannel,
 	selectAllUserClans,
 	selectCurrentClanId,
 	selectRolesByChannelId,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
@@ -57,12 +56,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 	);
 
 	const usersClan = useSelector(selectAllUserClans);
-	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
+	const rawMembers = useSelector(selectAllUserChannel);
 	const listUserInvite = useMemo(() => {
 		if (channel.channel_private !== 1) {
 			return usersClan.filter((user) => user.id !== userProfile?.user?.id);
 		}
-		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id || '');
+		const memberIds = rawMembers.map((member) => member.user?.id || '');
 		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
 	}, [usersClan, rawMembers, channel.channel_private, userProfile?.user?.id]);
 
@@ -192,6 +191,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 						<Icons.HashtagLocked defaultSize="w-5 h-5 " />
 					)}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
+					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 5-5" />}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-[16px]" style={{ wordBreak: 'break-word' }}>
 						{channel.channel_label}

@@ -35,6 +35,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
+export { mergeRefs } from './mergeRefs';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -273,10 +274,13 @@ export function compareObjects(a: any, b: any, searchText: string, prioritizePro
 }
 
 export function normalizeString(str: string): string {
-	return str
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toUpperCase();
+	if (str?.length)
+		return str
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toUpperCase();
+
+	return '';
 }
 
 export function searchMentionsHashtag(searchValue: string, list: MentionDataProps[]) {
@@ -742,22 +746,6 @@ export const blankReferenceObj: ApiMessageRef = {
 	channel_id: '',
 	mode: 0,
 	channel_label: ''
-};
-
-export const getBottomPopupClass = (hasAttachment: boolean, messageRefId: string) => {
-	if (hasAttachment && messageRefId !== '' && messageRefId !== undefined) {
-		return 'bottom-[370px]';
-	}
-	if (hasAttachment && (messageRefId === undefined || messageRefId === '')) {
-		return 'bottom-[320px]';
-	}
-	if (!hasAttachment && messageRefId !== undefined && messageRefId !== '') {
-		return 'bottom-[127px]';
-	}
-	if (!hasAttachment && (messageRefId === undefined || messageRefId === '')) {
-		return 'bottom-[76px]';
-	}
-	return '';
 };
 
 export const handleShowShortProfile = (

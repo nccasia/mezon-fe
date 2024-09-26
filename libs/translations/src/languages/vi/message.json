@@ -16,7 +16,8 @@
         "files": "Files",
         "saveImage": "Lưu ảnh",
         "copyMediaLink": "Sao chép đường dẫn media",
-        "giveACoffee": "Give A Coffee"
+        "giveACoffee": "Give A Coffee",
+        "resend": "Gửi lại"
     },
     "chatBox": {
         "replyingTo": "Đang phản hổi",
@@ -78,5 +79,5 @@
     },
     "newMessages": "Các tin nhắn mới",
     "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
-    "messageInputPlaceHolder": "Viết suy nghĩ của bạn ở đây..."
+    "messageInputPlaceHolder": "Viết suy nghĩ của bạn ở đây"
 }

@@ -1,22 +1,22 @@
-import { useOnClickOutside, useShowName } from '@mezon/core';
+import { useShowName } from '@mezon/core';
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, IMessageWithUser, WIDTH_PANEL_PROFILE, handleShowShortProfile } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useRef, useState } from 'react';
+import { IMessageWithUser } from '@mezon/utils';
+
+import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
-import { useMessageContextMenu } from '../../ContextMenu';
-import ModalUserProfile from '../../ModalUserProfile';
+
+import { ChannelStreamMode } from 'mezon-js';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 	mode?: number;
-	allowDisplayShortProfile?: boolean;
+	onClick?: (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => void;
 };
 
 // TODO: refactor component for message lines
-const MessageReply: React.FC<MessageReplyProps> = ({ message, mode, allowDisplayShortProfile }) => {
+const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) => {
 	const {
 		senderIdMessageRef,
 		messageContentRef,
@@ -48,20 +48,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, mode, allowDisplay
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? ''
 	);
-	const { posShortProfile, setPosShortProfile } = useMessageContextMenu();
-	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-	const panelRef = useRef<HTMLDivElement | null>(null);
-
-	const handleMouseClick = () => {
-		handleShowShortProfile(
-			panelRef,
-			WIDTH_PANEL_PROFILE,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
-			setIsShowPanelChannel,
-			setPosShortProfile
-		);
-	};
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			{message.references?.length ? (
@@ -74,11 +61,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, mode, allowDisplay
 
 						<div className="gap-1 flex flex-row items-center w-full">
 							<span
-								ref={panelRef}
-								onClick={handleMouseClick}
+								onClick={onClick}
 								className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap"
 							>
-								{nameShowed}
+								{isDM ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
 							</span>
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">
@@ -114,30 +100,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, mode, allowDisplay
 						</div>
 						<i className="dark:text-zinc-400 text-colorTextLightMode text-[13px]">Original message was deleted</i>
 					</div>
-				</div>
-			)}
-			{isShowPanelChannel && allowDisplayShortProfile && (
-				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
-					style={{
-						left: posShortProfile.left,
-						top: posShortProfile.top,
-						bottom: posShortProfile.bottom,
-						right: posShortProfile.right
-					}}
-					role="button"
-					onMouseDown={(e) => e.stopPropagation()}
-				>
-					<ModalUserProfile
-						userID={senderIdMessageRef}
-						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
-						message={message}
-						mode={mode}
-						positionType={''}
-						avatar={messageAvatarSenderRef}
-						name={nameShowed}
-						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
-					/>
 				</div>
 			)}
 		</div>

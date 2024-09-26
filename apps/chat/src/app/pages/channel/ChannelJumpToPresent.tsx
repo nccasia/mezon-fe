@@ -1,12 +1,14 @@
 import { messagesActions, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
+import classNames from 'classnames';
 import { useCallback } from 'react';
 
 type ChannelTypingProps = {
 	channelId: string;
-	mode: number;
+	className?: string;
 };
 
-export function ChannelJumpToPresent({ channelId, mode }: ChannelTypingProps) {
+export function ChannelJumpToPresent({ channelId, className }: ChannelTypingProps) {
 	const dispatch = useAppDispatch();
 
 	const handleJumpToPresent = useCallback(() => {
@@ -16,8 +18,14 @@ export function ChannelJumpToPresent({ channelId, mode }: ChannelTypingProps) {
 	}, [channelId, dispatch]);
 
 	return (
-		<div className="left-4 pl-4 cursor-pointer dark:bg-bgPrimary dark:text-white text-black" onClick={handleJumpToPresent}>
-			Viewing older messages (Click to jump to present)
+		<div
+			className={classNames('w-full h-full opacity-95 cursor-pointer dark:text-white text-black flex items-center justify-between', className)}
+			onClick={handleJumpToPresent}
+		>
+			<div>You're viewing older messages</div>
+			<div className="flex items-center gap-1">
+				Jump to present<Icons.ArrowDown></Icons.ArrowDown>
+			</div>
 		</div>
 	);
 }

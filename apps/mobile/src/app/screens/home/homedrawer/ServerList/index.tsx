@@ -1,6 +1,8 @@
 import { useFriends } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
+import { clansActions, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import LogoMezonDark from '../../../../../assets/svg/logoMezonDark.svg';
@@ -16,14 +18,19 @@ const ServerList = React.memo(() => {
 	const styles = style(themeValue);
 	const { quantityPendingRequest } = useFriends();
 	const navigation = useNavigation<any>();
+	const isTabletLandscape = useTabletLandscape();
+	const dispatch = useAppDispatch();
 
 	const navigateToDM = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+		if (isTabletLandscape) {
+			dispatch(clansActions.setCurrentClanId('0'));
+		}
 	};
 
 	return (
 		<View style={styles.wrapperServerList}>
-			<TouchableOpacity style={{ alignSelf: 'center' }} onPress={() => navigateToDM()}>
+			<TouchableOpacity style={styles.wrapperLogo} onPress={() => navigateToDM()}>
 				{theme === 'light' ? <LogoMezonLight width={50} height={50} /> : <LogoMezonDark width={50} height={50} />}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>

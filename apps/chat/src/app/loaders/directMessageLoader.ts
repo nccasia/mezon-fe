@@ -1,4 +1,4 @@
-import { directActions } from '@mezon/store';
+import { channelsActions, directActions } from '@mezon/store';
 import { CustomLoaderFunction } from './appLoader';
 
 export const directMessageLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
@@ -6,6 +6,7 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 	if (!directId) {
 		throw new Error('DirectMessage ID null');
 	}
+
 	dispatch(
 		directActions.joinDirectMessage({
 			directMessageId: directId,
@@ -13,6 +14,7 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 			type: Number(type)
 		})
 	);
+	dispatch(channelsActions.setPreviousChannels({ channelId: directId }));
 
 	return null;
 };

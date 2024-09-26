@@ -1,15 +1,15 @@
 import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import memoize from 'memoizee';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
+import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { messagesActions } from '../messages/messages.slice';
-import { notificationActions } from '../notification/notify.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -44,6 +44,8 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	request: Record<string, RequestInput>;
 	idChannelSelected: Record<string, string>;
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
+	selectedChannelId?: string | null;
+	previousChannels: string[];
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -106,6 +108,7 @@ export const joinChannel = createAsyncThunk(
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
@@ -125,7 +128,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser());
-			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: response.clan_id as string,
@@ -223,7 +226,7 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 	};
 }
 
-export const fetchChannelsCached = memoize(
+export const fetchChannelsCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) => {
 		const response = await mezon.client.listChannelDescs(mezon.session, limit, state, '', clanId, channelType);
 		return { ...response, time: Date.now() };
@@ -259,7 +262,6 @@ export const fetchChannels = createAsyncThunk(
 						clanId: channelText.clan_id ?? ''
 					};
 				});
-			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 
 			const lastChannelMessages =
 				response.channeldesc?.map((channel) => ({
@@ -289,7 +291,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	request: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
-	quantityNotifyChannels: {}
+	quantityNotifyChannels: {},
+	previousChannels: []
 });
 
 export const channelsSlice = createSlice({
@@ -309,13 +312,16 @@ export const channelsSlice = createSlice({
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
 		},
+		setSelectedChannelId: (state, action: PayloadAction<string>) => {
+			state.selectedChannelId = action.payload;
+		},
 		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
 			state.currentVoiceChannelId = action.payload;
 		},
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
 		},
-		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
+		setCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
@@ -379,6 +385,13 @@ export const channelsSlice = createSlice({
 		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
 			delete state.idChannelSelected[action.payload.clanId];
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+		},
+		setPreviousChannels: (state, action: PayloadAction<{ channelId: string }>) => {
+			state.previousChannels = state.previousChannels.filter((channelId) => channelId !== action.payload.channelId);
+			state.previousChannels.unshift(action.payload.channelId);
+			if (state.previousChannels.length > 3) {
+				state.previousChannels.pop();
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -498,11 +511,17 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
+export const selectSelectedChannelId = createSelector(getChannelsState, (state) => state.selectedChannelId);
+
 export const selectModeResponsive = createSelector(getChannelsState, (state) => state.modeResponsive);
 
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
+	clanId ? clansEntities[clanId] : null
+);
+
+export const selectSelectedChannel = createSelector(selectChannelsEntities, selectSelectedChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null
 );
 
@@ -560,3 +579,5 @@ export const selectIdChannelSelectedByClanId = (clanId: string) =>
 	});
 
 export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
+
+export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);

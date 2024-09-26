@@ -1,0 +1,31 @@
+name: Release Mezon App for Windows
+
+on: 
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: mezon-build-windows
+    name: Release Mezon App for Windows
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install package
+        run: |
+          yarn
+
+      - name: Change prod environment
+        run: |
+          cp apps/chat/prod.env apps/chat/.env
+
+      - name: Release Desktop
+        run: |
+          yarn release:desktop
+
+      - name: Push to MinIO
+        run: |
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/latest.yml mezon/mezon/release/latest.yml'"
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-x64.exe mezon/mezon/release/'"

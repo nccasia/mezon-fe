@@ -10,12 +10,14 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -63,13 +65,8 @@ const NavigationMain = () => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		}, 500);
-
-		const timerScrollToActive = setTimeout(async () => {
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { timeout: 100 });
-		}, 4000);
 		return () => {
 			clearTimeout(timer);
-			clearTimeout(timerScrollToActive);
 		};
 	}, []);
 
@@ -100,12 +97,6 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
-
-	useEffect(() => {
-		if (currentClanId) {
-			switchClanLoader();
-		}
-	}, [currentClanId]);
 
 	const refreshMessageInitApp = useCallback(async () => {
 		const store = await getStoreAsync();
@@ -164,6 +155,13 @@ const NavigationMain = () => {
 						channelId: '',
 						channelType: ChannelType.CHANNEL_TYPE_VOICE
 					})
+				),
+				store.dispatch(
+					usersStreamActions.fetchStreamChannelMembers({
+						clanId: currentClanId ?? '',
+						channelId: '',
+						channelType: ChannelType.CHANNEL_TYPE_STREAMING
+					})
 				)
 			];
 			await Promise.all(promise);
@@ -176,10 +174,6 @@ const NavigationMain = () => {
 		}
 	}, [currentChannelId]);
 
-	const switchClanLoader = async () => {
-		const store = await getStoreAsync();
-		await Promise.all([store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }))]);
-	};
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		try {
@@ -216,9 +210,11 @@ const NavigationMain = () => {
 					}
 				}
 
+				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser()));
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
+				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji()));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {
@@ -244,12 +240,12 @@ const NavigationMain = () => {
 	);
 
 	return (
-		<NavigationContainer>
-			<Suspense fallback={<SplashScreen />}>
+		<Suspense fallback={<SplashScreen />}>
+			<NavigationContainer>
 				<NetInfoComp />
 				{isReadyForUse && <MyStackComponent />}
-			</Suspense>
-		</NavigationContainer>
+			</NavigationContainer>
+		</Suspense>
 	);
 };
 

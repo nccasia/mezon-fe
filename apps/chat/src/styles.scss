@@ -344,6 +344,11 @@ input:-webkit-autofill:active {
 	}
 }
 .message-container {
+	&.hight-light {
+		background-color: #eab3081a;
+		outline: 3px solid #eab3081a;
+	}
+
 	&.is-sending {
 		opacity: 0.6;
 	}
@@ -777,4 +782,13 @@ input:-webkit-autofill:active {
 
 .custom-member-list {
 	-ms-overflow-style: none;
+}
+
+.error-boundary {
+	overflow: hidden;
+	min-height: 100vh;
+	background-size: cover;
+	color: #949ba4;
+	background-color: hsl(220 calc(1 * 6.5%) 18% / 1);
+	background-position: 50% 0;
 }

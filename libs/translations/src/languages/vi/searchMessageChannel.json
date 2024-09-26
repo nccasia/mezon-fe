@@ -1,5 +1,5 @@
 {
-  "joinChannel": "Tham gia kênh",
+  "joinChannel": "Tham gia",
   "textChannels": "Kênh văn bản",
   "voiceChannels": "Kênh thoại",
   "search": "Tìm kiếm",
@@ -7,5 +7,7 @@
   "members": "Thành viên",
   "channels": "Kênh",
   "media": "Phương tiện",
-  "pins": "Ghim"
+  "pins": "Ghim",
+  "in": "trong:",
+  "Messages": "Tin nhắn"
 }

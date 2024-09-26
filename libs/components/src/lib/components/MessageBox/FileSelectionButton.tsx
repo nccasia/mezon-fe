@@ -4,9 +4,10 @@ import { Icons } from '@mezon/ui';
 export type FileSelectionButtonProps = {
 	currentClanId: string;
 	currentChannelId: string;
+	hasPermissionEdit: boolean;
 };
 
-function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
+function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdit }: FileSelectionButtonProps) {
 	const dispatch = useAppDispatch();
 
 	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +32,9 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 		<label className="pl-2 flex items-center h-11">
 			<input id="preview_img" type="file" onChange={handleChange} className="w-full hidden" multiple />
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb cursor-pointer">
-				<Icons.AddCircle className="w-6 h-6 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
+				<Icons.AddCircle
+					className={`w-6 h-6 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}
+				/>
 			</div>
 		</label>
 	);

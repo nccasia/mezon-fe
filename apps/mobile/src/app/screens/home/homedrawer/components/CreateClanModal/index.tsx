@@ -138,7 +138,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 					<MezonInput
 						label={t('clanName')}
 						onTextChange={setNameClan}
-						placeHolder={`${userProfile?.user?.username}'s clan`}
+						placeHolder={t('placeholderClan')}
 						value={nameClan}
 						maxCharacter={64}
 						disabled={isSubmitting}

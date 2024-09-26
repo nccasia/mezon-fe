@@ -1,23 +1,48 @@
 import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTablet: boolean) =>
 	StyleSheet.create({
-		container: {
-			backgroundColor: colors.secondary,
+		containerMessages: {
 			flex: 1,
-			paddingHorizontal: size.s_18
+			flexDirection: 'row',
+			backgroundColor: colors.tertiary
+		},
+
+		containerServerlist: {
+			paddingHorizontal: size.s_10
+		},
+
+		container: {
+			backgroundColor: isTablet ? colors.primary : colors.secondary,
+			flex: 1
+		},
+
+		containerDetailMessage: {
+			flex: 2
 		},
 
 		headerWrapper: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			paddingVertical: size.s_20
+			paddingVertical: size.s_20,
+			paddingHorizontal: size.s_18
+		},
+
+		friendsWrapper: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_4,
+			marginTop: size.s_14,
+			paddingVertical: size.s_6,
+			borderRadius: size.s_10,
+			paddingHorizontal: size.s_8,
+			marginHorizontal: size.s_18
 		},
 
 		headerTitle: {
-			fontSize: size.s_18,
+			fontSize: isTablet ? size.s_16 : size.s_18,
 			color: colors.textStrong
 		},
 
@@ -25,7 +50,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			gap: size.s_8,
 			alignItems: 'center',
-			backgroundColor: colors.primary,
+			backgroundColor: isTablet ? colors.secondary : colors.primary,
 			borderRadius: size.s_20,
 			borderWidth: 1,
 			borderColor: colors.border,
@@ -34,7 +59,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		addFriendText: {
-			fontSize: size.label,
+			fontSize: isTablet ? size.medium : size.label,
 			color: colors.textStrong
 		},
 
@@ -43,18 +68,18 @@ export const style = (colors: Attributes) =>
 		},
 
 		searchMessage: {
-			backgroundColor: colors.primary,
+			backgroundColor: isTablet ? colors.secondary : colors.primary,
 			borderRadius: 40,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
 			flexDirection: 'row',
-			justifyContent: 'space-between'
+			justifyContent: 'space-between',
+			marginHorizontal: size.s_18
 		},
 
 		searchInput: {
-			width: '93%',
 			borderRadius: 20,
-			height: size.s_50,
+			height: isTablet ? size.s_34 : size.s_50,
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
 			paddingHorizontal: size.s_12,
@@ -64,8 +89,8 @@ export const style = (colors: Attributes) =>
 
 		statusTyping: {
 			position: 'absolute',
-			width: 30,
-			height: 16,
+			width: size.s_30,
+			height: size.s_16,
 			borderRadius: 10,
 			bottom: -2,
 			right: -6,
@@ -77,8 +102,8 @@ export const style = (colors: Attributes) =>
 
 		statusCircle: {
 			position: 'absolute',
-			width: 14,
-			height: 14,
+			width: size.s_14,
+			height: size.s_14,
 			borderRadius: 10,
 			bottom: 0,
 			right: 0,
@@ -90,7 +115,10 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_8,
-			marginBottom: size.s_10
+			marginHorizontal: size.s_10,
+			paddingHorizontal: size.s_8,
+			paddingVertical: size.s_4,
+			borderRadius: size.s_10
 		},
 		friendAvatar: {
 			width: size.s_40,
@@ -133,7 +161,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: Colors.orange,
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
@@ -153,7 +181,7 @@ export const style = (colors: Attributes) =>
 			flex: 1
 		},
 		avatarWrapper: {
-			borderRadius: 50,
+			borderRadius: size.s_50,
 			backgroundColor: colors.colorAvatarDefault,
 			height: size.s_40,
 			width: size.s_40
@@ -169,7 +197,7 @@ export const style = (colors: Attributes) =>
 			fontSize: size.h6,
 			color: Colors.white
 		},
-		lottie: { width: 30, height: 20 },
+		lottie: { width: size.s_30, height: size.s_20 },
 		contentMessage: {
 			flex: 1,
 			maxHeight: size.s_22,

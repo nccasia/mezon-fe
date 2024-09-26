@@ -1,5 +1,5 @@
 import { useAppNavigation, useReference, useThreads } from '@mezon/core';
-import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
 import { useMemo } from 'react';
@@ -22,6 +22,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const allUsesClan = useSelector(selectAllUserClans);
+	const appearanceTheme = useSelector(selectTheme);
 
 	const avatarMembers = useMemo(() => allUsesClan?.map((member) => member?.user?.avatar_url), [allUsesClan]);
 
@@ -59,7 +60,9 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						</button>
 					</div>
 				</div>
-				<div className="flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
+				<div
+					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+				>
 					{threadChannelOnline.length > 0 && (
 						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
 							{threadChannelOnline.map((thread) => (

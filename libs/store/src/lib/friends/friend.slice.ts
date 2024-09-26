@@ -1,11 +1,11 @@
 /* eslint-disable prefer-const */
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { Friend } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const FRIEND_FEATURE_KEY = 'friends';
 const LIST_FRIEND_CACHED_TIME = 1000 * 60 * 3;
@@ -43,7 +43,7 @@ export interface FriendsState extends EntityState<FriendsEntity, string> {
 
 export const friendsAdapter = createEntityAdapter<FriendsEntity>();
 
-export const fetchListFriendsCached = memoize(
+export const fetchListFriendsCached = memoizeAndTrack(
 	(mezon: MezonValueContext, state: number, limit: number, cursor: string) =>
 		mezon.client.listFriends(mezon.session, state === -1 ? undefined : state, limit, cursor),
 	{

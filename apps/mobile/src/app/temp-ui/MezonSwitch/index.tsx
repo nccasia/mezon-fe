@@ -26,7 +26,11 @@ export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff, 
 	};
 
 	return (
-		<TouchableOpacity style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]} onPress={toggleSwitch} disabled={disabled}>
+		<TouchableOpacity
+			style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}, disabled ? styles.disabled : {}]}
+			onPress={toggleSwitch}
+			disabled={disabled}
+		>
 			<View style={[styles.circle, isEnabled ? styles.circleEnabled : {}]}>
 				{iconYesNo ? (
 					isEnabled ? (

@@ -12,7 +12,8 @@ export const style = (colors: Attributes) =>
 
 		sectionDescription: {
 			color: Colors.gray72,
-			fontSize: Fonts.size.small
+			fontSize: Fonts.size.small,
+			marginTop: size.s_6
 		},
 
 		section: {

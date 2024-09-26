@@ -237,6 +237,29 @@ export type IVoice = {
 	last_screenshot: string;
 };
 
+export type IUserStream = {
+	user_id: string;
+	clan_id: string;
+	clan_name: string;
+	participant: string;
+	streaming_channel_id: string;
+	streaming_channel_label: string;
+};
+
+export type IChannelsStream = {
+	channel_id: string;
+	clan_id: string;
+	is_streaming: boolean;
+	streaming_url: string;
+};
+
+export type IStreamInfo = {
+	clanId: string;
+	clanName: string;
+	streamId: string;
+	streamName: string;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;
@@ -366,10 +389,14 @@ export type IReaction = ApiMessageReaction & {
 };
 
 export type IEmoji = {
-	id: string;
-	src: string;
-	category: string;
-	shortname: string;
+	category?: string;
+	creator_id?: string;
+	id?: string;
+	shortname?: string;
+	src?: string;
+	logo?: string;
+	clan_name?: string;
+	clan_id?: string;
 };
 
 export type IChannelUser = ChannelDescription & {

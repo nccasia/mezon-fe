@@ -10,6 +10,7 @@ import {
 } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
@@ -21,13 +22,11 @@ import {
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme,
-	selectTotalClansNotify,
-	selectTotalUnreadDM
+	selectTheme
 } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -46,8 +45,6 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const totalClanNotify = useSelector(selectTotalClansNotify);
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -162,11 +159,10 @@ function MyApp() {
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
-	useEffect(() => {
-		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
-		}
-	}, [totalClanNotify, totalUnreadDM]);
+	const dispatch = useAppDispatch();
+	const handleClickToJoinClan = () => {
+		dispatch(clansActions.joinClan({ clanId: '0' }));
+	};
 
 	return (
 		<div
@@ -194,6 +190,7 @@ function MyApp() {
 											width={48}
 											height={48}
 											className="clan w-full aspect-square object-cover"
+											onClick={handleClickToJoinClan}
 										/>
 										{quantityPendingRequest !== 0 && (
 											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">

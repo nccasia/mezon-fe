@@ -30,35 +30,37 @@ export default function MemberProfile({
 	nickName,
 	creatorClanId,
 	creatorDMId,
-	isDMThread,
+	isDMThread
 }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+
+	const userInfo: any = useMemo(() => {
+		return user?.user || user;
+	}, [user]);
+
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
-		if (user) {
-			return nickName || user?.user?.display_name || user?.user?.username;
+		if (userInfo) {
+			return nickName || userInfo?.display_name || userInfo?.username;
 		}
-	}, [user]);
+	}, [userInfo]);
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
-			<MezonAvatar
-				avatarUrl={user?.user?.avatar_url}
-				username={user?.user?.username}
-				userStatus={status}
-			/>
+			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={status} />
 
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
 				{!isHideUserName && (
 					<Text style={styles.textName}>
-						{user?.user?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
+						{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
 					</Text>
 				)}
-				{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />}
+				{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
+					<OwnerIcon width={16} height={16} />
+				)}
 			</View>
-
 		</View>
 	);
 }

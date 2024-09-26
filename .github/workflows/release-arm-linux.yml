@@ -1,0 +1,35 @@
+name: Release Mezon App for Linux
+
+on: 
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: mezon-build-linux
+    name: Release Mezon App for Linux
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install package
+        run: |
+          node -v
+          yarn
+
+      - name: Change prod environment
+        run: |
+          cp apps/chat/prod.env apps/chat/.env
+
+      - name: Release Desktop
+        run: |
+          yarn release:desktop
+        env:
+          USE_HARD_LINKS: false
+
+      - name: Push to MinIO
+        run: |
+          mc cp dist/executables/latest-linux.yml mezon/mezon/release/latest-linux.yml
+          mc cp dist/executables/mezon-*-linux-amd64.deb mezon/mezon/release/
+

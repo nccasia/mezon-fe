@@ -1,22 +1,18 @@
-import { useCategory } from '@mezon/core';
-import {
-	CloseIcon,
-	PenIcon,
-	STORAGE_CLAN_ID,
-	STORAGE_DATA_CATEGORY_CHANNEL,
-	SearchIcon,
-	SendIcon,
-	cloneDeep,
-	debounce,
-	getAttachmentUnique,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { CloseIcon, debounce, getAttachmentUnique, PenIcon, save, SearchIcon, SendIcon, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { channelMetaActions } from '@mezon/store';
-import { channelsActions, directActions, getStoreAsync, selectCurrentChannelId, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { channelMetaActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
+import {
+	channelsActions,
+	directActions,
+	getStoreAsync,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	selectDirectsOpenlist,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
+import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -26,13 +22,24 @@ import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { MezonAvatar } from '../../../temp-ui';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
 	const listDM = useSelector(selectDirectsOpenlist);
-	const { categorizedChannels } = useCategory();
+	const listChannels = useSelector(selectAllChannelsByUser);
+	const clans = useAppSelector((state) => selectClansEntities(state));
+
+	const listChannelsText = useMemo(() => {
+		return listChannels.filter((channel) => channel.type !== ChannelType.CHANNEL_TYPE_VOICE);
+	}, [listChannels]);
+
+	const listDMText = useMemo(() => {
+		return listDM.filter((channel) => !!channel.channel_label);
+	}, [listDM]);
+
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const mezon = useMezon();
@@ -62,7 +69,7 @@ export const Sharing = ({ data, onClose }) => {
 		if (searchText) {
 			handleSearchShareTo();
 		} else {
-			setDataShareTo([...flattenedData, ...listDM]);
+			setDataShareTo([...listChannelsText, ...listDMText]);
 		}
 	}, [searchText]);
 
@@ -79,41 +86,9 @@ export const Sharing = ({ data, onClose }) => {
 		[currentChannelId, currentClan.id, session]
 	);
 
-	function flattenData(categorizedChannels: any) {
-		const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
-
-		return categoryChannel.reduce((result: any, category: any) => {
-			const { category_id, category_name } = category;
-
-			category.channels.forEach((channel: any) => {
-				if (channel.type !== ChannelType.CHANNEL_TYPE_VOICE) {
-					result.push({
-						...channel,
-						category_id,
-						category_name
-					});
-					channel.threads.forEach((thread: any) => {
-						const { id: thread_id } = thread;
-
-						result.push({
-							...thread,
-							category_id,
-							category_name,
-							thread_id
-						});
-					});
-				}
-			});
-
-			return result;
-		}, []);
-	}
-
-	const flattenedData = useMemo(() => flattenData(cloneDeep(categorizedChannels)), [categorizedChannels]);
-
 	useEffect(() => {
-		if (flattenedData || listDM) setDataShareTo([...flattenedData, ...listDM]);
-	}, [flattenedData, listDM]);
+		if (listChannelsText || listDMText) setDataShareTo([...listChannelsText, ...listDMText]);
+	}, [listChannelsText, listDMText]);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedSetSearchText = useCallback(
 		debounce((text) => setSearchText(text), 300),
@@ -127,7 +102,7 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const handleSearchShareTo = async () => {
-		const matchedChannels = generateChannelMatch(flattenedData, listDM, searchText);
+		const matchedChannels = generateChannelMatch(listChannelsText, listDMText, searchText);
 		setDataShareTo(matchedChannels || []);
 	};
 
@@ -308,6 +283,28 @@ export const Sharing = ({ data, onClose }) => {
 		setAttachmentUpload((prevAttachments) => prevAttachments.filter((attachment) => attachment.url !== urlToRemove));
 	}
 
+	const isAttachmentUploaded = useMemo(() => {
+		if (!attachmentUpload) return true;
+
+		return attachmentUpload.every((attachment: any) => attachment.url.includes('http'));
+	}, [attachmentUpload]);
+
+	const renderItemSuggest = ({ item }) => {
+		return (
+			<TouchableOpacity onPress={() => onChooseSuggestion(item)} style={styles.itemSuggestion}>
+				<MezonAvatar
+					avatarUrl={item?.channel_avatar?.[0] || clans?.[item?.clan_id]?.logo}
+					username={clans?.[item?.clan_id]?.clan_name || item?.channel_label}
+					width={size.s_24}
+					height={size.s_24}
+				/>
+				<Text style={styles.titleSuggestion} numberOfLines={1}>
+					{item?.channel_label}
+				</Text>
+			</TouchableOpacity>
+		);
+	};
+
 	return (
 		<SafeAreaView style={styles.wrapper}>
 			<View style={styles.header}>
@@ -315,7 +312,7 @@ export const Sharing = ({ data, onClose }) => {
 					<CloseIcon width={size.s_28} height={size.s_28} />
 				</TouchableOpacity>
 				<Text style={styles.titleHeader}>Share</Text>
-				{channelSelected ? (
+				{channelSelected && isAttachmentUploaded ? (
 					isLoading ? (
 						<Flow size={size.s_28} color={Colors.white} />
 					) : (
@@ -334,15 +331,11 @@ export const Sharing = ({ data, onClose }) => {
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
 								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
-									let isFile;
-									if (Platform.OS === 'android') {
-										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
-									} else {
-										const checkIsImage = isImage(media?.url?.toLowerCase());
-										const checkIsVideo = isVideo(media?.url?.toLowerCase());
-										isFile = !checkIsImage && !checkIsVideo;
-									}
-									const isUploaded = !!media?.size || (!media?.size && media?.filetype?.includes?.('video')) || !!media?.url;
+									const isFile =
+										Platform.OS === 'android'
+											? !isImage(media?.filename?.toLowerCase()) && !isVideo(media?.filename?.toLowerCase())
+											: !isImage(media?.url?.toLowerCase()) && !isVideo(media?.url?.toLowerCase());
+									const isUploaded = media?.url?.includes('http');
 
 									return (
 										<View
@@ -398,7 +391,14 @@ export const Sharing = ({ data, onClose }) => {
 					<Text style={styles.title}>Share to</Text>
 					<View style={styles.inputWrapper}>
 						{channelSelected ? (
-							<FastImage source={{ uri: channelSelected?.channel_avatar?.[0] || currentClan?.logo }} style={styles.iconLeftInput} />
+							<View style={styles.iconLeftInput}>
+								<MezonAvatar
+									avatarUrl={channelSelected?.channel_avatar?.[0] || clans?.[channelSelected?.clan_id]?.logo}
+									username={clans?.[channelSelected?.clan_id]?.clan_name || channelSelected?.channel_label}
+									width={size.s_18}
+									height={size.s_18}
+								/>
+							</View>
 						) : (
 							<View style={styles.iconLeftInput}>
 								<SearchIcon width={size.s_18} height={size.s_18} />
@@ -446,20 +446,12 @@ export const Sharing = ({ data, onClose }) => {
 				{!!dataShareTo?.length && (
 					<View style={styles.rowItem}>
 						<Text style={styles.title}>Suggestions</Text>
-						{dataShareTo?.map((channel: any, index: number) => {
-							return (
-								<TouchableOpacity
-									onPress={() => onChooseSuggestion(channel)}
-									style={styles.itemSuggestion}
-									key={`${channel?.id}_${index}_suggestion`}
-								>
-									<FastImage source={{ uri: channel?.channel_avatar?.[0] || currentClan?.logo }} style={styles.logoSuggestion} />
-									<Text style={styles.titleSuggestion} numberOfLines={1}>
-										{channel?.channel_label}
-									</Text>
-								</TouchableOpacity>
-							);
-						})}
+						<FlashList
+							data={dataShareTo}
+							renderItem={renderItemSuggest}
+							keyExtractor={(item, index) => `${item?.id}_${index}_suggestion`}
+							estimatedItemSize={size.s_30}
+						/>
 					</View>
 				)}
 			</ScrollView>

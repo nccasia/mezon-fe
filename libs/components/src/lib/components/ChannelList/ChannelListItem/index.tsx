@@ -1,4 +1,4 @@
-import { selectCountNotifyByChannelId, selectIsUnreadChannelById } from '@mezon/store';
+import { selectCountByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import React, { Fragment, memo, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -22,8 +22,8 @@ export type ChannelListItemRef = {
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props: ChannelListItemProp, ref) => {
 	const { channel, isActive, permissions } = props;
-	const isUnReadChannel = useSelector(selectIsUnreadChannelById(channel.id));
-	const numberNotification = useSelector(selectCountNotifyByChannelId(channel.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
+	const numberNotification = useSelector(selectCountByChannelId(channel.id));
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));
@@ -61,7 +61,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 				permissions={permissions}
 			/>
 			{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} />}
-			<UserListVoiceChannel channelID={channel.channel_id ?? ''} />
+			<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} />
 		</Fragment>
 	);
 });

@@ -1,7 +1,7 @@
 import { AvatarImage, NavLinkComponent } from '@mezon/components';
-import { DirectEntity } from '@mezon/store';
+import { DirectEntity, directActions, useAppDispatch } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 export type DirectMessUnreadProp = {
 	readonly directMessage: Readonly<DirectEntity>;
@@ -9,8 +9,21 @@ export type DirectMessUnreadProp = {
 };
 
 function DirectUnreads({ directMessage, countMessUnread }: DirectMessUnreadProp) {
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const handleClick = async () => {
+		await dispatch(
+			directActions.joinDirectMessage({
+				directMessageId: directMessage.id,
+				channelName: '',
+				type: directMessage.type
+			})
+		);
+
+		navigate(`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`);
+	};
 	return (
-		<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`}>
+		<NavLink to="#" onClick={handleClick}>
 			<NavLinkComponent>
 				<div>
 					<AvatarImage

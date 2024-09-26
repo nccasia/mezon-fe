@@ -7,3 +7,9 @@ export enum EPermission {
 	manageThread = 'manage-thread',
 	manageClan = 'manage-clan'
 }
+
+export enum EOverriddenPermission {
+	manageThread = 'manage-thread',
+	sendMessage = 'send-message',
+	deleteMessage = 'delete-message'
+}

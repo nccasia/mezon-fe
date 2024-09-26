@@ -1,4 +1,3 @@
-import { useChatSending } from '@mezon/core';
 import {
 	messagesActions,
 	referencesActions,
@@ -9,12 +8,12 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { useProcessLink } from 'libs/core/src/lib/chat/hooks/useProcessLink';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useChatSending } from './useChatSending';
+import { useProcessLink } from './useProcessLink';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
 	const clanIdInMes = useMemo(() => {

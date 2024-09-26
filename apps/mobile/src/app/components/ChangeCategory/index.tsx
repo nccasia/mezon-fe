@@ -26,6 +26,7 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
         await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
             navigation.goBack()
         })
+		dispatch(channelsActions.setCurrentChannelId(channel?.channel_id))
     }
 
     const listOtherCategories = useMemo(() => {

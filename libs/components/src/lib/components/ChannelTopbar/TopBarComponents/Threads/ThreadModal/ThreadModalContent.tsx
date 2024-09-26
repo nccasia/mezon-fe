@@ -19,7 +19,7 @@ const ThreadModalContent = ({ message, thread }: ThreadModalContentProps) => {
 				{(message?.content?.t as string) ??
 					(thread.last_sent_message && checkType
 						? JSON.parse(thread.last_sent_message.content || '{}').t
-						: (thread.last_sent_message?.content as unknown as ContentProps).t || '')}
+						: (thread.last_sent_message?.content as unknown as ContentProps)?.t || '')}
 			</p>
 		</div>
 	);

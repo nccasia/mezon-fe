@@ -3,7 +3,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
+
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
 export interface EmojiSuggestionEntity extends IEmoji {
@@ -30,11 +30,6 @@ type UpdateEmojiRequest = {
 export const emojiSuggestionAdapter = createEntityAdapter({
 	selectId: (emo: EmojiSuggestionEntity) => emo.id || ''
 });
-
-type FetchEmojiArgs = {
-	clanId: string;
-	noCache?: boolean;
-};
 
 type EmojiObjPickedArgs = {
 	shortName: string;
@@ -196,3 +191,8 @@ export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emoj
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
 
 export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiObjPicked);
+
+export const selectEmojiByClanId = (clanId: string) =>
+	createSelector(selectAllEmojiSuggestion, (emojis) => {
+		return emojis.filter((emoji) => emoji.clan_id === clanId);
+	});

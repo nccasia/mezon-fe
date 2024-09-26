@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
@@ -104,26 +103,26 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			action: navigateToMessageDetail,
 			isShow: true
 		},
-		{
-			id: 2,
-			text: t('userAction.voiceCall'),
-			icon: <Icons.PhoneCallIcon color={themeValue.text} />,
-			action: () => {
-				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' });
-			},
-			isShow: true
-		},
-		{
-			id: 3,
-			text: t('userAction.videoCall'),
-			icon: <Icons.VideoIcon color={themeValue.text} />,
-			action: () => {
-				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' });
-			},
-			isShow: true
-		},
+		// {
+		// 	id: 2,
+		// 	text: t('userAction.voiceCall'),
+		// 	icon: <Icons.PhoneCallIcon color={themeValue.text} />,
+		// 	action: () => {
+		// 		//TODO
+		// 		Toast.show({ type: 'info', text1: 'Updating...' });
+		// 	},
+		// 	isShow: true
+		// },
+		// {
+		// 	id: 3,
+		// 	text: t('userAction.videoCall'),
+		// 	icon: <Icons.VideoIcon color={themeValue.text} />,
+		// 	action: () => {
+		// 		//TODO
+		// 		Toast.show({ type: 'info', text1: 'Updating...' });
+		// 	},
+		// 	isShow: true
+		// },
 		{
 			id: 4,
 			text: t('userAction.addFriend'),

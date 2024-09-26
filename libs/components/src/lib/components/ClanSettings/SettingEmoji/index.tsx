@@ -1,7 +1,6 @@
 import { useEscapeKey } from '@mezon/core';
-import { selectAllEmojiSuggestion, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClanId, selectEmojiByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import { EEmojiCategory } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,9 +9,10 @@ import ModalSticker, { EGraphicType } from '../SettingSticker/ModalEditSticker';
 import SettingEmojiList from './SettingEmojiList';
 
 const SettingEmoji = () => {
+	const currentClanId = useSelector(selectCurrentClanId);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
-	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM && emoji?.src);
+	const emojiList = useSelector(selectEmojiByClanId(currentClanId || ''));
 	const [selectedEmoji, setSelectedEmoji] = useState<ClanEmoji | null>(null);
 	const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
 	const dispatch = useAppDispatch();

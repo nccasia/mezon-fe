@@ -9,10 +9,13 @@ export const style = (colors: Attributes) =>
 			borderRadius: 15,
 			backgroundColor: colors.tertiary,
 			justifyContent: 'center',
-			padding: 2,
+			padding: 2
 		},
 		switchContainerEnabled: {
-			backgroundColor: baseColor.blurple,
+			backgroundColor: baseColor.blurple
+		},
+		disabled: {
+			opacity: 0.5
 		},
 		circle: {
 			width: 26,
@@ -20,9 +23,9 @@ export const style = (colors: Attributes) =>
 			borderRadius: 13,
 			backgroundColor: baseColor.white,
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		circleEnabled: {
-			transform: [{ translateX: 20 }],
-		},
+			transform: [{ translateX: 20 }]
+		}
 	});

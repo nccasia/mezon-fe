@@ -28,8 +28,11 @@
         "addMember": "Thêm thành viên",
         "description": "Gán vai trò này cho các thành viên của bạn. Thành viên có thể có nhiều hơn một vai trò.",
         "finish": "Hoàn thành",
-        "addedMember": "Bạn đã thêm {{memberCount}} thành viên vào vai trò này.",
-        "searchMembers": "Tìm kiếm thành viên"
+        "addedMember": "Thêm thành viên thành công",
+        "searchMembers": "Tìm kiếm thành viên",
+        "deletedMember": "Đã xoá {{memberName}} thành công",
+        "add": "Thêm",
+        "noMembersFound": "Không tìm thấy thành viên nào"
     },
     "roleDetail": {
         "permissions": "Quyền",

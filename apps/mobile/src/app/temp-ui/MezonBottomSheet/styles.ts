@@ -47,6 +47,6 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'flex-start'
 		},
 		handleIndicator: {
-			backgroundColor: colors.secondary
+			backgroundColor: colors.bgInputPrimary
 		}
 	});

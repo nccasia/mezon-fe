@@ -33,7 +33,7 @@ const ModalInvite = (props: ModalParam) => {
 
 	const handleOpenInvite = useCallback(async () => {
 		try {
-			const intiveIdChannel = (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
+			const intiveIdChannel = (channelID ? channelID : firstChannel.channel_id) as string;
 			const res = await createLinkInviteUser(currentClanId ?? '', intiveIdChannel, 10);
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
