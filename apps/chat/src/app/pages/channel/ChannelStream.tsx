@@ -279,7 +279,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 						<HLSPlayer src={hlsUrl} />
 					</div>
 				) : (
-					<div className="w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight min-h-[500px] text-5xl flex justify-center items-center">
+					<div className="w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight min-h-[500px] text-5xl flex justify-center items-center text-center">
 						<span>No stream today</span>
 					</div>
 				)}
