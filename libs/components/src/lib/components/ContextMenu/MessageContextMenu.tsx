@@ -399,7 +399,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos && !canViewChannelAndSendMessage, (builder) => {
+		builder.when(checkPos && canViewChannelAndSendMessage, (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',
