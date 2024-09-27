@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import CodeEditorField from '../../../components/InputField/CodeEditorField';
 import CustomTextField from '../../../components/InputField/CustomTextField';
-import ImageUploadField from '../../../components/MultiImageUploadField';
+import MultiImageUploadField from '../../../components/MultiImageUploadField';
 
 const NodeTypes = [
 	{
@@ -33,7 +33,7 @@ const NodeTypes = [
 			type: 'object',
 			properties: {
 				message: { type: 'string', uniforms: { component: CustomTextField, label: 'Message', name: 'message' } },
-				image: { type: 'string', uniforms: { component: ImageUploadField, label: 'Uploaded Image', name: 'image' } }
+				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
 			},
 			required: []
 		},
