@@ -1,7 +1,7 @@
 import * as yup from 'yup';
-import ImageUploadField from '../../../components/ImageUploadField';
 import CodeEditorField from '../../../components/InputField/CodeEditorField';
 import CustomTextField from '../../../components/InputField/CustomTextField';
+import ImageUploadField from '../../../components/MultiImageUploadField';
 
 const NodeTypes = [
 	{
