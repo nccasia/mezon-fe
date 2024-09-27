@@ -1,45 +1,25 @@
 import { Modal } from '@mezon/ui';
-import Ajv, { JSONSchemaType } from 'ajv';
 import { useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
-import { AutoForm, SubmitField } from 'uniforms-semantic';
+import { AutoForm } from 'uniforms-semantic';
+import * as yup from 'yup';
 import CustomTextField from '../../../components/InputField/CustomTextField';
-
 type FormData = {
 	flowName: string;
 	description: string;
 };
 
-const schema: JSONSchemaType<FormData> = {
-	title: 'Guest',
-	type: 'object',
-	properties: {
-		flowName: { type: 'string', uniforms: { component: CustomTextField, label: 'Flow Name', name: 'flowName' } },
-		description: { type: 'string', uniforms: { component: CustomTextField, label: 'Description', name: 'description' } }
-	},
-	required: ['flowName', 'description']
-};
-
-const ajv = new Ajv({
-	allErrors: true,
-	useDefaults: true,
-	keywords: ['uniforms']
-});
-
-function createValidator<T>(schema: JSONSchemaType<T>) {
-	const validator = ajv.compile(schema);
-
-	return (model: Record<string, unknown>) => {
-		validator(model);
-		return validator.errors?.length ? { details: validator.errors } : null;
-	};
+interface ValidationError {
+	path: string;
+	message: string;
+}
+interface ValidatorResult {
+	details: ValidationError[];
 }
 
-const schemaValidator = createValidator(schema);
-
-const bridge = new JSONSchemaBridge({
-	schema,
-	validator: schemaValidator
+const schema = yup.object().shape({
+	flowName: yup.string().required('Flow Name is required'),
+	description: yup.string()
 });
 
 interface SaveFlowModalProps {
@@ -51,18 +31,51 @@ interface SaveFlowModalProps {
 }
 const SaveFlowModal = ({ open, onClose, title, changeFlowData, flowData }: SaveFlowModalProps) => {
 	const submitBtnRef = useRef<any>(null);
+	const validator = (model: unknown): ValidatorResult | null => {
+		try {
+			schema.validateSync(model, { abortEarly: false });
+			return null; // no error
+		} catch (e: unknown) {
+			if (e instanceof yup.ValidationError) {
+				// return list error of yup validation
+				const details = e.inner.map((error) => ({
+					path: error.path ?? '',
+					message: error.message
+				}));
+				return { details };
+			}
+			return null;
+		}
+	};
+
+	const bridge = new JSONSchemaBridge({
+		schema: {
+			type: 'object',
+			properties: {
+				flowName: { type: 'string', uniforms: { component: CustomTextField, label: 'Flow Name', name: 'flowName' } },
+				description: { type: 'string', uniforms: { component: CustomTextField, label: 'Discription', name: 'description' } }
+			},
+			required: []
+		},
+		validator
+	});
 	const confirmSave = () => {
 		const data = submitBtnRef.current?.getModel();
+		submitBtnRef.current?.submit();
+		const validationResult = validator(data);
+		if (validationResult) {
+			return;
+		}
 		changeFlowData?.(data);
+	};
+	const handleSubmitForm = (formData: FormData) => {
+		changeFlowData?.(formData);
+		onClose();
 	};
 	return (
 		<Modal confirmButton={confirmSave} titleConfirm="Save" title={title} showModal={open} onClose={onClose}>
-			<div className="p-4">
-				<AutoForm model={flowData} ref={submitBtnRef} schema={bridge}>
-					<CustomTextField name="flowName" label="Flow Name" />
-					<CustomTextField name="description" label="Description" />
-					<SubmitField className="!hidden" />
-				</AutoForm>
+			<div className="p-4 hidden-submit-field">
+				<AutoForm onSubmit={handleSubmitForm} model={flowData} ref={submitBtnRef} schema={bridge}></AutoForm>
 			</div>
 		</Modal>
 	);

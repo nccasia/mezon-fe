@@ -1,4 +1,5 @@
 import { useAuth } from '@mezon/core';
+import { selectAppDetail } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	Background,
@@ -17,6 +18,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FlowContext } from '../../../context/FlowContext';
@@ -39,12 +41,14 @@ const Flow = () => {
 	const [nodes, setNodes, onNodesChange] = useNodesState(flowState.nodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState(flowState.edges);
 	const { screenToFlowPosition } = useReactFlow();
+	const appDetail = useSelector(selectAppDetail);
 	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
 	const [flowData, setFlowData] = React.useState<{ flowName: string; description: string }>({
 		flowName: 'Untitle Flow',
 		description: ''
 	});
 	useEffect(() => {
+		console.log('nodes', flowState.nodes);
 		setNodes(flowState.nodes);
 	}, [flowState.nodes, setNodes]);
 	useEffect(() => {
@@ -55,7 +59,6 @@ const Flow = () => {
 	// handle drag, drop and connect nodes
 	const onConnect = useCallback(
 		(params: Connection) => {
-			console.log(params);
 			flowDispatch(addEdge(params as Edge));
 		},
 		[flowDispatch]
@@ -70,7 +73,6 @@ const Flow = () => {
 		NodeTypes.forEach((item, index) => {
 			if (!obj[item.type]) {
 				obj[item.type] = (props) => {
-					console.log('props', props);
 					return (
 						<CustomNode
 							{...props}
@@ -108,7 +110,6 @@ const Flow = () => {
 				x: event.clientX + 50,
 				y: event.clientY + 50
 			});
-			console.log(position);
 			flowDispatch(addNode(position));
 		},
 		[screenToFlowPosition, flowDispatch]
@@ -155,10 +156,16 @@ const Flow = () => {
 		if (!checkValidate) return;
 		const listNodeInFlow: INode[] = [];
 		nodes.forEach((node) => {
-			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => ({
-				parameterKey: key,
-				parameterValue: formData[node.id][key]
-			}));
+			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => {
+				let value = formData[node.id][key];
+				if (typeof value !== 'string') {
+					value = JSON.stringify(value);
+				}
+				return {
+					parameterKey: key,
+					parameterValue: value
+				};
+			});
 			const newNode: INode = {
 				id: node.id,
 				nodeType: node.type as INodeType,
@@ -195,13 +202,17 @@ const Flow = () => {
 		}
 
 		const flowDataSave: IFlowDataRequest = {
-			userId: userProfile?.user?.id,
+			referralId: userProfile?.user?.id,
+			applicationId: applicationId ?? '',
+			applicationToken: appDetail?.token ?? '',
+			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
 			isActive: true,
 			connections: listEdgeInFlow,
 			nodes: listNodeInFlow
 		};
+		console.log(flowDataSave);
 
 		try {
 			if (flowId) {
@@ -235,12 +246,19 @@ const Flow = () => {
 				flowName: response?.flowName,
 				description: response?.description
 			});
+			console.log(response);
 			const listNode = response.nodes?.map((node: INode) => {
 				const params: {
 					[key: string]: string;
 				} = {};
 				node?.parameters?.forEach((param: IParameter) => {
-					params[param.parameterKey] = param.parameterValue;
+					let value = param.parameterValue;
+					try {
+						value = JSON.parse(param.parameterValue);
+					} catch {
+						value = param.parameterValue;
+					}
+					params[param.parameterKey] = value;
 				});
 				return {
 					id: node.id,

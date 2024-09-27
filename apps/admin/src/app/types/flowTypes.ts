@@ -46,7 +46,10 @@ export interface IEdge {
 }
 
 export interface IFlowDataRequest {
-	userId: string;
+	referralId: string;
+	applicationId: string;
+	applicationToken: string;
+	username: string;
 	flowId?: string;
 	flowName: string;
 	description: string;

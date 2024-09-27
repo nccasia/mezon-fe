@@ -142,6 +142,7 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 			{anchors.source?.map((item, index) => {
 				return (
 					<Handle
+						key={index}
 						type={'source'}
 						id={item.id}
 						position={Position.Right}
@@ -154,6 +155,7 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 			{anchors.target?.map((item, index) => {
 				return (
 					<Handle
+						key={index}
 						type={'target'}
 						id={item.id}
 						position={Position.Left}

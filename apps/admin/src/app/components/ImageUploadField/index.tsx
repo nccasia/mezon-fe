@@ -68,7 +68,7 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 				</div>
 				{error && <p className="text-red-500">{error}</p>}
 			</div>
-			{value.length > 0 && (
+			{value?.length > 0 && (
 				<div className="my-1 w-full flex flex-col items-center p-5 gap-4 bg-[#f2f3f5] dark:bg-[#2b2d31] border dark:border-[#4d4f52] rounded-md">
 					<div className="grid grid-cols-1 gap-4 w-full">
 						{value.map((imageUrl, index) => (

@@ -24,7 +24,11 @@ const FlowChatPopup = () => {
 		setMessages([...messages, { message: { message: input, urlImage: undefined }, type: 'input' }]);
 		setInput('');
 		try {
-			const response: IMessage = await apiInstance.get(`/execution?flowId=${flowId}&input=${input}`);
+			const response: IMessage = await apiInstance.post(`/execution`, {
+				flowId,
+				input
+			});
+			console.log(response);
 			setMessages((prev) => [...prev, { message: response.message, type: 'output' }]);
 		} catch (error) {
 			setMessages((prev) => [...prev, { message: { message: "Sory, I dont't know", urlImage: undefined }, type: 'output' }]);
@@ -35,7 +39,11 @@ const FlowChatPopup = () => {
 		<div className="text-sm text-gray-500 dark:text-gray-200 w-[350px]">
 			<div className="flex items-center gap-2 p-2  bg-gray-200 dark:bg-gray-600">
 				<div className="w-[40px] h-[40px]">
-					<img alt="avt" src="http://localhost:3000/assets/robot-CdlpHV-J.png" className="w-[40px] h-[40px] rounded-full" />
+					<img
+						alt="avt"
+						src="https://cdn.dribbble.com/users/344048/screenshots/4134234/bot_icon_dribbble.jpg"
+						className="w-[40px] h-[40px] rounded-full"
+					/>
 				</div>
 				<div>
 					<span>Hi there! How can I help?</span>
