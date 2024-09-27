@@ -10,16 +10,17 @@ interface INewMessageRedLineProps {
 	channelId: string;
 	isEdited?: boolean;
 	isSending?: boolean;
+	isMe?: boolean;
 }
 
 export const NewMessageRedLine = memo((props: INewMessageRedLineProps) => {
-	const { channelId = '', messageId = '', isEdited = false, isSending = false } = props;
+	const { channelId = '', messageId = '', isEdited = false, isSending = false, isMe = false } = props;
 	const { themeValue } = useTheme();
 	const { t } = useTranslation('message');
 	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 	const isUnread = useMemo(() => {
-		return lastSeen && !isEdited && !isSending;
-	}, [lastSeen, isEdited, isSending]);
+		return lastSeen && !isEdited && !isSending && !isMe;
+	}, [lastSeen, isEdited, isSending, isMe]);
 
 	return (
 		<Block alignItems="center">

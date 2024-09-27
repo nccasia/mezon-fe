@@ -32,7 +32,10 @@ import { ChannelListContext } from '../Reusables';
 import { style } from './styles';
 export type ChannelsPositionRef = {
 	current: {
-		[key: number]: number;
+		[key: number]: {
+			height: number;
+			cateId?: string | number;
+		};
 	};
 };
 
@@ -89,8 +92,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	useEffect(() => {
 		const positionChannel = channelsPositionRef?.current?.[currentChannel?.id];
-		const categoryOffset = selectCategoryOffsets[currentChannel?.category_id];
-		const position = (positionChannel || 0) + (categoryOffset || 0);
+		const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
+		const position = (positionChannel?.height || 0) + (categoryOffset || 0);
 		if (position && !isCollapseCategory) {
 			flashListRef?.current?.scrollTo({
 				x: 0,

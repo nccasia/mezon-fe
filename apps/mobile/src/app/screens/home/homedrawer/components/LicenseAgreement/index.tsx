@@ -33,20 +33,26 @@ const LicenseAgreement = ({ show, onClose }: ForwardMessageModalProps) => {
 						and destroy all copies, full or partial, of the app.
 					</Text>
 
-					<Text style={styles.header}>3. No Warranty</Text>
+					<Text style={styles.header}>3. No Tolerance for Objectionable Content or Abusive Users</Text>
+					<Text style={styles.text}>
+						Mezon has a zero-tolerance policy for objectionable content or abusive users. Any user found to be engaging in such behavior
+						will be banned from using the app and may be reported to the appropriate authorities.
+					</Text>
+
+					<Text style={styles.header}>4. No Warranty</Text>
 					<Text style={styles.text}>
 						You expressly acknowledge and agree that use of the app is at your sole risk and that the entire risk as to satisfactory
 						quality, performance, accuracy, and effort is with you. To the maximum extent permitted by applicable law, the app is provided
 						"as is" and "as available," with all faults and without warranty of any kind.
 					</Text>
 
-					<Text style={styles.header}>4. Governing Law</Text>
+					<Text style={styles.header}>5. Governing Law</Text>
 					<Text style={styles.text}>
 						This Agreement shall be governed by and construed in accordance with the laws of [Your Country], excluding its conflicts of
 						law rules.
 					</Text>
 
-					<Text style={styles.header}>5. Contact Information</Text>
+					<Text style={styles.header}>6. Contact Information</Text>
 					<TouchableOpacity onPress={() => Linking.openURL('https://mezon.ai')}>
 						<Text style={styles.text}>
 							If you have any questions about this Agreement, please contact us at <Text style={styles.link}>https://mezon.ai</Text>
@@ -55,7 +61,7 @@ const LicenseAgreement = ({ show, onClose }: ForwardMessageModalProps) => {
 				</ScrollView>
 
 				<TouchableOpacity style={styles.btn} onPress={onClose}>
-					<Text style={styles.btnText}>Agree</Text>
+					<Text style={styles.btnText}>Yes, Agree</Text>
 				</TouchableOpacity>
 			</View>
 		</Modal>

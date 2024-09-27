@@ -65,7 +65,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 		}
 	}, [currentSettingId]);
 	return (
-		<div className="  flex fixed inset-0  w-screen z-20">
+		<div className="  flex fixed inset-0  w-screen z-30">
 			<div className="flex flex-row w-screen">
 				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
 					<div

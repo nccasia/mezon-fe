@@ -1,7 +1,7 @@
 import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes, isTablet: boolean) =>
+export const style = (colors: Attributes, isTablet?: boolean) =>
 	StyleSheet.create({
 		containerMessages: {
 			flex: 1,
@@ -117,7 +117,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 			gap: size.s_8,
 			marginHorizontal: size.s_10,
 			paddingHorizontal: size.s_8,
-			paddingVertical: size.s_4,
+			paddingVertical: size.s_6,
 			borderRadius: size.s_10
 		},
 		friendAvatar: {
@@ -167,7 +167,8 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		},
 
 		lastMessage: {
-			color: colors.textStrong
+			color: colors.textStrong,
+			fontSize: size.small
 		},
 
 		dateTime: {
@@ -175,10 +176,10 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		},
 
 		channelLabel: {
-			fontSize: size.s_15,
+			fontSize: size.s_14,
 			color: colors.white,
 			fontWeight: '500',
-			flex: 1
+			flex: 1,
 		},
 		avatarWrapper: {
 			borderRadius: size.s_50,
@@ -200,7 +201,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		lottie: { width: size.s_30, height: size.s_20 },
 		contentMessage: {
 			flex: 1,
-			maxHeight: size.s_22,
+			maxHeight: size.s_20,
 			flexDirection: 'row',
 			alignItems: 'flex-end',
 			flexWrap: 'nowrap',

@@ -36,6 +36,7 @@ export default function MezonOption({ data, onChange, value, ...menuProps }: IMe
 								disabled={disabled}
 							/>
 						),
+						disabled,
 						onPress: () => !disabled && handleChange(value)
 					})),
 					...menuProps

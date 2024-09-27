@@ -1,6 +1,6 @@
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useRoles } from '@mezon/core';
-import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
+import { CheckIcon, CloseIcon, debounce } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, UsersClanEntity } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -23,6 +23,7 @@ export const AddMemberBsContent = memo((props: IAddMemberBsContentProps) => {
 	const { updateRole } = useRoles();
 	const { t } = useTranslation('clanRoles');
 	const [searchMemberText, setSearchMemberText] = useState('');
+	const debouncedSetSearchText = debounce((text) => setSearchMemberText(text), 300);
 	const [selectedMemberIdList, setSelectedMemberIdList] = useState<string[]>([]);
 
 	const filteredMemberList = useMemo(() => {
@@ -89,7 +90,7 @@ export const AddMemberBsContent = memo((props: IAddMemberBsContentProps) => {
 					</Block>
 				) : null}
 			</Block>
-			<MezonInput value={searchMemberText} onTextChange={setSearchMemberText} placeHolder={t('setupMember.searchMembers')} />
+			<MezonInput onTextChange={debouncedSetSearchText} placeHolder={t('setupMember.searchMembers')} />
 			{filteredMemberList?.length ? (
 				<BottomSheetFlatList
 					data={filteredMemberList}

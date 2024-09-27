@@ -8,6 +8,7 @@ import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
@@ -25,6 +26,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	const styles = style(themeValue);
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation<any>();
+	const isTabletLandscape = useTabletLandscape();
 	const listVoiceChannel = useMemo(
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_VOICE),
 		[listChannelSearch]
@@ -66,8 +68,12 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			});
 		}
 		if (channelData?.type !== ChannelType.CHANNEL_TYPE_VOICE) {
-			navigation.navigate('HomeDefault');
-			navigation.dispatch(DrawerActions.closeDrawer());
+			if (isTabletLandscape) {
+				navigation.goBack();
+			} else {
+				navigation.navigate('HomeDefault');
+				navigation.dispatch(DrawerActions.closeDrawer());
+			}
 			const channelId = channelData?.channel_id;
 
 			timeoutRef.current = setTimeout(async () => {

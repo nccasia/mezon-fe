@@ -4310,16 +4310,9 @@ export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 	);
 }
 
-export function EndCall({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function EndCall(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			width="24"
-			height="24"
-			preserveAspectRatio="xMidYMid meet"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" preserveAspectRatio="xMidYMid meet" {...props}>
 			<defs>
 				<clipPath id="__lottie_element_258">
 					<rect width="24" height="24" x="0" y="0"></rect>
@@ -4333,7 +4326,7 @@ export function EndCall({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 					<g transform="matrix(25,0,0,25,300,315)" opacity="1">
 						<g opacity="1" transform="matrix(1,0,0,1,0,-0.6100000143051147)">
 							<path
-								fill="white"
+								fill="currentColor"
 								fillOpacity="1"
 								d=" M9.335000038146973,-1.8179999589920044 C4.184999942779541,-6.9670000076293945 -4.164000034332275,-6.9670000076293945 -9.312999725341797,-1.8179999589920044 C-11.690999984741211,0.5609999895095825 -11.35099983215332,3.6040000915527344 -9.555999755859375,5.39900016784668 C-9.300999641418457,5.6539998054504395 -8.909000396728516,5.7129998207092285 -8.59000015258789,5.544000148773193 C-8.59000015258789,5.544000148773193 -4.269999980926514,3.256999969482422 -4.269999980926514,3.256999969482422 C-3.871000051498413,3.0460000038146973 -3.683000087738037,2.5769999027252197 -3.8259999752044678,2.1489999294281006 C-3.8259999752044678,2.1489999294281006 -4.558000087738037,-0.04600000008940697 -4.558000087738037,-0.04600000008940697 C-1.8250000476837158,-1.9980000257492065 1.8459999561309814,-1.9980000257492065 4.578999996185303,-0.04600000008940697 C4.578999996185303,-0.04600000008940697 3.815000057220459,2.757999897003174 3.815000057220459,2.757999897003174 C3.693000078201294,3.2070000171661377 3.9240000247955322,3.677000045776367 4.354000091552734,3.8540000915527344 C4.354000091552734,3.8540000915527344 8.63599967956543,5.617000102996826 8.63599967956543,5.617000102996826 C8.946000099182129,5.744999885559082 9.303000450134277,5.672999858856201 9.539999961853027,5.435999870300293 C11.331999778747559,3.6440000534057617 11.708999633789062,0.5559999942779541 9.335000038146973,-1.8179999589920044z"
 							></path>
@@ -4341,6 +4334,26 @@ export function EndCall({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 					</g>
 				</g>
 			</g>
+		</svg>
+	);
+}
+
+export function NetworkStatus({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
+			<path fill="green" d="M2 3a1 1 0 0 1 1-1 19 19 0 0 1 19 19 1 1 0 1 1-2 0A17 17 0 0 0 3 4a1 1 0 0 1-1-1Z"></path>
+			<path fill="green" d="M2 8a1 1 0 0 1 1-1 14 14 0 0 1 14 14 1 1 0 1 1-2 0A12 12 0 0 0 3 9a1 1 0 0 1-1-1Z"></path>
+			<path
+				fill="green"
+				d="M3 12a1 1 0 1 0 0 2 7 7 0 0 1 7 7 1 1 0 1 0 2 0 9 9 0 0 0-9-9ZM2 17.83c0-.46.37-.83.83-.83C5.13 17 7 18.87 7 21.17c0 .46-.37.83-.83.83H3a1 1 0 0 1-1-1v-3.17Z"
+			></path>
 		</svg>
 	);
 }

@@ -149,9 +149,9 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: clanId || '',
-							clanName: clanById.clan_name || '',
-							streamId: channel.channel_id || '',
-							streamName: channel.channel_label || ''
+							clanName: clanById?.clan_name || '',
+							streamId: channel?.channel_id || '',
+							streamName: channel?.channel_label || ''
 						})
 					);
 				}
@@ -187,13 +187,13 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				dispatch(
 					videoStreamActions.startStream({
 						clanId: clanId || '',
-						clanName: clanById.clan_name || '',
-						streamId: channel.channel_id || '',
-						streamName: channel.channel_label || ''
+						clanName: clanById?.clan_name || '',
+						streamId: currentChannel?.channel_id || '',
+						streamName: currentChannel?.channel_label || ''
 					})
 				);
 			}
-		}, [channel.channel_id, channel.channel_label, channel.id, channel.type, clanById.clan_name, clanId, currentChannel?.type, dispatch]);
+		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, dispatch]);
 
 		return (
 			<div

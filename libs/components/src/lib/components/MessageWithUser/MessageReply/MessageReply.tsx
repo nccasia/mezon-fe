@@ -1,12 +1,13 @@
 import { useShowName } from '@mezon/core';
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser } from '@mezon/utils';
+import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { ChannelStreamMode } from 'mezon-js';
+import { useSelector } from 'react-redux';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
@@ -27,6 +28,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		messageIdRef,
 		hasAttachmentInMessageRef
 	} = useMessageParser(message);
+	const messageSender = useSelector(selectMemberClanByUserId(senderIdMessageRef ?? '')) as ChannelMembersEntity;
 
 	const dispatch = useAppDispatch();
 
@@ -56,7 +58,12 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
 						<div className="w-5 h-5">
-							<AvatarImage className="w-5 h-5" alt="user avatar" userName={messageUsernameSenderRef} src={messageAvatarSenderRef} />
+							<AvatarImage
+								className="w-5 h-5"
+								alt="user avatar"
+								userName={messageUsernameSenderRef}
+								src={messageSender?.clan_avatar ?? messageSender?.user?.avatar_url}
+							/>
 						</div>
 
 						<div className="gap-1 flex flex-row items-center w-full">

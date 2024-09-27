@@ -43,7 +43,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	const { isClanOwner } = useUserPermission();
 
 	const handleOpenSettings = () => {
-		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
+		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS, params: { inviteRef: inviteRef } });
 		dismiss();
 	};
 
@@ -137,9 +137,9 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	const optionsShowEmptyCategories: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.optionShowEmptyCategories.title'),
-			component: <MezonSwitch onValueChange={handleToggleEmptyCategories} value={showEmptyCategories} />,
+			component: <MezonSwitch onValueChange={handleToggleEmptyCategories} value={showEmptyCategories} />
 		}
-	]
+	];
 
 	const menu: IMezonMenuSectionProps[] = [
 		// {

@@ -191,6 +191,16 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
+			thunkAPI.dispatch(
+				channelsActions.joinChat({
+					clanId: '0',
+					parentId: '0',
+					channelId: directMessageId,
+					channelType: type ?? 0,
+					isPublic: false,
+					isParentPublic: false
+				})
+			);
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);

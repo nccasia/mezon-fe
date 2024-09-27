@@ -76,7 +76,8 @@ const persistedClansReducer = persistReducer(
 const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
-		storage
+		storage,
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile']
 	},
 	appReducer
 );

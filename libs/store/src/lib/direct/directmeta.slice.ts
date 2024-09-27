@@ -126,11 +126,9 @@ export const directMetaSlice = createSlice({
 			}
 		},
 		removeUnreadAllDm: (state) => {
-			const entities = state.dmMetadata.entities;
-			Object.values(entities).forEach((channel) => {
-				if (channel) {
+			Object.values(state.dmMetadata.entities).forEach((channel) => {
+				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
 					channel.lastSentTimestamp = 0;
-					channel.notifiCount = 0;
 				}
 			});
 		},

@@ -1,6 +1,6 @@
 import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -27,7 +27,7 @@ export enum StatusVoiceChannel {
 	No_Active = 0
 }
 
-enum IThreadActiveType {
+export enum IThreadActiveType {
 	Active = 1
 }
 
@@ -35,7 +35,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
-	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
+	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
+
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
 	const isTabletLandscape = useTabletLandscape();
@@ -61,7 +62,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
 				await Linking.openURL(urlVoice);
-				return;
 			}
 		} else {
 			if (!isTabletLandscape) {
@@ -121,6 +121,9 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					)}
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 						<Icons.TextIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+					)}
+					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
+						<Icons.StreamIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
 					)}
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 						{props.data.channel_label}

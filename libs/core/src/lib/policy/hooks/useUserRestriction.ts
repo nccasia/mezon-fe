@@ -16,7 +16,7 @@ export function useUserRestriction(restrictions: EPermission[]) {
 		if (Number.isNaN(maxPermissionLevel)) {
 			return false;
 		}
-		return restrictions.every((restriction) => permissionLevel[restriction] >= Number(maxPermissionLevel));
+		return restrictions.every((restriction) => permissionLevel[restriction] <= Number(maxPermissionLevel));
 	}, [maxPermissionLevel, permissionLevel, restrictions]);
 
 	return isAllowed;

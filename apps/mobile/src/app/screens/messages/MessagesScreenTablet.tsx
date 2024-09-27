@@ -9,6 +9,7 @@ import {
 	getStoreAsync,
 	selectAllClans,
 	selectDirectsOpenlist,
+	selectDmGroupCurrentId,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
@@ -51,7 +52,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
 	const searchInputRef = useRef(null);
 	const dispatch = useAppDispatch();
-	const [directMessageId, setDirectMessageId] = useState<string>();
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId)
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -101,8 +102,8 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 		}
 	};
 
-	const handleFriendsPress = () => {
-		setDirectMessageId('');
+	const handleFriendsPress = async () => {
+		await dispatch(directActions.setDmGroupCurrentId(''));
 	};
 
 	return (
@@ -138,7 +139,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 
 				<Pressable
 					onPress={handleFriendsPress}
-					style={[styles.friendsWrapper, !directMessageId && { backgroundColor: themeValue.secondary }]}
+					style={[styles.friendsWrapper, !currentDmGroupId && { backgroundColor: themeValue.secondary }]}
 				>
 					<Icons.FriendIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
@@ -163,8 +164,6 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 								navigation={navigation}
 								key={item.id}
 								onLongPress={() => handleLongPress(item)}
-								onPress={setDirectMessageId}
-								directMessageId={directMessageId}
 							/>
 						)}
 					/>
@@ -180,7 +179,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 			</View>
 
 			<View style={styles.containerDetailMessage}>
-				{directMessageId ? <DirectMessageDetailTablet directMessageId={directMessageId} /> : <FriendsTablet navigation={navigation} />}
+				{!!currentDmGroupId ? <DirectMessageDetailTablet directMessageId={currentDmGroupId} /> : <FriendsTablet navigation={navigation} />}
 			</View>
 		</View>
 	);

@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
+import { useChannelRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
 	notificationActions,
@@ -11,7 +11,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
-import { EPermission, TIME_OFFSET } from '@mezon/utils';
+import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,9 +38,9 @@ function useChannelSeen(channelId: string) {
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const [canViewChannelAndSendMessage] = useClanRestriction([EPermission.viewChannel, EPermission.sendMessage]);
+	const { maxChannelPermissions } = useChannelRestriction(channelId);
 
-	if (canViewChannelAndSendMessage) {
+	if (!maxChannelPermissions[EOverriddenPermission.sendMessage]) {
 		return (
 			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
 				You do not have permission to send messages in this channel.

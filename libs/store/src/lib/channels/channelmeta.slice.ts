@@ -55,6 +55,14 @@ export const channelMetaSlice = createSlice({
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
 			state = channelMetaAdapter.upsertMany(state, action.payload);
+		},
+		removeUnreadAllChannel: (state) => {
+			const channels = state?.entities;
+			Object.values(channels).forEach((channel) => {
+				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
+					channel.lastSentTimestamp = 0;
+				}
+			});
 		}
 	}
 });

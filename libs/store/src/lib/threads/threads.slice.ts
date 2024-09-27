@@ -66,20 +66,23 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false
 });
 
-export const checkDuplicateThread = createAsyncThunk('thread/duplicateNameCthread', async (thread_name: string, thunkAPI) => {
-	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, '', TypeCheck.TYPETHREAD);
-		if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
-			return isDuplicateName.exist;
+export const checkDuplicateThread = createAsyncThunk(
+	'thread/duplicateNameCthread',
+	async ({ thread_name, channel_id }: { thread_name: string; channel_id: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, channel_id, TypeCheck.TYPETHREAD);
+			if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
+				return isDuplicateName.exist;
+			}
+		} catch (error: any) {
+			Sentry.captureException(error);
+			const errmsg = await error.json();
+			toast.error(errmsg.message);
+			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-	} catch (error: any) {
-		Sentry.captureException(error);
-		const errmsg = await error.json();
-		toast.error(errmsg.message);
-		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-});
+);
 
 export const threadsSlice = createSlice({
 	name: THREADS_FEATURE_KEY,

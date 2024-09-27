@@ -33,9 +33,12 @@ export const style = (colors: Attributes) =>
 			flex: 1,
 			fontSize: size.s_14,
 			fontWeight: '600',
-			marginLeft: size.s_6,
+			marginLeft: size.s_2,
+			paddingLeft: size.s_6,
+			paddingVertical: size.s_4,
 			color: colors.channelNormal,
-			top: size.s_6
+			top: size.s_10,
+			borderRadius: size.s_10,
 		},
 
 		channelListItemTitleActive: {

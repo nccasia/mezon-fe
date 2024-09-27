@@ -1,30 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dimensions } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 const useTabletLandscape = () => {
     const [isTabletLandscape, setIsTabletLandscape] = useState<boolean>(false);
+    const checkOrientation = useCallback(() => {
+        const { width, height } = Dimensions.get('window');
+        const isLandscape = width > height;
+
+        if (DeviceInfo.isTablet() && isLandscape) {
+            setIsTabletLandscape(true);
+        } else {
+            setIsTabletLandscape(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const checkOrientation = () => {
-            const { width, height } = Dimensions.get('window');
-            const isLandscape = width > height;
-
-            if (DeviceInfo.isTablet() && isLandscape) {
-                setIsTabletLandscape(true);
-            } else {
-                setIsTabletLandscape(false);
-            }
-        };
-
         checkOrientation();
 
         const subscription = Dimensions.addEventListener('change', checkOrientation);
 
         return () => subscription?.remove();
-    }, []);
+    }, [checkOrientation]);
 
-    return isTabletLandscape;
+    return useMemo(() => isTabletLandscape, [isTabletLandscape]);
 };
 
 export default useTabletLandscape;

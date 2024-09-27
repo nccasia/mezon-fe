@@ -1,7 +1,14 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from '@mezon/store-mobile';
+import {
+	ChannelMembersEntity,
+	selectAllRolesClan,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	useAppDispatch,
+	usersClanActions
+} from '@mezon/store-mobile';
 import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +42,8 @@ export const ManageUserModal = memo(
 		const [isLoading, setIsLoading] = useState(false);
 		const { t } = useTranslation('message');
 		const { maxPermissionLevel } = useUserPermission();
+		const dispatch = useAppDispatch();
+		const currentChannelId = useSelector(selectCurrentChannelId);
 
 		const activeRoleOfUser = useMemo(() => {
 			return rolesClan?.filter((role) => user?.role_id?.includes(role?.id)) || [];
@@ -69,6 +78,15 @@ export const ManageUserModal = memo(
 			const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
 			handleAfterUpdate(Boolean(response));
 			setIsLoading(false);
+			if (response) {
+				dispatch(
+					usersClanActions.addRoleIdUser({
+						id: roleId,
+						channelId: currentChannelId,
+						userId: user?.user?.id
+					})
+				);
+			}
 		};
 
 		const deleteRole = async (roleId: string) => {
@@ -76,6 +94,15 @@ export const ManageUserModal = memo(
 			const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
 			handleAfterUpdate(Boolean(response));
 			setIsLoading(false);
+			if (response) {
+				dispatch(
+					usersClanActions.removeRoleIdUser({
+						id: roleId,
+						channelId: currentChannelId,
+						userId: user?.user?.id
+					})
+				);
+			}
 		};
 
 		const onSelectedRoleChange = async (value: boolean, roleId) => {

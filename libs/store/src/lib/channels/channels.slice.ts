@@ -13,6 +13,7 @@ import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
+import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
@@ -97,6 +98,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
+			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
 
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ channelId, messageId }));
@@ -110,7 +112,22 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			const parrentChannel = selectChannelById(channel?.parrent_id ?? '')(getChannelsRootState(thunkAPI));
+
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
+
+			if (channel) {
+				thunkAPI.dispatch(
+					channelsActions.joinChat({
+						clanId: channel.clan_id ?? '',
+						parentId: channel.parrent_id ?? '',
+						channelId: channel.channel_id ?? '',
+						channelType: channel.type ?? 0,
+						isPublic: channel ? !channel.channel_private : false,
+						isParentPublic: parrentChannel ? !parrentChannel.channel_private : false
+					})
+				);
+			}
 
 			return channel;
 		} catch (error) {

@@ -153,7 +153,8 @@ type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES]: {
 		channelId: string;
-		roleId: string;
+		id: string;
+		type?: number;
 	};
 };
 
@@ -182,7 +183,7 @@ type MenuClanStackParamList = {
 		frequency: number;
 		onGoBack?: () => void;
 	};
-	[APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
+	[APP_SCREEN.MENU_CLAN.SETTINGS]: { inviteRef: React.MutableRefObject<any> };
 	[APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.EMOJI_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.STICKER_SETTING]: undefined;

@@ -1,5 +1,5 @@
 import { useFriends } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { clansActions, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
@@ -31,7 +31,7 @@ const ServerList = React.memo(() => {
 	return (
 		<View style={styles.wrapperServerList}>
 			<TouchableOpacity style={styles.wrapperLogo} onPress={() => navigateToDM()}>
-				{theme === 'light' ? <LogoMezonLight width={50} height={50} /> : <LogoMezonDark width={50} height={50} />}
+				{theme === 'light' ? <LogoMezonLight width={size.s_50} height={size.s_50} /> : <LogoMezonDark width={size.s_50} height={size.s_50} />}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>
 						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>

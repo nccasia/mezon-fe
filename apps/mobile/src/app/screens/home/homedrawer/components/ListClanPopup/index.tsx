@@ -32,6 +32,7 @@ export const ListClanPopup = React.memo(() => {
 
 	const handleChangeClan = useCallback(
 		async (clanId: string) => {
+			if (isTabletLandscape) navigation.navigate(APP_SCREEN.HOME as never);
 			const store = await getStoreAsync();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
@@ -41,7 +42,6 @@ export const ListClanPopup = React.memo(() => {
 			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
 			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
 			const results = await Promise.all(promises);
-			if (isTabletLandscape) navigation.navigate(APP_SCREEN.HOME as never);
 
 			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
 			if (channelResp) {

@@ -48,7 +48,11 @@ export const checkNotificationPermission = async () => {
 
 const requestNotificationPermission = async () => {
 	try {
-		await messaging().requestPermission();
+		await messaging().requestPermission({
+			alert: true,
+			sound: true,
+			badge: true
+		});
 		// Alert.alert('Notification Permission', 'Notifications have been enabled.');
 	} catch (error) {
 		Alert.alert('Notification Permission', 'Notification permission denied.', [
@@ -95,7 +99,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			},
 			ios: {
 				critical: true,
-				criticalVolume: 0.9,
+				criticalVolume: 1.0,
 				sound: 'default',
 				foregroundPresentationOptions: {
 					badge: true,
@@ -111,7 +115,11 @@ export const createLocalNotification = async (title: string, body: string, data:
 };
 
 export const handleFCMToken = async () => {
-	const authStatus = await messaging().requestPermission();
+	const authStatus = await messaging().requestPermission({
+		alert: true,
+		sound: true,
+		badge: true
+	});
 
 	const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || messaging.AuthorizationStatus.PROVISIONAL;
 

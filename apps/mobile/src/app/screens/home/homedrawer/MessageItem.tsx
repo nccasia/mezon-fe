@@ -193,25 +193,17 @@ const MessageItem = React.memo(
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
-		const onPressAvatar = useCallback(() => {
-			if (preventAction) return;
-			setIsOnlyEmojiPicker(false);
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
-		}, [preventAction, setIsOnlyEmojiPicker, onMessageAction, message]);
-
 		const onPressInfoUser = useCallback(() => {
 			if (preventAction) return;
 			setIsOnlyEmojiPicker(false);
 
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
+			if (!checkAnonymous) {
+				onMessageAction({
+					type: EMessageBSToShow.UserInformation,
+					user: message?.user,
+					message
+				});
+			}
 		}, [message, onMessageAction, preventAction, setIsOnlyEmojiPicker]);
 
 		const onMention = useCallback(
@@ -391,7 +383,7 @@ const MessageItem = React.memo(
 					) : null}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						<AvatarMessage
-							onPress={onPressAvatar}
+							onPress={onPressInfoUser}
 							id={message?.user?.id}
 							avatar={messageAvatar}
 							username={usernameMessage}
@@ -464,6 +456,7 @@ const MessageItem = React.memo(
 					messageId={props?.messageId}
 					isEdited={message?.hideEditted}
 					isSending={message?.isSending}
+					isMe={message?.isMe}
 				/>
 			</Animated.View>
 		);

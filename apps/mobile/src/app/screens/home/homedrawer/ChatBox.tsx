@@ -1,6 +1,7 @@
-import { useUserPermission } from '@mezon/core';
+import { useChannelRestriction } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
+import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
+import { EOverriddenPermission } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +25,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['message']);
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
-	const { isCanSendMessage } = useUserPermission();
+	const { maxChannelPermissions } = useChannelRestriction(props?.channelId);
 
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode);
@@ -52,7 +53,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 
 	return (
 		<Block>
-			{isCanSendMessage || isDM ? (
+			{!!maxChannelPermissions?.[EOverriddenPermission.sendMessage] || isDM ? (
 				<Block
 					backgroundColor={themeValue.secondary}
 					borderTopWidth={1}

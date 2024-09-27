@@ -1,10 +1,12 @@
 import { AvatarImage, Icons, getColorAverageFromURL } from '@mezon/components';
+import { useAuth } from '@mezon/core';
 import {
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId,
 	selectStatusStream,
 	useAppDispatch,
 	useAppSelector,
+	usersStreamActions,
 	videoStreamActions
 } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
@@ -141,22 +143,23 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 
 export type UserListStreamChannelProps = {
 	readonly memberJoin: IChannelMember[];
+	readonly memberMax?: number;
 };
 
-function UserListStreamChannel({ memberJoin }: UserListStreamChannelProps) {
+function UserListStreamChannel({ memberJoin, memberMax }: UserListStreamChannelProps) {
 	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin || []);
 
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			let membersToShow = memberJoin || [];
 			if (window.innerWidth < 900) {
-				membersToShow = membersToShow.slice(0, 4);
+				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 3);
 			} else if (window.innerWidth < 1000) {
-				membersToShow = membersToShow.slice(0, 5);
+				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 4);
 			} else if (window.innerWidth < 1200) {
-				membersToShow = membersToShow.slice(0, 6);
+				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 5);
 			} else if (window.innerWidth > 1200) {
-				membersToShow = membersToShow.slice(0, 8);
+				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 7);
 			}
 			setDisplayedMembers(membersToShow);
 		};
@@ -167,7 +170,7 @@ function UserListStreamChannel({ memberJoin }: UserListStreamChannelProps) {
 		return () => {
 			window.removeEventListener('resize', handleSizeWidth);
 		};
-	}, [memberJoin]);
+	}, [memberJoin, memberMax]);
 
 	return displayedMembers.map((item: IChannelMember) => (
 		<div key={item.id} className="w-[250px] h-[100px] min-w-[100px] min-h-[100px]">
@@ -235,51 +238,58 @@ type ChannelStreamProps = {
 };
 
 export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, channelName }: ChannelStreamProps) {
-	const [showScreenJoin, setShowScreenJoin] = useState(false);
+	const streamPlay = useSelector(selectStatusStream);
+	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
+	const [currentMemberJoin, setCurrentMemberJoin] = useState(memberJoin);
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
-		// dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
-		setShowScreenJoin(true);
+		dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
 	};
 
 	const handleJoinChannel = async () => {
 		// dispatch(usersStreamActions.add({}));
 		dispatch(videoStreamActions.startStream(currentStreamInfo as IStreamInfo));
-		setShowScreenJoin(false);
+		setCurrentMemberJoin(memberJoin);
 	};
 
-	return showScreenJoin ? (
+	return !streamPlay ? (
 		<div className="w-full h-full bg-black flex justify-center items-center">
-			<div className="flex flex-col justify-center items-center gap-4">
-				{memberJoin.length > 0 && <UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>}
-				<div className="text-3xl font-bold">{channelName}</div>
-				{memberJoin.length ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
-				<button className="bg-green-700 rounded-3xl p-2" onClick={handleJoinChannel}>
+			<div className="flex flex-col justify-center items-center gap-4 w-full">
+				<div className="w-full flex gap-2 justify-center p-2">
+					{currentMemberJoin.length > 0 && <UserListStreamChannel memberJoin={currentMemberJoin} memberMax={3}></UserListStreamChannel>}
+				</div>
+				<div className="max-w-[350px] text-center text-3xl font-bold">
+					{channelName && channelName.length > 20 ? `${channelName.substring(0, 20)}...` : channelName}
+				</div>
+				{currentMemberJoin.length ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
+				<button className="bg-green-700 rounded-3xl p-2 hover:bg-green-600" onClick={handleJoinChannel}>
 					Join stream
 				</button>
 			</div>
 		</div>
 	) : (
 		<div className="w-full flex flex-col gap-6">
-			{hlsUrl ? (
-				<div className="min-h-40 items-center flex justify-center">
-					<div className="w-9/12">
+			<div className="min-h-40 items-center flex justify-center">
+				{hlsUrl ? (
+					<div className="w-[70%]">
 						<HLSPlayer src={hlsUrl} />
 					</div>
-				</div>
-			) : (
-				<div className="bg-white min-h-[500px] text-5xl text-black flex justify-center items-center">No stream today</div>
-			)}
-			<div className="w-full flex gap-2 justify-center">
-				<UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>
+				) : (
+					<div className="w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight min-h-[500px] text-5xl flex justify-center items-center">
+						<span>No stream today</span>
+					</div>
+				)}
+			</div>
+			<div className="w-full flex gap-2 justify-center p-2">
+				<UserListStreamChannel memberJoin={currentMemberJoin}></UserListStreamChannel>
 			</div>
 			<div className="flex justify-center items-center">
-				<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3">
-					<Icons.EndCall defaultSize="w-6 h-6" />
+				<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3 hover:bg-red-500">
+					<Icons.EndCall className="w-6 h-6" />
 				</button>
 			</div>
 		</div>

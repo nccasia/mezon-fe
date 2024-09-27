@@ -1,19 +1,21 @@
+import { useMyRole } from '@mezon/core';
 import { Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { permissionRoleChannelActions, selectAllPermissionRoleChannel, selectPermissionChannel, useAppDispatch } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonConfirm } from '../../../temp-ui';
 import { PermissionItem } from '../components/PermissionItem';
-import { EPermissionStatus } from '../types/channelPermission.enum';
+import { EOverridePermissionType, EPermissionStatus, ERequestStatus } from '../types/channelPermission.enum';
 import { IPermissionSetting } from '../types/channelPermission.type';
 
 type AdvancedPermissionOverrides = typeof APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES;
 export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelScreenProps<AdvancedPermissionOverrides>) => {
-	const { channelId, roleId } = route.params;
+	const { channelId, id, type } = route.params;
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['channelSetting']);
@@ -22,26 +24,45 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 	const [originChannelPermissionValues, setOriginChannelPermissionValues] = useState<IPermissionSetting>();
 	const [currentChannelPermissionValues, setCurrentChannelPermissionValues] = useState<IPermissionSetting>();
 	const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
+	const { maxPermissionId } = useMyRole();
 
 	const isSettingNotChange = useMemo(() => {
 		return isEqual(originChannelPermissionValues, currentChannelPermissionValues);
 	}, [originChannelPermissionValues, currentChannelPermissionValues]);
 
+	//override Role permission in channel
+	const isOverrideRole = useMemo(() => {
+		return EOverridePermissionType.Role === type;
+	}, [type]);
+
 	const saveChannelPermission = async () => {
-		const changedPermissionValueList = Object.keys(currentChannelPermissionValues).reduce((acc, permissionId) => {
-			if (originChannelPermissionValues[permissionId] !== currentChannelPermissionValues[permissionId]) {
-				acc.push({ permission_id: permissionId, type: currentChannelPermissionValues[permissionId] });
-			}
-			return acc;
+		const permissionValueList = channelPermissionList?.reduce((acc, permission) => {
+			const { slug, id } = permission;
+			const permissionValue = {
+				permission_id: id,
+				type: currentChannelPermissionValues[id],
+				slug
+			};
+			return [...acc, permissionValue];
 		}, []);
 
-		await dispatch(
-			permissionRoleChannelActions.setPermissionRoleChannel({
-				channelId: channelId,
-				roleId: roleId || '',
-				permission: changedPermissionValueList
-			})
-		);
+		const updatePermissionPayload = {
+			channelId,
+			maxPermissionId,
+			permission: permissionValueList,
+			roleId: isOverrideRole ? id : '',
+			userId: isOverrideRole ? '' : id
+		};
+		const response = await dispatch(permissionRoleChannelActions.setPermissionRoleChannel(updatePermissionPayload));
+
+		const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;
+		Toast.show({
+			type: 'success',
+			props: {
+				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+				leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+			}
+		});
 		if (visibleConfirmModal) {
 			navigation.goBack();
 		}
@@ -95,41 +116,47 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 		[currentChannelPermissionValues]
 	);
 
-	const setInitialPermissionSetting = () => {
-		const changedValues = changedChannelPermissionList.reduce((acc, curr) => {
-			return { ...acc, [curr.permission_id]: curr?.active ? EPermissionStatus.Allow : EPermissionStatus.Deny };
+	const setInitialPermissionValues = () => {
+		const nonDefaultValues = changedChannelPermissionList.reduce((acc, permission) => {
+			return { ...acc, [permission.permission_id]: permission?.active ? EPermissionStatus.Allow : EPermissionStatus.Deny };
 		}, {});
-		const initialPermissionValue = channelPermissionList?.reduce((acc, curr) => {
-			if (changedValues[curr?.id]) {
-				return { ...acc, [curr?.id]: changedValues[curr?.id] };
+		const initialPermissionValue = channelPermissionList?.reduce((acc, permission) => {
+			if (nonDefaultValues[permission?.id]) {
+				return { ...acc, [permission?.id]: nonDefaultValues[permission?.id] };
 			}
-			return { ...acc, [curr?.id]: EPermissionStatus.None };
+			return { ...acc, [permission?.id]: EPermissionStatus.None };
 		}, {});
 		setOriginChannelPermissionValues(initialPermissionValue);
 		setCurrentChannelPermissionValues(initialPermissionValue);
 	};
 
-	const setDefaultPermissionSetting = () => {
-		const defaultPermissionValue = channelPermissionList?.reduce((acc, curr) => {
-			return { ...acc, [curr?.id]: EPermissionStatus.None };
-		}, {});
-		setOriginChannelPermissionValues(defaultPermissionValue);
-		setCurrentChannelPermissionValues(defaultPermissionValue);
-	};
+	useEffect(() => {
+		if (changedChannelPermissionList) {
+			setInitialPermissionValues();
+		}
+	}, [changedChannelPermissionList]);
 
 	useEffect(() => {
-		if (changedChannelPermissionList.length) {
-			setInitialPermissionSetting();
-		} else {
-			setDefaultPermissionSetting();
+		if (channelId && id) {
+			if (isOverrideRole) {
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({
+						channelId: channelId,
+						roleId: id,
+						userId: ''
+					})
+				);
+			} else {
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({
+						channelId: channelId,
+						roleId: '',
+						userId: id
+					})
+				);
+			}
 		}
-	}, [changedChannelPermissionList, channelPermissionList]);
-
-	useEffect(() => {
-		if (channelId && roleId) {
-			dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId, roleId }));
-		}
-	}, [channelId, dispatch, roleId]);
+	}, [channelId, dispatch, id, type, isOverrideRole]);
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary} paddingHorizontal={size.s_18} gap={size.s_18}>

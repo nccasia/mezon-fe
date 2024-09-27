@@ -35,8 +35,8 @@ const ThreadBox = () => {
 
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
-			const isDuplicate = await dispatch(checkDuplicateThread(value.nameValueThread));
-			if (isDuplicate?.payload === false) {
+			const isDuplicate = await dispatch(checkDuplicateThread({ thread_name: value.nameValueThread, channel_id: currentChannelId as string }));
+			if (isDuplicate?.payload) {
 				toast('Thread name already exists');
 				return;
 			}

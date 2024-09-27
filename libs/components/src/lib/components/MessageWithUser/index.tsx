@@ -53,18 +53,19 @@ function MessageWithUser({
 	allowDisplayShortProfile
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName } = useMessageParser(message);
+	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
-
+	const [shortUserId, setShortUserId] = useState(senderId);
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	const handleOpenShortUser = useCallback(
-		(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
 			if (checkAnonymous) {
 				return;
 			}
+			setShortUserId(userId);
 			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
 			if (window.innerHeight - e.clientY > heightPanel) {
 				setPositionShortUser({
@@ -167,7 +168,13 @@ function MessageWithUser({
 						<div className="relative rounded-sm overflow-visible">
 							<div className={childDivClass}></div>
 							<div className={parentDivClass}>
-								{checkMessageHasReply && <MessageReply message={message} mode={mode} onClick={handleOpenShortUser} />}
+								{checkMessageHasReply && (
+									<MessageReply
+										message={message}
+										mode={mode}
+										onClick={(e) => handleOpenShortUser(e, senderIdMessageRef as string)}
+									/>
+								)}
 								<div
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
@@ -177,7 +184,7 @@ function MessageWithUser({
 										isEditing={isEditing}
 										isShowFull={isShowFull}
 										mode={mode}
-										onClick={handleOpenShortUser}
+										onClick={(e) => handleOpenShortUser(e, senderId)}
 									/>
 									<div className="w-full relative h-full">
 										<MessageHead
@@ -185,7 +192,7 @@ function MessageWithUser({
 											isCombine={isCombine}
 											isShowFull={isShowFull}
 											mode={mode}
-											onClick={handleOpenShortUser}
+											onClick={(e) => handleOpenShortUser(e, senderId)}
 										/>
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
@@ -212,7 +219,7 @@ function MessageWithUser({
 					</div>
 				</HoverStateWrapper>
 			)}
-			{isShowPanelChannel && allowDisplayShortProfile && (
+			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && (
 				<div
 					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
 					style={{
@@ -222,14 +229,14 @@ function MessageWithUser({
 					ref={panelRef}
 				>
 					<ModalUserProfile
-						userID={senderId}
+						userID={shortUserId}
 						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 						message={message}
 						mode={mode}
 						positionType={''}
 						avatar={userClanAvatar}
 						name={userClanNickname || userDisplayName || username}
-						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
+						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 				</div>
 			)}

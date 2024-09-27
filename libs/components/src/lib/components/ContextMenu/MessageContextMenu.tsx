@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, useClanRestriction, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useChannelRestriction, useClanRestriction, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -32,6 +32,7 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	ContextMenuItem,
+	EOverriddenPermission,
 	EPermission,
 	MenuBuilder,
 	ModeResponsive,
@@ -78,7 +79,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const [checkAdmintrator, { isClanOwner, isOwnerGroupDM }] = useClanRestriction([EPermission.administrator]);
-	const checkSenderMessage = useMemo(() => {
+	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
 	const mode = useMemo(() => {
@@ -97,16 +98,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		return message?.content.t !== '';
 	}, [message?.content.t]);
 
-	const checkMessageInPinnedList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
+	const checkMessageInPinnedList = useMemo(() => {
+		return listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
+	}, [listPinMessages]);
+	const { maxChannelPermissions } = useChannelRestriction(message?.channel_id);
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
-	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
-	const [canViewChannelAndSendMessage] = useClanRestriction([EPermission.viewChannel, EPermission.sendMessage]);
 	const { type } = useAppParams();
 
-	const [createThread] = useClanRestriction([EPermission.manageChannel]);
-	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
-	const [isAllowCreateThread] = useClanRestriction([EPermission.manageThread]);
 	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
@@ -237,27 +236,16 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableEdit = checkSenderMessage;
-		const enableReport = !checkSenderMessage;
+		const enableEdit = isMyMessage;
+		const enableReport = !isMyMessage;
 
 		return [enableEdit, enableReport];
-	}, [checkSenderMessage, checkPos]);
+	}, [isMyMessage, checkPos]);
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
-
-		if (!checkMessageInPinnedList) {
-			if (pinMessage || isClanOwner || checkAdmintrator) {
-				return true;
-			}
-		} else if (checkMessageInPinnedList) {
-			if (pinMessage || isClanOwner || checkAdmintrator) {
-				return false;
-			}
-		} else {
-			return undefined;
-		}
-	}, [pinMessage, isClanOwner, checkAdmintrator, checkMessageInPinnedList, message, checkPos]);
+		return !checkMessageInPinnedList;
+	}, [checkMessageInPinnedList, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
 		if (!checkPos) return false;
@@ -276,20 +264,21 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return false;
 		} else {
-			return createThread || isAllowCreateThread || isClanOwner || checkAdmintrator;
+			return maxChannelPermissions[EOverriddenPermission.manageThread];
 		}
-	}, [createThread, isAllowCreateThread, isClanOwner, checkAdmintrator, activeMode, checkPos]);
+	}, [checkPos, activeMode, maxChannelPermissions]);
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
+		// DM Group
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
-			return checkSenderMessage || isOwnerGroupDM;
+			return isMyMessage || isOwnerGroupDM;
 		}
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return delMessage || isAllowDelMessage || checkSenderMessage || isClanOwner || checkAdmintrator;
+			return maxChannelPermissions[EOverriddenPermission.deleteMessage];
 		}
-		return checkSenderMessage;
-	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanOwner, checkAdmintrator, checkPos, isOwnerGroupDM]);
+		return isMyMessage;
+	}, [activeMode, type, maxChannelPermissions, isMyMessage, checkPos, isOwnerGroupDM]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
@@ -399,7 +388,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos && !canViewChannelAndSendMessage, (builder) => {
+		builder.when(checkPos && maxChannelPermissions[EOverriddenPermission.sendMessage], (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',

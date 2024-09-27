@@ -16,6 +16,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
@@ -24,7 +25,7 @@ import {
 	selectStatusMenu,
 	selectTheme
 } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -32,6 +33,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
+import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
 import DirectUnreads from './directUnreads';
@@ -56,6 +58,10 @@ function MyApp() {
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	useEffect(() => {
 		const handleSizeWidth = () => {
@@ -247,6 +253,18 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+
+			<div
+				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+			>
+				<ChannelStream
+					key={currentStreamInfo?.streamId}
+					hlsUrl={channelStream?.streaming_url}
+					memberJoin={streamChannelMember}
+					channelName={currentChannel?.channel_label}
+					currentStreamInfo={currentStreamInfo}
+				/>
+			</div>
 			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}

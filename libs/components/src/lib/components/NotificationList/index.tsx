@@ -1,5 +1,5 @@
 import { useNotification } from '@mezon/core';
-import { directMetaActions, notificationActions, selectTheme } from '@mezon/store';
+import { channelMetaActions, directMetaActions, notificationActions, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationCode } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
@@ -60,6 +60,7 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	const handleMarkAllAsRead = useCallback(() => {
 		localStorage.setItem('notiUnread', JSON.stringify([]));
 		dispatch(notificationActions.removeAllNotificattionChannel());
+		dispatch(channelMetaActions.removeUnreadAllChannel());
 		dispatch(directMetaActions.removeUnreadAllDm());
 		dispatch(notificationActions.setStatusNoti());
 	}, []);

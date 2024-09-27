@@ -182,7 +182,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 			return;
 		}
-		dispatch(directActions.setDmGroupCurrentId(''));
 		navigation.goBack();
 	}, []);
 

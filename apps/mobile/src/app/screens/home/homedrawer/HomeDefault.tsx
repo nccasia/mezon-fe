@@ -27,6 +27,7 @@ import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
+import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
@@ -48,6 +49,8 @@ const HomeDefault = React.memo((props: any) => {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
+
+	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
 
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
@@ -129,7 +132,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && (
+			{currentChannel && isFocusChannelView && !isChannelStream && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -147,6 +150,7 @@ const HomeDefault = React.memo((props: any) => {
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
+			{isChannelStream ? <StreamingRoom /> : null}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />
@@ -186,6 +190,27 @@ const HomeDefaultHeader = React.memo(
 				}
 			});
 		};
+
+		const renderChannelIcon = () => {
+			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)) {
+				return <Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id)) {
+				return <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				return <Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				return <Icons.StreamIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			return <Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+		};
+
 		return (
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
@@ -197,16 +222,7 @@ const HomeDefaultHeader = React.memo(
 						)}
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
-								{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								) : !!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								) : (
-									<Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								)}
+								{renderChannelIcon()}
 								<View>
 									<View style={styles.threadHeaderBox}>
 										<Text style={styles.threadHeaderLabel} numberOfLines={1}>

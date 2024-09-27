@@ -1,10 +1,11 @@
 name: Deploy Mezon FE Prod
-on:
-  workflow_dispatch:
+on: 
+  release:
+    types: [published]
 
 jobs:
   build:
-    runs-on: mezon-fe-prod
+    runs-on: mezone-fe-dev
     name: Build Mezon FE
     environment: prod
     steps:
@@ -19,12 +20,25 @@ jobs:
           echo "Installing dependencies"
           source ~/.bashrc
           yarn
+
       - name: Build
         run: |
           echo "Build"
           rm apps/chat/.env
           mv apps/chat/prod.env apps/chat/.env
           yarn build:chat
+      - name: Compress build artifact
+        run: |
+          echo "Compress Artifact"
+          cd ./dist/apps/chat/
+          zip -r mezon-fe-prod.zip *
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mezon-fe-prod
+          path: ./dist/apps/chat/mezon-fe-prod.zip
+          retention-days: 1
 
   deploy:
     runs-on: mezon-fe-prod
@@ -38,7 +52,15 @@ jobs:
           echo "Clearing /var/www/mezon-fe/"
           rm -rf /var/www/mezon-fe/*
 
-      - name: Copy files to www
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mezon-fe-prod
+          path: /var/www/mezon-fe/
+        
+      - name: Extract and check files
         run: |
-          echo "Copying files to /var/www/mezon-fe/"
-          cp -r ./dist/apps/chat/* /var/www/mezon-fe/
+          cd /var/www/mezon-fe/
+          ls -la
+          unzip mezon-fe-prod.zip
+
