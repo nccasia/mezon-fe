@@ -23,9 +23,6 @@ function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }
 
 	return (
 		<TouchableOpacity
-			onPress={() => {
-				onPressNotify(notify);
-			}}
 			onLongPress={() => {
 				onLongPressNotify(ENotifyBsToShow.removeNotification, notify);
 			}}
