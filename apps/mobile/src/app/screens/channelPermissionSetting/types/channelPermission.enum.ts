@@ -13,3 +13,14 @@ export enum EPermissionStatus {
 	Allow,
 	Deny
 }
+
+export enum EOverridePermissionType {
+	Member = 1,
+	Role = 0
+}
+
+export enum ERequestStatus {
+	Fulfilled = 'fulfilled',
+	Rejected = 'rejected',
+	Pending = 'pending'
+}

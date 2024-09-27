@@ -1,16 +1,17 @@
-import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
+import { ClanHeader, DirectMessageList, FooterProfile, StreamInfo } from '@mezon/components';
 import { useAuth } from '@mezon/core';
-import { clansActions, selectCloseMenu, selectStatusMenu } from '@mezon/store';
-import { useEffect } from 'react';
+import { clansActions, selectCloseMenu, selectStatusMenu, selectStatusStream } from '@mezon/store';
+import { memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
 
-export default function Direct() {
+const Direct = () => {
 	const dispatch = useDispatch();
 	const { userProfile } = useAuth();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
+	const streamPlay = useSelector(selectStatusStream);
 
 	useEffect(() => {
 		dispatch(clansActions.setCurrentClanId('0'));
@@ -27,6 +28,7 @@ export default function Direct() {
 			>
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
+				{streamPlay && <StreamInfo />}
 				<FooterProfile
 					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
@@ -39,4 +41,6 @@ export default function Direct() {
 			<Setting isDM={true} />
 		</>
 	);
-}
+};
+
+export default memo(Direct);

@@ -17,7 +17,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 				gestureEnabled: true,
 				headerLeftLabelVisible: false,
 				headerBackTitleVisible: false,
-				gestureDirection: 'horizontal',
+				gestureDirection: 'vertical',
 				headerTintColor: themeValue.text,
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
@@ -30,7 +30,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 					backgroundColor: themeValue.secondary
 				},
 				cardStyle: { backgroundColor: 'transparent' },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+				cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS
 			}}
 		>
 			<Stack.Screen

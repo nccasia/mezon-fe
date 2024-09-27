@@ -48,15 +48,18 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_14,
 	},
 	header: {
+		color: Colors.black,
 		fontSize: size.s_12,
 		fontWeight: 'bold',
 		marginBottom: size.s_12,
 	},
 	text: {
+		color: Colors.black,
 		fontSize: size.s_12,
 		marginBottom: size.s_12,
 	},
 	bulletPoint: {
+		color: Colors.black,
 		fontSize: size.s_12,
 		marginLeft: size.s_20,
 		marginBottom: size.s_12,

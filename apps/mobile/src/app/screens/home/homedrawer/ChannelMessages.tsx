@@ -1,8 +1,8 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllMessagesByChannelId, useAppSelector } from '@mezon/store';
-import { messagesActions, RootState, useAppDispatch } from '@mezon/store-mobile';
+import { selectMessagesByChannel } from '@mezon/store';
+import { messagesActions, RootState, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { Direction_Mode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -26,12 +26,18 @@ type ChannelMessagesProps = {
 	isPublic?: boolean;
 };
 
+const getEntitiesArray = (state: any) => {
+	if (!state?.ids) return [];
+	return state.ids.map((id) => state?.entities?.[id]);
+};
+
 const ChannelMessages = React.memo(
 	({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
 		const dispatch = useAppDispatch();
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
-		const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
+		const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
+		const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
 		const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 		const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 		const isLoadMore = useRef<boolean>(false);
@@ -42,10 +48,6 @@ const ChannelMessages = React.memo(
 		const timeOutRef = useRef(null);
 
 		useEffect(() => {
-			if (flatListRef.current) {
-				flatListRef.current.scrollToEnd({ animated: true });
-			}
-
 			return () => {
 				if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 			};
@@ -63,7 +65,7 @@ const ChannelMessages = React.memo(
 		const jumpToRepliedMessage = useCallback(
 			(messageId: string) => {
 				const indexToJump = messages?.findIndex?.((message) => message.id === messageId);
-				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0) {
+				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
 					flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
 				}
 			},
@@ -127,7 +129,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction]
+			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, messages]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {

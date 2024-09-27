@@ -6,6 +6,7 @@
   "byCreatingClan":"By creating a clan, you agree to Mezon’s",
   "upload": "UPLOAD",
   "addClan": "Add Clan",
+  "placeholderClan": "Enter the clan name",
   "errorMessage": "Please enter a valid clan name (max 64 characters, only words, numbers, _ or -).",
   "duplicateNameMessage" : "The clan name already exists. Please enter another name.",
   "commutityGuide" : "Community Guidelines.",

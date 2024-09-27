@@ -61,6 +61,10 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 		setFriendIdSelectedList(friendIdSelected);
 	}, []);
 
+	const handleMenuThreadBack = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage } });
+	};
+
 	const handleAddMemberToGroupChat = async (listAdd: ApiCreateChannelDescRequest) => {
 		await dispatch(
 			channelUsersActions.addChannelUsers({
@@ -70,8 +74,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 				channelType: directMessage?.type
 			})
 		);
-
-		navigation.goBack();
+		handleMenuThreadBack();
 	};
 
 	const createNewGroup = async () => {
@@ -107,7 +110,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.newGroupContainer}>
 					<View style={styles.headerWrapper}>
-						<Pressable onPress={() => navigation.goBack()}>
+						<Pressable onPress={handleMenuThreadBack}>
 							<Icons.ArrowLargeLeftIcon height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<View style={styles.screenTitleWrapper}>

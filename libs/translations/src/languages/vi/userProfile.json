@@ -1,34 +1,40 @@
 {
   "userAction": {
-    "sendMessage": "Gửi tin nhắn",
-    "voiceCall": "Gọi thoại",
-    "videoCall": "Gọi video",
-    "addFriend": "Thêm bạn",
-    "pending": "Chờ đợi",
-    "removeFriend": "Xóa bạn"
+    "sendMessage": "Gửi Tin Nhắn",
+    "voiceCall": "Gọi Thoại",
+    "videoCall": "Gọi Video",
+    "addFriend": "Kết Bạn",
+    "pending": "Đang Chờ",
+    "removeFriend": "Hủy Bạn"
   },
   "aboutMe": {
-    "headerTitle": "VỀ TÔI",
+    "headerTitle": "GIỚI THIỆU",
     "roles": {
       "headerTitle": "VAI TRÒ"
     }
   },
   "kickUserClanModal": {
-    "kickFromServer": "Đuổi {{userName}} khỏi máy chủ",
-    "description": "Bạn có chắc chắn muốn đuổi {{userName}} khỏi bang hội không? Họ sẽ có thể tham gia lại với một lời mời mới.",
+    "kickFromServer": "Đuổi {{userName}} khỏi Clan",
+    "description": "Bạn có chắc chắn muốn đuổi {{userName}} khỏi clan? Họ có thể tham gia lại bằng lời mời mới.",
     "reasonKick": "LÝ DO ĐUỔI",
     "buttonName": "Đuổi"
   },
   "pendingContent": {
     "block": "Chặn",
-    "reportUserProfile": "Báo cáo hồ sơ người dùng",
-    "acceptFriend": "Chấp nhận bạn bè",
-    "cancelFriendRequest": "Hủy yêu cầu kết bạn",
-    "copyUsername": "Sao chép tên người dùng",
+    "reportUserProfile": "Báo Cáo Hồ Sơ Người Dùng",
+    "acceptFriend": "Chấp Nhận Kết Bạn",
+    "cancelFriendRequest": "Hủy Yêu Cầu Kết Bạn",
+    "copyUsername": "Sao Chép Tên Người Dùng",
     "copiedUserName": "Đã sao chép '{{username}}'"
   },
-  "incomingFriendRequest": "Yêu cầu kết bạn",
-  "sendAddFriendSuccess": "Yêu cầu kết bạn đã được gửi",
-  "accept": "Đồng ý",
-  "ignore": "Bỏ qua"
+  "userInfoDM": {
+    "menu": {
+      "removeFromGroup": "Xóa Khỏi Nhóm"
+    },
+    "discordMemberSince": "THÀNH VIÊN DISCORD TỪ"
+  },
+  "incomingFriendRequest": "YÊU CẦU KẾT BẠN ĐANG ĐẾN",
+  "sendAddFriendSuccess": "Đã Gửi Yêu Cầu Kết Bạn",
+  "accept": "Chấp Nhận",
+  "ignore": "Bỏ Qua"
 }

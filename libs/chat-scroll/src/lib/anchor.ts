@@ -20,6 +20,13 @@ const createResizeObserver = (listenersMap: Map<Element, (entry: ResizeObserverE
 	});
 };
 
+/**
+ *
+ * @param containerRef
+ * @param contentRef
+ * @returns
+ * @deprecated use AnchorScroll component instead
+ */
 export const useAnchor = (containerRef: React.MutableRefObject<Element>, contentRef: React.MutableRefObject<Element>) => {
 	const anchor = useRef<{
 		resizeObserver: ResizeObserver;

@@ -1,6 +1,7 @@
-import { ChannelMembersEntity } from '@mezon/store';
+import { ChannelMembersEntity, selectTheme } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { FixedSizeList as List } from 'react-window';
 import MemberItem from './MemberItem';
 
@@ -15,6 +16,8 @@ const heightTopBar = 60;
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, offlineCount, onlineCount } = props;
 	const [height, setHeight] = useState(window.innerHeight - heightTopBar);
+
+	const appearanceTheme = useSelector(selectTheme);
 
 	useEffect(() => {
 		const handleResize = () => setHeight(window.innerHeight - heightTopBar);
@@ -50,7 +53,13 @@ const ListMember = (props: ListMemberProps) => {
 	};
 
 	return (
-		<List height={height} itemCount={lisMembers.length} itemSize={48} width={'100%'} className="custom-member-list thread-scroll">
+		<List
+			height={height}
+			itemCount={lisMembers.length}
+			itemSize={48}
+			width={'100%'}
+			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+		>
 			{Row}
 		</List>
 	);

@@ -10,29 +10,30 @@ import {
 } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme,
-	selectTotalClansNotify,
-	selectTotalUnreadDM
+	selectTheme
 } from '@mezon/store';
+import { selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
-import isElectron from 'is-electron';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
+import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
 import DirectUnreads from './directUnreads';
@@ -46,8 +47,6 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const totalClanNotify = useSelector(selectTotalClansNotify);
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -59,6 +58,10 @@ function MyApp() {
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
 	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	useEffect(() => {
 		const handleSizeWidth = () => {
@@ -162,11 +165,10 @@ function MyApp() {
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
-	useEffect(() => {
-		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
-		}
-	}, [totalClanNotify, totalUnreadDM]);
+	const dispatch = useAppDispatch();
+	const handleClickToJoinClan = () => {
+		dispatch(clansActions.joinClan({ clanId: '0' }));
+	};
 
 	return (
 		<div
@@ -194,6 +196,7 @@ function MyApp() {
 											width={48}
 											height={48}
 											className="clan w-full aspect-square object-cover"
+											onClick={handleClickToJoinClan}
 										/>
 										{quantityPendingRequest !== 0 && (
 											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
@@ -250,6 +253,18 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+
+			<div
+				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+			>
+				<ChannelStream
+					key={currentStreamInfo?.streamId}
+					hlsUrl={channelStream?.streaming_url}
+					memberJoin={streamChannelMember}
+					channelName={currentChannel?.channel_label}
+					currentStreamInfo={currentStreamInfo}
+				/>
+			</div>
 			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}

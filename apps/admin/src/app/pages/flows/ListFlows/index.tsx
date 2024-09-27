@@ -1,12 +1,7 @@
-import { apiInstance } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
-interface IFlow {
-	id: number;
-	flowName: string;
-	description: string;
-}
+import flowService from '../../../services/flowService';
+import { IFlow } from '../../../types/flowTypes';
 
 const ListFlow = () => {
 	const { applicationId } = useParams();
@@ -14,7 +9,7 @@ const ListFlow = () => {
 	useEffect(() => {
 		const getListFlow = async () => {
 			try {
-				const res: IFlow[] = await apiInstance.get(`/flow/getAll`);
+				const res: IFlow[] = await flowService.getAllFlows();
 				setListFlow(res);
 			} catch (error) {
 				console.log(error);

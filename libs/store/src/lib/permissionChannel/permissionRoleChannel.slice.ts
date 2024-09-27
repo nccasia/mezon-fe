@@ -1,7 +1,7 @@
 import { IPermissionRoleChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { PermissionRoleChannel } from 'mezon-js';
-import { ApiPermissionUpdate } from 'mezon-js/api.gen';
+import { ApiPermission, ApiPermissionUpdate } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 export const LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY = 'listpermissionroleschannel';
@@ -20,6 +20,7 @@ export const mapPermissionRoleChannelToEntity = (permission: PermissionRoleChann
 
 export interface PermissionRoleChannelState extends EntityState<PermissionRoleChannelsEntity, string> {
 	loadingStatus: LoadingStatus;
+	channelPermissions: ApiPermission[];
 	error?: string | null;
 }
 
@@ -28,13 +29,15 @@ export const permissionRoleChannelAdapter = createEntityAdapter<PermissionRoleCh
 type fetchChannelsArgs = {
 	channelId: string;
 	roleId: string;
+	userId: string;
 };
 
 export const fetchPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchPermissionRoleChannel',
-	async ({ channelId, roleId }: fetchChannelsArgs, thunkAPI) => {
+	async ({ channelId, roleId, userId }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId);
+
+		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId, userId);
 		if (!response?.permission_role_channel) {
 			return [];
 		}
@@ -46,21 +49,25 @@ export type SetPermissionRoleChannel = {
 	channelId: string;
 	roleId: string;
 	permission: Array<ApiPermissionUpdate>;
+	maxPermissionId: string;
+	userId: string;
 };
 
 export const setPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/setPermissionRoleChannel',
-	async ({ channelId, roleId, permission }: SetPermissionRoleChannel, thunkAPI) => {
+	async ({ channelId, roleId, permission, maxPermissionId, userId }: SetPermissionRoleChannel, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const body = {
 				channel_id: channelId,
 				role_id: roleId,
-				permission_update: permission
+				permission_update: permission,
+				max_permission_id: maxPermissionId,
+				user_id: userId
 			};
 			const response = await mezon.client.setRoleChannelPermission(mezon.session, body);
 			if (response) {
-				await thunkAPI.dispatch(fetchPermissionRoleChannel({ channelId: channelId, roleId: roleId }));
+				await thunkAPI.dispatch(fetchPermissionRoleChannel({ channelId: channelId, roleId: roleId, userId: userId }));
 			}
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
@@ -70,6 +77,7 @@ export const setPermissionRoleChannel = createAsyncThunk(
 
 export const initialPermissionRoleChannelState: PermissionRoleChannelState = permissionRoleChannelAdapter.getInitialState({
 	loadingStatus: 'not loaded',
+	channelPermissions: [],
 	error: null
 });
 
@@ -80,7 +88,10 @@ export const permissionRoleChannelSlice = createSlice({
 		add: permissionRoleChannelAdapter.addOne,
 		removeAll: permissionRoleChannelAdapter.removeAll,
 		remove: permissionRoleChannelAdapter.removeOne,
-		update: permissionRoleChannelAdapter.updateOne
+		update: permissionRoleChannelAdapter.updateOne,
+		setMaxPermissionChannel: (state, action: PayloadAction<ApiPermission[]>) => {
+			state.channelPermissions = action.payload;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -128,6 +139,7 @@ export const permissionRoleChannelReducer = permissionRoleChannelSlice.reducer;
 export const permissionRoleChannelActions = {
 	...permissionRoleChannelSlice.actions,
 	fetchPermissionRoleChannel,
+	// fetchMaxPermissionRoleChannel,
 	setPermissionRoleChannel
 };
 
@@ -156,3 +168,8 @@ export const getPermissionRoleChannelState = (rootState: {
 export const selectAllPermissionRoleChannel = createSelector(getPermissionRoleChannelState, selectAll);
 
 export const selectPermissionRoleChannelsEntities = createSelector(getPermissionRoleChannelState, selectEntities);
+
+export const selectPermissionByChannelId = (channelId: string) =>
+	createSelector(selectAllPermissionRoleChannel, (permissions) => {
+		return permissions.filter((p) => (p as any).channel_id === channelId);
+	});

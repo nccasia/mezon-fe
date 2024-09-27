@@ -1,72 +1,32 @@
-import { BADGE_STYLE } from './constants';
-import { BadgeIconElement, BadgeIconStyle } from './types';
+import { nativeImage } from 'electron';
+import sharp from 'sharp';
 
 export class BadgeIconGenerator {
-	private mainWindow: Electron.BrowserWindow;
-	private style: BadgeIconStyle;
-	constructor(mainWindow: Electron.BrowserWindow, style = {}) {
-		this.mainWindow = mainWindow;
-		this.style = Object.assign(BADGE_STYLE, style);
-	}
+	async generate(badgeNumber: number | null): Promise<Electron.NativeImage> {
+		let svgString: string;
 
-	generate(count: number): Promise<string> {
-		const opts = JSON.stringify(this.style);
-		return this.mainWindow.webContents.executeJavaScript(`window.drawBadge = function ${this.drawBadge}; window.drawBadge(${count}, ${opts});`);
-	}
+		if (badgeNumber === null) {
+			svgString = `<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="160" cy="160" r="160" fill="red" />
+							<circle cx="160" cy="160" r="20" fill="white" />
+						</svg>`;
+		} else {
+			svgString =
+				badgeNumber <= 9
+					? `<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="160" cy="160" r="160" fill="red" />
+							<text x="160" y="230" font-size="200" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial">${badgeNumber}</text>
+						</svg>`
+					: `<svg width="400" height="320" xmlns="http://www.w3.org/2000/svg">
+							<rect width="100%" height="100%" rx="140" fill="red" />
+							<text x="200" y="220" font-size="200" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial">
+							 9+
+							</text>
+						</svg>`;
+		}
 
-	drawBadge(count: number, style: BadgeIconStyle) {
-		const radius = style.radius;
-		const badgeIcon = document.createElement('canvas') as BadgeIconElement;
-		badgeIcon.width = Math.ceil(radius * 2);
-		badgeIcon.height = Math.ceil(radius * 2);
-		badgeIcon.ctx = badgeIcon.getContext('2d');
-		badgeIcon.radius = radius;
-		badgeIcon.count = count;
-		badgeIcon.displayStyle = style;
-
-		style.color = style.color ? style.color : 'red';
-		style.font = style.font ? style.font : '18px arial';
-		style.fontColor = style.fontColor ? style.fontColor : 'white';
-		style.fit = style.fit === undefined ? true : style.fit;
-
-		badgeIcon.draw = function () {
-			let fontScale: number, fontWidth: number;
-			this.width = Math.ceil(this.radius * 2);
-			this.height = Math.ceil(this.radius * 2);
-			this.ctx.clearRect(0, 0, this.width, this.height);
-			this.ctx.fillStyle = this.displayStyle.color;
-			this.ctx.beginPath();
-			this.ctx.arc(radius, radius, radius, 0, Math.PI * 2);
-			this.ctx.fill();
-			this.ctx.font = this.displayStyle.font;
-			this.ctx.textAlign = 'center';
-			this.ctx.textBaseline = 'middle';
-			this.ctx.fillStyle = this.displayStyle.fontColor;
-			const count = this.count > 99 ? '99+' : this.count.toString();
-			const fontSize = Number(/[0-9.]+/.exec(this.ctx.font)[0]);
-
-			if (!this.displayStyle.fit || isNaN(fontSize)) {
-				this.ctx.fillText(count, radius, radius);
-			} else {
-				fontWidth = this.ctx.measureText(count).width;
-				fontScale = (Math.cos(Math.atan(fontSize / fontWidth)) * this.radius * 2) / fontWidth;
-				this.ctx.setTransform(fontScale, 0, 0, fontScale, this.radius, this.radius);
-				this.ctx.fillText(count, 0, 0);
-				this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-			}
-
-			if (!this.displayStyle.fit || isNaN(fontSize)) {
-				this.ctx.fillText(count, radius, radius);
-			} else {
-				fontScale = (Math.cos(Math.atan(fontSize / fontWidth)) * this.radius * 2) / fontWidth;
-				this.ctx.setTransform(fontScale, 0, 0, fontScale, this.radius, this.radius);
-				this.ctx.fillText(count, 0, 0);
-				this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-			}
-			return this;
-		};
-
-		badgeIcon.draw();
-		return badgeIcon.toDataURL();
+		const svgBuffer = Buffer.from(svgString);
+		const pngBuffer = await sharp(svgBuffer).png().toBuffer();
+		return nativeImage.createFromBuffer(pngBuffer);
 	}
 }

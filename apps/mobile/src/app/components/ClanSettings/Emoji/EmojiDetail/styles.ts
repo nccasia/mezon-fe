@@ -1,4 +1,4 @@
-import { Attributes, baseColor, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
 const { width } = Dimensions.get('screen');
 
@@ -13,45 +13,50 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			gap: size.s_10,
 			height: size.s_60,
-			flex: 1,
+			flex: 1
 		},
 		rightItem: {
 			backgroundColor: baseColor.flamingo,
 			paddingHorizontal: size.s_15,
 			justifyContent: 'center',
 			alignItems: 'center',
-			paddingVertical: size.s_15,
+			paddingVertical: size.s_15
 		},
 		deleteButton: {
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		lightTitle: {
 			color: colors.white,
 			maxWidth: width * 0.3,
-			fontSize: size.s_14,
+			fontSize: size.s_14
 		},
 		emojiName: {
 			maxWidth: width * 0.3,
 			flexDirection: 'row',
 			alignItems: 'center',
-			width: 'auto',
+			width: 'auto'
 		},
 		title: {
 			color: colors.borderRadio,
 			maxWidth: '75%',
-			fontSize: size.s_12,
+			fontSize: size.s_12
 		},
 		whiteText: {
 			color: colors.white,
 			fontWeight: 'bold',
 			fontSize: size.s_14,
-			marginBottom: size.s_4,
+			marginBottom: size.s_4
+		},
+		deleteText: {
+			color: Colors.white,
+			fontWeight: 'bold',
+			fontSize: size.s_14
 		},
 		emoji: {
 			height: size.s_30,
 			width: size.s_30,
-			resizeMode: 'stretch',
+			resizeMode: 'stretch'
 		},
 		emojiItem: {
 			flexDirection: 'row',
@@ -60,18 +65,18 @@ export const style = (colors: Attributes) =>
 			flexGrow: 0,
 			gap: size.s_10,
 			maxWidth: width * 0.45,
-			minWidth: width * 0.35,
+			minWidth: width * 0.35
 		},
 		textAvatar: {
 			textAlign: 'center',
 			fontSize: size.h2,
 			color: baseColor.white,
-			fontWeight: 'bold',
+			fontWeight: 'bold'
 		},
 		imgWrapper: {
 			width: size.s_30,
 			height: size.s_30,
-			borderRadius: size.s_30,
+			borderRadius: size.s_30
 		},
 		user: {
 			flexDirection: 'row',
@@ -79,6 +84,6 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'flex-end',
 			flex: 1,
-			maxWidth: '70%',
-		},
+			maxWidth: '70%'
+		}
 	});

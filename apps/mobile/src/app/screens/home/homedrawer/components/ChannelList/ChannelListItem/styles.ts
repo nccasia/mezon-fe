@@ -21,7 +21,7 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: Metrics.size.m,
 			flexDirection: 'row',
 			alignItems: 'center',
-			paddingVertical: 8,
+			paddingVertical: size.s_8,
 			borderRadius: 5,
 			flex: 1
 		},

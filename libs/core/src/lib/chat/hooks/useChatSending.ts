@@ -161,7 +161,14 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL && newMessageUpdateImage.isMe) {
+		if (
+			newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ||
+			newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_DM ||
+			(newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_GROUP &&
+				newMessageUpdateImage.isMe &&
+				newMessageUpdateImage.content?.lk !== undefined &&
+				newMessageUpdateImage.code === 0)
+		) {
 			processLink(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.clan_id!,

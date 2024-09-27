@@ -13,7 +13,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Button, Image, InputField } from '@mezon/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import FriendList from './FriendsList';
 
@@ -23,8 +23,7 @@ const tabData = [
 	{ title: 'Pending', value: 'pending' },
 	{ title: 'Block', value: 'block' }
 ];
-
-export default function FriendsPage() {
+const FriendsPage = () => {
 	const dispatch = useAppDispatch();
 	const { friends, quantityPendingRequest, addFriend } = useFriends();
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
@@ -81,7 +80,7 @@ export default function FriendsPage() {
 	const filterStatus = (listFriends: FriendsEntity[]) => {
 		switch (currentTabStatus) {
 			case 'online':
-				return listFriends.filter((item) => item.state === 0 && onlineStatus[item.user?.id || '']);
+				return listFriends.filter((item) => item.state === 0 && item.user?.online);
 			case 'all':
 				return listFriends.filter((item) => item.state === 0);
 			case 'pending':
@@ -223,4 +222,6 @@ export default function FriendsPage() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default memo(FriendsPage);

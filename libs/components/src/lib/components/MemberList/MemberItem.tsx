@@ -1,6 +1,7 @@
-import { useMemberCustomStatus } from '@mezon/core';
+import { useAuth, useMemberCustomStatus } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
+import { useMemo } from 'react';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -16,6 +17,11 @@ export type MemberItemProps = {
 
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM }: MemberItemProps) {
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '', isDM);
+	const { userProfile } = useAuth();
+
+	const isMe = useMemo(() => {
+		return user?.user?.id === userProfile?.user?.id;
+	}, [user?.user?.id, userProfile?.user?.id]);
 
 	return (
 		<MemberProfile
@@ -23,14 +29,14 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
 			name={name || ''}
 			userNameAva={user?.user?.username}
-			status={user.user?.online}
+			status={isMe ? true : user.user?.online}
 			customStatus={userCustomStatus}
 			isHideStatus={true}
 			isHideIconStatus={false}
 			textColor="[#AEAEAE]"
 			user={user}
 			listProfile={listProfile}
-			isOffline={isOffline}
+			isOffline={isMe ? false : isOffline}
 			positionType={positionType}
 			dataMemberCreate={dataMemberCreate}
 			hideLongName={true}

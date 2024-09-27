@@ -68,7 +68,7 @@ export const MemberListStatus = React.memo(() => {
 				</TouchableOpacity>
 			) : null}
 
-			{currentChannel?.channel_avatar?.length !== 1 ? (
+			{currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM ? (
 				<Pressable
 					onPress={() => {
 						handleAddOrInviteMembers(isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers);

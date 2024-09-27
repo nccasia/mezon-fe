@@ -20,7 +20,7 @@ const ChannelListHeader = ({ onPress }: IProps) => {
 	}
 
 	return (
-		<View style={[styles.container, { height: currentClan?.banner ? 150 : 70 }]}>
+		<View style={[styles.container, { height: currentClan?.banner ? size.s_150 : size.s_70 }]}>
 			{currentClan?.banner && <FastImage source={{ uri: currentClan?.banner }} style={{ flex: 1 }} resizeMode="cover" />}
 
 			<TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.listHeader}>

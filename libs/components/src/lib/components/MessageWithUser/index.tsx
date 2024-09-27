@@ -1,10 +1,12 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, useOnClickOutside } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -12,6 +14,8 @@ import MessageHead from './MessageHead';
 import MessageReaction from './MessageReaction/MessageReaction';
 import MessageReply from './MessageReply/MessageReply';
 import { useMessageParser } from './useMessageParser';
+
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -49,6 +53,36 @@ function MessageWithUser({
 	allowDisplayShortProfile
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
+	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
+	const [shortUserId, setShortUserId] = useState(senderId);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+
+	const handleOpenShortUser = useCallback(
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
+			if (checkAnonymous) {
+				return;
+			}
+			setShortUserId(userId);
+			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+			if (window.innerHeight - e.clientY > heightPanel) {
+				setPositionShortUser({
+					top: e.clientY,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				});
+			} else {
+				setPositionShortUser({
+					top: window.innerHeight - heightPanel,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				});
+			}
+			setIsShowPanelChannel(!isShowPanelChannel);
+		},
+		[message.message_id]
+	);
+	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
@@ -114,14 +148,14 @@ function MessageWithUser({
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38]': checkMessageIncludeMention || checkJumpPinMessage },
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
 		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38]': hasIncludeMention },
+		{ 'bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
@@ -135,26 +169,30 @@ function MessageWithUser({
 							<div className={childDivClass}></div>
 							<div className={parentDivClass}>
 								{checkMessageHasReply && (
-									<MessageReply message={message} mode={mode} allowDisplayShortProfile={allowDisplayShortProfile} />
+									<MessageReply
+										message={message}
+										mode={mode}
+										onClick={(e) => handleOpenShortUser(e, senderIdMessageRef as string)}
+									/>
 								)}
 								<div
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
 									<MessageAvatar
-										allowDisplayShortProfile={allowDisplayShortProfile}
 										message={message}
 										isCombine={isCombine}
 										isEditing={isEditing}
 										isShowFull={isShowFull}
 										mode={mode}
+										onClick={(e) => handleOpenShortUser(e, senderId)}
 									/>
 									<div className="w-full relative h-full">
 										<MessageHead
-											allowDisplayShortProfile={allowDisplayShortProfile}
 											message={message}
 											isCombine={isCombine}
 											isShowFull={isShowFull}
 											mode={mode}
+											onClick={(e) => handleOpenShortUser(e, senderId)}
 										/>
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
@@ -180,6 +218,27 @@ function MessageWithUser({
 						<MessageReaction message={message} mode={mode} />
 					</div>
 				</HoverStateWrapper>
+			)}
+			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && (
+				<div
+					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
+					style={{
+						top: `${positionShortUser?.top}px`,
+						left: `${positionShortUser?.left}px`
+					}}
+					ref={panelRef}
+				>
+					<ModalUserProfile
+						userID={shortUserId}
+						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
+						message={message}
+						mode={mode}
+						positionType={''}
+						avatar={userClanAvatar}
+						name={userClanNickname || userDisplayName || username}
+						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+				</div>
 			)}
 		</>
 	);

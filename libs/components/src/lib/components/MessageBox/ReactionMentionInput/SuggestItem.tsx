@@ -1,4 +1,4 @@
-import { selectAllChannels, selectHashtagDMByDirectId, selectNumberMemberVoiceChannel } from '@mezon/store';
+import { selectAllChannels, selectAllHashtagDm, selectNumberMemberVoiceChannel } from '@mezon/store';
 import { HighlightMatchBold } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -40,7 +40,7 @@ const SuggestItem = ({
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
-	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ''));
+	const commonChannels = useSelector(selectAllHashtagDm);
 	const [specificChannel, setSpecificChannel] = useState<any>(null);
 	const numberMembersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
 	const checkVoiceStatus = useMemo(() => {
@@ -91,17 +91,19 @@ const SuggestItem = ({
 
 				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-					specificChannel?.parrent_id !== '0' && <Icons.ThreadIcon defaultSize="w-5 h-5" />}
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIcon defaultSize="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />}
 
 				{specificChannel?.channel_private === 1 &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-					specificChannel?.parrent_id !== '0' && <Icons.ThreadIconLocker className="w-5 h-5 " />}
+					specificChannel?.parrent_id !== '0' && <Icons.ThreadIconLocker className="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />}
 
 				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
 					specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
 				{specificChannel?.channel_private === 1 && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
+				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 5-5" />}
 
 				{display && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">

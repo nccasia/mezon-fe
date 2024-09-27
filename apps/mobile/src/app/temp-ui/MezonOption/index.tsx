@@ -1,26 +1,24 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from '../../temp-ui';
-import { useEffect } from 'react';
 
 export type IMezonOptionData = (Omit<IMezonMenuItemProps, 'onPress'> & {
-	value: number | string;
+	value: number | string | boolean;
 })[];
 
 interface IMezonOptionProps extends Omit<IMezonMenuSectionProps, 'items'> {
-	onChange?: (value: number | string) => void;
+	onChange?: (value: number | string | boolean) => void;
 	data: IMezonOptionData;
-	value?: number | string;
+	value?: number | string | boolean;
 }
 
 export default function MezonOption({ data, onChange, value, ...menuProps }: IMezonOptionProps) {
-	const [currentValue, setCurrentValue] = useState<number | string>(value || 0);
-  useEffect(()=>{
-    setCurrentValue(value)
-  },[value])
+	const [currentValue, setCurrentValue] = useState<number | string | boolean>(value || 0);
+	useEffect(() => {
+		setCurrentValue(value);
+	}, [value]);
 
-
-	function handleChange(value: number | string) {
+	function handleChange(value: number | string | boolean) {
 		setCurrentValue(value);
 		onChange && onChange(value);
 	}
@@ -30,13 +28,21 @@ export default function MezonOption({ data, onChange, value, ...menuProps }: IMe
 				{
 					items: data.map(({ value, disabled, ...props }) => ({
 						...props,
-						component: <MezonRadioButton checked={value === currentValue} onChange={() => handleChange(value)} noSwitchFalse disabled={disabled} />,
-						onPress: () => !disabled && handleChange(value),
+						component: (
+							<MezonRadioButton
+								checked={value === currentValue}
+								onChange={() => handleChange(value)}
+								noSwitchFalse
+								disabled={disabled}
+							/>
+						),
+						disabled,
+						onPress: () => !disabled && handleChange(value)
 					})),
-					...menuProps,
-				},
+					...menuProps
+				}
 			] satisfies IMezonMenuSectionProps[],
-		[data, currentValue],
+		[data, currentValue]
 	);
 
 	return (

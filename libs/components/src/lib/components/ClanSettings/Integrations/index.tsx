@@ -14,7 +14,7 @@ const Integrations = ({ currentChannel }: IIntegrationsProps) => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
 	const allWebhooks = useSelector(selectAllWebhooks);
 	return (
-		<div className="max-sm:px-[30px] mt-[60px]">
+		<div className="mt-[60px]">
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
 				<div
 					onClick={() => setIsOpenWebhooks(false)}

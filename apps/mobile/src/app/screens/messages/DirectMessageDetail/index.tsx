@@ -14,6 +14,7 @@ import {
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -55,6 +56,10 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const isModeDM = useMemo(() => {
 		return currentDmGroup?.user_id?.length === 1;
 	}, [currentDmGroup?.user_id?.length]);
+
+	const isTypeDMGroup = useMemo(() => {
+		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
+	}, [currentDmGroup?.type]);
 
 	const dmType = useMemo(() => {
 		return currentDmGroup?.type;
@@ -105,7 +110,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					directMessageId: directMessageId,
 					type: dmType,
 					noCache: true,
-					isFetchingLatestMessages: true
+					isFetchingLatestMessages: true,
+					isClearMessage: true
 				})
 			)
 		]);
@@ -156,7 +162,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }));
+				store.dispatch(
+					messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true, isClearMessage: true })
+				);
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {
@@ -174,7 +182,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 			return;
 		}
-		dispatch(directActions.setDmGroupCurrentId(''));
 		navigation.goBack();
 	}, []);
 
@@ -185,7 +192,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
 				</Pressable>
 				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
-					{!isModeDM ? (
+					{isTypeDMGroup ? (
 						<View style={styles.groupAvatar}>
 							<Icons.GroupIcon width={18} height={18} />
 						</View>

@@ -1,6 +1,9 @@
-import { IMessageWithUser, IThread, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, IThread, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { toast } from 'react-toastify';
+import { ensureSocket, getMezonCtx } from '../helpers';
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -63,6 +66,24 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	openThreadMessageState: false
 });
 
+export const checkDuplicateThread = createAsyncThunk(
+	'thread/duplicateNameCthread',
+	async ({ thread_name, channel_id }: { thread_name: string; channel_id: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, channel_id, TypeCheck.TYPETHREAD);
+			if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
+				return isDuplicateName.exist;
+			}
+		} catch (error: any) {
+			Sentry.captureException(error);
+			const errmsg = await error.json();
+			toast.error(errmsg.message);
+			return thunkAPI.rejectWithValue(errmsg.message);
+		}
+	}
+);
+
 export const threadsSlice = createSlice({
 	name: THREADS_FEATURE_KEY,
 	initialState: initialThreadsState,
@@ -123,6 +144,21 @@ export const threadsSlice = createSlice({
 			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			})
+			.addCase(checkDuplicateThread.pending, (state) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(checkDuplicateThread.fulfilled, (state, action: PayloadAction<boolean | undefined>) => {
+				state.loadingStatus = 'loaded';
+				if (action.payload) {
+					state.nameThreadError = 'Thread name already exists.';
+				} else {
+					state.nameThreadError = '';
+				}
+			})
+			.addCase(checkDuplicateThread.rejected, (state, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.payload as string;
 			});
 	}
 });

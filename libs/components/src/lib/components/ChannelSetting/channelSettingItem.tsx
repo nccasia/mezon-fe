@@ -21,7 +21,8 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const [showModal, setShowModal] = useState(false);
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageChannel]);
+	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission || hasManageChannelPermission;
 	const isThread = useMemo(() => {
 		return channel.parrent_id !== '0';
 	}, [channel]);
@@ -61,6 +62,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
 			}
 			return <Icons.Speaker defaultSize="w-5 h-5 min-w-5" />;
+		}
+
+		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (isPrivate) {
+				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
+			}
+			return <Icons.Stream defaultSize="w-5 h-5 min-w-5" />;
 		}
 	};
 

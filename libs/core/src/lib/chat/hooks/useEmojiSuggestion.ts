@@ -9,11 +9,14 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 
-const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+interface EmojiSuggestionProps {
+	isMobile?: boolean;
+}
 
 const filterEmojiData = (emojis: IEmoji[]) => {
 	return emojis.map(({ id, src, shortname, category }) => ({
@@ -24,8 +27,11 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 	}));
 };
 
-export function useEmojiSuggestion() {
+export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = {}) {
+	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
 	const userId = useAuth();
+	const [emojiRecentData, setEmojiRecentData] = useState<string | null>(null);
+
 	function filterEmojisByUserId(emojis: EmojiStorage[], userId: string): EmojiStorage[] {
 		return emojis.filter((emojiItem) => emojiItem.senderId === userId);
 	}
@@ -41,13 +47,33 @@ export function useEmojiSuggestion() {
 			};
 		});
 	}
-	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	const emojiRecentData = localStorage.getItem('recentEmojis');
+
+	useEffect(() => {
+		const fetchRecentEmojis = async () => {
+			try {
+				const recentEmojis = await AsyncStorage.getItem('recentEmojis');
+				if (recentEmojis !== null) {
+					setEmojiRecentData(recentEmojis);
+				}
+			} catch (error) {
+				console.error('Error fetching recent emojis:', error);
+			}
+		};
+
+		if (isMobile) {
+			fetchRecentEmojis();
+		} else {
+			const emojiRecentStorage = localStorage.getItem('recentEmojis');
+			setEmojiRecentData(emojiRecentStorage);
+		}
+	}, []);
+
 	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
 	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
 	const reversedEmojisRecentDataParse = emojiFiltered.reverse();
 
 	const emojiConverted = convertedEmojiRecent(reversedEmojisRecentDataParse, emojiMetadata);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const emojiCombine = [...emojiMetadata, ...emojiConverted];
 	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
@@ -94,6 +120,17 @@ export function useEmojiSuggestion() {
 		[dispatch]
 	);
 
+	const categoriesEmoji = ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoryEmoji = emojiMetadata
+		.map((emoji) => ({
+			id: emoji.clan_id,
+			clan_name: emoji.clan_name,
+			clan_logo: emoji.logo
+		}))
+		.filter((emoji, index, self) => emoji.id !== '0' && index === self.findIndex((s) => s.id === emoji.id));
+	const clanNames = categoryEmoji.map((emoji) => emoji.clan_name || '');
+	categoriesEmoji.splice(2, 0, ...clanNames);
+
 	return useMemo(
 		() => ({
 			emojiPicked,
@@ -102,6 +139,7 @@ export function useEmojiSuggestion() {
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
+			categoryEmoji,
 			setAddEmojiActionChatbox,
 			addEmojiState,
 			setShiftPressed,
@@ -122,7 +160,9 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
-			setSuggestionEmojiObjPicked
+			setSuggestionEmojiObjPicked,
+			categoriesEmoji,
+			categoryEmoji
 		]
 	);
 }

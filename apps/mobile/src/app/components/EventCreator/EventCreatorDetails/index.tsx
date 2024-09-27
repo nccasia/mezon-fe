@@ -1,13 +1,13 @@
 import { getDayName, getDayWeekName, getDayYearName, getNearTime, Icons } from '@mezon/mobile-components';
 import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { OptionEvent } from '@mezon/utils';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonDateTimePicker, MezonInput, MezonSelect } from '../../../temp-ui';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
+import { ErrorInput } from '../../ErrorInput';
 import { style } from './styles';
 
 type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
@@ -18,6 +18,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 	const { type, channelId, location, onGoBack } = route.params || {};
 
 	const language = useMemo(() => (i18n.language === 'vi' ? 'vi' : 'en'), [i18n]);
+	const today = new Date();
 
 	navigation.setOptions({
 		headerTitle: t('screens.eventDetails.headerTitle'),
@@ -45,8 +46,13 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 	const [eventTitle, setEventTitle] = useState<string>('');
 	const [eventDescription, setEventDescription] = useState<string>('');
 	const [startTime, setStartTime] = useState<Date>(getNearTime(120));
+	const [startDate, setStartDate] = useState<Date>(getNearTime(120));
+	const [combinedStartDateTime, setCombinedStartDateTime] = useState(new Date());
+	const [combinedEndDateTime, setCombinedEndDateTime] = useState(new Date());
+	const [endDate, setEndDate] = useState<Date>(getNearTime(240));
 	const [endTime, setEndTime] = useState<Date>(getNearTime(240));
 	const [eventFrequency, setEventFrequency] = useState<number>(0);
+	const [isValidEventTitle, setIsValidEventTitle] = useState<boolean>(true);
 
 	const options = useMemo(
 		() => [
@@ -55,19 +61,19 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 				value: 0
 			},
 			{
-				title: t('fields.eventFrequency.weeklyOn', { name: getDayName(startTime, language) }),
+				title: t('fields.eventFrequency.weeklyOn', { name: getDayName(combinedStartDateTime, language) }),
 				value: 1
 			},
 			{
-				title: t('fields.eventFrequency.everyOther', { name: getDayName(startTime, language) }),
+				title: t('fields.eventFrequency.everyOther', { name: getDayName(combinedStartDateTime, language) }),
 				value: 2
 			},
 			{
-				title: t('fields.eventFrequency.monthlyOn', { name: getDayWeekName(startTime, language) }),
+				title: t('fields.eventFrequency.monthlyOn', { name: getDayWeekName(combinedStartDateTime, language) }),
 				value: 3
 			},
 			{
-				title: t('fields.eventFrequency.annuallyOn', { name: getDayYearName(startTime, language) }),
+				title: t('fields.eventFrequency.annuallyOn', { name: getDayYearName(combinedStartDateTime, language) }),
 				value: 4
 			},
 			{
@@ -75,45 +81,71 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 				value: 5
 			}
 		],
-		[startTime]
+		[combinedStartDateTime]
 	);
 
 	function handleFrequencyChange(value: number) {
 		setEventFrequency(value);
 	}
 
+	const isErrorStartDate = useMemo(() => {
+		return startDate.getTime() <= today.getTime();
+	}, [startDate]);
+
+	const isErrorStartTime = useMemo(() => {
+		return startTime.getTime() <= today.getTime();
+	}, [startTime]);
+
+	const isErrorEndDate = useMemo(() => {
+		return startDate.getTime() >= endDate.getTime();
+	}, [endDate]);
+
+	const isErrorEndTime = useMemo(() => {
+		return startTime.getTime() >= endTime.getTime();
+	}, [endTime]);
+
 	function handlePressNext() {
-		const now = new Date();
+		setIsValidEventTitle(!!eventTitle?.trim()?.length);
+		const isValidTitle = Boolean(eventTitle?.trim());
+		const isFormValid =
+			isValidTitle && !isErrorStartDate && !isErrorStartTime && (type !== OptionEvent.OPTION_LOCATION || (!isErrorEndDate && !isErrorEndTime));
 
-		if (startTime.getTime() <= now.getTime() || (type == OptionEvent.OPTION_LOCATION && startTime.getTime() >= endTime.getTime())) {
-			Toast.show({
-				type: 'error',
-				text1: t('notify.time')
-			});
+		if (!isFormValid) {
 			return;
 		}
-
-		if (eventTitle?.trim()?.length === 0) {
-			Toast.show({
-				type: 'error',
-				text1: t('notify.titleBlank')
-			});
-			return;
-		}
-
 		navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
 			type,
 			channelId,
 			location,
 			title: eventTitle,
 			description: eventDescription,
-			startTime,
-			endTime,
+			startTime: combinedStartDateTime,
+			endTime: combinedEndDateTime,
 			frequency: eventFrequency,
 			onGoBack: onGoBack
 		});
 	}
 
+	const combineDateAndTime = (date, time) => {
+		const combined = new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
+		return combined;
+	};
+
+	useEffect(() => {
+		const newStartDateTime = combineDateAndTime(startDate, startTime);
+		const newEndDateTime = combineDateAndTime(endDate, endTime);
+		if (newStartDateTime) {
+			setCombinedStartDateTime(newStartDateTime);
+		}
+		if (newEndDateTime) {
+			setCombinedEndDateTime(newEndDateTime);
+		}
+	}, [startDate, startTime, endDate, endTime]);
+
+	const handleEventTitle = useCallback((value: string) => {
+		setEventTitle(value);
+		setIsValidEventTitle(true);
+	}, []);
 	return (
 		<View style={styles.container}>
 			<View style={styles.feedSection}>
@@ -128,7 +160,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 							label={t('fields.eventName.title')}
 							titleUppercase
 							value={eventTitle}
-							onTextChange={setEventTitle}
+							onTextChange={handleEventTitle}
 							placeHolder={t('fields.eventName.placeholder')}
 						/>
 
@@ -137,9 +169,10 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 								<MezonDateTimePicker
 									title={t('fields.startDate.title')}
 									titleUppercase
-									onChange={(value) => setStartTime(value)}
-									value={startTime}
+									onChange={setStartDate}
+									value={startDate}
 									keepTime
+									error={isErrorStartDate ? t('fields.startDate.errorMessage') : ''}
 								/>
 							</View>
 							<View style={{ flex: 1 }}>
@@ -147,10 +180,11 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 									title={t('fields.startTime.title')}
 									titleUppercase
 									mode="time"
-									onChange={(value) => setStartTime(value)}
+									onChange={setStartTime}
 									value={startTime}
 									need24HourFormat={{ is24hourSource: 'locale' }}
 									needLocale={{ locale: 'vi' }}
+									error={isErrorStartTime ? t('fields.startTime.errorMessage') : ''}
 								/>
 							</View>
 						</View>
@@ -160,19 +194,21 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 								<View style={{ flex: 2 }}>
 									<MezonDateTimePicker
 										title={t('fields.endDate.title')}
-										onChange={(value) => setEndTime(value)}
-										value={endTime}
+										onChange={setEndDate}
+										value={endDate}
 										keepTime
+										error={isErrorEndDate ? t('fields.endDate.errorMessage') : ''}
 									/>
 								</View>
 								<View style={{ flex: 1 }}>
 									<MezonDateTimePicker
 										title={t('fields.endTime.title')}
 										mode="time"
-										onChange={(value) => setEndTime(value)}
+										onChange={setEndTime}
 										value={endTime}
 										need24HourFormat={{ is24hourSource: 'locale' }}
 										needLocale={{ locale: 'vi' }}
+										error={isErrorEndTime ? t('fields.endTime.errorMessage') : ''}
 									/>
 								</View>
 							</View>
@@ -193,7 +229,16 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 			</View>
 
 			<View style={styles.btnWrapper}>
-				<MezonButton title={t('actions.next')} titleStyle={{ fontSize: Fonts.size.h7 }} type="success" onPress={handlePressNext} />
+				{isValidEventTitle ? null : (
+					<ErrorInput isShowIcon={false} textErrorStyle={{ fontStyle: 'normal' }} errorMessage={'An event topic is required'} />
+				)}
+				<MezonButton
+					title={t('actions.next')}
+					titleStyle={styles.titleMezonBtn}
+					type={EMezonButtonTheme.SUCCESS}
+					containerStyle={styles.mezonBtn}
+					onPress={handlePressNext}
+				/>
 			</View>
 		</View>
 	);

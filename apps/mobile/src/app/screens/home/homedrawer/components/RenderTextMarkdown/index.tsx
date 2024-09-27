@@ -1,7 +1,7 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, selectHashtagDmEntities, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities } from '@mezon/store-mobile';
+import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
+import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
@@ -49,7 +49,7 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
+export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean) =>
 	StyleSheet.create({
 		heading1: {
 			fontWeight: 'bold'
@@ -71,7 +71,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
 		},
 		body: {
 			color: isUnReadChannel ? colors.white : colors.text,
-			fontSize: size.medium
+			fontSize: isLastMessage ? size.small : size.medium
 		},
 		paragraph: {
 			marginTop: 0,
@@ -192,6 +192,7 @@ export type IMarkdownProps = {
 	isOpenLink?: boolean;
 	isOnlyContainEmoji?: boolean;
 	isUnReadChannel?: boolean;
+	isLastMessage?: boolean;
 };
 
 /**
@@ -365,7 +366,8 @@ export const RenderTextMarkdownContent = React.memo(
 		directMessageId,
 		isOpenLink = true,
 		isOnlyContainEmoji,
-		isUnReadChannel = false
+		isUnReadChannel = false,
+		isLastMessage = false
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -373,7 +375,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const currentChannelId = useSelector(selectCurrentChannelId);
 		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
-		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
+		const hashtagDmEntities = useAppSelector(selectHashtagDmEntities);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
@@ -413,10 +415,10 @@ export const RenderTextMarkdownContent = React.memo(
 					} else {
 						formattedContent += ChannelHashtag({
 							channelHashtagId: element.channelid,
-							channelsEntities,
-							hashtagDmEntities,
 							mode,
-							directMessageId
+							directMessageId,
+							channelsEntities,
+							hashtagDmEntities
 						});
 					}
 				}
@@ -446,7 +448,7 @@ export const RenderTextMarkdownContent = React.memo(
 					if (!voiceChannelFound) {
 						formattedContent += formatBlockCode(contentInElement, isMessageReply);
 					} else {
-						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
+						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities, hashtagDmEntities });
 					}
 				}
 				// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -466,7 +468,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {
@@ -487,7 +489,8 @@ export const RenderTextMarkdownContent = React.memo(
 								channel_id: dataChannel?.[1],
 								clan_id: dataChannel?.[2],
 								status: Number(dataChannel?.[3] || 1),
-								meeting_code: dataChannel?.[4] || ''
+								meeting_code: dataChannel?.[4] || '',
+								category_id: dataChannel?.[5]
 							};
 							onChannelMention && onChannelMention(payloadChannel);
 							return false;

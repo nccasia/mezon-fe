@@ -1,18 +1,18 @@
-import { ChannelsEntity, HashtagDmEntity } from '@mezon/store';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelsEntity } from '@mezon/store';
+import { ChannelStreamMode, ChannelType, HashtagDm } from 'mezon-js';
 
 type IChannelHashtag = {
 	channelHashtagId: string;
-	channelsEntities?: Record<string, ChannelsEntity>;
-	hashtagDmEntities?: Record<string, HashtagDmEntity>;
 	directMessageId?: string;
+	hashtagDmEntities: Record<string, HashtagDm>;
+	channelsEntities: Record<string, ChannelsEntity>;
 	mode?: number;
 };
-export const ChannelHashtag = ({ channelHashtagId, channelsEntities, directMessageId, mode, hashtagDmEntities }: IChannelHashtag) => {
+export const ChannelHashtag = ({ channelHashtagId, directMessageId, mode, hashtagDmEntities, channelsEntities }: IChannelHashtag) => {
 	const getChannelById = (channelHashtagId: string): ChannelsEntity => {
-		let channel: ChannelsEntity;
+		let channel;
 		if (directMessageId && [ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
-			channel = hashtagDmEntities[directMessageId + channelHashtagId];
+			channel = hashtagDmEntities[channelHashtagId];
 		} else {
 			channel = channelsEntities[channelHashtagId];
 		}
@@ -28,7 +28,7 @@ export const ChannelHashtag = ({ channelHashtagId, channelsEntities, directMessa
 
 	const channel = getChannelById(channelHashtagId);
 
-	const dataPress = `${channel.type}_${channel.channel_id}_${channel.clan_id}_${channel.status}_${channel.meeting_code}`;
+	const dataPress = `${channel.type}_${channel.channel_id}_${channel.clan_id}_${channel.status}_${channel.meeting_code}_${channel.category_id}`;
 
 	if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
 		return `[${channel.channel_label}](##voice${JSON.stringify(dataPress)})`;

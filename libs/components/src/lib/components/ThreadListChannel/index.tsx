@@ -45,19 +45,21 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 
 	return (
 		<div className="flex flex-col ml-6">
-			{threads.map((thread) => {
-				const isFirstThread = threads.indexOf(thread) === 0;
-				return (
-					<ThreadLink
-						ref={(node) => (threadLinkRefs.current[thread.id] = node)}
-						isActive={currentChannelId === thread.id}
-						key={thread.id}
-						thread={thread}
-						isFirstThread={isFirstThread}
-						handleClick={handleClickLink}
-					/>
-				);
-			})}
+			{threads
+				.filter((thread) => thread?.active === 1)
+				.map((thread) => {
+					const isFirstThread = threads.indexOf(thread) === 0;
+					return (
+						<ThreadLink
+							ref={(node) => (threadLinkRefs.current[thread.id] = node)}
+							isActive={currentChannelId === thread.id}
+							key={thread.id}
+							thread={thread}
+							isFirstThread={isFirstThread}
+							handleClick={handleClickLink}
+						/>
+					);
+				})}
 		</div>
 	);
 });

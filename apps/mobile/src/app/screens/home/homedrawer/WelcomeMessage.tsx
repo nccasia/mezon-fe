@@ -1,10 +1,12 @@
 import React from 'react';
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, selectChannelById, selectDmGroupCurrent, selectFriendStatus, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
+import { ChannelStatusEnum } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MezonAvatar } from '../../../temp-ui';
@@ -25,13 +27,17 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 		return currenChannel?.parrent_id === '0';
 	}, [currenChannel?.parrent_id]);
 
+	const isThreadPrivate = useMemo(() => {
+		return currenChannel ? currenChannel.channel_private : false;
+	}, [currenChannel?.channel_private]);
+
 	const isDM = useMemo(() => {
 		return currenChannel?.clan_id === '0';
 	}, [currenChannel?.clan_id]);
 
 	const isDMGroup = useMemo(() => {
-		return isDM && currenChannel?.user_id?.length > 1;
-	}, [isDM, currenChannel?.user_id]);
+		return Number(currenChannel?.type) === ChannelType.CHANNEL_TYPE_GROUP;
+	}, [currenChannel?.type]);
 
 	const stackUsers = useMemo(() => {
 		const username = currenChannel?.category_name?.split(',');
@@ -80,25 +86,27 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 		<View style={[styles.wrapperWelcomeMessage, isDMGroup && styles.wrapperCenter]}>
 			{isDM ? (
 				isDMGroup ? (
-					<MezonAvatar height={50} width={50} avatarUrl={''} username={''} stacks={stackUsers} />
+					<MezonAvatar height={size.s_50} width={size.s_50} avatarUrl={''} username={''} stacks={stackUsers} />
 				) : (
-					<MezonAvatar height={100} width={100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={currenChannel?.usernames} />
+					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={currenChannel?.usernames} />
 				)
 			) : (
 				<View style={styles.iconWelcomeMessage}>
 					{isChannel ? (
-						<Icons.TextIcon width={50} height={50} color={themeValue.textStrong} />
+						currenChannel?.channel_private === ChannelStatusEnum.isPrivate ? 
+						<Icons.TextLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
+						<Icons.TextIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					) : (
-						<Icons.ThreadIcon width={50} height={50} color={themeValue.textStrong} />
+						<Icons.ThreadIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					)}
 				</View>
 			)}
 
 			{isDM ? (
 				<View>
-					<Text style={styles.titleWelcomeMessage}>{currenChannel?.channel_label}</Text>
+					<Text style={[styles.titleWelcomeMessage, isDMGroup && {textAlign: 'center'}]}>{currenChannel?.channel_label}</Text>
 					{!isDMGroup && <Text style={styles.subTitleUsername}>{currenChannel?.usernames}</Text>}
-					{currenChannel?.user_id?.length > 1 ? (
+					{isDMGroup ? (
 						<Text style={styles.subTitleWelcomeMessageCenter}>{"Welcome to your new group! Invite friends whenever you're ready"}</Text>
 					) : (
 						<Text style={styles.subTitleWelcomeMessage}>

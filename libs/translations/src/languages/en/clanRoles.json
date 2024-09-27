@@ -28,8 +28,11 @@
         "addMember": "Add members",
         "description": "Assign this role to your members. Members can have more than one role.",
         "finish": "Finish",
-        "addedMember": "You have added {{memberCount}} member to this role.",
-        "searchMembers": "Search Members"
+        "addedMember": "Add member successfully",
+        "searchMembers": "Search Members",
+        "deletedMember": "Deleted {{memberName}} successfully",
+        "add": "Add",
+        "noMembersFound": "No members found"
     },
     "roleDetail": {
         "permissions": "Permissions",

@@ -76,6 +76,13 @@ export const voiceSlice = createSlice({
 		add: voiceAdapter.addOne,
 		addMany: voiceAdapter.addMany,
 		remove: voiceAdapter.removeOne,
+		voiceEnded: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			const idsToRemove = Object.values(state.entities)
+				.filter((member) => member?.voice_channel_id === channelId)
+				.map((member) => member?.id);
+			voiceAdapter.removeMany(state, idsToRemove);
+		},
 		setShowScreen: (state, action: PayloadAction<boolean>) => {
 			state.showScreen = action.payload;
 		},

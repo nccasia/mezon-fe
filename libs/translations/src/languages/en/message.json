@@ -17,7 +17,8 @@
         "files": "Files",
         "saveImage": "Save Image",
         "copyMediaLink": "Copy Media Link",
-        "giveACoffee": "Give A Coffee"
+        "giveACoffee": "Give A Coffee",
+        "resend": "Resend"
     },
     "chatBox": {
         "replyingTo": "Replying to",
@@ -79,5 +80,5 @@
     },
     "newMessages": "NEW MESSAGES",
     "noSendMessagePermission": "You don't have permission to send message",
-    "messageInputPlaceHolder": "Write your thoughts here..."
+    "messageInputPlaceHolder": "Write your thoughts here"
 }

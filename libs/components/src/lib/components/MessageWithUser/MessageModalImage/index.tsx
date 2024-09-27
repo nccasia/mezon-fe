@@ -191,7 +191,7 @@ const MessageModalImage = () => {
 					<img
 						src={urlImg}
 						alt={urlImg}
-						className={`object-contain rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
+						className={`object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
 						onDragStart={handleDrag}
 						onWheel={handleWheel}
 						onMouseUp={handleMouseUp}

@@ -27,11 +27,11 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -135,7 +135,7 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 
 export const TYPING_TIMEOUT = 3000;
 
-export const fetchMessagesCached = memoize(
+export const fetchMessagesCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) => {
 		const response = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
 		return { ...response, time: Date.now() };
@@ -172,7 +172,6 @@ export const fetchMessages = createAsyncThunk(
 		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
 		if (noCache) {
 			fetchMessagesCached.clear(mezon, channelId, messageId, direction);
 		}
@@ -570,14 +569,22 @@ type UpdateTypingArgs = {
 	isTyping: boolean;
 };
 
+const typingTimeouts: { [key: string]: NodeJS.Timeout } = {};
+
 export const updateTypingUsers = createAsyncThunk(
 	'messages/updateTypingUsers',
 	async ({ channelId, userId, isTyping }: UpdateTypingArgs, thunkAPI) => {
 		// set user typing to true
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
-		// after 30 seconds recalculate typing users
-		await sleep(TYPING_TIMEOUT + 100);
-		thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
+
+		if (typingTimeouts[userId]) {
+			clearTimeout(typingTimeouts[userId]);
+		}
+
+		typingTimeouts[userId] = setTimeout(() => {
+			thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
+			delete typingTimeouts[userId];
+		}, TYPING_TIMEOUT + 100);
 	}
 );
 
@@ -643,8 +650,6 @@ export type MarkAsSentArgs = {
 	id: string;
 	mess: IMessageWithUser;
 };
-
-export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
@@ -749,11 +754,6 @@ export const messagesSlice = createSlice({
 					[action.payload.channel_id]: action.payload.id
 				};
 			}
-			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
-
-			if (state?.typingUsers?.[typingUserKey]) {
-				delete state.typingUsers[typingUserKey];
-			}
 		},
 		setManyLastMessages: (state, action: PayloadAction<ApiChannelMessageHeaderWithChannel[]>) => {
 			action.payload.forEach((message) => {
@@ -839,13 +839,15 @@ export const messagesSlice = createSlice({
 				timeAt: Date.now()
 			};
 
-			if (!state.typingUsers?.[channelId]) {
+			if (!state.typingUsers) {
 				state.typingUsers = {};
+			}
+
+			if (!state.typingUsers?.[channelId]) {
 				state.typingUsers[channelId] = {
 					users: []
 				};
 			}
-
 			state.typingUsers[channelId].users.push(user);
 		},
 		recheckTypingUsers: (state, action) => {
@@ -1188,7 +1190,7 @@ export const selectLastSeenMessage = (channelId: string, messageId: string) =>
 
 export const selectIsViewingOlderMessagesByChannelId = (channelId: string) =>
 	createSelector(getMessagesState, (state) => {
-		return state.isViewingOlderMessagesByChannelId[channelId] || false;
+		return (state.isViewingOlderMessagesByChannelId[channelId] && state.channelMessages[channelId]?.ids.length) || false;
 	});
 
 export const selectMessageIsLoading = createSelector(getMessagesState, (state) => state.loadingStatus === 'loading');
@@ -1346,7 +1348,6 @@ const handleLimitMessage = (
 
 const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelId: string) => {
 	const channelLastMessage = state.lastMessageByChannel[channelId];
-
 	if (!channelLastMessage) {
 		return false;
 	}

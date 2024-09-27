@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { ChannelsEntity, selectChannelById, selectCurrentChannel, selectHashtagDmById } from '@mezon/store';
+import { selectChannelById, selectCurrentChannel, selectHashtagDmById } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,25 +20,26 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const hashtagDm = useSelector(selectHashtagDmById(channelHastagId.slice(2, -1)));
+	const hashtagChannel = useSelector(selectChannelById(channelHastagId.slice(2, -1)));
 	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
 		if (channelHastagId.startsWith('<#') && channelHastagId.endsWith('>')) {
 			return toChannelPage(channelHastagId.slice(2, -1), clanId || '');
 		}
 		return undefined;
 	};
-	const getChannelById = (channelHastagId: string) => {
-		let channel: ChannelsEntity;
+	const getChannelById = () => {
 		if (directId !== undefined) {
-			channel = useSelector(selectHashtagDmById(directId + channelHastagId));
-		} else {
-			channel = useSelector(selectChannelById(channelHastagId));
+			return hashtagDm;
 		}
-		return channel;
+		return hashtagChannel;
 	};
 
-	const channel = getChannelById(channelHastagId.slice(2, -1));
-	
-	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? '')));
+	const channel = getChannelById();
+
+	const [channelPath, setChannelPath] = useState(
+		getChannelPath(channelHastagId, directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? ''))
+	);
 
 	useEffect(() => {
 		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -46,25 +47,33 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		} else {
 			setChannelPath(getChannelPath(channelHastagId, directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? '')));
 		}
-	}, [channel, currentChannelId, clanId, channelHastagId]);
+	}, [currentChannelId, clanId, channelHastagId]);
 
 	const handleClick = useCallback(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channel?.type === ChannelType.CHANNEL_TYPE_VOICE)) {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}
 	}, [channel]);
-
-	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) &&
-		getChannelById(channelHastagId.slice(2, -1)) ? (
+	const tokenClickAble = () => {
+		if (!isJumMessageEnabled || isTokenClickAble) {
+			handleClick();
+		}
+	};
+	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) && getChannelById() ? (
 		<Link
-			onClick={!isJumMessageEnabled || isTokenClickAble ? handleClick : () => {}}
+			onClick={tokenClickAble}
 			style={{ textDecoration: 'none' }}
 			to={!isJumMessageEnabled || isTokenClickAble ? (channelPath ?? '') : ''}
 			className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
 		>
-			{channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channel.type === ChannelType.CHANNEL_TYPE_VOICE) ? (
+			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<Icons.Speaker
+					defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
+					defaultFill="#3297FF"
+				/>
+			) : channel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+				<Icons.Stream
 					defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 					defaultFill="#3297FF"
 				/>

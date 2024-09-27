@@ -123,7 +123,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 										animation="duration-500"
 										style={appearanceTheme === 'light' ? 'light' : 'dark'}
 									>
-										<Icons.IconUserProfileDM />
+										<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
 									</Tooltip>
 								</button>
 							)}
@@ -164,7 +164,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							animation="duration-500"
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						>
-							<Icons.IconUserProfileDM />
+							<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
 						</Tooltip>
 					</button>
 				)}

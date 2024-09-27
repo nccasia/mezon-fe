@@ -1,10 +1,28 @@
-import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat, ModalUserProfile } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
+import {
+	DirectMessageBox,
+	DmTopbar,
+	FileUploadByDnD,
+	GifStickerEmojiPopup,
+	MemberListGroupChat,
+	ModalUserProfile,
+	SearchMessageChannelRender
+} from '@mezon/components';
+import {
+	useApp,
+	useAppNavigation,
+	useAppParams,
+	useChatMessages,
+	useDragAndDrop,
+	useGifsStickersEmoji,
+	useSearchMessages,
+	useThreads
+} from '@mezon/core';
 import {
 	directMetaActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
+	selectIsSearchMessage,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectPositionEmojiButtonSmile,
@@ -14,7 +32,7 @@ import {
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, memo, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -36,7 +54,7 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
-export default function DirectMessage() {
+const DirectMessage = () => {
 	// TODO: move selector to store
 	const { clanId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
@@ -44,6 +62,7 @@ export default function DirectMessage() {
 	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+	const isSearchMessage = useSelector(selectIsSearchMessage(directId || ''));
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -133,7 +152,7 @@ export default function DirectMessage() {
 						{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
 							<div
 								id="emojiPicker"
-								className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+								className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 								style={{
 									right: setMarginleft
 								}}
@@ -222,8 +241,16 @@ export default function DirectMessage() {
 							/>
 						</div>
 					)}
+					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
 		</>
 	);
-}
+};
+
+const SearchMessageChannel = () => {
+	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+};
+
+export default memo(DirectMessage);

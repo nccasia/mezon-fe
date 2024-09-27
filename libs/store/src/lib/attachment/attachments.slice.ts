@@ -1,9 +1,9 @@
 import { ETypeLinkMedia, IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const ATTACHMENT_FEATURE_KEY = 'attachments';
 
@@ -32,7 +32,7 @@ type fetchChannelAttachmentsPayload = {
 };
 
 const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
-const fetchChannelAttachmentsCached = memoize(
+const fetchChannelAttachmentsCached = memoizeAndTrack(
 	(mezon: MezonValueContext, clanId: string, channelId: string) => mezon.client.listChannelAttachments(mezon.session, clanId, channelId, ''),
 	{
 		promise: true,

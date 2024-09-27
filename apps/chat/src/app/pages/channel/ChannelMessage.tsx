@@ -16,11 +16,22 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import React, {
+	ForwardRefExoticComponent,
+	PropsWithoutRef,
+	ReactNode,
+	RefAttributes,
+	memo,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef
+} from 'react';
 import { useSelector } from 'react-redux';
 import MessageInput from './MessageInput';
 
-type MessageProps = {
+export type MessageProps = {
 	channelId: string;
 	messageId: string;
 	mode: number;
@@ -30,80 +41,107 @@ type MessageProps = {
 	userName?: string;
 };
 
-export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
-	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
-	const { markMessageAsSeen } = useSeenMessagePool();
-	const openEditMessageState = useSelector(selectOpenEditMessageState);
-	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const { showMessageContextMenu } = useMessageContextMenu();
-	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+export type MessageRef = {
+	scrollIntoView: (options?: ScrollIntoViewOptions) => void;
+};
 
-	const isEditing = useMemo(() => {
-		if (channelDraftMessage.message_id === messageId) {
-			return openEditMessageState;
-		} else {
-			return openEditMessageState && idMessageRefEdit === messageId;
-		}
-	}, [openEditMessageState, idMessageRefEdit, channelDraftMessage.message_id, messageId]);
+type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<MessageProps> & RefAttributes<MessageRef>> & {
+	Skeleton?: () => ReactNode;
+};
 
-	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
+export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageRef, MessageProps>(
+	({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>, ref) => {
+		const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
+		const { markMessageAsSeen } = useSeenMessagePool();
+		const openEditMessageState = useSelector(selectOpenEditMessageState);
+		const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
+		const { showMessageContextMenu } = useMessageContextMenu();
+		const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+		const messageRef = useRef<HTMLDivElement | null>(null);
 
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
-			showMessageContextMenu(event, messageId, mode, props);
-		},
-		[showMessageContextMenu, messageId, mode]
-	);
+		const isEditing = useMemo(() => {
+			if (channelDraftMessage.message_id === messageId) {
+				return openEditMessageState;
+			} else {
+				return openEditMessageState && idMessageRefEdit === messageId;
+			}
+		}, [openEditMessageState, idMessageRefEdit, channelDraftMessage.message_id, messageId]);
 
-	const mess = useMemo(() => {
-		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
-			return message.content;
-		}
-		return message;
-	}, [message]);
+		const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
-	const editor = useMemo(() => {
-		return (
-			<MessageInput messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel} message={mess as IMessageWithUser} />
+		const handleContextMenu = useCallback(
+			(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
+				showMessageContextMenu(event, messageId, mode, props);
+			},
+			[showMessageContextMenu, messageId, mode]
 		);
-	}, [messageId, channelId, mode, channelLabel, mess]);
 
-	const popup = useMemo(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} />;
-	}, [message, handleContextMenu]);
+		const mess = useMemo(() => {
+			if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
+				return message.content;
+			}
+			return message;
+		}, [message]);
 
-	useEffect(() => {
-		markMessageAsSeen(message);
-	}, [markMessageAsSeen, message]);
+		const editor = useMemo(() => {
+			return (
+				<MessageInput
+					messageId={messageId}
+					channelId={channelId}
+					mode={mode}
+					channelLabel={channelLabel}
+					message={mess as IMessageWithUser}
+				/>
+			);
+		}, [messageId, channelId, mode, channelLabel, mess]);
 
-	return (
-		<>
-			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
+		const popup = useMemo(() => {
+			return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} />;
+		}, [message, handleContextMenu]);
 
-			{!mess.isFirst && (
-				<div className="fullBoxText relative group ">
-					<MessageWithUser
-						allowDisplayShortProfile={true}
-						message={mess as IMessageWithUser}
-						mode={mode}
-						isEditing={isEditing}
-						isHighlight={isHighlight}
-						popup={popup}
-						editor={editor}
-						onContextMenu={handleContextMenu}
-					/>
-				</div>
-			)}
+		useImperativeHandle(
+			ref,
+			() => ({
+				scrollIntoView: (options?: ScrollIntoViewOptions) => messageRef.current?.scrollIntoView(options)
+			}),
+			[messageRef]
+		);
 
-			{lastSeen && <UnreadMessageBreak />}
-		</>
-	);
-}
+		useEffect(() => {
+			markMessageAsSeen(message);
+		}, [markMessageAsSeen, message]);
 
-ChannelMessage.Skeleton = () => (
-	<div>
-		<MessageWithUser.Skeleton />
-	</div>
+		return (
+			<>
+				{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
+
+				{!mess.isFirst && (
+					<div ref={messageRef} className="fullBoxText relative group ">
+						<MessageWithUser
+							allowDisplayShortProfile={true}
+							message={mess as IMessageWithUser}
+							mode={mode}
+							isEditing={isEditing}
+							isHighlight={isHighlight}
+							popup={popup}
+							editor={editor}
+							onContextMenu={handleContextMenu}
+						/>
+					</div>
+				)}
+
+				{lastSeen && <UnreadMessageBreak />}
+			</>
+		);
+	}
 );
+
+ChannelMessage.Skeleton = function () {
+	return (
+		<div>
+			<MessageWithUser.Skeleton />
+		</div>
+	);
+};
 
 export const MemorizedChannelMessage = memo(ChannelMessage);

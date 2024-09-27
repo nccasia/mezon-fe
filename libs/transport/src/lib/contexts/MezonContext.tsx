@@ -1,5 +1,5 @@
 import { DeviceUUID } from 'device-uuid';
-import { Client, Session, Socket } from 'mezon-js';
+import { Client, DefaultSocket, Session, Socket } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
@@ -33,7 +33,7 @@ export type MezonContextValue = {
 	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
-	reconnect: (clanId: string) => Promise<unknown>;
+	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -173,11 +173,13 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(newSession, true);
 			sessionRef.current = session2;
-
 			return newSession;
 		},
 		[clientRef, socketRef]
 	);
+
+	const abortControllerRef = React.useRef<AbortController | null>(null);
+	const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
 
 	const reconnect = React.useCallback(
 		async (clanId: string) => {
@@ -195,9 +197,23 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return Promise.resolve(null);
 			}
 
+			if (abortControllerRef.current) {
+				abortControllerRef.current.abort();
+			}
+
+			abortControllerRef.current = new AbortController();
+			const signal = abortControllerRef.current.signal;
+
 			// eslint-disable-next-line no-async-promise-executor
 			return new Promise(async (resolve, reject) => {
 				let failCount = 0;
+
+				signal.addEventListener('abort', () => {
+					if (timeoutIdRef.current) {
+						clearTimeout(timeoutIdRef.current);
+						return resolve('RECONNECTING');
+					}
+				});
 
 				const retry = async () => {
 					if (failCount >= MAX_WEBSOCKET_FAILS) {
@@ -209,25 +225,44 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						const newSession = await clientRef?.current?.sessionRefresh(
 							new Session(session.token, session.refresh_token, session.created)
 						);
-						const recsession = await socket.connect(newSession || session, true);
+						const recsession = await socket.connect(newSession || session, true, DefaultSocket.DefaultConnectTimeoutMs, signal);
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
-						resolve(socket);
+						return resolve(socket);
 					} catch (error) {
 						failCount++;
 						const retryTime = isFromMobile
 							? 0
 							: Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
-						await new Promise((res) => setTimeout(res, retryTime));
-						await retry();
+						await new Promise((res) => {
+							timeoutIdRef.current = setTimeout(res, retryTime);
+						});
+
+						!socketRef.current?.isOpen() && (await retry());
 					}
 				};
 
-				await retry();
+				!socketRef.current?.isOpen() && (await retry());
 			});
 		},
 		[createSocket, isFromMobile]
+	);
+
+	const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+	const reconnectWithTimeout = React.useCallback(
+		(clanId: string) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+			return new Promise((resolve, reject) => {
+				timeoutRef.current = setTimeout(() => {
+					reconnect(clanId).then(resolve).catch(reject);
+				}, 500);
+			});
+		},
+		[reconnect]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
@@ -243,7 +278,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			refreshSession,
 			createSocket,
 			logOutMezon,
-			reconnect
+			reconnectWithTimeout
 		}),
 		[
 			clientRef,
@@ -257,7 +292,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			refreshSession,
 			createSocket,
 			logOutMezon,
-			reconnect
+			reconnectWithTimeout
 		]
 	);
 

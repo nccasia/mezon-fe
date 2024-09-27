@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { ISession, selectIsLogin, selectSession, selectTheme } from '@mezon/store';
-import { useGoogleLogin } from '@react-oauth/google';
-import React, { useCallback, useEffect } from 'react';
+import { useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -15,9 +15,7 @@ const LoginDesktop: React.FC<LoginDesktopProps> = () => {
 
 	const handleGoogleLoginSuccess = useCallback(
 		async ({ code }: { code: string }) => {
-			const session = await loginByGoogle(code);
-			const jsonString = encodeURIComponent(JSON.stringify(session));
-			window.location.href = `mezonapp://accounts?data=${jsonString}`;
+			await loginByGoogle(code);
 		},
 		[loginByGoogle]
 	);
@@ -28,13 +26,6 @@ const LoginDesktop: React.FC<LoginDesktopProps> = () => {
 		onSuccess: handleGoogleLoginSuccess,
 		onError: (errorResponse) => console.error(errorResponse)
 	});
-
-	useEffect(() => {
-		if (session) {
-			const jsonString = encodeURIComponent(JSON.stringify(session));
-			window.location.href = `mezonapp://accounts?data=${jsonString}`;
-		}
-	}, [session]);
 
 	if (isLogin) {
 		return <LoggedInView appearanceTheme={appearanceTheme} session={session} />;
@@ -48,26 +39,43 @@ interface LoggedInViewProps {
 	session: ISession | null | undefined;
 }
 
-const LoggedInView: React.FC<LoggedInViewProps> = ({ appearanceTheme, session }) => (
-	<div
-		className="w-screen h-screen overflow-x-hidden overflow-y-scroll scrollbar-hide flex items-center"
-		style={{
-			background: 'linear-gradient(219.23deg, #2970FF 1.49%, #8E84FF 43.14%, #E0D1FF 94.04%)'
-		}}
-	>
-		<div className="justify-center items-center flex w-full h-full lg:max-w-[360px] lg:max-h-[370px] rounded-none sm:rounded-2xl lg:p-12 px-0 dark:bg-[#F9F9F9] bg-[#F0F0F0] flex-col mx-auto">
-			<div className="text-textLightTheme">
-				<img
-					src={`/assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
-					alt=""
-					className="h-[120px] mb-8 clan w-full aspect-square"
-				/>
-				<h3 className="text-xl font-bold text-center">{`It’s great to have you aboard, ${session?.username || ''}`}</h3>
-				<p className="text-sm font-medium text-center mt-4">Redirecting you to the Desktop App</p>
+const LoggedInView: React.FC<LoggedInViewProps> = ({ appearanceTheme, session }) => {
+	const { loginByGoogle } = useAuth();
+
+	useGoogleOneTapLogin({
+		onSuccess: async (credentialResponse) => {
+			const session = await loginByGoogle(credentialResponse.credential as string);
+			const jsonString = encodeURIComponent(JSON.stringify(session));
+			window.location.href = `mezonapp://accounts?data=${jsonString}`;
+		},
+		onError: () => {
+			console.log('Login Failed');
+		},
+		auto_select: true,
+		cancel_on_tap_outside: false
+	});
+
+	return (
+		<div
+			className="w-screen h-screen overflow-x-hidden overflow-y-scroll scrollbar-hide flex items-center"
+			style={{
+				background: 'linear-gradient(219.23deg, #2970FF 1.49%, #8E84FF 43.14%, #E0D1FF 94.04%)'
+			}}
+		>
+			<div className="justify-center items-center flex w-full h-full lg:max-w-[360px] lg:max-h-[370px] rounded-none sm:rounded-2xl lg:p-12 px-0 dark:bg-[#F9F9F9] bg-[#F0F0F0] flex-col mx-auto">
+				<div className="text-textLightTheme">
+					<img
+						src={`/assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+						alt=""
+						className="h-[120px] mb-8 clan w-full aspect-square"
+					/>
+					<h3 className="text-xl font-bold text-center">{`It’s great to have you aboard, ${session?.username || ''}`}</h3>
+					<p className="text-sm font-medium text-center mt-4">Redirecting you to the Desktop App</p>
+				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 interface LoginViewProps {
 	googleLogin: () => void;

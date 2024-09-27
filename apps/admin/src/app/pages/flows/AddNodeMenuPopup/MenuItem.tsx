@@ -1,13 +1,18 @@
+import { useContext } from 'react';
+import { FlowContext } from '../../../context/FlowContext';
+import { changeNodeType } from '../../../stores/flowStore/flowActions';
+import { INodeType } from '../../../types/flowTypes';
+
 interface MenuItemProps {
 	title: string;
 	description: string;
 	imageUrl: string;
-	nodeType: string;
-	onChangeNodeType: (type: string) => void;
+	nodeType: INodeType;
 }
-const MenuItem = ({ title, description, imageUrl, nodeType, onChangeNodeType }: MenuItemProps) => {
+const MenuItem = ({ title, description, imageUrl, nodeType }: MenuItemProps) => {
+	const { flowDispatch } = useContext(FlowContext);
 	const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-		onChangeNodeType(nodeType);
+		flowDispatch(changeNodeType(nodeType));
 		event.dataTransfer.effectAllowed = 'move';
 	};
 	return (

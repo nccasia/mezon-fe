@@ -4,6 +4,7 @@ import MainPermissionManage from './MainPermissionManage';
 
 type PermissionManageProps = {
 	channelId: string;
+	channelPrivate: boolean;
 	setIsPrivateChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	setPermissionsListHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 	saveTriggerRef: React.MutableRefObject<(() => void) | null>;
@@ -12,6 +13,7 @@ type PermissionManageProps = {
 
 const PermissionManage: React.FC<PermissionManageProps> = ({
 	channelId,
+	channelPrivate,
 	setIsPrivateChannel,
 	setPermissionsListHasChanged,
 	saveTriggerRef,
@@ -19,18 +21,20 @@ const PermissionManage: React.FC<PermissionManageProps> = ({
 }) => {
 	const [showRole, setShowRole] = useState(true);
 	return (
-		<div>
-			<HeaderPermissionManage showRole={showRole} setShowRole={setShowRole} />
-			{showRole && (
-				<MainPermissionManage
-					channelId={channelId}
-					setIsPrivateChannel={setIsPrivateChannel}
-					setPermissionsListHasChanged={setPermissionsListHasChanged}
-					saveTriggerRef={saveTriggerRef}
-					resetTriggerRef={resetTriggerRef}
-				/>
-			)}
-		</div>
+		channelPrivate && (
+			<div>
+				<HeaderPermissionManage showRole={showRole} setShowRole={setShowRole} />
+				{showRole && (
+					<MainPermissionManage
+						channelId={channelId}
+						setIsPrivateChannel={setIsPrivateChannel}
+						setPermissionsListHasChanged={setPermissionsListHasChanged}
+						saveTriggerRef={saveTriggerRef}
+						resetTriggerRef={resetTriggerRef}
+					/>
+				)}
+			</div>
+		)
 	);
 };
 

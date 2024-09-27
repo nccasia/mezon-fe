@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../temp-ui';
 import MezonSlider, { IMezonSliderData } from '../../temp-ui/MezonSlider';
+import { validInput } from '../../utils/validate';
 import { style } from './styles';
 
 interface IChannelSettingValue {
@@ -30,6 +31,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	const channel = useSelector(selectChannelById(channelId || ''));
 	const isChannel = useMemo(() => channel?.parrent_id === '0', [channel?.parrent_id]);
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
+	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
 		channelTopic: ''
@@ -69,6 +71,10 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 			setCurrentSettingValue(initialChannelSettingValue);
 		}
 	}, [channel]);
+
+	useEffect(() => {
+		setIsCheckValid(validInput(currentSettingValue?.channelName));
+	}, [currentSettingValue?.channelName]);
 
 	const handleSaveChannelSetting = async () => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
@@ -312,6 +318,10 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					label={t('fields.channelName.title')}
 					value={currentSettingValue.channelName}
 					onTextChange={(text) => handleUpdateValue({ channelName: text })}
+					maxCharacter={64}
+					errorMessage={t('fields.channelName.errorMessage')}
+					placeHolder={t('fields.channelName.placeholder')}
+					isValid={isCheckValid}
 				/>
 
 				{isChannel && (

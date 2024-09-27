@@ -1,7 +1,10 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
+
+const enableMute = 0;
 
 export interface ChannelMetaEntity {
 	id: string; // Primary ID
@@ -13,6 +16,7 @@ export interface ChannelMetaEntity {
 export interface ChannelMetaState extends EntityState<ChannelMetaEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	lastSentChannelId?: string;
 }
 
 const channelMetaAdapter = createEntityAdapter<ChannelMetaEntity>();
@@ -34,6 +38,7 @@ export const channelMetaSlice = createSlice({
 			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
+				state.lastSentChannelId = channel.id;
 			}
 		},
 		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
@@ -50,6 +55,14 @@ export const channelMetaSlice = createSlice({
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
 			state = channelMetaAdapter.upsertMany(state, action.payload);
+		},
+		removeUnreadAllChannel: (state) => {
+			const channels = state?.entities;
+			Object.values(channels).forEach((channel) => {
+				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
+					channel.lastSentTimestamp = 0;
+				}
+			});
 		}
 	}
 });
@@ -113,15 +126,36 @@ export const selectLastSeenPinMessageChannelById = (channelId: string) =>
 		return channel?.lastSeenPinMessage || '';
 	});
 
-export const selectIsUnreadChannelById = (channelId: string) =>
-	createSelector(getChannelMetaState, (state) => {
+export const selectIsUnreadChannelById = createSelector(
+	[getChannelMetaState, selectEntiteschannelCategorySetting, (state, channelId) => channelId],
+	(state, settings, channelId) => {
 		const channel = state?.entities[channelId];
+		const inactiveMuteSetting = settings?.[channelId]?.action !== enableMute;
 		// unread last seen timestamp is less than last sent timestamp
-		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
-	});
+		return inactiveMuteSetting && channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
+	}
+);
 
 export const selectLastChannelTimestamp = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
 		const channel = state?.entities?.[channelId];
 		return channel?.lastSeenTimestamp || 0;
 	});
+
+export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selectEntiteschannelCategorySetting], (state, settings) => {
+	if (state.lastSentChannelId && settings?.[state.lastSentChannelId]?.action !== enableMute) {
+		const lastSentChannel = state?.entities?.[state.lastSentChannelId];
+		if (lastSentChannel?.lastSeenTimestamp && lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
+			return true;
+		}
+	}
+
+	for (let index = 0; index < state?.ids?.length; index++) {
+		const channel = state?.entities?.[state?.ids[index]];
+		if (settings?.[channel?.id]?.action === enableMute) continue;
+		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
+			return true;
+		}
+	}
+	return false;
+});

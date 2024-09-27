@@ -1,10 +1,22 @@
 import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
-import { channelsActions, notificationSettingActions, selectCloseMenu, threadsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	channelsActions,
+	notificationActions,
+	notificationSettingActions,
+	selectClanById,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentStreamInfo,
+	threadsActions,
+	useAppDispatch,
+	videoStreamActions,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
@@ -53,6 +65,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 
 		const dispatch = useAppDispatch();
+		const clanById = useSelector(selectClanById(clanId || ''));
 		const [openSetting, setOpenSetting] = useState(false);
 		const [showModal, setShowModal] = useState(false);
 		const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -67,6 +80,8 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			setOpenSetting(true);
 			setIsShowPanelChannel(false);
 		};
+		const currentChannel = useSelector(selectCurrentChannel);
+		const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -98,6 +113,8 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setCoords({ mouseX, mouseY, distanceToBottom });
 				setIsShowPanelChannel((s) => !s);
 			}
+
+			dispatch(notificationActions.removeNotificationsByChannelId(channel.channel_id ?? ''));
 		};
 
 		useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -127,6 +144,20 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (closeMenu) {
 				setStatusMenu(false);
 			}
+			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				if (currentStreamInfo?.streamId !== channel.id) {
+					dispatch(
+						videoStreamActions.startStream({
+							clanId: clanId || '',
+							clanName: clanById?.clan_name || '',
+							streamId: channel?.channel_id || '',
+							streamName: channel?.channel_label || ''
+						})
+					);
+				}
+			} else {
+				dispatch(channelsActions.setCurrentChannelId(channel.id));
+			}
 		};
 
 		const openModalJoinVoiceChannel = useCallback(
@@ -151,12 +182,25 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			handleCloseModalShow();
 		};
 
+		useEffect(() => {
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				dispatch(
+					videoStreamActions.startStream({
+						clanId: clanId || '',
+						clanName: clanById?.clan_name || '',
+						streamId: currentChannel?.channel_id || '',
+						streamName: currentChannel?.channel_label || ''
+					})
+				);
+			}
+		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, dispatch]);
+
 		return (
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
 				role="button"
-				className={`relative group ${isUnReadChannel ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+				className={`relative group ${isUnReadChannel || (numberNotification && numberNotification > 0) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>
 				{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 					<span
@@ -174,7 +218,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							{(isPrivate === undefined || isPrivate === 0) && <Icons.Speaker defaultSize="w-5 5-5 " />}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel || (numberNotification && numberNotification > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
@@ -187,7 +231,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 					<Link to={channelPath} onClick={handleClick}>
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
-							<div className="relative mt-[-5px]">
+							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
 								{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 									<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
@@ -200,9 +244,12 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
+								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
+									<Icons.Stream defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+								)}
 							</div>
 							<p
-								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel || (numberNotification && numberNotification > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 								title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 							>
 								{channel.channel_label && channel?.channel_label.length > 20

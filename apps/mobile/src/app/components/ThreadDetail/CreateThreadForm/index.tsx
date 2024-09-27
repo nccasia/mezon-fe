@@ -14,6 +14,7 @@ import {
 	channelsActions,
 	createNewChannel,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -130,7 +131,10 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
 						await sendMessageThread(content, mentions, attachments, references, thread);
+						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
 					}
+				} else {
+					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);
 				}
 			} else {
 				console.error('Session is not available');
@@ -162,7 +166,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: thread?.category_id });
 	};
 	return (
 		<KeyboardAvoidingView style={styles.createChannelContainer}>

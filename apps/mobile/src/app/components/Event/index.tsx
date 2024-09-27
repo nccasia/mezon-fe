@@ -40,7 +40,9 @@ export default function EventViewer({ handlePressEventCreate }: { handlePressEve
 				</View>
 			</View>
 			{allEventManagement?.length > 0 ? (
-				allEventManagement?.map((event, index) => <EventItem event={event} key={index.toString()} onPress={() => handlePress(event)} />)
+				allEventManagement?.map((event, index) => (
+					<EventItem event={event} start={event?.start_time} key={index.toString()} onPress={() => handlePress(event)} />
+				))
 			) : (
 				<View style={styles.emptyView}>
 					<View style={styles.iconWrapper}>

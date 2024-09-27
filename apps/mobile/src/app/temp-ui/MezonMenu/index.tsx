@@ -5,12 +5,15 @@ import MezonMenuSection, { IMezonMenuSectionProps } from './MezonMenuSection';
 
 interface IMezonMenu {
 	menu: IMezonMenuSectionProps[];
+	marginVertical?: number | null;
 }
 
-export default function MezonMenu({ menu }: IMezonMenu) {
+export default function MezonMenu({ menu, marginVertical = size.s_18 }: IMezonMenu) {
 	return (
-		<Block gap={size.s_12} paddingBottom={size.s_18} marginVertical={size.s_18}>
-			{menu.map((item, index) => <MezonMenuSection key={index.toString()} {...item} />)}
+		<Block gap={size.s_12} paddingBottom={size.s_18} marginVertical={marginVertical}>
+			{menu.map((item, index) => (
+				<MezonMenuSection key={index.toString()} {...item} />
+			))}
 		</Block>
 	);
 }
@@ -18,9 +21,8 @@ export default function MezonMenu({ menu }: IMezonMenu) {
 export const reserve = () => {
 	Toast.show({
 		type: 'info',
-		text1: 'Coming soon',
+		text1: 'Coming soon'
 	});
 };
 
 export { IMezonMenuItemProps, IMezonMenuSectionProps };
-

@@ -21,7 +21,7 @@ export function useClanRestriction(restrictions: EPermission[]): ClanRestriction
 
 	const isOwnerGroupDM = useMemo(() => {
 		return currentGroupDM?.creator_id === userProfile?.user?.id;
-	}, [directId]);
+	}, [currentGroupDM?.creator_id, userProfile?.user?.id]);
 
 	return [isAllowed, { isClanOwner, isOwnerGroupDM }] as ClanRestrictionReturnType;
 }

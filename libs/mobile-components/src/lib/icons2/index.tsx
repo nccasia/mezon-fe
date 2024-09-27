@@ -1466,3 +1466,33 @@ export function SlashIcon({ width = 20, height = 20, color = 'white', ...props }
 		</Svg>
 	);
 }
+
+export function LeaveGroup({ width = 24, height = 24, color = 'white', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 81 80" fill={color} {...props}>
+			<G clipPath="url(#clip0_577_666)" fill={color}>
+				<Path d="M38.934 36.667A31.767 31.767 0 007.167 68.433c0 2.7 2.2 4.9 4.9 4.9h.734c.8 0 1.466-.566 1.666-1.333.967-3.733 2.8-7.233 4.4-9.7.467-.7 1.434-.333 1.334.5l-.834 8.7c-.1 1 .667 1.833 1.667 1.833h25.433c.4 0 .567-1.033.2-1.2-3.433-1.666-6.166-4.733-6.166-8.8a10 10 0 0110-10h16.733c1.267 0 2.033-1.333 1.333-2.4a31.732 31.732 0 00-26.5-14.266h-3.133zm1.567-3.334a13.333 13.333 0 100-26.666 13.333 13.333 0 000 26.666z" />
+				<Path d="M50.5 60a3.334 3.334 0 000 6.667h26.667a3.333 3.333 0 000-6.667H50.501z" />
+			</G>
+			<Defs>
+				<ClipPath id="clip0_577_666">
+					<Path fill="#fff" transform="translate(.5)" d="M0 0H80V80H0z" />
+				</ClipPath>
+			</Defs>
+		</Svg>
+	);
+}
+
+export function StreamIcon({ width = 24, height = 24, color = 'white', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 24 24" {...props}>
+			<Path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M22 5a2 2 0 00-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V5zM10.514 7.143A1 1 0 009 8v6a1 1 0 001.514.857l5-3a1 1 0 000-1.714l-5-3z"
+				fill={color}
+			/>
+			<Path d="M8 20a1 1 0 100 2h8a1 1 0 100-2H8z" fill="currentColor" />
+		</Svg>
+	);
+}

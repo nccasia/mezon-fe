@@ -1,5 +1,5 @@
-import { authActions, useAppDispatch } from '@mezon/store';
-import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
+import { appActions, authActions, useAppDispatch } from '@mezon/store';
+import { LogoutModal } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName: string) => void; initSetting: string }) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(initSetting);
@@ -13,6 +13,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 	};
 	const handleLogOut = () => {
 		dispatch(authActions.logOut());
+		dispatch(appActions.setIsShowSettingFooterStatus(false));
 	};
 	const handleCloseModal = () => {
 		setOpenModal(false);

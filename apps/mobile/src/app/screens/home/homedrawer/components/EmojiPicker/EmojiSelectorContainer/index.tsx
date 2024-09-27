@@ -79,7 +79,7 @@ export default function EmojiSelectorContainer({
 	handleBottomSheetCollapse
 }: EmojiSelectorContainerProps) {
 	const currentClan = useAppSelector(selectCurrentClan);
-	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || '0');
+	const { categoriesEmoji, categoryEmoji, emojis } = getEmojis(currentClan?.clan_id || '0');
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -89,17 +89,22 @@ export default function EmojiSelectorContainer({
 	const { t } = useTranslation('message');
 	const dispatch = useDispatch();
 
-	const cateIcon = useMemo(
-		() => [
+	const cateIcon = useMemo(() => {
+		const clanEmojis = categoryEmoji?.length
+			? categoryEmoji?.map((item) =>
+					item?.clan_logo ? (
+						<View style={styles.clanLogo}>
+							<MezonClanAvatar alt={item?.clan_name} image={item?.clan_logo} />
+						</View>
+					) : (
+						<PenIcon color={themeValue.textStrong} />
+					)
+				)
+			: [];
+		return [
 			<Icons.ClockIcon color={themeValue.textStrong} />,
-			currentClan?.logo ? (
-				<View style={{ height: 24, width: 24, borderRadius: 12, overflow: 'hidden' }}>
-					<MezonClanAvatar alt={currentClan?.clan_name} image={currentClan?.logo} />
-				</View>
-			) : (
-				<PenIcon color={themeValue.textStrong} />
-			),
-			<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
+			...clanEmojis,
+			<SmilingFaceIcon height={size.s_24} width={size.s_24} color={themeValue.textStrong} />,
 			<LeafIcon color={themeValue.textStrong} />,
 			<BowlIcon color={themeValue.textStrong} />,
 			<GameControllerIcon color={themeValue.textStrong} />,
@@ -107,9 +112,8 @@ export default function EmojiSelectorContainer({
 			<ObjectIcon color={themeValue.textStrong} />,
 			<HeartIcon color={themeValue.textStrong} />,
 			<RibbonIcon color={themeValue.textStrong} />
-		],
-		[themeValue]
-	);
+		];
+	}, [themeValue]);
 
 	const categoriesWithIcons = useMemo(
 		() =>
@@ -182,7 +186,7 @@ export default function EmojiSelectorContainer({
 			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
-			<View style={{ backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.secondary }}>
+			<View style={{ backgroundColor: theme === 'dark' || isReactMessage ? themeValue.secondary : themeValue.tertiary }}>
 				<View style={styles.textInputWrapper}>
 					<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
 					<TextInput

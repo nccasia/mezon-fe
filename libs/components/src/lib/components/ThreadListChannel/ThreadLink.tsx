@@ -1,5 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectCountNotifyByChannelId, selectIsUnreadChannelById } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { notificationActions, selectCountByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
@@ -22,9 +23,10 @@ export type ThreadLinkRef = {
 };
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
-	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
-	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
+	const numberNotification = useSelector(selectCountByChannelId(thread.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -56,6 +58,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
+		dispatch(notificationActions.removeNotificationsByChannelId(thread.channel_id ?? ''));
 	};
 
 	const handleDeleteChannel = () => {
@@ -86,7 +89,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				ref={threadLinkRef}
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${isActive || isUnReadChannel || numberNotification > 0 ? 'dark:font-medium font-semibold dark:text-white text-black' : ' dark:text-channelTextLabel text-colorTextLightMode'} ${isActive ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
 				onClick={() => {
 					handleClick(thread);
 				}}

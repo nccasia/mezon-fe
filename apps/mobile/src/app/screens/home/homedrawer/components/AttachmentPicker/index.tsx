@@ -2,13 +2,13 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
-import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
+import { IFile } from '../../../../../temp-ui';
 import Gallery from './Gallery';
 import { style } from './styles';
 
@@ -38,7 +38,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			const session = sessionRef.current;
 			return createUploadFilePath(session, currentClanId, currentChannelId, fileName, true)?.filePath;
 		},
-		[currentChannelId, currentClanId, sessionRef],
+		[currentChannelId, currentClanId, sessionRef]
 	);
 
 	const onPickFiles = async () => {
@@ -47,19 +47,23 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				dispatch(appActions.setIsFromFCMMobile(true));
 			}, 500);
 			const res = await DocumentPicker.pick({
-				type: [DocumentPicker.types.allFiles],
+				type: [DocumentPicker.types.allFiles]
 			});
 			const file = res?.[0];
 
-			dispatch(referencesActions.setAtachmentAfterUpload({
-				channelId: currentChannelId,
-				files: [{
-					filename: getFullFileName(file?.name || file?.uri),
-					url: file?.uri || file?.fileCopyUri,
-					filetype: file?.type,
-					size: file.size as number,
-				}]
-			}));
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					files: [
+						{
+							filename: getFullFileName(file?.name || file?.uri),
+							url: file?.uri || file?.fileCopyUri,
+							filetype: file?.type,
+							size: file.size as number
+						}
+					]
+				})
+			);
 
 			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
@@ -78,16 +82,20 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	};
 
 	const handleSelectedAttachments = useCallback((file: IFile) => {
-		dispatch(referencesActions.setAtachmentAfterUpload({
-			channelId: currentChannelId,
-			files: [{
-				filename: file.name,
-				url: file.uri,
-				filetype: file.type,
-				size: file.size as number,
-			}]
-		}));
-	}, [])
+		dispatch(
+			referencesActions.setAtachmentAfterUpload({
+				channelId: currentChannelId,
+				files: [
+					{
+						filename: file.name,
+						url: file.uri,
+						filetype: file.type,
+						size: file.size as number
+					}
+				]
+			})
+		);
+	}, []);
 
 	return (
 		<View style={styles.container}>

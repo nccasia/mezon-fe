@@ -49,5 +49,11 @@ export const style = (colors: Attributes) =>
 			flexGrow: 1,
 			fontSize: size.medium,
 			height: size.s_40
+		},
+		clanLogo: {
+			height: size.s_24,
+			width: size.s_24,
+			borderRadius: size.s_12,
+			overflow: 'hidden'
 		}
 	});

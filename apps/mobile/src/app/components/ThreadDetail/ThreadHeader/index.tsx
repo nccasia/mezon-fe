@@ -9,6 +9,8 @@ import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { MezonAvatar, MezonBottomSheet } from '../../../temp-ui';
 import MenuCustomDm from '../../MenuCustomDm';
 import { threadDetailContext } from '../MenuThreadDetail';
@@ -20,6 +22,8 @@ export const ThreadHeader = memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentChannel?.id ?? ''));
 	const bottomSheetMenuCustom = useRef<BottomSheetModal>(null);
+	const isTabletLandscape = useTabletLandscape();
+
 	const snapPointsMenuCustom = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type) ? ['30%'] : ['15%'];
 	}, [currentChannel?.type]);
@@ -39,16 +43,27 @@ export const ThreadHeader = memo(() => {
 		return !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
 	}, [currentChannel?.channel_label, currentChannel?.parrent_id]);
 
+	const handlebackMessageDetail = () => {
+		if (isDMThread && !isTabletLandscape) {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: currentChannel?.id }
+			});
+		} else {
+			navigation.goBack();
+		}
+	};
+
 	return (
 		<View style={styles.channelLabelWrapper}>
-			<TouchableOpacity style={styles.iconBackHeader} onPress={() => navigation.goBack()}>
+			<TouchableOpacity style={styles.iconBackHeader} onPress={handlebackMessageDetail}>
 				<Icons.ArrowLargeLeftIcon color={themeValue.text} height={20} width={20} />
 			</TouchableOpacity>
 
 			{isDMThread ? (
 				<View style={styles.avatarWrapper}>
 					<View>
-						{currentChannel?.channel_avatar?.length > 1 ? (
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP ? (
 							<View style={[styles.groupAvatar, styles.avatarSize]}>
 								<Icons.GroupIcon color={baseColor.white} />
 							</View>
@@ -84,7 +99,7 @@ export const ThreadHeader = memo(() => {
 			)}
 			{isDMThread && (
 				<TouchableOpacity onPress={openMenu} style={styles.iconMenuHeader}>
-					<OverflowMenuHorizontalIcon />
+					<OverflowMenuHorizontalIcon color={themeValue.white} />
 				</TouchableOpacity>
 			)}
 			<MezonBottomSheet snapPoints={snapPointsMenuCustom} ref={bottomSheetMenuCustom}>

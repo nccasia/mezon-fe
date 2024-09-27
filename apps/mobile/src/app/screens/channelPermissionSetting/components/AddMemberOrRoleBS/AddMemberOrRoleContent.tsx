@@ -1,5 +1,6 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { debounce, Icons } from '@mezon/mobile-components';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	channelUsersActions,
 	selectAllChannelMembers,
@@ -14,9 +15,11 @@ import {
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { MezonInput } from '../../../../temp-ui';
 import { normalizeString } from '../../../../utils/helpers';
+import { EOverridePermissionType, ERequestStatus } from '../../types/channelPermission.enum';
 import { IAddMemberOrRoleContentProps } from '../../types/channelPermission.type';
 import { MemberItem } from '../MemberItem';
 import { RoleItem } from '../RoleItem';
@@ -24,6 +27,7 @@ import { RoleItem } from '../RoleItem';
 export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOrRoleContentProps) => {
 	const { themeValue } = useTheme();
 	const [searchText, setSearchText] = useState('');
+	const debouncedSetSearchText = debounce((text) => setSearchText(text), 300);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const everyoneRole = useSelector(selectEveryoneRole);
 	const dispatch = useAppDispatch();
@@ -34,17 +38,21 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 	const allClanMembers = useSelector(selectAllUserClans);
 	const allClanRoles = useSelector(selectAllRolesClan);
 
-	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
+	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel?.channel_id as string));
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
 
 	const listOfMemberCanAdd = useMemo(() => {
-		const addedMemberIdList = listOfChannelMember?.filter((member) => member.userChannelId !== '0')?.map((member) => member?.user?.id) || [];
-		return allClanMembers?.filter((member) => !addedMemberIdList.includes(member?.user?.id));
+		const addedMemberIdList = listOfChannelMember?.filter((member) => member?.userChannelId !== '0')?.map((member) => member?.user?.id) || [];
+		return allClanMembers
+			?.filter((member) => !addedMemberIdList.includes(member?.user?.id))
+			?.map((member) => ({ ...member, type: EOverridePermissionType.Member }));
 	}, [listOfChannelMember, allClanMembers]);
 
 	const listOfRoleCanAdd = useMemo(() => {
 		const addedRoleIdList = listOfChannelRole?.map((role) => role?.id) || [];
-		return allClanRoles?.filter((role) => !addedRoleIdList.includes(role?.id) && everyoneRole?.id !== role?.id);
+		return allClanRoles
+			?.filter((role) => !addedRoleIdList.includes(role?.id) && everyoneRole?.id !== role?.id)
+			?.map((role) => ({ ...role, type: EOverridePermissionType.Role }));
 	}, [listOfChannelRole, allClanRoles, everyoneRole?.id]);
 
 	const disableAddButton = useMemo(() => {
@@ -52,15 +60,20 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 	}, [selectedMemberIdList, selectedRoleIdList]);
 
 	const filteredSearch = useMemo(() => {
-		return {
-			roles: listOfRoleCanAdd?.filter((role) => normalizeString(role?.title)?.includes(normalizeString(searchText))),
-			members: listOfMemberCanAdd?.filter(
-				(member) =>
-					normalizeString(member?.user?.display_name)?.includes(normalizeString(searchText)) ||
-					normalizeString(member?.user?.username).includes(normalizeString(searchText))
-			)
-		};
-	}, [listOfRoleCanAdd, listOfMemberCanAdd, searchText]);
+		if (!listOfRoleCanAdd) return [];
+		const roleList = listOfRoleCanAdd?.filter((role) => normalizeString(role?.title)?.includes(normalizeString(searchText)));
+		const memberList = listOfMemberCanAdd?.filter(
+			(member) =>
+				normalizeString(member?.user?.display_name)?.includes(normalizeString(searchText)) ||
+				normalizeString(member?.user?.username).includes(normalizeString(searchText))
+		);
+		return [
+			{ headerTitle: t('channelPermission.bottomSheet.roles'), isShowHeaderTitle: roleList?.length },
+			...roleList,
+			{ headerTitle: t('channelPermission.bottomSheet.members'), isShowHeaderTitle: memberList?.length },
+			...memberList
+		];
+	}, [listOfRoleCanAdd, listOfMemberCanAdd, searchText, t]);
 
 	const onSelectMemberChange = useCallback(
 		(value: boolean, memberId: string) => {
@@ -92,6 +105,7 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 
 	const addMemberOrRole = async () => {
 		if (disableAddButton) return;
+		const promise = [];
 		if (selectedMemberIdList?.length > 0) {
 			const body = {
 				channelId: channel.id,
@@ -99,7 +113,7 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 				userIds: selectedMemberIdList,
 				clanId: currentClanId || ''
 			};
-			await dispatch(channelUsersActions.addChannelUsers(body));
+			promise.push(dispatch(channelUsersActions.addChannelUsers(body)));
 		}
 		if (selectedRoleIdList?.length > 0) {
 			const body = {
@@ -108,10 +122,61 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 				roleIds: selectedRoleIdList,
 				channelType: channel.type
 			};
-			await dispatch(channelUsersActions.addChannelRoles(body));
+			promise.push(dispatch(channelUsersActions.addChannelRoles(body)));
 		}
+		const response = await Promise.all(promise);
+		const isError = response?.some((data) => data?.meta?.requestStatus === ERequestStatus.Rejected);
+		Toast.show({
+			type: 'success',
+			props: {
+				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+				leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+			}
+		});
 		onDismiss && onDismiss();
 	};
+
+	const renderItem = useCallback(
+		({ item }) => {
+			const { type, headerTitle, isShowHeaderTitle } = item;
+			if (!type && headerTitle && isShowHeaderTitle) {
+				return (
+					<Block paddingTop={size.s_12} paddingLeft={size.s_12}>
+						<Text color={themeValue.text} h4>
+							{headerTitle}:
+						</Text>
+					</Block>
+				);
+			}
+			switch (type) {
+				case EOverridePermissionType.Member:
+					return (
+						<MemberItem
+							key={item?.id}
+							member={item}
+							channelId={channel?.channel_id}
+							isCheckbox={true}
+							isChecked={selectedMemberIdList?.includes(item?.user?.id)}
+							onSelectMemberChange={onSelectMemberChange}
+						/>
+					);
+				case EOverridePermissionType.Role:
+					return (
+						<RoleItem
+							key={item?.id}
+							role={item}
+							channel={channel}
+							isCheckbox={true}
+							isChecked={selectedRoleIdList?.includes(item?.id)}
+							onSelectRoleChange={onSelectRoleChange}
+						/>
+					);
+				default:
+					return <Block />;
+			}
+		},
+		[onSelectMemberChange, channel, onSelectRoleChange, selectedMemberIdList, selectedRoleIdList, themeValue]
+	);
 
 	return (
 		<Block paddingHorizontal={size.s_14} flex={1}>
@@ -132,7 +197,7 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 					disabled={disableAddButton}
 				>
 					<Block padding={size.s_10}>
-						<Text bold h4 color={Colors.textViolet}>
+						<Text bold h4 color={disableAddButton ? Colors.bgGrayLight : Colors.textViolet}>
 							{t('channelPermission.bottomSheet.add')}
 						</Text>
 					</Block>
@@ -140,47 +205,17 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 			</Block>
 
 			<Block paddingVertical={size.s_16}>
-				<MezonInput value={searchText} onTextChange={setSearchText} placeHolder={'Search Roles & Members'} />
+				<MezonInput onTextChange={debouncedSetSearchText} placeHolder={'Search Roles & Members'} />
 			</Block>
-			<BottomSheetScrollView>
-				<Block gap={size.s_16} marginBottom={size.s_18}>
-					{filteredSearch?.roles?.length ? (
-						<Block gap={size.s_16}>
-							<Text color={themeValue.textDisabled}>{t('channelPermission.bottomSheet.roles')}</Text>
-							{filteredSearch?.roles?.map((role) => {
-								return (
-									<RoleItem
-										key={role?.id}
-										role={role}
-										channel={channel}
-										isCheckbox={true}
-										isChecked={selectedRoleIdList?.includes(role?.id)}
-										onSelectRoleChange={onSelectRoleChange}
-									/>
-								);
-							})}
-						</Block>
-					) : null}
-
-					{filteredSearch?.members?.length ? (
-						<Block gap={size.s_16}>
-							<Text color={themeValue.textDisabled}>{t('channelPermission.bottomSheet.members')}</Text>
-							{filteredSearch?.members?.map((member) => {
-								return (
-									<MemberItem
-										key={member?.id}
-										member={member}
-										channelId={channel?.channel_id}
-										isCheckbox={true}
-										isChecked={selectedMemberIdList?.includes(member?.user?.id)}
-										onSelectMemberChange={onSelectMemberChange}
-									/>
-								);
-							})}
-						</Block>
-					) : null}
-				</Block>
-			</BottomSheetScrollView>
+			<Block flex={1} paddingBottom={size.s_10}>
+				<BottomSheetFlatList
+					data={filteredSearch}
+					keyboardShouldPersistTaps={'handled'}
+					renderItem={renderItem}
+					keyExtractor={(item) => `${item?.id}_${item?.headerTitle}`}
+					removeClippedSubviews={true}
+				/>
+			</Block>
 		</Block>
 	);
 });

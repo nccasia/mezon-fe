@@ -1,8 +1,10 @@
-import { useClanRestriction, useEscapeKey } from '@mezon/core';
+import { useChannelRestriction, useClanRestriction, useEscapeKey } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
+	channelsActions,
 	notificationSettingActions,
+	selectCategoryById,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDefaultNotificationCategory,
@@ -10,7 +12,17 @@ import {
 	selectSelectedChannelNotificationSetting,
 	useAppDispatch
 } from '@mezon/store';
-import { ENotificationTypes, EPermission, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS, IChannel } from '@mezon/utils';
+import {
+	ENotificationTypes,
+	EOverriddenPermission,
+	EPermission,
+	FOR_15_MINUTES,
+	FOR_1_HOUR,
+	FOR_24_HOURS,
+	FOR_3_HOURS,
+	FOR_8_HOURS,
+	IChannel
+} from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
@@ -65,6 +77,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -173,21 +186,21 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
-	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageThread]);
-
-	const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
-	const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
+	const { maxChannelPermissions } = useChannelRestriction(currentChannelId ?? '');
+	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageChannel]);
 
 	useEscapeKey(() => setIsShowPanelChannel(false));
+
+	const handleOpenCreateChannelModal = () => {
+		dispatch(channelsActions.setCurrentCategory(currentCategory));
+		dispatch(channelsActions.openCreateNewModalChannel(true));
+	};
 
 	return (
 		<div
 			ref={panelRef}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
+			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />
@@ -266,11 +279,13 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{isShowManageChannel && (
+					{hasManageChannelPermission && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
-							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" />}
-							{channel.type === typeChannel.voice && <ItemPanel children="Create Voice Channel" />}
+							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" onClick={handleOpenCreateChannelModal} />}
+							{channel.type === typeChannel.voice && (
+								<ItemPanel children="Create Voice Channel" onClick={handleOpenCreateChannelModal} />
+							)}
 							<ItemPanel onClick={handleDeleteChannel} children="Delete Channel" danger />
 						</GroupPanels>
 					)}
@@ -318,7 +333,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{isShowManageThread && (
+					{maxChannelPermissions[EOverriddenPermission.manageThread] && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Create Thread" />

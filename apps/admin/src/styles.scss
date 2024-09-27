@@ -679,6 +679,18 @@ input:-webkit-autofill:active {
 .applicationItemLargeSort {
 }
 
+.hidden-submit-field {
+	.ui.form {
+		.ui.button[type="submit"] {
+			display: none;
+		}
+	}
+	.ui.error.message {
+		color: red;
+		font-size: 12px;
+	}
+}
+
 @media(max-width: 924px) {
 	.applicationItemLargeSort{
 		width: 23%;

@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
+import { selectAllPermissionsDefault, selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const everyoneRole = useSelector(selectEveryoneRole);
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
+	const defaultPermissionList = useSelector(selectAllPermissionsDefault);
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
@@ -61,9 +62,8 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	);
 
 	const permissionList = useMemo(() => {
-		const allPermission = isEditRoleMode ? clanRole?.permission_list?.permissions : newRole?.permission_list?.permissions;
-		return allPermission.map((p) => ({ ...p, disabled: getDisablePermission(p?.slug) }));
-	}, [newRole?.permission_list?.permissions, getDisablePermission, isEditRoleMode, clanRole?.permission_list?.permissions]);
+		return defaultPermissionList?.map((p) => ({ ...p, disabled: getDisablePermission(p?.slug) }));
+	}, [defaultPermissionList, getDisablePermission]);
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedPermissions, selectedPermissions);

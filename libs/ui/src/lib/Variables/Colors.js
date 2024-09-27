@@ -35,6 +35,7 @@ module.exports = {
 	bgModalDark: 'rgba(0, 0, 0, 0.7)',
 	bgAvatarDark: '#F7E4F0',
 	bgIconDark: '#949BA4',
+	bgDarkAccent: 'color-mix( in oklab, hsl(227 calc(1 * 6.5%) 27.3% / 1) 100%, black 0.01% )',
 
 	/* background light*/
 	bgLightPrimary: '#FFFFFF',
@@ -51,6 +52,7 @@ module.exports = {
 	bgInputDark: '#26262B',
 	bgAvatarLight: '#A612A2',
 	bgIconLight: '#5C5E66',
+	bgAccent: 'color-mix(in oklab, hsl(227 6.5% 90% / 1) 80%, #fff 20%)',
 	channelActiveColor: 'color-mix( in oklab, hsl(0 calc(1 * 0%) 100% / 1) 100%, black 0.01%)',
 	channelActiveLightColor: 'color-mix( in oklab, hsl(240 calc(1 * 7.7%) 2.5% / 1) 100%, black 0.01% )',
 	/* text */

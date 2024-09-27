@@ -1,15 +1,23 @@
 import { GifStickerEmojiPopup, Icons } from '@mezon/components';
 import { useApp, useGifsStickersEmoji, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
+import {
+	notificationActions,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectPositionEmojiButtonSmile,
+	selectReactionTopState,
+	selectStatusMenu
+} from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -31,20 +39,25 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(notificationActions.removeNotificationsByChannelId(currentChannel?.channel_id ?? ''));
+	}, [currentChannel?.channel_id]);
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
 			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (
 				<>
-					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
+					<div
+						className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'} ${isChannelStream ? 'justify-center items-center mx-4' : ''}`}
+					>
 						<Outlet />
 					</div>
 					{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
 						<div
 							id="emojiPicker"
-							className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+							className={`z-20 fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 						>
 							<div className="mb-0 z-10 h-full">
 								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />

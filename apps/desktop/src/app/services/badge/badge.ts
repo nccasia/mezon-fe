@@ -1,9 +1,8 @@
-import { ipcMain, IpcMainEvent, nativeImage } from 'electron';
+import { ipcMain, IpcMainEvent } from 'electron';
 import { SET_BADGE_COUNT } from '../../events/constants';
 import { BADGE_DESCRIPTION } from './constants';
 import { BadgeIconGenerator } from './icon';
-import { BadgeOptions, IBadge } from './types';
-
+import { IBadge } from './types';
 /**
  * Badge class for mac and linux
  */
@@ -39,11 +38,11 @@ export class Badge implements IBadge {
 export class WindowBadge implements IBadge {
 	private mainWindow: Electron.BrowserWindow;
 	private generator: BadgeIconGenerator;
-	private currentOverlayIcon = { image: null, badgeDescription: BADGE_DESCRIPTION };
+	private currentOverlayIcon: { image: Electron.NativeImage; badgeDescription: string } = { image: null, badgeDescription: BADGE_DESCRIPTION };
 
-	constructor(win: Electron.BrowserWindow, opts: BadgeOptions = {}) {
+	constructor(win: Electron.BrowserWindow) {
 		this.mainWindow = win;
-		this.generator = new BadgeIconGenerator(win, opts?.iconStyle);
+		this.generator = new BadgeIconGenerator();
 		this.initListeners();
 	}
 
@@ -60,9 +59,8 @@ export class WindowBadge implements IBadge {
 	}
 
 	public setBadgeCount(badgeNumber: number) {
-		if (badgeNumber) {
-			this.generator.generate(badgeNumber).then((base64) => {
-				const image = nativeImage.createFromDataURL(base64);
+		if (badgeNumber || badgeNumber === null) {
+			this.generator.generate(badgeNumber).then((image) => {
 				this.currentOverlayIcon.image = image;
 				this.mainWindow.setOverlayIcon(this.currentOverlayIcon.image, this.currentOverlayIcon.badgeDescription);
 			});
@@ -95,11 +93,11 @@ export class WindowBadge implements IBadge {
  * @param opts use for window only
  * @returns badge instance
  */
-export const initBadge = (app: Electron.App, mainWindow: Electron.BrowserWindow, opts?: BadgeOptions): IBadge | null => {
+export const initBadge = (app: Electron.App, mainWindow: Electron.BrowserWindow): IBadge | null => {
 	const platform = process.platform;
 	switch (platform) {
 		case 'win32':
-			return new WindowBadge(mainWindow, opts);
+			return new WindowBadge(mainWindow);
 		case 'darwin':
 		case 'linux':
 			return new Badge(app);

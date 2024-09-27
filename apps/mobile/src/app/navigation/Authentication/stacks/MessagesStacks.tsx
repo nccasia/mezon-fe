@@ -19,13 +19,13 @@ export const MessagesStacks = ({ }: any) => {
 				headerShown: true,
 				headerShadowVisible: true,
 				gestureEnabled: true,
-				gestureDirection: 'horizontal',
+				gestureDirection: 'vertical',
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
 				},
 				cardStyle: { backgroundColor: themeValue.secondary },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
 				headerTitleAlign: 'center',
 				headerTintColor: themeValue.text,
 				headerStyle: {

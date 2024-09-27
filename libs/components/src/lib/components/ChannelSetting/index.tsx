@@ -1,5 +1,5 @@
 import { useEscapeKey } from '@mezon/core';
-import { fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchUserChannels, fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -38,6 +38,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
+		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
 	}, [channel.channel_id, dispatch]);
 
 	const closeMenu = useSelector(selectCloseMenu);
@@ -53,7 +54,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	useEscapeKey(handleClose);
 
 	return (
-		<div className="flex fixed inset-0  w-screen z-10 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
+		<div className="flex fixed inset-0  w-screen z-30 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
 			<div className="flex text-gray- w-screen relative text-white">
 				<div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
 					<div

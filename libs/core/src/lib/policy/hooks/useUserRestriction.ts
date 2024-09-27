@@ -2,20 +2,22 @@ import { selectCurrentClanId } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { usePermissionsLevel } from './usePermissionsLevel';
 import { useUserPolicy } from './useUserPolicy';
 
 export function useUserRestriction(restrictions: EPermission[]) {
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { permissionKeys } = useUserPolicy(currentClanId || '');
+	const { maxPermissionLevel } = useUserPolicy(currentClanId || '');
+	const permissionLevel = usePermissionsLevel();
 	const isAllowed = useMemo(() => {
-		if (!Array.isArray(restrictions)) {
+		if (!restrictions?.length) {
 			return true;
 		}
-		if (restrictions.length === 0) {
-			return true;
+		if (Number.isNaN(maxPermissionLevel)) {
+			return false;
 		}
-		return restrictions.every((restriction) => permissionKeys.includes(restriction));
-	}, [permissionKeys, restrictions]);
+		return restrictions.every((restriction) => permissionLevel[restriction] <= Number(maxPermissionLevel));
+	}, [maxPermissionLevel, permissionLevel, restrictions]);
 
 	return isAllowed;
 }

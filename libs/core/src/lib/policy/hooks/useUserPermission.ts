@@ -1,46 +1,59 @@
+import { selectUserMaxPermissionLevel } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
-import { useMemo } from 'react';
-import { useClanRestriction } from './useClanRestriction';
+import { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { useIsClanOwner } from './useIsClanOwner';
+import { usePermissionsLevel } from './usePermissionsLevel';
 
 export function useUserPermission() {
-	const [hasAdministrator, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasDeleteMessage] = useClanRestriction([EPermission.deleteMessage]);
-	const [hasManageChannel] = useClanRestriction([EPermission.manageChannel]);
-	const [hasManageClan] = useClanRestriction([EPermission.manageClan]);
-	const [hasManageThread] = useClanRestriction([EPermission.manageThread]);
-	const [hasSendMessage] = useClanRestriction([EPermission.sendMessage]);
-	const [hasViewChannel] = useClanRestriction([EPermission.viewChannel]);
+	const isClanOwner = useIsClanOwner();
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const permissionLevel = usePermissionsLevel();
 
-	const maxPermissionLevel = useMemo(() => {
-		if (hasAdministrator) {
-			return 1;
-		}
-		if (hasManageClan) {
-			return 2;
-		}
-		return 3;
-	}, [hasAdministrator, hasManageClan]);
+	const isAllowed = useCallback(
+		(permission: EPermission) => {
+			if (isClanOwner) {
+				return true;
+			}
+			const isInteger = Number.isInteger(permissionLevel?.[permission]) && Number.isInteger(maxPermissionLevel);
+			return isInteger && (maxPermissionLevel as number) >= permissionLevel?.[permission];
+		},
+		[isClanOwner, maxPermissionLevel, permissionLevel]
+	);
 
-	const userPermissionsStatus = {
-		hasAdministrator,
-		hasDeleteMessage,
-		hasManageChannel,
-		hasManageClan,
-		hasManageThread,
-		hasSendMessage,
-		hasViewChannel
-	};
+	const userPermissionsStatus = useMemo(() => {
+		return {
+			hasAdministrator: isAllowed(EPermission.administrator),
+			hasDeleteMessage: isAllowed(EPermission.deleteMessage),
+			hasManageChannel: isAllowed(EPermission.manageChannel),
+			hasManageClan: isAllowed(EPermission.manageClan),
+			hasManageThread: isAllowed(EPermission.manageThread),
+			hasSendMessage: isAllowed(EPermission.sendMessage),
+			hasViewChannel: isAllowed(EPermission.viewChannel)
+		};
+	}, [isAllowed]);
+
+	const composedActions = useMemo(() => {
+		const { hasManageClan, hasManageThread, hasManageChannel, hasViewChannel, hasDeleteMessage, hasSendMessage } = userPermissionsStatus;
+
+		return {
+			isCanManageThread: hasManageThread,
+			isCanManageChannel: hasManageChannel,
+			isCanManageClan: hasManageClan,
+			isCanDeleteMessage: hasDeleteMessage,
+			isCanSendMessage: hasSendMessage,
+			isCanViewChannel: hasViewChannel,
+			isCanManageEvent: hasManageClan,
+			isCanEditRole: hasManageClan
+		};
+	}, [userPermissionsStatus]);
+
 	return {
 		userPermissionsStatus,
+		// @deprecated
+		// TODO: remove
 		isClanOwner,
 		maxPermissionLevel,
-		isCanManageThread: hasManageThread || hasAdministrator || isClanOwner,
-		isCanManageChannel: hasManageChannel || hasAdministrator || isClanOwner || hasManageClan,
-		isCanManageClan: hasManageClan || hasAdministrator || isClanOwner,
-		isCanDeleteMessage: hasDeleteMessage || hasAdministrator || isClanOwner,
-		isCanSendMessage: hasSendMessage || hasAdministrator || isClanOwner || hasManageChannel || hasManageClan || hasManageThread,
-		isCanViewChannel: hasSendMessage || hasViewChannel || hasAdministrator || isClanOwner || hasManageChannel || hasManageClan || hasManageThread,
-		isCanManageEvent: isClanOwner || hasAdministrator || hasManageClan,
-		isCanEditRole: isClanOwner || hasAdministrator || hasManageClan
+		...composedActions
 	};
 }

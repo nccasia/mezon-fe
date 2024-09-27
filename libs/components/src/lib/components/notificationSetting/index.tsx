@@ -20,7 +20,6 @@ import { notificationTypesList } from '../PanelChannel';
 export type ModalParam = {
 	onClose: () => void;
 	open: boolean;
-	channelID: string;
 };
 
 export const customStyles = {

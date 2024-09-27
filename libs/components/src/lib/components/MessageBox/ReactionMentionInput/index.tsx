@@ -17,6 +17,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
+	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectAttachmentByChannelId,
@@ -26,7 +27,6 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
-	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -66,7 +66,6 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
@@ -121,10 +120,10 @@ export type MentionReactInputProps = {
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;
+	hasPermissionEdit?: boolean;
 };
 
 const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
 	const { channels } = useChannels();
@@ -132,7 +131,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
+	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
 
@@ -589,9 +588,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
-				<div
-					className={`flex flex-col overflow-y-auto h-heightMessageViewChatThread ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-				>
+				<div className={`flex flex-col overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
 							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-bgInputDark bg-bgTextarea rounded-full pointer-events-none">
@@ -637,10 +634,19 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
 						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`
 					},
+					'&multiLine': {
+						...(appearanceTheme === 'light' ? lightMentionsInputStyle['&multiLine'] : darkMentionsInputStyle['&multiLine']),
+						input: {
+							...(appearanceTheme === 'light'
+								? lightMentionsInputStyle['&multiLine'].input
+								: darkMentionsInputStyle['&multiLine'].input),
+							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 100px 9px 10px'
+						}
+					},
 					maxWidth: '100%',
 					maxHeight: '350px'
 				}}
-				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
+				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -712,7 +718,13 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
+			{!props.isThread && (
+				<GifStickerEmojiButtons
+					activeTab={SubPanelName.NONE}
+					currentClanId={props.currentClanId}
+					hasPermissionEdit={props.hasPermissionEdit || true}
+				/>
+			)}
 		</div>
 	);
 });

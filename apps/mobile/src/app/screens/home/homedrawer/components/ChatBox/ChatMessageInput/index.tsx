@@ -5,7 +5,7 @@ import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMes
 import { ChannelStreamMode } from 'mezon-js';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { EMessageActionType } from '../../../enums';
@@ -106,7 +106,7 @@ export const ChatMessageInput = memo(
 						isParentPublic: parent ? !parent.channel_private : false
 					})
 				);
-			}, [channelId, currentClanId, dispatch, isPublic, mode]);
+			}, [channelId, currentClanId, dispatch, isPublic, mode, parent, parentId]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -162,7 +162,7 @@ export const ChatMessageInput = memo(
 							ref={ref}
 							autoFocus={isFocus}
 							placeholder={t('messageInputPlaceHolder')}
-							placeholderTextColor={themeValue.text}
+							placeholderTextColor={themeValue.textDisabled}
 							blurOnSubmit={false}
 							onFocus={handleInputFocus}
 							onBlur={handleInputBlur}
@@ -171,13 +171,15 @@ export const ChatMessageInput = memo(
 							numberOfLines={4}
 							onChange={() => handleTypingMessage()}
 							{...textInputProps}
-							style={[styles.inputStyle, { height: Math.max(size.s_40, heightInput) }]}
+							style={[styles.inputStyle, { height: Platform.OS === 'ios' ? 'auto' : Math.max(size.s_40, heightInput) }]}
 							children={renderTextContent(text)}
 							onContentSizeChange={(e) => {
-								if (e.nativeEvent.contentSize.height < size.s_40 * 2) {
-									setHeightInput(e.nativeEvent.contentSize.height);
-								} else {
-									setHeightInput(size.s_40 * 2);
+								if (Platform.OS === 'android') {
+									if (e.nativeEvent.contentSize.height < size.s_40 * 2) {
+										setHeightInput(e.nativeEvent.contentSize.height);
+									} else {
+										setHeightInput(size.s_40 * 3);
+									}
 								}
 							}}
 						/>

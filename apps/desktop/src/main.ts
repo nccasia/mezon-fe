@@ -2,10 +2,7 @@ import { BrowserWindow, Notification, app, dialog, ipcMain } from 'electron';
 import log from 'electron-log/main';
 import { UpdateInfo, autoUpdater } from 'electron-updater';
 import { machineId } from 'node-machine-id';
-import { join } from 'path';
-import { format } from 'url';
 import App from './app/app';
-import { rendererAppName } from './app/constants';
 import { GET_DEVICE_ID, NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
@@ -44,18 +41,7 @@ ipcMain.handle(GET_DEVICE_ID, async () => {
 
 ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	if (App.mainWindow) {
-		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
-
-		if (path && !isSubPath) {
-			App.mainWindow.loadURL(
-				format({
-					pathname: baseUrl,
-					protocol: 'file:',
-					slashes: true,
-					query: { notificationPath: path }
-				})
-			);
-		}
+		App.mainWindow.webContents.send('navigate-to-path', path);
 
 		if (!App.mainWindow.isVisible()) {
 			App.mainWindow.show();

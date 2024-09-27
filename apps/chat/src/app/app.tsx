@@ -3,9 +3,10 @@ import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useSettingFooter } from '@mezon/core';
 import { electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
@@ -30,9 +31,12 @@ const mezon: CreateMezonClientOptions = {
 
 const AppInitializer = () => {
 	const isLogin = useSelector(selectIsLogin);
+	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	if (isElectron()) {
 		if (isLogin) {
-			electronBridge?.initListeners();
+			electronBridge?.initListeners(() => {
+				setIsShowSettingFooterStatus(true);
+			});
 		} else {
 			electronBridge?.removeAllListeners();
 		}
@@ -64,6 +68,13 @@ export function App() {
 }
 
 function AppWrapper() {
+	useEffect(() => {
+		const splashScreen = document.getElementById('splash-screen');
+		if (splashScreen) {
+			splashScreen.style.display = 'none';
+		}
+	}, []);
+
 	return (
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>

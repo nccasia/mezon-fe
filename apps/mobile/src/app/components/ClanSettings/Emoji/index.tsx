@@ -1,13 +1,14 @@
 import { handleUploadEmoticonMobile, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, createEmojiSetting, selectAllEmojiSuggestion, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { appActions, createEmojiSetting, selectCurrentClanId, selectEmojiByClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { EEmojiCategory, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
+import { MAX_FILE_NAME_EMOJI } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Dimensions, Platform, Pressable, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
@@ -32,10 +33,8 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
 	const { t } = useTranslation(['clanEmojiSetting']);
-	const emojiList = useSelector(selectAllEmojiSuggestion);
-	const emojiCustomList = useMemo(() => {
-		return emojiList.filter((emoji) => emoji.category === EEmojiCategory.CUSTOM);
-	}, [emojiList]);
+	const emojiList = useSelector(selectEmojiByClanId(currentClanId || ''));
+
 	const timerRef = useRef<any>(null);
 	const buttonRef = useRef<any>(null);
 
@@ -131,7 +130,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 				<Text style={styles.title}>{t('description.descriptions')}</Text>
 				<Text style={styles.lightTitle}>{t('description.requirements')}</Text>
 				<Text style={styles.requireTitle}>{t('description.requireList')}</Text>
-				<EmojiList emojiList={emojiCustomList} />
+				<EmojiList emojiList={emojiList} />
 			</ScrollView>
 		</View>
 	);

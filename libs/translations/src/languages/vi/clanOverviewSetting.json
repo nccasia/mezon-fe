@@ -8,7 +8,9 @@
 },
   "menu": {
     "serverName": {
-      "title": "Tên Clan"
+      "title": "Tên Clan",
+      "errorMessage": "Vui lòng nhập tên ban hội hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -).",
+      "duplicateNameMessage" : "Tên Clan đã tồn tại. Vui lòng chọn tên khác."
     },
     "inactive": {
       "title": "Cài Đặt Không Hoạt Động",

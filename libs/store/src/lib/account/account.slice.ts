@@ -1,7 +1,7 @@
 import { IUserAccount, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
 export interface IAccount {
@@ -22,7 +22,7 @@ export const initialAccountState: AccountState = {
 };
 
 const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 3;
-const fetchUserProfileCached = memoize((mezon: MezonValueContext) => mezon.client.getAccount(mezon.session), {
+const fetchUserProfileCached = memoizeAndTrack((mezon: MezonValueContext) => mezon.client.getAccount(mezon.session), {
 	promise: true,
 	maxAge: CHANNEL_PROFILE_CACHED_TIME,
 	normalizer: (args) => {

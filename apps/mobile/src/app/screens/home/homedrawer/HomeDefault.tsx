@@ -19,6 +19,7 @@ import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
@@ -26,6 +27,7 @@ import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
+import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
@@ -47,6 +49,8 @@ const HomeDefault = React.memo((props: any) => {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
+
+	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
 
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
@@ -128,7 +132,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && (
+			{currentChannel && isFocusChannelView && !isChannelStream && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -146,6 +150,7 @@ const HomeDefault = React.memo((props: any) => {
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
+			{isChannelStream ? <StreamingRoom /> : null}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />
@@ -174,32 +179,50 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
 		const { statusMute } = useStatusMuteChannel();
+		const isTabletLandscape = useTabletLandscape();
 
 		const navigateToSearchPage = () => {
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
+					currentChannel
 				}
 			});
 		};
+
+		const renderChannelIcon = () => {
+			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)) {
+				return <Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id)) {
+				return <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				return <Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				return <Icons.StreamIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			return <Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+		};
+
 		return (
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
-							<Icons.ArrowLargeLeftIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-						</TouchableOpacity>
+						{!isTabletLandscape && (
+							<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
+								<Icons.ArrowLargeLeftIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+							</TouchableOpacity>
+						)}
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
-								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								) : (
-									<Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-								)}
+								{renderChannelIcon()}
 								<View>
 									<View style={styles.threadHeaderBox}>
 										<Text style={styles.threadHeaderLabel} numberOfLines={1}>

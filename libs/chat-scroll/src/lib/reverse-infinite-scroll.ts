@@ -10,8 +10,8 @@ import { IChatScrollData } from './sticky-scroll';
  * It is very important to ensure that this callback does not issue a request if end of data is reached. Otherwise target server might be spammed with requests.
  * @param options Additional options to customize hook behavior.
  */
-export const useReverseInfiniteScroll = (
-	targetRef: React.MutableRefObject<Element>,
+export const useReverseInfiniteScroll = <TElement extends Element>(
+	targetRef: React.MutableRefObject<TElement | null>,
 	data: IChatScrollData,
 	loadMoreCb: ILoadMoreCb,
 	options?: IUseReverseInfiniteScrollOptions
@@ -76,6 +76,9 @@ export const useReverseInfiniteScroll = (
 	const isReachTop = useCallback(() => getScrollTop() === 0, [getScrollTop]);
 
 	const isReachBottom = useCallback(() => {
+		if (!targetRef.current) {
+			return false;
+		}
 		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
 		return scrollHeight === scrollTop + clientHeight;
 	}, [targetRef]);
@@ -98,9 +101,9 @@ export const useReverseInfiniteScroll = (
 				storeCurrentScrollTop();
 
 				// store height of each item
-				const items = targetRef.current.querySelectorAll('.message-container');
+				const items = targetRef.current?.querySelectorAll('.message-container');
 
-				items.forEach((item) => {
+				items?.forEach((item) => {
 					const id = item.getAttribute('id');
 					if (id) {
 						itemsHeightCache.set(id, item.clientHeight);
@@ -112,7 +115,7 @@ export const useReverseInfiniteScroll = (
 
 			let removedHeight = 0;
 			for (const [id, height] of cachedItems) {
-				const item = targetRef.current.querySelector(`#${id}`);
+				const item = targetRef.current?.querySelector(`#${id}`);
 				if (!item) {
 					removedHeight += height;
 				}

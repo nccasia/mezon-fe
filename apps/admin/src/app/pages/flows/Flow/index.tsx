@@ -1,13 +1,14 @@
 import { useAuth } from '@mezon/core';
+import { selectAppDetail } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { apiInstance } from '@mezon/utils';
 import {
-	addEdge,
 	Background,
 	BackgroundVariant,
 	Connection,
 	Controls,
-	Node,
+	Edge,
+	EdgeChange,
+	NodeChange,
 	Panel,
 	ReactFlow,
 	useEdgesState,
@@ -17,125 +18,91 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
+import { FlowContext } from '../../../context/FlowContext';
+import flowService from '../../../services/flowService';
+import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flowStore/flowActions';
+import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../types/flowTypes';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
-import CommandNode from '../nodes/CommandNode';
-import DefaultNode from '../nodes/DefaultNode';
-import CommandInputNode from '../nodes/InputNode';
-import CommandOutputNode from '../nodes/OutputNode';
+import CustomNode from '../nodes/CustomNode';
+import NodeTypes from '../nodes/NodeType';
 import SaveFlowModal from './SaveFlowModal';
 
-const initialNodes: Node[] = [
-	// { id: '1', position: { x: 0, y: 0 }, data: { label: 'Command Node' }, type: 'command' },
-	// { id: '2', position: { x: 300, y: 0 }, data: { label: 'Default Node' }, type: 'defaultCustom' }
-];
 const Flow = () => {
+	const { flowState, flowDispatch } = React.useContext(FlowContext);
 	const { flowId, applicationId } = useParams();
 	const { userProfile } = useAuth();
 	const navigate = useNavigate();
 	const reactFlowWrapper = useRef(null);
 	const [openModalSaveFlow, setOpenModalSaveFlow] = React.useState(false);
-	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-	const [nodeType, setNodeType] = React.useState('default');
+	const [nodes, setNodes, onNodesChange] = useNodesState(flowState.nodes);
+	const [edges, setEdges, onEdgesChange] = useEdgesState(flowState.edges);
 	const { screenToFlowPosition } = useReactFlow();
+	const appDetail = useSelector(selectAppDetail);
 	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
-	const [flowData, setFlowData] = React.useState<any>({});
+	const [flowData, setFlowData] = React.useState<{ flowName: string; description: string }>({
+		flowName: 'Untitle Flow',
+		description: ''
+	});
+	useEffect(() => {
+		console.log('nodes', flowState.nodes);
+		setNodes(flowState.nodes);
+	}, [flowState.nodes, setNodes]);
+	useEffect(() => {
+		console.log('edges', flowState.edges);
+		setEdges(flowState.edges);
+	}, [flowState.edges, setEdges]);
 
 	// handle drag, drop and connect nodes
-	const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+	const onConnect = useCallback(
+		(params: Connection) => {
+			flowDispatch(addEdge(params as Edge));
+		},
+		[flowDispatch]
+	);
 	const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = 'move';
 	}, []);
 
-	const handleChangeNodeType = useCallback(
-		(type: string) => {
-			setNodeType(type);
-		},
-		[setNodeType]
-	);
-
-	const handleDeleteNode = useCallback(
-		(nodeId: string) => {
-			// remove node in list nodes
-			setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-			// remove edges connect to this node
-			setEdges((eds) => eds.filter((e: { source: string; target: string }) => e.source !== nodeId && e.target !== nodeId));
-		},
-		[setNodes, setEdges]
-	);
-
-	const getId = () => {
-		const nodeId = uuidv4();
-		return `${nodeId}`;
-		// return `${nodeType}_${nodeId}`;
-	};
-
-	const handleCopyNode = useCallback(
-		(nodeId: string) => {
-			setNodes((nds) => {
-				const nodeToCopy = nds.find((node) => node.id === nodeId);
-				if (!nodeToCopy) return nds;
-
-				const id = getId();
-				const newNode = {
-					...nodeToCopy,
-					id, // Tạo id mới cho node sao chép
-					position: {
-						x: nodeToCopy.position.x + 50, // Di chuyển vị trí node mới
-						y: nodeToCopy.position.y + 50
-					},
-					data: {
-						...nodeToCopy.data,
-						id
-					}
+	const listNodeType = useMemo(() => {
+		const obj: { [key: string]: (props: any) => JSX.Element } = {};
+		NodeTypes.forEach((item, index) => {
+			if (!obj[item.type]) {
+				obj[item.type] = (props) => {
+					return (
+						<CustomNode
+							{...props}
+							schema={item.schema}
+							label={item.label}
+							bridgeSchema={item.bridgeSchema}
+							anchors={item.anchors}
+							ref={(el: HTMLElement | null) => {
+								if (el) {
+									nodeRefs.current[props.data.id] = el;
+								} else {
+									delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
+								}
+							}}
+						/>
+					);
 				};
-
-				return [...nds, newNode]; // Thêm node mới vào danh sách nodes
-			});
-		},
-		[nodes, setNodes, handleDeleteNode]
-	);
-
-	const nodeTypes = useMemo(() => {
-		return {
-			command: (props: any) => <CommandNode {...props} onCopy={handleCopyNode} onDelete={handleDeleteNode} />,
-			commandInput: (props: any) => (
-				<CommandInputNode
-					{...props}
-					onCopy={handleCopyNode}
-					onDelete={handleDeleteNode}
-					ref={(el: HTMLElement | null) => {
-						if (el) {
-							nodeRefs.current[props.data.id] = el;
-						} else {
-							delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
-						}
-					}}
-				/>
-			),
-			commandOutput: (props: any) => (
-				<CommandOutputNode
-					{...props}
-					onCopy={handleCopyNode}
-					onDelete={handleDeleteNode}
-					ref={(el: HTMLElement | null) => {
-						if (el) {
-							nodeRefs.current[props.data.id] = el;
-						} else {
-							delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
-						}
-					}}
-				/>
-			),
-			defaultCustom: DefaultNode
-		};
+			}
+		});
+		return obj;
 	}, []);
 
+	const onChangeNode = (changes: NodeChange[]) => {
+		onNodesChange(changes);
+		flowDispatch(setNodesContext(nodes));
+	};
+	const onChangeEdge = (changes: EdgeChange[]) => {
+		onEdgesChange(changes);
+		flowDispatch(setEdgesContext(edges));
+	};
 	const onDrop = useCallback(
 		(event: React.DragEvent<HTMLDivElement>) => {
 			event.preventDefault();
@@ -143,72 +110,86 @@ const Flow = () => {
 				x: event.clientX + 50,
 				y: event.clientY + 50
 			});
-			const id = getId();
-			const newNode = {
-				id,
-				type: nodeType,
-				position,
-				data: {
-					label: `${nodeType}`,
-					id
-				}
-			};
-
-			setNodes([...nodes, newNode]);
+			flowDispatch(addNode(position));
 		},
-		[screenToFlowPosition, nodeType, nodes, handleDeleteNode, handleCopyNode, setNodes]
+		[screenToFlowPosition, flowDispatch]
 	);
 
 	const handleClickBackButton = () => {
+		// reset flow data when click back button
+		flowDispatch(setNodesContext([]));
+		flowDispatch(setEdgesContext([]));
 		navigate(-1);
 	};
 
 	const handleClickSaveFlow = async () => {
-		const formData: { [key: string]: any } = Object.keys(nodeRefs.current).reduce(
-			(acc, nodeId) => {
-				const nodeRef = nodeRefs.current[nodeId] as { getFormData?: () => any };
-				acc[nodeId] = nodeRef?.getFormData?.(); // Lấy dữ liệu form từ ref
-				return acc;
+		let checkValidate = true;
+		// get data from all nodes
+		const formData: {
+			[key: string]: {
+				[key: string]: string;
+			};
+		} = Object.keys(nodeRefs.current).reduce(
+			(data, nodeId) => {
+				const nodeRef = nodeRefs.current[nodeId] as {
+					getFormData?: () => {
+						[key: string]: string;
+					};
+					checkValidate?: () => {
+						[key: string]: string;
+					};
+				};
+				data[nodeId] = nodeRef?.getFormData?.() ?? {};
+				// check validate of all nodes
+				const check = nodeRef?.checkValidate?.();
+				if (!check) checkValidate = false;
+				return data;
 			},
-			{} as { [key: string]: any }
+			{} as {
+				[key: string]: {
+					[key: string]: string;
+				};
+			}
 		);
-		const listNodeString: any[] = [];
+
+		// check validate of all nodes, if one node is invalid, return
+		if (!checkValidate) return;
+		const listNodeInFlow: INode[] = [];
 		nodes.forEach((node) => {
-			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => ({
-				parameterKey: key,
-				parameterValue: formData[node.id][key]
-			}));
-			const newNode = {
-				// ...node,
-				// data: {
-				// 	...node.data,
-				// 	id: node.id,
-				// 	label: node.data.label,
-				// 	type: node.type,
-				// 	inputParams: [],
-				// 	inputAnchors: [],
-				// 	input: formData[node.id],
-				// 	outputAnchors: [],
-				// 	output: {},
-				// 	selected: node.selected
-				// }
+			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => {
+				let value = formData[node.id][key];
+				if (typeof value !== 'string') {
+					value = JSON.stringify(value);
+				}
+				return {
+					parameterKey: key,
+					parameterValue: value
+				};
+			});
+			const newNode: INode = {
 				id: node.id,
-				nodeType: node.type,
-				nodeName: node.data.label,
+				nodeType: node.type as INodeType,
+				nodeName: node.type as INodeType,
 				position: node.position,
-				measured: node.measured,
-				parameters
+				measured: { width: node.measured?.width ?? 0, height: node.measured?.height ?? 0 },
+				parameters,
+				data: {
+					id: node.id ?? ''
+				},
+				selected: node.selected ?? false
 			};
-			console.log(newNode);
-			listNodeString.push(newNode);
+			listNodeInFlow.push(newNode);
 		});
-		const listEdgeString: any[] = [];
-		edges.forEach((edge: any) => {
+		const listEdgeInFlow: IEdge[] = [];
+		edges.forEach((edge: Edge) => {
 			const newEdge = {
+				id: edge.id,
 				sourceNodeId: edge.source,
-				targetNodeId: edge.target
+				targetNodeId: edge.target,
+				sourceHandleId: edge.sourceHandle ?? '',
+				targetHandleId: edge.targetHandle ?? ''
 			};
-			listEdgeString.push(newEdge);
+			listEdgeInFlow.push(newEdge);
 		});
 
 		if (!userProfile?.user?.id) {
@@ -220,23 +201,28 @@ const Flow = () => {
 			return;
 		}
 
-		const dataCreate = {
-			userId: userProfile?.user?.id,
+		const flowDataSave: IFlowDataRequest = {
+			referralId: userProfile?.user?.id,
+			applicationId: applicationId ?? '',
+			applicationToken: appDetail?.token ?? '',
+			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
 			isActive: true,
-			connections: listEdgeString,
-			nodes: listNodeString
+			connections: listEdgeInFlow,
+			nodes: listNodeInFlow
 		};
-		console.log(dataCreate);
+		console.log(flowDataSave);
 
 		try {
 			if (flowId) {
-				console.log('update flow');
+				toast.info('Api update flow is updating');
+				// const response = await flowService.updateFlow({ ...flowDataSave, flowId });
+				// console.log(response);
+				// toast.success('Update flow success');
 				// call api update flow
 			} else {
-				const response: any = await apiInstance.post('/flow/create', dataCreate);
-				console.log(response);
+				const response = await flowService.createNewFlow(flowDataSave);
 				toast.success('Save flow success');
 				// navigate to flow detail after create flow
 				navigate(`/applications/${applicationId}/flow/${response.id}`);
@@ -246,39 +232,61 @@ const Flow = () => {
 		}
 	};
 	useEffect(() => {
-		if (!flowId) return;
+		// set flow data is empty when flowId is empty
+		if (!flowId) {
+			flowDispatch(setNodesContext([]));
+			flowDispatch(setEdgesContext([]));
+			return;
+		}
+
+		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
-			const response: any = await apiInstance.get(`/flow/detail?flowId=${flowId}`);
-			console.log(flowId, response);
+			const response: IFlowDetail = await flowService.getFlowDetail(flowId);
 			setFlowData({
-				flowName: response.flow?.flowName,
-				description: response.flow?.description
+				flowName: response?.flowName,
+				description: response?.description
 			});
-			const listNode = response.nodes?.map((node: any) => {
+			console.log(response);
+			const listNode = response.nodes?.map((node: INode) => {
+				const params: {
+					[key: string]: string;
+				} = {};
+				node?.parameters?.forEach((param: IParameter) => {
+					let value = param.parameterValue;
+					try {
+						value = JSON.parse(param.parameterValue);
+					} catch {
+						value = param.parameterValue;
+					}
+					params[param.parameterKey] = value;
+				});
 				return {
 					id: node.id,
 					type: node.nodeType,
 					nodeName: node.nodeName,
-					measured: JSON.parse(node.measured),
-					position: JSON.parse(node.position),
+					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
+					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
 					data: {
 						label: node.nodeName,
-						id: node.id
+						id: node.id,
+						defaultValue: params
 					}
 				};
 			});
-			setNodes(listNode);
-			const listEdge = response.connections?.map((edge: any) => {
+			flowDispatch(setNodesContext(listNode));
+			const listEdge: Edge[] = response.connections?.map((edge: IEdge) => {
 				return {
+					id: edge.id ?? '',
 					source: edge.sourceNodeId,
-					target: edge.targetNodeId
+					target: edge.targetNodeId,
+					sourceHandle: edge.sourceHandleId ?? '',
+					targetHandle: edge.targetHandleId ?? ''
 				};
 			});
-			setEdges(listEdge);
+			flowDispatch(setEdgesContext(listEdge));
 		};
 		getDetailFlow();
-	}, [flowId]);
-
+	}, [flowId, flowDispatch]);
 	useEffect(() => {
 		// handle delete node when press delete key
 		const onKeyUp = (event: KeyboardEvent) => {
@@ -287,7 +295,7 @@ const Flow = () => {
 				if (selectedNodes.length) {
 					selectedNodes.forEach((node) => {
 						const nodeId = node.id;
-						handleDeleteNode(nodeId);
+						flowDispatch(deleteNode(nodeId));
 					});
 				}
 			}
@@ -296,7 +304,8 @@ const Flow = () => {
 		return () => {
 			document.removeEventListener('keyup', onKeyUp);
 		};
-	}, [nodes, edges, handleDeleteNode]);
+	}, [nodes, edges, flowDispatch]);
+
 	return (
 		<div
 			ref={reactFlowWrapper}
@@ -312,7 +321,7 @@ const Flow = () => {
 							<Icons.LeftArrowIcon className="w-full" />
 						</button>
 						<div className="flex items-center text-[24px] font-semibold ml-[20px] pl-[10px] border-l-[1px] border-l-gray-300">
-							<span>{flowData?.flowName ?? 'Initial Flow'}</span>
+							<span>{flowData?.flowName ?? 'Untitle Flow'}</span>
 							<button
 								onClick={() => setOpenModalSaveFlow(true)}
 								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500"
@@ -329,7 +338,7 @@ const Flow = () => {
 							<Icons.IconTick />
 						</button>
 						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
-							<Icons.SettingProfile className="w-4 h-4" />
+							<Icons.DeleteMessageRightClick />
 						</button>
 					</div>
 				</div>
@@ -337,9 +346,9 @@ const Flow = () => {
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
-				nodeTypes={nodeTypes}
-				onNodesChange={onNodesChange}
-				onEdgesChange={onEdgesChange}
+				nodeTypes={listNodeType}
+				onNodesChange={onChangeNode}
+				onEdgesChange={onChangeEdge}
 				onConnect={onConnect}
 				onDrop={onDrop}
 				onDragOver={onDragOver}
@@ -350,7 +359,7 @@ const Flow = () => {
 				colorMode="light"
 			>
 				<Panel position="top-left">
-					<Popover content={<AddNodeMenuPopup onChangeNodeType={handleChangeNodeType} />} trigger="click">
+					<Popover content={<AddNodeMenuPopup />} trigger="click">
 						<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
 							<Icons.AddIcon className="w-6 h-6" />
 						</button>
@@ -378,48 +387,3 @@ const Flow = () => {
 	);
 };
 export default Flow;
-
-// const nod = {
-// 	"id": "",
-// 	"connections": [
-// 			{
-// 					"sourceNodeId": "commandOutput_2f177c16-f3e6-4850-9251-2a92660de6d0"
-// 			}
-// 	],
-// 	"description": "test command",
-// 	"flowName": "test command",
-// 	"isActive": true,
-// 	"nodes": [
-// 			{
-// 				"id": "commandInput_89c7eef7-3004-47c4-b8a8-e55933694de9",
-// 				"nodeType": "commandInput",
-// 				"nodeName":"commandInput",
-// 				"position":{"x":-36, "y":-20},
-// 				"measured":{"width":250,"height":340},
-// 				"parameters":[
-// 					{
-// 						"parameterKey":"commandName",
-// 						"parameterValue":"xin chao"
-// 					},
-// 					{
-// 						"parameterKey":"commandCode",
-// 						"parameterValue":"hello"
-// 					}
-// 				]
-// 			},
-// 			{
-// 				"id":"commandOutput_2f177c16-f3e6-4850-9251-2a92660de6d0",
-// 				"nodeType":"commandOutput",
-// 				"nodeName":"commandOutput",
-// 				"position":{"x":268, "y":-27},
-// 				"measured":{"width":250, "height":271},
-// 				"parameters":[
-// 					{
-// 						"parameterKey":"commandName",
-// 						"parameterValue":"hi"
-// 					}
-// 				]
-// 			}
-// 	],
-// 	"userId": "1831890355411226624"
-// }

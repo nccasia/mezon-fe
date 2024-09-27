@@ -20,11 +20,12 @@ import {
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAllUserClans,
+	selectHasInternetMobile,
 	selectIdMessageToJump,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -38,11 +39,13 @@ import { clansActions, setSelectedMessage } from '@mezon/store';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
+import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -85,12 +88,15 @@ const MessageItem = React.memo(
 		const message: MessagesEntity = props?.message;
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const navigation = useNavigation<any>();
+		const [showHighlightReply, setShowHighlightReply] = useState(false);
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
 		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
+		const timeoutRef = useRef<NodeJS.Timeout>(null);
+		const hasInternet = useSelector(selectHasInternetMobile);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 		const hasIncludeMention = useMemo(() => {
@@ -114,10 +120,6 @@ const MessageItem = React.memo(
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
-
-		const checkMessageTargetToMoved = useMemo(() => {
-			return idMessageToJump === message?.id;
-		}, [idMessageToJump, message?.id]);
 
 		const isMessageReplyDeleted = useMemo(() => {
 			return !messageReferences && message?.references && message?.references?.length;
@@ -144,13 +146,40 @@ const MessageItem = React.memo(
 
 		const isOnlyContainEmoji = useMemo(() => {
 			return isValidEmojiData(message.content);
-		}, [message.content, message.mentions]);
+		}, [message.content]);
+
+		const isEdited = useMemo(() => {
+			if (message?.update_time) {
+				const updateDate = new Date(message?.update_time);
+				const createDate = new Date(message?.create_time);
+				return updateDate > createDate;
+			} else if (message.hideEditted === false && !!message?.content?.t) {
+				return true;
+			}
+			return false;
+		}, [message?.update_time, message.hideEditted, message?.content?.t, message?.create_time]);
 
 		useEffect(() => {
 			if (props?.messageId) {
 				markMessageAsSeen(message);
 			}
 		}, [markMessageAsSeen, message, props.messageId]);
+
+		useEffect(() => {
+			if (idMessageToJump === message?.id) {
+				setShowHighlightReply(true);
+				timeoutRef.current = setTimeout(() => {
+					setShowHighlightReply(false);
+					dispatch(messagesActions.setIdMessageToJump(null));
+				}, 3000);
+			} else {
+				setShowHighlightReply(false);
+				timeoutRef.current && clearTimeout(timeoutRef.current);
+			}
+			return () => {
+				timeoutRef.current && clearTimeout(timeoutRef.current);
+			};
+		}, [idMessageToJump]);
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -164,25 +193,17 @@ const MessageItem = React.memo(
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
-		const onPressAvatar = useCallback(() => {
-			if (preventAction) return;
-			setIsOnlyEmojiPicker(false);
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
-		}, [preventAction, setIsOnlyEmojiPicker, onMessageAction, message]);
-
 		const onPressInfoUser = useCallback(() => {
 			if (preventAction) return;
 			setIsOnlyEmojiPicker(false);
 
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
+			if (!checkAnonymous) {
+				onMessageAction({
+					type: EMessageBSToShow.UserInformation,
+					user: message?.user,
+					message
+				});
+			}
 		}, [message, onMessageAction, preventAction, setIsOnlyEmojiPicker]);
 
 		const onMention = useCallback(
@@ -214,7 +235,6 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
@@ -338,7 +358,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageMention,
-						checkMessageTargetToMoved && styles.highlightMessageReply
+						showHighlightReply && styles.highlightMessageReply
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (
@@ -363,7 +383,7 @@ const MessageItem = React.memo(
 					) : null}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						<AvatarMessage
-							onPress={onPressAvatar}
+							onPress={onPressInfoUser}
 							id={message?.user?.id}
 							avatar={messageAvatar}
 							username={usernameMessage}
@@ -392,14 +412,14 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							<Block opacity={message.isError ? 0.6 : 1}>
+							<Block opacity={message.isError || (message.isSending && !hasInternet) ? 0.6 : 1}>
 								<RenderTextMarkdownContent
 									content={{
 										...(typeof message.content === 'object' ? message.content : {}),
 										mentions: message.mentions,
 										...(checkOneLinkImage ? { t: '' } : {})
 									}}
-									isEdited={message.hideEditted === false && !!message?.content?.t}
+									isEdited={isEdited}
 									translate={t}
 									onMention={onMention}
 									onChannelMention={onChannelMention}
@@ -431,7 +451,13 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				{/*<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />*/}
+				<NewMessageRedLine
+					channelId={props?.channelId}
+					messageId={props?.messageId}
+					isEdited={message?.hideEditted}
+					isSending={message?.isSending}
+					isMe={message?.isMe}
+				/>
 			</Animated.View>
 		);
 	},

@@ -96,7 +96,7 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 								flex: 1,
 								paddingVertical: size.s_8,
 								borderRadius: size.s_16,
-								backgroundColor: isActive ? themeValue.secondaryLight : themeValue.tertiary
+								backgroundColor: isActive ? themeValue.bgViolet : themeValue.tertiary
 							}}
 						>
 							<Text center color={isActive ? Colors.white : themeValue.text} h5>
