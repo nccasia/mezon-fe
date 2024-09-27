@@ -119,7 +119,21 @@ const Flow = () => {
 		// reset flow data when click back button
 		flowDispatch(setNodesContext([]));
 		flowDispatch(setEdgesContext([]));
-		navigate(-1);
+		navigate(`/applications/${applicationId}/flow`);
+	};
+	const handleClickDeleteButton = async () => {
+		if (!flowId) {
+			toast.info('Flow has not been created yet');
+			return;
+		}
+		try {
+			const response = await flowService.deleteFlow(flowId);
+			console.log(response);
+			toast.success('Delete flow success');
+			navigate(`/applications/${applicationId}/flow`);
+		} catch {
+			toast.error('Delete flow failed');
+		}
 	};
 
 	const handleClickSaveFlow = async () => {
@@ -203,8 +217,10 @@ const Flow = () => {
 
 		const flowDataSave: IFlowDataRequest = {
 			referralId: userProfile?.user?.id,
-			applicationId: applicationId ?? '',
-			applicationToken: appDetail?.token ?? '',
+			// applicationId: applicationId ?? '',
+			// applicationToken: appDetail?.token ?? '',
+			applicationId: '1838774261079085056',
+			applicationToken: '7448444f33734352412d617265754f6a',
 			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
@@ -212,7 +228,15 @@ const Flow = () => {
 			connections: listEdgeInFlow,
 			nodes: listNodeInFlow
 		};
-		console.log(flowDataSave);
+
+		if (!flowDataSave.nodes.length) {
+			toast.error('Flow must have at least one node');
+			return;
+		}
+		if (!flowDataSave.connections.length) {
+			toast.error('Flow must have at least one connection');
+			return;
+		}
 
 		try {
 			if (flowId) {
@@ -241,49 +265,53 @@ const Flow = () => {
 
 		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
-			const response: IFlowDetail = await flowService.getFlowDetail(flowId);
-			setFlowData({
-				flowName: response?.flowName,
-				description: response?.description
-			});
-			console.log(response);
-			const listNode = response.nodes?.map((node: INode) => {
-				const params: {
-					[key: string]: string;
-				} = {};
-				node?.parameters?.forEach((param: IParameter) => {
-					let value = param.parameterValue;
-					try {
-						value = JSON.parse(param.parameterValue);
-					} catch {
-						value = param.parameterValue;
-					}
-					params[param.parameterKey] = value;
+			try {
+				const response: IFlowDetail = await flowService.getFlowDetail(flowId);
+				setFlowData({
+					flowName: response?.flowName,
+					description: response?.description
 				});
-				return {
-					id: node.id,
-					type: node.nodeType,
-					nodeName: node.nodeName,
-					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
-					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
-					data: {
-						label: node.nodeName,
+				console.log(response);
+				const listNode = response.nodes?.map((node: INode) => {
+					const params: {
+						[key: string]: string;
+					} = {};
+					node?.parameters?.forEach((param: IParameter) => {
+						let value = param.parameterValue;
+						try {
+							value = JSON.parse(param.parameterValue);
+						} catch {
+							value = param.parameterValue;
+						}
+						params[param.parameterKey] = value;
+					});
+					return {
 						id: node.id,
-						defaultValue: params
-					}
-				};
-			});
-			flowDispatch(setNodesContext(listNode));
-			const listEdge: Edge[] = response.connections?.map((edge: IEdge) => {
-				return {
-					id: edge.id ?? '',
-					source: edge.sourceNodeId,
-					target: edge.targetNodeId,
-					sourceHandle: edge.sourceHandleId ?? '',
-					targetHandle: edge.targetHandleId ?? ''
-				};
-			});
-			flowDispatch(setEdgesContext(listEdge));
+						type: node.nodeType,
+						nodeName: node.nodeName,
+						measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
+						position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
+						data: {
+							label: node.nodeName,
+							id: node.id,
+							defaultValue: params
+						}
+					};
+				});
+				flowDispatch(setNodesContext(listNode));
+				const listEdge: Edge[] = response.connections?.map((edge: IEdge) => {
+					return {
+						id: edge.id ?? '',
+						source: edge.sourceNodeId,
+						target: edge.targetNodeId,
+						sourceHandle: edge.sourceHandleId ?? '',
+						targetHandle: edge.targetHandleId ?? ''
+					};
+				});
+				flowDispatch(setEdgesContext(listEdge));
+			} catch (error) {
+				toast.error('Get flow detail failed');
+			}
 		};
 		getDetailFlow();
 	}, [flowId, flowDispatch]);
@@ -324,7 +352,7 @@ const Flow = () => {
 							<span>{flowData?.flowName ?? 'Untitle Flow'}</span>
 							<button
 								onClick={() => setOpenModalSaveFlow(true)}
-								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500"
+								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500 "
 							>
 								<Icons.PenEdit />
 							</button>
@@ -337,7 +365,11 @@ const Flow = () => {
 						>
 							<Icons.IconTick />
 						</button>
-						<button className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200">
+						<button
+							disabled={!flowId}
+							onClick={handleClickDeleteButton}
+							className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+						>
 							<Icons.DeleteMessageRightClick />
 						</button>
 					</div>

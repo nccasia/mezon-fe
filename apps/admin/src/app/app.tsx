@@ -30,7 +30,9 @@ const AppInitializer = () => {
 	const isLogin = useSelector(selectIsLogin);
 	if (isElectron()) {
 		if (isLogin) {
-			electronBridge?.initListeners();
+			electronBridge?.initListeners(() => {
+				console.log('Shortcut triggered');
+			});
 		} else {
 			electronBridge?.removeAllListeners();
 		}

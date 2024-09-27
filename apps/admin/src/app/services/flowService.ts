@@ -38,10 +38,30 @@ const updateFlow = async (dataUpdate: IFlowDataRequest): Promise<IFlowDetail> =>
 	}
 };
 
+const deleteFlow = async (flowId: string): Promise<any> => {
+	try {
+		const response = await apiInstance.delete(`/flow/delete?flowId=${flowId}`);
+		return response;
+	} catch (error) {
+		throw (error as any).response.data;
+	}
+};
+
+const executionFlow = async (flowId: string, input: string): Promise<any> => {
+	try {
+		const response = await apiInstance.post(`/flow/execution`, { flowId, input });
+		return response;
+	} catch (error) {
+		throw (error as any).response.data;
+	}
+};
+
 const flowService = {
 	getAllFlows,
 	getFlowDetail,
 	createNewFlow,
-	updateFlow
+	updateFlow,
+	deleteFlow,
+	executionFlow
 };
 export default flowService;
