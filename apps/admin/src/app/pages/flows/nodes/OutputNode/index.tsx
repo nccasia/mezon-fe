@@ -5,8 +5,8 @@ import Ajv, { JSONSchemaType } from 'ajv';
 import React, { useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
 import { AutoForm, SubmitField } from 'uniforms-semantic';
-import MultiImageUploadField from '../../../../components/ImageUploadField';
 import CustomTextField from '../../../../components/InputField/CustomTextField';
+import MultiImageUploadField from '../../../../components/MultiImageUploadField';
 
 type FormData = {
 	commandName: string;
