@@ -160,7 +160,7 @@ const PanelMember = ({
 
 	const isShowManageMember =
 		(isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
-
+	console.log(isOwnerChannel, hasAdministratorPermission, hasClanPermission, !hasAdminRole, !isOwnerClan, !isSelf, isMemberChannel);
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);

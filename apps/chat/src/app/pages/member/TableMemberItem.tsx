@@ -1,10 +1,22 @@
 import { AvatarImage } from '@mezon/components';
-import { useClanRestriction, useMemberContext, useRoles } from '@mezon/core';
-import { RolesClanEntity, selectRolesClanEntities, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
+import { useChannelMembersActions, useClanRestriction, useMemberContext, useOnClickOutside, useRoles } from '@mezon/core';
+import {
+	RolesClanEntity,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectRolesClanEntities,
+	selectTheme,
+	useAppDispatch,
+	usersClanActions
+} from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
-import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
+import { ChannelMembersEntity, EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useMemo } from 'react';
+import { Coords } from 'libs/components/src/lib/components/ChannelLink';
+import ModalRemoveMemberClan from 'libs/components/src/lib/components/MemberProfile/ModalRemoveMemberClan';
+import PanelMember from 'libs/components/src/lib/components/PanelMember';
+import { MouseEvent, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import RoleNameCard from './RoleNameCard';
 
@@ -44,84 +56,142 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
+	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const itemRef = useRef<HTMLDivElement>(null);
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0
+	});
 
+	const [openPanelMember, closePanelMember] = useModal(() => {
+		const member: ChannelMembersEntity = {
+			id: userId,
+			user_id: userId,
+			user: {
+				username: username,
+				id: userId
+			}
+		};
+		return (
+			<PanelMember coords={coords} onClose={closePanelMember} onRemoveMember={handleClickRemoveMember} isMemberChannel={true} member={member} />
+		);
+	}, [coords]);
+
+	const handleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
+		setCoords({
+			mouseX: e.clientX,
+			mouseY: e.clientY,
+			distanceToBottom: window.innerHeight - e.clientY
+		});
+		openPanelMember();
+	};
+
+	useOnClickOutside(itemRef, closePanelMember);
+
+	const handleClickRemoveMember = () => {
+		setOpenModalRemoveMember(true);
+	};
+	const { removeMemberClan } = useChannelMembersActions();
+
+	const handleRemoveMember = async () => {
+		await removeMemberClan({ clanId: currentClanId as string, channelId: currentChannelId as string, userIds: [userId] });
+
+		setOpenModalRemoveMember(false);
+	};
 	return (
-		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
-			<div className="flex-3 p-1">
-				<div className="flex flex-row gap-2 items-center">
-					<AvatarImage alt={username} userName={username} className="min-w-9 min-h-9 max-w-9 max-h-9" src={avatar} />
-					<div className="flex flex-col">
-						<p className="text-base font-medium">{HighlightMatchBold(displayName, searchQuery)}</p>
-						<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{HighlightMatchBold(username, searchQuery)}</p>
+		<>
+			<div
+				className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0"
+				onContextMenu={handleContextMenu}
+				ref={itemRef}
+			>
+				<div className="flex-3 p-1">
+					<div className="flex flex-row gap-2 items-center">
+						<AvatarImage alt={username} userName={username} className="min-w-9 min-h-9 max-w-9 max-h-9" src={avatar} />
+						<div className="flex flex-col">
+							<p className="text-base font-medium">{HighlightMatchBold(displayName, searchQuery)}</p>
+							<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{HighlightMatchBold(username, searchQuery)}</p>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex-1 p-1 text-center">
-				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{clanJoinTime ?? '-'}</span>
-			</div>
-			<div className="flex-1 p-1 text-center">
-				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
-					{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}
-				</span>
-			</div>
-			<div className="flex-1 p-1 text-center">
-				<span className={'inline-flex items-center'}>
-					{userRolesClan?.length ? (
-						<>
-							<RoleNameCard roleName={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''} />
-							{userRolesClan.length > 1 && (
-								<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
-									<Tooltip
-										content={
-											<div className={'flex flex-col items-start'}>
-												{Object.keys(userRolesClan.usersRole)
-													.slice(1)
-													.map((userRole) => (
-														<div className={'my-0.5'} key={rolesClanEntity[`${userRole}`].id}>
-															<RoleNameCard roleName={rolesClanEntity[`${userRole}`].title || ''} />
-														</div>
-													))}
-											</div>
-										}
-										trigger={'hover'}
-										style={appearanceTheme === 'light' ? 'light' : 'dark'}
-										className="dark:!text-white !text-black"
-									>
-										<span className="text-xs font-medium px-1 cursor-pointer" style={{ lineHeight: '15px' }}>
-											+{userRolesClan.length - 1}
-										</span>
-									</Tooltip>
-								</span>
-							)}
-						</>
-					) : (
-						'-'
-					)}
-					{hasPermissionEditRole && (
-						<Tooltip
-							content={
-								<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-									<div className="flex flex-col gap-1 max-w-72">
-										{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+				<div className="flex-1 p-1 text-center">
+					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{clanJoinTime ?? '-'}</span>
+				</div>
+				<div className="flex-1 p-1 text-center">
+					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
+						{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}
+					</span>
+				</div>
+				<div className="flex-1 p-1 text-center">
+					<span className={'inline-flex items-center'}>
+						{userRolesClan?.length ? (
+							<>
+								<RoleNameCard roleName={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''} />
+								{userRolesClan.length > 1 && (
+									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+										<Tooltip
+											content={
+												<div className={'flex flex-col items-start'}>
+													{Object.keys(userRolesClan.usersRole)
+														.slice(1)
+														.map((userRole) => (
+															<div className={'my-0.5'} key={rolesClanEntity[`${userRole}`].id}>
+																<RoleNameCard roleName={rolesClanEntity[`${userRole}`].title || ''} />
+															</div>
+														))}
+												</div>
+											}
+											trigger={'hover'}
+											style={appearanceTheme === 'light' ? 'light' : 'dark'}
+											className="dark:!text-white !text-black"
+										>
+											<span className="text-xs font-medium px-1 cursor-pointer" style={{ lineHeight: '15px' }}>
+												+{userRolesClan.length - 1}
+											</span>
+										</Tooltip>
+									</span>
+								)}
+							</>
+						) : (
+							'-'
+						)}
+						{hasPermissionEditRole && (
+							<Tooltip
+								content={
+									<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+										<div className="flex flex-col gap-1 max-w-72">
+											{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+										</div>
 									</div>
-								</div>
-							}
-							trigger="click"
-							arrow={false}
-						>
-							<Tooltip content="Add Role">
-								<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
-									+
-								</span>
+								}
+								trigger="click"
+								arrow={false}
+							>
+								<Tooltip content="Add Role">
+									<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
+										+
+									</span>
+								</Tooltip>
 							</Tooltip>
-						</Tooltip>
-					)}
-				</span>
+						)}
+					</span>
+				</div>
+				<div className="flex-3 p-1 text-center">
+					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Signals</span>
+				</div>
 			</div>
-			<div className="flex-3 p-1 text-center">
-				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Signals</span>
-			</div>
-		</div>
+			{openModalRemoveMember && (
+				<ModalRemoveMemberClan
+					openModal={openModalRemoveMember}
+					username={username}
+					onClose={() => setOpenModalRemoveMember(false)}
+					onRemoveMember={handleRemoveMember}
+				/>
+			)}
+		</>
 	);
 };
 
