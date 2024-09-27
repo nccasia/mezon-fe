@@ -108,15 +108,15 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			lineHeight: size.s_17
 		},
 		iconEmojiInMessage: {
-			width: size.s_20,
-			height: size.s_20
+			width: isLastMessage ? size.s_14 : size.s_20,
+			height: isLastMessage ? size.s_14 : size.s_20
 		},
 		onlyIconEmojiInMessage: {
 			width: size.s_40,
 			height: size.s_40
 		},
 		emojiInMessageContain: {
-			height: size.s_16,
+			height: isLastMessage ? size.s_14 : size.s_16,
 			width: size.s_20
 		},
 		editedText: {
@@ -328,7 +328,7 @@ export const formatUrls = (text: string) => {
 		.join('');
 };
 
-export const formatBlockCode = (text: string, isMessageReply: boolean) => {
+export const formatBlockCode = (text: string, isMessageReply: boolean, isLastMessage = false) => {
 	const matchesUrls = text?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
 
 	if (matchesUrls) {
@@ -336,6 +336,11 @@ export const formatBlockCode = (text: string, isMessageReply: boolean) => {
 	}
 
 	const addNewlinesToCodeBlock = (block) => {
+		if (isLastMessage) {
+			block = block.replace(/```|\n/g, '').trim();
+			return '\n' + block + '\n';
+		}
+
 		if (isMessageReply) {
 			block = block.replace(/```|\n/g, '').trim();
 			block = '`' + block + '`';
@@ -468,7 +473,10 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				style={{
+					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}),
+					...customStyle
+				}}
 				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {
@@ -500,7 +508,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{formatBlockCode(contentRender?.trim(), isMessageReply)}
+				{formatBlockCode(contentRender?.trim(), isMessageReply, isLastMessage)}
 			</Markdown>
 		);
 
@@ -508,7 +516,7 @@ export const RenderTextMarkdownContent = React.memo(
 			<View
 				style={{
 					flex: 1,
-					maxHeight: isMessageReply ? size.s_17 : size.s_20 * 10 - size.s_10,
+					maxHeight: isMessageReply ? size.s_17 : isLastMessage ? size.s_17 : size.s_20 * 10 - size.s_10,
 					overflow: 'hidden'
 				}}
 			>

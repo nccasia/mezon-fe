@@ -25,7 +25,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	const { t } = useTranslation('message');
 	const userStatus = directMessage?.is_online?.some(Boolean);
 	const isTabletLandscape = useTabletLandscape();
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId)
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
 
 	const redirectToMessageDetail = async () => {
@@ -74,7 +74,8 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 		return (
 			<View style={styles.contentMessage}>
 				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnread ? themeValue.white : themeValue.text }]}>
-					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}{': '}
+					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
+					{': '}
 				</Text>
 				{!!content && (
 					<RenderTextMarkdownContent
@@ -83,6 +84,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
 						isUnReadChannel={isUnread}
 						isLastMessage={true}
+						isNumberOfLine={true}
 					/>
 				)}
 			</View>
@@ -98,14 +100,16 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity 
-			style={[styles.messageItem, 
-					currentDmGroupId === directMessage?.id && 
-						{ backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary, 
-							borderColor: themeValue.borderHighlight, 
-							borderWidth: 1 }
-				]} 
-			onPress={() => redirectToMessageDetail()} 
+		<TouchableOpacity
+			style={[
+				styles.messageItem,
+				currentDmGroupId === directMessage?.id && {
+					backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
+					borderColor: themeValue.borderHighlight,
+					borderWidth: 1
+				}
+			]}
+			onPress={() => redirectToMessageDetail()}
 			onLongPress={onLongPress}
 		>
 			{isTypeDMGroup ? (
