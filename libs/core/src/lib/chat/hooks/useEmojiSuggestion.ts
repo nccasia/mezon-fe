@@ -63,8 +63,8 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		if (isMobile) {
 			fetchRecentEmojis();
 		} else {
-			const emojiRecentStorage = localStorage.getItem('recentEmojis')
-			setEmojiRecentData(emojiRecentStorage)
+			const emojiRecentStorage = localStorage.getItem('recentEmojis');
+			setEmojiRecentData(emojiRecentStorage);
 		}
 	}, []);
 
@@ -120,7 +120,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		[dispatch]
 	);
 
-	const categoriesEmoji = ['Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoriesEmoji = ['Recent', 'Frequency', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	const categoryEmoji = emojiMetadata
 		.map((emoji) => ({
 			id: emoji.clan_id,
@@ -129,7 +129,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		}))
 		.filter((emoji, index, self) => emoji.id !== '0' && index === self.findIndex((s) => s.id === emoji.id));
 	const clanNames = categoryEmoji.map((emoji) => emoji.clan_name || '');
-	categoriesEmoji.splice(1, 0, ...clanNames);
+	categoriesEmoji.splice(2, 0, ...clanNames);
 
 	return useMemo(
 		() => ({

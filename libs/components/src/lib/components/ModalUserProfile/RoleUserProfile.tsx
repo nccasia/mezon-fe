@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
+import { usePermissionChecker, useRoles, UserRestrictionZone } from '@mezon/core';
 import {
 	RolesClanEntity,
 	selectAllRolesClan,
@@ -33,9 +33,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
+	const [hasPermissionEditRole] = usePermissionChecker([EPermission.manageClan]);
 	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
 		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
 		return !isRoleInUserRoles;

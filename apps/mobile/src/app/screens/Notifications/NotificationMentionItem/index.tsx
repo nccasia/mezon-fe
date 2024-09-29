@@ -49,7 +49,7 @@ function parseObject(obj: any) {
 		mentions,
 		reactions,
 		references,
-		content,
+		content
 	};
 	return parsedObj;
 }

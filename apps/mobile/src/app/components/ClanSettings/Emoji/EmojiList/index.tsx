@@ -1,7 +1,8 @@
 import { DEFAULT_MAX_EMOJI_SLOTS } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { FlashList } from '@shopify/flash-list';
 import { ClanEmoji } from 'mezon-js';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import EmojiDetail from '../EmojiDetail';
@@ -28,13 +29,18 @@ const EmojiList = ({ emojiList }: EmojiListProps) => {
 		prevOpenedRow = row[parseInt(id)];
 	};
 
+	const handleSwipe = useCallback((item: ClanEmoji) => {
+		closeRow(item.id);
+	}, []);
+
+	const renderItem = ({ item }) => {
+		return <EmojiDetail item={item} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={handleSwipe} />;
+	};
+
 	return (
 		<View>
 			<Text style={styles.emojiSlotsTitle}>{t('emojiList.slotsDetails', { slots })}</Text>
-			{emojiList.length > 0 &&
-				emojiList.map((item) => (
-					<EmojiDetail item={item} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={() => closeRow(item.id)} />
-				))}
+			<FlashList data={emojiList} keyExtractor={(item) => item.id} renderItem={renderItem} />
 		</View>
 	);
 };

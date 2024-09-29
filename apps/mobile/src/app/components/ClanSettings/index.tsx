@@ -10,9 +10,10 @@ import { style } from './styles';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.SETTINGS;
 
-export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
+export default function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSettingsScreen>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { inviteRef } = route?.params || {};
 	const { t } = useTranslation(['clanSetting']);
 	const { isCanEditRole } = useUserPermission();
 
@@ -21,7 +22,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			<Pressable style={{ padding: 20 }} onPress={handleClose}>
 				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
 			</Pressable>
-		),
+		)
 	});
 
 	function handleClose() {
@@ -35,7 +36,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 				navigation.navigate(APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING);
 			},
 			expandable: true,
-			icon: <Icons.CircleInformationIcon color={themeValue.text} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.text} />
 		},
 		// {
 		// 	title: t('menu.settings.moderation'),
@@ -67,7 +68,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 				navigation.navigate(APP_SCREEN.MENU_CLAN.EMOJI_SETTING);
 			},
 			expandable: true,
-			icon: <Icons.ReactionIcon color={themeValue.text} />,
+			icon: <Icons.ReactionIcon color={themeValue.text} />
 		},
 		{
 			title: t('menu.settings.sticker'),
@@ -75,14 +76,14 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STICKER_SETTING);
 			},
 			expandable: true,
-			icon: <Icons.Sticker color={themeValue.text} />,
+			icon: <Icons.Sticker color={themeValue.text} />
 		},
 		{
 			title: t('menu.settings.webhooks'),
 			onPress: () => reserve(),
 			expandable: true,
-			icon: <Icons.WebhookIcon color={themeValue.text} />,
-		},
+			icon: <Icons.WebhookIcon color={themeValue.text} />
+		}
 		// {
 		// 	title: t('menu.settings.security'),
 		// 	onPress: () => reserve(),
@@ -96,8 +97,8 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			title: t('menu.community.enableCommunity'),
 			onPress: () => reserve(),
 			expandable: true,
-			icon: <Icons.TreeHouseIcon color={themeValue.text} />,
-		},
+			icon: <Icons.TreeHouseIcon color={themeValue.text} />
+		}
 	];
 
 	const subscriptionMenu: IMezonMenuItemProps[] = [
@@ -105,8 +106,8 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			title: t('menu.subscriptions.getStarted'),
 			onPress: () => reserve(),
 			expandable: true,
-			icon: <Icons.ShopSparkleIcon color={themeValue.text} />,
-		},
+			icon: <Icons.ShopSparkleIcon color={themeValue.text} />
+		}
 	];
 
 	const userManagementMenu: IMezonMenuItemProps[] = [
@@ -116,7 +117,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 				navigation.navigate(APP_SCREEN.MENU_CLAN.MEMBER_SETTING);
 			},
 			expandable: true,
-			icon: <Icons.GroupIcon color={themeValue.text} />,
+			icon: <Icons.GroupIcon color={themeValue.text} />
 		},
 		{
 			title: t('menu.userManagement.role'),
@@ -125,26 +126,26 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			},
 			expandable: true,
 			icon: <Icons.ShieldUserIcon color={themeValue.text} />,
-			isShow: isCanEditRole,
+			isShow: isCanEditRole
 		},
 		{
 			title: t('menu.userManagement.invite'),
-			onPress: () => reserve(),
+			onPress: () => inviteRef?.current?.present(),
 			expandable: true,
-			icon: <Icons.LinkIcon color={themeValue.text} />,
+			icon: <Icons.LinkIcon color={themeValue.text} />
 		},
 		{
 			title: t('menu.userManagement.bans'),
 			onPress: () => reserve(),
 			expandable: true,
-			icon: <Icons.HammerIcon color={themeValue.text} />,
-		},
+			icon: <Icons.HammerIcon color={themeValue.text} />
+		}
 	];
 
 	const menu: IMezonMenuSectionProps[] = [
 		{
 			title: t('menu.settings.title'),
-			items: settingsMenu,
+			items: settingsMenu
 		},
 		// {
 		// 	title: t('menu.community.title'),
@@ -156,15 +157,13 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 		// },
 		{
 			title: t('menu.userManagement.title'),
-			items: userManagementMenu,
-		},
+			items: userManagementMenu
+		}
 	];
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary}>
-			<ScrollView
-				contentContainerStyle={styles.container}
-				style={{ flex: 1, backgroundColor: themeValue.primary }}>
+			<ScrollView contentContainerStyle={styles.container} style={{ flex: 1, backgroundColor: themeValue.primary }}>
 				<LogoClanSelector />
 				<MezonMenu menu={menu} />
 			</ScrollView>

@@ -26,6 +26,7 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
@@ -43,11 +44,13 @@ import { notificationSettingReducer } from './notificationSetting/notificationSe
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
+import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { channelsStreamReducer } from './stream/channelsStream.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
+import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
@@ -73,7 +76,8 @@ const persistedClansReducer = persistReducer(
 const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
-		storage
+		storage,
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile']
 	},
 	appReducer
 );
@@ -262,6 +266,22 @@ const persistedsettingClanStickerReducer = persistReducer(
 	settingStickerReducer
 );
 
+const persistednotificationReducer = persistReducer(
+	{
+		key: 'notification',
+		storage
+	},
+	notificationReducer
+);
+
+const persisteduserChannelsReducer = persistReducer(
+	{
+		key: 'allUsersByAddChannel',
+		storage
+	},
+	userChannelsReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -271,6 +291,7 @@ const reducer = {
 	channels: persistedChannelReducer,
 	channelmeta: persistedChannelMetaReducer,
 	settingSticker: persistedsettingClanStickerReducer,
+	allUsersByAddChannel: persisteduserChannelsReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
@@ -289,6 +310,7 @@ const reducer = {
 	directmeta: directMetaReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
+	[OVERRIDDEN_POLICIES_FEATURE_KEY]: overriddenPoliciesReducer,
 	notificationsetting: notificationSettingReducer,
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: persistedDefaultNotiClanReducer,
@@ -299,10 +321,11 @@ const reducer = {
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
-	notification: notificationReducer,
+	notification: persistednotificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
+	videostream: videoStreamReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

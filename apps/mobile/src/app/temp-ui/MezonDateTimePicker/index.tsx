@@ -1,6 +1,6 @@
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Icons, getNearTime } from '@mezon/mobile-components';
-import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
@@ -16,6 +16,7 @@ type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, 'onPress' | 'postfixIcon' |
 	keepTime?: boolean;
 	need24HourFormat?: { is24hourSource: 'locale' | 'device' };
 	needLocale?: { locale: string };
+	error?: string;
 };
 
 export default memo(function MezonDateTimePicker({
@@ -25,6 +26,7 @@ export default memo(function MezonDateTimePicker({
 	keepTime,
 	need24HourFormat,
 	needLocale,
+	error,
 	...props
 }: IMezonDateTimePicker) {
 	const { themeValue, themeBasic } = useTheme();
@@ -42,15 +44,19 @@ export default memo(function MezonDateTimePicker({
 	const handleChange = useCallback(() => {
 		if (keepTime && !isModeTime && value) {
 			const new_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), value.getHours(), value.getMinutes(), value.getSeconds());
-
 			setCurrentDate(new_date);
 			onChange && onChange(new_date);
 		} else {
 			setCurrentDate(date);
 			onChange && onChange(date);
 		}
-		bottomSheetRef?.current?.dismiss();
-	}, [keepTime, mode, value, date]);
+	}, [keepTime, mode, value, date, error]);
+
+	useEffect(() => {
+		if (!error) {
+			handleClose();
+		}
+	}, [error, value]);
 
 	function handleClose() {
 		bottomSheetRef?.current?.dismiss();
@@ -59,6 +65,13 @@ export default memo(function MezonDateTimePicker({
 	function handlePress() {
 		bottomSheetRef?.current?.present();
 	}
+
+	const formatDate = (date) => {
+		const day = String(date.getDate()).padStart(2, '0');
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const year = date.getFullYear();
+		return `${day}/${month}/${year}`;
+	};
 
 	return (
 		<View>
@@ -95,6 +108,12 @@ export default memo(function MezonDateTimePicker({
 					</TouchableOpacity>
 				}
 			>
+				{error && (
+					<Block backgroundColor={Colors.textRed} marginHorizontal={size.s_20} padding={size.s_10} borderRadius={size.s_8}>
+						<Text style={styles.textError}>{error}</Text>
+						{<Text style={styles.textError}>{formatDate(new Date())}</Text>}
+					</Block>
+				)}
 				<View style={styles.bsContainer}>
 					<DatePicker
 						{...(need24HourFormat && isModeTime ? need24HourFormat : {})}

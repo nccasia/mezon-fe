@@ -1,4 +1,4 @@
-import { useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useAuth, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -15,7 +15,7 @@ import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
@@ -76,11 +76,15 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
+	const myProfile = useAuth();
+	const isMe = useMemo(() => {
+		return userId === myProfile.userId;
+	}, [myProfile.userId, userId]);
+
 	return (
 		<>
 			<button
-				className={`flex items-center justify-between border-t
-			 dark:border-borderDefault border-white px-4 py-2 font-title text-[15px]
+				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
@@ -93,12 +97,12 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
-							status={status}
+							status={isMe ? true : status}
 							avatar={avatar}
 							isHideStatus={false}
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
-							customStatus={userCustomStatus || userStatusProfile}
+							customStatus={userCustomStatus}
 						/>
 					</div>
 					{showModalFooterProfile && (
@@ -109,17 +113,19 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-						<Icons.SettingProfile
-							className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton"
+						<div
 							onClick={openSetting}
-						/>
+							className="ml-auto p-1 opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hover:rounded-md"
+						>
+							<Icons.SettingProfile className="w-5 h-5" />
+						</div>
 					</Tooltip>
 				</div>
 			</button>
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}
-					customStatus={userCustomStatus || userStatusProfile}
+					customStatus={userCustomStatus || ''}
 					handleSaveCustomStatus={handleSaveCustomStatus}
 					name={name}
 					openModal={showModalCustomStatus}

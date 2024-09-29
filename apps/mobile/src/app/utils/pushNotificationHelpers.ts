@@ -1,5 +1,4 @@
 import {
-	ActionEmitEvent,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
@@ -13,7 +12,7 @@ import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
-import { Alert, DeviceEventEmitter, Linking, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
@@ -49,7 +48,11 @@ export const checkNotificationPermission = async () => {
 
 const requestNotificationPermission = async () => {
 	try {
-		await messaging().requestPermission();
+		await messaging().requestPermission({
+			alert: true,
+			sound: true,
+			badge: true
+		});
 		// Alert.alert('Notification Permission', 'Notifications have been enabled.');
 	} catch (error) {
 		Alert.alert('Notification Permission', 'Notification permission denied.', [
@@ -96,7 +99,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			},
 			ios: {
 				critical: true,
-				criticalVolume: 0.9,
+				criticalVolume: 1.0,
 				sound: 'default',
 				foregroundPresentationOptions: {
 					badge: true,
@@ -112,7 +115,11 @@ export const createLocalNotification = async (title: string, body: string, data:
 };
 
 export const handleFCMToken = async () => {
-	const authStatus = await messaging().requestPermission();
+	const authStatus = await messaging().requestPermission({
+		alert: true,
+		sound: true,
+		badge: true
+	});
 
 	const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || messaging.AuthorizationStatus.PROVISIONAL;
 
@@ -174,14 +181,17 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					await Promise.all([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
 						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }))
+						store.dispatch(
+							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+						)
 					]);
 				};
 				await joinAndChangeClan(store, clanId);
 			} else {
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				store.dispatch(
+					channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+				);
 			}
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId });
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -258,26 +268,24 @@ export const setupNotificationListeners = async (navigation) => {
 		vibrationPattern: [300, 500]
 	});
 
-	if (IS_ANDROID) {
-		messaging()
-			.getInitialNotification()
-			.then(async (remoteMessage) => {
-				console.log('Notification caused app to open from quit state:');
-				if (remoteMessage) {
-					const store = await getStoreAsync();
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-					store.dispatch(appActions.setLoadingMainMobile(true));
-					store.dispatch(appActions.setIsFromFCMMobile(true));
-					if (remoteMessage?.notification?.title) {
-						processNotification({
-							notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
-							navigation,
-							time: 600
-						});
-					}
+	messaging()
+		.getInitialNotification()
+		.then(async (remoteMessage) => {
+			console.log('Notification caused app to open from quit state:');
+			if (remoteMessage) {
+				const store = await getStoreAsync();
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				store.dispatch(appActions.setLoadingMainMobile(true));
+				store.dispatch(appActions.setIsFromFCMMobile(true));
+				if (remoteMessage?.notification?.title) {
+					processNotification({
+						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
+						navigation,
+						time: 600
+					});
 				}
-			});
-	}
+			}
+		});
 
 	messaging().onNotificationOpenedApp(async (remoteMessage) => {
 		processNotification({

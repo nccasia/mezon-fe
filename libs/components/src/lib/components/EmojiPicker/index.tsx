@@ -1,4 +1,4 @@
-import { useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
 	reactionActions,
 	referencesActions,
@@ -324,18 +324,15 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
 	const appearanceTheme = useSelector(selectTheme);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasClanManagementPermission = hasAdminPermission || isClanOwner || hasClanPermission;
+	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const isShowAddButton = useMemo(() => {
-		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
-	}, [hasClanManagementPermission, categoryName, showAddButton]);
+		return hasClanPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
+	}, [hasClanPermission, categoryName, showAddButton]);
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
-			{' '}
 			{emojisData
 				.filter((item) => !!item.id)
 				.map((item, index) => (

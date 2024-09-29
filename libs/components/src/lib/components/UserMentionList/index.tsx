@@ -56,7 +56,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [channelMode, membersOfParent]);
+	}, [channelMode, membersOfParent, rolesInClan]);
 
 	return newUserMentionList;
 }

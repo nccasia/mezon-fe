@@ -65,7 +65,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 				<EventItem
 					event={{
 						id: '',
-						start_time: startTime.toString(),
+						start_time: convertToLocalTime(startTime),
 						address: location,
 						user_ids: [],
 						creator_id: myUser.userId,
@@ -74,6 +74,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 						channel_id: channelId
 					}}
 					showActions={false}
+					start={convertToLocalTime(startTime)}
 				/>
 
 				<View style={styles.headerSection}>
@@ -89,8 +90,9 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 			<View style={styles.btnWrapper}>
 				<MezonButton
 					title={t('actions.create')}
-					titleStyle={{ fontSize: Fonts.size.h7 }}
+					titleStyle={styles.titleMezonBtn}
 					type={EMezonButtonTheme.SUCCESS}
+					containerStyle={styles.mezonBtn}
 					onPress={handleCreate}
 				/>
 			</View>

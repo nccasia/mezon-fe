@@ -1,4 +1,4 @@
-import { useAuth, useCategory, useChannelMembersActions, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useAuth, useChannelMembersActions, useEscapeKey, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	categoriesActions,
 	hasGrandchildModal,
@@ -8,13 +8,13 @@ import {
 	selectIsShowEmptyCategory,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -35,9 +35,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { categorizedChannels } = useCategory();
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [isClanOwner, canManageClan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const { removeMemberClan } = useChannelMembersActions();
 	const { userProfile } = useAuth();
 	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
@@ -96,9 +94,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasClanPermission;
-
-	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
 	useEscapeKey(() => {
 		setIsShowModalPanelClan(false);
 		if (!hasChildModal) {
@@ -109,7 +104,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
 		toggleLeaveClanPopup();
-		navigate('/mezon');
+		navigate('/chat/direct/friends');
 	};
 
 	const toggleShowEmptyCategory = () => {
@@ -148,7 +143,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%] shadow-xl"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
-									{hasPermissionCreateCategory && (
+									{canManageClan && (
 										<ItemModal
 											onClick={handleShowCreateCategory}
 											children="Create Category"
@@ -177,10 +172,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									/>
 									<button
 										onClick={toggleShowEmptyCategory}
-										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2"
+										className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2 hover:bg-bgSelectItem group"
 									>
-										<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
-											Show empty categories
+										<li className="text-[14px] dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+											Show Empty Categories
 										</li>
 										{/* <div className="flex items-center justify-center h-[18px] w-[18px]"> */}
 										<input
@@ -232,7 +227,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					onClose={() => {
 						setOpenServerSettings(false);
 					}}
-					initialSetting={hasPermissionChangeFull ? ItemSetting.OVERVIEW : ItemSetting.EMOJI}
+					initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.CATEGORY_ORDER}
 				/>
 			)}
 

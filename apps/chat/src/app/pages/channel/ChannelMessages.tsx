@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage, MessageRef } from './ChannelMessage';
 
 type ChannelMessagesProps = {
+	clanId: string;
 	channelId: string;
 	type: ChannelType;
 	channelLabel?: string;
@@ -32,7 +33,7 @@ type ChannelMessagesProps = {
 	userName?: string;
 };
 
-function ChannelMessages({ channelId, channelLabel, avatarDM, userName, mode }: ChannelMessagesProps) {
+function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const idMessageNotified = useSelector(selectMessageNotified);
@@ -77,15 +78,15 @@ function ChannelMessages({ channelId, channelLabel, avatarDM, userName, mode }: 
 			}
 
 			if (direction === ELoadMoreDirection.bottom) {
-				await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
+				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
 				return true;
 			}
 
-			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
+			await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
 
 			return true;
 		},
-		[dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching]
+		[dispatch, clanId, channelId, hasMoreTop, hasMoreBottom, isFetching]
 	);
 
 	const chatScrollRef = useChatScroll<HTMLDivElement>(chatRef, chatRefData, loadMoreMessage);

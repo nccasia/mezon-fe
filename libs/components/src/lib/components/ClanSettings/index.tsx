@@ -1,4 +1,4 @@
-import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ export type ModalSettingProps = {
 
 const ClanSetting = (props: ModalSettingProps) => {
 	const { onClose, initialSetting } = props;
-	const [currentSettingId, setCurrentSettingId] = useState<string>(initialSetting ? initialSetting : listItemSetting[0].id);
+	const [currentSettingId, setCurrentSettingId] = useState<string>(() => (initialSetting ? initialSetting : listItemSetting[0].id));
 	const currentSetting = useMemo(() => {
 		return listItemSetting.find((item) => item.id === currentSettingId);
 	}, [currentSettingId]);
@@ -55,9 +55,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 	};
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) as string;
-	const currentChannelId = useSelector(selectCurrentChannelId) as string;
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: currentChannelId, clanId: currentClanId }));
+		dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
 	});
 
 	useEffect(() => {
@@ -66,7 +65,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 		}
 	}, [currentSettingId]);
 	return (
-		<div className="  flex fixed inset-0  w-screen z-10">
+		<div className="  flex fixed inset-0  w-screen z-30">
 			<div className="flex flex-row w-screen">
 				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
 					<div

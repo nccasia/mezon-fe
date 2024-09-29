@@ -1,17 +1,18 @@
-import { ACTIVE_TAB } from '@mezon/mobile-components';
+import { ACTIVE_TAB, IUerMention } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
-	selectAllChannelsByUser,
+	selectAllInfoChannels,
 	selectAllUsersByUser,
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage
 } from '@mezon/store-mobile';
-import { IChannel, SearchItemProps, compareObjects } from '@mezon/utils';
-import React, { useMemo, useState } from 'react';
+import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import ChannelsSearchTab from '../../../ChannelsSearchTab';
+import EmptySearchPage from '../../../EmptySearchPage';
 import MembersSearchTab from '../../../MembersSearchTab';
 import MessagesSearchTab from '../../../MessagesSearchTab';
 import HeaderTabSearch from './HeaderTabSearch';
@@ -19,12 +20,14 @@ import HeaderTabSearch from './HeaderTabSearch';
 interface ISearchMessagePageProps {
 	currentChannel: IChannel | DirectEntity;
 	searchText: string;
+	userMention: IUerMention;
+	isSearchMessagePage: boolean;
 }
 
-function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePageProps) {
+function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
-	const listChannels = useSelector(selectAllChannelsByUser);
+	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
@@ -33,7 +36,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 		if (!searchText) return listChannels;
 		return (
 			listChannels?.filter((channel) => {
-				return channel?.channel_label?.toLowerCase().includes(searchText?.toLowerCase());
+				return normalizeString(channel?.channel_label)?.toLowerCase().includes(normalizeString(searchText)?.toLowerCase());
 			}) || []
 		).sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'channel_label'));
 	}, [listChannels, searchText]);
@@ -51,22 +54,32 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 		return [
 			{
 				title: t('members'),
-				quantitySearch: searchText && membersSearch?.length
+				quantitySearch: searchText && membersSearch?.length,
+				display: !userMention && !!membersSearch?.length,
+				index: ACTIVE_TAB.MEMBER
 			},
 			{
 				title: t('channels'),
-				quantitySearch: searchText && channelsSearch?.length
+				quantitySearch: searchText && channelsSearch?.length,
+				display: !userMention && !!channelsSearch?.length,
+				index: ACTIVE_TAB.CHANNEL
 			},
 			{
 				title: t('Messages'),
-				quantitySearch: totalResult
+				quantitySearch: totalResult,
+				display: !!userMention || !!totalResult,
+				index: ACTIVE_TAB.MESSAGES
 			}
-		];
-	}, [channelsSearch, membersSearch, searchText, t, totalResult]);
+		].filter((tab) => tab?.display);
+	}, [channelsSearch?.length, membersSearch?.length, searchText, t, totalResult]);
 
 	function handelHeaderTabChange(index: number) {
 		setActiveTab(index);
 	}
+
+	useEffect(() => {
+		setActiveTab(TabList[0]?.index);
+	}, [TabList]);
 
 	const renderContent = () => {
 		switch (activeTab) {
@@ -77,7 +90,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 			case ACTIVE_TAB.CHANNEL:
 				return <ChannelsSearchTab listChannelSearch={channelsSearch} />;
 			default:
-				return <Block></Block>;
+				return <EmptySearchPage />;
 		}
 	};
 

@@ -20,7 +20,7 @@ const ErrorRoutes = () => {
 					<button
 						className="bg-[#5864f2] hover:bg-indigo-600 text-white font-medium w-[130px] h-[44px] px-4 rounded text-sm"
 						onClick={() => {
-							window.location.reload();
+							window.location.replace('/chat/direct/friends');
 						}}
 					>
 						Reload

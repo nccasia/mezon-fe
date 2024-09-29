@@ -41,6 +41,19 @@ export function debounce<T extends (...args: any[]) => void>(func: T, wait: numb
 	};
 }
 
+export function throttle<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
+	let isThrottling = false;
+	return (...args: Parameters<T>) => {
+		if (!isThrottling) {
+			func(...args);
+			isThrottling = true;
+			setTimeout(() => {
+				isThrottling = false;
+			}, delay);
+		}
+	};
+}
+
 export function isEmpty(value: any) {
 	if (value == null) {
 		return true;

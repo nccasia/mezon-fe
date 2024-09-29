@@ -519,17 +519,6 @@ input:-webkit-autofill:active {
 }
 
 // editor-scroll
-#editorReactMention::-webkit-scrollbar {
-	width: 4px;
-}
-
-#editorReactMention::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-#editorReactMention::-webkit-scrollbar-thumb {
-	background: #151515;
-}
 
 // attachment-scroll-dark
 .attachment-scroll::-webkit-scrollbar {
@@ -791,4 +780,38 @@ input:-webkit-autofill:active {
 	color: #949ba4;
 	background-color: hsl(220 calc(1 * 6.5%) 18% / 1);
 	background-position: 50% 0;
+}
+
+.anonymousAnimation {
+	animation: anonymous_hat 4s linear forwards;
+}
+
+@keyframes anonymous_hat {
+	0% {
+		transform: translate(25px, -100px) rotateZ(-25deg);
+	}
+	10% {
+		transform: translate(-20px, -78px) rotateZ(0);
+	}
+  20%{
+		transform: translate(-25px, -85px) rotateZ(35deg);
+  }
+	40% {
+		transform: translate(12px, -53px) rotateZ(-25deg);
+	}
+  50% {
+		transform: translate(17px, -60px) rotateZ(0deg);
+	}
+	60% {
+		transform: translate(-12px, -40px) rotateZ(35deg);
+	}
+  80% {
+		transform: translate(6px, -13px) rotateZ(0deg);
+  }
+  90% {
+		transform: translate(-6px, -20px) rotateZ(-25deg);
+  }
+	100% {
+		transform: translate(0px, 0px) rotateZ(45deg);
+	}
 }

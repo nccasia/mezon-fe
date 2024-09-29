@@ -2,7 +2,8 @@
     "fields": {
         "channelName": {
             "title": "Tên channel",
-            "placeholder": "Nhập tên channel"
+            "placeholder": "Nhập tên channel",
+            "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
         },
         "threadName": {
             "title": "Tên Thread",
@@ -115,7 +116,12 @@
             "add": "Thêm",
             "roles": "VAI TRÒ",
             "members": "THÀNH VIÊN"
-        }
+        },
+        "toast": {
+            "success": "Lưu thành công",
+            "failed": "Lưu thất bại"
+        },
+        "roleAndMemberEmpty": "không có Vai trò và Thành viên nào để ghi đè quyền"
     },
     "changeCategory": {
         "title": "Thay đổi Category",

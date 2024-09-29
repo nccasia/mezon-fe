@@ -49,7 +49,7 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
+export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean) =>
 	StyleSheet.create({
 		heading1: {
 			fontWeight: 'bold'
@@ -71,7 +71,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
 		},
 		body: {
 			color: isUnReadChannel ? colors.white : colors.text,
-			fontSize: size.medium
+			fontSize: isLastMessage ? size.small : size.medium
 		},
 		paragraph: {
 			marginTop: 0,
@@ -192,6 +192,7 @@ export type IMarkdownProps = {
 	isOpenLink?: boolean;
 	isOnlyContainEmoji?: boolean;
 	isUnReadChannel?: boolean;
+	isLastMessage?: boolean;
 };
 
 /**
@@ -365,7 +366,8 @@ export const RenderTextMarkdownContent = React.memo(
 		directMessageId,
 		isOpenLink = true,
 		isOnlyContainEmoji,
-		isUnReadChannel = false
+		isUnReadChannel = false,
+		isLastMessage = false
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -466,7 +468,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {

@@ -85,7 +85,7 @@ const ModalInvite = (props: ModalParam) => {
 			isInviteModal={true}
 		>
 			<div>
-				<ListMemberInvite url={urlInvite} channelID={firstChannel.channel_id} />
+				<ListMemberInvite url={urlInvite} channelID={channelID} />
 				<div className="relative ">
 					<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">Or, send a clan invite link to a friend</p>
 					<input

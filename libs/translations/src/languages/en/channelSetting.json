@@ -2,7 +2,8 @@
     "fields": {
         "channelName": {
             "title": "Channel Name",
-            "placeholder": "Input Channel Name"
+            "placeholder": "Input Channel Name",
+            "errorMessage": "Please enter a valid channel name (max 64 characters, only words, numbers, _ or -)."
         },
         "threadName": {
             "title": "Thread Name",
@@ -116,7 +117,12 @@
             "add": "Add",
             "roles": "ROLES",
             "members": "MEMBERS"
-        }
+        },
+        "toast": {
+            "success": "Save Successfully",
+            "failed": "Save Failed"
+        },
+        "roleAndMemberEmpty": "There are no Roles and Members to override permissions"
     },
     "changeCategory": {
         "title": "Change Category",

@@ -62,7 +62,9 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, 
 			}
 			return 0;
 		});
-		const firstChannelText = dataChannelSort?.find?.((channel: { type: ChannelType }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT);
+		const firstChannelText = dataChannelSort?.find?.(
+			(channel: { type: ChannelType; parrent_id: string }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT && channel?.parrent_id === '0'
+		);
 		if (firstChannelText) {
 			const firstChannelId = firstChannelText?.channel_id;
 			const firstClanId = firstChannelText?.clan_id;

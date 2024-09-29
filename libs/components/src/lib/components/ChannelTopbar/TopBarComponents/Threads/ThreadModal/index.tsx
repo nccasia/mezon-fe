@@ -1,6 +1,7 @@
-import { useAppNavigation, useReference, useThreads } from '@mezon/core';
+import { useAppNavigation, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -23,6 +24,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const allUsesClan = useSelector(selectAllUserClans);
 	const appearanceTheme = useSelector(selectTheme);
+	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 
 	const avatarMembers = useMemo(() => allUsesClan?.map((member) => member?.user?.avatar_url), [allUsesClan]);
 
@@ -47,18 +49,20 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
 					<SearchThread />
-					<div className="flex flex-row items-center gap-4">
-						<Button
-							onClick={handleCreateThread}
-							size="sm"
-							className="h-6 rounded focus:ring-transparent bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover items-center"
-						>
-							Create
-						</Button>
-						<button onClick={() => setIsShowThread(false)}>
-							<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
-						</button>
-					</div>
+					{canManageThread && (
+						<div className="flex flex-row items-center gap-4">
+							<Button
+								onClick={handleCreateThread}
+								size="sm"
+								className="h-6 rounded focus:ring-transparent bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover items-center"
+							>
+								Create
+							</Button>
+							<button onClick={() => setIsShowThread(false)}>
+								<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
+							</button>
+						</div>
+					)}
 				</div>
 				<div
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}

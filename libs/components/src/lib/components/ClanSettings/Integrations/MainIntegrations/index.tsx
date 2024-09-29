@@ -1,4 +1,4 @@
-import { Icons } from 'libs/components/src/lib/components';
+import { Icons } from '@mezon/ui';
 import { ApiWebhook } from 'mezon-js/api.gen';
 
 interface IIntegrationProps {
@@ -22,12 +22,12 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 				}}
 				className={`dark:text-[#b5bac1] text-textLightTheme py-[20px] px-[16px] flex justify-between items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary ${allWebhooks?.length !== 0 ? 'cursor-pointer' : ''}`}
 			>
-				<div className="flex gap-3 items-center">
-					<div className="rounded-full p-4 dark:bg-[#111214]">
+				<div className="flex gap-3 max-sm:gap-0 max-sbm:w-[40%] items-center">
+					<div className="rounded-full p-4 max-sm:p-2 dark:bg-[#111214]">
 						<Icons.WebhooksIcon className="text-[#4e5058] dark:text-[#b5bac1]" />
 					</div>
 					<div>
-						<div className="pb-[3px] font-semibold">Webhooks</div>
+						<div className="pb-[3px] font-semibold break-all">Webhooks</div>
 						<div className="text-[12px]">
 							{allWebhooks && allWebhooks?.length > 1 ? allWebhooks?.length + ' webhooks' : allWebhooks?.length + ' webhook'}
 						</div>

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
@@ -26,6 +27,7 @@ export const addChannelUsers = createAsyncThunk(
 				repace: true
 			};
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();
@@ -34,14 +36,16 @@ export const addChannelUsers = createAsyncThunk(
 	}
 );
 
-type removeChannelUsersPayload = {
+export type removeChannelUsersPayload = {
 	channelId: string;
 	userId: string;
+	clanId?: string;
+	channelType?: number;
 };
 
 export const removeChannelUsers = createAsyncThunk(
 	'channelUsers/removeChannelUsers',
-	async ({ channelId, userId }: removeChannelUsersPayload, thunkAPI) => {
+	async ({ channelId, userId, clanId, channelType }: removeChannelUsersPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const userIds = [userId];
@@ -49,7 +53,17 @@ export const removeChannelUsers = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(channelMembersActions.remove({ channelId, userId }));
+			if (clanId && channelType) {
+				const body = {
+					clanId: clanId,
+					channelId: channelId,
+					noCache: true,
+					channelType: channelType ?? 0,
+					repace: true
+				};
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
+				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+			}
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();

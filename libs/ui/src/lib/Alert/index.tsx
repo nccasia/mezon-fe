@@ -5,7 +5,7 @@ interface AlertProps {
 	onClick?: () => void;
 }
 
-export const AlertTitleTextWarning: React.FC<AlertProps> = ({ description, onClick }) => {
+const AlertTitleTextWarning: React.FC<AlertProps> = ({ description, onClick }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	useEffect(() => {
 		if (description) {
@@ -61,3 +61,5 @@ export const AlertTitleTextWarning: React.FC<AlertProps> = ({ description, onCli
 		</>
 	);
 };
+
+export default AlertTitleTextWarning;

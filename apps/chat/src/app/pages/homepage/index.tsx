@@ -29,7 +29,7 @@ function Homepage() {
 
 	const downloadUrl: string = useMemo(() => {
 		if (platform === 'MacOS') {
-			return `https://cdn.mezon.vn/release/Mezon-${version}-arm64-mac.zip`;
+			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.zip`;
 		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}

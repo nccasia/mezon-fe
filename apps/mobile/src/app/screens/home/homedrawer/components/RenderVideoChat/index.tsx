@@ -7,13 +7,13 @@ const widthMedia = Metrics.screenWidth - 150;
 
 export const RenderVideoChat = React.memo(
 	({ videoURL }: { videoURL: string }) => {
-		const [videoDimensions, setVideoDimensions] = useState({ width: widthMedia + size.s_50, height: 160 });
+		const [videoDimensions, setVideoDimensions] = useState({ width: widthMedia + size.s_50, height: 160, isLoading: true });
 
 		if (!videoURL) return null;
 		const isUploading = !videoURL?.includes('http');
 
 		return (
-			<Block marginTop={size.s_10} opacity={isUploading ? 0.5 : 1}>
+			<Block marginTop={size.s_10} opacity={isUploading || videoDimensions?.isLoading ? 0.5 : 1}>
 				<ExpoVideo
 					onError={(err) => {
 						console.log('load error', err);
@@ -23,7 +23,7 @@ export const RenderVideoChat = React.memo(
 						const aspectRatio = width / height;
 						const calculatedWidth = widthMedia;
 						const calculatedHeight = calculatedWidth / aspectRatio;
-						setVideoDimensions({ width: calculatedWidth, height: calculatedHeight });
+						setVideoDimensions({ width: calculatedWidth, height: calculatedHeight, isLoading: false });
 					}}
 					source={{
 						uri: videoURL
@@ -41,8 +41,18 @@ export const RenderVideoChat = React.memo(
 						backgroundColor: Colors.borderDim
 					}}
 				/>
-				{isUploading && (
-					<Block position="absolute" top={0} left={0} right={0} bottom={15} width={'100%'} alignItems="center" justifyContent="center">
+				{(isUploading || videoDimensions?.isLoading) && (
+					<Block
+						position="absolute"
+						top={0}
+						left={0}
+						right={0}
+						bottom={15}
+						width={videoDimensions.width}
+						height={videoDimensions.height}
+						alignItems="center"
+						justifyContent="center"
+					>
 						<ActivityIndicator />
 					</Block>
 				)}

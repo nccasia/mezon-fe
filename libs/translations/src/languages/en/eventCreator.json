@@ -38,19 +38,24 @@
         },
         "eventName": {
             "title": "Event Topic",
-            "placeholder": "What's your event?"
+            "placeholder": "What's your event?",
+            "errorMessage": "An event topic is required"
         },
         "startDate": {
-            "title": "Start Date"
+            "title": "Start Date",
+            "errorMessage": "Please choose a date on or after"
         },
         "startTime": {
-            "title": "Start Time"
+            "title": "Start Time",
+            "errorMessage": "Please choose a date on or after"
         },
         "endDate": {
-            "title": "End Date"
+            "title": "End Date",
+            "errorMessage": "Please choose a date on or after"
         },
         "endTime": {
-            "title": "End Time"
+            "title": "End Time",
+            "errorMessage": "Please choose a date on or after"
         },
         "eventFrequency": {
             "title": "Event Frequency",
@@ -74,5 +79,9 @@
         "locationBlank": "A location is required",
         "titleBlank": "An event topic is required",
         "time": "Invalid start time or end time"
+    },
+    "eventDetail": {
+      "eventIsTaking": "Event is taking place!",
+      "tenMinutesLeft": "10 minutes left. Join in!"
     }
 }

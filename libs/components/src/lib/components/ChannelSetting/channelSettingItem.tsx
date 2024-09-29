@@ -1,4 +1,4 @@
-import { useChannels, useClanRestriction } from '@mezon/core';
+import { useChannels, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -15,13 +15,12 @@ export type ChannelSettingItemProps = {
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, onCloseModal, channel, stateMenu, stateClose } = props;
+	const { onItemClick, channel, stateMenu, stateClose } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const [hasManageChannelPermission] = usePermissionChecker([EPermission.manageChannel], channel.channel_id ?? '');
+	const canEditChannelPermissions = hasManageChannelPermission;
 	const isThread = useMemo(() => {
 		return channel.parrent_id !== '0';
 	}, [channel]);
@@ -61,6 +60,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
 			}
 			return <Icons.Speaker defaultSize="w-5 h-5 min-w-5" />;
+		}
+
+		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (isPrivate) {
+				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
+			}
+			return <Icons.Stream defaultSize="w-5 h-5 min-w-5" />;
 		}
 	};
 

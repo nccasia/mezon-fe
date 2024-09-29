@@ -1,4 +1,3 @@
-import { useChatSending } from '@mezon/core';
 import {
 	messagesActions,
 	referencesActions,
@@ -9,12 +8,11 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { useProcessLink } from 'libs/core/src/lib/chat/hooks/useProcessLink';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useChatSending } from './useChatSending';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
 	const clanIdInMes = useMemo(() => {
@@ -36,7 +34,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [mode, selectedChannel, selectedDirect]);
 
 	const dispatch = useDispatch();
-	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel, mode });
+	const { editSendMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel, mode });
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 
@@ -69,16 +67,13 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		[dispatch]
 	);
 
-	const { processLink } = useProcessLink({ updateImageLinkMessage });
-
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
 			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? []);
 			dispatch(referencesActions.setOpenEditMessageState(false));
-			processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message);
 		},
-		[editSendMessage, attachmentsOnMessage, setChannelDraftMessage, channelId, dispatch, processLink, clanIdInMes, mode, message]
+		[editSendMessage, attachmentsOnMessage, setChannelDraftMessage, channelId, dispatch, clanIdInMes, mode, message]
 	);
 
 	return {

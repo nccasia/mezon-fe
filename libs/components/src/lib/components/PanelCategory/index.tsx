@@ -1,4 +1,4 @@
-import { useClanRestriction, UserRestrictionZone } from '@mezon/core';
+import { usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	defaultNotificationCategoryActions,
 	selectCurrentClanId,
@@ -40,9 +40,7 @@ interface IPanelCategoryProps {
 const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDeleteCategory, setIsShowPanelChannel, setOpenSetting }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-	const [hasManageClanPermission, { isClanOwner }] = useClanRestriction([EPermission.manageClan]);
-	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
-	const hasManageCategoryPermission = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const dispatch = useAppDispatch();
 	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
 	const currentClanId = useAppSelector(selectCurrentClanId);
@@ -134,7 +132,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 			ref={panelRef}
 			role={'button'}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-10 w-[200px] py-[10px] px-[10px] shadow-md"
+			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />
@@ -202,7 +200,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 				</Dropdown>
 			</GroupPanels>
 
-			<UserRestrictionZone policy={hasManageCategoryPermission}>
+			<UserRestrictionZone policy={canManageCategory}>
 				<GroupPanels>
 					<ItemPanel children={'Edit Category'} onClick={handleOpenSetting} />
 					<ItemPanel children={'Delete Category'} onClick={handleDeleteCategory} danger />

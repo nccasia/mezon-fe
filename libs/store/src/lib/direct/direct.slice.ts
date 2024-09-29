@@ -5,7 +5,6 @@ import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDes
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
-import { clansActions } from '../clans/clans.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -47,6 +46,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -176,7 +176,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage }));
+			thunkAPI.dispatch(
+				messagesActions.fetchMessages({ clanId: '0', channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage })
+			);
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: '',
@@ -191,7 +193,16 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
+			thunkAPI.dispatch(
+				channelsActions.joinChat({
+					clanId: '0',
+					parentId: '0',
+					channelId: directMessageId,
+					channelType: type ?? 0,
+					isPublic: false,
+					isParentPublic: false
+				})
+			);
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);
@@ -296,6 +307,7 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, sel
 		.map((dm) => {
 			if (!dm?.channel_id) return dm;
 			const found = directMetaEntities?.[dm.channel_id];
+			if (!found) return dm;
 			return {
 				...dm,
 				last_sent_message: { ...dm.last_sent_message, ...found.last_sent_message },

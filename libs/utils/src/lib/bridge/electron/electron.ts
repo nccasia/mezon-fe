@@ -49,7 +49,7 @@ export class ElectronBridge implements IElectronBridge {
 		this.hasListeners = false;
 	}
 
-	public setBadgeCount(badgeCount: number) {
+	public setBadgeCount(badgeCount: number | null) {
 		this.bridge.setBadgeCount(badgeCount);
 	}
 

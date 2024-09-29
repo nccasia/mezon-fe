@@ -212,10 +212,12 @@ export const selectDefaultNotificationCategory = createSelector(
 	(state: DefaultNotificationCategoryState) => state.defaultNotificationCategory
 );
 
-const { selectAll } = channelCategorySettingAdapter.getSelectors();
+const { selectAll, selectEntities } = channelCategorySettingAdapter.getSelectors();
 
 export const getchannelCategorySettingListState = (rootState: {
 	['notichannelcategorysetting']: ChannelCategorySettingState;
 }): ChannelCategorySettingState => rootState['notichannelcategorysetting'];
 
 export const selectAllchannelCategorySetting = createSelector(getchannelCategorySettingListState, selectAll);
+
+export const selectEntiteschannelCategorySetting = createSelector(getchannelCategorySettingListState, selectEntities);

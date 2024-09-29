@@ -1,34 +1,43 @@
-import { useChatTypings, useMemberStatus } from '@mezon/core';
-import { Icons, PaperclipIcon } from '@mezon/mobile-components';
+import { useChatTypings } from '@mezon/core';
+import { convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadDMById } from '@mezon/store';
-import { DirectEntity } from '@mezon/store-mobile';
+import { directActions, DirectEntity, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';
-import moment from 'moment';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { RenderTextMarkdownContent } from '../home/homedrawer/components';
 import { style } from './styles';
 
-export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress }) => {
+export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress; onPress? }) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const { directMessage, navigation, onLongPress } = props;
+	const { directMessage, navigation, onLongPress, onPress } = props;
 	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
-	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
-	const redirectToMessageDetail = () => {
-		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: directMessage?.id }
-		});
+	const userStatus = directMessage?.is_online?.some(Boolean);
+	const isTabletLandscape = useTabletLandscape();
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId)
+	const dispatch = useAppDispatch();
+
+	const redirectToMessageDetail = async () => {
+		await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
+		if (isTabletLandscape) {
+			onPress && onPress(directMessage?.id);
+		} else {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: directMessage?.id }
+			});
+		}
 	};
 
 	const isTypeDMGroup = useMemo(() => {
@@ -37,7 +46,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.usernames?.split?.(',') || [];
+		const usernameList = directMessage?.channel_label?.split?.(',') || [];
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
@@ -65,7 +74,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 		return (
 			<View style={styles.contentMessage}>
 				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnread ? themeValue.white : themeValue.text }]}>
-					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
+					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}{': '}
 				</Text>
 				{!!content && (
 					<RenderTextMarkdownContent
@@ -73,6 +82,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 						isHiddenHashtag={true}
 						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
 						isUnReadChannel={isUnread}
+						isLastMessage={true}
 					/>
 				)}
 			</View>
@@ -82,13 +92,22 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	const lastMessageTime = useMemo(() => {
 		if (directMessage?.last_sent_message?.timestamp_seconds) {
 			const timestamp = Number(directMessage?.last_sent_message?.timestamp_seconds);
-			return moment.unix(timestamp).format('DD/MM/YYYY HH:mm');
+			return convertTimestampToTimeAgo(timestamp);
 		}
 		return null;
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()} onLongPress={onLongPress}>
+		<TouchableOpacity 
+			style={[styles.messageItem, 
+					currentDmGroupId === directMessage?.id && 
+						{ backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary, 
+							borderColor: themeValue.borderHighlight, 
+							borderWidth: 1 }
+				]} 
+			onPress={() => redirectToMessageDetail()} 
+			onLongPress={onLongPress}
+		>
 			{isTypeDMGroup ? (
 				<View style={styles.groupAvatar}>
 					<Icons.GroupIcon />
@@ -120,7 +139,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
 					<Text numberOfLines={1} style={[styles.defaultText, styles.channelLabel]}>
-						{directMessage?.channel_label || directMessage?.usernames}
+						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 					</Text>
 					{lastMessageTime ? <Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text> : null}
 				</View>

@@ -144,6 +144,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 					<hr className="border-t border-solid dark:border-gray-700 border-bgModifierHoverLight mt-10 mb-[30px]" />
 					<PermissionManage
 						channelId={channel.id}
+						channelPrivate={channel.channel_private === 1}
 						setIsPrivateChannel={setValueToggle}
 						setPermissionsListHasChanged={setPermissionsListHasChanged}
 						saveTriggerRef={saveTriggerRef}

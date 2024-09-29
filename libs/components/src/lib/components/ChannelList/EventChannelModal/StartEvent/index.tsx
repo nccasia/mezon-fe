@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useClanRestriction } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { selectAllEventManagement } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -15,8 +15,7 @@ type StartEventModalProps = {
 const StartEventModal = (props: StartEventModalProps) => {
 	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement } = props;
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	return (
 		<>

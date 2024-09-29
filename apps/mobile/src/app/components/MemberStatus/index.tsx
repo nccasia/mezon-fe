@@ -1,10 +1,11 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +52,23 @@ export const MemberListStatus = React.memo(() => {
 		setSelectedUser(null);
 	}, []);
 
+	const handleUserPress = useCallback((user) => {
+		setSelectedUser(user);
+	}, []);
+
+	const renderMemberItem = ({ item, index }) => {
+		return (
+			<MemberItem
+				onPress={handleUserPress}
+				user={item}
+				key={`memberItem[${item?.user?.id}][${index}]`}
+				isOffline={!item?.user?.online}
+				currentChannel={currentChannel}
+				isDMThread={isDMThread}
+			/>
+		);
+	};
+
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
@@ -93,17 +111,13 @@ export const MemberListStatus = React.memo(() => {
 					<View>
 						<Text style={styles.text}>Member - {onlineMembers?.length || '0'}</Text>
 						<View style={styles.box}>
-							{onlineMembers.map((user) => (
-								<MemberItem
-									onPress={(user) => {
-										setSelectedUser(user);
-									}}
-									user={user}
-									key={user?.user?.id}
-									currentChannel={currentChannel}
-									isDMThread={isDMThread}
-								/>
-							))}
+							<FlashList
+								data={onlineMembers}
+								keyExtractor={(user, index) => `channelOnlineMember[${user?.id}][${index}]`}
+								renderItem={renderMemberItem}
+								estimatedItemSize={size.s_80}
+								nestedScrollEnabled
+							/>
 						</View>
 					</View>
 				)}
@@ -111,18 +125,13 @@ export const MemberListStatus = React.memo(() => {
 					<View style={{ marginTop: 20 }}>
 						<Text style={styles.text}>Offline - {offlineMembers?.length}</Text>
 						<View style={styles.box}>
-							{offlineMembers.map((user) => (
-								<MemberItem
-									key={user.id}
-									user={user}
-									isOffline={true}
-									onPress={(user) => {
-										setSelectedUser(user);
-									}}
-									currentChannel={currentChannel}
-									isDMThread={isDMThread}
-								/>
-							))}
+							<FlashList
+								data={offlineMembers}
+								keyExtractor={(user, index) => `channelOfflineMember[${user?.id}][${index}]`}
+								renderItem={renderMemberItem}
+								estimatedItemSize={size.s_80}
+								nestedScrollEnabled
+							/>
 						</View>
 					</View>
 				)}

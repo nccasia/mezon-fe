@@ -1,10 +1,11 @@
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { EOverriddenPermission } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Text } from 'react-native';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
 import { EMessageActionType } from './enums';
@@ -24,7 +25,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['message']);
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
-	const { isCanSendMessage } = useUserPermission();
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], props.channelId);
 
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode);
@@ -52,7 +53,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 
 	return (
 		<Block>
-			{isCanSendMessage || isDM ? (
+			{canSendMessage || isDM ? (
 				<Block
 					backgroundColor={themeValue.secondary}
 					borderTopWidth={1}
@@ -79,7 +80,13 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 			) : (
 				<Block>
 					<Block backgroundColor={themeValue.charcoal} padding={size.s_12} borderRadius={size.s_20} marginHorizontal={size.s_10}>
-						<Text color={themeValue.textDisabled}>{t('noSendMessagePermission')}</Text>
+						<Text
+							style={{
+								color: themeValue.textDisabled
+							}}
+						>
+							{t('noSendMessagePermission')}
+						</Text>
 					</Block>
 				</Block>
 			)}

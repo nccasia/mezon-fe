@@ -1,5 +1,5 @@
 import { EPermission } from '@mezon/utils';
-import { useUserRestriction } from '../hooks/useUserRestriction';
+import { useUserRestriction } from '../hooks/deprecated/useUserRestriction';
 
 export type UserRestrictionZoneProps = {
 	permissions?: EPermission[];
@@ -9,6 +9,9 @@ export type UserRestrictionZoneProps = {
 	condistion?: 'and' | 'or';
 };
 
+/**
+ * @deprecated will be removed
+ */
 export function UserRestrictionZone({ policy, permissions = [], render, children, condistion = 'and' }: UserRestrictionZoneProps) {
 	const isPermissionsAllowed = useUserRestriction(permissions);
 

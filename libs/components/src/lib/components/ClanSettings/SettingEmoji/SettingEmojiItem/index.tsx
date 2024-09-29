@@ -1,4 +1,4 @@
-import { useClanRestriction } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import {
 	emojiSuggestionActions,
 	selectCurrentClanId,
@@ -25,12 +25,11 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	const clanId = useSelector(selectCurrentClanId);
 	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
 	const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasManageClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id;
-	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]);
+		return hasManageClanPermission || currentUserId === emoji.creator_id;
+	}, [hasManageClanPermission, currentUserId]);
 
 	const handleDelete = () => {
 		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));

@@ -1,5 +1,4 @@
-import { policiesActions, selectAllPermissionsDefault, selectAllPermissionsUser, selectAllPermissionsUserKey, useAppDispatch } from '@mezon/store';
-import { EPermission } from '@mezon/utils';
+import { policiesActions, selectAllPermissionsDefault, selectAllPermissionsUser, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -9,7 +8,7 @@ export function useUserPolicy(clanId: string) {
 	const { userId } = useAuth();
 	const permissions = useSelector(selectAllPermissionsUser);
 	const permissionsDefault = useSelector(selectAllPermissionsDefault);
-	const permissionKeys = useSelector(selectAllPermissionsUserKey) as EPermission[];
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 
 	const fetchPolicies = useCallback(() => {
 		if (!clanId) return;
@@ -19,12 +18,12 @@ export function useUserPolicy(clanId: string) {
 
 	return useMemo(
 		() => ({
-			permissions,
-			permissionKeys,
 			userId,
-			fetchPolicies,
-			permissionsDefault
+			permissions,
+			maxPermissionLevel,
+			permissionsDefault,
+			fetchPolicies
 		}),
-		[permissions, userId, permissionKeys, fetchPolicies, permissionsDefault]
+		[permissions, maxPermissionLevel, userId, fetchPolicies, permissionsDefault]
 	);
 }

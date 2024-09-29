@@ -1,4 +1,4 @@
-import { selectTheme } from '@mezon/store';
+import { selectStatusStream, selectTheme } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,14 +14,16 @@ const heightAroundComponent = 230;
 const ListDMChannel = (props: ListDMChannelProps) => {
 	const { listDM } = props;
 	const appearanceTheme = useSelector(selectTheme);
+	const streamPlay = useSelector(selectStatusStream);
 
-	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent);
+	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
 
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight - heightAroundComponent);
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	}, []);
+		const updateHeight = () => setHeight(window.innerHeight - heightAroundComponent - (streamPlay ? 56 : 0));
+		updateHeight();
+		window.addEventListener('resize', updateHeight);
+		return () => window.removeEventListener('resize', updateHeight);
+	}, [streamPlay]);
 
 	const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
 		return (

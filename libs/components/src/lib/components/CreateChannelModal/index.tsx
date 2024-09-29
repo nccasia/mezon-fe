@@ -1,12 +1,11 @@
 import { useAppNavigation, useEscapeKey } from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
+import { AlertTitleTextWarning, Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import { ChannelLableModal } from './ChannelLabel';
 import { ChannelNameModalRef, ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelStatusModal } from './ChannelStatus';

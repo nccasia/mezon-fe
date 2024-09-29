@@ -1,11 +1,13 @@
 import { useShowName } from '@mezon/core';
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageWithUser } from '@mezon/utils';
+import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
+import { ChannelStreamMode } from 'mezon-js';
+import { useSelector } from 'react-redux';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
@@ -15,7 +17,7 @@ type MessageReplyProps = {
 };
 
 // TODO: refactor component for message lines
-const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
+const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) => {
 	const {
 		senderIdMessageRef,
 		messageContentRef,
@@ -26,6 +28,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 		messageIdRef,
 		hasAttachmentInMessageRef
 	} = useMessageParser(message);
+	const messageSender = useSelector(selectMemberClanByUserId(senderIdMessageRef ?? '')) as ChannelMembersEntity;
 
 	const dispatch = useAppDispatch();
 
@@ -33,10 +36,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 		(e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (messageIdRef) {
-				dispatch(messagesActions.jumpToMessage({ messageId: messageIdRef, channelId: message?.channel_id }));
+				dispatch(messagesActions.jumpToMessage({ clanId: message?.clan_id || '', messageId: messageIdRef, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch, message?.channel_id, messageIdRef]
+		[dispatch, message?.channel_id, message?.clan_id, messageIdRef]
 	);
 
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
@@ -47,7 +50,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? ''
 	);
-
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			{message.references?.length ? (
@@ -55,7 +58,12 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
 						<div className="w-5 h-5">
-							<AvatarImage className="w-5 h-5" alt="user avatar" userName={messageUsernameSenderRef} src={messageAvatarSenderRef} />
+							<AvatarImage
+								className="w-5 h-5"
+								alt="user avatar"
+								userName={messageUsernameSenderRef}
+								src={messageSender?.clan_avatar ?? messageSender?.user?.avatar_url}
+							/>
 						</div>
 
 						<div className="gap-1 flex flex-row items-center w-full">
@@ -63,7 +71,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 								onClick={onClick}
 								className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap"
 							>
-								{nameShowed}
+								{isDM ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
 							</span>
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">

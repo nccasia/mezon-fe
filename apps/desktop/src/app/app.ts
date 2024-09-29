@@ -111,7 +111,7 @@ export default class App {
 			return;
 		}
 
-		//App.mainWindow.webContents.openDevTools();
+		// App.mainWindow.webContents.openDevTools();
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
@@ -279,7 +279,6 @@ export default class App {
 				submenu: [
 					{ role: 'reload' },
 					{ role: 'forceReload' },
-					{ role: 'toggleDevTools' },
 					{ type: 'separator' },
 					{ role: 'resetZoom' },
 					{ role: 'zoomIn' },

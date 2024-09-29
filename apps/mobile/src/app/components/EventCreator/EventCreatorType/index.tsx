@@ -9,7 +9,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { IMezonOptionData, MezonInput, MezonOption, MezonSelect } from '../../../temp-ui';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import { style } from './styles';
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
@@ -53,7 +53,8 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 					value: OptionEvent.OPTION_SPEAKER,
 					textStyle: {
 						fontWeight: 'bold'
-					}
+					},
+					disabled: !voicesChannel?.length
 				},
 				{
 					title: t('fields.channelType.somewhere.title'),
@@ -141,7 +142,13 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 			</View>
 
 			<View style={styles.btnWrapper}>
-				<MezonButton title={t('actions.next')} titleStyle={{ fontSize: Fonts.size.medium }} type="success" onPress={handlePressNext} />
+				<MezonButton
+					title={t('actions.next')}
+					titleStyle={styles.titleMezonBtn}
+					type={EMezonButtonTheme.SUCCESS}
+					containerStyle={styles.mezonBtn}
+					onPress={handlePressNext}
+				/>
 			</View>
 		</View>
 	);

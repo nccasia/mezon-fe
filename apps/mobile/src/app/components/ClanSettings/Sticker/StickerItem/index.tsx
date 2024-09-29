@@ -1,10 +1,12 @@
+import { useClanRestriction } from "@mezon/core";
 import { Icons } from "@mezon/mobile-components";
-import { baseColor, useTheme } from "@mezon/mobile-ui";
+import { baseColor, size, useTheme } from "@mezon/mobile-ui";
 import { deleteSticker, updateSticker, useAppDispatch } from "@mezon/store";
-import { selectMemberClanByUserId, useAppSelector } from "@mezon/store-mobile";
+import { selectCurrentUserId, selectMemberClanByUserId, useAppSelector } from "@mezon/store-mobile";
+import { EPermission } from "@mezon/utils";
 import { MezonAvatar } from "apps/mobile/src/app/temp-ui";
 import { ClanSticker } from "mezon-js";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
@@ -36,6 +38,13 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
     const [stickerName, setStickerName] = useState<string>(data.shortname);
     const dispatch = useAppDispatch();
     const { t } = useTranslation(["clanStickerSetting"])
+	const currentUserId = useAppSelector(selectCurrentUserId);
+
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+    const hasDeleteOrEditPermission = useMemo(() => {
+		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === data.creator_id;
+	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, data.creator_id]);
 
     const [sticker, setSticker] = useState({
         shortname: data.shortname ?? '',
@@ -88,12 +97,13 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                 renderRightActions={() => <CloseAction />}
                 renderLeftActions={() => <CloseAction />}
                 onSwipeableOpen={handleDeleteSticker}
+                enabled={hasDeleteOrEditPermission}
             >
                 <View style={styles.container}>
                     <View style={styles.flexRow}>
                         <FastImage
                             source={{ uri: data.source }}
-                            style={{ height: 40, width: 40 }}
+                            style={{ height: size.s_40, width: size.s_40 }}
                         />
 
                         <TextInput
@@ -101,14 +111,15 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                             style={{ color: themeValue.text }}
                             onChangeText={setStickerName}
                             onBlur={handleUpdateSticker}
+                            editable={hasDeleteOrEditPermission}
                         />
                     </View>
 
                     <View style={styles.flexRow}>
                         <Text style={styles.text}>{user?.user?.username}</Text>
                         <MezonAvatar
-                            height={30}
-                            width={30}
+                            height={size.s_30}
+                            width={size.s_30}
                             avatarUrl={user?.user?.avatar_url}
                             username={user?.user?.username}
                         />

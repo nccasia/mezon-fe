@@ -3,6 +3,7 @@ import { useThreadMessage, useThreads } from '@mezon/core';
 import {
 	RootState,
 	channelsActions,
+	checkDuplicateThread,
 	createNewChannel,
 	messagesActions,
 	selectCurrentChannel,
@@ -15,6 +16,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
 import ChannelMessages from '../channel/ChannelMessages';
 
@@ -33,6 +35,11 @@ const ThreadBox = () => {
 
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
+			const isDuplicate = await dispatch(checkDuplicateThread({ thread_name: value.nameValueThread, channel_id: currentChannelId as string }));
+			if (isDuplicate?.payload) {
+				toast('Thread name already exists');
+				return;
+			}
 			const body: ApiCreateChannelDescRequest = {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
@@ -41,6 +48,7 @@ const ThreadBox = () => {
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_TEXT
 			};
+
 			const thread = await dispatch(createNewChannel(body));
 			return thread.payload;
 		},
@@ -69,7 +77,13 @@ const ThreadBox = () => {
 								isParentPublic: currentChannel ? !currentChannel.channel_private : false
 							})
 						);
-						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
+						await dispatch(
+							messagesActions.fetchMessages({
+								clanId: currentClanId || '',
+								channelId: thread.channel_id as string,
+								isFetchingLatestMessages: true
+							})
+						);
 						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
 				} else {
@@ -79,7 +93,7 @@ const ThreadBox = () => {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, currentClanId, dispatch, sendMessageThread, sessionUser]
+		[createThread, currentClanId, currentChannel, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -94,6 +108,7 @@ const ThreadBox = () => {
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
+							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}
 							type={ChannelType.CHANNEL_TYPE_THREAD}

@@ -26,7 +26,7 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 					clan_name: unreadNotification?.content?.clan_name,
 					clan_id: unreadNotification?.content?.clan_id,
 					category_name: unreadNotification?.content?.category_name,
-					notifications: [],
+					notifications: []
 				};
 			}
 
@@ -44,7 +44,7 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 			dispatch(notificationActions.setReadNotiStatus(ids));
 			dispatch(notificationActions.setStatusNoti());
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	const handleDeleteNotification = useCallback(
@@ -52,7 +52,7 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 			dispatch(notificationActions.setReadNotiStatus([notification.id]));
 			deleteNotify(notification.id, clanId ?? '0');
 		},
-		[clanId, deleteNotify, dispatch],
+		[clanId, deleteNotify, dispatch]
 	);
 
 	return (

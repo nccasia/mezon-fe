@@ -59,7 +59,7 @@ export class WindowBadge implements IBadge {
 	}
 
 	public setBadgeCount(badgeNumber: number) {
-		if (badgeNumber) {
+		if (badgeNumber || badgeNumber === null) {
 			this.generator.generate(badgeNumber).then((image) => {
 				this.currentOverlayIcon.image = image;
 				this.mainWindow.setOverlayIcon(this.currentOverlayIcon.image, this.currentOverlayIcon.badgeDescription);

@@ -1,7 +1,10 @@
 import { PlusAltIcon, remove, save, setDefaultChannelLoader, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllClans } from '@mezon/store-mobile';
-import React, { useCallback, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
+import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ClanIcon } from '../ClanIcon';
@@ -13,27 +16,40 @@ export const ListClanPopup = React.memo(() => {
 	const styles = style(themeValue);
 	const clans = useSelector(selectAllClans);
 	const [isVisibleCreateClanModal, setIsVisibleCreateClanModal] = useState<boolean>(false);
+	const timerRef = useRef(null);
+	const navigation = useNavigation();
+	const isTabletLandscape = useTabletLandscape();
+
+	useEffect(() => {
+		return () => {
+			timerRef?.current && clearTimeout(timerRef.current);
+		};
+	}, []);
 
 	const visibleCreateClanModal = useCallback((value: boolean) => {
 		setIsVisibleCreateClanModal(value);
 	}, []);
 
-	const handleChangeClan = useCallback(async (clanId: string) => {
-		const store = await getStoreAsync();
-		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-		save(STORAGE_CLAN_ID, clanId);
-		store.dispatch(clansActions.setCurrentClanId(clanId));
-		const promises = [];
-		promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
-		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
-		promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
-		const results = await Promise.all(promises);
+	const handleChangeClan = useCallback(
+		async (clanId: string) => {
+			if (isTabletLandscape) navigation.navigate(APP_SCREEN.HOME as never);
+			const store = await getStoreAsync();
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			save(STORAGE_CLAN_ID, clanId);
+			store.dispatch(clansActions.setCurrentClanId(clanId));
+			const promises = [];
+			promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+			const results = await Promise.all(promises);
 
-		const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-		if (channelResp) {
-			await setDefaultChannelLoader(channelResp.payload, clanId);
-		}
-	}, []);
+			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+			if (channelResp) {
+				await setDefaultChannelLoader(channelResp.payload, clanId);
+			}
+		},
+		[isTabletLandscape]
+	);
 
 	return (
 		<View style={styles.clansBox}>

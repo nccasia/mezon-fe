@@ -1,5 +1,5 @@
 import { DeviceUUID } from 'device-uuid';
-import { Client, Session, Socket } from 'mezon-js';
+import { Client, DefaultSocket, Session, Socket } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
@@ -178,6 +178,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[clientRef, socketRef]
 	);
 
+	const abortControllerRef = React.useRef<AbortController | null>(null);
+	const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
+
 	const reconnect = React.useCallback(
 		async (clanId: string) => {
 			if (!clientRef.current) {
@@ -194,9 +197,23 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return Promise.resolve(null);
 			}
 
+			if (abortControllerRef.current) {
+				abortControllerRef.current.abort();
+			}
+
+			abortControllerRef.current = new AbortController();
+			const signal = abortControllerRef.current.signal;
+
 			// eslint-disable-next-line no-async-promise-executor
 			return new Promise(async (resolve, reject) => {
 				let failCount = 0;
+
+				signal.addEventListener('abort', () => {
+					if (timeoutIdRef.current) {
+						clearTimeout(timeoutIdRef.current);
+						return resolve('RECONNECTING');
+					}
+				});
 
 				const retry = async () => {
 					if (failCount >= MAX_WEBSOCKET_FAILS) {
@@ -208,18 +225,21 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						const newSession = await clientRef?.current?.sessionRefresh(
 							new Session(session.token, session.refresh_token, session.created)
 						);
-						const recsession = await socket.connect(newSession || session, true);
+						const recsession = await socket.connect(newSession || session, true, DefaultSocket.DefaultConnectTimeoutMs, signal);
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
-						resolve(socket);
+						return resolve(socket);
 					} catch (error) {
 						failCount++;
 						const retryTime = isFromMobile
 							? 0
 							: Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
-						await new Promise((res) => setTimeout(res, retryTime));
-						await retry();
+						await new Promise((res) => {
+							timeoutIdRef.current = setTimeout(res, retryTime);
+						});
+
+						!socketRef.current?.isOpen() && (await retry());
 					}
 				};
 

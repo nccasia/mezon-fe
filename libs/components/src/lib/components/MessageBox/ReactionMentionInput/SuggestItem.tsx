@@ -102,6 +102,8 @@ const SuggestItem = ({
 				{specificChannel?.channel_private === 1 && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
+				{(!specificChannel?.channel_private || specificChannel?.channel_private === 0) &&
+					specificChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 5-5" />}
 
 				{display && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">

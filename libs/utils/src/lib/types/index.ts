@@ -253,6 +253,13 @@ export type IChannelsStream = {
 	streaming_url: string;
 };
 
+export type IStreamInfo = {
+	clanId: string;
+	clanName: string;
+	streamId: string;
+	streamName: string;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;

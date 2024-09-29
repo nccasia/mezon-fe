@@ -25,6 +25,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	quantityNotifyClans: Record<string, number>;
 	lastSeenTimeStampChannels: Record<string, number>;
 	isShowInbox: boolean;
+	specificNotifications: NotificationEntity[];
 }
 
 export type QuantityNotifyChannelArgs = {
@@ -82,20 +83,6 @@ export const deleteNotify = createAsyncThunk('notification/deleteNotify', async 
 	return response;
 });
 
-export const setAllLastSeenTimeStampChannelThunk = createAsyncThunk(
-	'notification/setAllLastSeenTimeStampChannel',
-	async (payload: LastSeenTimeStampChannelArgs[], thunkAPI) => {
-		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannel(payload));
-	}
-);
-
-export const setLastSeenTimeStampChannelThunk = createAsyncThunk(
-	'notification/setLastSeenTimeStampChannel',
-	async (payload: LastSeenTimeStampChannelArgs, thunkAPI) => {
-		thunkAPI.dispatch(notificationActions.setLastSeenTimeStampChannel(payload));
-	}
-);
-
 export const initialNotificationState: NotificationState = notificationAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	notificationMentions: [],
@@ -106,7 +93,8 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
-	isShowInbox: false
+	isShowInbox: false,
+	specificNotifications: []
 });
 
 export const notificationSlice = createSlice({
@@ -125,6 +113,9 @@ export const notificationSlice = createSlice({
 				state.quantityNotifyChannels[action.payload.channel_id] = quantityNotify;
 				state.quantityNotifyClans[action.payload.clan_id] = quantityNotifyClan;
 			}
+			if (action.payload.code === NotificationCode.USER_MENTIONED || action.payload.code === NotificationCode.USER_REPLIED) {
+				state.specificNotifications.push(action.payload);
+			}
 		},
 		remove: notificationAdapter.removeOne,
 		setMessageNotifiedId(state, action) {
@@ -136,12 +127,14 @@ export const notificationSlice = createSlice({
 
 		removeNotificationsByChannelId: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
-
-			const remainingNotifications = state.entities
-				? Object.values(state.entities).filter((notification) => notification?.content?.channel_id !== channelId)
+			const remainingNotifications = state.specificNotifications
+				? Object.values(state.specificNotifications).filter((notification) => notification?.content?.channel_id !== channelId)
 				: [];
+			state.specificNotifications = remainingNotifications;
+		},
 
-			notificationAdapter.setAll(state, remainingNotifications as any);
+		removeAllNotificattionChannel: (state) => {
+			state.specificNotifications = [];
 		},
 
 		setNotiListUnread(state, action) {
@@ -217,6 +210,7 @@ const countNotifyByChannelId = (state: NotificationState, channelId: string, aft
 	).length;
 	return quantityNotify;
 };
+
 const countNotifyByClanId = (state: NotificationState, clanId: string) => {
 	const listNotifies = Object.values(state.entities);
 	let countClanNotify = 0;
@@ -237,9 +231,7 @@ export const notificationReducer = notificationSlice.reducer;
 export const notificationActions = {
 	...notificationSlice.actions,
 	fetchListNotification,
-	deleteNotify,
-	setAllLastSeenTimeStampChannelThunk,
-	setLastSeenTimeStampChannelThunk
+	deleteNotify
 };
 
 const { selectAll, selectEntities } = notificationAdapter.getSelectors();
@@ -248,6 +240,7 @@ export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: No
 	rootState[NOTIFICATION_FEATURE_KEY];
 
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
+
 export const selectNotificationEntities = createSelector(getNotificationState, selectEntities);
 export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
@@ -296,3 +289,17 @@ export const selectCountNotifyByClanId = (clanId: string) =>
 export const selectTotalClansNotify = createSelector(getNotificationState, (state) => {
 	return Object.values(state.quantityNotifyClans).reduce((totalNotifyCount, notifyCount) => totalNotifyCount + notifyCount, 0);
 });
+
+export const selectSpecificNotifications = createSelector(getNotificationState, (state: NotificationState) => state.specificNotifications);
+
+export const selectCountByChannelId = (channelId: string) =>
+	createSelector(
+		selectSpecificNotifications,
+		(notifications) => notifications.filter((notification) => notification.content.channel_id === channelId).length
+	);
+
+export const selectCountByClanId = (clanId: string) =>
+	createSelector(
+		selectSpecificNotifications,
+		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
+	);

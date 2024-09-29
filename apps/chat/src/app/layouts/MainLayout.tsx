@@ -1,5 +1,6 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAllNotification, selectTotalUnreadDM } from '@mezon/store';
+import { reactionActions, selectAnyUnreadChannel, selectSpecificNotifications, selectTotalUnreadDM } from '@mezon/store';
+import { useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -11,9 +12,12 @@ import { Outlet, useNavigate } from 'react-router-dom';
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
-	const allNotify = useSelector(selectAllNotification);
+	const allNotify = useSelector(selectSpecificNotifications);
+
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
+
+	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
 
 	useEffect(() => {
 		const handleNavigateToPath = (_: unknown, path: string) => {
@@ -28,7 +32,7 @@ const GlobalEventListener = () => {
 	useEffect(() => {
 		const reconnectSocket = debounce(() => {
 			if (document.visibilityState === 'visible') {
-				handleReconnect('Socket disconnected, attempting to reconnect...');
+				handleReconnect('Socket disconnected event, attempting to reconnect...');
 			}
 		}, 100);
 
@@ -42,15 +46,21 @@ const GlobalEventListener = () => {
 
 	useEffect(() => {
 		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
-		if (notificationCount > 0) {
-			document.title = `Mezon (${notificationCount})`;
-		} else {
-			document.title = 'Mezon';
-		}
+
 		if (isElectron()) {
+			if (hasUnreadChannel && !notificationCount) {
+				electronBridge?.setBadgeCount(null);
+				return;
+			}
 			electronBridge?.setBadgeCount(notificationCount);
+		} else {
+			if (notificationCount > 0) {
+				document.title = `(${notificationCount}) Mezon`;
+			} else {
+				document.title = 'Mezon';
+			}
 		}
-	}, [allNotify.length, totalUnreadDM, quantityPendingRequest]);
+	}, [allNotify.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

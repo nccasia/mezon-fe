@@ -104,7 +104,7 @@ const ModalUserProfile = ({
 	useEffect(() => {
 		const getColor = async () => {
 			if ((isFooterProfile && checkUrl(userProfile?.user?.avatar_url)) || checkUrl(message?.avatar) || checkUrl(userById?.user?.avatar_url)) {
-				const url = (isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url;
+				const url = userById?.user?.avatar_url;
 				const colorImg = await getColorAverageFromURL(url || '');
 				if (colorImg) setColor(colorImg);
 			}
@@ -143,7 +143,7 @@ const ModalUserProfile = ({
 				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
-				customStatus={userStatusProfile ? userStatusProfile : userCustomStatus}
+				customStatus={userCustomStatus}
 				isAnonymous={checkAnonymous}
 				userID={userID}
 				positionType={positionType}
@@ -153,7 +153,7 @@ const ModalUserProfile = ({
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{name || userById?.user?.display_name || userById?.user?.username}
+							{checkAnonymous ? 'Anonymous' : userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
 							{isFooterProfile

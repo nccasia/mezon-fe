@@ -34,7 +34,7 @@ const Setting = ({ isDM }: settingProps) => {
 	return (
 		<div>
 			{isShowSettingFooter?.status ? (
-				<div className=" z-10 flex fixed inset-0  w-screen">
+				<div className=" z-20 flex fixed inset-0  w-screen">
 					<div className="flex text-gray- w-screen relative">
 						<div className={`${!menuIsOpen ? 'hidden' : 'flex'} text-gray- w-1/6 xl:w-1/4 min-w-56 relative`}>
 							<SettingItem onItemClick={handleSettingItemClick} initSetting={currentSetting} />

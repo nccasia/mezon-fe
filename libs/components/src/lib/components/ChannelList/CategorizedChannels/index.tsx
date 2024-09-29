@@ -1,9 +1,11 @@
-import { useAuth, useCategory, useEscapeKey, useOnClickOutside, UserRestrictionZone, useUserRestriction } from '@mezon/core';
+import { useAuth, useCategory, useEscapeKey, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	categoriesActions,
 	channelsActions,
 	defaultNotificationCategoryActions,
 	selectCategoryIdSortChannel,
+	selectChannelMetaEntities,
+	selectCtrlKSelectedChannelId,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	useAppDispatch
@@ -34,11 +36,13 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
-	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
-	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
+	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.manageChannel
+	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-
+	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 	const permissions = useMemo(
 		() => ({
 			hasAdminPermission,
@@ -58,13 +62,14 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const [isShowPanelCategory, setIsShowPanelCategory] = useState<boolean>(false);
 	const [showModal, setShowModal] = useState(false);
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
-	const [isShowCategoryChannels, setIsShowCategoryChannels] = useState<boolean>(true);
+	const [isShowAllCategoryChannels, setIsShowAllCategoryChannels] = useState<boolean>(true);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
 	const location = useLocation();
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
+	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -82,7 +87,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	const handleToggleCategory = () => {
-		setIsShowCategoryChannels(!isShowCategoryChannels);
+		setIsShowAllCategoryChannels(!isShowAllCategoryChannels);
 	};
 
 	const handleCloseCategorySetting = () => {
@@ -97,11 +102,11 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
-		dispatch(channelsActions.getCurrentCategory(paramCategory));
+		dispatch(channelsActions.setCurrentCategory(paramCategory));
 	};
 
 	const handleOpenCreateChannelModal = (category: ICategoryChannel) => {
-		setIsShowCategoryChannels(true);
+		setIsShowAllCategoryChannels(true);
 		openModalCreateNewChannel(category);
 	};
 
@@ -113,6 +118,10 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const confirmDeleteCategory = async () => {
 		handleDeleteCategory({ category });
 		setShowModal(false);
+	};
+
+	const isUnreadChannel = (channelId: string) => {
+		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
@@ -139,7 +148,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						}}
 						className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 					>
-						{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+						{isShowAllCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 						<span className="one-line">{category.category_name}</span>
 					</button>
 					<button
@@ -182,26 +191,23 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>
 			)}
-			{isShowCategoryChannels && (
-				<div className="mt-[5px] space-y-0.5 text-contentTertiary">
-					{category?.channels
-						?.filter((channel: IChannel) => {
-							const categoryIsOpen = isShowCategoryChannels;
-							return categoryIsOpen || channel?.unread;
-						})
-						.map((channel: IChannel) => {
-							return (
-								<ChannelListItem
-									ref={(component) => (channelRefs.current[channel.id] = component)}
-									isActive={currentChannelId === channel.id}
-									key={channel.id}
-									channel={channel as ChannelThreads}
-									permissions={permissions}
-								/>
-							);
-						})}
-				</div>
-			)}
+			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
+				{category?.channels
+					?.filter((channel: IChannel) => {
+						return isShowAllCategoryChannels || isUnreadChannel(channel.id) || channel.id === ctrlKSelectedChannelId;
+					})
+					.map((channel: IChannel) => {
+						return (
+							<ChannelListItem
+								ref={(component) => (channelRefs.current[channel.id] = component)}
+								isActive={currentChannelId === channel.id}
+								key={channel.id}
+								channel={channel as ChannelThreads}
+								permissions={permissions}
+							/>
+						);
+					})}
+			</div>
 		</div>
 	);
 };

@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useChatReaction, useChatSending, useUserPermission } from '@mezon/core';
+import { useAuth, useChatReaction, useChatSending, useClanRestriction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -21,7 +21,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, EPermission, getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -64,7 +64,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
 	});
 
-	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
+	const { isCanManageThread } = useUserPermission();
+	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
@@ -181,7 +182,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
-	const handleActionPinMessage = async () => {
+	const handleActionPinMessage = () => {
 		if (message) onClose();
 		timeoutRef.current = setTimeout(
 			() => {
@@ -366,39 +367,39 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const getActionMessageIcon = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.EditMessage:
-				return <Icons.PencilIcon color={themeValue.text} />;
+				return <Icons.PencilIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Reply:
-				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.ForwardMessage:
-				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.ForwardAllMessages:
-				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CreateThread:
-				return <Icons.ThreadIcon color={themeValue.text} />;
+				return <Icons.ThreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyText:
-				return <Icons.CopyIcon color={themeValue.text} />;
+				return <Icons.CopyIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.DeleteMessage:
-				return <Icons.TrashIcon color={baseColor.red} height={20} width={20} />;
+				return <Icons.TrashIcon color={baseColor.red} height={size.s_20} width={size.s_20} />;
 			case EMessageActionType.PinMessage:
-				return <Icons.PinIcon color={themeValue.text} />;
+				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.UnPinMessage:
-				return <Icons.PinIcon color={themeValue.text} />;
+				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.MarkUnRead:
-				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Mention:
-				return <Icons.AtIcon color={themeValue.text} />;
+				return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
-				return <Icons.DownloadIcon color={themeValue.text} />;
+				return <Icons.DownloadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMediaLink:
-				return <Icons.LinkIcon color={themeValue.text} />;
+				return <Icons.LinkIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMessageLink:
-				return <Icons.LinkIcon color={themeValue.text} />;
+				return <Icons.LinkIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.Report:
 				return <Icons.FlagIcon color={baseColor.red} height={size.s_14} width={size.s_14} />;
 			case EMessageActionType.GiveACoffee:
 				return <Icons.GiftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />;
 			case EMessageActionType.ResendMessage:
-				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			default:
 				return <View />;
 		}
@@ -410,9 +411,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
 		const isHideCreateThread = isDM || !isCanManageThread || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
-		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
+		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [
@@ -455,10 +456,33 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
-	}, [t, userProfile, message, listPinMessages]);
+	}, [
+		userProfile?.user?.id,
+		message?.user?.id,
+		message?.isError,
+		message?.attachments,
+		message?.id,
+		listPinMessages,
+		isDM,
+		isCanManageThread,
+		currentChannel?.parrent_id,
+		isAllowDelMessage,
+		isShowForwardAll,
+		t
+	]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous} showAction={!isDM} />;
+		return (
+			<UserProfile
+				userId={user?.id}
+				user={user}
+				message={message}
+				checkAnonymous={checkAnonymous}
+				showAction={!isDM}
+				currentChannel={isDM ? currentDmGroup : currentChannel}
+				showRole={!isDM}
+			/>
+		);
 	};
 
 	const handleReact = async (mode, messageId, emoji_id: string, emoji: string, senderId) => {

@@ -20,6 +20,7 @@ import {
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
+	selectAnonymousMode,
 	selectAttachmentByChannelId,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -120,6 +121,7 @@ export type MentionReactInputProps = {
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;
+	hasPermissionEdit?: boolean;
 };
 
 const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
@@ -133,7 +135,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
-
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
@@ -218,16 +220,6 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 			}
 		}
 
-		if (isEnterKey && ctrlKey && shiftKey) {
-			event.preventDefault();
-			if (request?.valueTextInput !== '' || openThreadMessageState) {
-				if (props.currentClanId) {
-					handleSend(true);
-				}
-				return;
-			}
-		}
-
 		switch (key) {
 			case 'Enter': {
 				if (shiftKey || isComposing) {
@@ -235,7 +227,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 				} else {
 					event.preventDefault();
 					trackEnterPress();
-					handleSend(false);
+					handleSend(anonymousMode);
 					return;
 				}
 			}
@@ -645,7 +637,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 					maxWidth: '100%',
 					maxHeight: '350px'
 				}}
-				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
+				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -717,7 +709,13 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
+			{!props.isThread && (
+				<GifStickerEmojiButtons
+					activeTab={SubPanelName.NONE}
+					currentClanId={props.currentClanId}
+					hasPermissionEdit={props.hasPermissionEdit || true}
+				/>
+			)}
 		</div>
 	);
 });

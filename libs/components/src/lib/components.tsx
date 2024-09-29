@@ -21,6 +21,7 @@ export { default as ModalInvite } from './components/ListMemberInvite/modalInvit
 export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMarkup';
 export { default as MarkdownContent } from './components/MarkdownFormatText/MarkdownContent';
 export { default as PlainText } from './components/MarkdownFormatText/PlainText';
+export { default as StreamInfo } from './components/StreamInfo';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
 
@@ -43,9 +44,9 @@ export { default as MessageModalImage } from './components/MessageWithUser/Messa
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
+export { default as ModalNotificationSetting } from './components/notificationSetting';
 export { default as SearchModal } from './components/SearchModal';
 export { default as ToastController } from './components/ToastController/ToastController';
-export { default as ModalNotificationSetting } from './components/notificationSetting';
 
 export { Icons } from '@mezon/ui';
 export * from './components/AvatarImage/AvatarImage';
@@ -78,4 +79,7 @@ export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
 export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
+export { default as ModalDeleteMess } from './components/DeleteMessageModal/ModalDeleteMess';
+export { default as useProcessMention } from './components/MessageBox/ReactionMentionInput/useProcessMention';
 export * from './components/ThumbnailAttachmentRender';
+

@@ -22,6 +22,11 @@
             "leaveServer": "Rời clan",
             "deleteClan": "Xóa Clan"
         },
+        "optionShowEmptyCategories": {
+            "title": "Hiển thị danh mục trống",
+            "show": "Hiển thị",
+            "hide": "Ẩn"
+        },
         "devMode": {
             "title": "Chế độ nhà phát triển",
             "copyServerID": "Sao chép ID clan",

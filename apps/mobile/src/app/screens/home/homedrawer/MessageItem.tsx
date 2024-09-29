@@ -45,6 +45,7 @@ import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
+import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -145,7 +146,18 @@ const MessageItem = React.memo(
 
 		const isOnlyContainEmoji = useMemo(() => {
 			return isValidEmojiData(message.content);
-		}, [message.content, message.mentions]);
+		}, [message.content]);
+
+		const isEdited = useMemo(() => {
+			if (message?.update_time) {
+				const updateDate = new Date(message?.update_time);
+				const createDate = new Date(message?.create_time);
+				return updateDate > createDate;
+			} else if (message.hideEditted === false && !!message?.content?.t) {
+				return true;
+			}
+			return false;
+		}, [message?.update_time, message.hideEditted, message?.content?.t, message?.create_time]);
 
 		useEffect(() => {
 			if (props?.messageId) {
@@ -162,6 +174,7 @@ const MessageItem = React.memo(
 				}, 3000);
 			} else {
 				setShowHighlightReply(false);
+				timeoutRef.current && clearTimeout(timeoutRef.current);
 			}
 			return () => {
 				timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -180,25 +193,17 @@ const MessageItem = React.memo(
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
-		const onPressAvatar = useCallback(() => {
-			if (preventAction) return;
-			setIsOnlyEmojiPicker(false);
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
-		}, [preventAction, setIsOnlyEmojiPicker, onMessageAction, message]);
-
 		const onPressInfoUser = useCallback(() => {
 			if (preventAction) return;
 			setIsOnlyEmojiPicker(false);
 
-			onMessageAction({
-				type: EMessageBSToShow.UserInformation,
-				user: message?.user,
-				message
-			});
+			if (!checkAnonymous) {
+				onMessageAction({
+					type: EMessageBSToShow.UserInformation,
+					user: message?.user,
+					message
+				});
+			}
 		}, [message, onMessageAction, preventAction, setIsOnlyEmojiPicker]);
 
 		const onMention = useCallback(
@@ -230,7 +235,6 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
@@ -379,7 +383,7 @@ const MessageItem = React.memo(
 					) : null}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 						<AvatarMessage
-							onPress={onPressAvatar}
+							onPress={onPressInfoUser}
 							id={message?.user?.id}
 							avatar={messageAvatar}
 							username={usernameMessage}
@@ -415,7 +419,7 @@ const MessageItem = React.memo(
 										mentions: message.mentions,
 										...(checkOneLinkImage ? { t: '' } : {})
 									}}
-									isEdited={message.hideEditted === false && !!message?.content?.t}
+									isEdited={isEdited}
 									translate={t}
 									onMention={onMention}
 									onChannelMention={onChannelMention}
@@ -447,7 +451,13 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				{/*<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />*/}
+				<NewMessageRedLine
+					channelId={props?.channelId}
+					messageId={props?.messageId}
+					isEdited={message?.hideEditted}
+					isSending={message?.isSending}
+					isMe={message?.isMe}
+				/>
 			</Animated.View>
 		);
 	},

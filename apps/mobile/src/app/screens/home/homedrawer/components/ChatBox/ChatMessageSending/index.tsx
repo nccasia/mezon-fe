@@ -161,14 +161,16 @@ export const ChatMessageSending = memo(
 			);
 			clearInputAfterSendMessage();
 			const sendMessageAsync = async () => {
-				if (type === EMessageActionType.EditMessage) {
-					await onEditMessage(
-						filterEmptyArrays(payloadSendMessage),
-						messageActionNeedToResolve?.targetMessage?.id,
-						simplifiedMentionList || []
-					);
+				if ([EMessageActionType.CreateThread].includes(messageAction)) {
+					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 				} else {
-					if (![EMessageActionType.CreateThread].includes(messageAction)) {
+					if (type === EMessageActionType.EditMessage) {
+						await onEditMessage(
+							filterEmptyArrays(payloadSendMessage),
+							messageActionNeedToResolve?.targetMessage?.id,
+							simplifiedMentionList || []
+						);
+					} else {
 						const isMentionEveryOne = mentionsOnMessage?.current?.some?.((mention) => mention.user_id === ID_MENTION_HERE);
 						await sendMessage(
 							filterEmptyArrays(payloadSendMessage),
@@ -180,10 +182,6 @@ export const ChatMessageSending = memo(
 							true
 						);
 					}
-				}
-
-				if ([EMessageActionType.CreateThread].includes(messageAction)) {
-					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 				}
 			};
 

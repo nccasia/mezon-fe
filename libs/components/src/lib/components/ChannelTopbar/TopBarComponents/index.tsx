@@ -34,11 +34,10 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 					</div>
 				)}
 
-				{isPrivate === ChannelStatusEnum.isPrivate && (isChannelVoice || isChannelStream) && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
+				{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
 				{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
-				{isPrivate === undefined && (isChannelVoice || isChannelStream) && (
-					<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
-				)}
+				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
+				{isPrivate === undefined && isChannelStream && <Icons.Stream defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
 				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 

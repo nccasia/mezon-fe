@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useAuth, useEscapeKey, useOnClickOutside, useThreads, useUserRestriction } from '@mezon/core';
+import { useAppNavigation, useAppParams, useEscapeKey, useOnClickOutside, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
@@ -7,7 +7,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
-	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
@@ -49,7 +48,7 @@ const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			className={`z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			{isChannelVoice ? <TopBarChannelVoice channel={channel} /> : <TopBarChannelText channel={channel} mode={mode} />}
 		</div>
@@ -85,13 +84,8 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
-	const { userProfile } = useAuth();
-	const currentClan = useSelector(selectCurrentClan);
-	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
-	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
-	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
-	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
+	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
+	const isShowSettingChannel = hasChannelManagePermission;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">

@@ -12,11 +12,12 @@ export const POLICIES_FEATURE_KEY = 'policies';
 
 export interface PermissionUserEntity extends IPermissionUser {
 	id: string; // Primary ID
+	max_level_permission?: number;
 }
 
-export const mapPermissionUserToEntity = (PermissionsUserRes: ApiPermission) => {
-	const id = (PermissionsUserRes as unknown as any).id;
-	return { ...PermissionsUserRes, id };
+export const mapPermissionUserToEntity = (userPermissions: ApiPermission) => {
+	const id = (userPermissions as unknown as any).id;
+	return { ...userPermissions, id };
 };
 
 export interface PoliciesState extends EntityState<PermissionUserEntity, string> {
@@ -35,11 +36,11 @@ export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPa
 	'policies/fetchPermissionsUser',
 	async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.getPermissionOfUserInTheClan(mezon.session, clanId);
-		if (!response.permissions) {
+		const response = await mezon.client.GetRoleOfUserInTheClan(mezon.session, clanId);
+		if (!response.roles) {
 			return [];
 		}
-		return response.permissions.map(mapPermissionUserToEntity);
+		return response.roles.map(mapPermissionUserToEntity);
 	}
 );
 const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 3;
@@ -69,10 +70,7 @@ export const initialPoliciesState: PoliciesState = policiesAdapter.getInitialSta
 export const policiesSlice = createSlice({
 	name: POLICIES_FEATURE_KEY,
 	initialState: initialPoliciesState,
-	reducers: {
-		add: policiesAdapter.addOne,
-		remove: policiesAdapter.removeOne
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchPermissionsUser.pending, (state: PoliciesState) => {
@@ -82,7 +80,6 @@ export const policiesSlice = createSlice({
 				policiesAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
-
 			.addCase(fetchPermissionsUser.rejected, (state: PoliciesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -114,9 +111,21 @@ const { selectAll } = policiesAdapter.getSelectors();
 
 export const getPoliciesState = (rootState: { [POLICIES_FEATURE_KEY]: PoliciesState }): PoliciesState => rootState[POLICIES_FEATURE_KEY];
 
+export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: PoliciesState }): PoliciesState => rootState['policiesDefaultSlice'];
+
 export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
 
-export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: PoliciesState }): PoliciesState => rootState['policiesDefaultSlice'];
+export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsUser, (userPermissions) => {
+	let maxPermissionLevel: number | null = null;
+	for (const permission of userPermissions) {
+		if (Number.isInteger(permission?.max_level_permission)) {
+			const permissionLevel = permission.max_level_permission as number;
+			maxPermissionLevel = maxPermissionLevel === null ? permissionLevel : Math.max(maxPermissionLevel, permissionLevel);
+		}
+	}
+
+	return maxPermissionLevel ?? null;
+});
 
 export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
 
@@ -125,5 +134,5 @@ export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUs
 });
 
 export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) => {
-	return permissions.filter((permission) => permission.scope === 1);
+	return permissions.filter((permission) => permission.scope === 2);
 });

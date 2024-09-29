@@ -1,78 +1,62 @@
-import { Icons } from "@mezon/mobile-components";
-import { useTheme } from "@mezon/mobile-ui";
-import { selectAllRolesClan, selectMemberClanByUserId, useAppSelector } from "@mezon/store-mobile";
-import { MezonAvatar } from "apps/mobile/src/app/temp-ui";
-import { useCallback, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
-import { style } from "./styles";
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
+import { selectAllRolesClan, selectMemberClanByUserId, useAppSelector, UsersClanEntity } from '@mezon/store-mobile';
+import { useMemo } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { MezonAvatar } from '../../../../temp-ui';
+import { style } from './styles';
 
 interface IUserItem {
-    userID: string;
-    hasBorder?: boolean;
-    onPress?: () => void;
+	userID: string;
+	onMemberSelect?: (member: UsersClanEntity) => void;
 }
 
-export default function UserItem({ userID, hasBorder, onPress }: IUserItem) {
-    const { themeValue } = useTheme();
-    const styles = style(themeValue);
-    const user = useAppSelector(selectMemberClanByUserId(userID));
-    const rolesClan = useAppSelector(selectAllRolesClan);
+export default function UserItem({ userID, onMemberSelect }: IUserItem) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const user = useAppSelector(selectMemberClanByUserId(userID));
+	const rolesClan = useAppSelector(selectAllRolesClan);
 
-    const userRolesClan = useMemo(() => {
-        return rolesClan?.filter((role) => {
-            if (role.role_user_list?.role_users) {
-                const list = role.role_user_list.role_users.filter(user => user.id === userID);
-                return list.length;
-            }
-            return false;
-        }) || [];
-    }, [userID, rolesClan]);
+	const clanUserRole = useMemo(() => {
+		return (
+			rolesClan?.filter((role) => {
+				const roleUser = role?.role_user_list?.role_users;
+				if (roleUser) {
+					return roleUser?.some((user) => user?.id === userID);
+				}
+				return false;
+			}) || []
+		);
+	}, [userID, rolesClan]);
 
-    const userName = useMemo(() => {
-        return user?.user?.username;
-    }, [user?.user?.username]);
+	const onPressMemberItem = () => {
+		onMemberSelect(user);
+	};
 
-    const userAvatar = useMemo(() => {
-        return user?.user?.avatar_url;
-    }, [user?.user?.avatar_url])
+	return (
+		<Pressable onPress={onPressMemberItem}>
+			<View style={styles.container}>
+				<MezonAvatar avatarUrl={user?.user?.avatar_url || ''} username={user?.user?.username} />
+				<View style={[styles.rightContent]}>
+					<View style={styles.content}>
+						<Text style={styles.displayName}>{user?.user?.display_name || ''}</Text>
+						<Text style={styles.username}>{user?.user?.username || ''}</Text>
 
-    const userDisplay = useMemo(() => {
-        return user?.user?.display_name;
-    }, [user?.user?.display_name]);
-
-    const onPressUser = useCallback(() => {
-        onPress && onPress();
-    }, [user?.user?.id])
-
-    return (
-        <Pressable onPress={onPressUser}>
-            <View style={styles.container}>
-                <MezonAvatar
-                    avatarUrl={userAvatar}
-                    username={userName}
-                />
-                <View style={[styles.rightContent, hasBorder && styles.border]}>
-                    <View style={styles.content}>
-                        <Text style={styles.displayName}>{userDisplay}</Text>
-                        <Text style={styles.username}>{userName}</Text>
-
-                        <View style={styles.roleWrapper}>
-                            {userRolesClan?.length > 0 && userRolesClan.map((role, index) => (
-                                <View
-                                    key={"role_" + role.title + index.toString()}
-                                    style={styles.roleContainer}>
-                                    <View style={styles.roleCircle}></View>
-                                    <Text style={styles.roleTitle}>{role.title}</Text>
-                                </View>
-                            ))}
-                        </View>
-                    </View>
-                    <View style={styles.icon}>
-                        <Icons.ChevronSmallRightIcon color={themeValue.text} height={20} width={20} />
-                    </View>
-                </View>
-            </View>
-        </Pressable>
-
-    )
+						<View style={styles.roleWrapper}>
+							{clanUserRole?.length > 0 &&
+								clanUserRole.map((role, index) => (
+									<View key={'role_' + role.title + index.toString()} style={styles.roleContainer}>
+										<View style={styles.roleCircle}></View>
+										<Text style={styles.roleTitle}>{role.title}</Text>
+									</View>
+								))}
+						</View>
+					</View>
+					<View style={styles.icon}>
+						<Icons.ChevronSmallRightIcon color={themeValue.text} height={20} width={20} />
+					</View>
+				</View>
+			</View>
+		</Pressable>
+	);
 }

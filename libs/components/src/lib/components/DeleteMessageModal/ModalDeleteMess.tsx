@@ -1,8 +1,7 @@
-import { MessageWithUser } from '@mezon/components';
-import { useDeleteMessage } from '@mezon/core';
+import { useDeleteMessage, useEditMessage } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect } from 'react';
-import { useEditMessage } from './useEditMessage';
+import MessageWithUser from '../MessageWithUser';
 
 type ModalDeleteMessProps = {
 	mess: IMessageWithUser;
