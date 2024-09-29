@@ -106,7 +106,8 @@ const NavigationMain = () => {
 					channelId: currentChannelId,
 					noCache: true,
 					isFetchingLatestMessages: true,
-					isClearMessage: true
+					isClearMessage: true,
+					clanId: currentClanId
 				})
 			);
 		}
@@ -146,7 +147,8 @@ const NavigationMain = () => {
 						channelId: currentChannelId,
 						noCache: true,
 						isFetchingLatestMessages: true,
-						isClearMessage: true
+						isClearMessage: true,
+						clanId: currentClanId,
 					})
 				),
 				store.dispatch(
