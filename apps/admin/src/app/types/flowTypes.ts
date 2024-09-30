@@ -62,3 +62,14 @@ export interface IParameter {
 	parameterKey: string;
 	parameterValue: string;
 }
+
+export interface ISelectedNode {
+	type?: string;
+	label?: string;
+	description?: string;
+	parameters: Array<{
+		type: string;
+		label: string;
+		name: string;
+	}>;
+}

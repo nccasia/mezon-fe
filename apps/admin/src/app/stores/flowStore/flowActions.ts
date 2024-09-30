@@ -1,5 +1,5 @@
 import { Edge, Node } from '@xyflow/react';
-import { INodeType } from '../../types/flowTypes';
+import { INodeType, ISelectedNode } from '../../types/flowTypes';
 import { FLOW_ACTION_TYPE, FlowActionType } from './flowTypes';
 
 export const setNodesContext = (nodes: Node[]): FlowActionType => {
@@ -50,5 +50,17 @@ export const changeNodeType = (nodeType: INodeType): FlowActionType => {
 	return {
 		type: FLOW_ACTION_TYPE.CHANGE_NODE_TYPE,
 		payload: nodeType
+	};
+};
+export const changeSelectedNode = (node: ISelectedNode | null): FlowActionType => {
+	return {
+		type: FLOW_ACTION_TYPE.CHANGE_SELECTED_NODE,
+		payload: node
+	};
+};
+export const changeOpenModalNodeDetail = (open: boolean): FlowActionType => {
+	return {
+		type: FLOW_ACTION_TYPE.CHANGE_OPEN_MODAL_NODE_DETAIL,
+		payload: open
 	};
 };

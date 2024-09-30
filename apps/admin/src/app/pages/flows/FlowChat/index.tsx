@@ -24,15 +24,19 @@ const FlowChatPopup = () => {
 		setMessages([...messages, { message: { message: input, urlImage: undefined }, type: 'input' }]);
 		setInput('');
 		try {
-			const response: IMessage = await apiInstance.post(`/execution`, {
+			const response: { message: string; urlImage: string } = await apiInstance.post(`/execution`, {
 				flowId,
 				input
 			});
-			console.log(response);
-			setMessages((prev) => [...prev, { message: response.message, type: 'output' }]);
+			let urlImage: string[] = [];
+			try {
+				urlImage = JSON.parse(response.urlImage);
+			} catch {
+				urlImage = [response.urlImage];
+			}
+			setMessages((prev) => [...prev, { message: { message: response.message, urlImage: urlImage }, type: 'output' }]);
 		} catch (error) {
 			setMessages((prev) => [...prev, { message: { message: "Sory, I dont't know", urlImage: undefined }, type: 'output' }]);
-			console.log(error);
 		}
 	};
 	return (
@@ -41,7 +45,7 @@ const FlowChatPopup = () => {
 				<div className="w-[40px] h-[40px]">
 					<img
 						alt="avt"
-						src="https://cdn.dribbble.com/users/344048/screenshots/4134234/bot_icon_dribbble.jpg"
+						src="https://st3.depositphotos.com/8950810/17657/v/1600/depositphotos_176577870-stock-illustration-cute-smiling-funny-robot-chat.jpg"
 						className="w-[40px] h-[40px] rounded-full"
 					/>
 				</div>
@@ -55,11 +59,13 @@ const FlowChatPopup = () => {
 						key={index}
 						className={`p-2 shadow-inner flex ${message.type === 'input' ? 'bg-gray-50 dark:bg-gray-600 justify-end text-end' : 'bg-gray-100 dark:bg-gray-700 justify-start'}`}
 					>
-						<div className="w-[80%]">
+						<div className="w-[70%]">
 							<span>{message.message.message}</span>
 							<div className="bg-gray-100">
 								{message.message.urlImage?.map((img, index) => (
-									<img key={index} src={img} alt="img" className="max-w-[100%] object-cover ml-1 mb-1" />
+									<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] rounded-lg mb-1">
+										<img src={img} alt="img" className="max-w-[100%] object-cover" />
+									</div>
 								))}
 							</div>
 						</div>

@@ -70,7 +70,7 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 						</>
 					)}
 				</div>
-				{value.length > 0 && (
+				{value?.length > 0 && (
 					<div className="w-full flex gap-1 flex-col ">
 						{value.map((file, index) => (
 							<div key={index} className="flex justify-between items-center bg-white dark:bg-[#36393f] p-2 rounded-md">

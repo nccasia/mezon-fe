@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/ui';
 import { Handle, Position } from '@xyflow/react';
-import { copyNode, deleteNode } from '../../../../stores/flowStore/flowActions';
+import { changeOpenModalNodeDetail, changeSelectedNode, copyNode, deleteNode } from '../../../../stores/flowStore/flowActions';
 
 import React, { useContext, useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
@@ -8,6 +8,7 @@ import { AutoForm } from 'uniforms-semantic';
 import * as yup from 'yup';
 
 import { FlowContext } from '../../../../context/FlowContext';
+import { ISelectedNode } from '../../../../types/flowTypes';
 
 interface IAnchor {
 	id: string;
@@ -17,6 +18,7 @@ interface IAnchor {
 interface CustomNodeProps {
 	data: {
 		label: string;
+		type: string;
 		id: string;
 		defaultValue: {
 			[key: string]: string;
@@ -89,6 +91,25 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 		const defaultValue = (formRef.current as any)?.getModel();
 		flowDispatch(copyNode(nodeId, defaultValue));
 	};
+	const handleShowDetail = (e: React.MouseEvent<HTMLButtonElement>, nodeId: string) => {
+		const parameters = [];
+		for (const schema in bridgeSchema.properties) {
+			parameters.push({
+				name: schema,
+				type: bridgeSchema.properties[schema].type,
+				label: bridgeSchema.properties[schema].uniforms.label
+			});
+		}
+		const nodeData: ISelectedNode = {
+			type: data.type,
+			label: label,
+			description: '',
+			parameters
+		};
+		flowDispatch(changeSelectedNode(nodeData));
+		flowDispatch(changeOpenModalNodeDetail(true));
+		e.stopPropagation();
+	};
 
 	return (
 		<div className="w-[250px] border-2 rounded-lg bg-slate-50 dark:bg-gray-600 relative group hover:border-blue-300">
@@ -133,7 +154,7 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 				<button onClick={(e) => handleDeleteNode(e, data.id)} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md text-sm">
 					<Icons.DeleteMessageRightClick />
 				</button>
-				<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
+				<button onClick={(e) => handleShowDetail(e, data.id)} className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
 					<Icons.EyeOpen />
 				</button>
 			</div>

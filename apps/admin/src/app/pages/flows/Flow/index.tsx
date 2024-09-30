@@ -29,6 +29,7 @@ import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
 import NodeTypes from '../nodes/NodeType';
+import NodeDetailModal from './NodeDetailModal';
 import SaveFlowModal from './SaveFlowModal';
 
 const Flow = () => {
@@ -415,6 +416,7 @@ const Flow = () => {
 				open={openModalSaveFlow}
 				onClose={() => setOpenModalSaveFlow(false)}
 			/>
+			<NodeDetailModal />
 		</div>
 	);
 };

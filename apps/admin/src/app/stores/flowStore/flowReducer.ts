@@ -3,7 +3,9 @@ import { FLOW_ACTION_TYPE, FlowActionType, IFlowState } from './flowTypes';
 export const initFlowState: IFlowState = {
 	nodes: [],
 	edges: [],
-	nodeType: 'default'
+	nodeType: 'default',
+	selectedNode: null,
+	openModalNodeDetail: false
 };
 
 const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState => {
@@ -91,6 +93,17 @@ const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState 
 				edges: state.edges?.filter((e: { source: string; target: string }) => e.source !== nodeIdToDelete && e.target !== nodeIdToDelete)
 			};
 		}
+
+		case FLOW_ACTION_TYPE.CHANGE_OPEN_MODAL_NODE_DETAIL:
+			return {
+				...state,
+				openModalNodeDetail: action.payload
+			};
+		case FLOW_ACTION_TYPE.CHANGE_SELECTED_NODE:
+			return {
+				...state,
+				selectedNode: action.payload
+			};
 		default:
 			return state;
 	}
