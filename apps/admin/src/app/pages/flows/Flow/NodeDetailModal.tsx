@@ -17,8 +17,8 @@ const NodeDetailModal = () => {
 					<div>Name</div>
 					<div>Type</div>
 				</div>
-				{nodeData?.parameters?.map((parameter) => (
-					<div className="grid grid-cols-3 p-2 border-b-[1px] border-gray-300">
+				{nodeData?.parameters?.map((parameter, index) => (
+					<div key={index} className="grid grid-cols-3 p-2 border-b-[1px] border-gray-300">
 						<div>{parameter.label}</div>
 						<div>{parameter.name}</div>
 						<div>{parameter.type}</div>

@@ -11,7 +11,6 @@ export const initFlowState: IFlowState = {
 const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState => {
 	switch (action.type) {
 		case FLOW_ACTION_TYPE.SET_EDGES:
-			console.log('edges', action.payload);
 			return {
 				...state,
 				edges: action.payload

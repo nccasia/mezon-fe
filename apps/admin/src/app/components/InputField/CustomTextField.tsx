@@ -3,8 +3,7 @@ import { connectField, HTMLFieldProps } from 'uniforms';
 type CustomFormFieldProps = HTMLFieldProps<string, HTMLDivElement> & {
 	label?: string;
 };
-
-function CustomTextField({ onChange, value, label, ...props }: CustomFormFieldProps) {
+function CustomTextField({ onChange, value, label, errorMessage, showInlineError, fieldType, changed, ...props }: CustomFormFieldProps) {
 	return (
 		<div className="ImageField mt-2">
 			{label && <label className="block text-sm">{label}</label>}
@@ -14,7 +13,10 @@ function CustomTextField({ onChange, value, label, ...props }: CustomFormFieldPr
 					onChange(event.target.value);
 				}}
 				value={value || ''}
-				{...props}
+				type={props.type}
+				placeholder={props.placeholder}
+				disabled={props.disabled}
+				name={props.name}
 				ref={undefined}
 			/>
 		</div>

@@ -49,11 +49,9 @@ const Flow = () => {
 		description: ''
 	});
 	useEffect(() => {
-		console.log('nodes', flowState.nodes);
 		setNodes(flowState.nodes);
 	}, [flowState.nodes, setNodes]);
 	useEffect(() => {
-		console.log('edges', flowState.edges);
 		setEdges(flowState.edges);
 	}, [flowState.edges, setEdges]);
 
@@ -272,7 +270,6 @@ const Flow = () => {
 					flowName: response?.flowName,
 					description: response?.description
 				});
-				console.log(response);
 				const listNode = response.nodes?.map((node: INode) => {
 					const params: {
 						[key: string]: string;

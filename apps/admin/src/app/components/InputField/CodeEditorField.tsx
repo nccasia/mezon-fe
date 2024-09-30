@@ -9,7 +9,7 @@ type CustomFormFieldProps = HTMLFieldProps<string, HTMLDivElement> & {
 	label?: string;
 };
 
-function CodeEditorField({ onChange, value, label, ...props }: CustomFormFieldProps) {
+function CodeEditorField({ onChange, value, label, errorMessage, showInlineError, fieldType, changed, ...props }: CustomFormFieldProps) {
 	const highlight = (code: string) => Prism.highlight(code, Prism.languages.javascript, 'javascript');
 	return (
 		<div className="ImageField mt-2">

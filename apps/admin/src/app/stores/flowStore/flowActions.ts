@@ -3,7 +3,6 @@ import { INodeType, ISelectedNode } from '../../types/flowTypes';
 import { FLOW_ACTION_TYPE, FlowActionType } from './flowTypes';
 
 export const setNodesContext = (nodes: Node[]): FlowActionType => {
-	console.log('nodes', nodes);
 	return {
 		type: FLOW_ACTION_TYPE.SET_NODES,
 		payload: nodes
