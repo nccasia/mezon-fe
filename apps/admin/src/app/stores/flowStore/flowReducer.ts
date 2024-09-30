@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import ConnectionsAllowed from '../../pages/flows/nodes/ConnectionAlows';
 import { FLOW_ACTION_TYPE, FlowActionType, IFlowState } from './flowTypes';
 export const initFlowState: IFlowState = {
 	nodes: [],
@@ -39,16 +40,25 @@ const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState 
 		case FLOW_ACTION_TYPE.ADD_EDGE: {
 			const newEdge = action.payload;
 			newEdge.id = uuidv4();
-			if (
-				state.edges.find(
-					(edge) =>
-						edge.source === newEdge.source &&
-						edge.target === newEdge.target &&
-						edge.sourceHandle === newEdge.sourceHandle &&
-						edge.targetHandle === newEdge.targetHandle
-				)
-			)
-				return state;
+			// check if connection is exist
+			const checkExist = state.edges.find(
+				(edge) =>
+					edge.source === newEdge.source &&
+					edge.target === newEdge.target &&
+					edge.sourceHandle === newEdge.sourceHandle &&
+					edge.targetHandle === newEdge.targetHandle
+			);
+			// check if connection is not allowed
+			const checkAllowed = ConnectionsAllowed.find((item) => {
+				return item.source === newEdge.sourceHandle && item.target === newEdge.targetHandle;
+			});
+			// check if connection is limit
+			const checkLimit = state.edges.find(
+				(edge) =>
+					(edge.sourceHandle === newEdge.sourceHandle && edge.source === newEdge.source) ||
+					(edge.targetHandle === newEdge.targetHandle && edge.target === newEdge.target)
+			);
+			if (!checkAllowed || checkExist || checkLimit) return state;
 			return {
 				...state,
 				edges: [...state.edges, newEdge]

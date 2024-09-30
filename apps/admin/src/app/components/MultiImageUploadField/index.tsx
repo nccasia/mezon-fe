@@ -2,16 +2,13 @@ import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { ChangeEvent, useRef, useState } from 'react';
 import { HTMLFieldProps, connectField } from 'uniforms';
-
 type CustomFormFieldProps = HTMLFieldProps<string[], HTMLDivElement>;
-
 const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 	const { value = [], onChange } = props;
 	const { sessionRef, clientRef } = useMezon();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-
 	const handleChooseFiles = async (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			const client = clientRef.current;
@@ -42,21 +39,20 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 			}
 		}
 	};
-
-	const handleRemoveImage = (index: number) => {
-		const newValue = value.filter((_, i) => i !== index);
-		onChange(newValue);
-	};
 	const extractFileNameFromUrl = (url: string): string => {
 		const parts = url.split('undefined');
 		return parts[parts.length - 1].split('/').pop() || 'unknown';
 	};
 
+	const handleRemoveImage = (index: number) => {
+		const newValue = value.filter((_, i) => i !== index);
+		onChange(newValue);
+	};
 	return (
-		<div className="MultiFileField mt-2">
-			<label className="block text-sm">Upload Files</label>
+		<div className="MultiImageField mt-2">
+			<label className="block text-sm">Upload Images</label>
 			<div className="my-1 w-full flex flex-col items-center p-2 gap-4 bg-[#f2f3f5] dark:bg-[#2b2d31] border dark:border-[#4d4f52] rounded-md">
-				<input type="file" ref={fileInputRef} hidden onChange={handleChooseFiles} multiple />
+				<input type="file" ref={fileInputRef} hidden onChange={handleChooseFiles} accept="image/*" multiple />
 				<div
 					className="relative w-full h-12 cursor-pointer flex justify-center items-center bg-bgLightModeThird dark:bg-[#141416] hover:bg-[#c6ccd2] transition-colors duration-200 rounded-md"
 					onClick={() => fileInputRef.current?.click()}
@@ -66,7 +62,7 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 					) : (
 						<>
 							<Icons.SelectFileIcon className="w-8 h-8 text-gray-400" />
-							<p className="ml-2">Select Files</p>
+							<p className="ml-2">Select Images</p>
 						</>
 					)}
 				</div>
@@ -82,11 +78,9 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 						))}
 					</div>
 				)}
-
 				{error && <p className="text-red-500">{error}</p>}
 			</div>
 		</div>
 	);
 });
-
 export default MultiImageUploadField;

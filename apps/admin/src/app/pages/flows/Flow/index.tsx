@@ -16,7 +16,7 @@ import {
 	useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Popover } from 'flowbite-react';
+import { Popover, Tooltip } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -29,6 +29,7 @@ import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
 import NodeTypes from '../nodes/NodeType';
+import ConfirmDeleteFlowPopup from './ConfirmDeleteFlowPopup';
 import NodeDetailModal from './NodeDetailModal';
 import SaveFlowModal from './SaveFlowModal';
 
@@ -216,10 +217,10 @@ const Flow = () => {
 
 		const flowDataSave: IFlowDataRequest = {
 			referralId: userProfile?.user?.id,
-			// applicationId: applicationId ?? '',
-			// applicationToken: appDetail?.token ?? '',
-			applicationId: '1838774261079085056',
-			applicationToken: '7448444f33734352412d617265754f6a',
+			applicationId: applicationId ?? '',
+			applicationToken: appDetail?.token ?? '',
+			// applicationId: '1838774261079085056',
+			// applicationToken: '7448444f33734352412d617265754f6a',
 			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
@@ -239,10 +240,11 @@ const Flow = () => {
 
 		try {
 			if (flowId) {
-				toast.info('Api update flow is updating');
-				// const response = await flowService.updateFlow({ ...flowDataSave, flowId });
-				// console.log(response);
-				// toast.success('Update flow success');
+				// toast.info('Api update flow is updating');
+				console.log({ ...flowDataSave, flowId });
+				const response = await flowService.updateFlow({ ...flowDataSave, flowId });
+				console.log(response);
+				toast.success('Update flow success');
 				// call api update flow
 			} else {
 				const response = await flowService.createNewFlow(flowDataSave);
@@ -357,19 +359,24 @@ const Flow = () => {
 						</div>
 					</div>
 					<div className="rightbox flex items-center gap-2">
-						<button
-							onClick={handleClickSaveFlow}
-							className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
-						>
-							<Icons.IconTick />
-						</button>
-						<button
-							disabled={!flowId}
-							onClick={handleClickDeleteButton}
-							className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-						>
-							<Icons.DeleteMessageRightClick />
-						</button>
+						<Tooltip content="Save Flow" style={'light'}>
+							<button
+								onClick={handleClickSaveFlow}
+								className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
+							>
+								<Icons.IconTick />
+							</button>
+						</Tooltip>
+						<Tooltip content="Delete Flow" style={'light'}>
+							<Popover content={<ConfirmDeleteFlowPopup onConfirm={handleClickDeleteButton} />} trigger="click">
+								<button
+									disabled={!flowId}
+									className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									<Icons.DeleteMessageRightClick />
+								</button>
+							</Popover>
+						</Tooltip>
 					</div>
 				</div>
 			</div>

@@ -27,7 +27,7 @@ const NodeTypes = [
 		label: 'Command Output',
 		schema: yup.object().shape({
 			message: yup.string(),
-			image: yup.array()
+			image: yup.array().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -39,7 +39,7 @@ const NodeTypes = [
 		},
 		anchors: {
 			source: [],
-			target: [{ id: 'command-input-target-1', text: 'Command Input' }]
+			target: [{ id: 'command-output-target-1', text: 'Command Input' }]
 		}
 	},
 	{
