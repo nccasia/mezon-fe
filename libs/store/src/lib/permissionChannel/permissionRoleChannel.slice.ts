@@ -91,6 +91,9 @@ export const permissionRoleChannelSlice = createSlice({
 		update: permissionRoleChannelAdapter.updateOne,
 		setMaxPermissionChannel: (state, action: PayloadAction<ApiPermission[]>) => {
 			state.channelPermissions = action.payload;
+		},
+		setPermissionChannel: (state, action: PayloadAction<any>) => {
+			state.channelPermissions = action.payload;
 		}
 	},
 	extraReducers: (builder) => {

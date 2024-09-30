@@ -24,6 +24,7 @@ import {
 	mapReactionToEntity,
 	messagesActions,
 	notificationActions,
+	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
 	reactionActions,
@@ -64,6 +65,7 @@ import {
 	MessageTypingEvent,
 	Notification,
 	RoleEvent,
+	SetPermissionChannelEvent,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -748,6 +750,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		};
 		handleRoleEvent();
 	}, []);
+
+	const onsetpermissionchannel = useCallback((updateEvent: SetPermissionChannelEvent) => {
+		const handleSetPermissionUpdateEvent = async () => {
+			dispatch(permissionRoleChannelActions.setPermissionChannel({ updateEvent }));
+		};
+		handleSetPermissionUpdateEvent();
+	}, []);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -817,6 +827,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oncoffeegiven = oncoffeegiven;
 
 			socket.onroleevent = onroleevent;
+
+			socket.onsetpermissionchannel = onsetpermissionchannel;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -850,7 +862,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
-			onroleevent
+			onroleevent,
+			onsetpermissionchannel
 		]
 	);
 
