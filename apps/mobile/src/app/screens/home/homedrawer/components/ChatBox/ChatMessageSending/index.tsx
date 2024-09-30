@@ -81,7 +81,10 @@ export const ChatMessageSending = memo(
 
 		const removeTags = (text: string) => {
 			if (!text) return '';
-			return text?.replace?.(/@\[(.*?)\]/g, '@$1')?.replace?.(/<#(.*?)>/g, '#$1');
+			return text
+				?.replace?.(/@\[(.*?)\]/g, '@$1')
+				?.replace?.(/<#(.*?)>/g, '#$1')
+				?.replace?.(/:(\w+):/g, '$1');
 		};
 
 		const onEditMessage = useCallback(

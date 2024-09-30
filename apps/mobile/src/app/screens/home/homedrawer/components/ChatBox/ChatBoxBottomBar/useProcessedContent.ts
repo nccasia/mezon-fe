@@ -59,8 +59,8 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				if (preCharFour !== 'http' && preCharFive !== 'https' && emojiObjPicked?.[`:${shortname}:`]) {
 					emojis.push({
 						emojiid: emojiObjPicked?.[`:${shortname}:`],
-						s: startindex,
-						e: endindex
+						s: startindex - emojis.length * 2,
+						e: endindex - (emojis.length + 1) * 2
 					});
 				}
 				i++;

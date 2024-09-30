@@ -95,8 +95,8 @@ export const createFormattedString = (data: IExtendedMessage) => {
 				formatContentDraft += `{#}[${contentInElement.slice(1)}](${element.channelid})`;
 				break;
 			case ETokenMessage.EMOJIS:
-				emojiPicked?.push({ ...element, shortName: contentInElement });
-				formatContentDraft += contentInElement;
+				emojiPicked?.push({ ...element, shortName: `:${contentInElement.split(':').join(' ')}:` });
+				formatContentDraft += `:${contentInElement.split(':').join(' ')}:`;
 				break;
 			default:
 				formatContentDraft += contentInElement;
