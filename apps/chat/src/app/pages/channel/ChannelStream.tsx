@@ -201,13 +201,13 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 	return (
 		<div
 			ref={containerRef}
-			className="relative w-full overflow-hidden rounded-lg"
+			className="relative w-full h-full overflow-hidden rounded-lg"
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onMouseMove={handleMouseMoveOrClick}
 			onClick={handleMouseMoveOrClick}
 		>
-			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full" />
+			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full object-cover" />
 
 			{isLoading && (
 				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
@@ -399,7 +399,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 			<div className="flex flex-col justify-center gap-1 w-full">
 				<div className="relative min-h-40 items-center flex justify-center">
 					{hlsUrl ? (
-						<div className={`transition-all duration-300 w-${showMembers ? '[70%]' : '[100%]'}`}>
+						<div className={`transition-all duration-300 h-full w-${showMembers ? '[70%]' : '[100%]'}`}>
 							<HLSPlayer src={hlsUrl} />
 						</div>
 					) : (
@@ -409,7 +409,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 					)}
 					{memberJoin.length > 0 && (
 						<div
-							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-14' : 'bottom-14 max-[1700px]:bottom-2'} group-hover:opacity-100`}
+							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-14' : 'bottom-20 max-[1700px]:bottom-2'} group-hover:opacity-100`}
 						>
 							<Tooltip
 								content={`${showMembers ? 'Hide Members' : 'Show Members'}`}
@@ -432,11 +432,11 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 						</div>
 					)}
 				</div>
-				{memberJoin.length > 0 && (
+				{memberJoin.length > 0 && showMembers && (
 					<div
 						className={`w-full flex gap-2 justify-center p-2 transition-opacity duration-300 ${showMembers ? 'opacity-100' : 'opacity-0'}`}
 					>
-						{showMembers && <UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>}
+						<UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>
 					</div>
 				)}
 			</div>
