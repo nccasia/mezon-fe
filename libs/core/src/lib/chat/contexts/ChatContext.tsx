@@ -63,6 +63,7 @@ import {
 	CustomStatusEvent,
 	EventEmoji,
 	LastPinMessageEvent,
+	LastSeenMessageEvent,
 	MessageTypingEvent,
 	Notification,
 	RoleEvent,
@@ -787,6 +788,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		};
 		handleRoleEvent();
 	}, []);
+
+	const onlastseenupdated = useCallback((lastseenEvent: LastSeenMessageEvent) => {
+		console.log('lastseenEvent', lastseenEvent);
+	}, []);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -858,6 +864,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oncoffeegiven = oncoffeegiven;
 
 			socket.onroleevent = onroleevent;
+
+			socket.onlastseenupdated = onlastseenupdated;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -892,7 +900,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
-			onroleevent
+			onroleevent,
+			onlastseenupdated
 		]
 	);
 
@@ -988,6 +997,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oncoffeegiven = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onroleevent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onlastseenupdated = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1025,7 +1036,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oneventcreated,
 		setCallbackEventFn,
 		oncoffeegiven,
-		onroleevent
+		onroleevent,
+		onlastseenupdated
 	]);
 
 	useEffect(() => {
