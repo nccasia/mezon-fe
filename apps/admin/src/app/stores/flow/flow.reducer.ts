@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import ConnectionsAllowed from '../../pages/flows/nodes/ConnectionAlows';
-import { FLOW_ACTION_TYPE, FlowActionType, IFlowState } from './flowTypes';
+import { FLOW_ACTION_TYPE, FlowActionType, IFlowState } from './flow.type';
 export const initFlowState: IFlowState = {
 	nodes: [],
 	edges: [],

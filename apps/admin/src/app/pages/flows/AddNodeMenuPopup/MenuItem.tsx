@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { FlowContext } from '../../../context/FlowContext';
-import { changeNodeType } from '../../../stores/flowStore/flowActions';
-import { INodeType } from '../../../types/flowTypes';
+import { changeNodeType } from '../../../stores/flow/flow.action';
+import { INodeType } from '../../../stores/flow/flow.interface';
 
 interface MenuItemProps {
 	title: string;

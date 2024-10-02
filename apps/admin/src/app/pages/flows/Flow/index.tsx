@@ -23,8 +23,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
-import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flowStore/flowActions';
-import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../types/flowTypes';
+import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flow/flow.action';
+import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../stores/flow/flow.interface';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
@@ -46,7 +46,7 @@ const Flow = () => {
 	const appDetail = useSelector(selectAppDetail);
 	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
 	const [flowData, setFlowData] = React.useState<{ flowName: string; description: string }>({
-		flowName: 'Untitle Flow',
+		flowName: 'Untitled Flow',
 		description: ''
 	});
 	useEffect(() => {
@@ -402,16 +402,15 @@ const Flow = () => {
 						</button>
 					</Popover>
 				</Panel>
-				<Panel position="top-right">
-					<Popover content={<FlowChatPopup />} trigger="click">
-						<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
-							<Icons.IconChat className="w-6 h-6" />
-						</button>
-					</Popover>
-				</Panel>
 				<Controls />
 				<Background className="dark:bg-bgPrimary bg-bgLightPrimary text-gray-500 dark:text-gray-100" variant={BackgroundVariant.Dots} />
 			</ReactFlow>
+
+			<Popover content={<FlowChatPopup />} trigger="click">
+				<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md absolute top-[80px] right-3">
+					<Icons.IconChat className="w-6 h-6" />
+				</button>
+			</Popover>
 
 			<SaveFlowModal
 				flowData={flowData}

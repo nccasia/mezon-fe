@@ -1,13 +1,21 @@
-import { IFlow, IFlowDataRequest, IFlowDetail } from '../types/flowTypes';
+import { IFlow, IFlowDataRequest, IFlowDetail } from '../stores/flow/flow.interface';
 import { apiInstance } from './apiInstance';
 
-const getAllFlows = async (): Promise<IFlow[]> => {
+interface IError {
+	response: {
+		data: {
+			message: string;
+		};
+	};
+}
+
+const getAllFlowByApplication = async (applicationId: string): Promise<IFlow[]> => {
 	try {
-		const listFlow: IFlow[] = await apiInstance.get('/flow/getAll');
+		const listFlow: IFlow[] = await apiInstance.get(`/flow/getAllByApplication?appId=${applicationId}`);
 		return listFlow;
 	} catch (error) {
 		console.log('error', error);
-		throw (error as any).response.data;
+		throw (error as IError).response.data;
 	}
 };
 
@@ -16,7 +24,7 @@ const getFlowDetail = async (flowId: string): Promise<IFlowDetail> => {
 		const flowDetail: IFlowDetail = await apiInstance.get(`/flow/detail?flowId=${flowId}`);
 		return flowDetail;
 	} catch (error) {
-		throw (error as any).response?.data;
+		throw (error as IError).response?.data;
 	}
 };
 
@@ -25,7 +33,7 @@ const createNewFlow = async (dataCreate: IFlowDataRequest): Promise<IFlowDetail>
 		const response: IFlowDetail = await apiInstance.post('/flow/create', dataCreate);
 		return response;
 	} catch (error) {
-		throw (error as any).response.data;
+		throw (error as IError).response.data;
 	}
 };
 
@@ -34,30 +42,30 @@ const updateFlow = async (dataUpdate: IFlowDataRequest): Promise<IFlowDetail> =>
 		const response: IFlowDetail = await apiInstance.put('/flow/update', dataUpdate);
 		return response;
 	} catch (error) {
-		throw (error as any).response.data;
+		throw (error as IError).response.data;
 	}
 };
 
-const deleteFlow = async (flowId: string): Promise<any> => {
+const deleteFlow = async (flowId: string): Promise<IFlowDetail> => {
 	try {
-		const response = await apiInstance.delete(`/flow/delete?flowId=${flowId}`);
+		const response: IFlowDetail = await apiInstance.delete(`/flow/delete?flowId=${flowId}`);
 		return response;
 	} catch (error) {
-		throw (error as any).response.data;
+		throw (error as IError).response.data;
 	}
 };
 
-const executionFlow = async (flowId: string, input: string): Promise<any> => {
+const executionFlow = async (flowId: string, input: string): Promise<IFlowDetail> => {
 	try {
-		const response = await apiInstance.post(`/flow/execution`, { flowId, input });
+		const response: IFlowDetail = await apiInstance.post(`/flow/execution`, { flowId, input });
 		return response;
 	} catch (error) {
-		throw (error as any).response.data;
+		throw (error as IError).response.data;
 	}
 };
 
 const flowService = {
-	getAllFlows,
+	getAllFlowByApplication,
 	getFlowDetail,
 	createNewFlow,
 	updateFlow,

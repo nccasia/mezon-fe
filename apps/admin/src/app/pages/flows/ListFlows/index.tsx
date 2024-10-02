@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import flowService from '../../../services/flowService';
-import { IFlow } from '../../../types/flowTypes';
+import { IFlow } from '../../../stores/flow/flow.interface';
 
 const ListFlow = () => {
 	const { applicationId } = useParams();
@@ -9,7 +9,7 @@ const ListFlow = () => {
 	useEffect(() => {
 		const getListFlow = async () => {
 			try {
-				const res: IFlow[] = await flowService.getAllFlows();
+				const res: IFlow[] = await flowService.getAllFlowByApplication(applicationId ?? '');
 				setListFlow(res);
 			} catch (error) {
 				console.log(error);

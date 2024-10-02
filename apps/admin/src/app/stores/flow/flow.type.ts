@@ -1,5 +1,5 @@
 import { Edge, Node } from '@xyflow/react';
-import { INodeType, ISelectedNode } from '../../types/flowTypes';
+import { INodeType, ISelectedNode } from './flow.interface';
 
 export enum FLOW_ACTION_TYPE {
 	SET_NODES = 'SET_NODES',

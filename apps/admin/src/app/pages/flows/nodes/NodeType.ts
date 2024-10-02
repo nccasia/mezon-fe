@@ -43,6 +43,26 @@ const NodeTypes = [
 		}
 	},
 	{
+		type: 'commandOutput',
+		label: 'Command Output',
+		schema: yup.object().shape({
+			message: yup.string(),
+			image: yup.array().nullable()
+		}),
+		bridgeSchema: {
+			type: 'object',
+			properties: {
+				message: { type: 'string', uniforms: { component: CustomTextField, label: 'Message', name: 'message' } },
+				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
+			},
+			required: []
+		},
+		anchors: {
+			source: [],
+			target: [{ id: 'command-output-target-1', text: 'Command Input' }]
+		}
+	},
+	{
 		type: 'apiLoader',
 		label: 'API Loader',
 		schema: yup.object().shape({
@@ -53,7 +73,7 @@ const NodeTypes = [
 			type: 'object',
 			properties: {
 				url: { type: 'string', uniforms: { component: CustomTextField, label: 'Api Url', name: 'url' } },
-				method: { type: 'string', uniforms: { component: CustomTextField, label: 'Method', name: 'method' } }
+				method: { type: 'string', uniforms: { component: CustomTextField, label: 'Method (GET | POST)', name: 'method' } }
 			},
 			required: []
 		},

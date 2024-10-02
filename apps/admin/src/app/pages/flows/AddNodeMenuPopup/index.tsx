@@ -1,4 +1,4 @@
-import { INodeType } from '../../../types/flowTypes';
+import { INodeType } from '../../../stores/flow/flow.interface';
 import MenuItem from './MenuItem';
 
 interface INodeMenu {

@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/ui';
 import { Handle, Position } from '@xyflow/react';
-import { changeOpenModalNodeDetail, changeSelectedNode, copyNode, deleteNode } from '../../../../stores/flowStore/flowActions';
+import { changeOpenModalNodeDetail, changeSelectedNode, copyNode, deleteNode } from '../../../../stores/flow/flow.action';
 
 import React, { useContext, useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
@@ -8,7 +8,7 @@ import { AutoForm } from 'uniforms-semantic';
 import * as yup from 'yup';
 
 import { FlowContext } from '../../../../context/FlowContext';
-import { ISelectedNode } from '../../../../types/flowTypes';
+import { ISelectedNode } from '../../../../stores/flow/flow.interface';
 
 interface IAnchor {
 	id: string;
@@ -25,7 +25,7 @@ interface CustomNodeProps {
 		};
 	};
 	label: string;
-	schema: yup.ObjectSchema<any>;
+	schema: yup.ObjectSchema<Record<string, unknown>>;
 	bridgeSchema: {
 		type: string;
 		properties: Record<string, { type: string; uniforms: { component: React.ComponentType; label: string; name: string } }>;
@@ -68,15 +68,15 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 		validator
 	});
 
-	const formRef = useRef(null);
+	const formRef = useRef<any>(null);
 	React.useImperativeHandle(ref, () => ({
 		getFormData: () => {
-			return (formRef.current as any)?.getModel();
+			return formRef.current?.getModel();
 		},
 		checkValidate: () => {
-			const model = (formRef.current as any)?.getModel();
+			const model = formRef.current?.getModel();
 			const validationResult = validator(model);
-			(formRef.current as any)?.submit();
+			formRef.current?.submit();
 
 			return validationResult ? false : true;
 		}
@@ -88,7 +88,7 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 	};
 	const handleCopyNode = (e: React.MouseEvent<HTMLButtonElement>, nodeId: string) => {
 		e.stopPropagation();
-		const defaultValue = (formRef.current as any)?.getModel();
+		const defaultValue = formRef.current?.getModel();
 		flowDispatch(copyNode(nodeId, defaultValue));
 	};
 	const handleShowDetail = (e: React.MouseEvent<HTMLButtonElement>, nodeId: string) => {

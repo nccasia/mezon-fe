@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/ui';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { apiInstance } from '../../../services/apiInstance';
@@ -15,6 +15,7 @@ const FlowChatPopup = () => {
 	const { flowId } = useParams();
 	const [input, setInput] = useState('');
 	const [messages, setMessages] = useState<IMessage[]>([]);
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (!input) {
@@ -28,19 +29,33 @@ const FlowChatPopup = () => {
 				flowId,
 				input
 			});
-			let urlImage: string[] = [];
+			let urlImage: string[] | undefined = [];
 			try {
 				urlImage = JSON.parse(response.urlImage);
 			} catch {
-				urlImage = [response.urlImage];
+				urlImage = undefined;
 			}
 			setMessages((prev) => [...prev, { message: { message: response.message, urlImage: urlImage }, type: 'output' }]);
 		} catch (error) {
 			setMessages((prev) => [...prev, { message: { message: "Sory, I dont't know", urlImage: undefined }, type: 'output' }]);
 		}
 	};
+	const scrollToBottom = () => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	};
+
+	useEffect(() => {
+		if (messages.length > 0) {
+			setTimeout(() => {
+				scrollToBottom();
+			}, 0);
+		}
+	}, [messages]);
+	console.log('messages', messages);
 	return (
-		<div className="text-sm text-gray-500 dark:text-gray-200 w-[350px]">
+		<div className="text-sm text-gray-500 dark:text-gray-200 max-w-[350px] w-[95vw]">
 			<div className="flex items-center gap-2 p-2  bg-gray-200 dark:bg-gray-600">
 				<div className="w-[40px] h-[40px]">
 					<img
@@ -53,7 +68,7 @@ const FlowChatPopup = () => {
 					<span>Hi there! How can I help?</span>
 				</div>
 			</div>
-			<div className="h-[60vh] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:[width:3px] [&::-webkit-scrollbar-thumb]:bg-red-500 transition-all">
+			<div className="h-[55vh] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:[width:3px] [&::-webkit-scrollbar-thumb]:bg-red-500 transition-all">
 				{messages.map((message, index) => (
 					<div
 						key={index}
@@ -61,16 +76,19 @@ const FlowChatPopup = () => {
 					>
 						<div className="w-[70%]">
 							<span>{message.message.message}</span>
-							<div className="bg-gray-100">
-								{message.message.urlImage?.map((img, index) => (
-									<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] rounded-lg mb-1">
-										<img src={img} alt="img" className="max-w-[100%] object-cover" />
-									</div>
-								))}
-							</div>
+							{message.message?.urlImage && message.message.urlImage?.length > 0 && (
+								<div className="bg-gray-100">
+									{message.message.urlImage?.map((img, index) => (
+										<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] rounded-lg mb-1">
+											<img src={img} alt="img" className="max-w-[100%] object-cover" />
+										</div>
+									))}
+								</div>
+							)}
 						</div>
 					</div>
 				))}
+				<div ref={messagesEndRef} />
 			</div>
 			<form onSubmit={handleSubmit}>
 				<div className="footer p-2 border-[1px] border-t-gray-400 relative">

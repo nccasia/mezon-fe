@@ -1,7 +1,7 @@
 import { Modal } from '@mezon/ui';
 import { useContext } from 'react';
 import { FlowContext } from '../../../context/FlowContext';
-import { changeOpenModalNodeDetail } from '../../../stores/flowStore/flowActions';
+import { changeOpenModalNodeDetail } from '../../../stores/flow/flow.action';
 
 const NodeDetailModal = () => {
 	const { flowState, flowDispatch } = useContext(FlowContext);

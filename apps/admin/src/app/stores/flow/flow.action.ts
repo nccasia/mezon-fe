@@ -1,6 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
-import { INodeType, ISelectedNode } from '../../types/flowTypes';
-import { FLOW_ACTION_TYPE, FlowActionType } from './flowTypes';
+import { INodeType, ISelectedNode } from './flow.interface';
+import { FLOW_ACTION_TYPE, FlowActionType } from './flow.type';
 
 export const setNodesContext = (nodes: Node[]): FlowActionType => {
 	return {

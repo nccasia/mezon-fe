@@ -17,7 +17,7 @@ interface IMezonInputProps {
 	maxCharacter?: number;
 	inputWrapperStyle?: StyleProp<ViewStyle>;
 	showBorderOnFocus?: boolean;
-	errorMessage?: string;
+	message?: string;
 	onFocus?: () => void;
 	onBlur?: () => void;
 	prefixIcon?: ReactNode;
