@@ -30,14 +30,26 @@ export interface ChannelsEntity extends IChannel {
 	id: string; // Primary ID
 }
 
+function getLastSeenTimestamp(channel: ChannelsEntity): number {
+	return Number(channel?.last_seen_message?.timestamp_seconds ?? channel?.last_sent_message?.timestamp_seconds ?? 0);
+}
+
+function getFinalLastSeenTimestamp(channel: ChannelsEntity, lastSeenTimestamp: number): number {
+	// covert some case channel voice have last_sent_message
+	if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+		return 0;
+	}
+	return isNaN(lastSeenTimestamp) ? Number(channel?.last_sent_message?.timestamp_seconds ?? 0) : lastSeenTimestamp;
+}
+
 function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
-	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
-	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
+	const lastSeenTimestamp = getLastSeenTimestamp(channel);
+	const finalLastSeenTimestamp = getFinalLastSeenTimestamp(channel, lastSeenTimestamp);
 
 	return {
 		id: channel.id,
 		lastSeenTimestamp: finalLastSeenTimestamp,
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
+		lastSentTimestamp: Number(channel?.last_sent_message?.timestamp_seconds ?? 0),
 		lastSeenPinMessage: channel.last_pin_message || '',
 		clanId: channel.clan_id ?? ''
 	};

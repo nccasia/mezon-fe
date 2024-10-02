@@ -123,6 +123,7 @@ export const selectIsUnreadChannelById = createSelector(
 	[getChannelMetaState, selectEntiteschannelCategorySetting, (state, channelId) => channelId],
 	(state, settings, channelId) => {
 		const channel = state?.entities[channelId];
+		if (!channel?.lastSentTimestamp || !channel?.lastSeenTimestamp) return false;
 		const inactiveMuteSetting = settings?.[channelId]?.action !== enableMute;
 		// unread last seen timestamp is less than last sent timestamp
 		return inactiveMuteSetting && channel?.lastSeenTimestamp <= channel?.lastSentTimestamp;
