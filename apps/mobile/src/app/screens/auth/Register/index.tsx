@@ -6,8 +6,8 @@ import { Alert, KeyboardAvoidingView, ScrollView, Text, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 import Button from '../../../components/auth/Button';
-import FooterAuth from '../../../components/auth/FooterAuth';
-import TextInputUser from '../../../components/auth/TextInput';
+import { FooterAuth } from '../../../components/auth/FooterAuth';
+import { TextInputUser } from '../../../components/auth/TextInput';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 

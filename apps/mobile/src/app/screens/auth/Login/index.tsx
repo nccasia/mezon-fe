@@ -2,7 +2,7 @@ import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { useAuth } from '@mezon/core';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleOneTapSignIn } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React, { useEffect } from 'react';
@@ -11,11 +11,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import LoadingModal from '../../../components/LoadingModal';
+import LoadingModal from '../../../components/LoadingModal/LoadingModal';
 import Button from '../../../components/auth/Button';
-import FooterAuth from '../../../components/auth/FooterAuth';
-import LoginSocial from '../../../components/auth/LoginSocial';
-import TextInputUser from '../../../components/auth/TextInput';
+import { FooterAuth } from '../../../components/auth/FooterAuth';
+import { LoginSocial } from '../../../components/auth/LoginSocial';
+import { TextInputUser } from '../../../components/auth/TextInput';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 const LoginSchema = Yup.object().shape({
@@ -37,13 +37,13 @@ const LoginScreen = () => {
 	const { loginByGoogle, loginByApple, loginEmail } = useAuth();
 
 	useEffect(() => {
-		const config = {
-			webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
-			iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID,
-			offlineAccess: true,
-			forceCodeForRefreshToken: true
-		};
-		GoogleSignin.configure(config);
+		// const config = {
+		// 	webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
+		// 	iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID,
+		// 	offlineAccess: true,
+		// 	forceCodeForRefreshToken: true,
+		// };
+		// GoogleSignin.configure(config);
 	}, []);
 
 	const handleSubmit = React.useCallback(
@@ -72,10 +72,16 @@ const LoginScreen = () => {
 			// fetch('https://5f831a256b97440016f4e334.mockapi.io/api/post');
 
 			// await GoogleSignin.hasPlayServices();
-			const { idToken } = await GoogleSignin.signIn();
+			// const { idToken } = await GoogleSignin.signIn();
+			// 648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com
+			// (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
+			const { idToken } = await GoogleOneTapSignIn.presentExplicitSignIn({
+				webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
+				iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID
+			});
 			await loginByGoogle(idToken);
 		} catch (error) {
-			if (error.message !== 'Sign in action cancelled' && error.code != -5) {
+			if (error.message !== 'Sign in action cancelled' && error.code != -5 && error.code != 12501) {
 				Toast.show({
 					type: 'error',
 					text1: 'Login Failed',
