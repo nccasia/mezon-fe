@@ -6,7 +6,7 @@ import Notifications from '../../../screens/Notifications';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const NotificationStacks = ({ }: any) => {
+export const NotificationStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { themeValue } = useTheme();
 	return (
@@ -18,10 +18,10 @@ export const NotificationStacks = ({ }: any) => {
 				gestureDirection: 'horizontal',
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
-					close: TransitionSpecs.TransitionIOSSpec,
+					close: TransitionSpecs.TransitionIOSSpec
 				},
 				cardStyle: { backgroundColor: themeValue.secondary },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
 			}}
 			initialRouteName={APP_SCREEN.NOTIFICATION.HOME}
 		>
@@ -30,7 +30,7 @@ export const NotificationStacks = ({ }: any) => {
 				component={Notifications}
 				// component={ListIconScreens}
 				options={{
-					headerShown: false,
+					headerShown: false
 				}}
 			/>
 			{/* <Stack.Screen

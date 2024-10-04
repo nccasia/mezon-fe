@@ -34,13 +34,16 @@ export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, c
 		setIsError(false);
 	}, [src]);
 
-	if ((!src && !userName) || isAnonymous) return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
+	if ((!src && !userName) || isAnonymous)
+		return <img className={computedClassName} src="./assets/images/anonymous-avatar.jpg" alt={'anonymous-avatar'} {...rest} />;
 
 	if (!src || isError) {
 		const avatarChar = userName?.charAt(0)?.toUpperCase() || '';
 
 		return (
-			<div className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] ${className} ${classNameText}`}>
+			<div
+				className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] ${className} ${classNameText}`}
+			>
 				{avatarChar}
 			</div>
 		);
@@ -51,6 +54,15 @@ export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, c
 			<Skeleton circle={true} className="block h-full" />
 		</div>
 	) : (
-		<img onLoadStart={handleLoadStart} onLoad={handleLoad} onError={handleError} className={computedClassName} src={src} alt={alt} {...rest} />
+		<img
+			loading="lazy"
+			onLoadStart={handleLoadStart}
+			onLoad={handleLoad}
+			onError={handleError}
+			className={computedClassName}
+			src={src}
+			alt={alt}
+			{...rest}
+		/>
 	);
 };

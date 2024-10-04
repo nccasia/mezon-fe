@@ -1,16 +1,16 @@
 import { Block, size } from '@mezon/mobile-ui';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity } from 'react-native';
 import Images from '../../../../../assets/Images';
 import CreateClanModal from '../components/CreateClanModal';
 import JoinClanModal from '../components/JoinClanModal';
 import { styles } from './UserEmptyClan.styles';
-import { useTranslation } from 'react-i18next';
 
 const UserEmptyClan = () => {
 	const [isVisibleCreateClanModal, setIsVisibleCreateClanModal] = useState<boolean>(false);
 	const [isVisibleJoinClanModal, setIsVisibleJoinClanModal] = useState<boolean>(false);
-  const { t } = useTranslation('userEmptyClan');
+	const { t } = useTranslation('userEmptyClan');
 
 	return (
 		<Block style={styles.wrapper}>
@@ -18,9 +18,7 @@ const UserEmptyClan = () => {
 			<Image style={styles.imageBg} source={Images.CHAT_PANA} />
 			<Block>
 				<Text style={styles.title}>{t('emptyClans.readyChat')}</Text>
-				<Text style={styles.description}>
-        {t('emptyClans.buildYourCommunity')}
-				</Text>
+				<Text style={styles.description}>{t('emptyClans.buildYourCommunity')}</Text>
 			</Block>
 			<Block marginTop={size.s_20}>
 				<TouchableOpacity onPress={() => setIsVisibleJoinClanModal(!isVisibleJoinClanModal)} style={styles.joinClan}>

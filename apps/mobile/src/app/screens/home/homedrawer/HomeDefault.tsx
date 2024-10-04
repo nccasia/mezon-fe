@@ -5,12 +5,13 @@ import {
 	ChannelsEntity,
 	RootState,
 	channelMembersActions,
+	channelMetaActions,
 	selectAllClans,
 	selectChannelById,
 	selectCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum } from '@mezon/utils';
+import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -30,6 +31,15 @@ import LicenseAgreement from './components/LicenseAgreement';
 import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
+function useChannelSeen(channelId: string) {
+	const dispatch = useAppDispatch();
+	const currentChannel = useSelector(selectChannelById(channelId));
+	useEffect(() => {
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+	}, [channelId, currentChannel, dispatch]);
+}
+
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -44,6 +54,8 @@ const HomeDefault = React.memo((props: any) => {
 	const dispatch = useAppDispatch();
 	const panelKeyboardRef = useRef(null);
 	const prevChannelIdRef = useRef<string>();
+
+	useChannelSeen(currentChannel?.channel_id || '');
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);

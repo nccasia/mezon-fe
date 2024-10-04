@@ -52,7 +52,8 @@ const LoggedInView: React.FC<LoggedInViewProps> = ({ appearanceTheme, session })
 			console.log('Login Failed');
 		},
 		auto_select: true,
-		cancel_on_tap_outside: false
+		cancel_on_tap_outside: false,
+		use_fedcm_for_prompt: true
 	});
 
 	return (

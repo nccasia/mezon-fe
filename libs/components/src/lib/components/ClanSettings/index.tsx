@@ -1,6 +1,8 @@
+import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { EPermission } from '@mezon/utils';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
 import { ExitSetting } from '../SettingProfile';
@@ -21,7 +23,7 @@ export type ModalSettingProps = {
 
 const ClanSetting = (props: ModalSettingProps) => {
 	const { onClose, initialSetting } = props;
-	const [currentSettingId, setCurrentSettingId] = useState<string>(initialSetting ? initialSetting : listItemSetting[0].id);
+	const [currentSettingId, setCurrentSettingId] = useState<string>(() => (initialSetting ? initialSetting : listItemSetting[0].id));
 	const currentSetting = useMemo(() => {
 		return listItemSetting.find((item) => item.id === currentSettingId);
 	}, [currentSettingId]);
@@ -29,6 +31,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const handleSettingItemClick = (settingItem: ItemObjProps) => {
 		setCurrentSettingId(settingItem.id);
 	};
+
+	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
 
 	const [menu, setMenu] = useState(true);
 	const closeMenu = useSelector(selectCloseMenu);
@@ -44,11 +48,11 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.INTEGRATIONS:
 				return <Integrations currentChannel={currentChannel} />;
 			case ItemSetting.EMOJI:
-				return <SettingEmoji />;
+				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:
 				return <NotificationSoundSetting />;
 			case ItemSetting.STICKERS:
-				return <SettingSticker />;
+				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 		}
@@ -56,16 +60,22 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) as string;
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
-	});
+		if (canManageClan) {
+			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
+		}
+	}, [canManageClan, currentClanId, dispatch]);
 
 	useEffect(() => {
 		if (currentSettingId === ItemSetting.DELETE_SERVER) {
 			setIsShowDeletePopup(true);
 		}
 	}, [currentSettingId]);
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+
 	return (
-		<div className="  flex fixed inset-0  w-screen z-30">
+		<div ref={modalRef} tabIndex={-1} className="  flex fixed inset-0  w-screen z-30">
 			<div className="flex flex-row w-screen">
 				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
 					<div

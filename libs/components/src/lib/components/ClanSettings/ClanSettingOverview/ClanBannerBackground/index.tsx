@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Icons } from '@mezon/ui';
 import { fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';

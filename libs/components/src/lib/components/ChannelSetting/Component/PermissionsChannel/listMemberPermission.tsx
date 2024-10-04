@@ -1,4 +1,3 @@
-import { AvatarImage, Icons } from '@mezon/components';
 import { useCheckOwnerForUser } from '@mezon/core';
 import {
 	channelUsersActions,
@@ -8,9 +7,12 @@ import {
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
+
 type ListMemberPermissionProps = {
 	channel: IChannel;
 	selectedUserIds: string[];

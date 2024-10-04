@@ -51,6 +51,22 @@
 	font-display: swap;
 }
 
+@font-face {
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets//fonts/Poppins-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets//fonts/Inter-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
 /* You can add global styles to this file, and also import other style files */
 :root {
 	--white-500: #ffffff;
@@ -519,17 +535,6 @@ input:-webkit-autofill:active {
 }
 
 // editor-scroll
-#editorReactMention::-webkit-scrollbar {
-	width: 4px;
-}
-
-#editorReactMention::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-#editorReactMention::-webkit-scrollbar-thumb {
-	background: #151515;
-}
 
 // attachment-scroll-dark
 .attachment-scroll::-webkit-scrollbar {
@@ -676,6 +681,24 @@ input:-webkit-autofill:active {
 	}
 }
 
+/* Custom Scrollbar for lightModeScrollBarMention */
+.lightModeScrollBarMention::-webkit-scrollbar {
+	width: 8px; /* Width of the scrollbar */
+}
+
+.lightModeScrollBarMention::-webkit-scrollbar-track {
+	background: #ebedef; /* Scrollbar track color */
+}
+
+.lightModeScrollBarMention::-webkit-scrollbar-thumb {
+	background-color: #c4c9ce; /* Scrollbar thumb color */
+	border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.lightModeScrollBarMention::-webkit-scrollbar-thumb:hover {
+	background-color: #a3a8ad; /* Darker thumb color on hover */
+}
+
 .noselect {
 	-webkit-user-select: none; /* Safari */
 	-moz-user-select: none; /* Firefox */
@@ -791,4 +814,38 @@ input:-webkit-autofill:active {
 	color: #949ba4;
 	background-color: hsl(220 calc(1 * 6.5%) 18% / 1);
 	background-position: 50% 0;
+}
+
+.anonymousAnimation {
+	animation: anonymous_hat 4s linear forwards;
+}
+
+@keyframes anonymous_hat {
+	0% {
+		transform: translate(25px, -100px) rotateZ(-25deg);
+	}
+	10% {
+		transform: translate(-20px, -78px) rotateZ(0);
+	}
+	20% {
+		transform: translate(-25px, -85px) rotateZ(35deg);
+	}
+	40% {
+		transform: translate(12px, -53px) rotateZ(-25deg);
+	}
+	50% {
+		transform: translate(17px, -60px) rotateZ(0deg);
+	}
+	60% {
+		transform: translate(-12px, -40px) rotateZ(35deg);
+	}
+	80% {
+		transform: translate(6px, -13px) rotateZ(0deg);
+	}
+	90% {
+		transform: translate(-6px, -20px) rotateZ(-25deg);
+	}
+	100% {
+		transform: translate(0px, 0px) rotateZ(45deg);
+	}
 }

@@ -1,8 +1,8 @@
-import { useAuth, useEscapeKey } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import React, { memo, useCallback, useRef, useState } from 'react';
+import { MutableRefObject, RefObject, memo, useCallback, useRef, useState } from 'react';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import PermissionManage from './PermissionManage';
@@ -11,12 +11,12 @@ import ListRolePermission from './listRolePermission';
 
 export type PermissionsChannelProps = {
 	channel: IChannel;
-	openModalAdd: boolean;
-	setOpenModalAdd: React.Dispatch<React.SetStateAction<boolean>>;
+	openModalAdd: MutableRefObject<boolean>;
+	parentRef: RefObject<HTMLDivElement>;
 };
 
 const PermissionsChannel = (props: PermissionsChannelProps) => {
-	const { channel, openModalAdd, setOpenModalAdd } = props;
+	const { channel, openModalAdd, parentRef } = props;
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private !== undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
@@ -65,13 +65,16 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	const openAddMemRoleModal = useCallback(() => {
 		setShowAddMemRole(true);
-		setOpenModalAdd(true);
-	}, [setOpenModalAdd]);
+		openModalAdd.current = true;
+	}, []);
 
 	const closeAddMemRoleModal = useCallback(() => {
 		setShowAddMemRole(false);
-		setOpenModalAdd(false);
-	}, [setOpenModalAdd]);
+		setTimeout(() => {
+			openModalAdd.current = false;
+			parentRef?.current?.focus();
+		}, 0);
+	}, []);
 
 	const handleSelectedUsersChange = useCallback((newSelectedUserIds: string[]) => {
 		setSelectedUserIds(newSelectedUserIds);
@@ -80,12 +83,6 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const handleSelectedRolesChange = useCallback((newSelectedRoleIds: string[]) => {
 		setSelectedRoleIds(newSelectedRoleIds);
 	}, []);
-
-	useEscapeKey(() => {
-		if (openModalAdd) {
-			closeAddMemRoleModal();
-		}
-	});
 
 	return (
 		<>

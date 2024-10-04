@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions, referencesActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -20,7 +20,7 @@ const ReactionBottom = ({ smileButtonRef, messageIdRefReaction }: ReactionBottom
 			event.stopPropagation();
 			dispatch(referencesActions.setIdReferenceMessageReaction(messageIdRefReaction));
 		},
-		[setSubPanelActive],
+		[setSubPanelActive]
 	);
 
 	useEffect(() => {
@@ -38,8 +38,8 @@ const ReactionBottom = ({ smileButtonRef, messageIdRefReaction }: ReactionBottom
 					top: rect.top,
 					right: rect.right,
 					left: rect.left,
-					bottom: rect.bottom,
-				}),
+					bottom: rect.bottom
+				})
 			);
 		}
 		dispatch(reactionActions.setUserReactionPanelState(false));

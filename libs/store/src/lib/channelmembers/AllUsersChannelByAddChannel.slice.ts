@@ -1,10 +1,13 @@
 import { LoadingStatus } from '@mezon/utils';
-import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { ChannelMembersEntity } from './channel.members';
 
 export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
+
+const ADD_CHANNEL_USERS_CACHE_TIME = 1000 * 60 * 3;
 
 export interface UsersByAddChannelState extends EntityState<string, string> {
 	loadingStatus: LoadingStatus;
@@ -20,12 +23,31 @@ export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapte
 	error: null
 });
 
+export const fetchUserChannelsCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, channelId: string, limit: number) => {
+		const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, limit);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: ADD_CHANNEL_USERS_CACHE_TIME,
+		normalizer: (args) => {
+			return args[2] + args[1] + args[0]?.session?.username || '';
+		}
+	}
+);
+
 export const fetchUserChannels = createAsyncThunk(
 	'allUsersByAddChannel/fetchUserChannels',
-	async ({ channelId }: { channelId: string }, thunkAPI) => {
+	async ({ channelId, noCache }: { channelId: string; noCache?: boolean }, thunkAPI) => {
 		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.listUsersAddChannelByChannelId(channelId, 500);
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			if (noCache) {
+				fetchUserChannelsCached.clear(mezon, channelId, 500);
+			}
+
+			const response = await fetchUserChannelsCached(mezon, channelId, 500);
 
 			if (response) {
 				return response ?? [];

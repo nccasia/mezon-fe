@@ -1,5 +1,4 @@
-import { Icons } from '@mezon/components';
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import { Link } from 'react-router-dom';
 
 interface SideBarProps {

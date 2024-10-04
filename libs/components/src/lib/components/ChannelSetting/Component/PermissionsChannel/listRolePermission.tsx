@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { channelUsersActions, selectAllRolesClan, selectCurrentClanId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ const ListRolePermission = (props: ListRolePermissionProps) => {
 			channelId: channel.id,
 			clanId: currentClanId || '',
 			roleId: roleId,
-			channelType: channel.type,
+			channelType: channel.type
 		};
 		await dispatch(channelUsersActions.removeChannelRole(body));
 	};

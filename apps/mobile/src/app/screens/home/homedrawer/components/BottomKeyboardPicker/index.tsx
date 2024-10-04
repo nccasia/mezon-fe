@@ -24,10 +24,7 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 			snapPoints={[height === 0 ? 1 : height, '100%']}
 			animateOnMount
 			backgroundStyle={{
-				backgroundColor: 
-					theme === 'light' ? 
-						themeValue.tertiary : 
-						themeValue.secondary
+				backgroundColor: theme === 'light' ? themeValue.tertiary : themeValue.secondary
 			}}
 		>
 			<BottomSheetScrollView stickyHeaderIndices={isStickyHeader ? [0] : []} style={styles.contentContainer}>

@@ -3,8 +3,18 @@ import { useChatSending } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAttachmentByChannelId, selectChannelById, selectDmGroupCurrent } from '@mezon/store';
-import { referencesActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
+	ChannelsEntity,
+	channelMetaActions,
+	channelUsersActions,
+	referencesActions,
+	selectAllChannelMembers,
+	selectAllRolesClan,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
+import {
+	ChannelMembersEntity,
 	IEmojiOnMessage,
 	IHashtagOnMessage,
 	ILinkOnMessage,
@@ -12,7 +22,8 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
-	filterEmptyArrays
+	filterEmptyArrays,
+	uniqueUsers
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -62,6 +73,7 @@ export const ChatMessageSending = memo(
 		const rolesInClan = useSelector(selectAllRolesClan);
 		const currentChannel = useSelector(selectChannelById(channelId));
 		const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
+		const membersOfChild = useAppSelector((state) => (channelId ? selectAllChannelMembers(state, channelId as string) : null));
 
 		const { editSendMessage, sendMessage } = useChatSending({
 			mode,
@@ -183,6 +195,9 @@ export const ChatMessageSending = memo(
 						);
 					}
 				}
+				if (currentChannel?.channel_private) {
+					addMemberToPrivateThread(currentChannel, simplifiedMentionList, membersOfChild);
+				}
 			};
 
 			InteractionManager.runAfterInteractions(() => {
@@ -194,6 +209,34 @@ export const ChatMessageSending = memo(
 			});
 		};
 
+		const addMemberToPrivateThread = async (
+			currentChannel: ChannelsEntity | null,
+			mentions: IMentionOnMessage[],
+			membersOfChild: ChannelMembersEntity[] | null
+		) => {
+			const timestamp = Date.now() / 1000;
+			const userIds = uniqueUsers(mentions, membersOfChild);
+			const body = {
+				channelId: currentChannel?.channel_id as string,
+				channelType: currentChannel?.type,
+				userIds: userIds,
+				clanId: currentChannel?.channel_id || ''
+			};
+			if (userIds?.length > 0) {
+				await dispatch(channelUsersActions.addChannelUsers(body));
+				dispatch(
+					channelMetaActions.updateBulkChannelMetadata([
+						{
+							id: currentChannel.channel_id ?? '',
+							lastSeenTimestamp: timestamp,
+							lastSentTimestamp: timestamp,
+							lastSeenPinMessage: '',
+							clanId: currentChannel.clan_id ?? ''
+						}
+					])
+				);
+			}
+		};
 		return (
 			<Block alignItems="center" justifyContent="center">
 				{(isAvailableSending || !!attachmentDataRef?.length) && (

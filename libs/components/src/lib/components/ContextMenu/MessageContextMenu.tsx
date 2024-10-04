@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, useChannelRestriction, useClanRestriction, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -45,6 +45,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalDeleteMess from '../DeleteMessageModal/ModalDeleteMess';
 import { ModalAddPinMess } from '../PinMessModal';
@@ -58,11 +59,23 @@ type MessageContextMenuProps = {
 	activeMode: number | undefined;
 };
 
+const useIsOwnerGroupDM = () => {
+	const { userProfile } = useAuth();
+	const { directId } = useAppParams();
+	const currentGroupDM = useSelector(selectDmGroupCurrent(directId as string));
+
+	const isOwnerGroupDM = useMemo(() => {
+		return currentGroupDM?.creator_id === userProfile?.user?.id;
+	}, [currentGroupDM?.creator_id, userProfile?.user?.id]);
+
+	return isOwnerGroupDM;
+};
+
 function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const parrent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
+	const messageParent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
@@ -73,12 +86,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
 	const currentMessage = useAppSelector(selectMessageByMessageId(messageId));
-	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
+	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-	const [checkAdmintrator, { isClanOwner, isOwnerGroupDM }] = useClanRestriction([EPermission.administrator]);
+	const isOwnerGroupDM = useIsOwnerGroupDM();
 	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
@@ -99,30 +112,38 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [message?.content.t]);
 
 	const checkMessageInPinnedList = useMemo(() => {
-		return listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
-	}, [listPinMessages]);
-	const { maxChannelPermissions } = useChannelRestriction(message?.channel_id);
-	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
-	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
+		return listPinMessages?.some((pinMessage) => pinMessage?.message_id === messageId);
+	}, [listPinMessages, messageId]);
+
+	const [canManageThread, canDeleteMessage, canSendMessage] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
+		message?.channel_id ?? ''
+	);
+	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
 	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
-	const [isOPenDeleteMessageModal, setIsOPenDeleteMessageModal] = useState<boolean>(false);
+	const [isOPenDeleteMessageModal, isCloseDeleteMessageModal] = useModal(() => {
+		return <ModalDeleteMess mess={currentMessage} closeModal={isCloseDeleteMessageModal} mode={mode} />;
+	}, [currentMessage]);
 	const appearanceTheme = useSelector(selectTheme);
 
-	const isShowForwardAll = () => {
+	const isShowForwardAll = useMemo(() => {
 		if (messagePosition === -1) return false;
 		return (
-			message.isStartedMessageGroup &&
-			messagePosition < convertedAllMessagesEntities.length - 1 &&
-			!convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup
+			message?.isStartedMessageGroup &&
+			messagePosition < convertedAllMessagesEntities?.length - 1 &&
+			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
 		);
-	};
+	}, [convertedAllMessagesEntities, message?.isStartedMessageGroup, messagePosition]);
 
-	const handleReplyMessage = () => {
+	const handleReplyMessage = useCallback(() => {
+		if (!message) {
+			return;
+		}
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: message.channel_id,
@@ -130,7 +151,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					message_ref_id: message.id,
 					ref_type: 0,
 					message_sender_id: message.sender_id,
-					content: JSON.stringify(message.content),
+					content: JSON.stringify(message.content ?? '{}'),
 					message_sender_username: message.username,
 					mesages_sender_avatar: message.clan_avatar ? message.clan_avatar : message.avatar,
 					message_sender_clan_nick: message.clan_nick,
@@ -144,43 +165,43 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	};
+	}, [dispatch, message]);
 
-	const handleEditMessage = () => {
+	const handleEditMessage = useCallback(() => {
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
+		dispatch(referencesActions.setIdReferenceMessageEdit(message?.id));
 		dispatch(
 			messagesActions.setChannelDraftMessage({
-				channelId: message.channel_id,
+				channelId: message?.channel_id,
 				channelDraftMessage: {
-					message_id: message.id,
-					draftContent: message.content,
-					draftMention: message.mentions ?? [],
-					draftAttachment: message.attachments ?? []
+					message_id: message?.id,
+					draftContent: message?.content,
+					draftMention: message?.mentions ?? [],
+					draftAttachment: message?.attachments ?? []
 				}
 			})
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
-	};
+	}, [dispatch, message]);
 
-	const handleForwardMessage = () => {
-		if (dmGroupChatList.length === 0) {
+	const handleForwardMessage = useCallback(() => {
+		if (dmGroupChatList?.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));
 		}
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 		dispatch(setIsForwardAll(false));
-	};
+	}, [dispatch, dmGroupChatList?.length, message]);
 
-	const handleForwardAllMessage = () => {
-		if (dmGroupChatList.length === 0) {
+	const handleForwardAllMessage = useCallback(() => {
+		if (dmGroupChatList?.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));
 		}
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 		dispatch(setIsForwardAll(true));
-	};
+	}, [dispatch, dmGroupChatList?.length, message]);
 
 	const [openModalAddPin, setOpenModalAddPin] = useState(false);
 	const handlePinMessage = async () => {
@@ -192,32 +213,30 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				channelId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
 				isPublic: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
-				isParentPublic: parrent ? !parrent.channel_private : false,
+				isParentPublic: messageParent ? !messageParent.channel_private : false,
 				mode: activeMode as number
 			})
 		);
 	};
 
-	const handleUnPinMessage = () => {
+	const handleUnPinMessage = useCallback(() => {
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
-	};
+	}, [dispatch, message?.channel_id, message?.id]);
 
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 
-	const handleCreateThread = () => {
+	const handleCreateThread = useCallback(() => {
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
 		setValueThread(message);
-	};
+	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
 
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
 			return true;
 		}
-		{
-			return false;
-		}
+		return false;
 	}, [posShowMenu]);
 
 	const isClickedSticker = useMemo(() => {
@@ -254,31 +273,33 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableOne = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
-		const enableAll = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableOne = removeReaction && enableViewReactionItem;
+		const enableAll = removeReaction && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanOwner, checkAdmintrator, enableViewReactionItem, removeReaction]);
+	}, [checkPos, enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
 		if (!checkPos) return false;
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return false;
 		} else {
-			return maxChannelPermissions[EOverriddenPermission.manageThread];
+			return canManageThread;
 		}
-	}, [checkPos, activeMode, maxChannelPermissions]);
+	}, [checkPos, activeMode, canManageThread]);
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
+		if (isMyMessage) {
+			return true;
+		}
 		// DM Group
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
-			return isMyMessage || isOwnerGroupDM;
+			return isOwnerGroupDM;
 		}
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return maxChannelPermissions[EOverriddenPermission.deleteMessage];
+			return canDeleteMessage;
 		}
-		return isMyMessage;
-	}, [activeMode, type, maxChannelPermissions, isMyMessage, checkPos, isOwnerGroupDM]);
+	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
@@ -286,7 +307,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		if (imageSrc) {
 			return imageSrc;
 		} else return '';
-	}, [checkElementIsImage, elementTarget, imageSrc]);
+	}, [imageSrc]);
 
 	useMemo(() => {
 		if (isClickedEmoji) {
@@ -315,7 +336,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			setEnableCopyImageItem(false);
 			setEnableSaveImageItem(false);
 		}
-	}, [checkElementIsImage, elementTarget, isClickedSticker]);
+	}, [checkElementIsImage, isClickedEmoji, isClickedSticker]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
@@ -323,7 +344,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem(
 				'addReaction', // id
-				'Add Reaction', // lable
+				'Add Reaction', // label
 				() => console.log('add reaction'),
 				<Icons.RightArrowRightClick />
 			);
@@ -332,7 +353,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem(
 				'giveAcoffee', // id
-				'Give A Coffee', // lable
+				'Give A Coffee', // label
 
 				async () => {
 					try {
@@ -371,7 +392,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'Edit Message',
 				async () => {
 					try {
-						await handleEditMessage();
+						handleEditMessage();
 					} catch (error) {
 						console.error('Failed to edit message', error);
 					}
@@ -388,7 +409,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos && maxChannelPermissions[EOverriddenPermission.sendMessage], (builder) => {
+		builder.when(checkPos && canSendMessage, (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',
@@ -438,17 +459,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
 		});
 
-		{
-			isShowForwardAll() &&
-				builder.when(checkPos, (builder) => {
-					builder.addMenuItem(
-						'forwardAll',
-						'Forward All Message',
-						() => handleForwardAllMessage(),
-						<Icons.ForwardRightClick defaultSize="w-4 h-4" />
-					);
-				});
-		}
+		isShowForwardAll &&
+			builder.when(checkPos, (builder) => {
+				builder.addMenuItem(
+					'forwardAll',
+					'Forward All Message',
+					() => handleForwardAllMessage(),
+					<Icons.ForwardRightClick defaultSize="w-4 h-4" />
+				);
+			});
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(
@@ -478,12 +497,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(enableDelMessageItem, (builder) => {
-			builder.addMenuItem(
-				'deleteMessage',
-				'Delete Message',
-				() => setIsOPenDeleteMessageModal(true),
-				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
-			);
+			builder.addMenuItem('deleteMessage', 'Delete Message', isOPenDeleteMessageModal, <Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
 		builder.when(enableReportMessageItem, (builder) => {
@@ -530,7 +544,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(enableSaveImageItem, (builder) => {
 			builder.addMenuItem('saveImage', 'Save Image', async () => {
 				try {
-					await handleSaveImage(urlImage);
+					handleSaveImage(urlImage);
 				} catch (error) {
 					console.error('Failed to save image:', error);
 				}
@@ -539,12 +553,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 		return builder.build();
 	}, [
-		dispatch,
-		messageId,
-		message,
+		checkPos,
 		enableViewReactionItem,
 		enableEditMessageItem,
+		pinMessageStatus,
+		canSendMessage,
 		enableCreateThreadItem,
+		isShowForwardAll,
 		enableSpeakMessageItem,
 		enableRemoveOneReactionItem,
 		enableRemoveAllReactionsItem,
@@ -554,10 +569,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableOpenLinkItem,
 		enableCopyImageItem,
 		enableSaveImageItem,
-		pinMessageStatus,
-		checkPos,
-		urlImage,
-		posShowMenu
+		appearanceTheme,
+		userId,
+		message,
+		dispatch,
+		handleEditMessage,
+		handleUnPinMessage,
+		handleReplyMessage,
+		handleCreateThread,
+		handleForwardMessage,
+		handleForwardAllMessage,
+		urlImage
 	]);
 
 	return (
@@ -570,15 +592,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					handlePinMessage={handlePinMessage}
 					mode={activeMode || 0}
 					channelLabel={currentChannel?.channel_label || ''}
-				/>
-			)}
-			{isOPenDeleteMessageModal && (
-				<ModalDeleteMess
-					mess={currentMessage}
-					closeModal={() => {
-						setIsOPenDeleteMessageModal(false);
-					}}
-					mode={mode}
 				/>
 			)}
 		</>

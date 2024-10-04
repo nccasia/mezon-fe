@@ -11,10 +11,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#00000060',
 		position: 'absolute',
 		top: 0,
-		left: 0,
+		left: 0
 	},
 	textTitle: {
-		color: Colors.white,
+		color: Colors.white
 	},
 	content: {
 		position: 'relative',
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexBasis: 170,
 		borderRadius: 10,
-		overflow: 'hidden',
+		overflow: 'hidden'
 	},
 	container: {
 		marginTop: 20,

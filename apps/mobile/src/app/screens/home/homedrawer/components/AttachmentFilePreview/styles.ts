@@ -5,18 +5,18 @@ const styles = StyleSheet.create({
 	container: {
 		backgroundColor: Colors.secondary,
 		borderTopColor: Colors.gray72,
-		padding: size.s_16,
+		padding: size.s_16
 	},
 	attachmentItem: {
 		marginRight: size.s_14,
 		borderRadius: size.s_6,
 		height: verticalScale(80),
-		paddingTop: size.s_10,
+		paddingTop: size.s_10
 	},
 	attachmentItemImage: {
 		width: verticalScale(70),
 		height: '100%',
-		borderRadius: size.s_6,
+		borderRadius: size.s_6
 	},
 	iconClose: {
 		position: 'absolute',
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
 		borderColor: Colors.secondary,
 		borderRadius: size.s_20,
 		padding: size.s_2,
-		zIndex: size.s_2,
+		zIndex: size.s_2
 	},
 	videoOverlay: {
 		position: 'absolute',
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		height: '100%',
 		width: '100%',
-		borderRadius: size.s_6,
+		borderRadius: size.s_6
 	},
 	fileViewer: {
 		gap: size.s_6,
@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderRadius: size.s_6,
 		flexDirection: 'row',
-		backgroundColor: Colors.bgPrimary,
+		backgroundColor: Colors.bgPrimary
 	},
 	fileName: {
 		fontSize: size.small,
-		color: Colors.white,
+		color: Colors.white
 	},
 	typeFile: {
 		fontSize: size.small,
 		color: Colors.textGray,
-		textTransform: 'uppercase',
-	},
+		textTransform: 'uppercase'
+	}
 });
 
 export default styles;

@@ -5,7 +5,7 @@ import {
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
-	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
@@ -22,7 +22,7 @@ enum EAccountSettingType {
 	DisplayName,
 	BlockedUsers,
 	DisableAccount,
-	DeleteAccount,
+	DeleteAccount
 }
 
 interface IAccountOption {
@@ -55,7 +55,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 	const showUpdating = () => {
 		Toast.show({
 			type: 'info',
-			text1: 'Coming soon',
+			text1: 'Coming soon'
 		});
 	};
 
@@ -77,14 +77,14 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 					[
 						{
 							text: 'No',
-							style: 'cancel',
+							style: 'cancel'
 						},
 						{
 							text: 'Yes',
-							onPress: () => logout(),
-						},
+							onPress: () => logout()
+						}
 					],
-					{ cancelable: false },
+					{ cancelable: false }
 				);
 				break;
 			case EAccountSettingType.DisableAccount:
@@ -94,14 +94,14 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 					[
 						{
 							text: 'No',
-							style: 'cancel',
+							style: 'cancel'
 						},
 						{
 							text: 'Yes',
-							onPress: () => logout(),
-						},
+							onPress: () => logout()
+						}
 					],
-					{ cancelable: false },
+					{ cancelable: false }
 				);
 				break;
 			default:
@@ -114,36 +114,36 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 			{
 				title: t('username'),
 				description: userProfile?.user?.username,
-				type: EAccountSettingType.UserName,
+				type: EAccountSettingType.UserName
 			},
 			{
 				title: t('displayName'),
-				type: EAccountSettingType.DisplayName,
-			},
+				type: EAccountSettingType.DisplayName
+			}
 		];
 
 		const usersOptions: IAccountOption[] = [
 			{
 				title: t('blockedUsers'),
 				description: '0', //TODO: get blocked count
-				type: EAccountSettingType.BlockedUsers,
-			},
+				type: EAccountSettingType.BlockedUsers
+			}
 		];
 
 		const accountManagementOptions: IAccountOption[] = [
 			{
 				title: t('disableAccount'),
-				type: EAccountSettingType.DisableAccount,
+				type: EAccountSettingType.DisableAccount
 			},
 			{
 				title: t('deleteAccount'),
-				type: EAccountSettingType.DeleteAccount,
-			},
+				type: EAccountSettingType.DeleteAccount
+			}
 		];
 		return {
 			accountInformationOptions,
 			usersOptions,
-			accountManagementOptions,
+			accountManagementOptions
 		};
 	}, [t, userProfile?.user?.username]);
 

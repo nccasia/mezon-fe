@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -111,19 +111,41 @@ const Notifications = () => {
 		closeBottomSheet();
 	};
 
-	const handleOnPressNotify = async (notify: INotification) => {
-		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME as never);
-		requestAnimationFrame(async () => {
-			store.dispatch(
-				channelsActions.joinChannel({
-					clanId: notify?.content?.clan_id ?? '',
-					channelId: notify?.content?.channel_id,
-					noFetchMembers: false
-				})
-			);
-			navigation.dispatch(DrawerActions.closeDrawer());
+	const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
+		store.dispatch(appActions.setLoadingMainMobile(true));
+		return new Promise<void>((resolve) => {
+			requestAnimationFrame(async () => {
+				const promises = [];
+				if (notify?.content?.clan_id !== currentClanId) {
+					promises.push(store.dispatch(clansActions.joinClan({ clanId: notify?.content?.clan_id })));
+					promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
+				}
+
+				promises.push(
+					store.dispatch(
+						channelsActions.joinChannel({
+							clanId: notify?.content?.clan_id ?? '',
+							channelId: notify?.content?.channel_id,
+							noFetchMembers: false
+						})
+					)
+				);
+
+				await Promise.all(promises);
+				navigation.navigate(APP_SCREEN.HOME as never);
+				navigation.dispatch(DrawerActions.closeDrawer());
+				store.dispatch(appActions.setLoadingMainMobile(false));
+				resolve();
+			});
 		});
+	};
+
+	const handleOnPressNotify = async (notify: INotification) => {
+		if (!notify?.content?.channel_id) {
+			return;
+		}
+		const store = await getStoreAsync();
+		await handleNotification(notify, currentClanId, store, navigation);
 	};
 
 	const closeBottomSheet = () => {

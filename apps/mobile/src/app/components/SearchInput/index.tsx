@@ -35,9 +35,9 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.black,
 		paddingLeft: 10,
 		paddingRight: 10,
-		gap: 10,
+		gap: 10
 	},
 	icon: {
-		color: Colors.gray48,
-	},
+		color: Colors.gray48
+	}
 });

@@ -25,8 +25,8 @@ const CategoryOrderSetting = () => {
 	const handleDragEnter = (index: number) => {
 		dragOverItemIndex.current = index;
 		setHoveredIndex(index);
-		
-		if(dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
+
+		if (dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
 			if (dragItemIndex.current > dragOverItemIndex.current) {
 				setDragBorderPosition(EDragBorderPositon.TOP);
 			} else if (dragItemIndex.current < dragOverItemIndex.current) {
@@ -38,7 +38,7 @@ const CategoryOrderSetting = () => {
 	const handleDragEnd = () => {
 		setDragBorderPosition(null);
 		setHoveredIndex(null);
-		
+
 		if (dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
 			const copyCategoryList = [...categoryListState];
 			const [draggedItem] = copyCategoryList.splice(dragItemIndex.current, 1);
@@ -47,7 +47,7 @@ const CategoryOrderSetting = () => {
 			setCategoryListState(copyCategoryList);
 			setHasChanged(true);
 		}
-		
+
 		dragItemIndex.current = null;
 		dragOverItemIndex.current = null;
 	};

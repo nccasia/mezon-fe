@@ -29,7 +29,7 @@ type fetchChannelPinMessagesPayload = {
 
 const CHANNEL_PIN_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 const fetchChannelPinMessagesCached = memoizeAndTrack(
-	(mezon: MezonValueContext, channelId: string) => mezon.client.pinMessagesList(mezon.session, channelId),
+	(mezon: MezonValueContext, channelId: string) => mezon.client.pinMessagesList(mezon.session, '', channelId, ''),
 	{
 		promise: true,
 		maxAge: CHANNEL_PIN_MESSAGES_CACHED_TIME,

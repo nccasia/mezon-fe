@@ -1,9 +1,7 @@
-import { useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { selectDirectsOpenlist, selectTheme } from '@mezon/store';
+import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CreateMessageGroup from './CreateMessageGroup';
@@ -12,23 +10,14 @@ import ListDMChannel from './listDMChannel';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
-const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
-	return notSortedArr.sort((a, b) => {
-		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
-		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
-		return timestampB - timestampA;
-	});
-};
-
 function DirectMessageList() {
-	const dmGroupChatList = useSelector(selectDirectsOpenlist);
+	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const appearanceTheme = useSelector(selectTheme);
-	const sortedFilteredDataDM = sortDMItem(dmGroupChatList);
 	return (
 		<>
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
-					<FriendsButton navigateToFriend={sortedFilteredDataDM?.length === 0} />
+					<FriendsButton navigateToFriend={dmGroupChatList?.length === 0} />
 				</div>
 
 				<div className="text-xs font-semibold tracking-wide left-sp dark:text-[#AEAEAE] text-[#585858] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default dark:hover:text-white hover:text-black">
@@ -40,7 +29,7 @@ function DirectMessageList() {
 				className={`flex-1 font-medium text-gray-300 pl-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] text-center relative">
-					<ListDMChannel listDM={sortedFilteredDataDM} />
+					<ListDMChannel listDM={dmGroupChatList} />
 				</div>
 			</div>
 		</>
@@ -56,12 +45,9 @@ const CreateMessageGroupModal = memo(() => {
 		setIsOpen(!isOpen);
 	};
 
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setIsOpen(false);
-	};
-
-	useEscapeKey(handleCloseModal);
-	useOnClickOutside(buttonPlusRef, handleCloseModal);
+	}, []);
 
 	return (
 		<div
@@ -72,7 +58,7 @@ const CreateMessageGroupModal = memo(() => {
 			<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 				<Icons.Plus className="w-4 h-4" />
 			</Tooltip>
-			{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} />}
+			{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
 		</div>
 	);
 });

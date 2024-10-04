@@ -1,3 +1,4 @@
+import { selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -8,9 +9,11 @@ interface ChannelNameModalProps {
 	type: ChannelType;
 	channelNameProps: string;
 	onChange: (value: string) => void;
-	onCheckValidate: (check: boolean) => void;
-	onHandleChangeValue: () => void;
-	error: string;
+	onCheckValidate?: (check: boolean) => void;
+	onHandleChangeValue?: () => void;
+	error?: string;
+	placeholder: string;
+	shouldValidate: boolean;
 }
 
 export type ChannelNameModalRef = {
@@ -18,9 +21,11 @@ export type ChannelNameModalRef = {
 };
 
 export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
-	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, error } = props;
+	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, error, placeholder, shouldValidate } = props;
 	const [checkvalidate, setCheckValidate] = useState(true);
 	const [checkNameChannel, setCheckNameChannel] = useState(true);
+	const theme = useAppSelector(selectTheme);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		onChange(value);
@@ -32,10 +37,14 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 		const regex = ValidateSpecialCharacters();
 		if (regex.test(value)) {
 			setCheckValidate(false);
-			onCheckValidate(true);
+			if (onCheckValidate) {
+				onCheckValidate(true);
+			}
 		} else {
 			setCheckValidate(true);
-			onCheckValidate(false);
+			if (onCheckValidate) {
+				onCheckValidate(false);
+			}
 		}
 	};
 
@@ -44,7 +53,7 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 		[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
 		[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
-		[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_APP]: <Icons.AppChannelIcon className="w-6 h-6" fill={theme} />,
 		[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Stream defaultSize="w-6 h-6" />,
 		// 2 lines below only get index
 		[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
@@ -56,7 +65,9 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 	}));
 
 	useEffect(() => {
-		onHandleChangeValue();
+		if (onHandleChangeValue) {
+			onHandleChangeValue();
+		}
 	}, [checkvalidate, checkNameChannel, onHandleChangeValue]);
 
 	return (
@@ -71,13 +82,13 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 						<input
 							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
 							onChange={handleInputChange}
-							placeholder="Enter the channel's name"
+							placeholder={placeholder}
 							maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 						/>
 					</div>
 				</div>
 			</div>
-			{checkvalidate || checkNameChannel ? (
+			{shouldValidate && (checkvalidate || checkNameChannel) ? (
 				<p className="text-[#e44141] text-xs italic font-thin">
 					Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 				</p>

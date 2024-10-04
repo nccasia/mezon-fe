@@ -1,9 +1,9 @@
 import { ThemeMode, ThemeModeAuto, ThemeModeBase, themeColors, useTheme } from '@mezon/mobile-ui';
-import { APP_SCREEN, SettingScreenProps } from 'apps/mobile/src/app/navigation/ScreenTypes';
-import { IMezonSlideOptionsData, MezonSlideOption } from 'apps/mobile/src/app/temp-ui';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Appearance, View } from 'react-native';
+import { APP_SCREEN, SettingScreenProps } from '../../../../navigation/ScreenTypes';
+import { IMezonSlideOptionsData, MezonSlideOption } from '../../../../temp-ui';
 import { style } from './styles';
 
 type AppThemeScreen = typeof APP_SCREEN.SETTINGS.APP_THEME;
@@ -17,7 +17,7 @@ export default function AppThemeSetting({ navigation }: SettingScreenProps<AppTh
 		({ color = 'transparent', border = 'transparent' }: { color?: string; border?: string }) => (
 			<View style={[styles.box, { backgroundColor: color, borderColor: border }]}></View>
 		),
-		[],
+		[]
 	);
 
 	const themeOptions = useMemo(
@@ -26,12 +26,12 @@ export default function AppThemeSetting({ navigation }: SettingScreenProps<AppTh
 				{
 					element: <BoxSelector color={themeColors.dark.primary} border={themeColors.dark.border} />,
 					value: ThemeModeBase.DARK,
-					title: t('fields.dark'),
+					title: t('fields.dark')
 				},
 				{
 					element: <BoxSelector color={themeColors.light.primary} border={themeColors.light.border} />,
 					value: ThemeModeBase.LIGHT,
-					title: t('fields.light'),
+					title: t('fields.light')
 				},
 				{
 					element: (
@@ -41,10 +41,10 @@ export default function AppThemeSetting({ navigation }: SettingScreenProps<AppTh
 						/>
 					),
 					value: ThemeModeAuto.AUTO,
-					title: t('fields.system'),
-				},
+					title: t('fields.system')
+				}
 			] satisfies IMezonSlideOptionsData[],
-		[],
+		[]
 	);
 
 	function handleThemeChange(value: string) {

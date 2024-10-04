@@ -1,27 +1,27 @@
-import { IChannelMember } from "@mezon/utils";
-import { useMemo } from "react";
+import { IChannelMember } from '@mezon/utils';
+import { useMemo } from 'react';
 
 export function useMessageSender(user?: IChannelMember | null) {
-    const avatarImg = useMemo(() => {
-        return user?.user?.avatar_url || ''
-    }, [user]);
+	const avatarImg = useMemo(() => {
+		return user?.user?.avatar_url || '';
+	}, [user]);
 
-    const hasAvatar = useMemo(() => {
-        return Boolean(user?.user?.avatar_url);
-    }, [user])
+	const hasAvatar = useMemo(() => {
+		return Boolean(user?.user?.avatar_url);
+	}, [user]);
 
-    const username = useMemo(() => {
-        return user?.user?.username || ''
-    }, [user])
+	const username = useMemo(() => {
+		return user?.user?.username || '';
+	}, [user]);
 
-    const avatarChar = useMemo(() => {
-        return user?.user?.username?.charAt(0)?.toUpperCase() || '';
-    }, [user])
+	const avatarChar = useMemo(() => {
+		return user?.user?.username?.charAt(0)?.toUpperCase() || '';
+	}, [user]);
 
-    return {
-        avatarImg,
-        hasAvatar,
-        username,
-        avatarChar,
-    }
+	return {
+		avatarImg,
+		hasAvatar,
+		username,
+		avatarChar
+	};
 }

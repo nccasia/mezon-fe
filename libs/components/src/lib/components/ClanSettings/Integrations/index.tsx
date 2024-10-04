@@ -1,8 +1,8 @@
 import { selectAllWebhooks } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 import MainIntegrations from './MainIntegrations';
 import Webhooks from './Webhooks';
 

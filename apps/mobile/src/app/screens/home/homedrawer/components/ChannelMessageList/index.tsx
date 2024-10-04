@@ -1,7 +1,7 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, channelMetaActions, useAppDispatch } from '@mezon/store';
+import { MessagesEntity } from '@mezon/store';
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import { style } from './styles';
@@ -21,12 +21,6 @@ const ChannelListMessage = React.memo(
 		const styles = style(themeValue);
 
 		const keyExtractor = useCallback((message) => message.id, []);
-
-		const dispatch = useAppDispatch();
-		if (messages?.[0]?.channel_id) {
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: messages[0].channel_id, timestamp }));
-		}
 
 		const ViewLoadMore = () => {
 			return (
@@ -54,6 +48,8 @@ const ChannelListMessage = React.memo(
 				renderItem={renderItem}
 				removeClippedSubviews={false}
 				keyExtractor={keyExtractor}
+				windowSize={20}
+				initialNumToRender={20}
 				onEndReached={
 					messages?.length && !isCannotLoadMore
 						? () => {

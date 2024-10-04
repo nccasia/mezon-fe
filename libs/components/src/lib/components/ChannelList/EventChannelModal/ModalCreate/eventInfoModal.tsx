@@ -2,6 +2,7 @@ import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
 import { ContenSubmitEventProps, fileTypeImage } from '@mezon/utils';
+import { format } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -77,7 +78,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const handleChangeTimeStart = (e: any) => {
 		const time = e.target.value;
 		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
-		setErrorStart(!compareTime(timeStartDefault, time, true));
+		const formatDate = format(contentSubmit.selectedDateStart, 'yyyyMMdd');
+		const today = format(Date.now(), 'yyyyMMdd');
+		if (Number(formatDate) === Number(today)) {
+			setErrorStart(!compareTime(timeStartDefault, time, true));
+		}
 	};
 
 	const handleChangeTimeEnd = (e: any) => {

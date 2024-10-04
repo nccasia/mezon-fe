@@ -1,7 +1,5 @@
-import { useEscapeKey } from '@mezon/core';
 import {
 	ChannelsEntity,
-	hasGrandchildModal,
 	selectAllChannels,
 	selectChannelById,
 	selectCurrentClanId,
@@ -16,7 +14,7 @@ import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread, IChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
@@ -84,6 +82,12 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 		dispatch(settingClanStickerActions.openModalInChild());
 		setIsShowPopup(!isShowPopup);
 	};
+
+	const handleCloseDeletePopup = useCallback(() => {
+		setIsShowPopup(false);
+		modalRef?.current?.focus();
+	}, []);
+
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
 	};
@@ -149,16 +153,6 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 		setHasChange(false);
 	};
 
-	const isChildModal = useSelector(hasGrandchildModal);
-
-	const handleUseEscapeKey = () => {
-		if (isChildModal) {
-			setIsShowPopup(false);
-			dispatch(settingClanStickerActions.closeModalInChild());
-		}
-	};
-	useEscapeKey(handleUseEscapeKey);
-
 	const handleResetChange = () => {
 		setDataForUpdate({
 			channelIdForUpdate: webhookItem.channel_id,
@@ -168,9 +162,12 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 		setDropdownValue(webhookChannel.channel_label);
 		setHasChange(false);
 	};
+
+	const modalRef = useRef<HTMLDivElement>(null);
+
 	return (
 		<>
-			<div className="pt-[20px] mt-[12px] border-t dark:border-[#3b3d44]">
+			<div ref={modalRef} tabIndex={-1} className="pt-[20px] mt-[12px] border-t dark:border-[#3b3d44]">
 				<div className="flex gap-2">
 					<div className="w-3/12 dark:text-[#b5bac1] text-textLightTheme">
 						<input onChange={handleChooseFile} ref={avatarRef} type="file" hidden />
@@ -253,7 +250,14 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 				</div>
 			</div>
 			{hasChange && <ModalSaveChanges onSave={handleEditWebhook} onReset={handleResetChange} />}
-			{isShowPopup && <DeleteWebhookPopup currentChannel={currentChannel} webhookItem={webhookItem} toggleShowPopup={toggleShowPopup} />}
+			{isShowPopup && (
+				<DeleteWebhookPopup
+					currentChannel={currentChannel}
+					webhookItem={webhookItem}
+					toggleShowPopup={toggleShowPopup}
+					closeShowPopup={handleCloseDeletePopup}
+				/>
+			)}
 		</>
 	);
 };

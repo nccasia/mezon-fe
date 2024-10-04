@@ -11,10 +11,10 @@ const GroupThread = ({ title, children }: GroupThreadsProps) => {
 	const styles = style(themeValue);
 	return (
 		<View>
-      <Block marginTop={size.s_10}>
-      <Text style={styles.title}>{title}</Text>
-			<View style={styles.groupThread}>{children}</View>
-      </Block>
+			<Block marginTop={size.s_10}>
+				<Text style={styles.title}>{title}</Text>
+				<View style={styles.groupThread}>{children}</View>
+			</Block>
 		</View>
 	);
 };

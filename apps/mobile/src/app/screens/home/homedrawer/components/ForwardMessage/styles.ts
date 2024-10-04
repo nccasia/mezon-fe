@@ -13,13 +13,13 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_18
 	},
 	btnText: {
-		color: Colors.white,
+		color: Colors.white
 	},
 	memberAvatar: {
 		height: size.s_34,
 		width: size.s_34,
 		borderRadius: 50,
-    backgroundColor: Colors.bgGrayDark
+		backgroundColor: Colors.bgGrayDark
 	},
 	groupAvatar: {
 		backgroundColor: Colors.orange,
@@ -28,5 +28,5 @@ export const styles = StyleSheet.create({
 		borderRadius: 50,
 		justifyContent: 'center',
 		alignItems: 'center'
-	},
+	}
 });

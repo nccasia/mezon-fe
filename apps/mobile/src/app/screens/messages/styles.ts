@@ -179,7 +179,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			fontSize: size.s_14,
 			color: colors.white,
 			fontWeight: '500',
-			flex: 1,
+			flex: 1
 		},
 		avatarWrapper: {
 			borderRadius: size.s_50,

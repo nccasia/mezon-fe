@@ -23,7 +23,7 @@ function LoginForm(props: LoginFormProps) {
 				console.error(error);
 			}
 		},
-		[loginEmail],
+		[loginEmail]
 	);
 
 	return <FormLogin onSubmit={handleSubmit} />;

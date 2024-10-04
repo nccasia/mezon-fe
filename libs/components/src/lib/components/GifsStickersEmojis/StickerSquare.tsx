@@ -1,4 +1,4 @@
-import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { useChatSending, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
 import { selectAllStickerSuggestion, selectCurrentClan, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from 'react';
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
 	mode: number;
+	onClose: () => void;
 };
 
 interface ICategorizedStickerProps {
@@ -27,7 +28,7 @@ type StickerPanel = {
 	id: string;
 };
 
-function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
+function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
 	const handleSend = useCallback(
 		(
@@ -82,8 +83,11 @@ function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
 		}
 	};
 
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+
 	return (
-		<div className="flex h-full w-full md:w-[500px] max-sm:ml-1">
+		<div ref={modalRef} tabIndex={-1} className="outline-none flex h-full w-full md:w-[500px] max-sm:ml-1">
 			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2 ">
 				<div
 					className="w-11 max-sm:gap-x-1

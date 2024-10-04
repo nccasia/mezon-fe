@@ -13,7 +13,7 @@ export const style = (colors: Attributes) =>
 			borderBottomWidth: 1,
 			alignItems: 'center',
 			paddingHorizontal: size.s_16,
-			paddingVertical: size.s_8,
+			paddingVertical: size.s_8
 		},
 		channelTitle: {
 			alignItems: 'center',

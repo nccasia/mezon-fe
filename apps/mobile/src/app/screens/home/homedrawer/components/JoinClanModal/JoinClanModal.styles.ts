@@ -8,13 +8,13 @@ export const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: Colors.white,
 		textAlign: 'center',
-		marginBottom: size.s_10,
+		marginBottom: size.s_10
 	},
 	textInviteBtn: {
 		fontSize: size.label,
 		fontWeight: '500',
 		color: Colors.white,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	btnInvite: {
 		width: '100%',
@@ -23,17 +23,17 @@ export const styles = StyleSheet.create({
 		borderRadius: size.s_50,
 		position: 'absolute',
 		bottom: size.s_60,
-		left: size.s_20,
+		left: size.s_20
 	},
 	description: {
 		fontSize: size.label,
 		fontWeight: '500',
 		color: Colors.textGray,
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	textExample: {
 		fontSize: size.label,
 		fontWeight: '400',
-		color: Colors.textGray,
-	},
+		color: Colors.textGray
+	}
 });

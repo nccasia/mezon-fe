@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/components';
+import { Icons } from '@mezon/ui';
 import { ReactNode } from 'react';
 
 type ItemStatusProps = {

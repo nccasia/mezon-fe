@@ -34,7 +34,9 @@ const CustomDropdown = ({ dropdownItems, dropDownTitle }: ICustomDropdownProps) 
 					<ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
 						<li>
 							{dropdownItems.map((value, index) => (
-								<div key={index} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{value}</div>
+								<div key={index} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+									{value}
+								</div>
 							))}
 						</li>
 					</ul>

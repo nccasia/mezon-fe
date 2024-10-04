@@ -1,6 +1,6 @@
 export enum EMessageBSToShow {
-	MessageAction,
-	UserInformation
+	MessageAction = 'MessageAction',
+	UserInformation = 'UserInformation'
 }
 
 export enum EMessageActionType {

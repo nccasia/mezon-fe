@@ -1,5 +1,4 @@
-import { INotification } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser, INotification } from '@mezon/utils';
 export type NotifyProps = {
 	readonly notify: INotification;
 	onLongPressNotify?: (type: ENotifyBsToShow, notify: INotification) => void;
@@ -14,10 +13,10 @@ export interface IMessageNotifyProps {
 export enum EActionDataNotify {
 	All = 'all',
 	Individual = 'individual',
-	Mention = 'mention',
+	Mention = 'mention'
 }
 
 export enum ENotifyBsToShow {
 	notification,
-	removeNotification,
+	removeNotification
 }

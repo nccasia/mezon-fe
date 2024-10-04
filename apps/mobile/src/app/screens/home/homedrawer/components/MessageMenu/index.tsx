@@ -3,11 +3,11 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentUserId, useAppSelector } from '@mezon/store';
 import { DirectEntity, deleteChannel, directActions, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from 'apps/mobile/src/app/temp-ui';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../temp-ui';
 import { style } from './styles';
 
 interface IServerMenuProps {
@@ -51,8 +51,8 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		},
 		{
 			onPress: async () => {
-				await dispatch(directActions.closeDirectMessage({ channel_id: messageInfo?.channel_id }))
-				dismiss()
+				await dispatch(directActions.closeDirectMessage({ channel_id: messageInfo?.channel_id }));
+				dismiss();
 			},
 			title: t('menu.closeDm'),
 			isShow: !isGroup
@@ -135,7 +135,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 					</View>
 				)}
 				<View style={styles.titleWrapper}>
-					<Text style={styles.serverName} numberOfLines={2}>{messageInfo?.channel_label || messageInfo?.usernames}</Text>
+					<Text style={styles.serverName} numberOfLines={2}>
+						{messageInfo?.channel_label || messageInfo?.usernames}
+					</Text>
 					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id.length + 1} members</Text>}
 				</View>
 			</View>

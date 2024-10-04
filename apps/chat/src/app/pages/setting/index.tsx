@@ -1,8 +1,9 @@
-import { ExitSetting, Icons, SettingAccount, SettingAppearance, SettingItem, SettingRightProfile } from '@mezon/components';
-import { useEscapeKey, useSettingFooter } from '@mezon/core';
+import { ExitSetting, SettingAccount, SettingAppearance, SettingItem, SettingRightProfile } from '@mezon/components';
+import { useEscapeKeyClose, useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EUserSettings } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface settingProps {
@@ -20,21 +21,23 @@ const Setting = ({ isDM }: settingProps) => {
 		setMenuIsOpen(!menuIsOpen);
 	};
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
-	const closeSetting = () => {
+	const closeSetting = useCallback(() => {
 		setIsShowSettingFooterStatus(false);
 		setIsShowSettingFooterInitTab('Account');
 		setIsUserProfile(true);
-	};
+	}, [isShowSettingFooter?.status]);
 
 	useEffect(() => {
 		setCurrentSetting(isShowSettingFooter?.initTab || 'Account');
 	}, [isShowSettingFooter?.initTab]);
 
-	useEscapeKey(closeSetting);
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, closeSetting);
+
 	return (
 		<div>
 			{isShowSettingFooter?.status ? (
-				<div className=" z-20 flex fixed inset-0  w-screen">
+				<div ref={modalRef} tabIndex={-1} className=" z-20 flex fixed inset-0  w-screen">
 					<div className="flex text-gray- w-screen relative">
 						<div className={`${!menuIsOpen ? 'hidden' : 'flex'} text-gray- w-1/6 xl:w-1/4 min-w-56 relative`}>
 							<SettingItem onItemClick={handleSettingItemClick} initSetting={currentSetting} />

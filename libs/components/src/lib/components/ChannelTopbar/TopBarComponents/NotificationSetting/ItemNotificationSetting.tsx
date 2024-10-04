@@ -1,7 +1,6 @@
-import { Icons } from '@mezon/components';
-import { notifiReactMessageActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { notifiReactMessageActions, notificationSettingActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Checkbox, Radio } from 'flowbite-react';
-import { notificationSettingActions } from 'libs/store/src/lib/notificationSetting/notificationSettingChannel.slice';
 import { useSelector } from 'react-redux';
 
 type ItemNotificationSettingProps = {
@@ -27,7 +26,7 @@ const ItemNotificationSetting = ({
 	notifiSelected,
 	defaultNotifi,
 	defaultNotifiName,
-	muteTime,
+	muteTime
 }: ItemNotificationSettingProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -40,7 +39,7 @@ const ItemNotificationSetting = ({
 			const body = {
 				channel_id: currentChannelId || '',
 				notification_type: notificationId || '',
-				clan_id: currentClanId || '',
+				clan_id: currentClanId || ''
 			};
 			dispatch(notificationSettingActions.setNotificationSetting(body));
 		}

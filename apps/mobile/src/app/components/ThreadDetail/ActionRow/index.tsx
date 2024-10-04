@@ -1,13 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { ENotificationActive, EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelNotificatonSelected } from '@mezon/store-mobile';
+import { EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
@@ -24,9 +23,11 @@ export const ActionRow = React.memo(() => {
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
-	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		currentChannel?.channel_id ?? ''
+	);
 	const { statusMute } = useStatusMuteChannel();
 
 	useEffect(() => {

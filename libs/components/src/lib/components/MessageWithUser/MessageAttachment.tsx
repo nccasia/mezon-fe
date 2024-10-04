@@ -25,9 +25,10 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 		) {
 			videos.push(attachment);
 		} else if (
-			attachment.filetype?.indexOf(EMimeTypes.png) !== -1 ||
-			attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1 ||
-			attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)
+			(attachment.filetype?.indexOf(EMimeTypes.png) !== -1 ||
+				attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1 ||
+				attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) &&
+			!attachment.filetype?.includes('svg+xml')
 		) {
 			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
 				...attachment,

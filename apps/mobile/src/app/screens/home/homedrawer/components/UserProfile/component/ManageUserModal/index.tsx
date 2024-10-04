@@ -1,4 +1,4 @@
-import { useRoles, useUserPermission } from '@mezon/core';
+import { useRoles } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
@@ -6,6 +6,7 @@ import {
 	selectAllRolesClan,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store-mobile';
@@ -41,7 +42,7 @@ export const ManageUserModal = memo(
 		const [selectedRole, setSelectedRole] = useState<string[]>([]);
 		const [isLoading, setIsLoading] = useState(false);
 		const { t } = useTranslation('message');
-		const { maxPermissionLevel } = useUserPermission();
+		const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 		const dispatch = useAppDispatch();
 		const currentChannelId = useSelector(selectCurrentChannelId);
 

@@ -1,5 +1,5 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useUserPermission } from '@mezon/core';
+import { useCategory, usePermissionChecker } from '@mezon/core';
 import {
 	ENotificationActive,
 	ENotificationChannelId,
@@ -20,7 +20,7 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelThreads } from '@mezon/utils';
+import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +45,10 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
-	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		channel?.channel_id ?? ''
+	);
 	const { categorizedChannels } = useCategory();
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
@@ -193,27 +196,27 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	];
 
 	const manageThreadMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.manageThreadMenu.leaveThread'),
-			icon: <Icons.LeaveGroup color={Colors.textRed} />,
-			onPress: () => reserve(),
-			textStyle: {
-				color: Colors.textRed
-			},
-			isShow: isCanManageThread
-		},
-		{
-			title: t('menu.manageThreadMenu.closeThread'),
-			icon: <Icons.CloseSmallBoldIcon color={themeValue.textStrong} />,
-			onPress: () => reserve(),
-			isShow: isCanManageThread
-		},
-		{
-			title: t('menu.manageThreadMenu.lockThread'),
-			icon: <Icons.LockIcon color={themeValue.textStrong} />,
-			onPress: () => reserve(),
-			isShow: isCanManageThread
-		},
+		// {
+		// 	title: t('menu.manageThreadMenu.leaveThread'),
+		// 	icon: <Icons.LeaveGroup color={Colors.textRed} />,
+		// 	onPress: () => reserve(),
+		// 	textStyle: {
+		// 		color: Colors.textRed
+		// 	},
+		// 	isShow: isCanManageThread
+		// },
+		// {
+		// 	title: t('menu.manageThreadMenu.closeThread'),
+		// 	icon: <Icons.CloseSmallBoldIcon color={themeValue.textStrong} />,
+		// 	onPress: () => reserve(),
+		// 	isShow: isCanManageThread
+		// },
+		// {
+		// 	title: t('menu.manageThreadMenu.lockThread'),
+		// 	icon: <Icons.LockIcon color={themeValue.textStrong} />,
+		// 	onPress: () => reserve(),
+		// 	isShow: isCanManageThread
+		// },
 		{
 			title: t('menu.manageThreadMenu.editThread'),
 			icon: <Icons.PencilIcon color={themeValue.textStrong} />,
@@ -227,13 +230,13 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				});
 			},
 			isShow: isCanManageThread
-		},
-		{
-			title: t('menu.manageThreadMenu.copyLink'),
-			icon: <Icons.LinkIcon color={themeValue.textStrong} />,
-			onPress: () => reserve(),
-			isShow: isCanManageThread
 		}
+		// {
+		// 	title: t('menu.manageThreadMenu.copyLink'),
+		// 	icon: <Icons.LinkIcon color={themeValue.textStrong} />,
+		// 	onPress: () => reserve(),
+		// 	isShow: isCanManageThread
+		// }
 	];
 
 	const mainChannelMenu: IMezonMenuSectionProps[] = [
@@ -255,9 +258,9 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	];
 
 	const mainThreadMenu: IMezonMenuSectionProps[] = [
-		{
-			items: watchMenu
-		},
+		// {
+		// 	items: watchMenu
+		// },
 		{
 			items: manageThreadMenu
 		},

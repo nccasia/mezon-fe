@@ -17,7 +17,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -37,7 +37,6 @@ type ChannelsMentionProps = {
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
-	const dispatch = useDispatch();
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
 		channelLabel,
@@ -125,8 +124,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [channelDraftMessage.draftContent?.t]);
 
 	const originalContent = useMemo(() => {
-		return message.content.t;
-	}, [message.content.t]);
+		return message.content?.t;
+	}, [message.content?.t]);
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {

@@ -2,9 +2,9 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannelMembersActions } from '@mezon/core';
 import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from 'apps/mobile/src/app/temp-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../../../../../../temp-ui';
 import { style } from './UserInfoDm.styles';
 
 export default function UserInfoDm({ user, currentChannel }: { user: ChannelMembersEntity; currentChannel: ChannelsEntity }) {

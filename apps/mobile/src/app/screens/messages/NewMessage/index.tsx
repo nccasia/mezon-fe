@@ -44,7 +44,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 		return friendList.filter(
 			(friend) =>
 				normalizeString(friend?.user?.username).includes(normalizeString(searchText)) ||
-				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText)),
+				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText))
 		);
 	}, [friendList, searchText]);
 
@@ -54,7 +54,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 			if (directMessage?.id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: directMessage?.id },
+					params: { directMessageId: directMessage?.id }
 				});
 				return;
 			}
@@ -62,18 +62,18 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 			if (response?.channel_id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: response?.channel_id },
+					params: { directMessageId: response?.channel_id }
 				});
 			}
 		},
-		[createDirectMessageWithUser, listDM, navigation],
+		[createDirectMessageWithUser, listDM, navigation]
 	);
 
 	const handleFriendAction = useCallback(
 		(friend: FriendsEntity, action: EFriendItemAction) => {
 			switch (action) {
 				case EFriendItemAction.Call:
-					Toast.show({ type: 'info', text1: 'Updating...' })
+					Toast.show({ type: 'info', text1: 'Updating...' });
 					break;
 				case EFriendItemAction.MessageDetail:
 					directMessageWithUser(friend?.user?.id);
@@ -85,12 +85,12 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					break;
 			}
 		},
-		[directMessageWithUser],
+		[directMessageWithUser]
 	);
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 

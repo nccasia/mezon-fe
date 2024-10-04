@@ -1,4 +1,4 @@
-import { useEscapeKey, useInvite } from '@mezon/core';
+import { useInvite } from '@mezon/core';
 import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
@@ -47,8 +47,6 @@ const ModalInvite = (props: ModalParam) => {
 		handleOpenInvite();
 	}, []);
 
-	useEscapeKey(onClose);
-
 	const unsecuredCopyToClipboard = (text: string) => {
 		const textArea = document.createElement('textarea');
 		textArea.value = text;
@@ -71,13 +69,11 @@ const ModalInvite = (props: ModalParam) => {
 		}
 	};
 
-	const closeModalEdit = () => setModalEdit(false);
+	const closeModalEdit = useCallback(() => setModalEdit(false), []);
 	return !modalEdit ? (
 		<Modal
 			title={`Invite friends to ${clan?.clan_name}`}
-			onClose={() => {
-				props.onClose();
-			}}
+			onClose={props.onClose}
 			showModal={props.open}
 			hasChannel={channel}
 			classSubTitleBox="ml-[0px] cursor-default"
@@ -85,7 +81,7 @@ const ModalInvite = (props: ModalParam) => {
 			isInviteModal={true}
 		>
 			<div>
-				<ListMemberInvite url={urlInvite} channelID={firstChannel.channel_id} />
+				<ListMemberInvite url={urlInvite} channelID={channelID} />
 				<div className="relative ">
 					<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">Or, send a clan invite link to a friend</p>
 					<input

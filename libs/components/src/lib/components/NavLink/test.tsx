@@ -2,11 +2,12 @@ import { render, screen } from '@testing-library/react';
 
 import NavLink from '.';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const useRouter = jest.spyOn(require('next/router'), 'useRouter');
 
 let asPath = '';
 useRouter.mockImplementation(() => ({
-	asPath,
+	asPath
 }));
 
 describe('<NavLink />', () => {
@@ -21,7 +22,7 @@ describe('<NavLink />', () => {
 		render(
 			<NavLink href="/some-link" active>
 				Discord
-			</NavLink>,
+			</NavLink>
 		);
 
 		expect(screen.getByText(/discord/i)).toHaveClass('rounded-2xl bg-brand text-white');

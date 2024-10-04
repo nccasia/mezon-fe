@@ -3,7 +3,7 @@ import { selectMemberClanByUserId } from '@mezon/store';
 import { INotification, convertTimeString } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import MemberProfile from '../MemberProfile';
+import { MemberProfile } from '../MemberProfile';
 import UserProfileModalInner from '../UserProfileModalInner';
 export type NotifyProps = {
 	readonly notify: INotification;

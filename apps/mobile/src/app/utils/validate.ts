@@ -1,5 +1,5 @@
-import { validTextInputRegex } from "./helpers"
+import { validTextInputRegex } from './helpers';
 
-export const validInput = (value: string) =>{
-  return value?.trim?.()?.length && validTextInputRegex.test(value)
-}
+export const validInput = (value: string) => {
+	return value?.trim?.()?.length && validTextInputRegex.test(value);
+};

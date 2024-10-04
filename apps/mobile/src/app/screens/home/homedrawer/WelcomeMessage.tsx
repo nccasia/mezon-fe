@@ -17,11 +17,17 @@ interface IWelcomeMessage {
 	uri?: string;
 }
 
+const useCurrentChannel = (channelId: string) => {
+	const channel = useAppSelector(selectChannelById(channelId));
+	const dmGroup = useAppSelector(selectDmGroupCurrent(channelId));
+	return channel || dmGroup;
+};
+
 const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
-	const currenChannel = useAppSelector(selectChannelById(channelId)) || useAppSelector(selectDmGroupCurrent(channelId));
+	const currenChannel = useCurrentChannel(channelId);
 
 	const isChannel = useMemo(() => {
 		return currenChannel?.parrent_id === '0';
@@ -88,14 +94,21 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 				isDMGroup ? (
 					<MezonAvatar height={size.s_50} width={size.s_50} avatarUrl={''} username={''} stacks={stackUsers} />
 				) : (
-					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={currenChannel?.usernames} />
+					<MezonAvatar
+						height={size.s_100}
+						width={size.s_100}
+						avatarUrl={currenChannel?.channel_avatar?.[0]}
+						username={currenChannel?.usernames}
+					/>
 				)
 			) : (
 				<View style={styles.iconWelcomeMessage}>
 					{isChannel ? (
-						currenChannel?.channel_private === ChannelStatusEnum.isPrivate ? 
-						<Icons.TextLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
-						<Icons.TextIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
+						currenChannel?.channel_private === ChannelStatusEnum.isPrivate ? (
+							<Icons.TextLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
+						) : (
+							<Icons.TextIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
+						)
 					) : (
 						<Icons.ThreadIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					)}
@@ -104,7 +117,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 
 			{isDM ? (
 				<View>
-					<Text style={[styles.titleWelcomeMessage, isDMGroup && {textAlign: 'center'}]}>{currenChannel?.channel_label}</Text>
+					<Text style={[styles.titleWelcomeMessage, isDMGroup && { textAlign: 'center' }]}>{currenChannel?.channel_label}</Text>
 					{!isDMGroup && <Text style={styles.subTitleUsername}>{currenChannel?.usernames}</Text>}
 					{isDMGroup ? (
 						<Text style={styles.subTitleWelcomeMessageCenter}>{"Welcome to your new group! Invite friends whenever you're ready"}</Text>

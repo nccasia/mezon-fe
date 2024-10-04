@@ -32,15 +32,15 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginTop: 20,
-		height: 50,
+		height: 50
 	},
 	signinButtonText: {
 		fontSize: 18,
 		lineHeight: 18 * 1.4,
-		color: '#FFFFFF',
+		color: '#FFFFFF'
 	},
 	wrapperLoading: {
 		flexDirection: 'row',
-		gap: 8,
-	},
+		gap: 8
+	}
 });

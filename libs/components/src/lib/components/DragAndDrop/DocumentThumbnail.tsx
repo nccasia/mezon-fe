@@ -1,4 +1,4 @@
-import { Icons } from '../../components';
+import { Icons } from '@mezon/ui';
 
 function DocumentThumbnail() {
 	return (

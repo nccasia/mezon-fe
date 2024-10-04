@@ -9,10 +9,10 @@ export const toastConfig: ToastConfig = {
 	*/
 
 	success: (props) => {
-		return <ToastSuccess {...props} />
+		return <ToastSuccess {...props} />;
 	},
 
 	notification: (props) => {
-		return <ToastNotification {...props} />
+		return <ToastNotification {...props} />;
 	}
 };

@@ -45,14 +45,14 @@ export default function MezonSlideOption({ data, onChange, height = 90, width = 
 		const finalIndex = initialIndex >= 0 ? initialIndex : 0;
 		ref?.current?.scrollTo({
 			x: finalIndex * width,
-			animated: false,
+			animated: false
 		});
 	}, [padding]);
 
 	function handlePressItem(index: number) {
 		ref?.current?.scrollTo({
 			x: index * width,
-			animated: false,
+			animated: false
 		});
 	}
 
@@ -77,9 +77,9 @@ export default function MezonSlideOption({ data, onChange, height = 90, width = 
 					contentContainerStyle={[
 						{
 							paddingLeft: padding + 5,
-							paddingRight: padding + 5,
+							paddingRight: padding + 5
 						},
-						styles.selectList,
+						styles.selectList
 					]}
 				>
 					{data.map((item, index) => (

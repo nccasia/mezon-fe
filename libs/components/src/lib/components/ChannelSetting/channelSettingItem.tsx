@@ -1,4 +1,4 @@
-import { useChannels, useClanRestriction } from '@mezon/core';
+import { useChannels, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -15,14 +15,12 @@ export type ChannelSettingItemProps = {
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, onCloseModal, channel, stateMenu, stateClose } = props;
+	const { onItemClick, channel, stateMenu, stateClose } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageChannel]);
-	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission || hasManageChannelPermission;
+	const [hasManageChannelPermission] = usePermissionChecker([EPermission.manageChannel], channel.channel_id ?? '');
+	const canEditChannelPermissions = hasManageChannelPermission;
 	const isThread = useMemo(() => {
 		return channel.parrent_id !== '0';
 	}, [channel]);

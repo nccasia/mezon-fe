@@ -1,4 +1,4 @@
-import { useEscapeKey, useInvite } from '@mezon/core';
+import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { inviteActions, selectInviteById, selectIsClickInvite, useAppDispatch } from '@mezon/store';
@@ -55,8 +55,6 @@ export default function InvitePage() {
 	const handleBackNavigate = () => {
 		dispatch(inviteActions.setIsClickInvite(false));
 	};
-
-	useEscapeKey(handleCancelJoin);
 
 	useEffect(() => {
 		if (userJoined) {

@@ -1172,6 +1172,18 @@ export const ChatIcon = ({ width = 24, height = 24, color = 'white', ...props }:
 	</Svg>
 );
 
+export function HashIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 32 33" fill={color} {...props}>
+			<Path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M14.378 2.35a1.599 1.599 0 10-3.156-.525l-1.377 8.262H3.2a1.6 1.6 0 000 3.2h6.112l-1.067 6.4H1.6a1.6 1.6 0 000 3.2h6.112l-1.29 7.736a1.6 1.6 0 103.156.528l1.377-8.264h7.957l-1.29 7.736a1.6 1.6 0 103.156.528l1.377-8.264H28.8a1.6 1.6 0 000-3.2h-6.112l1.067-6.4H30.4a1.6 1.6 0 000-3.2h-6.112l1.29-7.737a1.599 1.599 0 10-3.156-.525l-1.377 8.262h-7.957l1.29-7.737zm5.067 17.338l1.065-6.4h-7.953l-1.067 6.4h7.956-.001z"
+			/>
+		</Svg>
+	);
+}
+
 export const ChatCheckIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
 		<Path

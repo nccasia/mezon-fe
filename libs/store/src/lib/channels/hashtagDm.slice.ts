@@ -1,7 +1,8 @@
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { HashtagDm } from 'mezon-js';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureClient, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export interface HashtagDmState extends EntityState<HashtagDm, string> {
 	loadingStatus: LoadingStatus;
@@ -16,11 +17,30 @@ type fetchHashtagDmArgs = {
 	userIds: string[];
 	limit?: number;
 	directId: string;
+	noCache?: boolean;
 };
 
-export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, directId }: fetchHashtagDmArgs, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const response = await mezon.socketRef.current?.hashtagDMList(userIds, 500);
+export const fetchHashtagDmCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, userIds: string[]) => {
+		const response = await mezon.client.hashtagDMList(mezon.session, userIds, 500);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			const username = args[0]?.session?.username || '';
+			return args[1] + username;
+		}
+	}
+);
+
+export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, noCache }: fetchHashtagDmArgs, thunkAPI) => {
+	const mezon = await ensureClient(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchHashtagDmCached.clear(mezon, userIds);
+	}
+	const response = await fetchHashtagDmCached(mezon, userIds);
 	if (!response?.hashtag_dm) {
 		return [];
 	}

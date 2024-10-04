@@ -1,4 +1,4 @@
-import { useAppNavigation, useMenu, useVoice } from '@mezon/core';
+import { useAppNavigation, useMenu } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -6,13 +6,13 @@ import {
 	selectCurrentClan,
 	selectCurrentVoiceChannelId,
 	selectShowScreen,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 
 export type VoiceControlPanelProps = {
 	readonly channelCurrent: ChannelsEntity | null | undefined;
@@ -24,7 +24,6 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
-	const { setStatusCall } = useVoice();
 
 	const startScreenShare = useCallback(() => {
 		console.log('not implemented');
@@ -35,7 +34,6 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
-		setStatusCall(false);
 		console.log('not implemented');
 	}, []);
 
@@ -52,11 +50,9 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 		}
 	}, []);
 
-	const { closeMenu, setStatusMenu } = useMenu();
+	const { setStatusMenu } = useMenu();
 	const handleClick = () => {
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
+		setStatusMenu(false);
 	};
 
 	return (

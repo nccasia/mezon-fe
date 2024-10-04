@@ -7,12 +7,12 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_4,
 			flex: 1,
 			backgroundColor: colors.tertiary,
-			paddingVertical: size.s_8,
+			paddingVertical: size.s_8
 		},
 		textBtn: {
 			color: colors.text,
 			fontSize: size.medium,
 			fontWeight: '600',
-			textAlign: 'center',
-		},
+			textAlign: 'center'
+		}
 	});

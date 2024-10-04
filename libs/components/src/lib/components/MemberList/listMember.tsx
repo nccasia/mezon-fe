@@ -1,8 +1,8 @@
 import { ChannelMembersEntity, selectTheme } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { FixedSizeList as List } from 'react-window';
 import MemberItem from './MemberItem';
 
 type ListMemberProps = {
@@ -25,43 +25,69 @@ const ListMember = (props: ListMemberProps) => {
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
-	const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-		const user = lisMembers[index];
-		return (
-			<div style={style} className="flex items-center px-4">
-				{'onlineSeparate' in user ? (
-					<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-						Member - {onlineCount}
-					</p>
-				) : 'offlineSeparate' in user ? (
-					<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-						Offline - {offlineCount}
-					</p>
-				) : (
-					<MemberItem
-						name={user.clan_nick || user?.user?.display_name || user?.user?.username}
-						user={user}
-						key={user?.user?.id}
-						listProfile={true}
-						isOffline={!user?.user?.online}
-						positionType={MemberProfileType.MEMBER_LIST}
-						isDM={false}
-					/>
-				)}
-			</div>
-		);
-	};
-
+	const parentRef = useRef(null);
+	const rowVirtualizer = useVirtualizer({
+		count: lisMembers.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 48,
+		overscan: 5
+	});
 	return (
-		<List
-			height={height}
-			itemCount={lisMembers.length}
-			itemSize={48}
-			width={'100%'}
+		<div
+			ref={parentRef}
 			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			style={{
+				height: height,
+				overflow: 'auto'
+			}}
 		>
-			{Row}
-		</List>
+			<div
+				style={{
+					height: `${rowVirtualizer.getTotalSize()}px`,
+					width: '100%',
+					position: 'relative'
+				}}
+			>
+				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+					const user = lisMembers[virtualRow.index];
+					return (
+						<div
+							key={virtualRow.index}
+							style={{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								height: `${virtualRow.size}px`,
+								transform: `translateY(${virtualRow.start}px)`
+							}}
+						>
+							<div className="flex items-center px-4 h-full">
+								{'onlineSeparate' in user ? (
+									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+										Member - {onlineCount}
+									</p>
+								) : 'offlineSeparate' in user ? (
+									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+										Offline - {offlineCount}
+									</p>
+								) : (
+									<MemberItem
+										name={user.clan_nick || user?.user?.display_name || user?.user?.username}
+										user={user}
+										key={user?.user?.id}
+										listProfile={true}
+										isOffline={!user?.user?.online}
+										positionType={MemberProfileType.MEMBER_LIST}
+										isDM={false}
+									/>
+								)}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</div>
 	);
 };
 

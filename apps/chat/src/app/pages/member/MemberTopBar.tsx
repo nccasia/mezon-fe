@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { useMemberContext } from '@mezon/core';
+import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
 
 const MemberTopBar = () => {

@@ -14,14 +14,14 @@ const BottomSheet = ({ bottomSheetRef, children }) => {
 			closeOnPressMask={true}
 			customStyles={{
 				wrapper: {
-					backgroundColor: 'rgba(0,0,0,0.2)',
+					backgroundColor: 'rgba(0,0,0,0.2)'
 				},
 				draggableIcon: { backgroundColor: darkColor.Backgound_Subtle, width: 100 },
 				container: {
 					borderTopLeftRadius: 30,
 					borderTopRightRadius: 30,
-					backgroundColor: '#2b2d31',
-				},
+					backgroundColor: '#2b2d31'
+				}
 			}}
 		>
 			<View>{children}</View>

@@ -1,18 +1,23 @@
-import { selectStatusStream, selectTheme } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useAppParams, useMenu } from '@mezon/core';
+import { channelsActions, directActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { FixedSizeList as List } from 'react-window';
+import { useNavigate } from 'react-router-dom';
 import DMListItem from './DMListItem';
 
 type ListDMChannelProps = {
-	listDM: IChannel[];
+	listDM: string[];
 };
 
 const heightAroundComponent = 230;
 
-const ListDMChannel = (props: ListDMChannelProps) => {
-	const { listDM } = props;
+const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { directId: currentDmGroupId } = useAppParams();
+	const { setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
 	const appearanceTheme = useSelector(selectTheme);
 	const streamPlay = useSelector(selectStatusStream);
 
@@ -25,24 +30,83 @@ const ListDMChannel = (props: ListDMChannelProps) => {
 		return () => window.removeEventListener('resize', updateHeight);
 	}, [streamPlay]);
 
-	const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-		return (
-			<div style={style} className="pr-2 flex items-center">
-				<DMListItem key={index} directMessage={listDM[index]} />
-			</div>
-		);
-	};
+	const parentRef = useRef(null);
+
+	const rowVirtualizer = useVirtualizer({
+		count: listDM.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 50,
+		overscan: 5
+	});
+
+	const joinToChatAndNavigate = useCallback(
+		async (DMid: string, type: number) => {
+			dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: DMid, timestamp: timestamp }));
+			const result = await dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: DMid,
+					channelName: '',
+					type: type
+				})
+			);
+			dispatch(directActions.setDmGroupCurrentId(DMid));
+			if (result) {
+				navigate(`/chat/direct/message/${DMid}/${type}`);
+			}
+
+			if (closeMenu) {
+				setStatusMenu(false);
+			}
+		},
+		[closeMenu]
+	);
 
 	return (
-		<List
-			height={height}
-			itemCount={listDM.length}
-			itemSize={56}
-			width={'100%'}
+		<div
+			ref={parentRef}
 			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+			style={{
+				height: height,
+				overflow: 'auto'
+			}}
 		>
-			{Row}
-		</List>
+			<div
+				style={{
+					height: `${rowVirtualizer.getTotalSize()}px`,
+					width: '100%',
+					position: 'relative'
+				}}
+			>
+				{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+					const isActive = currentDmGroupId === listDM[virtualRow.index];
+					return (
+						<div
+							key={virtualRow.index}
+							style={{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								height: `${virtualRow.size}px`,
+								transform: `translateY(${virtualRow.start}px)`
+							}}
+						>
+							<DMListItem
+								currentDmGroupId={currentDmGroupId as string}
+								key={virtualRow.index}
+								id={listDM[virtualRow.index]}
+								isActive={isActive}
+								navigateToFriends={() => navigate(`/chat/direct/friends`)}
+								// eslint-disable-next-line @typescript-eslint/no-empty-function
+								joinToChatAndNavigate={isActive ? () => {} : joinToChatAndNavigate}
+							/>
+						</div>
+					);
+				})}
+			</div>
+		</div>
 	);
 };
 

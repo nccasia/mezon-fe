@@ -2,6 +2,7 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { PinMessageEntity } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
+import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
@@ -13,7 +14,7 @@ interface IPinMessageItemProps {
 	contentMessage: IExtendedMessage;
 }
 
-const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
+const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	return (
@@ -35,6 +36,6 @@ const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage }: 
 			</View>
 		</View>
 	);
-};
+});
 
 export default PinMessageItem;

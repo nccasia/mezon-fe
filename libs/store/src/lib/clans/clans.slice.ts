@@ -1,3 +1,4 @@
+import { notificationActions } from '@mezon/store';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -74,6 +75,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
+		thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId: clanId ?? '' }));
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
 				clanId: clanId ?? '',
@@ -96,11 +98,10 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
-
 		if (!response.clandesc) {
 			return [];
 		}
-		thunkAPI.dispatch(fetchListChannelsByUser());
+		thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 		const clans = response.clandesc.map(mapClanToEntity);
 		const meta = clans.map((clan) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
@@ -290,6 +291,18 @@ export const clansSlice = createSlice({
 		},
 		removeByClanID: (state, action: PayloadAction<string>) => {
 			clansAdapter.removeOne(state, action.payload);
+		},
+		updateClanBadgeCount: (state: ClansState, action: PayloadAction<{ clanId: string; count: number }>) => {
+			const { clanId, count } = action.payload;
+			const entity = state.entities[clanId];
+			if (entity) {
+				clansAdapter.updateOne(state, {
+					id: clanId,
+					changes: {
+						badge_count: (entity.badge_count ?? 0) + count
+					}
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -403,3 +416,13 @@ export const selectShowNumEvent = (clanId: string) =>
 	});
 
 export const selectClanByUserId = (userId: string) => createSelector(selectAllClans, (clans) => clans.filter((clan) => clan.creator_id === userId));
+
+export const selectBadgeCountAllClan = createSelector(selectAllClans, (clan) => {
+	return clan.reduce((total, count) => total + (count.badge_count ?? 0), 0);
+});
+
+export const selectBadgeCountByClanId = (clanId: string) =>
+	createSelector(getClansState, (state) => {
+		const clan = state.entities[clanId];
+		return clan.badge_count;
+	});

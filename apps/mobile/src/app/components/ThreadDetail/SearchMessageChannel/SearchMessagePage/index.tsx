@@ -2,18 +2,18 @@ import { ACTIVE_TAB, IUerMention } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
-	selectAllChannelsByUser,
+	selectAllInfoChannels,
 	selectAllUsersByUser,
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage
 } from '@mezon/store-mobile';
-import { IChannel, SearchItemProps, compareObjects } from '@mezon/utils';
+import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import ChannelsSearchTab from '../../../ChannelsSearchTab';
-import EmptySearchPage from '../../../EmptySearchPage';
-import MembersSearchTab from '../../../MembersSearchTab';
+import { ChannelsSearchTab } from '../../../ChannelsSearchTab';
+import { EmptySearchPage } from '../../../EmptySearchPage';
+import MembersSearchTab from '../../../MembersSearchTab/MembersSearchTab';
 import MessagesSearchTab from '../../../MessagesSearchTab';
 import HeaderTabSearch from './HeaderTabSearch';
 
@@ -27,7 +27,7 @@ interface ISearchMessagePageProps {
 function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
-	const listChannels = useSelector(selectAllChannelsByUser);
+	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
@@ -36,7 +36,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 		if (!searchText) return listChannels;
 		return (
 			listChannels?.filter((channel) => {
-				return channel?.channel_label?.toLowerCase().includes(searchText?.toLowerCase());
+				return normalizeString(channel?.channel_label)?.toLowerCase().includes(normalizeString(searchText)?.toLowerCase());
 			}) || []
 		).sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'channel_label'));
 	}, [listChannels, searchText]);
@@ -71,7 +71,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 				index: ACTIVE_TAB.MESSAGES
 			}
 		].filter((tab) => tab?.display);
-	}, [channelsSearch, membersSearch, searchText, t, totalResult]);
+	}, [channelsSearch?.length, membersSearch?.length, searchText, t, totalResult]);
 
 	function handelHeaderTabChange(index: number) {
 		setActiveTab(index);

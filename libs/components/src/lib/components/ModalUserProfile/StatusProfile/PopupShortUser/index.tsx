@@ -19,9 +19,9 @@ export const PopupFriend = ({ user, showPopupLeft }: { user: ChannelMembersEntit
 };
 
 type PopupOptionProps = {
-	showPopupLeft?: boolean,
-	isSelf: boolean
-}
+	showPopupLeft?: boolean;
+	isSelf: boolean;
+};
 
 export const PopupOption = ({ showPopupLeft, isSelf }: PopupOptionProps) => {
 	return (

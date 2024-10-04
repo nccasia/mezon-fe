@@ -17,12 +17,12 @@ export const LanguageSetting = () => {
 		return [
 			{
 				title: 'English, UK',
-				value: 'en',
+				value: 'en'
 			},
 			{
 				title: 'Tiếng Việt',
-				value: 'vi',
-			},
+				value: 'vi'
+			}
 		];
 	}, []);
 

@@ -1,7 +1,7 @@
-import { Icons, MemberProfile } from '@mezon/components';
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
-import { OnlineStatus } from '../../../../../../ui/src/lib/Icons';
+import { MemberProfile } from '../../MemberProfile';
 import ItemStatus from './ItemStatus';
 
 export const StatusProfile = () => {
@@ -19,14 +19,14 @@ export const StatusProfile = () => {
 					dismissOnClick={true}
 					renderTrigger={() => (
 						<div>
-							<ItemStatus children="Online" dropdown startIcon={<OnlineStatus className="w-5" />} />
+							<ItemStatus children="Online" dropdown startIcon={<Icons.OnlineStatus className="w-5" />} />
 						</div>
 					)}
 					label=""
 					placement="right-start"
 					className="bg-[#232428] border-none ml-2 py-[6px] px-[8px] w-[200px]"
 				>
-					<ItemStatus children="Online" startIcon={<OnlineStatus />} />
+					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 					<ItemStatus children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
 					<ItemStatus children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />

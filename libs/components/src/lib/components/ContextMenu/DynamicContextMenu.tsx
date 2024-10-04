@@ -43,7 +43,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 		'--contexify-menu-radius': '2px',
 		'--contexify-activeItem-radius': '2px',
 		'--contexify-menu-minWidth': '188px',
-		'--contexify-separator-color': '#ADB3B9',
+		'--contexify-separator-color': '#ADB3B9'
 	} as CSSProperties;
 
 	const { posShowMenu } = useMessageContextMenu();
@@ -92,14 +92,14 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 							width: '100%',
 							fontFamily: `'gg sans', 'Noto Sans', sans-serif`,
 							fontSize: '14px',
-							fontWeight: 500,
+							fontWeight: 500
 						}}
 						className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
 					>
 						<span>{item.label}</span>
 						<span> {item.icon}</span>
 					</div>
-				</Item>,
+				</Item>
 			);
 
 			if (item.hasSubmenu)
@@ -110,7 +110,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 								{subMenuItem.label}
 							</Item>
 						))}
-					</Submenu>,
+					</Submenu>
 				);
 		}
 		return elements;

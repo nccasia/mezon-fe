@@ -1,17 +1,19 @@
-import { Icons } from '@mezon/components';
-import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
+import { usePermissionChecker, useRoles, UserRestrictionZone } from '@mezon/core';
 import {
 	RolesClanEntity,
 	selectAllRolesClan,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectMemberClanByUserId,
+	selectRolesClanEntities,
 	selectTheme,
+	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions
 } from '@mezon/store';
-import { EPermission } from '@mezon/utils';
+import { Icons } from '@mezon/ui';
+import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -33,17 +35,24 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
+	const [hasPermissionEditRole] = usePermissionChecker([EPermission.manageClan]);
 	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
 		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
 		return !isRoleInUserRoles;
 	});
 
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+	const rolesClanEntity = useSelector(selectRolesClanEntities);
+
 	const filteredListRoleBySearch = useMemo(() => {
 		return activeRolesWithoutUserRoles?.filter((role) => {
-			return role.slug !== 'everyone' && !userById.role_id?.includes(role.id) && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
+			return (
+				role.id !== EVERYONE_ROLE_ID &&
+				!userById.role_id?.includes(role.id) &&
+				role.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+				(isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[role.id]?.max_level_permission))
+			);
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
 
@@ -79,29 +88,43 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2 flex flex-wrap gap-2">
-				{userRolesClan.map((role, index) => (
-					<span
+				{userRolesClan.slice(0, 6).map((role, index) => (
+					<RoleClanItem
 						key={`${role.id}_${index}`}
-						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
-					>
-						{hasPermissionEditRole ? (
-							<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-								<Tooltip
-									content="Remove role"
-									trigger="hover"
-									animation="duration-500"
-									style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									className="dark:!text-white !text-black"
-								>
-									<Icons.IconRemove className="dark:text-channelActiveColor text-channelActiveLightColor size-2" />
-								</Tooltip>
-							</button>
-						) : (
-							<div className="size-2 bg-white  rounded-full"></div>
-						)}
-						<span className="text-xs font-medium">{role.title}</span>
-					</span>
+						appearanceTheme={appearanceTheme}
+						deleteRole={deleteRole}
+						role={role}
+						index={index}
+						hasPermissionEditRole={hasPermissionEditRole}
+					/>
 				))}
+				{userRolesClan.length > 6 && (
+					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+						<Tooltip
+							content={
+								<div className={'flex flex-col items-start gap-1'}>
+									{userRolesClan.slice(6, -1).map((userRole, index) => (
+										<RoleClanItem
+											key={`${userRole.id}_role`}
+											appearanceTheme={appearanceTheme}
+											deleteRole={deleteRole}
+											role={userRole}
+											index={index}
+											hasPermissionEditRole={hasPermissionEditRole}
+										/>
+									))}
+								</div>
+							}
+							trigger={'hover'}
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							className="dark:!text-white !text-black"
+						>
+							<span className="text-xs font-medium px-1 cursor-pointer" style={{ lineHeight: '15px' }}>
+								+ {userRolesClan.length - 6}
+							</span>
+						</Tooltip>
+					</span>
+				)}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
 					<Tooltip
 						content={<AddRolesComp addRole={addRole} filteredListRoleBySearch={filteredListRoleBySearch} setSearchTerm={setSearchTerm} />}
@@ -117,7 +140,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 							className="dark:text-white text-black"
 						>
-							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300 items-center">
+							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-800 bg-slate-300 items-center">
 								<Icons.Plus className="size-5 select-none" />
 								<p className="text-xs m-0 font-medium select-none">Add Role</p>
 							</button>
@@ -177,4 +200,38 @@ const AddRolesComp = ({
 	);
 };
 
+const RoleClanItem = ({
+	role,
+	index,
+	deleteRole,
+	hasPermissionEditRole,
+	appearanceTheme
+}: {
+	role: RolesClanEntity;
+	index: number;
+	deleteRole: (id: string) => void;
+	hasPermissionEditRole: boolean;
+	appearanceTheme: string;
+}) => {
+	return (
+		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
+			{hasPermissionEditRole ? (
+				<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
+					<Tooltip
+						content="Remove role"
+						trigger="hover"
+						animation="duration-500"
+						style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						className="dark:!text-white !text-black"
+					>
+						<Icons.IconRemove className="dark:text-channelActiveColor text-channelActiveLightColor size-2" />
+					</Tooltip>
+				</button>
+			) : (
+				<div className="size-2 bg-white  rounded-full"></div>
+			)}
+			<span className="text-xs font-medium">{role.title}</span>
+		</span>
+	);
+};
 export default RoleUserProfile;

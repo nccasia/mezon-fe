@@ -21,173 +21,173 @@ interface IInviteToChannelProp {
 }
 
 export const InviteToChannel = React.memo(
-	React.forwardRef(({ isUnknownChannel, onClose, isDMThread = false }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
-		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
-		const reducedMotion = useReducedMotion();
+	React.forwardRef(
+		({ isUnknownChannel, onClose, isDMThread = false }: IInviteToChannelProp, refRBSheet: React.MutableRefObject<BottomSheetModal>) => {
+			const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
+			const reducedMotion = useReducedMotion();
 
-		const { themeValue } = useTheme();
-		const styles = style(themeValue);
-		const currentClan = useSelector(selectCurrentClan);
-		const { t } = useTranslation(['inviteToChannel']);
-		const timeoutRef = useRef(null);
-		//TODO: get from API
-		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
-		const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
-		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
-		const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+			const { themeValue } = useTheme();
+			const styles = style(themeValue);
+			const currentClan = useSelector(selectCurrentClan);
+			const { t } = useTranslation(['inviteToChannel']);
+			const timeoutRef = useRef(null);
+			//TODO: get from API
+			const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
+			const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
+			const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
+			const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
-		useEffect(() => {
-			const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-				setIsKeyboardVisible(true);
-			});
-			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-				setIsKeyboardVisible(false);
-			});
+			useEffect(() => {
+				const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+					setIsKeyboardVisible(true);
+				});
+				const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+					setIsKeyboardVisible(false);
+				});
 
-			return () => {
-				keyboardDidShowListener.remove();
-				keyboardDidHideListener.remove();
+				return () => {
+					keyboardDidShowListener.remove();
+					keyboardDidHideListener.remove();
+				};
+			}, []);
+
+			const openEditLinkModal = useCallback(() => {
+				refRBSheet?.current?.close();
+				timeoutRef.current = setTimeout(() => {
+					setIsVisibleEditLinkModal(true);
+				}, 300);
+			}, []);
+
+			const onVisibleEditLinkModalChange = (isVisible: boolean) => {
+				if (!isVisible) {
+					backToInviteModal();
+				}
 			};
-		}, []);
 
-		const openEditLinkModal = useCallback(() => {
-			//@ts-ignore
-			refRBSheet?.current?.close();
-			timeoutRef.current = setTimeout(() => {
-				setIsVisibleEditLinkModal(true);
-			}, 300);
-		}, []);
+			const backToInviteModal = () => {
+				setIsVisibleEditLinkModal(false);
+				refRBSheet.current.present();
+			};
 
-		const onVisibleEditLinkModalChange = (isVisible: boolean) => {
-			if (!isVisible) {
+			const saveInviteLinkSettings = () => {
+				//TODO: save invite link setting
 				backToInviteModal();
-			}
-		};
+			};
 
-		const backToInviteModal = () => {
-			setIsVisibleEditLinkModal(false);
-			//@ts-ignore
-			refRBSheet.current.present();
-		};
+			const snapPoints = useMemo(() => {
+				if (isKeyboardVisible) {
+					return ['90%'];
+				}
+				return ['80%'];
+			}, [isKeyboardVisible]);
 
-		const saveInviteLinkSettings = () => {
-			//TODO: save invite link setting
-			backToInviteModal();
-		};
-
-		const snapPoints = useMemo(() => {
-			if (isKeyboardVisible) {
-				return ['90%'];
-			}
-			return ['80%'];
-		}, [isKeyboardVisible]);
-
-		return (
-			<View>
-				<BottomSheetModal
-					ref={refRBSheet}
-					enableDynamicSizing={false}
-					snapPoints={snapPoints}
-					animateOnMount={!reducedMotion}
-					index={0}
-					enablePanDownToClose
-					backdropComponent={Backdrop}
-					onDismiss={() => {
-						onClose?.();
-						// setSentIdList([]);
-						// resetSearch();
-					}}
-					handleComponent={() => null}
-				>
-					<FriendList
-						isUnknownChannel={isUnknownChannel}
-						expiredTimeSelected={expiredTimeSelected}
-						isDMThread={isDMThread}
-						isKeyboardVisible={isKeyboardVisible}
-						openEditLinkModal={openEditLinkModal}
-					/>
-				</BottomSheetModal>
-
-				{isVisibleEditLinkModal ? (
-					<MezonModal
-						visible={isVisibleEditLinkModal}
-						title="Link Settings"
-						confirmText="Save"
-						onConfirm={saveInviteLinkSettings}
-						visibleChange={onVisibleEditLinkModalChange}
+			return (
+				<View>
+					<BottomSheetModal
+						ref={refRBSheet}
+						enableDynamicSizing={false}
+						snapPoints={snapPoints}
+						animateOnMount={!reducedMotion}
+						index={0}
+						enablePanDownToClose
+						backdropComponent={Backdrop}
+						onDismiss={() => {
+							onClose?.();
+							// setSentIdList([]);
+							// resetSearch();
+						}}
+						handleComponent={() => null}
 					>
-						<View style={styles.inviteChannelListWrapper}>
-							<Text style={styles.inviteChannelListTitle}>{t('inviteChannel')}</Text>
-							<View style={styles.channelInviteItem}>
-								{/* <HashSignIcon width={18} height={18} /> */}
-								<Text style={styles.channelInviteTitle}>{currentClan?.clan_name}</Text>
-							</View>
-						</View>
-						<View style={styles.advancedSettingWrapper}>
-							<Text style={styles.advancedSettingTitle}>{t('advancedSettings')}</Text>
-							<Text style={styles.advancedSettingSubTitle}>{t('expireAfter')}</Text>
-							<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-								<View style={styles.radioContainer}>
-									{LINK_EXPIRE_OPTION.map((option) => (
-										<Pressable
-											key={option.value}
-											style={[
-												styles.radioItem,
-												option.value === expiredTimeSelected ? styles.radioItemActive : styles.radioItemDeActive,
-											]}
-											onPress={() => setExpiredTimeSelected(option.value)}
-										>
-											<Text
-												style={[
-													{
-														color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray,
-														textAlign: 'center',
-													},
-												]}
-											>
-												{option.label}
-											</Text>
-										</Pressable>
-									))}
+						<FriendList
+							isUnknownChannel={isUnknownChannel}
+							expiredTimeSelected={expiredTimeSelected}
+							isDMThread={isDMThread}
+							isKeyboardVisible={isKeyboardVisible}
+							openEditLinkModal={openEditLinkModal}
+						/>
+					</BottomSheetModal>
+
+					{isVisibleEditLinkModal ? (
+						<MezonModal
+							visible={isVisibleEditLinkModal}
+							title="Link Settings"
+							confirmText="Save"
+							onConfirm={saveInviteLinkSettings}
+							visibleChange={onVisibleEditLinkModalChange}
+						>
+							<View style={styles.inviteChannelListWrapper}>
+								<Text style={styles.inviteChannelListTitle}>{t('inviteChannel')}</Text>
+								<View style={styles.channelInviteItem}>
+									{/* <HashSignIcon width={18} height={18} /> */}
+									<Text style={styles.channelInviteTitle}>{currentClan?.clan_name}</Text>
 								</View>
-							</ScrollView>
-							<Text style={styles.advancedSettingSubTitle}>{t('maxUsers')}</Text>
-							<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-								<View style={styles.radioContainer}>
-									{MAX_USER_OPTION.map((option) => (
-										<Pressable
-											key={option}
-											style={[
-												styles.radioItem,
-												option === maxUserCanInviteSelected ? styles.radioItemActive : styles.radioItemDeActive,
-											]}
-											onPress={() => setMaxUserCanInviteSelected(option)}
-										>
-											<Text
+							</View>
+							<View style={styles.advancedSettingWrapper}>
+								<Text style={styles.advancedSettingTitle}>{t('advancedSettings')}</Text>
+								<Text style={styles.advancedSettingSubTitle}>{t('expireAfter')}</Text>
+								<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+									<View style={styles.radioContainer}>
+										{LINK_EXPIRE_OPTION.map((option) => (
+											<Pressable
+												key={option.value}
 												style={[
-													{
-														color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray,
-														textAlign: 'center',
-													},
+													styles.radioItem,
+													option.value === expiredTimeSelected ? styles.radioItemActive : styles.radioItemDeActive
 												]}
+												onPress={() => setExpiredTimeSelected(option.value)}
 											>
-												{option}
-											</Text>
-										</Pressable>
-									))}
+												<Text
+													style={[
+														{
+															color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray,
+															textAlign: 'center'
+														}
+													]}
+												>
+													{option.label}
+												</Text>
+											</Pressable>
+										))}
+									</View>
+								</ScrollView>
+								<Text style={styles.advancedSettingSubTitle}>{t('maxUsers')}</Text>
+								<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+									<View style={styles.radioContainer}>
+										{MAX_USER_OPTION.map((option) => (
+											<Pressable
+												key={option}
+												style={[
+													styles.radioItem,
+													option === maxUserCanInviteSelected ? styles.radioItemActive : styles.radioItemDeActive
+												]}
+												onPress={() => setMaxUserCanInviteSelected(option)}
+											>
+												<Text
+													style={[
+														{
+															color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray,
+															textAlign: 'center'
+														}
+													]}
+												>
+													{option}
+												</Text>
+											</Pressable>
+										))}
+									</View>
+								</ScrollView>
+								<View style={styles.temporaryMemberWrapper}>
+									<Text style={styles.temporaryMemberTitle}>{t('temporaryMembership')}</Text>
+									<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
 								</View>
-							</ScrollView>
-							<View style={styles.temporaryMemberWrapper}>
-								<Text style={styles.temporaryMemberTitle}>{t('temporaryMembership')}</Text>
-								<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
+								<View style={{ flexDirection: 'row' }}>
+									<Text style={{ color: Colors.textGray }}>{t('memberAutoKick')}</Text>
+								</View>
 							</View>
-							<View style={{ flexDirection: 'row' }}>
-								<Text style={{ color: Colors.textGray }}>{t('memberAutoKick')}</Text>
-							</View>
-						</View>
-					</MezonModal>
-				) : null}
-			</View>
-		);
-	}),
+						</MezonModal>
+					) : null}
+				</View>
+			);
+		}
+	)
 );

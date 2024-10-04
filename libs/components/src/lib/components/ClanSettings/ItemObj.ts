@@ -26,8 +26,7 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
 	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
-	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
-	
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [

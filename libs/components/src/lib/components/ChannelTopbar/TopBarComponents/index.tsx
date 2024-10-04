@@ -1,5 +1,5 @@
 import { useAppNavigation, useMenu } from '@mezon/core';
-import { selectChannelById, selectCloseMenu, selectCurrentChannel, selectStatusMenu } from '@mezon/store';
+import { selectChannelById, selectCloseMenu, selectCurrentChannel, selectStatusMenu, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -15,9 +15,11 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_VOICE;
 	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT;
 	const isChannelStream = type === ChannelType.CHANNEL_TYPE_STREAMING;
+	const isAppChannel = type === ChannelType.CHANNEL_TYPE_APP;
 	const channelParent = useSelector(selectChannelById(channel?.parrent_id ? (channel.parrent_id as string) : ''));
 	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
+	const theme = useSelector(selectTheme);
 
 	const handleRedirect = () => {
 		if (channelParent) {
@@ -39,6 +41,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
 				{isPrivate === undefined && isChannelStream && <Icons.Stream defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
 				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
+				{isAppChannel && <Icons.AppChannelIcon className={'w-6 h-6'} fill={theme} />}
 			</div>
 
 			<p

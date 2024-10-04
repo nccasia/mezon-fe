@@ -1,10 +1,10 @@
-import { useAppNavigation, useFriends } from '@mezon/core';
+import { useAppNavigation, useEscapeKeyClose, useFriends, useOnClickOutside } from '@mezon/core';
 import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
@@ -14,11 +14,12 @@ type CreateMessageGroupProps = {
 	onClose: () => void;
 	classNames?: string;
 	currentDM?: DirectEntity;
+	rootRef?: RefObject<HTMLElement>;
 };
 
 const ITEM_HEIGHT = 40;
 
-const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGroupProps) => {
+const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateMessageGroupProps) => {
 	const dispatch = useAppDispatch();
 	const { navigate, toDmGroupPage } = useAppNavigation();
 	const friends = useSelector(selectAllFriends);
@@ -196,10 +197,17 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 				: GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDmGroup
 			: 0;
 	}, [friends]);
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
+
 	return (
 		<div
+			ref={modalRef}
+			tabIndex={-1}
 			onMouseDown={(e) => e.stopPropagation()}
-			className={`absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800 ${classNames}`}
+			className={`outline-none absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800 ${classNames}`}
 			onClick={(e) => {
 				e.stopPropagation();
 			}}

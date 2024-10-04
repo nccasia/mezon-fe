@@ -1,5 +1,6 @@
-import { useReference, useThreads } from '@mezon/core';
+import { useThreads } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { threadsActions, useAppDispatch } from '@mezon/store-mobile';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
@@ -9,7 +10,6 @@ import GroupThread from './GroupThread';
 import ThreadAddButton from './ThreadAddButton';
 import ThreadItem from './ThreadItem';
 import { style } from './styles';
-import { threadsActions, useAppDispatch } from '@mezon/store-mobile';
 
 type CreateThreadModalScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD;
 export default function CreateThreadModal({ navigation, route }: MenuThreadScreenProps<CreateThreadModalScreen>) {

@@ -6,7 +6,7 @@ import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm'
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuThreadDetailStacks = ({}: any) => {
+export const MenuThreadDetailStacks = () => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	return (

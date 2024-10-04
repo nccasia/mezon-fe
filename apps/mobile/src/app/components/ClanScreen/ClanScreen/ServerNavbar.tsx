@@ -10,7 +10,7 @@ const ServerNavbar = () => {
 			<View style={styles.commonIconStyle}>
 				<Text
 					style={{
-						color: darkColor.Content_Subtle,
+						color: darkColor.Content_Subtle
 					}}
 				>
 					1st
@@ -19,7 +19,7 @@ const ServerNavbar = () => {
 			<View style={styles.commonIconStyle}>
 				<Text
 					style={{
-						color: darkColor.Content_Subtle,
+						color: darkColor.Content_Subtle
 					}}
 				>
 					2nd
@@ -28,7 +28,7 @@ const ServerNavbar = () => {
 			<View style={styles.commonIconStyle}>
 				<Text
 					style={{
-						color: darkColor.Content_Subtle,
+						color: darkColor.Content_Subtle
 					}}
 				>
 					3nd
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 		width: '18%',
 		height: '98%',
 		alignSelf: 'flex-end',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	commonIconStyle: {
 		justifyContent: 'center',
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
 		width: 50,
 		borderRadius: 50,
 		marginBottom: 10,
-		backgroundColor: darkColor.Backgound_Tertiary,
-	},
+		backgroundColor: darkColor.Backgound_Tertiary
+	}
 });

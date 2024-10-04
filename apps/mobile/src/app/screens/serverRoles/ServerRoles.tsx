@@ -1,27 +1,31 @@
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, selectAllRolesClan, selectEveryoneRole } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { checkCanEditPermission } from './helper';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_SETTING;
 export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) => {
 	const { t } = useTranslation('clanRoles');
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { themeValue } = useTheme();
-	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
 	const everyoneRole = useSelector(selectEveryoneRole);
 
 	const allClanRoles = useMemo(() => {
 		if (!rolesClan || rolesClan?.length === 0) return [];
-		return (rolesClan || []).map((role) => ({ ...role, isView: !checkCanEditPermission({ isClanOwner, role, userPermissionsStatus }) }));
-	}, [rolesClan, isClanOwner, userPermissionsStatus]);
+		return (rolesClan || []).map((role) => ({ ...role, isView: !(hasAdminPermission || hasManageClanPermission || isClanOwner) }));
+	}, [rolesClan, hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
 	navigation.setOptions({
 		headerRight: () => (

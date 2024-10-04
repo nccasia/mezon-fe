@@ -6,7 +6,7 @@ import InterestedDetail from './InterestedDetail';
 
 enum tabs {
 	event = 'Events',
-	interest = 'Interested',
+	interest = 'Interested'
 }
 
 type DetailItemEventProps = {

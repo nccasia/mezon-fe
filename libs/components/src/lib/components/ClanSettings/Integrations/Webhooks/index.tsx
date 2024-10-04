@@ -22,7 +22,7 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/red_webhook.png',
 		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/green_webhook.png',
 		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/yellow_webhook.png',
-		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/blue_webhook.png',
+		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/blue_webhook.png'
 	];
 
 	const getRandomAvatar = (): string => {
@@ -34,7 +34,7 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 		const newWebhookReq: ApiWebhookCreateRequest = {
 			channel_id: currentChannel?.channel_id as string,
 			webhook_name: getRandomWebhookName(),
-			avatar: getRandomAvatar(),
+			avatar: getRandomAvatar()
 		};
 		dispatch(generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string, clanId: clanId }));
 	};
@@ -56,20 +56,12 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 						New Webhook
 					</div>
 					{allWebhooks &&
-						allWebhooks.map((webhook) => (
-							<WebhookItemModal currentChannel={currentChannel} webhookItem={webhook} key={webhook.id} />
-						))}
+						allWebhooks.map((webhook) => <WebhookItemModal currentChannel={currentChannel} webhookItem={webhook} key={webhook.id} />)}
 				</>
 			) : (
-				<div className='flex items-center flex-col gap-4'>
-					<Image
-						src={`assets/images/empty-webhook.svg`}
-						alt={'logoMezon'}
-						width={48}
-						height={48}
-						className="clan object-cover w-[272px]"
-					/>
-					<div className='font-medium dark:text-[#b5bac1] text-textLightTheme'>You have no webhooks!</div>
+				<div className="flex items-center flex-col gap-4">
+					<Image src={`assets/images/empty-webhook.svg`} alt={'logoMezon'} width={48} height={48} className="clan object-cover w-[272px]" />
+					<div className="font-medium dark:text-[#b5bac1] text-textLightTheme">You have no webhooks!</div>
 					<div
 						onClick={handleAddWebhook}
 						className="py-2 px-4 bg-[#5865f2] rounded-sm mb-[24px] w-fit text-[14px] font-semibold cursor-pointer"

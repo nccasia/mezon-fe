@@ -1,6 +1,7 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { AppDispatch, PinMessageEntity, pinMessageActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
+import { memo } from 'react';
 import { Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +9,7 @@ import EmptyPinMessage from './EmptyPinMessage';
 import { style } from './PinMessage';
 import PinMessageItem from './PinMessageItem';
 
-const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
+const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
@@ -52,6 +53,6 @@ const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
 			</View>
 		</ScrollView>
 	);
-};
+});
 
 export default PinMessage;

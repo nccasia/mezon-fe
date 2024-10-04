@@ -2,9 +2,12 @@ import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
+
+const EMOJI_SUGGESTION_CACHE_TIME = 1000 * 60 * 3;
 
 export interface EmojiSuggestionEntity extends IEmoji {
 	id: string;
@@ -37,9 +40,28 @@ type EmojiObjPickedArgs = {
 	isReset?: boolean;
 };
 
-export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async (_, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const response = await mezon.socketRef.current?.listClanEmojiByUserId();
+export const fetchEmojiCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.getListEmojisByUserId(mezon.session);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: EMOJI_SUGGESTION_CACHE_TIME,
+		normalizer: (args) => {
+			return args[0]?.session?.username || '';
+		}
+	}
+);
+
+export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+	if (noCache) {
+		fetchEmojiCached.clear(mezon);
+	}
+	const response = await fetchEmojiCached(mezon);
+
 	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');
 	}
@@ -55,7 +77,7 @@ export const createEmojiSetting = createAsyncThunk(
 			if (!res) {
 				return thunkAPI.rejectWithValue({});
 			}
-			thunkAPI.dispatch(fetchEmoji());
+			thunkAPI.dispatch(fetchEmoji({ noCache: true }));
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
 		}
@@ -102,9 +124,11 @@ export const emojiSuggestionSlice = createSlice({
 	name: EMOJI_SUGGESTION_FEATURE_KEY,
 	initialState: initialEmojiSuggestionState,
 	reducers: {
-		add: emojiSuggestionAdapter.addOne,
+		add: (state, action: PayloadAction<any>) => {
+			emojiSuggestionAdapter.addOne(state, action.payload);
+		},
 		remove: emojiSuggestionAdapter.removeOne,
-
+		update: emojiSuggestionAdapter.updateOne,
 		setSuggestionEmojiPicked: (state, action: PayloadAction<string>) => {
 			state.emojiPicked = action.payload;
 		},
@@ -124,10 +148,10 @@ export const emojiSuggestionSlice = createSlice({
 
 		setSuggestionEmojiObjPicked: (state, action: PayloadAction<EmojiObjPickedArgs>) => {
 			const { shortName, id, isReset } = action.payload;
-			if (!state.emojiObjPicked || isReset) {
+
+			if (isReset || !state.emojiObjPicked) {
 				state.emojiObjPicked = {};
-			}
-			if (!state.emojiObjPicked[shortName]) {
+			} else if (shortName !== '' && id !== '') {
 				state.emojiObjPicked[shortName] = id;
 			}
 		}

@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
-import MessageLine from '../MessageWithUser/MessageLine';
+import { MessageLine } from '../MessageWithUser/MessageLine';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageParser } from '../MessageWithUser/useMessageParser';
 export type NotifyMentionProps = {
@@ -60,8 +60,6 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId, clanId: clanId });
 
 	const handleClickJump = useCallback(() => {
-		dispatch(notificationActions.setReadNotiStatus([notify.id]));
-		dispatch(notificationActions.setStatusNoti());
 		dispatch(messagesActions.setIdMessageToJump(messageId));
 		directToMessageById();
 		dispatch(notificationActions.setIsShowInbox(false));

@@ -6,7 +6,7 @@ import UpdateGateScreen from '../../../screens/updateGate/UpdateGateScreen';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const ServersStacks = ({ }: any) => {
+export const ServersStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { themeValue } = useTheme();
 
@@ -19,10 +19,10 @@ export const ServersStacks = ({ }: any) => {
 				gestureDirection: 'horizontal',
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
-					close: TransitionSpecs.TransitionIOSSpec,
+					close: TransitionSpecs.TransitionIOSSpec
 				},
-				cardStyle: { backgroundColor: "transparent" },
-				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				cardStyle: { backgroundColor: 'transparent' },
+				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
 			}}
 			initialRouteName={APP_SCREEN.SERVERS.HOME}
 		>
@@ -31,7 +31,7 @@ export const ServersStacks = ({ }: any) => {
 				component={UpdateGateScreen}
 				options={{
 					cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-					headerShown: false,
+					headerShown: false
 				}}
 			/>
 		</Stack.Navigator>

@@ -36,7 +36,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					senderId: message_sender_id ?? '',
 					action: action_delete ?? false
 				};
-				saveRecentEmojiMobile(emojiLastest)
+				saveRecentEmojiMobile(emojiLastest);
 			}
 
 			return dispatch(
@@ -69,23 +69,22 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 }
 
 function saveRecentEmojiMobile(emojiLastest: EmojiStorage) {
-	AsyncStorage.getItem('recentEmojis')
-		.then((storedEmojis) => {
-			const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
+	AsyncStorage.getItem('recentEmojis').then((storedEmojis) => {
+		const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
 
-			const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
-				return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
-			});
-		
-			if (emojiLastest.action === true) {
-				if (duplicateIndex !== -1) {
-					emojisRecentParse.splice(duplicateIndex, 1);
-				}
-			} else {
-				if (duplicateIndex === -1) {
-					emojisRecentParse.push(emojiLastest);
-				}
+		const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
+			return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
+		});
+
+		if (emojiLastest.action === true) {
+			if (duplicateIndex !== -1) {
+				emojisRecentParse.splice(duplicateIndex, 1);
 			}
-			AsyncStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
-		})
+		} else {
+			if (duplicateIndex === -1) {
+				emojisRecentParse.push(emojiLastest);
+			}
+		}
+		AsyncStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
+	});
 }

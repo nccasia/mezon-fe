@@ -1,4 +1,3 @@
-import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import {
 	reactionActions,
@@ -11,11 +10,12 @@ import {
 	selectMemberClanByUserId,
 	useAppSelector
 } from '@mezon/store';
-import { NameComponent } from '@mezon/ui';
+import { Icons, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
@@ -94,22 +94,24 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel.emojiId} emojiName={emojiShowPanel.emoji ?? ''} count={count} />
-						{senderList.map((sender: SenderInfoOptionals, index: number) => {
-							if (sender.count && sender.count > 0) {
-								return (
-									<Fragment key={`${index}_${sender.sender_id}`}>
-										<SenderItem
-											sender={sender}
-											emojiShowPanel={emojiShowPanel}
-											userId={userId}
-											removeEmojiSender={removeEmojiSender}
-											hideSenderOnPanel={hideSenderOnPanel}
-										/>
-									</Fragment>
-								);
-							}
-							return null;
-						})}
+						<div className="max-h-40 overflow-y-auto hide-scrollbar">
+							{senderList.map((sender: SenderInfoOptionals, index: number) => {
+								if (sender.count && sender.count > 0) {
+									return (
+										<Fragment key={`${index}_${sender.sender_id}`}>
+											<SenderItem
+												sender={sender}
+												emojiShowPanel={emojiShowPanel}
+												userId={userId}
+												removeEmojiSender={removeEmojiSender}
+												hideSenderOnPanel={hideSenderOnPanel}
+											/>
+										</Fragment>
+									);
+								}
+								return null;
+							})}
+						</div>
 					</div>
 				</div>
 			)}

@@ -1,8 +1,9 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useRoles, useUserPermission } from '@mezon/core';
+import { usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { UsersClanEntity, selectAllRolesClan, selectAllUserClans, selectRoleByRoleId } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -12,7 +13,6 @@ import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonInput } from '../../../temp-ui';
 import { normalizeString } from '../../../utils/helpers';
-import { checkCanEditPermission } from '../helper';
 import { AddMemberBS } from './components/AddMemberBs';
 import { MemberItem } from './components/MemberItem';
 
@@ -27,7 +27,12 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
 	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
+
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const [assignedMemberList, setAssignedMemberList] = useState<UsersClanEntity[]>([]);
 	const [unAssignedMemberList, setUnAssignedMemberList] = useState<UsersClanEntity[]>([]);
@@ -42,8 +47,8 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	}, [roleId]);
 
 	const isCanEditRole = useMemo(() => {
-		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus]);
+		return hasAdminPermission || isClanOwner || hasManageClanPermission;
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
 	navigation.setOptions({
 		headerTitle: !isEditRoleMode

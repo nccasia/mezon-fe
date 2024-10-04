@@ -7,10 +7,10 @@ import {
 	selectOngoingEvent,
 	selectShowNumEvent
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../../../../../../ui/src/lib/Icons';
 import EventModal from '../EventChannelModal';
 
 export const Events = () => {

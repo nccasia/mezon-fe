@@ -66,7 +66,7 @@ export default function AssetsHeader({ pageID = 0, onChange, tabList = [] }: IPr
 						style={{
 							...styles.b,
 							width: pos[selected].width || 0,
-							left: pos[selected].x || 0,
+							left: pos[selected].x || 0
 						}}
 					></View>
 				</View>

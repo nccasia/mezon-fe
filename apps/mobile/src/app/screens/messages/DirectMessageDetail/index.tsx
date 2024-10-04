@@ -52,7 +52,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const isMentionHashtagDMRef = useRef(false);
+	const isFetchMemberChannelDmRef = useRef(false);
 	const isModeDM = useMemo(() => {
 		return currentDmGroup?.user_id?.length === 1;
 	}, [currentDmGroup?.user_id?.length]);
@@ -119,8 +119,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [currentChannel?.clan_id, directMessageId, dmType]);
 
 	useEffect(() => {
-		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_HASHTAG_DM, ({ isMentionHashtagDM }) => {
-			isMentionHashtagDMRef.current = isMentionHashtagDM;
+		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, ({ isFetchMemberChannelDM }) => {
+			isFetchMemberChannelDmRef.current = isFetchMemberChannelDM;
 		});
 		return () => {
 			onMentionHashtagDM.remove();
@@ -129,11 +129,11 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	useEffect(() => {
 		return () => {
-			if (!isMentionHashtagDMRef.current) {
+			if (!isFetchMemberChannelDmRef.current) {
 				fetchMemberChannel();
 			}
 		};
-	}, [fetchMemberChannel, isMentionHashtagDMRef]);
+	}, [fetchMemberChannel, isFetchMemberChannelDmRef]);
 
 	useEffect(() => {
 		let timeout: NodeJS.Timeout;
@@ -163,7 +163,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 				store.dispatch(
-					messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true, isClearMessage: true })
+					messagesActions.fetchMessages({
+						channelId: directMessageId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true,
+						clanId: '0'
+					})
 				);
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });

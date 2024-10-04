@@ -1,12 +1,12 @@
+import { Icons } from '@mezon/ui';
 import { Checkbox, Radio } from 'flowbite-react';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 
 type ItemPanelMemberProps = {
 	children: string;
 	dropdown?: boolean;
 	type?: 'radio' | 'checkbox' | 'none';
 	danger?: boolean;
-	onClick?: (e : any) => void;
+	onClick?: (e: any) => void;
 };
 
 const ItemPanelMember = ({ children, dropdown, type, danger, onClick }: ItemPanelMemberProps) => {

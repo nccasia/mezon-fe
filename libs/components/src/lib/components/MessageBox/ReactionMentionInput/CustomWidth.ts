@@ -14,9 +14,8 @@ export const widthSearchMessage = `calc(100vw - ${clanWidth} - ${channelListWidt
 export const widthDmUserProfile = `calc(100vw - ${clanWidth} - ${channelListWidth} - ${dmUserProfile} - ${margin})`;
 export const widthDmGroupMemberList = `calc(100vw - ${clanWidth} - ${channelListWidth} - ${dmGroupMemberList} - ${margin})`;
 
-
 //react mention input max width
-const uploadBtnChatBox = '32px'; 
+const uploadBtnChatBox = '32px';
 const messageBoxGap = '20px';
 const messageBoxBtnGroup = '80px';
 const xMarginOfMessageBox = '16px';

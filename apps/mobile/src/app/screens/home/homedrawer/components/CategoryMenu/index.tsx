@@ -1,9 +1,9 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClan } from '@mezon/store-mobile';
-import { ICategoryChannel } from '@mezon/utils';
+import { selectCurrentChannelId, selectCurrentClan } from '@mezon/store-mobile';
+import { EPermission, ICategoryChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject } from 'react';
@@ -27,16 +27,16 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 	const styles = style(themeValue);
 	const { dismiss } = useBottomSheetModal();
 	const currentClan = useSelector(selectCurrentClan);
-	const { isCanManageChannel } = useUserPermission();
-
+	const currentChanelId = useSelector(selectCurrentChannelId);
+	const [isCanManageChannel] = usePermissionChecker([EPermission.manageChannel], currentChanelId ?? '');
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.watchMenu.markAsRead'),
 			onPress: () => reserve(),
-			icon: <Icons.EyeIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.EyeIcon color={themeValue.textStrong} />
+		}
 	];
 
 	const inviteMenu: IMezonMenuItemProps[] = [
@@ -46,21 +46,21 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 				inviteRef?.current?.present?.();
 				dismiss();
 			},
-			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />
+		}
 	];
 
 	const notificationMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.notification.muteCategory'),
 			onPress: () => reserve(),
-			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />,
+			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />
 		},
 		{
 			title: t('menu.notification.notification'),
 			onPress: () => reserve(),
-			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />
+		}
 	];
 
 	const organizationMenu: IMezonMenuItemProps[] = [
@@ -71,8 +71,8 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 					screen: APP_SCREEN.MENU_CLAN.CATEGORY_SETTING,
 					params: {
-						categoryId: category?.category_id,
-					},
+						categoryId: category?.category_id
+					}
 				});
 			},
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
@@ -85,13 +85,13 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 					screen: APP_SCREEN.MENU_CLAN.CREATE_CHANNEL,
 					params: {
-						categoryId: category?.category_id,
-					},
+						categoryId: category?.category_id
+					}
 				});
 			},
 			icon: <Icons.PlusLargeIcon color={themeValue.textStrong} />,
 			isShow: isCanManageChannel
-		},
+		}
 	];
 
 	const devMenu: IMezonMenuItemProps[] = [
@@ -102,39 +102,35 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 				Clipboard.setString(category?.category_id);
 				Toast.show({
 					type: 'info',
-					text1: t('notify.serverIDCopied'),
+					text1: t('notify.serverIDCopied')
 				});
-			},
-		},
+			}
+		}
 	];
 
 	const menu: IMezonMenuSectionProps[] = [
 		{
-			items: watchMenu,
+			items: watchMenu
 		},
 		{
-			items: inviteMenu,
+			items: inviteMenu
 		},
 		{
-			items: notificationMenu,
+			items: notificationMenu
 		},
 		{
-			items: organizationMenu,
+			items: organizationMenu
 		},
 		{
-			items: devMenu,
-		},
+			items: devMenu
+		}
 	];
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<MezonClanAvatar
-						defaultColor={baseColor.blurple}
-						alt={currentClan?.clan_name}
-						image={currentClan?.logo}
-					/>
+					<MezonClanAvatar defaultColor={baseColor.blurple} alt={currentClan?.clan_name} image={currentClan?.logo} />
 				</View>
 				<Text style={styles.serverName}>{category?.category_name}</Text>
 			</View>

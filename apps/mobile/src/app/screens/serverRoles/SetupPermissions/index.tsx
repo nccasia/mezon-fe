@@ -1,4 +1,4 @@
-import { useRoles, useUserPermission } from '@mezon/core';
+import { usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllPermissionsDefault, selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
@@ -12,7 +12,6 @@ import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { normalizeString } from '../../../utils/helpers';
-import { checkCanEditPermission } from '../helper';
 
 type SetupPermissionsScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS;
 export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<SetupPermissionsScreen>) => {
@@ -25,7 +24,12 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
 	const everyoneRole = useSelector(selectEveryoneRole);
-	const { userPermissionsStatus, isClanOwner } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
+
 	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
 	const defaultPermissionList = useSelector(selectAllPermissionsDefault);
 
@@ -44,8 +48,8 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 	const isCanEditRole = useMemo(() => {
 		if (isEveryoneRole) return false;
-		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus, isEveryoneRole]);
+		return hasAdminPermission || isClanOwner || hasManageClanPermission;
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner, isEveryoneRole]);
 
 	const getDisablePermission = useCallback(
 		(slug: string) => {
@@ -53,12 +57,12 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 				case EPermission.administrator:
 					return !isClanOwner || !isCanEditRole;
 				case EPermission.manageClan:
-					return (!isClanOwner && !userPermissionsStatus.hasAdministrator) || !isCanEditRole;
+					return (!isClanOwner && !hasAdminPermission) || !isCanEditRole;
 				default:
 					return !isCanEditRole;
 			}
 		},
-		[userPermissionsStatus, isClanOwner, isCanEditRole]
+		[hasAdminPermission, isClanOwner, isCanEditRole]
 	);
 
 	const permissionList = useMemo(() => {

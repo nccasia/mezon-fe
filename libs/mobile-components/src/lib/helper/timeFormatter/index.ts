@@ -157,27 +157,27 @@ export function getDayWeekName(date: Date, lang: 'vi' | 'en') {
 }
 
 export function convertTimestampToTimeAgo(timestampSeconds: number) {
-    const now = Math.floor(Date.now() / 1000);
-    const diff = now - timestampSeconds;
+	const now = Math.floor(Date.now() / 1000);
+	const diff = now - timestampSeconds;
 
-    const years = Math.floor(diff / (60 * 60 * 24 * 365));
-    const months = Math.floor((diff % (60 * 60 * 24 * 365)) / (60 * 60 * 24 * 30));
-    const days = Math.floor((diff % (60 * 60 * 24 * 30)) / (60 * 60 * 24));
-    const hours = Math.floor((diff % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((diff % (60 * 60)) / 60);
+	const years = Math.floor(diff / (60 * 60 * 24 * 365));
+	const months = Math.floor((diff % (60 * 60 * 24 * 365)) / (60 * 60 * 24 * 30));
+	const days = Math.floor((diff % (60 * 60 * 24 * 30)) / (60 * 60 * 24));
+	const hours = Math.floor((diff % (60 * 60 * 24)) / (60 * 60));
+	const minutes = Math.floor((diff % (60 * 60)) / 60);
 
-    switch (true) {
-        case years > 0:
-            return `${years}y`;
-        case months > 0:
-            return `${months}mo`;
-        case days > 0:
-            return `${days}d`;
-        case hours > 0:
-            return `${hours}h`;
-        case minutes > 0:
-            return `${minutes}m`;
-        default:
-            return `Just now`;
-    }
+	switch (true) {
+		case years > 0:
+			return `${years}y`;
+		case months > 0:
+			return `${months}mo`;
+		case days > 0:
+			return `${days}d`;
+		case hours > 0:
+			return `${hours}h`;
+		case minutes > 0:
+			return `${minutes}m`;
+		default:
+			return `Just now`;
+	}
 }

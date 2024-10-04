@@ -1,4 +1,4 @@
-import * as Icons from '../../../../../../ui/src/lib/Icons';
+import { Icons } from '@mezon/ui';
 import { ChannelLableModal } from '../ChannelLabel';
 
 interface ChannelStatusModalProps {

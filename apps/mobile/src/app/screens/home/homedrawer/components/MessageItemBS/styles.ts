@@ -59,11 +59,11 @@ export const style = (colors: Attributes) =>
 		},
 		actionText: {
 			color: colors.text,
-			fontSize: size.h8,
+			fontSize: size.h8
 		},
 		warningActionText: {
 			color: Colors.textRed,
-			fontSize: size.h8,
+			fontSize: size.h8
 		},
 		actionIcon: {
 			color: Colors.white

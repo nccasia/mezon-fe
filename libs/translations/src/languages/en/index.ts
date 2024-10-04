@@ -14,7 +14,7 @@ import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
 import clanRoles from './clanRoles.json';
 import clanSetting from './clanSetting.json';
-import clanStickerSetting from "./clanStickerSetting.json";
+import clanStickerSetting from './clanStickerSetting.json';
 import common from './common.json';
 import createThread from './createThread.json';
 import customUserStatus from './customUserStatus.json';
@@ -24,6 +24,7 @@ import eventCreator from './eventCreator.json';
 import eventMenu from './eventMenu.json';
 import friends from './friends.json';
 import inviteToChannel from './inviteToChannel.json';
+import linkMessageInvite from './linkMessageInvite.json';
 import media from './media.json';
 import menuCustomDM from './menuCustomDM.json';
 import message from './message.json';
@@ -79,5 +80,6 @@ export default {
 	searchMessageChannel,
 	clanNotificationsSetting,
 	clanStickerSetting,
-  menuCustomDM
+	menuCustomDM,
+	linkMessageInvite
 };

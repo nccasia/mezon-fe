@@ -20,10 +20,7 @@ export const MezonButton = (props: IMezonButtonProps) => {
 	return (
 		<TouchableOpacity disabled={disabled} style={styles.fill} onPress={onPress} {...props}>
 			<View style={[styles.buttonWrapper, disabled && styles.disable, viewContainerStyle]}>
-				{isString
-					? <Text style={[styles.text, textStyle]}>{children}</Text>
-					: children
-				}
+				{isString ? <Text style={[styles.text, textStyle]}>{children}</Text> : children}
 			</View>
 		</TouchableOpacity>
 	);

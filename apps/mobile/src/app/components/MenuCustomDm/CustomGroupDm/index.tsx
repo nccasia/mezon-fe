@@ -3,10 +3,10 @@ import { baseColor, Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, useAppDispatch } from '@mezon/store-mobile';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text } from 'react-native';
 import { MezonInput } from '../../../temp-ui';
 import style from '../MenuCustomDm.styles';
-import { useTranslation } from 'react-i18next';
 
 const CustomGroupDm = ({ dmGroupId, channelLabel }: { dmGroupId: string; channelLabel: string }) => {
 	const [nameGroup, setNameGroup] = useState<string>(channelLabel || '');
@@ -32,13 +32,13 @@ const CustomGroupDm = ({ dmGroupId, channelLabel }: { dmGroupId: string; channel
 
 	const handleSave = async (nameGroup: string) => {
 		if (nameGroup && channelLabel !== nameGroup) {
-      const updateChannel: ApiUpdateChannelDescRequest = {
-        channel_id: dmGroupId || '',
-        channel_label: nameGroup || '',
-        category_id: '0',
-      };
-      await dispatch(channelsActions.updateChannel(updateChannel));
-    }
+			const updateChannel: ApiUpdateChannelDescRequest = {
+				channel_id: dmGroupId || '',
+				channel_label: nameGroup || '',
+				category_id: '0'
+			};
+			await dispatch(channelsActions.updateChannel(updateChannel));
+		}
 	};
 
 	return (

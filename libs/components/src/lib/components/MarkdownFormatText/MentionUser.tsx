@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -29,6 +29,7 @@ type UserProfilePopupProps = {
 	mode?: number;
 	positionShortUser: { top: number; left: number } | null;
 	isDm?: boolean;
+	onClose: () => void;
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
@@ -56,7 +57,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
 
-	const mentionRef = useRef<HTMLButtonElement>(null);
+	const mentionRef = useRef<HTMLSpanElement>(null);
 
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
@@ -85,14 +86,14 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		[tagRoleId]
 	);
 
-	const handleClickOutside = () => {
+	const handleClickOutside = useCallback(() => {
 		setIsShowPanelChannel(false);
-	};
+	}, []);
+
 	useOnClickOutside(mentionRef, handleClickOutside);
-	useEscapeKey(() => setIsShowPanelChannel(false));
 
 	return (
-		<>
+		<span ref={mentionRef}>
 			{showProfileUser && (
 				<UserProfilePopup
 					userID={tagUserId ?? ''}
@@ -100,6 +101,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					mode={mode}
 					isDm={isDM}
 					positionShortUser={positionShortUser}
+					onClose={handleClickOutside}
 				/>
 			)}
 
@@ -110,7 +112,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				<span
 					className={`font-medium px-0.1 rounded-sm 'cursor-text'
 					${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-	
+
 					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
 					{displayToken.display}
@@ -120,7 +122,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
-					ref={mentionRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
 					className={`font-medium px-0.1 rounded-sm
@@ -130,13 +131,13 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					{displayToken.display}
 				</button>
 			)}
-		</>
+		</span>
 	);
 };
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
@@ -154,9 +155,12 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser }: 
 	};
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
+	useEscapeKeyClose(panelRef, onClose);
+
 	return (
 		<div
-			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
+			tabIndex={-1}
+			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 			style={{
 				top: `${positionShortUser?.top}px`,
 				left: `${positionShortUser?.left}px`

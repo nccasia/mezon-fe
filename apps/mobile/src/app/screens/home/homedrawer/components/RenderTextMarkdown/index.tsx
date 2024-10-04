@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
-
 interface ElementToken {
 	s?: number;
 	e?: number;
@@ -154,7 +153,6 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
-			color: colors.textRoleLink,
 			backgroundColor: colors.darkMossGreen
 		}
 	});
@@ -468,7 +466,10 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				style={{
+					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}),
+					...customStyle
+				}}
 				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {

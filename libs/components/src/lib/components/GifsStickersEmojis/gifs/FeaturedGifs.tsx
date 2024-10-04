@@ -1,5 +1,5 @@
 import { useGifs } from '@mezon/core';
-import { Icons } from '../../../components';
+import { Icons } from '@mezon/ui';
 
 type FeaturedGifsProps = {
 	channelId: string;

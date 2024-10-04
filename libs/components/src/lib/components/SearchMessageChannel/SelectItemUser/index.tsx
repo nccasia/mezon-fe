@@ -1,5 +1,4 @@
-import { Icons } from '@mezon/components';
-import { HighlightMatchBold } from '@mezon/ui';
+import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { memo } from 'react';
 
 type SelectItemProps = {

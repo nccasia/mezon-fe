@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import DetailItemEvent from '../DetailItemEvent';
 import ModalCreate from './ModalCreate';
-import StartEventModal from './StartEvent';
+import { StartEventModal } from './StartEvent';
 
 export type EventModalProps = {
 	numberEventManagement: number;

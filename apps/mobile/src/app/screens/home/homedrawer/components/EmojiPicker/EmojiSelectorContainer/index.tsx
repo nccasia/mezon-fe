@@ -2,28 +2,28 @@ import {
 	ActionEmitEvent,
 	BicycleIcon,
 	BowlIcon,
-	debounce,
 	GameControllerIcon,
-	getEmojis,
 	HeartIcon,
 	Icons,
 	LeafIcon,
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	SmilingFaceIcon
+	SmilingFaceIcon,
+	debounce,
+	useGetEmojis
 } from '@mezon/mobile-components';
-import { baseColor, Colors, Metrics, size, useTheme } from '@mezon/mobile-ui';
+import { Colors, Metrics, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import { emojiSuggestionActions, selectCurrentClan } from '@mezon/store-mobile';
-import { getSrcEmoji, IEmoji } from '@mezon/utils';
-import { MezonClanAvatar } from 'apps/mobile/src/app/temp-ui';
+import { IEmoji, getSrcEmoji } from '@mezon/utils';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
+import { MezonClanAvatar } from '../../../../../../temp-ui';
 import { style } from './styles';
 
 type EmojiSelectorContainerProps = {
@@ -79,7 +79,7 @@ export default function EmojiSelectorContainer({
 	handleBottomSheetCollapse
 }: EmojiSelectorContainerProps) {
 	const currentClan = useAppSelector(selectCurrentClan);
-	const { categoriesEmoji, categoryEmoji, emojis } = getEmojis(currentClan?.clan_id || '0');
+	const { categoriesEmoji, categoryEmoji, emojis } = useGetEmojis(currentClan?.clan_id || '0');
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -121,8 +121,8 @@ export default function EmojiSelectorContainer({
 				displayName: category === 'Custom' && currentClan?.clan_name ? currentClan?.clan_name : category,
 				name: category,
 				icon: cateIcon[index],
-				emojis: emojis.reduce((acc, emoji) => {
-					if (emoji.category.includes(category)) {
+				emojis: emojis?.reduce((acc, emoji) => {
+					if (emoji?.category?.includes?.(category)) {
 						acc.push({
 							...emoji,
 							category: category

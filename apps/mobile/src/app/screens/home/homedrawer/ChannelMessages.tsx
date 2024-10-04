@@ -18,6 +18,7 @@ import { IMessageActionPayload } from './types';
 
 type ChannelMessagesProps = {
 	channelId: string;
+	clanId: string;
 	mode: ChannelStreamMode;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	onMessageAction?: (payload: IMessageActionPayload) => void;
@@ -32,7 +33,7 @@ const getEntitiesArray = (state: any) => {
 };
 
 const ChannelMessages = React.memo(
-	({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
+	({ channelId, clanId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
 		const dispatch = useAppDispatch();
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
@@ -78,17 +79,19 @@ const ChannelMessages = React.memo(
 				isLoadMore.current = true;
 				setTriggerRender(true);
 				if (direction === ELoadMoreDirection.bottom) {
-					await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP, fromMobile: true }));
+					await dispatch(
+						messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP, fromMobile: true })
+					);
 					isLoadMore.current = false;
 					setTriggerRender(false);
 					return;
 				}
-				await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP, fromMobile: true }));
+				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.BEFORE_TIMESTAMP, fromMobile: true }));
 				isLoadMore.current = false;
 				setTriggerRender(false);
 				return true;
 			},
-			[dispatch, channelId]
+			[dispatch, clanId, channelId]
 		);
 
 		// const handleScroll = useCallback(
@@ -129,7 +132,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, messages]
+			[messages, jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, setIsOnlyEmojiPicker]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {

@@ -11,16 +11,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import LoadingModal from '../../../components/LoadingModal';
+import LoadingModal from '../../../components/LoadingModal/LoadingModal';
 import Button from '../../../components/auth/Button';
-import FooterAuth from '../../../components/auth/FooterAuth';
-import LoginSocial from '../../../components/auth/LoginSocial';
-import TextInputUser from '../../../components/auth/TextInput';
+import { FooterAuth } from '../../../components/auth/FooterAuth';
+import { LoginSocial } from '../../../components/auth/LoginSocial';
+import { TextInputUser } from '../../../components/auth/TextInput';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
-	password: Yup.string().min(8, 'Confirm password must be 8 characters long.').required('Please enter your password'),
+	password: Yup.string().min(8, 'Confirm password must be 8 characters long.').required('Please enter your password')
 });
 
 type LoginFormPayload = {
@@ -41,7 +41,7 @@ const LoginScreen = () => {
 			webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
 			iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID,
 			offlineAccess: true,
-			forceCodeForRefreshToken: true,
+			forceCodeForRefreshToken: true
 		};
 		GoogleSignin.configure(config);
 	}, []);
@@ -55,7 +55,7 @@ const LoginScreen = () => {
 						Toast.show({
 							type: 'error',
 							text1: 'Login Failed',
-							text2: 'Invalid email or password',
+							text2: 'Invalid email or password'
 						});
 					}
 				}
@@ -63,7 +63,7 @@ const LoginScreen = () => {
 				/* empty */
 			}
 		},
-		[loginEmail],
+		[loginEmail]
 	);
 
 	async function onGoogleButtonPress() {
@@ -79,7 +79,7 @@ const LoginScreen = () => {
 				Toast.show({
 					type: 'error',
 					text1: 'Login Failed',
-					text2: error.message,
+					text2: error.message
 				});
 			}
 		}
@@ -89,7 +89,7 @@ const LoginScreen = () => {
 		try {
 			const appleAuthRequestResponse = await appleAuth.performRequest({
 				requestedOperation: appleAuth.Operation.LOGIN,
-				requestedScopes: [appleAuth.Scope.EMAIL],
+				requestedScopes: [appleAuth.Scope.EMAIL]
 			});
 			const identityToken = appleAuthRequestResponse?.identityToken;
 			await loginByApple(identityToken);
@@ -100,7 +100,7 @@ const LoginScreen = () => {
 			Toast.show({
 				type: 'error',
 				text1: 'Login Failed',
-				text2: error.message,
+				text2: error.message
 			});
 		}
 	}
@@ -126,7 +126,7 @@ const LoginScreen = () => {
 					<Formik
 						initialValues={{
 							email: '',
-							password: '',
+							password: ''
 						}}
 						validationSchema={LoginSchema}
 						onSubmit={handleSubmit}

@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useChatReaction, useChatSending, useClanRestriction, useUserPermission } from '@mezon/core';
+import { useAuth, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -21,7 +21,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EPermission, getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -64,8 +64,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
 	});
 
-	const { isCanManageThread } = useUserPermission();
-	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
+	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		currentChannelId ?? ''
+	);
+	const [isAllowDelMessage] = usePermissionChecker([EOverriddenPermission.deleteMessage], message?.channel_id ?? '');
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
@@ -335,9 +338,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.MarkUnRead:
 				handleActionMarkUnRead();
 				break;
-			case EMessageActionType.Mention:
-				handleActionMention();
-				break;
+			// case EMessageActionType.Mention:
+			// 	handleActionMention();
+			// 	break;
 			case EMessageActionType.CopyMessageLink:
 				handleActionCopyMessageLink();
 				break;
@@ -386,8 +389,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.MarkUnRead:
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
-			case EMessageActionType.Mention:
-				return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
+			// case EMessageActionType.Mention:
+			// 	return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
 				return <Icons.DownloadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMediaLink:
@@ -409,7 +412,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const isMessageError = message?.isError;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const isHideCreateThread = isDM || !isCanManageThread || currentChannel?.parrent_id !== '0';
+		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parrent_id !== '0';
 		const isHideThread = currentChannel?.parrent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
 
@@ -465,6 +468,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		listPinMessages,
 		isDM,
 		isCanManageThread,
+		isCanManageChannel,
 		currentChannel?.parrent_id,
 		isAllowDelMessage,
 		isShowForwardAll,

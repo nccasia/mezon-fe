@@ -1,4 +1,4 @@
-import { Attributes, Metrics, size } from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -6,8 +6,7 @@ export const style = (colors: Attributes) =>
 		channelListHeader: {
 			width: '100%',
 			flexDirection: 'row',
-			justifyContent: 'space-between',
-			marginBottom: Metrics.size.m
+			justifyContent: 'space-between'
 		},
 
 		channelListHeaderItem: {
@@ -18,7 +17,7 @@ export const style = (colors: Attributes) =>
 
 		channelListHeaderItemTitle: {
 			textTransform: 'uppercase',
-			fontSize: size.s_14,
+			fontSize: size.s_13,
 			fontWeight: 'bold',
 			color: colors.text
 		},

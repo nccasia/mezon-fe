@@ -1,8 +1,8 @@
-import {useEscapeKey, useOnClickOutside} from '@mezon/core';
-import { channelsActions, DirectEntity, useAppDispatch } from '@mezon/store';
-import {MouseButton, ValidateSpecialCharacters} from '@mezon/utils';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
+import { DirectEntity, channelsActions, useAppDispatch } from '@mezon/store';
+import { MouseButton, ValidateSpecialCharacters } from '@mezon/utils';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Coords } from '../../ChannelLink';
 import PanelMember from '../../PanelMember';
 
@@ -22,12 +22,12 @@ const LabelDm = (props: LabelDmProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 	const isValidGroupName = useMemo(() => {
-		return ValidateSpecialCharacters().test(label)
-	}, [label])
-	
+		return ValidateSpecialCharacters().test(label);
+	}, [label]);
+
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
@@ -38,7 +38,6 @@ const LabelDm = (props: LabelDmProps) => {
 		const windowHeight = window.innerHeight;
 
 		const distanceToBottom = windowHeight - mouseY;
-
 		if (event.button === MouseButton.RIGHT) {
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanel(true);
@@ -66,7 +65,7 @@ const LabelDm = (props: LabelDmProps) => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: dmGroupId || '',
 			channel_label: label,
-			category_id: '0',
+			category_id: '0'
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 	};
@@ -84,12 +83,14 @@ const LabelDm = (props: LabelDmProps) => {
 		setIsShowPanel(false);
 	}, [currentDmGroup?.channel_label]);
 
-	useOnClickOutside(panelRef, () => setIsShowPanel(false));
-	
-	useEscapeKey(() => {
+	const cancelEditTitle = useCallback(() => {
 		setLabel(initLabel);
 		setOpenEditName(false);
-	})
+	}, [openEditName]);
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, cancelEditTitle);
+	useOnClickOutside(modalRef, cancelEditTitle);
 
 	return (
 		<>
@@ -103,7 +104,7 @@ const LabelDm = (props: LabelDmProps) => {
 					{label || `${currentDmGroup?.creator_name}'s Group`}
 				</h2>
 			) : (
-				<div className={'flex flex-col w-full relative'}>
+				<div ref={modalRef} tabIndex={-1} className={'outline-none flex flex-col w-full relative'}>
 					<input
 						ref={inputRef}
 						defaultValue={label}
@@ -113,7 +114,9 @@ const LabelDm = (props: LabelDmProps) => {
 						className="w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded"
 					/>
 					{!isValidGroupName && (
-						<p className={'text-colorDanger text-xs absolute top-7 italic w-full truncate'}>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>
+						<p className={'text-colorDanger text-xs absolute top-7 italic w-full truncate'}>
+							Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+						</p>
 					)}
 				</div>
 			)}
@@ -126,7 +129,7 @@ const LabelDm = (props: LabelDmProps) => {
 					directMessageValue={{
 						type: currentDmGroup?.type,
 						userId: currentDmGroup?.user_id || [],
-						dmID: currentDmGroup?.channel_id || '',
+						dmID: currentDmGroup?.channel_id || ''
 					}}
 				/>
 			)}

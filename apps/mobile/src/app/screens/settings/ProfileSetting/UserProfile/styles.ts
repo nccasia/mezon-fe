@@ -1,22 +1,23 @@
-import { Attributes, Colors } from "@mezon/mobile-ui";
-import { Dimensions, StyleSheet } from "react-native";
+import { Attributes, Colors } from '@mezon/mobile-ui';
+import { Dimensions, StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) => StyleSheet.create({
-    container: {
-        flex: 1,
-        width: Dimensions.get("screen").width
-    },
+export const style = (colors: Attributes) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			width: Dimensions.get('screen').width
+		},
 
-    btnIcon: {
-        padding: 7,
-        borderRadius: 10,
-        backgroundColor: Colors.bgViolet
-    },
+		btnIcon: {
+			padding: 7,
+			borderRadius: 10,
+			backgroundColor: Colors.bgViolet
+		},
 
-    btnGroup: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        paddingHorizontal: 10,
-        marginTop: -20
-    }
-})
+		btnGroup: {
+			flexDirection: 'row',
+			justifyContent: 'flex-end',
+			paddingHorizontal: 10,
+			marginTop: -20
+		}
+	});

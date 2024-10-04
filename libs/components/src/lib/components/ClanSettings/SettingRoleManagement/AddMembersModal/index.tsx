@@ -1,11 +1,10 @@
-import { AvatarImage, Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
 import { RolesClanEntity, getSelectedRoleId, selectAllUserClans, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
-import { InputField } from '@mezon/ui';
+import { Icons, InputField } from '@mezon/ui';
 import { ThemeApp, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 interface ModalProps {
 	isOpen: boolean;
 	RolesClan: RolesClanEntity[];

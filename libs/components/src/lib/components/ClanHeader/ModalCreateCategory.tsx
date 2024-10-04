@@ -1,8 +1,7 @@
-import { InputField } from '@mezon/ui';
+import { Icons, InputField } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useState } from 'react';
-import { Icons } from '@mezon/ui';
 
 type ModalCreateCategoryProps = {
 	openCreateCate: boolean;
@@ -29,10 +28,10 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 		onCreateCategory(nameCate);
 		setNameCate('');
 	};
-  
-  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.checked ? 1 : 0;
-  };
+
+	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.checked ? 1 : 0;
+	};
 
 	return (
 		<Modal
@@ -64,30 +63,35 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 					</p>
 				)}
-        <div className="flex flex-row justify-between my-2 items-center">
-          <div className='flex flex-row items-center'>
-            <Icons.LockIcon/>
-            <span className='dark:text-textSecondary text-textSecondary800 text-lg font-semibold'>Private Category</span>
-          </div>
-          <div className="relative flex flex-wrap items-center">
-            <input
-              className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
+				<div className="flex flex-row justify-between my-2 items-center">
+					<div className="flex flex-row items-center">
+						<Icons.LockIcon />
+						<span className="dark:text-textSecondary text-textSecondary800 text-lg font-semibold">Private Category</span>
+					</div>
+					<div className="relative flex flex-wrap items-center">
+						<input
+							className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
                bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
                 after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
                  hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
                   focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
                    disabled:bg-slate-200 disabled:after:bg-slate-300"
-              type="checkbox"
-              value={1}
-              id="id-c01"
-              onChange={handleToggle}
-            />
-          </div>
-        </div>
-        <p className='dark:text-textSecondary text-textSecondary800 text-sm'>By making a category private, only select members and roles will be able to view this category. Synced channels in this  category will automatically match to this setting</p>
+							type="checkbox"
+							value={1}
+							id="id-c01"
+							onChange={handleToggle}
+						/>
+					</div>
+				</div>
+				<p className="dark:text-textSecondary text-textSecondary800 text-sm">
+					By making a category private, only select members and roles will be able to view this category. Synced channels in this category
+					will automatically match to this setting
+				</p>
 			</Modal.Body>
 			<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
-				<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">Cancel</button>
+				<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">
+					Cancel
+				</button>
 				<button
 					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={handleCreateCate}

@@ -39,7 +39,7 @@ export const style = (colors: Attributes) =>
 
 		input: {
 			paddingVertical: 0,
-			paddingHorizontal: 10,
+			paddingHorizontal: size.s_10,
 			color: colors.textStrong,
 			flexGrow: 1,
 			fontSize: size.medium
@@ -47,7 +47,8 @@ export const style = (colors: Attributes) =>
 
 		clearBtn: {
 			borderRadius: 10,
-			zIndex: 100
+			zIndex: 100,
+			marginRight: size.s_10
 		},
 
 		lineCountWrapper: {

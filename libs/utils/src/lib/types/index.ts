@@ -5,7 +5,6 @@ import {
 	ChannelType,
 	HashtagDm,
 	Notification,
-	NotificationChannelCategorySetting,
 	NotificationType,
 	NotifiReactMessage,
 	PermissionRoleChannel
@@ -35,6 +34,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
+import { ApiNotificationChannelCategorySetting } from 'mezon-js/dist/api.gen';
 import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
@@ -91,7 +91,7 @@ export type IDefaultNotificationCategory = ApiNotificationSetting & {
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
 };
-export type IChannelCategorySetting = NotificationChannelCategorySetting & {
+export type IChannelCategorySetting = ApiNotificationChannelCategorySetting & {
 	id: string;
 };
 export type IHashtagDm = HashtagDm & {
@@ -621,8 +621,8 @@ export type EmojiStorage = {
 };
 
 export enum Direction_Mode {
-	AROUND_TIMESTAMP = 1,
-	AFTER_TIMESTAMP = 2,
+	AFTER_TIMESTAMP = 1,
+	AROUND_TIMESTAMP = 2,
 	BEFORE_TIMESTAMP = 3
 }
 
@@ -716,6 +716,9 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 	channel_private?: number;
+	parrent_id?: string;
+	clanId?: string;
+	meeting_code?: string;
 };
 
 export enum EEmojiCategory {

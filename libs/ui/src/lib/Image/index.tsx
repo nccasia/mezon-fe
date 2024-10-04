@@ -9,8 +9,8 @@ export type ImageProps = ImgProps & {
 	blurdataurl?: string;
 };
 
-function Image(params: ImageProps) {
-	return <Img {...params} />;
+function Image({ loading = 'lazy', ...rest }: ImageProps) {
+	return <Img {...rest} loading={loading} />;
 }
 
 export default Image;

@@ -1,8 +1,8 @@
 import { PinMessageEntity, selectMemberClanByUserId } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
-import MemberProfile from '../../../MemberProfile';
-import MessageLine from '../../../MessageWithUser/MessageLine';
+import { MemberProfile } from '../../../MemberProfile';
+import { MessageLine } from '../../../MessageWithUser/MessageLine';
 import { ListPinAttachment } from './ItemPinMessage';
 
 type ModalDeletePinMessProps = {
@@ -44,7 +44,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 										isEditted={false}
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
-										content={JSON.parse(pinMessage.content || '')}
+										content={JSON.parse(pinMessage.content || '{}')}
 									/>
 								</span>
 								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}

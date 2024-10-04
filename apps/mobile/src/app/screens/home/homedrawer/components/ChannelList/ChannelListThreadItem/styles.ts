@@ -20,25 +20,28 @@ export const style = (colors: Attributes) =>
 		threadItemActive: {
 			backgroundColor: colors.secondaryLight,
 			borderRadius: size.s_10,
-			// borderWidth: 0.4,
-			// borderColor: Colors.gray48,
 			position: 'absolute',
 			width: '95%',
 			height: Platform.OS === 'android' ? '90%' : '95%',
 			right: 0,
 			top: Platform.OS === 'android' ? size.s_18 : size.s_14
 		},
-
+		boxThread: {
+			flex: 1,
+			marginLeft: size.s_2,
+			paddingLeft: size.s_6,
+			paddingTop: size.s_2,
+			paddingBottom: size.s_6,
+			borderRadius: size.s_10,
+			marginBottom: size.s_6
+		},
 		titleThread: {
 			flex: 1,
 			fontSize: size.s_14,
 			fontWeight: '600',
-			marginLeft: size.s_2,
-			paddingLeft: size.s_6,
-			paddingVertical: size.s_4,
 			color: colors.channelNormal,
-			top: size.s_10,
-			borderRadius: size.s_10,
+			top: size.s_4,
+			paddingBottom: size.s_2
 		},
 
 		channelListItemTitleActive: {
@@ -51,8 +54,6 @@ export const style = (colors: Attributes) =>
 			top: size.s_2,
 			backgroundColor: colors.secondaryLight,
 			borderRadius: size.s_10
-			// borderWidth: 0.4,
-			// borderColor: Colors.gray48
 		},
 
 		channelDotWrapper: {
@@ -63,7 +64,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			borderRadius: size.s_18,
-			top: Platform.OS === 'android' ? size.s_18 : size.s_14
+			top: -size.s_2
 		},
 
 		channelDot: {

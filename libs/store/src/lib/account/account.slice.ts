@@ -13,12 +13,14 @@ export interface AccountState {
 	error?: string | null;
 	account?: IAccount | null;
 	userProfile?: IUserAccount | null;
+	anonymousMode: boolean;
 }
 
 export const initialAccountState: AccountState = {
 	loadingStatus: 'not loaded',
 	account: null,
-	userProfile: null
+	userProfile: null,
+	anonymousMode: false
 };
 
 const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 3;
@@ -49,6 +51,9 @@ export const accountSlice = createSlice({
 	reducers: {
 		setAccount(state, action) {
 			state.account = action.payload;
+		},
+		setAnonymousMode(state) {
+			state.anonymousMode = !state.anonymousMode;
 		}
 	},
 	extraReducers: (builder) => {
@@ -79,3 +84,5 @@ export const getAccountState = (rootState: { [ACCOUNT_FEATURE_KEY]: AccountState
 export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state.userProfile);
 
 export const selectCurrentUserId = createSelector(getAccountState, (state: AccountState) => state?.userProfile?.user?.id || '');
+
+export const selectAnonymousMode = createSelector(getAccountState, (state: AccountState) => state.anonymousMode);

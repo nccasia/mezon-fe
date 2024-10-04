@@ -1,6 +1,6 @@
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
 import { useMemo } from 'react';
-import MessageLine from './MessageLine';
+import { MessageLine } from './MessageLine';
 import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {
@@ -61,17 +61,17 @@ const MessageText = ({
 		return message.attachments;
 	}, [message.attachments]);
 
-	const contentTonMessage = useMemo(() => {
-		return message.content.t;
-	}, [message.content.t]);
+	const contentToMessage = useMemo(() => {
+		return message.content?.t;
+	}, [message]);
 
 	const checkOneLinkImage = useMemo(() => {
 		return (
 			attachmentOnMessage?.length === 1 &&
 			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-			attachmentOnMessage[0].url === contentTonMessage?.trim()
+			attachmentOnMessage[0].url === contentToMessage?.trim()
 		);
-	}, [attachmentOnMessage, contentTonMessage]);
+	}, [attachmentOnMessage, contentToMessage]);
 
 	const showEditted = useMemo(() => {
 		return message.hideEditted === false;

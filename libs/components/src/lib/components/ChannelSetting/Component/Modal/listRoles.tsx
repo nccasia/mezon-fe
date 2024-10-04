@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { RolesClanEntity } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 
 type ListRoleProps = {
 	listItem: RolesClanEntity[];

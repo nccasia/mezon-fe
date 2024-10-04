@@ -18,7 +18,9 @@ export interface UsersStreamState extends EntityState<UsersStreamEntity, string>
 	streamChannelMember: IChannelMember[];
 }
 
-export const userStreamAdapter = createEntityAdapter<UsersStreamEntity>();
+export const userStreamAdapter = createEntityAdapter({
+	selectId: (user: UsersStreamEntity) => user.user_id || ''
+});
 
 type fetchStreamChannelMembersPayload = {
 	clanId: string;
@@ -66,7 +68,14 @@ export const usersStreamSlice = createSlice({
 	reducers: {
 		add: userStreamAdapter.addOne,
 		addMany: userStreamAdapter.addMany,
-		remove: userStreamAdapter.removeOne
+		remove: userStreamAdapter.removeOne,
+		streamEnded: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			const idsToRemove = Object.values(state.entities)
+				.filter((member) => member?.streaming_channel_id === channelId)
+				.map((member) => member?.user_id);
+			userStreamAdapter.removeMany(state, idsToRemove);
+		}
 		// ...
 	},
 	extraReducers: (builder) => {

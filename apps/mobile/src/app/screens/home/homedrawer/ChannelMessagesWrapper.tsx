@@ -127,6 +127,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, 
 		<View style={{ flex: 1 }}>
 			<ChannelMessages
 				channelId={channelId}
+				clanId={clanId}
 				mode={mode}
 				onOpenImage={onOpenImage}
 				onMessageAction={onMessageAction}

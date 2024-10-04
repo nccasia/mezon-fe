@@ -1,7 +1,8 @@
-import { DirectEntity, MessagesEntity } from '@mezon/store-mobile';
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessage } from 'mezon-js';
+import { MessagesEntity } from '../messages/messages.slice';
+import { DirectEntity } from './direct.slice';
 
 export const DIRECT_META_FEATURE_KEY = 'directmeta';
 
@@ -125,13 +126,7 @@ export const directMetaSlice = createSlice({
 				channel.notifiCount = 0;
 			}
 		},
-		removeUnreadAllDm: (state) => {
-			Object.values(state.dmMetadata.entities).forEach((channel) => {
-				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
-					channel.lastSentTimestamp = 0;
-				}
-			});
-		},
+
 		setDirectMetaEntities: (state, action: PayloadAction<IChannel[]>) => {
 			const channels = action.payload;
 			if (channels) {

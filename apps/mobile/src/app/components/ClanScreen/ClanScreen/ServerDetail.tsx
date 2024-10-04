@@ -1,7 +1,7 @@
-import Images from 'apps/mobile/src/assets/Images';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import Images from '../../../../assets/Images';
 import { darkColor } from '../../../constants/Colors';
 const ServerDetail = () => {
 	return (
@@ -28,7 +28,7 @@ const ServerDetail = () => {
 							justifyContent: 'center',
 							borderRadius: 50,
 							backgroundColor: darkColor.Border_Focus,
-							gap: 5,
+							gap: 5
 						}}
 					>
 						<Feather size={20} name="search" style={{ color: darkColor.Backgound_Subtle }} />
@@ -42,7 +42,7 @@ const ServerDetail = () => {
 							borderRadius: 50,
 							backgroundColor: darkColor.Border_Focus,
 							width: 30,
-							height: 30,
+							height: 30
 						}}
 					>
 						<Feather size={20} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
@@ -55,7 +55,7 @@ const ServerDetail = () => {
 							borderRadius: 50,
 							backgroundColor: darkColor.Border_Focus,
 							width: 30,
-							height: 30,
+							height: 30
 						}}
 					>
 						<Feather size={20} name="calendar" style={{ color: darkColor.Backgound_Subtle }} />
@@ -92,6 +92,6 @@ const styles = StyleSheet.create({
 		height: '98%',
 		alignSelf: 'flex-end',
 		borderTopLeftRadius: 20,
-		backgroundColor: darkColor.Backgound_Disabled,
-	},
+		backgroundColor: darkColor.Backgound_Disabled
+	}
 });

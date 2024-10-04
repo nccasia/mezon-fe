@@ -10,21 +10,21 @@ module.exports = function (api) {
 				[
 					'@nx/react/babel',
 					{
-						runtime: 'automatic',
-					},
-				],
+						runtime: 'automatic'
+					}
+				]
 			],
 			plugins: [
 				'react-native-reanimated/plugin',
 				[
-					"module:react-native-dotenv",
+					'module:react-native-dotenv',
 					{
-						envName: "APP_ENV",
-						moduleName: "@env",
-						path: ".env"
+						envName: 'APP_ENV',
+						moduleName: '@env',
+						path: '.env'
 					}
 				]
-			],
+			]
 		};
 	}
 
@@ -33,11 +33,11 @@ module.exports = function (api) {
 		plugins: [
 			'react-native-reanimated/plugin',
 			[
-				"module:react-native-dotenv",
+				'module:react-native-dotenv',
 				{
-					envName: "APP_ENV",
-					moduleName: "@env",
-					path: ".env"
+					envName: 'APP_ENV',
+					moduleName: '@env',
+					path: '.env'
 				}
 			]
 		]

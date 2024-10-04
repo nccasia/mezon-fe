@@ -1,4 +1,4 @@
-import {useAppNavigation, useEscapeKey} from '@mezon/core';
+import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import {
 	channelsActions,
 	selectChannelById,
@@ -8,9 +8,9 @@ import {
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from "react";
 
 interface DeleteModalProps {
 	onClose: () => void;
@@ -27,8 +27,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 	const channelSecond = useSelector(selectChannelSecond);
 	let channelNavId = channelFirst.id;
 	const selectedChannel = useSelector(selectChannelById(channelId));
-	const isThread = selectedChannel.parrent_id !== '0'
-	
+	const isThread = selectedChannel.parrent_id !== '0';
 	const { toChannelPage } = useAppNavigation();
 	const navigate = useNavigate();
 
@@ -46,8 +45,8 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 			onCloseModal();
 		}
 	};
-	
-	useEffect (() => {
+
+	useEffect(() => {
 		const handleEnterKey = (event: KeyboardEvent) => {
 			if (event.key === 'Enter') {
 				handleDeleteChannel(channelId);
@@ -59,11 +58,12 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 			document.removeEventListener('keydown', handleEnterKey);
 		};
 	}, [handleDeleteChannel]);
-	
-	useEscapeKey(onClose)
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
 
 	return (
-		<div className="fixed  inset-0 flex items-center justify-center z-50 dark:text-white text-black">
+		<div ref={modalRef} tabIndex={-1} className="fixed  inset-0 flex items-center justify-center z-50 dark:text-white text-black">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
 			<div className="relative z-10 dark:bg-gray-900 bg-bgLightModeSecond p-6 rounded-[5px] text-center">
 				<h2 className="text-[30px] font-semibold mb-4">Delete {isThread ? 'Thread' : 'Channel'}</h2>

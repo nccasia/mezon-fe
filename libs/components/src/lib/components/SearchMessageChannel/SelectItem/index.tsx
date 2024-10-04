@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 

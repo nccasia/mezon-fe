@@ -8,7 +8,8 @@ import {
 	setDefaultChannelLoader,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
@@ -46,6 +47,7 @@ import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
 import { NewMessageRedLine } from './components/NewMessageRedLine';
+import RenderMessageInvite from './components/RenderMessageInvite';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -89,6 +91,11 @@ const MessageItem = React.memo(
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const navigation = useNavigation<any>();
 		const [showHighlightReply, setShowHighlightReply] = useState(false);
+		const { t: contentMessage, lk = [] } = message?.content || {};
+
+		const isInviteLink = useMemo(() => {
+			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
+		}, [contentMessage, lk]);
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
@@ -99,6 +106,10 @@ const MessageItem = React.memo(
 		const hasInternet = useSelector(selectHasInternetMobile);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+		const checkSystem = useMemo(() => {
+			return message?.sender_id === '0' && message?.username?.toLowerCase() === 'system';
+		}, [message?.sender_id, message?.username]);
+
 		const hasIncludeMention = useMemo(() => {
 			return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
 		}, [message?.content?.t, userProfile]);
@@ -149,7 +160,9 @@ const MessageItem = React.memo(
 		}, [message.content]);
 
 		const isEdited = useMemo(() => {
-			if (message?.update_time) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
+			if (message?.update_time && !message.isError && !message.isErrorRetry) {
 				const updateDate = new Date(message?.update_time);
 				const createDate = new Date(message?.create_time);
 				return updateDate > createDate;
@@ -197,7 +210,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			setIsOnlyEmojiPicker(false);
 
-			if (!checkAnonymous) {
+			if (!checkAnonymous && !checkSystem) {
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
 					user: message?.user,
@@ -227,7 +240,7 @@ const MessageItem = React.memo(
 		const jumpToChannel = async (channelId: string, clanId: string, channelCateId: string) => {
 			const store = await getStoreAsync();
 			// TODO: do we need to jump to message here?
-			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
+			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId, clanId }));
 			store.dispatch(
 				channelsActions.joinChannel({
 					clanId,
@@ -249,8 +262,8 @@ const MessageItem = React.memo(
 					await Linking.openURL(urlVoice);
 				} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 					handleChangeClan(clanId);
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_MENTION_HASHTAG_DM, {
-						isMentionHashtagDM: true
+					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+						isFetchMemberChannelDM: true
 					});
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
@@ -412,23 +425,29 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							<Block opacity={message.isError || (message.isSending && !hasInternet) ? 0.6 : 1}>
-								<RenderTextMarkdownContent
-									content={{
-										...(typeof message.content === 'object' ? message.content : {}),
-										mentions: message.mentions,
-										...(checkOneLinkImage ? { t: '' } : {})
-									}}
-									isEdited={isEdited}
-									translate={t}
-									onMention={onMention}
-									onChannelMention={onChannelMention}
-									isNumberOfLine={isNumberOfLine}
-									isMessageReply={false}
-									mode={mode}
-									directMessageId={channelId}
-									isOnlyContainEmoji={isOnlyContainEmoji}
-								/>
+							{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+							{/*@ts-expect-error*/}
+							<Block opacity={message.isError || (message.isSending && !hasInternet) || message?.isErrorRetry ? 0.6 : 1}>
+								{isInviteLink ? (
+									<RenderMessageInvite content={contentMessage} />
+								) : (
+									<RenderTextMarkdownContent
+										content={{
+											...(typeof message.content === 'object' ? message.content : {}),
+											mentions: message.mentions,
+											...(checkOneLinkImage ? { t: '' } : {})
+										}}
+										isEdited={isEdited}
+										translate={t}
+										onMention={onMention}
+										onChannelMention={onChannelMention}
+										isNumberOfLine={isNumberOfLine}
+										isMessageReply={false}
+										mode={mode}
+										directMessageId={channelId}
+										isOnlyContainEmoji={isOnlyContainEmoji}
+									/>
+								)}
 							</Block>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 							{!preventAction ? (
@@ -456,7 +475,7 @@ const MessageItem = React.memo(
 					messageId={props?.messageId}
 					isEdited={message?.hideEditted}
 					isSending={message?.isSending}
-					isMe={message?.isMe}
+					isMe={message.sender_id === userProfile?.user?.id}
 				/>
 			</Animated.View>
 		);

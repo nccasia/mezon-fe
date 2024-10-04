@@ -1,7 +1,7 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, useEscapeKeyClose } from '@mezon/core';
 import {
-	channelUsersActions,
 	RolesClanEntity,
+	channelUsersActions,
 	selectAllRolesClan,
 	selectAllUserChannel,
 	selectAllUserClans,
@@ -13,7 +13,7 @@ import { Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import ListMembers from './listMembers';
@@ -178,8 +178,11 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 		debouncedSetValueSearch(valueSearch);
 	}, [valueSearch]);
 
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+
 	return (
-		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
+		<div ref={modalRef} tabIndex={-1} className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
 			<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode dark:text-textDarkTheme text-textLightTheme p-6 rounded-[5px] w-[440px] text-[15px]">
 				<h2 className="text-[24px] font-semibold text-center">Add members or roles</h2>

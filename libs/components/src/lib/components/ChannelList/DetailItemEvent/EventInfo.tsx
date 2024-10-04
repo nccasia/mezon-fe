@@ -1,7 +1,7 @@
 import { EventManagementEntity, selectChannelById, selectCurrentClan, selectMemberClanByUserId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 import { timeFomat } from '../EventChannelModal/timeFomatEvent';
 
 type EventInfoDetailProps = {

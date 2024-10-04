@@ -1,4 +1,3 @@
-import { useEscapeKey } from '@mezon/core';
 import { Icons, Image } from '@mezon/ui';
 import { useState } from 'react';
 
@@ -12,7 +11,6 @@ const FirstJoinPopup = ({ onclose, openCreateClanModal }: IFirstJoinPopup) => {
 	const handleJoinClan = () => {
 		window.open(inputValue, '_blank');
 	};
-	useEscapeKey(onclose);
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50 bg-[#000000c9]">
 			<div className="relative z-10 w-[680px] flex max-sm:justify-center">

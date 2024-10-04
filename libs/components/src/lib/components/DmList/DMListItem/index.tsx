@@ -1,21 +1,16 @@
-import { useAppNavigation, useAppParams, useMenu } from '@mezon/core';
-import {
-	ChannelMembersEntity,
-	channelsActions,
-	directActions,
-	directMetaActions,
-	selectCloseMenu,
-	selectIsUnreadDMById,
-	useAppDispatch
-} from '@mezon/store';
+import { directActions, directMetaActions, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, MemberProfileType } from '@mezon/utils';
+import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { memo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-import MemberProfile from '../../MemberProfile';
+import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
-	readonly directMessage: Readonly<IChannel>;
+	id: string;
+	currentDmGroupId: string;
+	joinToChatAndNavigate: (DMid: string, type: number) => void;
+	navigateToFriends: () => void;
+	isActive: boolean;
 };
 
 export type directMessageValueProps = {
@@ -24,40 +19,19 @@ export type directMessageValueProps = {
 	dmID: string;
 };
 
-function DMListItem({ directMessage }: DirectMessProp) {
+function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFriends, isActive }: DirectMessProp) {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const pathname = useLocation().pathname;
+	const directMessage = useAppSelector((state) => selectDirectById(state, id));
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage.id));
-	const { directId: currentDmGroupId } = useAppParams();
-	const { toDmGroupPage } = useAppNavigation();
-	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
-
-	const joinToChatAndNavigate = async (DMid: string, type: number) => {
-		dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
-		const result = await dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: DMid,
-				channelName: '',
-				type: type
-			})
-		);
-		await dispatch(directActions.setDmGroupCurrentId(DMid));
-		if (result) {
-			navigate(toDmGroupPage(DMid, type));
-		}
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
-	};
 
 	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
-		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: 0 }));
+		const timestamp = Date.now() / 1000;
+		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+
 		if (directId === currentDmGroupId) {
-			navigate(`/chat/direct/friends`);
+			navigateToFriends();
 		}
 	};
 
@@ -69,11 +43,21 @@ function DMListItem({ directMessage }: DirectMessProp) {
 
 	const isTypeDMGroup = Number(directMessage.type) === ChannelType.CHANNEL_TYPE_GROUP;
 
+	const ref = useRef<HTMLDivElement>(null);
+
 	return (
 		<div
-			key={directMessage.channel_id}
-			className={`group/itemListDm relative  text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:bg-black hover:bg-[#E1E1E1] py-2 w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black' : ''}`}
-			onClick={() => joinToChatAndNavigate(directMessage.channel_id as string, directMessage.type as number)}
+			ref={ref}
+			className={`group/itemListDm relative  text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:bg-[rgba(30,30,30,0.4)] hover:bg-[#E1E1E1] py-2 w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${isActive ? 'dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black' : ''}`}
+			style={{
+				cursor: 'pointer'
+			}}
+			onClick={() => {
+				if (ref.current) {
+					ref.current.className = ref.current.className + ' dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black';
+				}
+				joinToChatAndNavigate(id, directMessage?.type as number);
+			}}
 		>
 			<MemberProfile
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
@@ -100,4 +84,6 @@ function DMListItem({ directMessage }: DirectMessProp) {
 	);
 }
 
-export default DMListItem;
+export default memo(DMListItem, (prev, cur) => {
+	return prev.id === cur.id && prev.isActive === cur.isActive;
+});

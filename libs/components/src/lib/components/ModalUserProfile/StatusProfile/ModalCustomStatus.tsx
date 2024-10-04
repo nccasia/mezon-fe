@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Button, Dropdown, Label, Modal } from 'flowbite-react';
 import { ReactNode, useEffect } from 'react';
 
@@ -9,7 +9,7 @@ type ModalCustomStatusProps = {
 	onClose?: () => void;
 	customStatus?: string;
 	setCustomStatus: (customStatus: string) => void;
-	handleSaveCustomStatus?: () => void
+	handleSaveCustomStatus?: () => void;
 };
 
 const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomStatus, handleSaveCustomStatus }: ModalCustomStatusProps) => {

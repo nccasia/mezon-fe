@@ -1,9 +1,19 @@
 import { Image } from '@mezon/ui';
+import isElectron from 'is-electron';
 import { useRouteError } from 'react-router-dom';
 
 const ErrorRoutes = () => {
 	const error = useRouteError();
 	console.error(error);
+
+	const handleClick = () => {
+		if (isElectron()) {
+			window.location.replace('/');
+		} else {
+			window.location.replace('/chat/direct/friends');
+		}
+	};
+
 	return (
 		<div
 			style={{ backgroundImage: `url(assets/images/bg-boundary.svg)` }}
@@ -19,9 +29,7 @@ const ErrorRoutes = () => {
 				<div className="mt-6">
 					<button
 						className="bg-[#5864f2] hover:bg-indigo-600 text-white font-medium w-[130px] h-[44px] px-4 rounded text-sm"
-						onClick={() => {
-							window.location.replace('/chat/direct/friends');
-						}}
+						onClick={handleClick}
 					>
 						Reload
 					</button>

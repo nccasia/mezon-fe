@@ -1,6 +1,6 @@
+import Images from '@mezon/mobile/src/assets/Images';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import Images from 'apps/mobile/src/assets/Images';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -57,7 +57,7 @@ const CustomDrawerContent = (props) => {
 									justifyContent: 'center',
 									borderRadius: 50,
 									backgroundColor: darkColor.Border_Focus,
-									gap: 5,
+									gap: 5
 								}}
 							>
 								<Feather size={20} name="search" style={{ color: darkColor.Backgound_Subtle }} />
@@ -71,7 +71,7 @@ const CustomDrawerContent = (props) => {
 									borderRadius: 50,
 									backgroundColor: darkColor.Border_Focus,
 									width: 30,
-									height: 30,
+									height: 30
 								}}
 							>
 								<Feather size={20} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
@@ -84,7 +84,7 @@ const CustomDrawerContent = (props) => {
 									borderRadius: 50,
 									backgroundColor: darkColor.Border_Focus,
 									width: 30,
-									height: 30,
+									height: 30
 								}}
 							>
 								<Feather size={20} name="calendar" style={{ color: darkColor.Backgound_Subtle }} />
@@ -123,13 +123,13 @@ export default CustomDrawerContent;
 const styles = StyleSheet.create({
 	sideBar: {
 		width: '20%',
-		backgroundColor: darkColor.Backgound_Primary,
+		backgroundColor: darkColor.Backgound_Primary
 	},
 	serverNavbarContainer: {
 		alignSelf: 'flex-end',
 		alignItems: 'center',
 		width: '100%',
-		paddingTop: 10, // Adjust as needed
+		paddingTop: 10 // Adjust as needed
 	},
 	commonIconStyle: {
 		justifyContent: 'center',
@@ -138,6 +138,6 @@ const styles = StyleSheet.create({
 		height: 50,
 		width: 50,
 		borderRadius: 100,
-		marginBottom: 10,
-	},
+		marginBottom: 10
+	}
 });

@@ -79,7 +79,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 
 	const updateChannel = async () => {
 		await setVisibleModalConfirm(false);
-		navigation?.goBack();
+
 		const response = await dispatch(
 			channelsActions.updateChannelPrivate({
 				channel_id: channel.id,

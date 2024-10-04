@@ -1,3 +1,4 @@
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
@@ -11,9 +12,10 @@ type ShortUserProfilePopup = {
 	name?: string;
 	coords?: Coords;
 	isDM?: boolean;
+	closeProfileItem: () => void;
 };
 
-const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, coords, isDM }: ShortUserProfilePopup) => {
+const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, coords, isDM, closeProfileItem }: ShortUserProfilePopup) => {
 	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
@@ -31,9 +33,14 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 		}
 	}, [coords?.distanceToBottom]);
 
+	useEscapeKeyClose(profileRef, closeProfileItem);
+	useOnClickOutside(profileRef, closeProfileItem);
+
 	return (
 		<div
-			className={`dark:bg-black right-[15] bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
+			ref={profileRef}
+			tabIndex={-1}
+			className={`outline-none dark:bg-black right-[15] bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
 			style={{
 				top: positionTop ? 'auto' : coords?.mouseY,
 				right: Number(coords?.mouseX) + 16,
@@ -41,7 +48,6 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 			}}
 			onMouseDown={(e) => e.stopPropagation()}
 			onClick={(e) => e.stopPropagation()}
-			ref={profileRef}
 		>
 			<div className="relative">
 				<div onClick={handleClickOutside} className="text-white w-full" role="button">

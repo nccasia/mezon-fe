@@ -1,9 +1,9 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { IMezonImagePickerHandler, IMezonMenuSectionProps, MezonBottomSheet, MezonImagePicker, MezonMenu } from 'apps/mobile/src/app/temp-ui';
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useMixImageColor } from '../../../../../../../app/hooks/useMixImageColor';
+import { IMezonImagePickerHandler, IMezonMenuSectionProps, MezonBottomSheet, MezonImagePicker, MezonMenu } from '../../../../../../temp-ui';
 import { style } from './styles';
 
 interface IBannerAvatarProps {

@@ -1,21 +1,20 @@
-import { useAppNavigation, useAppParams, useAuth, useEscapeKey, useOnClickOutside, useThreads, useUserRestriction } from '@mezon/core';
+import { useAppNavigation, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
+	selectAllChannelLastSeenTimestampByClanId,
 	selectCloseMenu,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
-	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectNewNotificationStatus,
+	selectMentionAndReplyUnreadByClanId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -24,10 +23,10 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import SettingChannel from '../ChannelSetting';
+import { useParams } from 'react-router-dom';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -85,13 +84,9 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
-	const { userProfile } = useAuth();
-	const currentClan = useSelector(selectCurrentClan);
-	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
-	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
-	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
-	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
+	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
+	const isShowSettingChannel = hasChannelManagePermission;
+	const param = useParams();
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -102,8 +97,6 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<InviteBtn isLightMode={appearanceTheme === 'light'} />
-								{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -130,76 +123,6 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 	);
 }
 
-function ChannelSettingBtn({ isLightMode }: { isLightMode: boolean }) {
-	const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
-	const ChannelSettingRef = useRef<HTMLDivElement | null>(null);
-	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
-	const handleShowChannelSetting = () => {
-		setIsOpenSetting(!isOpenSetting);
-	};
-
-	useOnClickOutside(ChannelSettingRef, () => setIsOpenSetting(false));
-	useEscapeKey(() => setIsOpenSetting(false));
-
-	return (
-		<div className="relative leading-5 h-5" ref={ChannelSettingRef}>
-			<Tooltip
-				className={`${isOpenSetting && 'hidden'}`}
-				content="Channel setting"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-			>
-				<button className="focus-visible:outline-none" onClick={handleShowChannelSetting} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.SettingProfile
-						className={`w-6 h-6hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
-					/>
-				</button>
-			</Tooltip>
-			{isOpenSetting && (
-				<SettingChannel
-					onClose={() => {
-						setIsOpenSetting(false);
-					}}
-					channel={currentChannel}
-				/>
-			)}
-		</div>
-	);
-}
-
-function InviteBtn({ isLightMode }: { isLightMode: boolean }) {
-	const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-	const InviteBtnRef = useRef<HTMLDivElement | null>(null);
-	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
-
-	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
-		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={currentChannel.id} />,
-		[currentChannel?.id]
-	);
-
-	useOnClickOutside(InviteBtnRef, () => setIsOpenModal(false));
-	useEscapeKey(() => setIsOpenModal(false));
-
-	return (
-		<div className="relative leading-5 h-5" ref={InviteBtnRef}>
-			<Tooltip
-				className={`${isOpenModal && 'hidden'}`}
-				content="Invite Friends"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-			>
-				<button className="focus-visible:outline-none" onClick={openInviteChannelModal} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.AddPerson
-						className={`w-6 h-6 hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
-					/>
-				</button>
-			</Tooltip>
-		</div>
-	);
-}
-
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
@@ -208,13 +131,14 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 		setIsShowThread(!isShowThread);
 	};
 
-	useOnClickOutside(threadRef, () => setIsShowThread(false));
-	useEscapeKey(() => setIsShowThread(false));
+	const handleClose = useCallback(() => {
+		setIsShowThread(false);
+	}, []);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
-				className={`${isShowThread && 'hidden'}`}
+				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
 				content="Threads"
 				trigger="hover"
 				animation="duration-500"
@@ -224,7 +148,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
 			</Tooltip>
-			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}
+			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -234,32 +158,32 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+
 	useEffect(() => {
-		if (
-			getNotificationChannelSelected?.active === 1 &&
-			getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
-		) {
-			setIsMuteBell(true);
-		} else if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
-			setIsMuteBell(true);
-		} else if (getNotificationChannelSelected?.id === '0') {
+		const shouldMuteBell = (): boolean => {
 			if (
-				defaultNotificationCategory?.notification_setting_type &&
-				defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+				getNotificationChannelSelected?.active === 1 &&
+				getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
 			) {
-				setIsMuteBell(true);
-			} else if (
-				defaultNotificationClan?.notification_setting_type &&
-				defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE
-			) {
-				setIsMuteBell(true);
-			} else {
-				setIsMuteBell(false);
+				return true;
 			}
-		} else {
-			setIsMuteBell(false);
-		}
+
+			if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
+				return true;
+			}
+
+			if (getNotificationChannelSelected?.id === '0') {
+				if (defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+					return true;
+				}
+				return defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE;
+			}
+
+			return false;
+		};
+		setIsMuteBell(shouldMuteBell());
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
+
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const notiRef = useRef<HTMLDivElement | null>(null);
 
@@ -267,12 +191,14 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		setIsShowNotificationSetting(!isShowNotificationSetting);
 	};
 
-	useOnClickOutside(notiRef, () => setIsShowNotificationSetting(false));
-	useEscapeKey(() => setIsShowNotificationSetting(false));
+	const handleClose = useCallback(() => {
+		setIsShowNotificationSetting(false);
+	}, []);
+
 	return (
 		<div className="relative leading-5 h-5" ref={notiRef}>
 			<Tooltip
-				className={`${isShowNotificationSetting && 'hidden'} w-[164px]`}
+				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center`}
 				content="Notification Settings"
 				trigger="hover"
 				animation="duration-500"
@@ -286,7 +212,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowNotificationSetting && <NotificationSetting />}
+			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
 }
@@ -297,17 +223,17 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleShowPinMessage = () => {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
+	const handleClose = useCallback(() => {
+		setIsShowPinMessage(false);
+	}, []);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
 	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
-	useOnClickOutside(pinRef, () => setIsShowPinMessage(false));
 	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
-	const handleClose = () => setIsShowPinMessage(false);
-	useEscapeKey(handleClose);
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
 			<Tooltip
-				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
+				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center`}
 				content="Pinned Messages"
 				trigger="hover"
 				animation="duration-500"
@@ -320,7 +246,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages onClose={handleClose} />}
+			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
 		</div>
 	);
 }
@@ -329,54 +255,26 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const newNotificationStatus = useSelector(selectNewNotificationStatus);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const { directId: currentDmGroupId } = useAppParams();
+	const currentClan = useSelector(selectCurrentClan);
 
-	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
-
-	const notiUnreadList = useMemo(() => {
-		return localStorage.getItem('notiUnread');
-	}, [newNotificationStatus]);
-
-	useEffect(() => {
-		const updateNotiUnread = () => {
-			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
-		};
-		updateNotiUnread();
-		const handleStorageChange = (event: StorageEvent) => {
-			if (event.key === 'notiUnread') {
-				updateNotiUnread();
-			}
-		};
-		window.addEventListener('storage', handleStorageChange);
-
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, [newNotificationStatus]);
+	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
+	const getNotificationMentionAndReplyUnread = useSelector(
+		selectMentionAndReplyUnreadByClanId(currentClan?.clan_id ?? '', allLastSeenChannelAllChannelInClan)
+	);
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
-
-	const handleSetIsShowInbox = () => {
-		dispatch(notificationActions.setIsShowInbox(false));
-	};
-
-	useOnClickOutside(inboxRef, () => handleSetIsShowInbox());
-	useEscapeKey(() => handleSetIsShowInbox());
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
+					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadList={notiIdsUnread} />}
+			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
 		</div>
 	);
 }
@@ -414,7 +312,13 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip content="Members" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tooltip
+				content="Members"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+				className={'flex justify-center items-center'}
+			>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
 				</button>

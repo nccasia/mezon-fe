@@ -1,20 +1,34 @@
 import { SearchItemProps, TypeSearch } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { memo } from 'react';
-import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
+import React, { useImperativeHandle, useRef } from 'react';
+import { SuggestItem } from '../../components';
 
 type ListSearchModalProps = {
 	listSearch: SearchItemProps[];
 	searchText: string;
-	itemRef: React.MutableRefObject<HTMLDivElement | null>;
 	idActive: string;
 	handleSelect: (type: boolean, item: SearchItemProps) => Promise<void>;
 	setIdActive: React.Dispatch<React.SetStateAction<string>>;
 	isSearchByUsername?: boolean;
 };
 
-const ListSearchModal = (props: ListSearchModalProps) => {
-	const { listSearch, itemRef, searchText, idActive, handleSelect, setIdActive, isSearchByUsername } = props;
+export type ListSearchModalRef = {
+	scrollIntoItem: (id: string) => void;
+};
+
+const ListSearchModal = React.forwardRef<ListSearchModalRef, ListSearchModalProps>((props, ref) => {
+	const { listSearch, searchText, idActive, handleSelect, setIdActive, isSearchByUsername } = props;
+	const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			scrollIntoItem: (id: string) => {
+				itemRefs.current[id]?.scrollIntoView({ behavior: 'smooth' });
+			}
+		}),
+		[]
+	);
 
 	return (
 		listSearch.length > 0 &&
@@ -22,8 +36,8 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 			const isTypeChannel = item.typeChat === TypeSearch.Channel_Type;
 			return (
 				<div
-					ref={itemRef}
 					key={item.id}
+					ref={(element) => item?.id && (itemRefs.current[item.id] = element)}
 					onClick={() => handleSelect(isTypeChannel, item)}
 					onMouseEnter={() => setIdActive(item.id ?? '')}
 					onMouseLeave={() => setIdActive(item.id ?? '')}
@@ -39,7 +53,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							subTextStyle="uppercase"
 							isOpenSearchModal
 							emojiId=""
-							channel= {item}
+							channel={item}
 						/>
 					) : (
 						<SuggestItem
@@ -47,7 +61,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							avatarUrl={item?.avatarUser}
 							showAvatar
 							valueHightLight={isSearchByUsername ? searchText.slice(1) : searchText}
-							subText={item.type ===  ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
+							subText={item.type === ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
 							wrapSuggestItemStyle="gap-x-1"
 							subTextStyle="text-[13px]"
 							isHightLight={!isSearchByUsername}
@@ -58,6 +72,6 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 			);
 		})
 	);
-};
+});
 
-export default memo(ListSearchModal);
+export default ListSearchModal;

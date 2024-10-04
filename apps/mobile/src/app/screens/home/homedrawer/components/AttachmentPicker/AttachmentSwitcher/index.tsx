@@ -65,7 +65,11 @@ function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
 					backgroundColor: themeValue.tertiary
 				}}
 			>
-				<Icons.PlusLargeIcon width={size.s_24} height={size.s_24} color={mode === 'attachment' ? themeValue.bgViolet : themeValue.textStrong} />
+				<Icons.PlusLargeIcon
+					width={size.s_24}
+					height={size.s_24}
+					color={mode === 'attachment' ? themeValue.bgViolet : themeValue.textStrong}
+				/>
 			</TouchableOpacity>
 		</Animated.View>
 	);

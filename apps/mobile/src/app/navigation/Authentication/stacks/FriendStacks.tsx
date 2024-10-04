@@ -25,7 +25,7 @@ const AddFriendButton = ({ navigation }: { navigation: any }) => {
 
 const SettingFriendRequestButton = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['screen']);
-	const { themeValue } = useTheme()
+	const { themeValue } = useTheme();
 	return (
 		<Pressable
 			onPress={() => navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND_SETTING })}
@@ -39,7 +39,7 @@ const SettingFriendRequestButton = ({ navigation }: { navigation: any }) => {
 // eslint-disable-next-line no-empty-pattern
 export const FriendStacks = ({ navigation }: { navigation: any }) => {
 	const Stack = createStackNavigator();
-	const { themeValue } = useTheme()
+	const { themeValue } = useTheme();
 	const { t } = useTranslation(['screen']);
 	return (
 		<Stack.Navigator
@@ -56,7 +56,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					color: themeValue.textStrong
 				},
 				cardStyle: {
-					backgroundColor: "transparent"
+					backgroundColor: 'transparent'
 				},
 				headerTintColor: themeValue.text,
 				headerLeftLabelVisible: false,
@@ -68,14 +68,14 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				component={FriendScreen}
 				options={{
 					headerTitle: t('headerTitle.Friends'),
-					headerRight: () => <AddFriendButton navigation={navigation} />,
+					headerRight: () => <AddFriendButton navigation={navigation} />
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.FRIENDS.ADD_FRIEND}
 				component={AddFriendScreen}
 				options={{
-					headerTitle: t('headerTitle.addFriends'),
+					headerTitle: t('headerTitle.addFriends')
 				}}
 			/>
 			<Stack.Screen
@@ -83,7 +83,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				component={RequestFriendScreen}
 				options={{
 					headerTitle: t('headerTitle.requestFriend'),
-					headerRight: () => <SettingFriendRequestButton navigation={navigation} />,
+					headerRight: () => <SettingFriendRequestButton navigation={navigation} />
 				}}
 			/>
 			<Stack.Screen

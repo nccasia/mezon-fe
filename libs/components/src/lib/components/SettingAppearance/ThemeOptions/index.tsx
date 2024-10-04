@@ -1,8 +1,8 @@
 import { useApp } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 
 const ThemeOptions = () => {
 	const appearanceTheme = useSelector(selectTheme);

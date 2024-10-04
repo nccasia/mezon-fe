@@ -1,7 +1,8 @@
 import { IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 export const DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY = 'defaultnotificationclan';
 
 export interface DefaultNotificationClanState {
@@ -17,19 +18,38 @@ export const initialDefaultNotificationClanState: DefaultNotificationClanState =
 
 type fetchNotificationClanSettingsArgs = {
 	clanId: string;
+	noCache?: boolean;
 };
+
+export const fetchDefaultNotificationClanCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.getNotificationClan(mezon.session, clanId);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			return args[1] + args[0]?.session?.username || '';
+		}
+	}
+);
 
 export const getDefaultNotificationClan = createAsyncThunk(
 	'defaultnotificationclan/getDefaultNotificationClan',
-	async ({ clanId }: fetchNotificationClanSettingsArgs, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.getNotificationClanSetting(clanId);
+	async ({ clanId, noCache }: fetchNotificationClanSettingsArgs, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		if (noCache) {
+			fetchDefaultNotificationClanCached.clear(mezon, clanId);
+		}
+		const response = await fetchDefaultNotificationClanCached(mezon, clanId);
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
 		const clanNotificationConfig: ApiNotificationSetting = {
-			id: response.notification_setting?.id,
-			notification_setting_type: response.notification_setting?.notification_setting_type
+			id: response.id,
+			notification_setting_type: response.notification_setting_type
 		};
 
 		return clanNotificationConfig;
@@ -53,7 +73,7 @@ export const setDefaultNotificationClan = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || '', noCache: true }));
 		return response;
 	}
 );

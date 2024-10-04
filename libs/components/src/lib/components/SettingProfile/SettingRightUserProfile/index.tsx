@@ -2,8 +2,9 @@ import { useAccount } from '@mezon/core';
 import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, selectTheme, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
-import { fileTypeImage, resizeFileImage } from '@mezon/utils';
+import { fetchAndCreateFiles, fileTypeImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { ApiMessageAttachment } from 'mezon-js/dist/api.gen';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
@@ -61,7 +62,16 @@ const SettingRightUser = ({
 		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
-		const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
+
+		const files = [
+			{
+				filename: file.name,
+				filetype: file.type,
+				size: file.size,
+				url: URL.createObjectURL(file)
+			}
+		] as ApiMessageAttachment[];
+
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
@@ -79,7 +89,8 @@ const SettingRightUser = ({
 			e.target.value = null;
 			return;
 		}
-		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', imageAvatarResize?.name, imageAvatarResize).then(
+		const createdFiles = await fetchAndCreateFiles(files);
+		handleUploadFile(client, session, currentClanId || '0', currentChannelId || '0', files[0]?.filename || '', createdFiles[0]).then(
 			(attachment: any) => {
 				setUrlImage(attachment.url ?? '');
 			}

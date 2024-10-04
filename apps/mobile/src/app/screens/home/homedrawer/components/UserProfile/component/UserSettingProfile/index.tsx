@@ -1,7 +1,8 @@
-import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/core';
+import { useAuth, useChannelMembersActions, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Block, Text, baseColor, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -50,7 +51,7 @@ const UserSettingProfile = ({
 	const isItMe = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
 	const isThatClanOwner = useMemo(() => currentClan?.creator_id === user?.user?.id, [user?.user?.id, currentClan?.creator_id]);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const [hasAdminPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
 
 	useEffect(() => {
 		setVisibleKickUserModal(showKickUserModal);
@@ -60,7 +61,7 @@ const UserSettingProfile = ({
 		setVisibleManageUserModal(showManagementUserModal);
 	}, [showManagementUserModal]);
 
-	const handleSettingUserProfile = (action?: EActionSettingUserProfile) => {
+	const handleSettingUserProfile = useCallback((action?: EActionSettingUserProfile) => {
 		switch (action) {
 			case EActionSettingUserProfile.Manage:
 				setVisibleManageUserModal(true);
@@ -76,7 +77,7 @@ const UserSettingProfile = ({
 			default:
 				break;
 		}
-	};
+	}, []);
 
 	const profileSetting: IProfileSetting[] = useMemo(() => {
 		const settingList = [
@@ -85,32 +86,32 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.Manage,
 				icon: <Icons.SettingsIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner || userPermissionsStatus.hasAdministrator || userPermissionsStatus.hasManageClan
+				isShow: hasAdminPermission
 			},
 			{
 				label: `${EActionSettingUserProfile.TimeOut}`,
 				value: EActionSettingUserProfile.TimeOut,
 				icon: <Icons.ClockWarningIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner && !isItMe
+				isShow: hasAdminPermission && !isItMe
 			},
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
 				icon: <Icons.UserMinusIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: (isClanOwner || userPermissionsStatus.hasAdministrator) && !isItMe && !isThatClanOwner
+				isShow: hasAdminPermission && !isItMe && !isThatClanOwner
 			},
 			{
 				label: `${EActionSettingUserProfile.Ban}`,
 				value: EActionSettingUserProfile.Ban,
 				icon: <Icons.HammerIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner && !isItMe
+				isShow: hasAdminPermission && !isItMe
 			}
 		];
 		return settingList;
-	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus, isThatClanOwner]);
+	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner]);
 
 	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {

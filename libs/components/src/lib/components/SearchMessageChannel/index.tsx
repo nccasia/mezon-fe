@@ -17,23 +17,20 @@ import { Icons } from '@mezon/ui';
 import { Platform, SIZE_PAGE_SEARCH, SearchFilter, getPlatform, searchMentionsHashtag } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import SearchMessageChannelModal from './SearchMessageChannelModal';
 import SelectGroup from './SelectGroup';
 import darkMentionsInputStyle from './StyleSearchMessagesDark';
 import lightMentionsInputStyle from './StyleSearchMessagesLight';
 
-import UserMentionList from '../UserMentionList';
+import { UserMentionList } from '../UserMentionList';
 import SelectItemUser from './SelectItemUser';
 import { hasKeySearch, searchFieldName } from './constant';
 
 type SearchMessageChannelProps = {
 	mode?: ChannelStreamMode;
 };
-interface ExtendedSuggestionDataItem extends SuggestionDataItem {
-	subDisplay?: string;
-}
 
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();

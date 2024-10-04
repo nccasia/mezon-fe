@@ -1,4 +1,4 @@
-import { useCategory, useEscapeKey } from '@mezon/core';
+import { useCategory } from '@mezon/core';
 import {
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
@@ -112,9 +112,6 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const handleNotificationClanChange = (event: any, notification: number) => {
 		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.id, notification_type: notification }));
 	};
-	const onCloseModal = () => {
-		props.onClose();
-	};
 	const { categorizedChannels } = useCategory();
 	const options = categorizedChannels.flatMap((category) => [
 		{
@@ -193,14 +190,10 @@ const ModalNotificationSetting = (props: ModalParam) => {
 		}
 	};
 
-	useEscapeKey(onCloseModal);
-
 	return (
 		<Modal
 			title="Notification Setting"
-			onClose={() => {
-				onCloseModal();
-			}}
+			onClose={props.onClose}
 			showModal={props.open}
 			subTitleBox={`${currentClan?.clan_name}`}
 			classSubTitleBox="ml-[0px] cursor-default dark:text-zinc-400 text-colorTextLightMode"

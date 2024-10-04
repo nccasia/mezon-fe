@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import ImageColors from "react-native-image-colors";
+import { useCallback, useEffect, useState } from 'react';
+import ImageColors from 'react-native-image-colors';
 
-export function useMixImageColor (imageUrl: string) {
-    const [color, setColor] = useState<string>('#323232');
+export function useMixImageColor(imageUrl: string) {
+	const [color, setColor] = useState<string>('#323232');
 
-    const getColor = useCallback(async () => {
+	const getColor = useCallback(async () => {
 		if (imageUrl) {
 			try {
 				const result = await ImageColors.getColors(imageUrl, {
 					fallback: '#323232',
 					cache: true,
-					key: imageUrl,
+					key: imageUrl
 				});
 
 				switch (result.platform) {
@@ -27,14 +27,13 @@ export function useMixImageColor (imageUrl: string) {
 		}
 	}, [imageUrl]);
 
-    useEffect(() => {
-        if (imageUrl !== undefined && imageUrl !== '') {
-            getColor();
-        }
-    }, [imageUrl, getColor])
+	useEffect(() => {
+		if (imageUrl !== undefined && imageUrl !== '') {
+			getColor();
+		}
+	}, [imageUrl, getColor]);
 
-    
-    return {
-        color
-    }
+	return {
+		color
+	};
 }

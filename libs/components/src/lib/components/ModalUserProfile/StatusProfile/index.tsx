@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
 import { ChannelMembersEntity, selectUpdateToken, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';

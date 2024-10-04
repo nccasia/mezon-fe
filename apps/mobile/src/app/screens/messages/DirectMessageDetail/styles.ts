@@ -51,12 +51,12 @@ export const style = (colors: Attributes) =>
 		},
 		statusCircle: {
 			position: 'absolute',
-			width: size.s_10,
-			height: size.s_10,
-			borderRadius: 10,
+			width: size.s_14,
+			height: size.s_14,
+			borderRadius: size.s_10,
 			bottom: 0,
-			right: -2,
-			borderWidth: 2,
+			right: -4,
+			borderWidth: size.s_2,
 			borderColor: colors.secondary
 		},
 		online: {

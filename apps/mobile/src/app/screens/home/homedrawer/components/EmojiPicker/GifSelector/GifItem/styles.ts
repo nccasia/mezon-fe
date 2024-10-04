@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		alignItems: 'center',
 		justifyContent: 'space-around',
-		gap: 10,
+		gap: 10
 	},
 
 	content: {
@@ -19,14 +19,14 @@ const styles = StyleSheet.create({
 		flexBasis: 170,
 		borderRadius: 10,
 		overflow: 'hidden',
-		backgroundColor: 'black',
+		backgroundColor: 'black'
 	},
 	containerLoading: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: size.s_10,
-	},
+		paddingTop: size.s_10
+	}
 });
 
 export default styles;

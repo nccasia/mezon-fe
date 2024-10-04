@@ -2,7 +2,7 @@ import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { ChangeCategory } from '../../../components/ChangeCategory';
-import ChannelSetting from '../../../components/ChannelSetting';
+import { ChannelSetting } from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';

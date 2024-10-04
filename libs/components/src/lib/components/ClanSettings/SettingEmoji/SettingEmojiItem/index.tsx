@@ -1,4 +1,4 @@
-import { useClanRestriction } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import {
 	emojiSuggestionActions,
 	selectCurrentClanId,
@@ -25,12 +25,11 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	const clanId = useSelector(selectCurrentClanId);
 	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
 	const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasManageClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id;
-	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]);
+		return hasManageClanPermission || currentUserId === emoji.creator_id;
+	}, [hasManageClanPermission, currentUserId]);
 
 	const handleDelete = () => {
 		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));
@@ -70,24 +69,24 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 			onMouseLeave={handleOnMouseLeave}
 			onBlur={handleOnMouseLeave}
 		>
-			<div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
+			<div className="w-full h-full flex flex-row gap-1 shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 				<div className={'w-14 h-8'}>
 					<div className={'w-8 h-8 overflow-hidden flex items-center justify-center select-none '}>
 						<img className={'w-auto max-h-full object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
 					</div>
 				</div>
 
-				<div className={'flex-1 relative'}>
+				<div className={'md:flex-1 relative max-md:w-[40%] max-[400px]:w-[30%]'}>
 					<div
 						className={
-							'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
+							'h-[26px] px-1 w-fit max-md:w-full relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
 						}
 					>
-						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
+						<p className={`max-w-[172px] w-full truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
 					</div>
 					{showEdit && (
 						<input
-							className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
+							className={`w-full dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 mx-[2px] outline-none px-2 absolute rounded-[3px]`}
 							value={nameEmoji}
 							onChange={(e) => handleChangeEmojiName(e)}
 							onKeyDown={(e) => {
@@ -98,7 +97,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 					)}
 				</div>
 
-				<div className={'flex-1 flex gap-[6px]  select-none'}>
+				<div className={'flex-1 flex gap-[6px]  select-none max-md:min-w-[40%]'}>
 					<div className={'w-6 h-6 rounded-[50%] overflow-hidden flex items-center justify-center'}>
 						<img className={'w-full h-auto object-cover'} src={dataAuthor?.user?.avatar_url} />
 					</div>

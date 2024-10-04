@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/components';
+import { Icons } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
 
 type SelectGroupProps = {

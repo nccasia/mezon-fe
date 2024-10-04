@@ -1,6 +1,6 @@
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import { Icons } from '@mezon/ui';
 
-export const typeFormats = [
+export const typeFormats: Record<string, any> = [
 	{
 		type: 'text/plain',
 		icon: Icons.TxtThumbnail

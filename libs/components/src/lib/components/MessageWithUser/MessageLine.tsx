@@ -18,7 +18,7 @@ type MessageLineProps = {
 	isEditted: boolean;
 };
 
-const MessageLine = ({
+const MessageLineComponent = ({
 	mode,
 	content,
 	isJumMessageEnabled,
@@ -57,7 +57,7 @@ const MessageLine = ({
 	);
 };
 
-export default memo(MessageLine);
+export const MessageLine = memo(MessageLineComponent);
 
 interface RenderContentProps {
 	data: IExtendedMessage;

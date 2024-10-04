@@ -1,6 +1,8 @@
+import { selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
+import { useSelector } from 'react-redux';
 interface ChannelTypeProps {
 	type: ChannelType;
 	onChange: (value: number) => void;
@@ -8,24 +10,12 @@ interface ChannelTypeProps {
 	disable?: boolean;
 }
 
-const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
-	[ChannelType.CHANNEL_TYPE_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Stream defaultSize="w-6 h-6" />,
-	// 2 lines below only get index
-	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />
-};
-
 const labelMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: 'Text',
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
-	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
+	[ChannelType.CHANNEL_TYPE_APP]: 'Apps',
 	[ChannelType.CHANNEL_TYPE_STREAMING]: 'Stream',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
@@ -37,7 +27,7 @@ const descriptionMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
 	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the clan',
-	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
+	[ChannelType.CHANNEL_TYPE_APP]: 'Apps',
 	[ChannelType.CHANNEL_TYPE_STREAMING]: 'Sharing hobbies activity',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
@@ -45,6 +35,19 @@ const descriptionMap: Partial<Record<ChannelType, string>> = {
 };
 
 export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChange, error, disable }) => {
+	const theme = useSelector(selectTheme);
+	const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
+		[ChannelType.CHANNEL_TYPE_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_STREAMING]: <Icons.Stream defaultSize="w-6 h-6" />,
+		// 2 lines below only get index
+		[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_APP]: <Icons.AppChannelIcon className="w-6 h-6" fill={theme} />
+	};
+
 	const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		onChange(Number(e.target.value));
 	};
@@ -52,7 +55,7 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 	return (
 		<label
 			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
-			htmlFor={type.toString()}
+			htmlFor={type?.toString()}
 		>
 			<div className="ChannelChat w-6 h-6 relative">{iconMap[type]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">

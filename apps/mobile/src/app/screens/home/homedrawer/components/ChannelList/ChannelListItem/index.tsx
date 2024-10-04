@@ -4,11 +4,11 @@ import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, Linking, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
@@ -133,7 +133,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					<ActivityIndicator color={themeValue.white} />
 				)}
 
-				<ChannelBadgeUnread channelId={props.data?.channel_id} />
+				{!!isUnRead && <ChannelBadgeUnread channelId={props.data?.channel_id} clanId={props.data?.clan_id} />}
 			</TouchableOpacity>
 
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}

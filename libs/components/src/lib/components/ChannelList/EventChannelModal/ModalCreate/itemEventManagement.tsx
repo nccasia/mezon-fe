@@ -1,13 +1,13 @@
-import { useEventManagement, useOnClickOutside } from '@mezon/core';
+import { useEventManagement, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EEventStatus, OptionEvent } from '@mezon/utils';
+import { EEventStatus, EPermission, OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
-import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
+import { differenceTime, timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
 import PanelEventItem from './panelEventItem';
 
@@ -23,36 +23,20 @@ export type ItemEventManagementProps = {
 	end?: string;
 	event?: EventManagementEntity;
 	createTime?: string;
-	checkUserCreate?: boolean;
 	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const {
-		topic,
-		voiceChannel,
-		titleEvent,
-		option,
-		address,
-		logo,
-		logoRight,
-		start,
-		end,
-		event,
-		createTime,
-		checkUserCreate,
-		isReviewEvent,
-		setOpenModalDetail
-	} = props;
+	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, isReviewEvent, setOpenModalDetail } = props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
+	const appearanceTheme = useSelector(selectTheme);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
-
-	const appearanceTheme = useSelector(selectTheme);
 
 	const [openPanel, setOpenPanel] = useState(false);
 	const [openModalDelEvent, setOpenModalDelEvent] = useState(false);
@@ -61,10 +45,6 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		mouseY: 0,
 		distanceToBottom: 0
 	});
-
-	const isSameDay = useMemo(() => {
-		return compareDate(new Date(), createTime || '');
-	}, [createTime]);
 
 	const eventStatus = useMemo(() => {
 		if (event?.status) {
@@ -208,14 +188,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							Share
 						</button>
 
-						{eventStatus == EEventStatus.ONGOING && checkUserCreate ? (
+						{eventStatus === EEventStatus.ONGOING && isClanOwner ? (
 							<button
 								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
 								onClick={() => setOpenModalDelEvent(true)}
 							>
 								End event
 							</button>
-						) : eventStatus != EEventStatus.ONGOING ? (
+						) : eventStatus !== EEventStatus.ONGOING ? (
 							<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
 								<Icons.MuteBell defaultSize="size-4 text-white" />
 								Interested
@@ -226,11 +206,12 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					</div>
 				)}
 			</div>
+
 			{openPanel && (
 				<PanelEventItem
+					event={event}
 					coords={coords}
 					onHandle={handleStopPropagation}
-					checkUserCreate={checkUserCreate ?? true}
 					setOpenModalDelEvent={setOpenModalDelEvent}
 					onClose={() => setOpenPanel(false)}
 				/>

@@ -1,4 +1,3 @@
-import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import {
 	selectComputedReactionsByMessageId,
 	selectIdMessageRefReaction,
@@ -9,7 +8,9 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
 import ItemEmoji from './ItemEmoji';
+import ReactionBottom from './ReactionBottom';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;

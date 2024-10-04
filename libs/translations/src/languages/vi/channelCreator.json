@@ -6,7 +6,8 @@
     "channelName": {
       "title": "Tên kênh",
       "placeholder": "kenh-moi",
-      "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
+      "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -).",
+      "duplicateChannelName": "Tên Channel đã có trong Clan. Vui lòng nhập tên khác."
     },
     "channelPrivate": {
       "title": "Kênh riêng tư",

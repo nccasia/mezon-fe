@@ -2,11 +2,11 @@ import { PlusAltIcon, remove, save, setDefaultChannelLoader, STORAGE_CHANNEL_CUR
 import { size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllClans } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
-import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { ClanIcon } from '../ClanIcon';
 import CreateClanModal from '../CreateClanModal';
 import { style } from './styles';
@@ -37,16 +37,19 @@ export const ListClanPopup = React.memo(() => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));
-			const promises = [];
-			promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
-			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
-			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
-			const results = await Promise.all(promises);
 
-			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-			if (channelResp) {
-				await setDefaultChannelLoader(channelResp.payload, clanId);
-			}
+			requestAnimationFrame(async () => {
+				const promises = [];
+				promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+				promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+				promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+				const results = await Promise.all(promises);
+
+				const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+				if (channelResp) {
+					await setDefaultChannelLoader(channelResp.payload, clanId);
+				}
+			});
 		},
 		[isTabletLandscape]
 	);

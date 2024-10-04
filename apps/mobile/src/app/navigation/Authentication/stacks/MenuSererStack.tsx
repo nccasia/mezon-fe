@@ -1,20 +1,20 @@
 import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
-import CategoryCreator from '../../../components/Category';
-import CategorySetting from '../../../components/CategorySetting';
-import ChannelCreator from '../../../components/ChannelCreator';
-import ClanNotificationSetting from '../../../components/ClanNotificationSetting';
-import NotificationOverrides from '../../../components/ClanNotificationSetting/NotificationOverrides';
-import NotificationSettingDetail from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
-import ClanSetting from '../../../components/ClanSettings';
-import ClanEmojiSetting from '../../../components/ClanSettings/Emoji';
-import MemberSetting from '../../../components/ClanSettings/Member';
-import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
-import StickerSetting from '../../../components/ClanSettings/Sticker';
-import EventCreatorDetails from '../../../components/EventCreator/EventCreatorDetails';
-import EventCreatorPreview from '../../../components/EventCreator/EventCreatorPreview';
-import EventCreatorType from '../../../components/EventCreator/EventCreatorType';
+import { CategoryCreator } from '../../../components/Category';
+import { CategorySetting } from '../../../components/CategorySetting';
+import { ChannelCreator } from '../../../components/ChannelCreator';
+import { ClanNotificationSetting } from '../../../components/ClanNotificationSetting';
+import { NotificationOverrides } from '../../../components/ClanNotificationSetting/NotificationOverrides';
+import { ClanNotificationSetting as NotificationSettingDetail } from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
+import { ClanSetting } from '../../../components/ClanSettings';
+import { ClanEmojiSetting } from '../../../components/ClanSettings/Emoji';
+import { MemberSetting } from '../../../components/ClanSettings/Member';
+import { ClanOverviewSetting } from '../../../components/ClanSettings/Overview';
+import { StickerSetting } from '../../../components/ClanSettings/Sticker';
+import { EventCreatorDetails } from '../../../components/EventCreator/EventCreatorDetails';
+import { EventCreatorPreview } from '../../../components/EventCreator/EventCreatorPreview';
+import { EventCreatorType } from '../../../components/EventCreator/EventCreatorType';
 import { CreateNewRole } from '../../../screens/serverRoles/CreateNewRole';
 import { RoleDetail } from '../../../screens/serverRoles/RoleDetail';
 import { ServerRoles } from '../../../screens/serverRoles/ServerRoles';
@@ -22,7 +22,7 @@ import { SetupMembers } from '../../../screens/serverRoles/SetupMembers';
 import { SetupPermissions } from '../../../screens/serverRoles/SetupPermissions';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuClanStacks = ({ }: any) => {
+export const MenuClanStacks = () => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
@@ -38,23 +38,23 @@ export const MenuClanStacks = ({ }: any) => {
 				headerTitleAlign: 'center',
 				headerTintColor: themeValue.white,
 				headerStyle: {
-					backgroundColor: themeValue.secondary,
+					backgroundColor: themeValue.secondary
 				},
 				headerTitleStyle: {
 					fontSize: Fonts.size.h6,
 					fontWeight: 'bold',
-					color: themeValue.textStrong,
+					color: themeValue.textStrong
 				},
 				cardStyle: {
-					backgroundColor: 'transparent',
-				},
+					backgroundColor: 'transparent'
+				}
 			}}
 		>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.CREATE_CATEGORY}
 				component={CategoryCreator}
 				options={{
-					headerTitle: t('menuClanStack.categoryCreator'),
+					headerTitle: t('menuClanStack.categoryCreator')
 				}}
 			/>
 
@@ -62,7 +62,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.CREATE_CHANNEL}
 				component={ChannelCreator}
 				options={{
-					headerTitle: t('menuClanStack.channelCreator'),
+					headerTitle: t('menuClanStack.channelCreator')
 				}}
 			/>
 
@@ -71,7 +71,7 @@ export const MenuClanStacks = ({ }: any) => {
 				component={EventCreatorType}
 				options={{
 					headerTitle: t('menuClanStack.eventCreator'),
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -80,7 +80,7 @@ export const MenuClanStacks = ({ }: any) => {
 				component={EventCreatorDetails}
 				options={{
 					headerTitle: t('menuClanStack.eventCreator'),
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -89,7 +89,7 @@ export const MenuClanStacks = ({ }: any) => {
 				component={EventCreatorPreview}
 				options={{
 					headerTitle: t('menuClanStack.eventCreator'),
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -97,7 +97,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.SETTINGS}
 				component={ClanSetting}
 				options={{
-					headerTitle: t('menuClanStack.clanSetting'),
+					headerTitle: t('menuClanStack.clanSetting')
 				}}
 			/>
 
@@ -105,7 +105,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
 				component={ClanOverviewSetting}
 				options={{
-					headerTitle: t('menuClanStack.clanOverviewSetting'),
+					headerTitle: t('menuClanStack.clanOverviewSetting')
 				}}
 			/>
 
@@ -113,14 +113,14 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.EMOJI_SETTING}
 				component={ClanEmojiSetting}
 				options={{
-					headerTitle: t('menuClanStack.clanEmojiSetting'),
+					headerTitle: t('menuClanStack.clanEmojiSetting')
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.STICKER_SETTING}
 				component={StickerSetting}
 				options={{
-					headerTitle: t('menuClanStack.sticker'),
+					headerTitle: t('menuClanStack.sticker')
 				}}
 			/>
 
@@ -128,7 +128,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.MEMBER_SETTING}
 				component={MemberSetting}
 				options={{
-					headerTitle: t('menuClanStack.member'),
+					headerTitle: t('menuClanStack.member')
 				}}
 			/>
 
@@ -136,7 +136,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.ROLE_SETTING}
 				component={ServerRoles}
 				options={{
-					headerTitle: t('menuClanStack.serverRoles'),
+					headerTitle: t('menuClanStack.serverRoles')
 				}}
 			/>
 
@@ -144,7 +144,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE}
 				component={CreateNewRole}
 				options={{
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -152,7 +152,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.CATEGORY_SETTING}
 				component={CategorySetting}
 				options={{
-					headerTitle: t('menuClanStack.categorySetting'),
+					headerTitle: t('menuClanStack.categorySetting')
 				}}
 			/>
 
@@ -160,7 +160,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS}
 				component={SetupPermissions}
 				options={{
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -168,7 +168,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS}
 				component={SetupMembers}
 				options={{
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -176,7 +176,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.ROLE_DETAIL}
 				component={RoleDetail}
 				options={{
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 
@@ -184,7 +184,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING}
 				component={ClanNotificationSetting}
 				options={{
-					headerTitle: t('menuClanStack.notificationSetting'),
+					headerTitle: t('menuClanStack.notificationSetting')
 				}}
 			/>
 
@@ -192,14 +192,14 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES}
 				component={NotificationOverrides}
 				options={{
-					headerTitle: t('menuClanStack.newOverride'),
+					headerTitle: t('menuClanStack.newOverride')
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL}
 				component={NotificationSettingDetail}
 				options={{
-					headerTitle: t('menuClanStack.notificationSetting'),
+					headerTitle: t('menuClanStack.notificationSetting')
 				}}
 			/>
 		</Stack.Navigator>

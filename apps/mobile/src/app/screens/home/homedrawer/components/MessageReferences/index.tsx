@@ -1,12 +1,13 @@
+import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
-import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
+import { MezonAvatar } from '../../../../../temp-ui';
 import { RenderTextMarkdownContent } from '../RenderTextMarkdown';
 import { style } from './styles';
 
@@ -23,6 +24,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
+	const { clanAvatar } = useGetPriorityNameFromUserClan(messageReferences.message_sender_id);
 
 	const handleJumpToMessage = (messageId: string) => {
 		dispatch(messagesActions.setIdMessageToJump(messageId));
@@ -42,7 +44,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 			</View>
 			<Pressable onPress={onPressAvatar} style={styles.repliedMessageWrapper}>
 				<MezonAvatar
-					avatarUrl={messageReferences?.mesages_sender_avatar}
+					avatarUrl={clanAvatar || messageReferences?.mesages_sender_avatar}
 					username={messageReferences?.message_sender_username}
 					height={size.s_20}
 					width={size.s_20}

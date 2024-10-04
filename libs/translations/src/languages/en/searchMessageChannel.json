@@ -2,6 +2,7 @@
   "joinChannel": "Join",
   "textChannels": "Text Channels",
   "voiceChannels": "Voice Channels",
+  "streamingChannels": "Streaming Channels",
   "search": "Search",
   "filterResults":"Filter results...",
   "members": "Members",

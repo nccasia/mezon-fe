@@ -39,7 +39,6 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 	const httpPrefix = 'http';
 	const googleMeetPrefix = 'https://meet.google.com/';
 	const colon = ':';
-	const space = ' ';
 
 	let i = 0;
 	while (i < inputString.length) {
@@ -48,7 +47,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			const startindex = i;
 			i++;
 			let shortname = '';
-			while (i < inputString.length && inputString[i] !== colon && inputString[i] !== space) {
+			while (i < inputString.length && inputString[i] !== colon) {
 				shortname += inputString[i];
 				i++;
 			}
@@ -56,14 +55,14 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				const endindex = i + 1;
 				const preCharFour = inputString.substring(startindex - 4, startindex);
 				const preCharFive = inputString.substring(startindex - 5, startindex);
-				if (preCharFour !== 'http' && preCharFive !== 'https' && emojiObjPicked?.[`:${shortname}:`]) {
+				const emojiId = emojiObjPicked?.[`:${shortname}:`];
+				if (preCharFour !== 'http' && preCharFive !== 'https' && emojiId) {
 					emojis.push({
-						emojiid: emojiObjPicked?.[`:${shortname}:`],
+						emojiid: emojiId,
 						s: startindex,
 						e: endindex
 					});
 				}
-				i++;
 			}
 		} else if (inputString.startsWith(httpPrefix, i)) {
 			// Link processing

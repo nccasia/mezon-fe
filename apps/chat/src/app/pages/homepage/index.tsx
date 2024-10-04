@@ -1,7 +1,6 @@
-import { Icons } from '@mezon/components';
 import { version } from '@mezon/package-js';
 import { selectIsLogin } from '@mezon/store';
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';

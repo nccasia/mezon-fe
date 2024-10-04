@@ -1,6 +1,5 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, Text, useTheme } from '@mezon/mobile-ui';
-import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, TouchableOpacity, View } from 'react-native';
@@ -65,7 +64,7 @@ export default function MezonSearch({
 				/>
 				{!!value?.length && (
 					<Pressable onPress={clearTextInput}>
-						<CircleXIcon height={18} width={18} color={themeValue.text} />
+						<Icons.CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
 				)}
 			</View>

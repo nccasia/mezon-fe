@@ -167,7 +167,8 @@ const colors = {
 	darkGray: '#333333',
 	persianRed: '#DA373C',
 	outerSpace: '#404249',
-	jungleGreen: '#23A559'
+	jungleGreen: '#23A559',
+	linkText: '#dfe0e4'
 };
 
 export { colors, darkThemeColor, lightThemeColor };

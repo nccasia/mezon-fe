@@ -1,10 +1,7 @@
-import { initStore, MezonStoreProvider, selectIsLogin } from '@mezon/store';
+import { initStore, MezonStoreProvider } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
-import { electronBridge } from '@mezon/utils';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { createBrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
@@ -27,17 +24,6 @@ const mezon: CreateMezonClientOptions = {
 };
 
 const AppInitializer = () => {
-	const isLogin = useSelector(selectIsLogin);
-	if (isElectron()) {
-		if (isLogin) {
-			electronBridge?.initListeners(() => {
-				console.log('Shortcut triggered');
-			});
-		} else {
-			electronBridge?.removeAllListeners();
-		}
-	}
-
 	return null;
 };
 

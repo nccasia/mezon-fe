@@ -1,6 +1,6 @@
+import { Icons } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 
 const PreClass = ({ children }: any) => {
 	const [copied, setCopied] = useState(false);

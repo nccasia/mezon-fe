@@ -28,7 +28,7 @@ export function useMessageLine(line: string): IMessageLine {
 				nonMatchText,
 				matchedText,
 				startIndex,
-				endIndex,
+				endIndex
 			};
 		});
 
@@ -38,8 +38,8 @@ export function useMessageLine(line: string): IMessageLine {
 					nonMatchText: nonMatchText,
 					matchedText: '',
 					startIndex: 0,
-					endIndex: 0,
-				},
+					endIndex: 0
+				}
 			];
 		}
 
@@ -48,7 +48,7 @@ export function useMessageLine(line: string): IMessageLine {
 				nonMatchText: inputLine.substring(lastIndex),
 				matchedText: '',
 				startIndex: lastIndex,
-				endIndex: inputLine.length,
+				endIndex: inputLine.length
 			});
 		}
 
@@ -73,8 +73,8 @@ export function useMessageLine(line: string): IMessageLine {
 					nonMatchText: line,
 					matchedText: '',
 					startIndex: 0,
-					endIndex: line.length,
-				},
+					endIndex: line.length
+				}
 			];
 		}
 
@@ -84,6 +84,6 @@ export function useMessageLine(line: string): IMessageLine {
 	return {
 		mentions,
 		isOnlyEmoji,
-		links,
+		links
 	};
 }

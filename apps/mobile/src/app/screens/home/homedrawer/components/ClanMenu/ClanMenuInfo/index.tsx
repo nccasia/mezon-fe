@@ -1,9 +1,10 @@
 import { CircleIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { ClansEntity } from '@mezon/store-mobile';
-import { MezonBadge } from 'apps/mobile/src/app/temp-ui';
+import { ClansEntity, selectMembersClanCount, selectMembersClanOnlineCount } from '@mezon/store-mobile';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { MezonBadge } from '../../../../../../temp-ui';
 import { style } from './styles';
 
 interface ClanMenuInfoProps {
@@ -12,9 +13,8 @@ interface ClanMenuInfoProps {
 export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
 	const { t } = useTranslation(['clanMenu']);
 	const styles = style(useTheme().themeValue);
-
-	// TODO: check this
-	const [onlineMembers, offlineMembers] = [333, 398];
+	const onlineMembers = useSelector(selectMembersClanOnlineCount);
+	const members = useSelector(selectMembersClanCount);
 
 	return (
 		<View style={styles.info}>
@@ -26,7 +26,7 @@ export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
 
 			<View style={styles.inlineInfo}>
 				<CircleIcon height={10} width={10} color="gray" />
-				<Text style={styles.inlineText}>{`${offlineMembers + onlineMembers} ${t('info.members')}`}</Text>
+				<Text style={styles.inlineText}>{`${members} ${t('info.members')}`}</Text>
 			</View>
 		</View>
 	);

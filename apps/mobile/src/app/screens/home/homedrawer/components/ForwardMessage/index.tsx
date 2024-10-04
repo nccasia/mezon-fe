@@ -12,10 +12,7 @@ import {
 	selectMessageEntitiesByChannelId,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
-import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
-import { MezonInput } from 'apps/mobile/src/app/temp-ui';
-import { normalizeString } from 'apps/mobile/src/app/utils/helpers';
+import { ChannelThreads, IMessageWithUser, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +21,8 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { SeparatorWithLine } from '../../../../../components/Common';
+import { MezonInput } from '../../../../../temp-ui';
 import { styles } from './styles';
 
 interface IForwardIObject {

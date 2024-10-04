@@ -41,7 +41,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 	const friendRequestCount = useMemo(() => {
 		return {
 			sent: allUser.filter((user) => user.state === 1)?.length,
-			received: allUser.filter((user) => user.state === 2)?.length,
+			received: allUser.filter((user) => user.state === 2)?.length
 		};
 	}, [allUser]);
 
@@ -51,7 +51,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 			if (directMessage?.id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: directMessage?.id },
+					params: { directMessageId: directMessage?.id }
 				});
 				return;
 			}
@@ -59,11 +59,11 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 			if (response?.channel_id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: response?.channel_id },
+					params: { directMessageId: response?.channel_id }
 				});
 			}
 		},
-		[createDirectMessageWithUser, listDM, navigation],
+		[createDirectMessageWithUser, listDM, navigation]
 	);
 
 	const handleFriendAction = useCallback(
@@ -71,7 +71,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 			switch (action) {
 				case EFriendItemAction.Call:
 					console.log('handle phone call', friend);
-					Toast.show({ type: 'info', text1: 'Updating...' })
+					Toast.show({ type: 'info', text1: 'Updating...' });
 					break;
 				case EFriendItemAction.MessageDetail:
 					directMessageWithUser(friend?.user?.id);
@@ -83,12 +83,12 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 					break;
 			}
 		},
-		[directMessageWithUser],
+		[directMessageWithUser]
 	);
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 

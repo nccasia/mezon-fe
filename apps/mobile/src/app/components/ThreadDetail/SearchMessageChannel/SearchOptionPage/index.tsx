@@ -3,10 +3,10 @@ import { Block, size } from '@mezon/mobile-ui';
 import { DirectEntity, selectCurrentChannel } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
-import UseMentionList from 'apps/mobile/src/app/hooks/useUserMentionList';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import EmptySearchPage from '../../../EmptySearchPage';
+import UseMentionList from '../../../../hooks/useUserMentionList';
+import { EmptySearchPage } from '../../../EmptySearchPage';
 import UserInfoSearch from './UserInfoSearch';
 
 interface ISeachOptionPageProps {

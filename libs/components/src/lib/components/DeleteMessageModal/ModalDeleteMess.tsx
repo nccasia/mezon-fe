@@ -48,7 +48,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 						<h3 className="font-bold pb-4">Delete Message</h3>
 						<p>Are you sure you want to delete this message?</p>
 					</div>
-					<div className="p-4">
+					<div className="p-4 max-w-[720px] max-h-[50vh] overflow-y-auto hide-scrollbar">
 						<MessageWithUser
 							allowDisplayShortProfile={false}
 							message={mess}

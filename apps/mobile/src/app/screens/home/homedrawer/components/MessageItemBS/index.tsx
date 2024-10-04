@@ -39,6 +39,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
 	const snapPoints = useMemo(() => {
+		if (!type) return [];
 		if (isShowEmojiPicker || isOnlyEmojiPicker) {
 			return ['90%'];
 		}

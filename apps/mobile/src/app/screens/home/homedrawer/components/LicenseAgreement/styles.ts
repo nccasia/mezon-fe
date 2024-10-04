@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
 		maxWidth: '95%',
 		display: 'flex',
 		flexDirection: 'column',
-		justifyContent: 'space-between',
+		justifyContent: 'space-between'
 	},
 	headerModal: {
 		display: 'flex',
@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		paddingHorizontal: size.s_14,
-		paddingTop: size.s_10,
+		paddingTop: size.s_10
 	},
 	headerText: {
 		color: Colors.black,
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
 		paddingBottom: size.label,
 		textAlign: 'center',
 		flex: 1,
-		fontWeight: '600',
+		fontWeight: '600'
 	},
 	btn: {
 		flexDirection: 'row',
@@ -38,35 +38,35 @@ export const styles = StyleSheet.create({
 		paddingVertical: 10,
 		borderRadius: 50,
 		marginHorizontal: size.s_10,
-		marginBottom: size.s_18,
+		marginBottom: size.s_18
 	},
 	btnText: {
-		color: Colors.white,
+		color: Colors.white
 	},
 	content: {
 		backgroundColor: Colors.white,
-		paddingHorizontal: size.s_14,
+		paddingHorizontal: size.s_14
 	},
 	header: {
 		color: Colors.black,
 		fontSize: size.s_12,
 		fontWeight: 'bold',
-		marginBottom: size.s_12,
+		marginBottom: size.s_12
 	},
 	text: {
 		color: Colors.black,
 		fontSize: size.s_12,
-		marginBottom: size.s_12,
+		marginBottom: size.s_12
 	},
 	bulletPoint: {
 		color: Colors.black,
 		fontSize: size.s_12,
 		marginLeft: size.s_20,
-		marginBottom: size.s_12,
+		marginBottom: size.s_12
 	},
 	link: {
 		fontSize: size.s_12,
 		color: Colors.textLink,
-		paddingBottom: size.s_20,
-	},
+		paddingBottom: size.s_20
+	}
 });

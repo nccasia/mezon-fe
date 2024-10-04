@@ -18,7 +18,7 @@ const MezonToggleButton = ({
 	toggleBgOnColor = Colors.bgToggleOnBtn,
 	toggleBgOffColor = Colors.bgToggleOnBtn,
 	height = 80,
-	width = 150,
+	width = 150
 }) => {
 	const BUTTON_WIDTH = width;
 	const BUTTON_HEIGHT = height;
@@ -31,17 +31,17 @@ const MezonToggleButton = ({
 		setToggled(value);
 		shareValue.value = withTiming(value ? 1 : 0, {
 			duration: 800,
-			easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+			easing: Easing.bezier(0.4, 0.0, 0.2, 1)
 		});
 	}, [value]);
 
 	const containerScale = {
 		height: BUTTON_HEIGHT,
-		width: BUTTON_WIDTH,
+		width: BUTTON_WIDTH
 	};
 	const switchScale = {
 		height: SWITCH_BUTTON_AREA,
-		width: SWITCH_BUTTON_AREA,
+		width: SWITCH_BUTTON_AREA
 	};
 
 	const onChangeToggle = () => {
@@ -53,12 +53,12 @@ const MezonToggleButton = ({
 		if (shareValue.value === 0) {
 			shareValue.value = withTiming(1, {
 				duration: 800,
-				easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+				easing: Easing.bezier(0.4, 0.0, 0.2, 1)
 			});
 		} else {
 			shareValue.value = withTiming(0, {
 				duration: 800,
-				easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+				easing: Easing.bezier(0.4, 0.0, 0.2, 1)
 			});
 		}
 		onChangeToggle();
@@ -72,11 +72,11 @@ const MezonToggleButton = ({
 						shareValue.value,
 						InterpolateXInput,
 						[0, BUTTON_WIDTH - SWITCH_BUTTON_AREA - 2 * SWITCH_BUTTON_PADDING],
-						Extrapolate.CLAMP,
-					),
-				},
+						Extrapolate.CLAMP
+					)
+				}
 			],
-			backgroundColor: interpolateColor(shareValue.value, InterpolateXInput, [toggleOffColor, toggleOnColor]),
+			backgroundColor: interpolateColor(shareValue.value, InterpolateXInput, [toggleOffColor, toggleOnColor])
 		};
 	});
 

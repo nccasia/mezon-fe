@@ -2,9 +2,10 @@ import { messagesActions, reactionActions, referencesActions } from '@mezon/stor
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export const useEscapeKey = (handler: () => void) => {
+export const useEscapeKey = (handler: () => void, options: Partial<{ preventEvent: boolean }> = {}) => {
 	const dispatch = useDispatch();
 	useEffect(() => {
+		const { preventEvent } = options;
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
 				dispatch(messagesActions.setIdMessageToJump(''));
@@ -21,7 +22,10 @@ export const useEscapeKey = (handler: () => void) => {
 			}
 		};
 
-		document.addEventListener('keydown', handleKeyDown);
+		if (!preventEvent) {
+			document.addEventListener('keydown', handleKeyDown);
+		}
+
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown);
 		};

@@ -1,8 +1,8 @@
-import { useChatSending, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { useChatSending, useEscapeKeyClose, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { Loading } from '@mezon/ui';
 import { IGifCategory, IMessageSendPayload, SubPanelName } from '@mezon/utils';
-import { Loading } from 'libs/ui/src/lib/Loading';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import FeaturedGifs from './FeaturedGifs';
 import GifCategory from './GifCategory';
 
@@ -11,9 +11,10 @@ type ChannelMessageBoxProps = {
 	activeTab: SubPanelName;
 	channelOrDirect: ApiChannelDescription | undefined;
 	mode: number;
+	onClose: () => void;
 };
 
-function TenorGifCategories({ channelOrDirect, mode }: ChannelMessageBoxProps) {
+function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelOrDirect: channelOrDirect ?? undefined, mode });
 	const {
 		dataGifCategories,
@@ -105,8 +106,12 @@ function TenorGifCategories({ channelOrDirect, mode }: ChannelMessageBoxProps) {
 			</div>
 		);
 	};
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
 	return (
-		<>{categoriesStatus || (valueInputToCheckHandleSearch === '' && trendingClickingStatus === false) ? renderGifCategories() : renderGifs()}</>
+		<div ref={modalRef} tabIndex={-1} className="outline-none">
+			{categoriesStatus || (valueInputToCheckHandleSearch === '' && trendingClickingStatus === false) ? renderGifCategories() : renderGifs()}
+		</div>
 	);
 }
 

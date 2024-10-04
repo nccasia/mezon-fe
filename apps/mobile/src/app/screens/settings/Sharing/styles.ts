@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.secondary,
 		flex: 1,
 		padding: size.s_16,
-		width: '100%',
+		width: '100%'
 	},
 	header: {
 		width: '100%',
@@ -27,22 +27,22 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingVertical: size.s_30,
 		paddingHorizontal: size.s_10,
-		backgroundColor: Colors.secondary,
+		backgroundColor: Colors.secondary
 	},
 	titleHeader: {
 		fontSize: size.s_20,
 		fontWeight: 'bold',
-		color: Colors.white,
+		color: Colors.white
 	},
 	title: {
 		fontSize: size.medium,
 		fontWeight: '600',
 		paddingBottom: size.s_20,
 		color: Colors.white,
-		textTransform: 'uppercase',
+		textTransform: 'uppercase'
 	},
 	rowItem: {
-		marginBottom: size.s_30,
+		marginBottom: size.s_30
 	},
 	inputWrapper: {
 		backgroundColor: Colors.primary,
@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: size.s_10,
 		paddingVertical: size.s_4,
-		borderRadius: size.s_10,
+		borderRadius: size.s_10
 	},
 	iconLeftInput: {
 		marginHorizontal: size.s_10,
@@ -67,27 +67,27 @@ export const styles = StyleSheet.create({
 		height: size.s_24,
 		borderRadius: size.s_24,
 		justifyContent: 'center',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	textInput: {
 		flex: 1,
 		alignItems: 'center',
 		paddingVertical: 0,
 		height: size.s_50,
-		color: Colors.white,
+		color: Colors.white
 	},
 	textChannelSelected: {
 		flex: 1,
 		alignItems: 'center',
 		paddingVertical: 0,
 		lineHeight: size.s_50,
-		color: Colors.white,
+		color: Colors.white
 	},
 	itemSuggestion: {
 		paddingVertical: size.s_10,
 		flexDirection: 'row',
 		gap: size.s_18,
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	logoSuggestion: {
 		width: size.s_24,
@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
 	},
 	titleSuggestion: {
 		fontSize: size.label,
-		color: Colors.tertiary,
+		color: Colors.tertiary
 	},
 	wrapperItemMedia: {
 		width: size.s_100,
@@ -107,12 +107,12 @@ export const styles = StyleSheet.create({
 	},
 	wrapperMedia: {
 		padding: size.s_10,
-		paddingHorizontal: size.s_4,
+		paddingHorizontal: size.s_4
 	},
 	itemMedia: {
 		width: '100%',
 		height: '100%',
-		borderRadius: size.s_6,
+		borderRadius: size.s_6
 	},
 	iconRemoveMedia: {
 		position: 'absolute',
@@ -137,7 +137,7 @@ export const styles = StyleSheet.create({
 	},
 	fileName: {
 		fontSize: size.small,
-		color: Colors.white,
+		color: Colors.white
 	},
 	typeFile: {
 		fontSize: size.small,
@@ -152,6 +152,6 @@ export const styles = StyleSheet.create({
 		bottom: 0,
 		height: '100%',
 		width: '100%',
-		borderRadius: size.s_6,
-	},
+		borderRadius: size.s_6
+	}
 });

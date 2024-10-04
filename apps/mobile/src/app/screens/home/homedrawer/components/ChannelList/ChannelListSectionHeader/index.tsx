@@ -18,7 +18,12 @@ const ChannelListSectionHeader = ({ onPress, title, onLongPress, onPressSortChan
 	return (
 		<TouchableOpacity activeOpacity={0.8} onPress={onPress} onLongPress={onLongPress} style={styles.channelListHeader}>
 			<View style={styles.channelListHeaderItem}>
-				<Icons.ChevronSmallDownIcon width={size.s_20} height={size.s_20} color={themeValue.text} style={[isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
+				<Icons.ChevronSmallDownIcon
+					width={size.s_20}
+					height={size.s_20}
+					color={themeValue.text}
+					style={[isCollapsed && { transform: [{ rotate: '-90deg' }] }]}
+				/>
 				<Text style={styles.channelListHeaderItemTitle}>{title}</Text>
 
 				<TouchableOpacity onPress={onPressSortChannel} style={styles.sortButton}>

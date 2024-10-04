@@ -7,9 +7,7 @@ const ExpiryTimeModal = (pops: ModalParam) => {
 	return (
 		<Modal
 			title=""
-			onClose={() => {
-				pops.onClose();
-			}}
+			onClose={pops.onClose}
 			showModal={pops.open}
 			titleConfirm=""
 			classSubTitleBox="ml-[0px] mt-[15px] cursor-default"

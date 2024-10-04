@@ -29,20 +29,18 @@ export function useTheme(themeMode?: ThemeMode) {
 		[dispatch]
 	);
 
-	// @ts-ignore
-	const [theme, setTheme] = useState<ThemeMode>(themeMode ? themeMode : appearanceTheme);
+	const [theme, setTheme] = useState<ThemeMode>(themeMode ? themeMode : (appearanceTheme as ThemeMode));
 
 	useEffect(() => {
-		// @ts-ignore
-		setTheme(themeMode ? themeMode : appearanceTheme);
+		setTheme(themeMode ? themeMode : (appearanceTheme as ThemeMode));
 	}, [appearanceTheme, themeMode]);
 
 	return useMemo(() => {
 		const themeBasicMode = themeMode
-			? themeMode == ThemeModeAuto.AUTO
+			? themeMode === ThemeModeAuto.AUTO
 				? systemTheme
 				: themeMode
-			: appearanceTheme == 'system'
+			: appearanceTheme === 'system'
 				? systemTheme
 				: appearanceTheme;
 

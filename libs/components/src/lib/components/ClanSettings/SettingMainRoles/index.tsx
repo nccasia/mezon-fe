@@ -1,4 +1,3 @@
-import { Icons } from '@mezon/components';
 import {
 	rolesClanActions,
 	selectAllRolesClan,
@@ -13,7 +12,7 @@ import {
 	setSelectedRoleId,
 	useAppDispatch
 } from '@mezon/store';
-import { InputField } from '@mezon/ui';
+import { Icons, InputField } from '@mezon/ui';
 import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

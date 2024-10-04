@@ -2,13 +2,12 @@ import { useAuth, useFriends } from '@mezon/core';
 import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, requestAddFriendParam, selectStatusSentMobile } from '@mezon/store-mobile';
-import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-// eslint-disable-next-line @typescript-eslint/no-absolute-imports
+import { MezonButton, MezonModal } from '../../../../../temp-ui';
 import { EAddFriendBy, EAddFriendWays } from '../../../enum';
 import { style } from './styles';
 

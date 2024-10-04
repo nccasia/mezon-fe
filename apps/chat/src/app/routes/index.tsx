@@ -27,6 +27,7 @@ import { appActions, useAppDispatch } from '@mezon/store';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import AppDirectory from '../pages/AppDirectory';
+import MezonPage from '../pages/homepage/mezonpage';
 import ThreadsMain from '../pages/thread';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
@@ -92,7 +93,7 @@ export const Routes = memo(() => {
 							: {
 									path: '/',
 									loader: loaderWithStore(loginLoader),
-									element: <Homepage />
+									element: <MezonPage />
 								},
 						{
 							path: '/application-directory',

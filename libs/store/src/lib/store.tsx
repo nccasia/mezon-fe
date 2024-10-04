@@ -110,8 +110,7 @@ const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending'],
-		transforms: [transformJumpingError]
+		blacklist: ['typingUsers', 'isSending']
 	},
 	messagesReducer
 );
@@ -261,17 +260,10 @@ const persistedChannelMetaReducer = persistReducer(
 const persistedsettingClanStickerReducer = persistReducer(
 	{
 		key: 'settingSticker',
-		storage
+		storage,
+		blacklist: ['hasGrandchildModal']
 	},
 	settingStickerReducer
-);
-
-const persistednotificationReducer = persistReducer(
-	{
-		key: 'notification',
-		storage
-	},
-	notificationReducer
 );
 
 const persisteduserChannelsReducer = persistReducer(
@@ -321,7 +313,7 @@ const reducer = {
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
-	notification: persistednotificationReducer,
+	notification: notificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,

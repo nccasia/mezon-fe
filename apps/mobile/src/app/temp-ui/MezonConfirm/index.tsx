@@ -15,12 +15,22 @@ interface IMezonConfirmProps {
 	onCancel?: () => void;
 	hasBackdrop?: boolean;
 }
-export default function MezonConfirm({ children, hasBackdrop = true, visible, onVisibleChange, title, confirmText, content, onConfirm, onCancel }: IMezonConfirmProps) {
+export default function MezonConfirm({
+	children,
+	hasBackdrop = true,
+	visible,
+	onVisibleChange,
+	title,
+	confirmText,
+	content,
+	onConfirm,
+	onCancel
+}: IMezonConfirmProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
 	function handleClose() {
-		onCancel && onCancel()
+		onCancel && onCancel();
 		onVisibleChange && onVisibleChange(false);
 	}
 

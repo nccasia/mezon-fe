@@ -19,12 +19,12 @@ export default memo(function NotificationItemOption({ onDelete }: { onDelete: ()
 							icon: <Icons.TrashIcon height={20} width={20} color={themeValue.textStrong} />,
 							onPress: () => {
 								onDelete();
-							},
-						},
-					],
-				},
+							}
+						}
+					]
+				}
 			] satisfies IMezonMenuSectionProps[],
-		[],
+		[]
 	);
 
 	return (

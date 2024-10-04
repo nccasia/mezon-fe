@@ -108,12 +108,12 @@ function MessageWithUser({
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
 		let includesHere = false;
-		if (typeof message.content.t == 'string') {
+		if (typeof message.content?.t == 'string') {
 			includesHere = message.content.t?.includes('@here');
 		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
 		return includesHere || includesUser;
-	}, [message.content.t, userLogin.userProfile?.user?.id, message.mentions]);
+	}, [message.content?.t, userLogin.userProfile?.user?.id, message.mentions]);
 
 	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
@@ -122,7 +122,7 @@ function MessageWithUser({
 
 	const checkMessageHasReply = useMemo(() => {
 		if (message.references && message.references.length > 0) {
-			return message.references[0]?.message_ref_id !== undefined;
+			return true;
 		}
 		return false;
 	}, [message.references]);
@@ -221,7 +221,7 @@ function MessageWithUser({
 			)}
 			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && (
 				<div
-					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
+					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 					style={{
 						top: `${positionShortUser?.top}px`,
 						left: `${positionShortUser?.left}px`

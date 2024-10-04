@@ -1,6 +1,7 @@
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
-	notificationSettingActions,
 	notifiReactMessageActions,
+	notificationSettingActions,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
@@ -12,12 +13,12 @@ import {
 import { ENotificationTypes, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { notificationTypesList, notiLabels } from '../../../PanelChannel';
+import { notiLabels, notificationTypesList } from '../../../PanelChannel';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
 
-const NotificationSetting = () => {
+const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRef?: RefObject<HTMLElement> }) => {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -119,12 +120,15 @@ const NotificationSetting = () => {
 		}
 		setisNotifyReactMessage(!isNotifyReactMessage);
 	};
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
-		<div className="absolute top-8 right-0 shadow z-[99999999]">
+		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px] dark:bg-black bg-white">
 				<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] dark:border-b-[#6A6A6A] border-b-[#E1E1E1] last:border-b-0 last:mb-0 last:pb-0">
-					{getNotificationChannelSelected?.active === 1 ? (
+					{getNotificationChannelSelected?.active === undefined || getNotificationChannelSelected?.active === 1 ? (
 						<Dropdown
 							trigger="hover"
 							dismissOnClick={false}
@@ -134,7 +138,7 @@ const NotificationSetting = () => {
 										children={nameChildren}
 										subText={mutedUntil}
 										dropdown="change here"
-										onClick={() => muteOrUnMuteChannel(0)}
+										onClick={() => muteOrUnMuteChannel(1)}
 									/>
 								</div>
 							)}
@@ -167,7 +171,10 @@ const NotificationSetting = () => {
 					type="radio"
 					name="NotificationSetting"
 					defaultNotifi={true}
-					checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
+					checked={
+						getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
+						getNotificationChannelSelected?.notification_setting_type === undefined
+					}
 					subText={defaultNotifiName}
 					onClick={() => setNotification(ENotificationTypes.DEFAULT)}
 				/>

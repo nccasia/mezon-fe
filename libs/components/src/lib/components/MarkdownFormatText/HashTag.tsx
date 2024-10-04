@@ -1,10 +1,10 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
 import { selectChannelById, selectCurrentChannel, selectHashtagDmById } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Icons } from '../../components';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {

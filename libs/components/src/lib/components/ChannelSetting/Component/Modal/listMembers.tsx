@@ -1,6 +1,7 @@
-import { AvatarImage, Icons } from '@mezon/components';
+import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { ApiUser } from 'mezon-js/api.gen';
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
 type ListMembersProps = {
 	listItem: (ApiUser | undefined)[];
@@ -11,7 +12,7 @@ type ListMembersProps = {
 const ListMembers = (props: ListMembersProps) => {
 	const { listItem, selectedUserIds, handleCheckboxUserChange } = props;
 	return listItem.map((user: any) => (
-		<ItemMember 
+		<ItemMember
 			key={user?.id}
 			userName={user?.username}
 			displayName={user?.display_name}
@@ -19,9 +20,7 @@ const ListMembers = (props: ListMembersProps) => {
 			avatar={user?.avatar_url}
 			clanName={user.clanNick}
 			checked={selectedUserIds.includes(user?.id || '')}
-			onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
-				handleCheckboxUserChange(event, user?.id || '')
-			}
+			onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCheckboxUserChange(event, user?.id || '')}
 		/>
 	));
 };
@@ -36,13 +35,13 @@ type ItemMemberProps = {
 	avatar?: string;
 	checked: boolean;
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+};
 
 const ItemMember = (props: ItemMemberProps) => {
-	const {userName='', displayName='', clanName='', clanAvatar='', avatar='', checked, onChange} = props;
+	const { userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked, onChange } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
-	return(
+	return (
 		<div className={`flex justify-between py-2 rounded hover:bg-[#E1E2E4] dark:hover:bg-[#43444B] px-[6px]`}>
 			<label className="flex gap-x-2 items-center w-full">
 				<div className="relative flex flex-row justify-center">
@@ -55,16 +54,16 @@ const ItemMember = (props: ItemMemberProps) => {
 					/>
 					<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
 				</div>
-				<AvatarImage 
+				<AvatarImage
 					alt={userName}
 					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
 					src={avatarPrioritize}
-					classNameText='text-[9px] pt-[3px]'
+					classNameText="text-[9px] pt-[3px]"
 				/>
 				<p className="text-sm one-line">{namePrioritize}</p>
 				<p className="text-contentTertiary font-light">{userName}</p>
 			</label>
 		</div>
-	)
-}
+	);
+};

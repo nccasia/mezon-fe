@@ -2,7 +2,8 @@ import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
-import { CameraRoll, PhotoIdentifier, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
+import { CameraRoll, PhotoIdentifier, iosRefreshGallerySelection, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
+import { iosReadGalleryPermission } from '@react-native-camera-roll/camera-roll/src/CameraRollIOSPermission';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Linking, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -88,11 +89,13 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			return granted === PermissionsAndroid.RESULTS.GRANTED;
 		} else if (Platform.OS === 'ios') {
 			dispatch(appActions.setIsFromFCMMobile(true));
-			const result = await iosReadGalleryPermission('addOnly');
+			const result = await iosReadGalleryPermission('readWrite');
 			timerRef.current = setTimeout(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
-			if (result === 'not-determined') {
+			if (result === 'not-determined' || result === 'denied') {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
 				return requestResult === 'granted' || requestResult === 'limited';
+			} else if (result === 'limited') {
+				await iosRefreshGallerySelection();
 			}
 			return result === 'granted' || result === 'limited';
 		}

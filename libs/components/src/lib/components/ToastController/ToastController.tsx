@@ -1,5 +1,4 @@
-import { selectToasts } from '@mezon/store';
-import { ToastPayload } from 'libs/store/src/lib/toasts';
+import { ToastPayload, selectToasts } from '@mezon/store';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast as showToast } from 'react-toastify';
@@ -40,7 +39,7 @@ const ToastController: React.FC = () => {
 				pauseOnHover: toast.pauseOnHover,
 				draggable: toast.draggable,
 				theme: toast.theme,
-				toastId: toast.id,
+				toastId: toast.id
 			});
 
 			trackedToasts.current[toast.id] = id;

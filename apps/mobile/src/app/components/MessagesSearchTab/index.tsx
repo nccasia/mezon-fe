@@ -8,7 +8,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
-import EmptySearchPage from '../EmptySearchPage';
+import { EmptySearchPage } from '../EmptySearchPage';
 import { SearchMessageChannelContext } from '../ThreadDetail/SearchMessageChannel';
 import style from './MessagesSearchTab.styles';
 

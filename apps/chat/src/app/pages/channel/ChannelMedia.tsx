@@ -10,6 +10,7 @@ export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 	if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
 		return (
 			<ChannelMessages
+				clanId={currentChannel?.clan_id || ''}
 				channelId={currentChannel?.id}
 				channelLabel={currentChannel.channel_label}
 				type={ChannelType.CHANNEL_TYPE_TEXT}

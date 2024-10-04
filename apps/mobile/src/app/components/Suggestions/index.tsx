@@ -1,8 +1,9 @@
+import { debounce } from '@mezon/mobile-components';
 import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion } from '@mezon/store';
 import { selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { FC, memo, useEffect, useMemo } from 'react';
+import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { FlatList, LayoutAnimation, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
@@ -23,15 +24,17 @@ export interface MentionSuggestionsProps {
 const Suggestions: FC<MentionSuggestionsProps> = memo(
 	({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue, channelMode }) => {
 		const listMentions = UseMentionList(channelId || '', channelMode);
+		const [listMentionData, setListMentionData] = useState([]);
 		useEffect(() => {
 			if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
 				onAddMentionMessageAction(listMentions);
 			}
 		}, [messageActionNeedToResolve]);
 
-		const formattedMentionList = useMemo(() => {
-			if (keyword === null || !listMentions.length) {
-				return [];
+		const filterMentionList = debounce(() => {
+			if (!listMentions?.length) {
+				setListMentionData([]);
+				return;
 			}
 			LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
 			const mentionSearchText = keyword?.toLocaleLowerCase();
@@ -43,18 +46,19 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 				);
 			};
 
-			return listMentions
+			const filteredUserMentions = listMentions
 				.filter(filterMatchedMentions)
 				.sort((a, b) => compareObjects(a, b, mentionSearchText, 'display', 'display'))
 				.map((item) => ({
 					...item,
 					name: item?.display
 				}));
-		}, [keyword, listMentions]);
+			setListMentionData(filteredUserMentions || []);
+		}, 300);
 
-		if (keyword == null) {
-			return null;
-		}
+		useEffect(() => {
+			filterMentionList();
+		}, [keyword, listMentions]);
 
 		const handleSuggestionPress = (user: MentionDataProps) => {
 			onSelect(user as MentionDataProps);
@@ -62,7 +66,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 		return (
 			<FlatList
 				style={{ maxHeight: 200 }}
-				data={formattedMentionList}
+				data={listMentionData}
 				renderItem={({ item }) => (
 					<Pressable onPress={() => handleSuggestionPress(item)}>
 						<SuggestItem
@@ -101,6 +105,7 @@ export interface MentionHashtagSuggestionsProps {
 const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect, directMessageId, mode }) => {
 	const channels = useSelector(selectAllChannels);
 	const commonChannelDms = useSelector(selectAllHashtagDm);
+	const [channelsMentionData, setChannelsMentionData] = useState([]);
 	const listChannelsMention = useMemo(() => {
 		let channelsMention = [];
 		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
@@ -117,9 +122,20 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			name: item?.channel_label ?? ''
 		}));
 	}, [channels, commonChannelDms, mode]);
-	if (keyword == null) {
-		return null;
-	}
+
+	const filterChannelsMention = debounce(() => {
+		if (!listChannelsMention?.length) {
+			setChannelsMentionData([]);
+			return;
+		}
+		const filteredChannelsMention = listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()));
+		setChannelsMentionData(filteredChannelsMention || []);
+	}, 300);
+
+	useEffect(() => {
+		filterChannelsMention();
+	}, [keyword, listChannelsMention]);
+
 	const handleSuggestionPress = (channel: ChannelsMention) => {
 		onSelect(channel);
 	};
@@ -127,7 +143,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
+			data={channelsMentionData}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
 					<SuggestItem
@@ -154,13 +170,22 @@ export interface IEmojiSuggestionProps {
 const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const dispatch = useAppDispatch();
+	const [formattedEmojiData, setFormattedEmojiData] = useState([]);
 
-	const formattedEmojiList = useMemo(() => {
+	const fetchEmojis = debounce(() => {
 		if (!keyword) {
-			return [];
+			setFormattedEmojiData([]);
+			return;
 		}
 		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
-		return emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20);
+		const filteredListEmoji = emojiListPNG
+			?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)
+			?.slice(0, 20);
+		setFormattedEmojiData(filteredListEmoji);
+	}, 300);
+
+	useEffect(() => {
+		fetchEmojis();
 	}, [keyword, emojiListPNG]);
 
 	const handleEmojiSuggestionPress = (emoji: any) => {
@@ -181,7 +206,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={formattedEmojiList}
+			data={formattedEmojiData}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
 					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />

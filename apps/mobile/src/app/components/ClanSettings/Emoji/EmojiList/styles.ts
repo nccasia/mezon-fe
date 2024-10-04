@@ -6,14 +6,14 @@ export const style = (colors: Attributes) =>
 		headerActionTitle: {
 			color: baseColor.blurple,
 			fontWeight: 'bold',
-			fontSize: size.s_16,
+			fontSize: size.s_16
 		},
 		container: {
 			flex: 1,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.primary
 		},
 		scrollContainer: {
-			backgroundColor: colors.primary,
+			backgroundColor: colors.primary
 		},
 		addEmojiButton: {
 			marginHorizontal: size.s_20,
@@ -22,38 +22,38 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			borderRadius: size.s_15,
-			marginVertical: size.s_15,
+			marginVertical: size.s_15
 		},
 		buttonText: {
 			fontSize: size.s_14,
 			color: baseColor.white,
-			fontWeight: '500',
+			fontWeight: '500'
 		},
 		title: {
 			marginHorizontal: size.s_20,
 			color: colors.borderRadio,
 			fontSize: size.s_14,
-			lineHeight: size.s_18,
+			lineHeight: size.s_18
 		},
 		requireTitle: {
 			marginHorizontal: size.s_20,
 			color: colors.borderRadio,
 			fontSize: size.s_12,
 			lineHeight: size.s_18,
-			marginLeft: size.s_28,
+			marginLeft: size.s_28
 		},
 		lightTitle: {
 			fontWeight: 'bold',
 			marginHorizontal: size.s_20,
 			marginVertical: size.s_10,
 			color: colors.textStrong,
-			fontSize: size.s_14,
+			fontSize: size.s_14
 		},
 		emojiSlotsTitle: {
 			fontWeight: 'bold',
 			marginHorizontal: size.s_20,
 			marginVertical: size.s_30,
 			color: colors.textStrong,
-			fontSize: size.s_14,
-		},
+			fontSize: size.s_14
+		}
 	});

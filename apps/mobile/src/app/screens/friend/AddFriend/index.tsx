@@ -39,25 +39,25 @@ export const AddFriendScreen = () => {
 					break;
 			}
 		},
-		[acceptFriend, deleteFriend],
+		[acceptFriend, deleteFriend]
 	);
 
 	const waysToAddFriendList = useMemo(() => {
 		return [
 			{
 				title: t('addFriend.findYourFriend'),
-				type: EAddFriendWays.FindFriend,
+				type: EAddFriendWays.FindFriend
 			},
 			{
 				title: t('addFriend.addByUserName'),
-				type: EAddFriendWays.UserName,
-			},
+				type: EAddFriendWays.UserName
+			}
 		];
 	}, [t]);
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	return (
 		<View style={styles.addFriendContainer}>

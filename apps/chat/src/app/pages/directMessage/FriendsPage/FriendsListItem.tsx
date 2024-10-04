@@ -1,6 +1,7 @@
-import { Icons, MemberProfile } from '@mezon/components';
+import { MemberProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
 import { ChannelMembersEntity, FriendsEntity } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 

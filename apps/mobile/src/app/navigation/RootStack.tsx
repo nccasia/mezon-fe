@@ -23,7 +23,7 @@ const RootStack = () => {
 			{isLoggedIn ? (
 				<Root.Group
 					screenOptions={{
-						gestureEnabled: false,
+						gestureEnabled: false
 					}}
 				>
 					<Root.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
@@ -32,7 +32,7 @@ const RootStack = () => {
 				<Root.Group
 					screenOptions={{
 						animationTypeForReplace: 'pop',
-						gestureEnabled: false,
+						gestureEnabled: false
 					}}
 				>
 					<Root.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />

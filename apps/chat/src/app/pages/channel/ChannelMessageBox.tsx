@@ -1,6 +1,7 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { referencesActions, selectAnonymousMode, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -23,7 +24,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	const dispatch = useDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
-
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 
@@ -60,16 +61,16 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
 
-	const handleCloseReplyMessageBox = () => {
+	const handleCloseReplyMessageBox = useCallback(() => {
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: channelId ?? '',
 				dataReferences: blankReferenceObj
 			})
 		);
-	};
+	}, [dataReferences.message_ref_id]);
 
-	useEscapeKey(handleCloseReplyMessageBox);
+	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
 	return (
 		<div className="mx-4 relative" role="button" ref={chatboxRef}>
 			{isEmojiOnChat && (
@@ -77,7 +78,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`right-[2px] absolute z-10`}
+					className={`right-[2px] absolute z-10 animate-scale_up origin-bottom-right`}
 					style={{
 						bottom: chatboxRef.current ? `${chatboxRef.current.offsetHeight}px` : ''
 					}}
@@ -90,11 +91,11 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				{isViewingOldMessage && (
 					<div
 						className={classNames(
-							'relative z-0 px-2 py-1 text-sm bg-bgAccent dark:bg-bgDarkAccent rounded-md',
+							'relative z-0 px-2 py-1 text-sm bg-[#6d6f78] dark:bg-bgDarkAccent font-semibold rounded-md',
 							dataReferences.message_ref_id ? 'top-[8px]' : ''
 						)}
 					>
-						<ChannelJumpToPresent channelId={channelId ?? ''} className="pb-[10px]" />
+						<ChannelJumpToPresent clanId={clanId || ''} channelId={channelId ?? ''} className="pb-[10px]" />
 					</div>
 				)}
 				{dataReferences.message_ref_id && (
@@ -112,6 +113,11 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				currentClanId={clanId}
 				mode={mode}
 			/>
+			{anonymousMode && (
+				<div className="absolute -top-3 -right-3 rotate-45 anonymousAnimation">
+					<Icons.HatIcon defaultSize="w-7 h-7 dark:fill-white fill-black " />
+				</div>
+			)}
 		</div>
 	);
 }

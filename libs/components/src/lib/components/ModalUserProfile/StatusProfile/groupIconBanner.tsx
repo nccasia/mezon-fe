@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { useFriends } from '@mezon/core';
 import { ChannelMembersEntity, selectCurrentUserId, selectTheme, StateFriendProps, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IUser } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useSelector } from 'react-redux';
@@ -59,13 +59,13 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 								if (user) {
 									addFriend({
 										usernames: [user.user?.username || ''],
-										ids: [],
+										ids: []
 									});
 								} else {
 									if (kichUser) {
 										addFriend({
 											usernames: [kichUser.username],
-											ids: [],
+											ids: []
 										});
 									}
 								}
@@ -82,7 +82,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 							</Tooltip>
 						</div>
 					)}
-					
+
 					{checkAddFriend.myPendingFriend && showPopupLeft && (
 						<>
 							<div
@@ -125,7 +125,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 							</div>
 						</>
 					)}
-					
+
 					{checkAddFriend.otherPendingFriend && (
 						<div
 							className="p-2 rounded-full bg-[#4e5058] relative h-fit"
@@ -146,7 +146,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 					)}
 				</>
 			)}
-			
+
 			<div
 				className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit"
 				onClick={(e) => {
@@ -163,7 +163,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				>
 					<Icons.ThreeDot defaultSize="size-4 iconWhiteImportant" />
 				</Tooltip>
-				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isSelf={isSelf}/>}
+				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isSelf={isSelf} />}
 			</div>
 		</>
 	);

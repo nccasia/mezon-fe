@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import {Linking, Text} from 'react-native';
+import { Linking, Text } from 'react-native';
 import { style } from './styles';
 
 type IPlainText = {
@@ -13,10 +13,9 @@ export const PlainText = React.memo(({ key, text, isLink = false }: IPlainText) 
 	const styles = style(themeValue);
 
 	const openUrl = (url: string) => {
-		if (isLink)
-		Linking.openURL(url);
-	}
-	
+		if (isLink) Linking.openURL(url);
+	};
+
 	return (
 		<Text key={key} style={[styles.plainText, isLink && styles.textLink]} onPress={() => openUrl(text)}>
 			{text}

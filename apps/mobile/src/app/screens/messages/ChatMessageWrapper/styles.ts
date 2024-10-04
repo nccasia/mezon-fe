@@ -30,7 +30,7 @@ export const style = (colors: Attributes) =>
 		},
 		content: {
 			flex: 1,
-			backgroundColor: Colors.tertiaryWeight
+			backgroundColor: colors.secondary
 		},
 		actions: {
 			flexDirection: 'row',

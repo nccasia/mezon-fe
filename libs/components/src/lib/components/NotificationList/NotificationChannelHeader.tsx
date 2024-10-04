@@ -1,25 +1,49 @@
-import { selectClanById, useAppSelector } from '@mezon/store';
+import {
+	channelMetaActions,
+	clansActions,
+	selectClanById,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, TNotificationChannel } from '@mezon/utils';
+import { INotification, TIME_OFFSET, TNotificationChannel } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
+import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 type NotificationChannelHeaderProps = {
 	itemUnread?: TNotificationChannel;
 	notification?: INotification;
 	isUnreadTab?: boolean;
 	clan_id?: string;
-	onMarkAsRead?: () => void;
 	onDeleteNotification?: () => void;
 };
 
-const NotificationChannelHeader = ({
-	itemUnread,
-	isUnreadTab,
-	clan_id,
-	notification,
-	onMarkAsRead,
-	onDeleteNotification,
-}: NotificationChannelHeaderProps) => {
+const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notification, onDeleteNotification }: NotificationChannelHeaderProps) => {
+	const dispatch = useDispatch();
 	const clan = useAppSelector(selectClanById(clan_id as string));
+	const appearanceTheme = useSelector(selectTheme);
+
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(itemUnread?.channel_id ?? ''));
+
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
+
+	const handleMarkAsRead = useCallback(
+		(itemUnread: TNotificationChannel) => {
+			console.log(itemUnread);
+			const timestamp = Date.now() / 1000;
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+			// if (numberNotification && numberNotification > 0) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+			// }
+		},
+		[dispatch]
+	);
+
 	return (
 		<div className="flex justify-between">
 			<div className="flex flex-row items-center gap-2">
@@ -54,23 +78,60 @@ const NotificationChannelHeader = ({
 			<div className="flex flex-row items-center gap-3">
 				{isUnreadTab ? (
 					<>
-						<button className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]">
-							<Icons.UnMuteBell defaultSize="w-4 h-4" />
-						</button>
-						<button
-							className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-							onClick={onMarkAsRead}
+						<Tooltip
+							content={
+								<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
+									{'Notification Settings'}
+								</p>
+							}
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							placement="top"
 						>
-							✔
-						</button>
+							<button className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]">
+								<Icons.UnMuteBell defaultSize="w-4 h-4" />
+							</button>
+						</Tooltip>
+
+						<Tooltip
+							content={
+								<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
+									{'Mark as read'}
+								</p>
+							}
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							placement="top"
+						>
+							<button
+								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+								onClick={() => handleMarkAsRead}
+							>
+								✔
+							</button>{' '}
+						</Tooltip>
 					</>
 				) : (
-					<button
-						className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-						onClick={onDeleteNotification}
+					<Tooltip
+						content={
+							<p style={{ whiteSpace: 'nowrap' }} className="max-w-60 truncate">
+								{'Close'}
+							</p>
+						}
+						trigger="hover"
+						animation="duration-500"
+						style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						placement="top"
 					>
-						✕
-					</button>
+						<button
+							className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+							onClick={onDeleteNotification}
+						>
+							✕
+						</button>
+					</Tooltip>
 				)}
 			</div>
 		</div>

@@ -1,16 +1,20 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useChannelRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
-	notificationActions,
+	clansActions,
+	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
+import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
@@ -22,25 +26,30 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
+
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(currentChannel.clan_id ?? '', currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(
-			notificationActions.setLastSeenTimeStampChannel({
-				channelId,
-				lastSeenTimeStamp: timestamp + TIME_OFFSET,
-				clanId: currentChannel?.clan_id ?? ''
-			})
-		);
-	}, [channelId, currentChannel, dispatch]);
+	}, [channelId, currentChannel, dispatch, numberNotification]);
+
+	useEffect(() => {
+		if (numberNotification && numberNotification > 0) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
+	}, [numberNotification]);
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const { maxChannelPermissions } = useChannelRestriction(channelId);
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 
-	if (!maxChannelPermissions[EOverriddenPermission.sendMessage]) {
+	if (!canSendMessage) {
 		return (
 			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
 				You do not have permission to send messages in this channel.
@@ -79,6 +88,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const appChannel = useSelector(selectAppChannelById(channelId));
 
 	useChannelSeen(currentChannel?.id || '');
 
@@ -96,7 +106,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
-	return (
+	return currentChannel.type === ChannelType.CHANNEL_TYPE_APP ? (
+		appChannel?.url ? (
+			<iframe src={appChannel?.url} className={'w-full h-full'}></iframe>
+		) : (
+			<div className={'w-full h-full flex items-center justify-center'}>
+				<Loading />
+			</div>
+		)
+	) : (
 		currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 			<>
 				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}

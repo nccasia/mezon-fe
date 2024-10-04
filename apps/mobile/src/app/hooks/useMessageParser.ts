@@ -47,6 +47,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		mentions,
 		lines,
 		messageDate,
-		messageTimeDifference,
+		messageTimeDifference
 	};
 }

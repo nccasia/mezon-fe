@@ -21,7 +21,8 @@ export function useAppNavigation() {
 	}, []);
 
 	const toChannelPage = useCallback((channelId: string, clanId: string) => {
-		return `/chat/clans/${clanId}/channels/${channelId}`;
+		if (channelId) return `/chat/clans/${clanId}/channels/${channelId}`;
+		return `/chat/clans/${clanId}`;
 	}, []);
 
 	const toMessageChannel = useCallback((channelId: string, clanId: string, messageId: string) => {

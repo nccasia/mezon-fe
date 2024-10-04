@@ -52,7 +52,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
 	const searchInputRef = useRef(null);
 	const dispatch = useAppDispatch();
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId)
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -159,12 +159,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 						keyExtractor={(dm) => dm.id.toString()}
 						ItemSeparatorComponent={SeparatorWithSpace}
 						renderItem={({ item }) => (
-							<DmListItem
-								directMessage={item}
-								navigation={navigation}
-								key={item.id}
-								onLongPress={() => handleLongPress(item)}
-							/>
+							<DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />
 						)}
 					/>
 				)}
@@ -179,7 +174,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 			</View>
 
 			<View style={styles.containerDetailMessage}>
-				{!!currentDmGroupId ? <DirectMessageDetailTablet directMessageId={currentDmGroupId} /> : <FriendsTablet navigation={navigation} />}
+				{currentDmGroupId ? <DirectMessageDetailTablet directMessageId={currentDmGroupId} /> : <FriendsTablet navigation={navigation} />}
 			</View>
 		</View>
 	);

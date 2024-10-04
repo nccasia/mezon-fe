@@ -1,7 +1,15 @@
 import { useAppNavigation, useAppParams } from '@mezon/core';
-import { deleteChannel, fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	deleteChannel,
+	directMetaActions,
+	fetchDirectMessage,
+	removeMemberChannel,
+	selectCurrentUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import ModalConfirm from '../ModalConfirm';
 import ItemPanelMember from './ItemPanelMember';
 
@@ -42,11 +50,17 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const handleCancelLeave = () => {
 		setPopupLeave(false);
 	};
-
+	const handleMarkAsRead = useCallback(
+		(directId: string) => {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+		},
+		[dispatch]
+	);
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
-				<ItemPanelMember children="Mark as read" />
+				<ItemPanelMember onClick={() => handleMarkAsRead(dmGroupId ?? '')} children="Mark as read" />
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
 				{isDmGroupOwner && <ItemPanelMember children="Invites" />}

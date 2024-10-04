@@ -6,7 +6,7 @@ describe('<ChannelTopbar />', () => {
 	it('should render correctly', () => {
 		const channel = {
 			label: 'welcome',
-			description: 'Introduction to the Tailwind CSS framework and community.',
+			description: 'Introduction to the Tailwind CSS framework and community.'
 		};
 		render(<ChannelTopbar channel={channel} />);
 

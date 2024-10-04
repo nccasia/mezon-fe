@@ -1,4 +1,4 @@
-import { useClanRestriction, UserRestrictionZone } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	defaultNotificationCategoryActions,
 	selectCurrentClanId,
@@ -23,7 +23,7 @@ import {
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
 import { notificationTypesList } from '../PanelChannel';
 import GroupPanels from '../PanelChannel/GroupPanels';
@@ -40,9 +40,7 @@ interface IPanelCategoryProps {
 const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDeleteCategory, setIsShowPanelChannel, setOpenSetting }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-	const [hasManageClanPermission, { isClanOwner }] = useClanRestriction([EPermission.manageClan]);
-	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
-	const hasManageCategoryPermission = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const dispatch = useAppDispatch();
 	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
 	const currentClanId = useAppSelector(selectCurrentClanId);
@@ -129,12 +127,20 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 		}
 	}, [defaultCategoryNotificationSetting]);
 
+	const handClosePannel = useCallback(() => {
+		setIsShowPanelChannel(false);
+	}, []);
+
+	useEscapeKeyClose(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, handClosePannel);
+
 	return (
 		<div
 			ref={panelRef}
+			tabIndex={-1}
 			role={'button'}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
+			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />
@@ -202,7 +208,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 				</Dropdown>
 			</GroupPanels>
 
-			<UserRestrictionZone policy={hasManageCategoryPermission}>
+			<UserRestrictionZone policy={canManageCategory}>
 				<GroupPanels>
 					<ItemPanel children={'Edit Category'} onClick={handleOpenSetting} />
 					<ItemPanel children={'Delete Category'} onClick={handleDeleteCategory} danger />

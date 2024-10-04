@@ -25,7 +25,7 @@ export function useRoles() {
 					maxPermissionId: maxPermissionId
 				})
 			);
-			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
+			await dispatch(rolesClanActions.fetchRolesClan({ clanId, noCache: true }));
 			return response?.payload;
 		},
 		[dispatch]
@@ -53,7 +53,7 @@ export function useRoles() {
 					maxPermissionId: maxPermissionId
 				})
 			);
-			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
+			await dispatch(rolesClanActions.fetchRolesClan({ clanId, noCache: true }));
 			return response?.payload;
 		},
 		[dispatch]

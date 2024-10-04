@@ -11,7 +11,7 @@ interface IFile {
 	uri: string;
 	name: string;
 	type: string;
-	size: number;
+	size: number | string;
 	fileData: any;
 }
 
@@ -44,7 +44,7 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
 	});
 }
 
-export function getEmojis(clan_id: string) {
+export function useGetEmojis(clan_id: string) {
 	const { categoriesEmoji, categoryEmoji, emojis } = useEmojiSuggestion({ isMobile: true });
 	const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
 

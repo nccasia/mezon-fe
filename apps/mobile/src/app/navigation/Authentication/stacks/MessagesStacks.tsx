@@ -9,7 +9,7 @@ import { NewMessageScreen } from '../../../screens/messages/NewMessage';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const MessagesStacks = ({ }: any) => {
+export const MessagesStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { themeValue } = useTheme();
 	const { t } = useTranslation('screen');
@@ -22,16 +22,16 @@ export const MessagesStacks = ({ }: any) => {
 				gestureDirection: 'vertical',
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
-					close: TransitionSpecs.TransitionIOSSpec,
+					close: TransitionSpecs.TransitionIOSSpec
 				},
 				cardStyle: { backgroundColor: themeValue.secondary },
 				cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
 				headerTitleAlign: 'center',
 				headerTintColor: themeValue.text,
 				headerStyle: {
-					backgroundColor: themeValue.secondary,
+					backgroundColor: themeValue.secondary
 				},
-				headerLeftLabelVisible: false,
+				headerLeftLabelVisible: false
 			}}
 		>
 			<Stack.Screen
@@ -39,21 +39,21 @@ export const MessagesStacks = ({ }: any) => {
 				component={DirectMessageDetailScreen}
 				options={{
 					headerShown: false,
-					headerShadowVisible: false,
+					headerShadowVisible: false
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MESSAGES.NEW_MESSAGE}
 				component={NewMessageScreen}
 				options={{
-					headerTitle: t('headerTitle.newMessage'),
+					headerTitle: t('headerTitle.newMessage')
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MESSAGES.NEW_GROUP}
 				component={NewGroupScreen}
 				options={{
-					headerShown: false,
+					headerShown: false
 				}}
 			/>
 		</Stack.Navigator>

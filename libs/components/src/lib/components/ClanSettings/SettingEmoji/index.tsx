@@ -1,14 +1,13 @@
-import { useEscapeKey } from '@mezon/core';
 import { selectCurrentClanId, selectEmojiByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ClanEmoji } from 'mezon-js';
-import { useState } from 'react';
+import { RefObject, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import ModalSticker, { EGraphicType } from '../SettingSticker/ModalEditSticker';
 import SettingEmojiList from './SettingEmojiList';
 
-const SettingEmoji = () => {
+const SettingEmoji = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> }) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
@@ -29,12 +28,13 @@ const SettingEmoji = () => {
 		dispatch(settingClanStickerActions.openModalInChild());
 	};
 
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setIsOpenEditModal(false);
-		dispatch(settingClanStickerActions.closeModalInChild());
-	};
-
-	useEscapeKey(handleCloseModal);
+		setTimeout(() => {
+			dispatch(settingClanStickerActions.closeModalInChild());
+			parentRef?.current?.focus();
+		}, 0);
+	}, []);
 
 	return (
 		<>

@@ -1,10 +1,11 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
-import { PinMessageEntity, messagesActions, pinMessageActions, selectMessageByMessageId, useAppDispatch } from '@mezon/store';
+import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId, selectMessageByMessageId, useAppDispatch } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import MemberProfile from '../../../MemberProfile';
-import MessageLine from '../../../MessageWithUser/MessageLine';
+import { MemberProfile } from '../../../MemberProfile';
+import { MessageLine } from '../../../MessageWithUser/MessageLine';
 import { ModalDeletePinMess } from './DeletePinMessPopup';
 
 type ItemPinMessageProps = {
@@ -16,9 +17,8 @@ type ItemPinMessageProps = {
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage, onClose } = props;
-	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || '');
-
+	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 
 	const handleJumpMess = () => {
@@ -26,11 +26,29 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 		onClose();
 
 		if (pinMessage.message_id && pinMessage.channel_id) {
-			dispatch(messagesActions.jumpToMessage({ messageId: pinMessage.message_id ?? '', channelId: pinMessage.channel_id ?? '' }));
+			dispatch(
+				messagesActions.jumpToMessage({
+					clanId: currentClanId || '',
+					messageId: pinMessage.message_id ?? '',
+					channelId: pinMessage.channel_id ?? ''
+				})
+			);
 		}
 	};
 
 	const message = useSelector(selectMessageByMessageId(pinMessage.message_id as string));
+
+	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
+		return (
+			<ModalDeletePinMess
+				pinMessage={pinMessage}
+				contentString={contentString}
+				handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
+				closeModal={closeDeletePinMessage}
+				attachments={message?.attachments ? message.attachments : []}
+			/>
+		);
+	}, []);
 
 	return (
 		<div
@@ -55,7 +73,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div className="leading-6">
 						<MessageLine
 							isEditted={false}
-							content={JSON.parse(pinMessage.content || '')}
+							content={JSON.parse(pinMessage.content || '{}')}
 							isJumMessageEnabled={false}
 							isTokenClickAble={false}
 						/>
@@ -72,22 +90,11 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				</p>
 				<button
 					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
-					onClick={() => {
-						setOpenModalDelPin(true);
-					}}
+					onClick={openDeletePinMessage}
 				>
 					✕
 				</button>
 			</div>
-			{openModalDelPin && (
-				<ModalDeletePinMess
-					pinMessage={pinMessage}
-					contentString={contentString}
-					handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
-					closeModal={() => setOpenModalDelPin(false)}
-					attachments={message?.attachments ? message.attachments : []}
-				/>
-			)}
 		</div>
 	);
 };

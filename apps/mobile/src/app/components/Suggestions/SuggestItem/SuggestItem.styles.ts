@@ -73,5 +73,8 @@ export const style = (colors: Attributes) =>
 			color: baseColor.redStrong,
 			fontStyle: 'italic',
 			fontSize: Fonts.size.h7
+		},
+		streamIcon: {
+			marginTop: size.s_4
 		}
 	});

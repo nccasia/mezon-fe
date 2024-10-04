@@ -3,14 +3,13 @@ import { useAuth, useFriends, useMemberCustomStatus } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, channelMembersActions, selectCurrentClanId, selectUpdateToken, useAppDispatch } from '@mezon/store-mobile';
-import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import AddStatusUserModal from '../../components/AddStatusUserModal';
-import CustomStatusUser from '../../components/CustomStatusUser';
+import { AddStatusUserModal } from '../../components/AddStatusUserModal';
+import { CustomStatusUser } from '../../components/CustomStatusUser';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonAvatar, MezonButton } from '../../temp-ui';
@@ -127,7 +126,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 								<Text style={styles.text}>{userCustomStatus}</Text>
 							</TouchableOpacity>
 							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
-								<CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
+								<Icons.CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 							</Pressable>
 						</Block>
 					) : null}

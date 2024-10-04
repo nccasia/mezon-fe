@@ -34,7 +34,7 @@ export default function GiftItem({ loading, data, onPress }: GifItemProps) {
 								source={{
 									uri: item.media_formats.tinygif.url,
 									cache: FastImage.cacheControl.web,
-									priority: FastImage.priority.high,
+									priority: FastImage.priority.high
 								}}
 								resizeMode={FastImage.resizeMode.cover}
 								style={{ height: '100%', width: '100%' }}

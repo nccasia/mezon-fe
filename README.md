@@ -217,7 +217,6 @@ There are several ways to manage the access control:
 
 -   using `policies` slice and `selectAllPermissionsUser` to get the permissions of the user
 -   using `useSelector(selectAllPermissionsUser)` to get the permissions of the user
--   using `useUserPermissions` to get the permissions of the user
 -   using `UserRestrictionZone` to control displaying the components based on the user permissions
 -   using `useUserRestriction` to get the user restrictions based on the user permissions
 

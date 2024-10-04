@@ -1,4 +1,4 @@
-import { useAppNavigation, useDirect, useEscapeKey, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useEscapeKeyClose, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	notificationActions,
@@ -13,7 +13,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserSettings, INotification, ModeResponsive } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { OpenModalProps } from '../ModalUserProfile';
 import AvatarProfile from '../ModalUserProfile/AvatarProfile';
@@ -99,19 +99,19 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 
 	useOnClickOutside(userProfileRef, () => onClose?.());
 
-	const handleOpenEditOption = () => {
+	const handleOpenEditOption = useCallback(() => {
 		setIsOPenEditOption(!isOPenEditOption);
-	};
+	}, [isOPenEditOption]);
 
 	useOnClickOutside(panelRef, () => setIsOPenEditOption(false));
 
-	useEscapeKey(() => {
+	const handleKeydownESC = useCallback(() => {
 		if (isOPenEditOption) {
 			setIsOPenEditOption(false);
 		} else if (onClose) {
 			onClose();
 		}
-	});
+	}, [isOPenEditOption]);
 
 	const handleOpenUserProfileSetting = () => {
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
@@ -130,8 +130,15 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 		}
 	};
 
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, handleKeydownESC);
+
 	return (
-		<div className="w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			className="outline-none w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black"
+		>
 			<div
 				ref={userProfileRef}
 				className="w-[600px] h-[90vh] dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start items-start inline-flex"

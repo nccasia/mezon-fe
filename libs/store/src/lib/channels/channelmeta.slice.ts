@@ -11,6 +11,7 @@ export interface ChannelMetaEntity {
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
 	lastSeenPinMessage: string;
+	clanId: string;
 }
 
 export interface ChannelMetaState extends EntityState<ChannelMetaEntity, string> {
@@ -55,14 +56,6 @@ export const channelMetaSlice = createSlice({
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMetaEntity[]>) => {
 			state = channelMetaAdapter.upsertMany(state, action.payload);
-		},
-		removeUnreadAllChannel: (state) => {
-			const channels = state?.entities;
-			Object.values(channels).forEach((channel) => {
-				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
-					channel.lastSentTimestamp = 0;
-				}
-			});
 		}
 	}
 });
@@ -159,3 +152,8 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 	}
 	return false;
 });
+
+export const selectAllChannelLastSeenTimestampByClanId = (clanId: string) =>
+	createSelector(selectAllChannelMeta, (channelMetas) =>
+		channelMetas.filter((channelMeta) => channelMeta.lastSeenTimestamp && channelMeta.clanId === clanId)
+	);

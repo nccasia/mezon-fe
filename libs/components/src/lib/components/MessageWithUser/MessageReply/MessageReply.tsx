@@ -8,7 +8,7 @@ import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import MessageLine from '../MessageLine';
+import { MessageLine } from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
 	message: IMessageWithUser;
@@ -36,10 +36,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		(e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (messageIdRef) {
-				dispatch(messagesActions.jumpToMessage({ messageId: messageIdRef, channelId: message?.channel_id }));
+				dispatch(messagesActions.jumpToMessage({ clanId: message?.clan_id || '', messageId: messageIdRef, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch, message?.channel_id, messageIdRef]
+		[dispatch, message?.channel_id, message?.clan_id, messageIdRef]
 	);
 
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
@@ -53,7 +53,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
-			{message.references?.length ? (
+			{message.references?.[0].message_ref_id ? (
 				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
@@ -62,7 +62,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={messageSender?.clan_avatar ?? messageSender?.user?.avatar_url}
+								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
 							/>
 						</div>
 

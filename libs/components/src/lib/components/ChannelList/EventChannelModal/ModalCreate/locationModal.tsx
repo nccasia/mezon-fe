@@ -1,9 +1,9 @@
 import { ChannelsEntity, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
-import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { customStyles, lightCustomStyles } from '../../../notificationSetting';
 
 export type LocationModalProps = {
@@ -22,7 +22,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const handleChangeVoice = (selectedOption: any) => {
 		setContentSubmit({
 			...contentSubmit,
-			voiceChannel: selectedOption.value,
+			voiceChannel: selectedOption.value
 		});
 	};
 
@@ -38,7 +38,7 @@ const LocationModal = (props: LocationModalProps) => {
 				{voice.channel_private ? <Icons.SpeakerLocked /> : <Icons.Speaker />}
 				{voice.channel_label}
 			</div>
-		),
+		)
 	}));
 
 	useEffect(() => {

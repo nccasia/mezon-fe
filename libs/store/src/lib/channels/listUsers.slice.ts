@@ -1,7 +1,8 @@
 import { IUsers, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUser } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const LIST_USERS_BY_USER_FEATURE_KEY = 'listusersbyuserid';
 
@@ -27,16 +28,35 @@ export interface ListUsersRootState {
 	[LIST_USERS_BY_USER_FEATURE_KEY]: ListUsersState;
 }
 
-export const fetchListUsersByUser = createAsyncThunk('usersByUser/fetchListUsersByUser', async (_, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-
-	const response = await mezon.socketRef.current?.listUserClansByUserId();
-	if (!response?.user) {
-		return [];
+export const fetchListUsersByUserCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.listUserClansByUserId(mezon.session);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			return args[0].session.username || '';
+		}
 	}
-	const users = response?.user.map(mapUsersToEntity);
-	return users;
-});
+);
+
+export const fetchListUsersByUser = createAsyncThunk(
+	'usersByUser/fetchListUsersByUser',
+	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchListUsersByUserCached.clear(mezon);
+		}
+		const response = await fetchListUsersByUserCached(mezon);
+		if (!response?.users) {
+			return [];
+		}
+		const users = response?.users.map(mapUsersToEntity);
+		return users;
+	}
+);
 
 export const initialListUsersByUserState: ListUsersState = listUsersAdapter.getInitialState({
 	loadingStatus: 'not loaded',

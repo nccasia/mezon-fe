@@ -1,9 +1,8 @@
-
 import { selectMemberClanByGoogleId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
-import { NameComponent } from '@mezon/ui';
+import { Icons, NameComponent } from '@mezon/ui';
 import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useSelector } from 'react-redux';
-import { AvatarImage, Icons } from '../../components';
+import { AvatarImage } from '../../components';
 
 function UserListItem({ user, channelID }: { user: IChannelMember; channelID: string }) {
 	const member = useSelector(selectMemberClanByGoogleId(user.user_id ?? ''));

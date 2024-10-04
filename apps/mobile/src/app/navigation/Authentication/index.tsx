@@ -19,7 +19,7 @@ import { Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-import LoadingModal from '../../components/LoadingModal';
+import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import {
@@ -28,7 +28,7 @@ import {
 	handleFCMToken,
 	isShowNotification,
 	navigateToNotification,
-	setupNotificationListeners,
+	setupNotificationListeners
 } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
@@ -79,7 +79,7 @@ export const Authentication = () => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 				Toast.show({
 					type: 'notification',
-					topOffset: Platform.OS === "ios" ? undefined : 10,
+					topOffset: Platform.OS === 'ios' ? undefined : 10,
 					props: remoteMessage.notification,
 					swipeable: true,
 					visibilityTime: 5000,
@@ -89,7 +89,7 @@ export const Authentication = () => {
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
 						await navigateToNotification(store, remoteMessage, navigation);
-					},
+					}
 				});
 			}
 		});
@@ -118,7 +118,7 @@ export const Authentication = () => {
 				(error: any) => {
 					console.log('Error receiving files:', error);
 				},
-				'mezon.mobile.sharing',
+				'mezon.mobile.sharing'
 			);
 		} catch (error) {
 			console.log('Error while receiving files:', error);
@@ -151,7 +151,7 @@ export const Authentication = () => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					gestureDirection: 'horizontal',
+					gestureDirection: 'horizontal'
 				}}
 			>
 				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />

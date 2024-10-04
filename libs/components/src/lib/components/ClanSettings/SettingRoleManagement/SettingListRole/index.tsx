@@ -9,9 +9,10 @@ import {
 	setSelectedPermissions,
 	setSelectedRoleId
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../../../ui/src/lib/Icons';
+
 type closeEditRole = {
 	RolesClan: RolesClanEntity[];
 	handleClose: () => void;

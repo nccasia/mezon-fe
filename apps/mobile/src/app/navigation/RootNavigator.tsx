@@ -17,15 +17,14 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
-	usersStreamActions,
 	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
-import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContextProvider } from '@mezon/core';
+import { ChatContext, ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
@@ -57,6 +56,7 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
+	const { handleReconnect } = useContext(ChatContext);
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
@@ -106,7 +106,8 @@ const NavigationMain = () => {
 					channelId: currentChannelId,
 					noCache: true,
 					isFetchingLatestMessages: true,
-					isClearMessage: true
+					isClearMessage: true,
+					clanId: currentClanId
 				})
 			);
 		}
@@ -139,6 +140,7 @@ const NavigationMain = () => {
 				return null;
 			}
 			const store = await getStoreAsync();
+			handleReconnect('Initial reconnect attempt');
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			const promise = [
 				store.dispatch(
@@ -146,7 +148,8 @@ const NavigationMain = () => {
 						channelId: currentChannelId,
 						noCache: true,
 						isFetchingLatestMessages: true,
-						isClearMessage: true
+						isClearMessage: true,
+						clanId: currentClanId
 					})
 				),
 				store.dispatch(
@@ -155,14 +158,14 @@ const NavigationMain = () => {
 						channelId: '',
 						channelType: ChannelType.CHANNEL_TYPE_VOICE
 					})
-				),
-				store.dispatch(
-					usersStreamActions.fetchStreamChannelMembers({
-						clanId: currentClanId ?? '',
-						channelId: '',
-						channelType: ChannelType.CHANNEL_TYPE_STREAMING
-					})
 				)
+				// store.dispatch(
+				// 	usersStreamActions.fetchStreamChannelMembers({
+				// 		clanId: currentClanId ?? '',
+				// 		channelId: '',
+				// 		channelType: ChannelType.CHANNEL_TYPE_STREAMING
+				// 	})
+				// )
 			];
 			await Promise.all(promise);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -172,7 +175,7 @@ const NavigationMain = () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
 		}
-	}, [currentChannelId]);
+	}, [currentChannelId, currentClanId]);
 
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
@@ -210,11 +213,11 @@ const NavigationMain = () => {
 					}
 				}
 
-				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser()));
+				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
-				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji()));
+				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {

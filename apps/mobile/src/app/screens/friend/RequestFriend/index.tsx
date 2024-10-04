@@ -12,7 +12,7 @@ import { style } from './styles';
 
 enum EFriendRequest {
 	Received,
-	Sent,
+	Sent
 }
 
 export const RequestFriendScreen = () => {
@@ -25,12 +25,12 @@ export const RequestFriendScreen = () => {
 	const friendRequestTabs = [
 		{
 			title: t('friendRequest.received'),
-			type: EFriendRequest.Received,
+			type: EFriendRequest.Received
 		},
 		{
 			title: t('friendRequest.sent'),
-			type: EFriendRequest.Sent,
-		},
+			type: EFriendRequest.Sent
+		}
 	];
 
 	const handleFriendAction = useCallback(
@@ -49,7 +49,7 @@ export const RequestFriendScreen = () => {
 					break;
 			}
 		},
-		[acceptFriend, deleteFriend],
+		[acceptFriend, deleteFriend]
 	);
 
 	const receivedFriendRequestList = useMemo(() => {
@@ -61,8 +61,8 @@ export const RequestFriendScreen = () => {
 	}, [friends]);
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	return (
 		<View style={styles.requestFriendContainer}>

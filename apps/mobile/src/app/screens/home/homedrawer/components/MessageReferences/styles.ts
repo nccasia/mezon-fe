@@ -7,30 +7,30 @@ export const style = (colors: Attributes) =>
 			marginTop: size.s_6,
 			paddingLeft: size.s_10,
 			gap: 15,
-			height: size.s_24,
+			height: size.s_24
 		},
 		iconReply: {
 			width: size.s_34,
 			height: '100%',
 			alignItems: 'center',
-			paddingLeft: size.s_30,
+			paddingLeft: size.s_30
 		},
 		deletedMessageReplyIcon: {
-			top: size.s_4,
+			top: size.s_4
 		},
 		replyAvatar: {
 			width: size.s_20,
 			height: size.s_20,
 			borderRadius: size.s_50,
 			backgroundColor: Colors.gray48,
-			overflow: 'hidden',
+			overflow: 'hidden'
 		},
 		repliedMessageWrapper: {
 			flexDirection: 'row',
 			gap: 8,
 			marginRight: 0,
 			height: size.s_20,
-			alignContent: 'center',
+			alignContent: 'center'
 		},
 		avatarMessageBoxDefault: {
 			width: '100%',
@@ -38,34 +38,34 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_50,
 			backgroundColor: colors.colorAvatarDefault,
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		textAvatarMessageBoxDefault: {
 			fontSize: size.s_22,
-			color: Colors.white,
+			color: Colors.white
 		},
 		imageMessageRender: {
 			borderRadius: verticalScale(5),
 			marginVertical: size.s_6,
 			borderWidth: 0.5,
-			borderColor: Colors.borderPrimary,
+			borderColor: Colors.borderPrimary
 		},
 		repliedTextAvatar: {
 			fontSize: size.s_12,
-			color: Colors.white,
+			color: Colors.white
 		},
 		replyContentWrapper: {
 			width: '85%',
 			flexDirection: 'row',
 			alignItems: 'center',
-			gap: 4,
+			gap: 4
 		},
 		replyDisplayName: {
 			color: Colors.caribbeanGreen,
-			fontSize: size.small,
+			fontSize: size.small
 		},
 		tapToSeeAttachmentText: {
 			color: colors.text,
-			fontSize: size.small,
-		},
+			fontSize: size.small
+		}
 	});

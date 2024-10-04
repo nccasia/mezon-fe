@@ -12,7 +12,14 @@ interface IMezonClanAvatarProps {
 	lightMode?: boolean;
 }
 
-export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor, textStyle, noDefaultText = false, lightMode }: IMezonClanAvatarProps) {
+export default function MezonClanAvatar({
+	image,
+	alt = 'anonymous',
+	defaultColor,
+	textStyle,
+	noDefaultText = false,
+	lightMode
+}: IMezonClanAvatarProps) {
 	const { themeValue } = useTheme();
 
 	const styles = style(themeValue);

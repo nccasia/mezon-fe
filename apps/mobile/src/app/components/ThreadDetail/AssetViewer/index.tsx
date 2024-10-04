@@ -3,23 +3,23 @@ import { ChannelType } from 'mezon-js';
 import React, { useContext, useRef, useState } from 'react';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import MediaChannel from '../../MediaChannel/MediaChannel';
 import { MemberListStatus } from '../../MemberStatus';
 import PinMessage from '../../PinMessage';
 import AssetsHeader from '../AssetsHeader';
 import { threadDetailContext } from '../MenuThreadDetail';
 import styles from './style';
-import MediaChannel from '../../MediaChannel';
 
 const TabList = [
-  {
-    title: 'Members'
-  },
-  {
-    title: 'Media'
-  },
-  {
-    title: 'Pins'
-  },
+	{
+		title: 'Members'
+	},
+	{
+		title: 'Media'
+	},
+	{
+		title: 'Pins'
+	}
 	// "Links",
 	// "Files"
 ];

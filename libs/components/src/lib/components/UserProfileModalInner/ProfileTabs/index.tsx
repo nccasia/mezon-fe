@@ -7,14 +7,14 @@ export const typeTab = {
 	ABOUT_ME: 'About Me',
 	ACTIVITY: 'Activity',
 	MUTUAL_FRIENDS: 'Mutual Friends',
-	MUTUAL_SERVERS: 'Mutual Servers',
+	MUTUAL_SERVERS: 'Mutual Servers'
 };
 
 const profileTabs = [
 	{ id: typeTab.ABOUT_ME, name: typeTab.ABOUT_ME },
 	{ id: typeTab.ACTIVITY, name: typeTab.ACTIVITY },
 	{ id: typeTab.MUTUAL_FRIENDS, name: typeTab.MUTUAL_FRIENDS },
-	{ id: typeTab.MUTUAL_SERVERS, name: typeTab.MUTUAL_SERVERS },
+	{ id: typeTab.MUTUAL_SERVERS, name: typeTab.MUTUAL_SERVERS }
 ];
 
 const ProfileTabs = ({ activeTab, onActiveTabChange }: ProfileTabsProps) => {

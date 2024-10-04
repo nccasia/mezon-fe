@@ -28,10 +28,10 @@ export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypin
 			channelId,
 			typingUsersIds?.length
 				? typingUsersIds
-					?.filter((item) => item.id !== userId)
-					.map((item) => item.id)
-					.splice(0, 2) // only handle <= 2 items because business logic only show several user typing
-					.join('/')
+						?.filter((item) => item.id !== userId)
+						.map((item) => item.id)
+						.splice(0, 2) // only handle <= 2 items because business logic only show several user typing
+						.join('/')
 				: '',
 			isDM ? '1' : ''
 		)

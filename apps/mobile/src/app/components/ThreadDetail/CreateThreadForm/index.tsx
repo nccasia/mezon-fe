@@ -131,7 +131,13 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
 						await sendMessageThread(content, mentions, attachments, references, thread);
-						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
+						await dispatch(
+							messagesActions.fetchMessages({
+								channelId: thread.channel_id as string,
+								isFetchingLatestMessages: true,
+								clanId: currentClanId
+							})
+						);
 					}
 				} else {
 					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);

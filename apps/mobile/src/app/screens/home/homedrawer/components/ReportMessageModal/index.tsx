@@ -26,32 +26,32 @@ enum EReportCategory {
 	ABUSE_OR_HARASSMENT = 'ABUSE_OR_HARASSMENT',
 	SPAM = 'SPAM',
 	HARMFUL_MISINFORMATION_OR_GLORIFYING_VIOLENCE = 'HARMFUL_MISINFORMATION_OR_GLORIFYING_VIOLENCE',
-	EXPOSING_PRIVATE_IDENTIFYING_INFORMATION = 'EXPOSING_PRIVATE_IDENTIFYING_INFORMATION',
+	EXPOSING_PRIVATE_IDENTIFYING_INFORMATION = 'EXPOSING_PRIVATE_IDENTIFYING_INFORMATION'
 }
 //mock data
 const reportOptionList: IReportOption[] = [
 	{
 		title: 'Spam',
-		type: EReportCategory.SPAM,
+		type: EReportCategory.SPAM
 	},
 	{
 		title: 'Abuse or harassment',
-		type: EReportCategory.ABUSE_OR_HARASSMENT,
+		type: EReportCategory.ABUSE_OR_HARASSMENT
 	},
 	{
 		title: 'Harmful misinformation or glorifying violence',
-		type: EReportCategory.HARMFUL_MISINFORMATION_OR_GLORIFYING_VIOLENCE,
+		type: EReportCategory.HARMFUL_MISINFORMATION_OR_GLORIFYING_VIOLENCE
 	},
 	{
 		title: 'Exposing private identifying information',
-		type: EReportCategory.EXPOSING_PRIVATE_IDENTIFYING_INFORMATION,
-	},
+		type: EReportCategory.EXPOSING_PRIVATE_IDENTIFYING_INFORMATION
+	}
 ];
 
 export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 	const { isVisible, onClose, message } = props;
 	const { themeValue } = useTheme();
-	const styles = style(themeValue)
+	const styles = style(themeValue);
 	const [reportSelected, setReportSelected] = useState<IReportOption | null>(null);
 	const slideAnim = useRef(new Animated.Value(1)).current;
 	const { t } = useTranslation('message');
@@ -66,7 +66,7 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 		Animated.timing(slideAnim, {
 			toValue: reportSelected ? 0 : size.s_100,
 			duration: 300,
-			useNativeDriver: true,
+			useNativeDriver: true
 		}).start();
 	}, [reportSelected]);
 
@@ -78,8 +78,8 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 				type: 'success',
 				props: {
 					text2: t('reportMessage.reportSubmitted'),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+				}
 			});
 		});
 	};

@@ -1,6 +1,13 @@
 import { useAppNavigation } from '@mezon/core';
-import { ChannelsEntity, selectLastMessageIdByChannelId, selectMemberClanByUserId, selectMessageEntityById, useAppSelector } from '@mezon/store';
-import { IChannelMember, convertTimeMessage } from '@mezon/utils';
+import {
+	ChannelsEntity,
+	selectAllChannelMembers,
+	selectLastMessageIdByChannelId,
+	selectMemberClanByUserId,
+	selectMessageEntityById,
+	useAppSelector
+} from '@mezon/store';
+import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,13 +17,14 @@ import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
 	thread: ChannelsEntity;
-	avatarMembers?: (string | undefined)[];
-	setIsShowThread: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsShowThread: () => void;
 };
 
-const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
+
+	const threadMembers = useSelector((state) => selectAllChannelMembers(state, thread.channel_id));
 
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread.channel_id as string));
 	const message = useAppSelector((state) =>
@@ -25,7 +33,7 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
 	const { avatarImg, username } = useMessageSender(user);
 
-	const getRandomElements = (array: (string | undefined)[], count: number) => {
+	const getRandomElements = (array: ChannelMembersEntity[], count: number) => {
 		const result = [];
 		const usedIndices = new Set();
 
@@ -41,11 +49,11 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 	};
 
 	const previewAvatarList = useMemo(() => {
-		if (avatarMembers && avatarMembers.length > 0) {
-			return getRandomElements(avatarMembers, 5);
+		if (threadMembers && threadMembers.length > 0) {
+			return getRandomElements(threadMembers, 5);
 		}
 		return [];
-	}, [avatarMembers]);
+	}, [threadMembers]);
 
 	const timeMessage = useMemo(() => {
 		if (message && message.create_time_seconds) {
@@ -61,7 +69,7 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
 		navigate(toChannelPage(channelId, clanId));
-		setIsShowThread(false);
+		setIsShowThread();
 	};
 
 	return (
@@ -89,12 +97,14 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 					</div>
 				</div>
 				<div className="w-[120px]">
-					{avatarMembers && (
+					{threadMembers && (
 						<Avatar.Group className="flex gap-3 justify-end items-center">
-							{previewAvatarList?.map((avatar, index) => <Avatar key={index} img={avatar} rounded size="xs" />)}
-							{avatarMembers && avatarMembers.length > 5 && (
+							{previewAvatarList?.map((avatar, index) => (
+								<Avatar key={index} img={avatar.clan_avatar || avatar.user?.avatar_url} rounded size="xs" />
+							))}
+							{threadMembers && threadMembers.length > 5 && (
 								<Avatar.Counter
-									total={avatarMembers?.length - 5 > 50 ? 50 : avatarMembers?.length - 5}
+									total={threadMembers?.length - 5 > 50 ? 50 : threadMembers?.length - 5}
 									className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
 								/>
 							)}

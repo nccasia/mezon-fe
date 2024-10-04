@@ -1,14 +1,12 @@
-import { useEscapeKey } from '@mezon/core';
 import { selectCurrentClanId, selectStickerByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
-import { Button, Modal } from '@mezon/ui';
+import { Button, Icons, Modal } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
-import { useState } from 'react';
+import { RefObject, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 import ModalSticker, { EGraphicType } from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
 
-const SettingSticker = () => {
+const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> }) => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
 	const [editSticker, setEditSticker] = useState<ClanSticker | null>(null);
 	const currentClanId = useSelector(selectCurrentClanId) || '';
@@ -21,17 +19,18 @@ const SettingSticker = () => {
 
 		setShowModalSticker(true);
 	};
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setShowModalSticker(false);
 		setEditSticker(null);
-		dispatch(settingClanStickerActions.closeModalInChild());
-	};
+		setTimeout(() => {
+			dispatch(settingClanStickerActions.closeModalInChild());
+			parentRef?.current?.focus();
+		}, 0);
+	}, []);
 	const handleOpenModalUpload = () => {
 		setShowModalSticker(true);
 		dispatch(settingClanStickerActions.openModalInChild());
 	};
-
-	useEscapeKey(handleCloseModal);
 
 	return (
 		<>
@@ -51,7 +50,7 @@ const SettingSticker = () => {
 					</div>
 					<Button label="upload sticker" className="capitalize" onClick={handleOpenModalUpload}></Button>
 				</div>
-				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] md:gap-x-[calc((100%_-_116px_*_6)/5)]">
+				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] max-sbm:justify-evenly md:gap-x-[calc((100%_-_116px_*_4)/3)] gap-x-[calc((100%_-_116px_*_3)/2)]">
 					{listSticker.map((sticker) => (
 						<SettingStickerItem key={sticker.id} sticker={sticker} updateSticker={handleUpdateSticker} />
 					))}

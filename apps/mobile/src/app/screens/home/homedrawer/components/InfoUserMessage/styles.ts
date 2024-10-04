@@ -6,18 +6,18 @@ export const style = (colors: Attributes) =>
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '700',
-			color: Colors.caribbeanGreen,
+			color: Colors.caribbeanGreen
 		},
 		dateMessageBox: {
 			fontSize: size.small,
-			color: Colors.gray72,
+			color: Colors.gray72
 		},
 		wrapperAvatarCombine: {
-			width: size.s_40,
+			width: size.s_40
 		},
 		messageBoxTop: {
 			flexDirection: 'row',
 			alignItems: 'flex-end',
-			marginBottom: size.s_6,
-		},
+			marginBottom: size.s_6
+		}
 	});

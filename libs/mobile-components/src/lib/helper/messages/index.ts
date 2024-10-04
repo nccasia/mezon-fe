@@ -16,7 +16,7 @@ export function abbreviateText(filename: string) {
 	// Abbreviate the parts according to the examples given
 	if (baseNameParts.length > 2) {
 		baseName = baseNameParts[0] + '...' + baseNameParts[baseNameParts.length - 1];
-	} else if (baseNameParts.length == 2) {
+	} else if (baseNameParts.length === 2) {
 		baseName = baseNameParts[0] + '...' + baseNameParts[1];
 	}
 
@@ -41,8 +41,10 @@ export const getChannelById = (channelHashtagId: string, channelsEntities?: Reco
 };
 
 export const convertToPlainTextHashtag = (text: string) => {
+	// eslint-disable-next-line no-useless-escape
 	const hashtagPattern = /\{\#\}\[(.*?)\]\(\d+\)/g;
 	text = text.replace(hashtagPattern, (match, p1) => `#${p1}`);
+	// eslint-disable-next-line no-useless-escape
 	const mentionPattern = /\{\@\}\[(.*?)\]\(\d+\)/g;
 	text = text.replace(mentionPattern, (match, p1) => `@${p1}`);
 
@@ -55,7 +57,8 @@ export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
 export const splitBlockCodeRegex =
 	/(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
-
+export const validLinkInviteRegex = /https:\/\/mezon\.ai\/invite\/[0-9]{19}/;
+export const inviteLinkRegex = /https:\/\/mezon\.ai\/invite\/([0-9]{19})/;
 export const pushAttachmentToCache = (attachment: any, channelId: string | number) => {
 	const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 

@@ -1,7 +1,8 @@
 import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
 
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
@@ -35,19 +36,40 @@ type GetRolePayload = {
 	clanId?: string;
 	repace?: boolean;
 	channelId?: string;
+	noCache?: boolean;
 };
+
+export const fetchRolesClanCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.listRoles(mezon.session, clanId, '500', '1', '');
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			const username = args[0]?.session?.username || '';
+			return args[1] + username;
+		}
+	}
+);
+
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
-	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.listRoles(clanId || '', 500, 1, '');
+	async ({ clanId, repace = false, channelId, noCache }: GetRolePayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchRolesClanCached.clear(mezon, clanId || '');
+		}
+		const response = await fetchRolesClanCached(mezon, clanId || '');
 		if (!response?.roles?.roles) {
 			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
-		return response.roles.roles.map(mapRolesClanToEntity);
+		const roles = response?.roles.roles.map(mapRolesClanToEntity);
+		return roles;
 	}
 );
 

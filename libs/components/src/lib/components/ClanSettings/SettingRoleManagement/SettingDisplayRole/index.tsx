@@ -17,7 +17,7 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
+const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[]; hasPermissionEdit: boolean }) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const clickRole = useSelector(getSelectedRoleId);
@@ -45,9 +45,7 @@ const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
-		<div 
-			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800 pr-5'
-		>
+		<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800 pr-5">
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>
 			</div>

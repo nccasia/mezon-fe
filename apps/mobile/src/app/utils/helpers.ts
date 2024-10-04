@@ -72,5 +72,4 @@ export const clanAndChannelIdLinkRegex = /clans\/(\d+)\/channels\/(\d+)/;
 export const clanDirectMessageLinkRegex = /chat\/direct\/message\/(\d+)\/(\d+)$/;
 
 export const validTextInputRegex = /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}_\-\s]{1,64}$/u;
-export const validLinkInviteRegex = /^https:\/\/mezon\.vn\/invite\/[0-9]{19}$/;
 export const linkGoogleMeet = 'https://meet.google.com/';

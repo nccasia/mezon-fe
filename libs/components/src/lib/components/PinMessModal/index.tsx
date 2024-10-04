@@ -1,6 +1,6 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKeyClose } from '@mezon/core';
 import { IMessageWithUser, KEY_KEYBOARD } from '@mezon/utils';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import MessageWithUser from '../MessageWithUser';
 
 type ModalAddPinMessProps = {
@@ -18,8 +18,6 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 		closeModal();
 	};
 
-	useEscapeKey(closeModal);
-
 	useEffect(() => {
 		const handleEnterKey = (event: KeyboardEvent) => {
 			if (event.keyCode === KEY_KEYBOARD.ENTER) {
@@ -33,8 +31,16 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 		};
 	}, [handlePinMessageAndCloseModal]);
 
+	const modalRef = useRef<HTMLDivElement>(null);
+
+	useEscapeKeyClose(modalRef, closeModal);
+
 	return (
-		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+		>
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
 				<div className="dark:text-white text-black max-w-full">
 					<div className="p-4 pb-0">

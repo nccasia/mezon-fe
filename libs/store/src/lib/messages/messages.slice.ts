@@ -110,12 +110,18 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
+	directMessageUnread: Record<string, ChannelMessage[]>;
 }
 export type FetchMessagesMeta = {
 	arg: {
 		channelId: string;
 		direction?: Direction_Mode;
 	};
+};
+export type DirectTimeStampArg = {
+	directId: string;
+	lastSeenTimestamp: number;
+	lastSentTimestamp: number;
 };
 
 type FetchMessagesPayloadAction = {
@@ -136,8 +142,8 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) => {
-		const response = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
+	async (mezon: MezonValueContext, clanId: string, channelId: string, messageId?: string, direction?: number) => {
+		const response = await mezon.client.listChannelMessages(mezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -145,38 +151,40 @@ export const fetchMessagesCached = memoizeAndTrack(
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
 			// set default value
-			if (args[2] === undefined) {
-				args[2] = '';
-			}
 			if (args[3] === undefined) {
-				args[3] = 1;
+				args[3] = '';
 			}
-			return args[1] + args[2] + args[3] + args[0].session.username;
+			if (args[4] === undefined) {
+				args[4] = 1;
+			}
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
 		}
 	}
 );
 
 type fetchMessageChannelPayload = {
+	clanId: string;
 	channelId: string;
 	noCache?: boolean;
 	messageId?: string;
 	direction?: number;
 	isFetchingLatestMessages?: boolean;
 	isClearMessage?: boolean;
+	directTimeStamp?: DirectTimeStampArg;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
-		{ channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
+		{ clanId, channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage, directTimeStamp }: fetchMessageChannelPayload,
 		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchMessagesCached.clear(mezon, channelId, messageId, direction);
+			fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
 		}
 
-		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
+		const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
 
 		if (!response.messages) {
 			return {
@@ -274,6 +282,7 @@ export const fetchMessages = createAsyncThunk(
 );
 
 type LoadMoreMessArgs = {
+	clanId: string;
 	channelId: string;
 	direction?: Direction_Mode;
 	fromMobile?: boolean;
@@ -281,7 +290,7 @@ type LoadMoreMessArgs = {
 
 export const loadMoreMessage = createAsyncThunk(
 	'messages/loadMoreMessage',
-	async ({ channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false }: LoadMoreMessArgs, thunkAPI) => {
+	async ({ clanId, channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false }: LoadMoreMessArgs, thunkAPI) => {
 		try {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
 			// ignore when:
@@ -304,6 +313,7 @@ export const loadMoreMessage = createAsyncThunk(
 
 				return await thunkAPI.dispatch(
 					fetchMessages({
+						clanId: clanId,
 						channelId: channelId,
 						noCache: true,
 						messageId: lastScrollMessageId,
@@ -321,6 +331,7 @@ export const loadMoreMessage = createAsyncThunk(
 
 				return thunkAPI.dispatch(
 					fetchMessages({
+						clanId: clanId,
 						channelId: channelId,
 						noCache: true,
 						messageId: firstScrollMessageId,
@@ -336,6 +347,7 @@ export const loadMoreMessage = createAsyncThunk(
 );
 
 type JumpToMessageArgs = {
+	clanId: string;
 	channelId: string;
 	messageId: string;
 	noCache?: boolean;
@@ -352,13 +364,14 @@ type JumpToMessageArgs = {
  */
 export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
-	async ({ messageId, channelId, noCache = true, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
+	async ({ clanId, messageId, channelId, noCache = true, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
 		try {
 			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const isMessageExist = channelMessages.includes(messageId);
 			if (!isMessageExist) {
 				await thunkAPI.dispatch(
 					fetchMessages({
+						clanId: clanId,
 						channelId: channelId,
 						noCache: noCache,
 						messageId: messageId,
@@ -639,7 +652,8 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
-	channelIdLastFetch: ''
+	channelIdLastFetch: '',
+	directMessageUnread: {}
 };
 
 export type SetCursorChannelArgs = {
@@ -669,20 +683,9 @@ export const messagesSlice = createSlice({
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel, mode } = action.payload;
 
 			if (!channelId || !messageId) return state;
-			state.newMesssageUpdateImage = {
-				channel_id: action.payload.channel_id,
-				message_id: action.payload.id,
-				clan_id: action.payload.clan_id,
-				mode: action.payload.mode,
-				mentions: action.payload.mentions,
-				content: action.payload.content,
-				isMe: action.payload.isMe,
-				code: action.payload.code,
-				attachments: action.payload.attachments
-			};
 
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({

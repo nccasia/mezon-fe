@@ -1,10 +1,10 @@
-import { useClanRestriction } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { deleteSticker, selectCurrentClanId, selectCurrentUserId, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 
 type SettingEmojiListProps = {
 	updateSticker: (sticker: ClanSticker) => void;
@@ -14,12 +14,11 @@ type SettingEmojiListProps = {
 const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) => {
 	const dataAuthor = useSelector(selectMemberClanByUserId(sticker.creator_id ?? ''));
 	const dispatch = useAppDispatch();
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === sticker.creator_id;
-	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, sticker.creator_id]);
+		return canManageClan || currentUserId === sticker.creator_id;
+	}, [currentUserId, sticker.creator_id]);
 	const clanId = useSelector(selectCurrentClanId);
 	const handleUpdateSticker = () => {
 		updateSticker(sticker);

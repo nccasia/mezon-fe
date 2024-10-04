@@ -5,7 +5,7 @@ export const searchFieldName: Record<string, string> = {
 	before: 'create_time',
 	in: 'channel_label',
 	pinned: '',
-	content: 'content',
+	content: 'content'
 };
 
 export const searchOptions = [
@@ -15,7 +15,7 @@ export const searchOptions = [
 	{ title: 'before:', content: 'specific data', value: 'username' },
 	{ title: 'during:', content: 'specific data', value: 'username' },
 	{ title: 'after:', content: 'specific data', value: 'username' },
-	{ title: 'pinned:', content: 'true or false', value: 'username' },
+	{ title: 'pinned:', content: 'true or false', value: 'username' }
 ];
 
 export const hasKeySearch = (value: string) => {

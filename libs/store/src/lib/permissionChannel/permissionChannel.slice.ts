@@ -27,7 +27,7 @@ export const addChannelUsers = createAsyncThunk(
 				repace: true
 			};
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();
@@ -62,7 +62,7 @@ export const removeChannelUsers = createAsyncThunk(
 					repace: true
 				};
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			}
 			return response;
 		} catch (error: any) {
@@ -97,7 +97,8 @@ export const addChannelRoles = createAsyncThunk(
 			const bodyFetchRoles = {
 				clanId: clanId,
 				channelId: channelId,
-				repace: true
+				repace: true,
+				noCache: true
 			};
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(bodyFetchUsers));
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan(bodyFetchRoles));
@@ -135,7 +136,8 @@ export const removeChannelRole = createAsyncThunk(
 			const bodyFetchRoles = {
 				clanId: clanId,
 				channelId: channelId,
-				repace: true
+				repace: true,
+				noCache: true
 			};
 			thunkAPI.dispatch(rolesClanActions.fetchRolesClan(bodyFetchRoles));
 			return response;

@@ -4,15 +4,15 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		clansBox: {
-			marginTop: size.s_10,
+			marginTop: size.s_10
 		},
 		serverItem: {
-			marginBottom: size.s_10,
+			marginBottom: size.s_10
 		},
 		serverName: {
 			flexDirection: 'row',
 			gap: size.s_16,
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		wrapperPlusClan: {
 			height: verticalScale(50),
@@ -21,35 +21,35 @@ export const style = (colors: Attributes) =>
 			overflow: 'hidden',
 			alignItems: 'center',
 			justifyContent: 'center',
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.secondary
 		},
 		createClan: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			alignSelf: 'center',
-			marginVertical: size.s_10,
+			marginVertical: size.s_10
 		},
 		clanName: {
 			color: colors.textStrong,
 			fontSize: size.label,
 			fontWeight: '400',
-			maxWidth: 150,
+			maxWidth: 150
 		},
 
 		activeClanItem: {
-			backgroundColor: colors.secondaryLight,
+			backgroundColor: colors.secondaryLight
 		},
 		activeClanName: {
 			fontWeight: '700',
-			color: colors.white,
+			color: colors.white
 		},
 		mt10: {
-			marginTop: size.s_10,
+			marginTop: size.s_10
 		},
 		wrapperClanIcon: {
-			alignItems: 'center',
+			alignItems: 'center'
 		},
-		
+
 		clanIcon: {
 			height: verticalScale(50),
 			width: verticalScale(50),
@@ -58,24 +58,24 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			backgroundColor: colors.black,
-			marginTop: size.s_10,
+			marginTop: size.s_10
 		},
-		
+
 		textLogoClanIcon: {
 			color: colors.white,
 			fontSize: size.s_22,
-			fontWeight: '400',
+			fontWeight: '400'
 		},
-		
+
 		logoClan: {
 			height: verticalScale(70),
 			width: verticalScale(70),
-			resizeMode: 'cover',
+			resizeMode: 'cover'
 		},
-		
+
 		clanIconActive: {
 			backgroundColor: colors.secondary,
-			borderRadius: verticalScale(15),
+			borderRadius: verticalScale(15)
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
@@ -85,6 +85,6 @@ export const style = (colors: Attributes) =>
 			left: -13,
 			borderTopRightRadius: 10,
 			borderBottomEndRadius: 10,
-			position: 'absolute',
-		},
+			position: 'absolute'
+		}
 	});

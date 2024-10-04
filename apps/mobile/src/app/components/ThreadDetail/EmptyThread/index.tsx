@@ -1,15 +1,23 @@
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { selectCurrentChannelId } from '@mezon/store';
+import { EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { style } from './EmptyThread.style';
 
 const EmptyThread = ({ onPress }: { onPress: () => void }) => {
 	const { themeValue } = useTheme();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+
 	const styles = style(themeValue);
 	const { t } = useTranslation(['createThread']);
-	const { isCanManageThread } = useUserPermission();
+	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		currentChannelId ?? ''
+	);
 	return (
 		<View style={styles.emptyThreadContainer}>
 			<View style={styles.emptyThreadContent}>
@@ -18,7 +26,7 @@ const EmptyThread = ({ onPress }: { onPress: () => void }) => {
 				</View>
 				<Text style={styles.textNoThread}>{t('emptyThread.textNoThread')}</Text>
 				<Text style={styles.textNotify}>{t('emptyThread.textNotify')}</Text>
-				{isCanManageThread ? (
+				{isCanManageThread || isCanManageChannel ? (
 					<TouchableOpacity onPress={onPress} style={[styles.button]}>
 						<Text style={[styles.buttonText]}>{t('emptyThread.createThreads')}</Text>
 					</TouchableOpacity>

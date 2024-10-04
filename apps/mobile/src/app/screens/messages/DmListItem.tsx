@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { RenderTextMarkdownContent } from '../home/homedrawer/components';
+import { DmListItemLastMessage } from './DMListItemLastMessage';
 import { style } from './styles';
 
 export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress; onPress? }) => {
@@ -25,7 +25,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	const { t } = useTranslation('message');
 	const userStatus = directMessage?.is_online?.some(Boolean);
 	const isTabletLandscape = useTabletLandscape();
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId)
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
 
 	const redirectToMessageDetail = async () => {
@@ -74,17 +74,10 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 		return (
 			<View style={styles.contentMessage}>
 				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnread ? themeValue.white : themeValue.text }]}>
-					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}{': '}
+					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
+					{': '}
 				</Text>
-				{!!content && (
-					<RenderTextMarkdownContent
-						isOpenLink={false}
-						isHiddenHashtag={true}
-						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
-						isUnReadChannel={isUnread}
-						isLastMessage={true}
-					/>
-				)}
+				{!!content && <DmListItemLastMessage content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
 			</View>
 		);
 	};
@@ -98,14 +91,16 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity 
-			style={[styles.messageItem, 
-					currentDmGroupId === directMessage?.id && 
-						{ backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary, 
-							borderColor: themeValue.borderHighlight, 
-							borderWidth: 1 }
-				]} 
-			onPress={() => redirectToMessageDetail()} 
+		<TouchableOpacity
+			style={[
+				styles.messageItem,
+				currentDmGroupId === directMessage?.id && {
+					backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
+					borderColor: themeValue.borderHighlight,
+					borderWidth: 1
+				}
+			]}
+			onPress={redirectToMessageDetail}
 			onLongPress={onLongPress}
 		>
 			{isTypeDMGroup ? (

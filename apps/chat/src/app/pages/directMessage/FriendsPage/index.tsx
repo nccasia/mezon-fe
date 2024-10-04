@@ -1,4 +1,3 @@
-import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
@@ -12,7 +11,7 @@ import {
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
-import { Button, Image, InputField } from '@mezon/ui';
+import { Button, Icons, Image, InputField } from '@mezon/ui';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import FriendList from './FriendsList';
@@ -26,6 +25,8 @@ const tabData = [
 const FriendsPage = () => {
 	const dispatch = useAppDispatch();
 	const { friends, quantityPendingRequest, addFriend } = useFriends();
+	const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
+	const [showRequestFailedPopup, setShowRequestFailedPopup] = useState(false);
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector((state: RootState) => state.friends.currentTabStatus);
@@ -64,6 +65,7 @@ const FriendsPage = () => {
 			default:
 				return;
 		}
+		setIsAlreadyFriend(false);
 	};
 
 	const resetField = () => {
@@ -72,7 +74,22 @@ const FriendsPage = () => {
 			ids: []
 		});
 	};
+
+	const checkIsAlreadyFriend = (username: string) => {
+		return friends.some((user) => user.user?.username === username);
+	};
+
+	const toggleRequestFailedPopup = () => {
+		setShowRequestFailedPopup(!showRequestFailedPopup);
+	};
+
 	const handleAddFriend = async () => {
+		//used !== undefined be cause empty arrays always return truthy
+		if (requestAddFriend.usernames !== undefined && checkIsAlreadyFriend(requestAddFriend.usernames[0])) {
+			setIsAlreadyFriend(true);
+			setShowRequestFailedPopup(true);
+			return;
+		}
 		await addFriend(requestAddFriend);
 		resetField();
 	};
@@ -146,7 +163,7 @@ const FriendsPage = () => {
 						))}
 					</div>
 					<button
-						className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 hover:bg-blue-500 ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
+						className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 font-medium ${openModalAddFriend ? 'text-[#248046] dark:text-[#2dc770]' : 'text-white bg-[#248046]'} `}
 						onClick={handleOpenRequestFriend}
 						style={{ whiteSpace: 'nowrap' }}
 					>
@@ -191,15 +208,22 @@ const FriendsPage = () => {
 									<InputField
 										onChange={(e) => handleChange('username', e.target.value)}
 										type="text"
-										className="dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3"
+										className={`dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
 										value={requestAddFriend.usernames}
-										placeholder="Usernames"
+										placeholder="You can add friends with their Mezon usernames"
+										needOutline={true}
 									/>
+									{isAlreadyFriend && (
+										<div className="text-red-500 dark:text-red-400 text-[14px] pb-5">
+											Hm, that didn’t work. Double-check that the username is correct.
+										</div>
+									)}
 									<Button
 										label={'Send Friend Request'}
 										className="absolute top-3 right-2 text-[14px] py-[5px]"
 										disable={!requestAddFriend.usernames?.length}
 										onClick={handleAddFriend}
+										noNeedOpacity={true}
 									/>
 								</div>
 							</div>
@@ -219,6 +243,29 @@ const FriendsPage = () => {
 					)}
 				</div>
 				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden"></div>
+			</div>
+			{showRequestFailedPopup && <RequestFailedPopup togglePopup={toggleRequestFailedPopup} />}
+		</div>
+	);
+};
+
+const RequestFailedPopup = ({ togglePopup }: { togglePopup: () => void }) => {
+	return (
+		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
+			<div onClick={togglePopup} className="fixed inset-0 bg-black opacity-50" />
+			<div className="relative z-10 w-[440px] text-center">
+				<div className="dark:bg-[#313338] bg-white dark:text-[#dbdee1] text-textLightTheme px-4 py-5 flex flex-col gap-5 items-center rounded-t-md">
+					<div className="text-textLightTheme dark:text-textDarkTheme uppercase font-semibold text-[20px]">Friend request failed</div>
+					<div>Hm, that didn’t work. Double-check that the username is correct.</div>
+				</div>
+				<div className="p-4 dark:bg-[#2b2d31] bg-[#f2f3f5] rounded-b-md">
+					<div
+						onClick={togglePopup}
+						className="w-full cursor-pointer bg-[#5865f2] hover:bg-[#4752c4] text-whit rounded-sm h-[44px] flex items-center font-semibold justify-center"
+					>
+						Okay
+					</div>
+				</div>
 			</div>
 		</div>
 	);

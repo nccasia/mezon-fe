@@ -25,19 +25,19 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 							previewValue: tTheme(`fields.${theme}`),
 							onPress: () => {
 								navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
-									screen: APP_SCREEN.SETTINGS.APP_THEME,
+									screen: APP_SCREEN.SETTINGS.APP_THEME
 								});
-							},
+							}
 						},
 						{
 							title: t('menu.theme.syncAcrossClients.title'),
 							description: t('menu.theme.syncAcrossClients.description'),
-							component: <MezonSwitch iconYesNo />,
-						},
-					],
-				},
+							component: <MezonSwitch iconYesNo />
+						}
+					]
+				}
 			] as IMezonMenuSectionProps[],
-		[theme],
+		[theme]
 	);
 
 	const menuSearch = useMemo(
@@ -49,12 +49,12 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 						{
 							title: t('menu.search.showResultCount.title'),
 							description: t('menu.search.showResultCount.description'),
-							component: <MezonSwitch iconYesNo />,
-						},
-					],
-				},
+							component: <MezonSwitch iconYesNo />
+						}
+					]
+				}
 			] as IMezonMenuSectionProps[],
-		[],
+		[]
 	);
 
 	const DMMessagePreviewOptions = useMemo(
@@ -62,18 +62,18 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 			[
 				{
 					title: t('fields.DMMessagePreview.AllMessages'),
-					value: 0,
+					value: 0
 				},
 				{
 					title: t('fields.DMMessagePreview.UnreadDMOnly'),
-					value: 1,
+					value: 1
 				},
 				{
 					title: t('fields.DMMessagePreview.None'),
-					value: 2,
-				},
+					value: 2
+				}
 			] as IMezonOptionData,
-		[],
+		[]
 	);
 
 	return (

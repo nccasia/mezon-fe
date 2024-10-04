@@ -1,8 +1,8 @@
-import { AvatarImage } from '@mezon/components';
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 
@@ -54,7 +54,7 @@ const MessageAvatar = ({ message, isCombine, isShowFull, mode, onClick }: IMessa
 			userName={username}
 			data-popover-target="popover-content"
 			src={
-				(mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (pendingClanAvatar ? pendingClanAvatar : pendingUserAvatar) : pendingUserAvatar) ||
+				(mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanAvatar || pendingClanAvatar || pendingUserAvatar : pendingUserAvatar) ||
 				avatarSender
 			}
 			className="min-w-10 min-h-10"

@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
 import React from 'react';
 import { Pressable, View } from 'react-native';
+import { MezonAvatar } from '../../../../../temp-ui';
 import { style } from './styles';
 
 interface IProps {
@@ -18,10 +18,7 @@ export const AvatarMessage = React.memo(({ isShow, onPress, id, username, avatar
 	if (isShow) {
 		return (
 			<Pressable onPress={onPress} style={styles.wrapperAvatar}>
-				<MezonAvatar
-					avatarUrl={avatar}
-					username={username}
-				/>
+				<MezonAvatar avatarUrl={avatar} username={username} />
 			</Pressable>
 		);
 	}

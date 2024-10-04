@@ -52,9 +52,9 @@ const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			gap: size.s_14,
 			marginBottom: size.s_20,
-			paddingHorizontal: size.s_10,
+			paddingHorizontal: size.s_10
 		},
 		avatar: { width: size.s_40, height: size.s_40, borderRadius: 50 },
 		bigText: { marginBottom: size.s_10, height: size.s_16, borderRadius: size.s_8 },
-		normalText: { height: size.s_16, borderRadius: size.s_6, marginBottom: size.s_10 },
+		normalText: { height: size.s_16, borderRadius: size.s_6, marginBottom: size.s_10 }
 	});

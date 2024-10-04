@@ -3,7 +3,7 @@ import { ChannelMembersEntity } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useMemo } from 'react';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
-import MemberProfile from '../MemberProfile';
+import { MemberProfile } from '../MemberProfile';
 export type MemberItemProps = {
 	user: ChannelMembersEntity;
 	listProfile?: boolean;

@@ -54,6 +54,7 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
+
 const DirectMessage = () => {
 	// TODO: move selector to store
 	const { clanId, directId, type } = useAppParams();
@@ -139,6 +140,7 @@ const DirectMessage = () => {
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
+									clanId="0"
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
 									userName={isDmChannel ? currentDmGroup?.usernames : undefined}

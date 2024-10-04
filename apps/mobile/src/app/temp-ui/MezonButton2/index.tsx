@@ -4,15 +4,15 @@ import { Pressable, StyleProp, Text, TextStyle, ViewStyle } from 'react-native';
 import { style } from './styles';
 
 export enum EMezonButtonTheme {
-	SUCCESS = "success",
-	WARNING = "warning",
-	DANGER = "danger",
-	THEME = "theme",
+	SUCCESS = 'success',
+	WARNING = 'warning',
+	DANGER = 'danger',
+	THEME = 'theme'
 }
 
 export enum EMezonButtonSize {
-	MD = "md",
-	LG = "lg",
+	MD = 'md',
+	LG = 'lg'
 }
 interface IMezonButton {
 	icon?: any;
@@ -21,13 +21,24 @@ interface IMezonButton {
 	containerStyle?: StyleProp<ViewStyle>;
 	fluid?: boolean;
 	border?: boolean;
-	type?: EMezonButtonTheme
-	size?: EMezonButtonSize
+	type?: EMezonButtonTheme;
+	size?: EMezonButtonSize;
 	onPress?: () => void;
 	rounded?: boolean;
 }
 
-export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = EMezonButtonSize.MD, rounded = false, containerStyle }: IMezonButton) {
+export default function MezonButton({
+	icon,
+	title,
+	titleStyle,
+	fluid,
+	border,
+	type,
+	onPress,
+	size = EMezonButtonSize.MD,
+	rounded = false,
+	containerStyle
+}: IMezonButton) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -44,7 +55,7 @@ export default function MezonButton({ icon, title, titleStyle, fluid, border, ty
 			default:
 				break;
 		}
-	}, [type])
+	}, [type]);
 
 	const renderContainerSize = useMemo(() => {
 		switch (size) {
@@ -55,19 +66,21 @@ export default function MezonButton({ icon, title, titleStyle, fluid, border, ty
 			default:
 				break;
 		}
-	}, [size])
+	}, [size]);
 
 	return (
-		<Pressable style={[
-			styles.container,
-			fluid && styles.fluid,
-			border && styles.border,
-			rounded && styles.rounded,
-			renderContainerStyle,
-			renderContainerSize,
-			containerStyle
-		]
-		} onPress={onPress}>
+		<Pressable
+			style={[
+				styles.container,
+				fluid && styles.fluid,
+				border && styles.border,
+				rounded && styles.rounded,
+				renderContainerStyle,
+				renderContainerSize,
+				containerStyle
+			]}
+			onPress={onPress}
+		>
 			{icon}
 			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
 		</Pressable>

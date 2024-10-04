@@ -44,6 +44,11 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 		};
 	}, []);
 
+	const onClose = useCallback(() => {
+		onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+	}, [heightKeyboardShow, onShowKeyboardBottomSheet]);
+
 	return (
 		<>
 			<View
@@ -55,16 +60,9 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 				<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
 					{typeKeyboardBottomSheet === 'emoji' ? (
-						<EmojiPicker
-							onDone={() => {
-								onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-								DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-							}}
-							bottomSheetRef={bottomPickerRef}
-							directMessageId={props?.directMessageId || ''}
-						/>
+						<EmojiPicker onDone={onClose} bottomSheetRef={bottomPickerRef} directMessageId={props?.directMessageId || ''} />
 					) : typeKeyboardBottomSheet === 'attachment' ? (
-						<AttachmentPicker currentChannelId={props?.currentChannelId} currentClanId={props?.currentClanId} />
+						<AttachmentPicker currentChannelId={props?.currentChannelId} currentClanId={props?.currentClanId} onCancel={onClose} />
 					) : (
 						<View />
 					)}

@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { APP_SCREEN, SettingScreenProps } from 'apps/mobile/src/app/navigation/ScreenTypes';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
+import { APP_SCREEN, SettingScreenProps } from '../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
 type BlockedUsersScreen = typeof APP_SCREEN.SETTINGS.BLOCKED_USERS;

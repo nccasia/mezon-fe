@@ -1,7 +1,8 @@
-import { useRoles, useUserPermission } from '@mezon/core';
+import { usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -10,7 +11,6 @@ import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonConfirm, MezonInput } from '../../../temp-ui';
-import { checkCanEditPermission } from '../helper';
 
 enum EActionType {
 	permissions,
@@ -27,17 +27,20 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
-	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 	const clanRole = useSelector(selectRoleByRoleId(roleId));
-
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
 	}, [originRoleName, currentRoleName]);
 
 	const isCanEditRole = useMemo(() => {
 		if (!clanRole) return false;
-		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus]);
+		return hasAdminPermission || hasManageClanPermission || isClanOwner;
+	}, [clanRole, hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
 	const handleBack = useCallback(() => {
 		if (isNotChange) {

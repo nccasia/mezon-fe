@@ -34,7 +34,7 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 			}
 			onKeyDown(event);
 		},
-		[dispatch, onKeyDown],
+		[dispatch, onKeyDown]
 	);
 
 	return (

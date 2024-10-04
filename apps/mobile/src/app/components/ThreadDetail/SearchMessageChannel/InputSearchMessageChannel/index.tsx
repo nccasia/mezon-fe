@@ -3,8 +3,8 @@ import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
-import { useEffect, useRef, useState } from 'react';
+import debounce from 'lodash.debounce';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -39,13 +39,21 @@ const InputSearchMessageChannel = ({
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
+	const debouncedOnChangeText = useCallback(
+		debounce((e) => {
+			onChangeText(e);
+		}, 300),
+		[]
+	);
+
 	const handleTextChange = (e) => {
-		onChangeText(e);
 		setTextInput(e);
+		debouncedOnChangeText(e);
 		if (!e?.length) {
 			onChangeOptionFilter(null);
 		}
 	};
+
 	const clearTextInput = () => {
 		setTextInput('');
 		onChangeText('');
@@ -97,7 +105,7 @@ const InputSearchMessageChannel = ({
 				></TextInput>
 				{textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
-						<CircleXIcon height={18} width={18} color={themeValue.text} />
+						<Icons.CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
 				) : null}
 			</View>
