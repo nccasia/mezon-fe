@@ -24,7 +24,7 @@ const ListFlow = () => {
 				<Link
 					to={`/applications/${applicationId}/flow/${flow.id}`}
 					key={flow.id}
-					className="bg-white min-h-[150px] dark:bg-gray-800 dark:hover:bg-gray-700 p-3 rounded-md shadow-md border-[1px] border-slate-300 cursor-pointer hover:shadow-inner transition-all"
+					className="bg-white min-h-[150px] dark:bg-gray-800 dark:hover:bg-gray-700 p-3 rounded-md shadow-md border-[1px] border-gray-400 cursor-pointer hover:shadow-inner transition-all"
 				>
 					<h4 className="font-semibold">{flow.flowName}</h4>
 					<p className="text-gray-500 mt-2">{flow.description}</p>
@@ -34,7 +34,7 @@ const ListFlow = () => {
 				<Link
 					to={`/applications/${applicationId}/flow/${flow.id}`}
 					key={flow.id}
-					className="bg-white min-h-[150px] dark:bg-gray-800 dark:hover:bg-gray-700 p-3 rounded-md shadow-md border-[1px] border-slate-300 cursor-pointer hover:shadow-inner transition-all"
+					className="bg-white min-h-[150px] dark:bg-gray-800 dark:hover:bg-gray-700 p-3 rounded-md shadow-md border-[1px] border-gray-400 cursor-pointer hover:shadow-inner transition-all"
 				>
 					<h4 className="font-semibold">{flow.flowName}</h4>
 					<p className="text-gray-500 mt-2">{flow.description}</p>

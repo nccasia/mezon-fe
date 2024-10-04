@@ -349,12 +349,9 @@ const Flow = () => {
 		};
 	}, [nodes, edges, flowDispatch]);
 	return (
-		<div
-			ref={reactFlowWrapper}
-			className={'border-gray-200 border-[1px] w-full transition-all fixed top-0 left-0 right-0 bottom-0 z-50 h-[calc(100vh-50px)]'}
-		>
+		<div ref={reactFlowWrapper} className={'w-full transition-all fixed top-0 left-0 right-0 bottom-0 z-50 h-[calc(100vh-50px)]'}>
 			<div className="px-4">
-				<div className="top-2 left-3 right-3 z-10 bg-gray-50 dark:bg-gray-400 h-[50px] flex items-center justify-between px-3 my-2 rounded-full">
+				<div className="top-1 left-3 right-3 z-10 bg-gray-50 dark:bg-gray-600 h-[50px] flex items-center justify-between px-3 my-1 rounded-full">
 					<div className="flex items-center gap-2">
 						<button
 							onClick={handleClickBackButton}

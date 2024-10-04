@@ -5,37 +5,28 @@ interface INodeMenu {
 	title: string;
 	nodeType: INodeType;
 	description: string;
-	imageUrl: string;
 }
 const AddNodeMenuPopup = () => {
 	const nodeMenu: INodeMenu[] = [
 		{
 			title: 'Command Input',
 			nodeType: 'commandInput',
-			description: 'Listens for specific triggers to start the bot’s response.',
-			imageUrl:
-				'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
+			description: 'Listens for specific triggers to start the bot’s response.'
 		},
 		{
 			title: 'Command Output',
 			nodeType: 'uploadedImage',
-			description: 'Sends the bot’s reply based on the input and processing.',
-			imageUrl:
-				'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
+			description: 'Sends the bot’s reply based on the input and processing.'
 		},
 		{
 			title: 'Format Function',
 			nodeType: 'formatFunction',
-			description: 'Executes custom logic or processes for flexible responses.',
-			imageUrl:
-				'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
+			description: 'Executes custom logic or processes for flexible responses.'
 		},
 		{
 			title: 'Custom JS Function',
 			nodeType: 'apiLoader',
-			description: 'Fetches data from external APIs for integration into bot responses.',
-			imageUrl:
-				'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
+			description: 'Fetches data from external APIs for integration into bot responses.'
 		}
 	];
 	return (
@@ -47,7 +38,7 @@ const AddNodeMenuPopup = () => {
 			</div>
 			<div className="p-2 max-h-[400px] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:[width:3px] [&::-webkit-scrollbar-thumb]:bg-red-500 transition-all">
 				{nodeMenu.map((node, index) => (
-					<MenuItem key={index} nodeType={node.nodeType} imageUrl={node.imageUrl} title={node.title} description={node.description} />
+					<MenuItem key={index} nodeType={node.nodeType} title={node.title} description={node.description} />
 				))}
 			</div>
 		</div>

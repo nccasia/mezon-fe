@@ -55,9 +55,9 @@ const deleteFlow = async (flowId: string): Promise<IFlowDetail> => {
 	}
 };
 
-const executionFlow = async (flowId: string, input: string): Promise<IFlowDetail> => {
+const executionFlow = async (appId: string, appToken: string, message: string): Promise<{ message: string; urlImage: string }> => {
 	try {
-		const response: IFlowDetail = await apiInstance.post(`/flow/execution`, { flowId, input });
+		const response: { message: string; urlImage: string } = await apiInstance.post(`/execution`, { appId, message, appToken });
 		return response;
 	} catch (error) {
 		throw (error as IError).response.data;

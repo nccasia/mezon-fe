@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { apiInstance } from '../../../services/apiInstance';
+import flowService from '../../../services/flowService';
 import ExampleFlow from '../ExampleFlows';
 
 interface IMessage {
@@ -43,11 +43,11 @@ const FlowChatPopup = () => {
 				]);
 				return;
 			}
-			const response: { message: string; urlImage: string } = await apiInstance.post(`/execution`, {
-				appId: applicationId,
-				appToken: appDetail.token,
-				message: input
-			});
+			const response: { message: string; urlImage: string } = await flowService.executionFlow(
+				applicationId ?? '',
+				appDetail.token ?? '',
+				input
+			);
 			let urlImage: string[] | undefined = [];
 			try {
 				urlImage = JSON.parse(response.urlImage);
@@ -104,10 +104,10 @@ const FlowChatPopup = () => {
 								{message.message.message}
 							</div>
 							{message.message?.urlImage && message.message.urlImage?.length > 0 && (
-								<div className="bg-gray-100">
+								<div className="">
 									{message.message.urlImage?.map((img, index) => (
 										<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] rounded-lg mb-1">
-											<img src={img} alt="img" className="max-w-[100%] object-cover" />
+											<img src={img} alt="img" className="max-w-[100%] object-cover rounded-md" />
 										</div>
 									))}
 								</div>
@@ -118,12 +118,12 @@ const FlowChatPopup = () => {
 				<div ref={messagesEndRef} />
 			</div>
 			<form onSubmit={handleSubmit}>
-				<div className="footer p-2 border-[1px] border-t-gray-400 relative">
+				<div className="footer p-2 border-t-[1px] border-t-gray-400 relative">
 					<input
 						value={input}
 						disabled={flowId === undefined}
 						onChange={(e) => setInput(e.target.value)}
-						className="my-1 block w-full px-3 py-3 border-[1px] focus:border-[1px] focus:border-gray-500 focus-visible:border-[1px] focus:ring-0 focus-visible:border-gray-400 focus-within:ring-0 focus:ring-transparent rounded-lg dark:bg-gray-700"
+						className="my-1 block w-full px-3 py-3 border-[1px] ring-0 focus:border-[1px] focus:border-gray-500 focus-visible:border-[1px] focus:ring-0 focus-visible:border-gray-400 focus-within:ring-0 focus:ring-transparent rounded-lg dark:bg-gray-700"
 					/>
 					<button
 						disabled={flowId === undefined}
