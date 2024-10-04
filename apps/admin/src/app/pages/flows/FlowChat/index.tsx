@@ -1,8 +1,11 @@
+import { selectAppDetail } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { apiInstance } from '../../../services/apiInstance';
+import ExampleFlow from '../ExampleFlows';
 
 interface IMessage {
 	message: {
@@ -12,7 +15,8 @@ interface IMessage {
 	type: 'input' | 'output';
 }
 const FlowChatPopup = () => {
-	const { flowId } = useParams();
+	const { flowId, applicationId } = useParams();
+	const appDetail = useSelector(selectAppDetail);
 	const [input, setInput] = useState('');
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -25,15 +29,33 @@ const FlowChatPopup = () => {
 		setMessages([...messages, { message: { message: input, urlImage: undefined }, type: 'input' }]);
 		setInput('');
 		try {
+			const checkMessageIsIntoExampleFlow = ExampleFlow.find((flow) => flow.message.input === input?.trim());
+			if (checkMessageIsIntoExampleFlow) {
+				setMessages((prev) => [
+					...prev,
+					{
+						message: {
+							message: checkMessageIsIntoExampleFlow.message.output.message,
+							urlImage: checkMessageIsIntoExampleFlow.message.output.image
+						},
+						type: 'output'
+					}
+				]);
+				return;
+			}
 			const response: { message: string; urlImage: string } = await apiInstance.post(`/execution`, {
-				flowId,
-				input
+				appId: applicationId,
+				appToken: appDetail.token,
+				message: input
 			});
 			let urlImage: string[] | undefined = [];
 			try {
 				urlImage = JSON.parse(response.urlImage);
 			} catch {
 				urlImage = undefined;
+			}
+			if (!response.message && !urlImage) {
+				response.message = 'Sorry, I dont know';
 			}
 			setMessages((prev) => [...prev, { message: { message: response.message, urlImage: urlImage }, type: 'output' }]);
 		} catch (error) {
@@ -74,8 +96,13 @@ const FlowChatPopup = () => {
 						key={index}
 						className={`p-2 shadow-inner flex ${message.type === 'input' ? 'bg-gray-50 dark:bg-gray-600 justify-end text-end' : 'bg-gray-100 dark:bg-gray-700 justify-start'}`}
 					>
-						<div className="w-[70%]">
-							<span>{message.message.message}</span>
+						<div className="w-[75%]">
+							<div
+								style={message.type === 'output' ? { fontFamily: 'monospace', whiteSpace: 'pre' } : {}}
+								className="overflow-x-auto [&::-webkit-scrollbar]:[height:3px] [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-200"
+							>
+								{message.message.message}
+							</div>
 							{message.message?.urlImage && message.message.urlImage?.length > 0 && (
 								<div className="bg-gray-100">
 									{message.message.urlImage?.map((img, index) => (

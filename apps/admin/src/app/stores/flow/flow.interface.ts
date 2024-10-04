@@ -3,8 +3,8 @@ export interface IFlow {
 	flowName: string;
 	description: string;
 	status: string;
-	createdAt: string;
-	updatedAt: string;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface IFlowDetail {
@@ -27,14 +27,18 @@ export interface INode {
 		id: string;
 	};
 	parameters: IParameter[];
-	position: {
-		x: number;
-		y: number;
-	};
-	measured: {
-		width: number;
-		height: number;
-	};
+	position:
+		| {
+				x: number;
+				y: number;
+		  }
+		| string;
+	measured:
+		| {
+				width: number;
+				height: number;
+		  }
+		| string;
 	selected: boolean;
 }
 export interface IEdge {
@@ -43,6 +47,7 @@ export interface IEdge {
 	targetNodeId: string;
 	sourceHandleId: string;
 	targetHandleId: string;
+	flowId?: string;
 }
 
 export interface IFlowDataRequest {
@@ -61,6 +66,8 @@ export interface IFlowDataRequest {
 export interface IParameter {
 	parameterKey: string;
 	parameterValue: string;
+	id?: string;
+	nodeId?: string;
 }
 
 export interface ISelectedNode {

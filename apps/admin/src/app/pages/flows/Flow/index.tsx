@@ -26,6 +26,7 @@ import flowService from '../../../services/flowService';
 import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flow/flow.action';
 import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../stores/flow/flow.interface';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
+import ExampleFlow from '../ExampleFlows';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
 import NodeTypes from '../nodes/NodeType';
@@ -40,6 +41,7 @@ const Flow = () => {
 	const navigate = useNavigate();
 	const reactFlowWrapper = useRef(null);
 	const [openModalSaveFlow, setOpenModalSaveFlow] = React.useState(false);
+	const [isExampleFlow, setIsExampleFlow] = React.useState(true);
 	const [nodes, setNodes, onNodesChange] = useNodesState(flowState.nodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState(flowState.edges);
 	const { screenToFlowPosition } = useReactFlow();
@@ -219,8 +221,8 @@ const Flow = () => {
 			referralId: userProfile?.user?.id,
 			applicationId: applicationId ?? '',
 			applicationToken: appDetail?.token ?? '',
-			// applicationId: '1838774261079085056',
-			// applicationToken: '7448444f33734352412d617265754f6a',
+			// applicationId: '1842062828475781120',
+			// applicationToken: '4b3152783648644e4358534f54387131',
 			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
@@ -261,54 +263,67 @@ const Flow = () => {
 		if (!flowId) {
 			flowDispatch(setNodesContext([]));
 			flowDispatch(setEdgesContext([]));
+			setIsExampleFlow(false);
 			return;
 		}
+
+		const checkIsExampleFlow = ExampleFlow.find((item) => item.id === flowId);
+
+		const setFlowDetail = (flowDetail: IFlowDetail) => {
+			setFlowData({
+				flowName: flowDetail?.flowName,
+				description: flowDetail?.description
+			});
+			const listNode = flowDetail.nodes?.map((node: INode) => {
+				const params: {
+					[key: string]: string;
+				} = {};
+				node?.parameters?.forEach((param: IParameter) => {
+					let value = param.parameterValue;
+					try {
+						value = JSON.parse(param.parameterValue);
+					} catch {
+						value = param.parameterValue;
+					}
+					params[param.parameterKey] = value;
+				});
+				return {
+					id: node.id,
+					type: node.nodeType,
+					nodeName: node.nodeName,
+					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
+					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
+					data: {
+						label: node.nodeName,
+						id: node.id,
+						defaultValue: params
+					}
+				};
+			});
+			flowDispatch(setNodesContext(listNode));
+			const listEdge: Edge[] = flowDetail.connections?.map((edge: IEdge) => {
+				return {
+					id: edge.id ?? '',
+					source: edge.sourceNodeId,
+					target: edge.targetNodeId,
+					sourceHandle: edge.sourceHandleId ?? '',
+					targetHandle: edge.targetHandleId ?? ''
+				};
+			});
+			flowDispatch(setEdgesContext(listEdge));
+		};
 
 		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
 			try {
-				const response: IFlowDetail = await flowService.getFlowDetail(flowId);
-				setFlowData({
-					flowName: response?.flowName,
-					description: response?.description
-				});
-				const listNode = response.nodes?.map((node: INode) => {
-					const params: {
-						[key: string]: string;
-					} = {};
-					node?.parameters?.forEach((param: IParameter) => {
-						let value = param.parameterValue;
-						try {
-							value = JSON.parse(param.parameterValue);
-						} catch {
-							value = param.parameterValue;
-						}
-						params[param.parameterKey] = value;
-					});
-					return {
-						id: node.id,
-						type: node.nodeType,
-						nodeName: node.nodeName,
-						measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
-						position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
-						data: {
-							label: node.nodeName,
-							id: node.id,
-							defaultValue: params
-						}
-					};
-				});
-				flowDispatch(setNodesContext(listNode));
-				const listEdge: Edge[] = response.connections?.map((edge: IEdge) => {
-					return {
-						id: edge.id ?? '',
-						source: edge.sourceNodeId,
-						target: edge.targetNodeId,
-						sourceHandle: edge.sourceHandleId ?? '',
-						targetHandle: edge.targetHandleId ?? ''
-					};
-				});
-				flowDispatch(setEdgesContext(listEdge));
+				if (checkIsExampleFlow) {
+					setFlowDetail(checkIsExampleFlow.flowDetail);
+					setIsExampleFlow(true);
+				} else {
+					const response: IFlowDetail = await flowService.getFlowDetail(flowId);
+					setIsExampleFlow(false);
+					setFlowDetail(response);
+				}
 			} catch (error) {
 				toast.error('Get flow detail failed');
 			}
@@ -333,7 +348,6 @@ const Flow = () => {
 			document.removeEventListener('keyup', onKeyUp);
 		};
 	}, [nodes, edges, flowDispatch]);
-
 	return (
 		<div
 			ref={reactFlowWrapper}
@@ -362,6 +376,7 @@ const Flow = () => {
 						<Tooltip content="Save Flow" style={'light'}>
 							<button
 								onClick={handleClickSaveFlow}
+								disabled={isExampleFlow}
 								className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
 							>
 								<Icons.IconTick />
@@ -370,7 +385,7 @@ const Flow = () => {
 						<Tooltip content="Delete Flow" style={'light'}>
 							<Popover content={<ConfirmDeleteFlowPopup onConfirm={handleClickDeleteButton} />} trigger="click">
 								<button
-									disabled={!flowId}
+									disabled={!flowId || isExampleFlow}
 									className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									<Icons.DeleteMessageRightClick />

@@ -8,7 +8,10 @@ const NodeTypes = [
 		type: 'commandInput',
 		label: 'Command Input',
 		schema: yup.object().shape({
-			commandName: yup.string().required('Command Name is required')
+			commandName: yup
+				.string()
+				.required('Command Name is required')
+				.test('starts-with-asterisk', 'Command Name must start with an asterisk (*)', (value) => !!value && value.startsWith('*'))
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -64,10 +67,10 @@ const NodeTypes = [
 	},
 	{
 		type: 'apiLoader',
-		label: 'API Loader',
+		label: 'Custom JS Function',
 		schema: yup.object().shape({
 			url: yup.string().required('Url is required'),
-			method: yup.string().required('Method is required')
+			method: yup.string().required('Method is required').oneOf(['GET', 'POST'], 'Method must be either GET or POST')
 		}),
 		bridgeSchema: {
 			type: 'object',

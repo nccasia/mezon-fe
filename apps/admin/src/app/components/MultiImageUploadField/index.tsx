@@ -9,6 +9,7 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	console.log('value', value);
 	const handleChooseFiles = async (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			const client = clientRef.current;
@@ -30,7 +31,11 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 						console.warn(`Failed to upload file: ${file.name}`);
 					}
 				}
-				onChange([...value, ...newAttachments]);
+				if (value === null) {
+					onChange([...newAttachments]);
+				} else {
+					onChange([...value, ...newAttachments]);
+				}
 			} catch (error) {
 				console.error('Error uploading files:', error);
 				setError('Failed to upload files. Please try again.');

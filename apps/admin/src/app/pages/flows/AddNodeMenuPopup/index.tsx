@@ -12,28 +12,28 @@ const AddNodeMenuPopup = () => {
 		{
 			title: 'Command Input',
 			nodeType: 'commandInput',
-			description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+			description: 'Listens for specific triggers to start the bot’s response.',
 			imageUrl:
 				'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
 		},
 		{
 			title: 'Command Output',
 			nodeType: 'uploadedImage',
-			description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+			description: 'Sends the bot’s reply based on the input and processing.',
 			imageUrl:
 				'https://static.vecteezy.com/system/resources/previews/022/095/996/non_2x/command-button-icon-isolated-on-white-background-vector.jpg'
 		},
 		{
 			title: 'Format Function',
 			nodeType: 'formatFunction',
-			description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+			description: 'Executes custom logic or processes for flexible responses.',
 			imageUrl:
 				'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
 		},
 		{
-			title: 'API Loader',
+			title: 'Custom JS Function',
 			nodeType: 'apiLoader',
-			description: 'Wrapper around OpenAI large language model that use the Chat endpoint',
+			description: 'Fetches data from external APIs for integration into bot responses.',
 			imageUrl:
 				'https://static.vecteezy.com/system/resources/previews/021/059/827/non_2x/chatgpt-logo-chat-gpt-icon-on-white-background-free-vector.jpg'
 		}
