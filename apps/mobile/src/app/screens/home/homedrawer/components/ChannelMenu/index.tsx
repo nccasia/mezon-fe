@@ -78,13 +78,6 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
 
 	const handleMarkAsRead = useCallback(() => {
-		// dispatch(
-		// 	messagesActions.updateLastSeenMessage({
-		// 		clanId: channel.clan_id,
-		// 		channelId: channel.channel_id,
-		// 		messageId: channel?.last_sent_message?.id
-		// 	})
-		// );
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
 		dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
