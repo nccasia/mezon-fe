@@ -9,6 +9,7 @@ import { ExitSetting } from '../SettingProfile';
 import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
+import ListChannelSetting from './ListChannelSetting';
 import NotificationSoundSetting from './NotificationSoundSetting';
 import CategoryOrderSetting from './OrderCategorySetting';
 import SettingEmoji from './SettingEmoji';
@@ -56,7 +57,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 			case ItemSetting.CHANNEL_SETTING:
-				return <CategoryOrderSetting />;
+				return <ListChannelSetting />;
 		}
 	};
 	const dispatch = useAppDispatch();
