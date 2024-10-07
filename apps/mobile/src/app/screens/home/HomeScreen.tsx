@@ -6,6 +6,7 @@ import React from 'react';
 import { Keyboard, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 import { styles } from './styles';
@@ -54,7 +55,7 @@ const HomeScreen = React.memo((props: any) => {
 			drawerContent={() => <LeftDrawerContent />}
 		>
 			<Drawer.Screen
-				name="HomeDefault"
+				name={APP_SCREEN.HOME_DEFAULT}
 				component={HomeDefault}
 				options={{
 					drawerType: 'slide',

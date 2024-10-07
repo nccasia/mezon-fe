@@ -1,11 +1,13 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	appActions,
 	channelsActions,
 	notificationSettingActions,
 	selectClanById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentStreamInfo,
+	selectStatusStream,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -16,7 +18,7 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
@@ -83,6 +85,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		};
 		const currentChannel = useSelector(selectCurrentChannel);
 		const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+		const playStream = useSelector(selectStatusStream);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -141,7 +144,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setStatusMenu(false);
 			}
 			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				if (currentStreamInfo?.streamId !== channel.id) {
+				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: clanId || '',
@@ -150,6 +153,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							streamName: channel?.channel_label || ''
 						})
 					);
+					dispatch(appActions.setIsShowChatStream(false));
 				}
 			} else {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
@@ -177,9 +181,12 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
 			handleCloseModalShow();
 		};
-
 		useEffect(() => {
-			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (
+				currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING &&
+				currentStreamInfo?.clanId !== clanId &&
+				currentStreamInfo?.streamId !== currentChannel.channel_id
+			) {
 				dispatch(
 					videoStreamActions.startStream({
 						clanId: clanId || '',
@@ -188,14 +195,20 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						streamName: currentChannel?.channel_label || ''
 					})
 				);
+				dispatch(appActions.setIsShowChatStream(false));
 			}
-		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, dispatch]);
+		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, currentStreamInfo?.clanId, currentStreamInfo?.streamId, dispatch]);
+
+		const isNotVoiceOrAppChannel = useMemo(
+			() => channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_APP,
+			[channel.channel_id]
+		);
 
 		return (
 			<div
 				onContextMenu={handleMouseClick}
 				role="button"
-				className={`relative group ${isUnReadChannel || (numberNotification && numberNotification > 0) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+				className={`relative group ${(isUnReadChannel && isNotVoiceOrAppChannel) || (numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>
 				{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 					<span
@@ -213,7 +226,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							{(isPrivate === undefined || isPrivate === 0) && <Icons.Speaker defaultSize="w-5 5-5 " />}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel || (numberNotification && numberNotification > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(isActive && isNotVoiceOrAppChannel) || (isUnReadChannel && isNotVoiceOrAppChannel) || (numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
@@ -245,7 +258,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
 							</div>
 							<p
-								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel || (numberNotification && numberNotification > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(isActive && isNotVoiceOrAppChannel) || (isUnReadChannel && isNotVoiceOrAppChannel) || (numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 								title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 							>
 								{channel.channel_label && channel?.channel_label.length > 20
@@ -257,7 +270,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				)}
 
 				{isShowSettingChannel ? (
-					numberNotification !== 0 ? (
+					numberNotification && numberNotification > 0 ? (
 						<>
 							<Icons.AddPerson
 								className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}
@@ -309,6 +322,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				)}
 				{isShowPanelChannel && (
 					<PanelChannel
+						isUnread={isUnReadChannel}
 						onDeleteChannel={handleOpenModalConfirm}
 						channel={channel}
 						coords={coords}

@@ -28,7 +28,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MutableRefObject, memo, useCallback, useMemo } from 'react';
-import { DeviceEventEmitter, InteractionManager, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from '../../../types';
@@ -193,20 +193,26 @@ export const ChatMessageSending = memo(
 							isMentionEveryOne,
 							true
 						);
+						DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT);
 					}
 				}
 				if (currentChannel?.channel_private) {
 					addMemberToPrivateThread(currentChannel, simplifiedMentionList, membersOfChild);
 				}
 			};
-
-			InteractionManager.runAfterInteractions(() => {
-				setTimeout(() => {
-					sendMessageAsync().catch((error) => {
-						console.log('Error sending message:', error);
-					});
-				}, 0);
+			requestAnimationFrame(async () => {
+				sendMessageAsync().catch((error) => {
+					console.log('Error sending message:', error);
+				});
 			});
+			// comment todo check performance
+			// InteractionManager.runAfterInteractions(() => {
+			// 	setTimeout(() => {
+			// 		sendMessageAsync().catch((error) => {
+			// 			console.log('Error sending message:', error);
+			// 		});
+			// 	}, 0);
+			// });
 		};
 
 		const addMemberToPrivateThread = async (

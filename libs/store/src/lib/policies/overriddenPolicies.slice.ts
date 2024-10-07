@@ -1,7 +1,8 @@
 import { EOverriddenPermission } from '@mezon/utils';
-import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 import { ApiPermission } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const OVERRIDDEN_POLICIES_FEATURE_KEY = 'overriddenPolicies';
 
@@ -37,19 +38,39 @@ const overriddenPoliciesSlice = createSlice({
 interface FetchMaxPermissionChannelsArgs {
 	channelId: string;
 	clanId: string;
+	noCache?: boolean;
 }
 
 /**
  * Fetch highest permission for a channel.
  * These permissions override clan's permissions
  */
+
+export const fetchMaxChannelPermissionCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string, channelId: string) => {
+		const response = await mezon.client.listUserPermissionInChannel(mezon.session, clanId, channelId);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			const username = args[0]?.session?.username || '';
+			return args[1] + username;
+		}
+	}
+);
+
 export const fetchMaxChannelPermission = createAsyncThunk(
 	`${OVERRIDDEN_POLICIES_FEATURE_KEY}/fetchMaxPermissionRoleChannel`,
-	async ({ clanId, channelId }: FetchMaxPermissionChannelsArgs, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: FetchMaxPermissionChannelsArgs, thunkAPI) => {
 		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
-			if (response && response.permissions.permissions) {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchMaxChannelPermissionCached.clear(mezon, clanId, channelId);
+			}
+			const response = await fetchMaxChannelPermissionCached(mezon, clanId, channelId);
+			if (response && response.permissions?.permissions) {
 				return {
 					channelId,
 					maxPermissions: response.permissions.permissions.reduce<Record<EOverriddenPermission, ApiPermission>>(

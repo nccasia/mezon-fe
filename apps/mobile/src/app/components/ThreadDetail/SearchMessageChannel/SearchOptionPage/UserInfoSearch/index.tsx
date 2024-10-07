@@ -2,7 +2,7 @@ import { IUserMention } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
-import { MezonAvatar } from '../../../../../temp-ui';
+import { MezonAvatar } from '../../../../../componentUI';
 import { style } from '../SearchOptionPage.styles';
 
 interface UserInfoSearchProps {

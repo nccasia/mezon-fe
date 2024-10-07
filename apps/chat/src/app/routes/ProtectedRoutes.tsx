@@ -13,7 +13,7 @@ const ProtectedRoutes = () => {
 		dispatch(stickerSettingActions.fetchStickerByUserId({}));
 	}, [dispatch]);
 	if (!isLogin) {
-		return <Navigate to={redirect || '/guess/login'} replace />;
+		return <Navigate to={redirect || '/desktop/login'} replace />;
 	}
 
 	return <Outlet />;

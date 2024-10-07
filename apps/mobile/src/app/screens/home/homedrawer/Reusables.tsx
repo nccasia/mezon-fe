@@ -5,8 +5,8 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Images from '../../../../assets/Images';
-import { MezonButton } from '../../../temp-ui';
-import MezonAvatar from '../../../temp-ui/MezonAvatar';
+import { MezonButton } from '../../../componentUI';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './styles';
 
 export const ChannelListContext = React.createContext({} as any);

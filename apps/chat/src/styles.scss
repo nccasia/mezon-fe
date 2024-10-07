@@ -849,3 +849,11 @@ input:-webkit-autofill:active {
 		transform: translate(0px, 0px) rotateZ(45deg);
 	}
 }
+
+.eventDescriptionTruncate{
+	overflow: hidden;
+   display: -webkit-box;
+   -webkit-line-clamp: 4; /* number of lines to show */
+           line-clamp: 4; 
+   -webkit-box-orient: vertical;
+}

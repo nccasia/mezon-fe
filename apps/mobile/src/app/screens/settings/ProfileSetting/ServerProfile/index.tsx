@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IClanProfileValue } from '..';
 import { SeparatorWithLine } from '../../../../../app/components/Common';
-import { MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../../app/temp-ui';
+import { MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../componentUI';
 import { normalizeString } from '../../../../utils/helpers';
 import BannerAvatar from '../UserProfile/components/Banner';
 import { style } from './styles';
@@ -128,7 +128,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 					onTextChange={(newValue) => onValueChange({ displayName: newValue })}
 					placeHolder={clanProfileValue?.username}
 					maxCharacter={32}
-					label={t('fields.displayName.label')}
+					label={t('fields.clanName.label')}
 				/>
 			</View>
 

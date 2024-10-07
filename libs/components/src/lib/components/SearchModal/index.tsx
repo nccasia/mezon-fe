@@ -10,7 +10,6 @@ import {
 	selectAllUsesInAllClansEntities,
 	selectEntitesUserClans,
 	selectPreviousChannels,
-	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
@@ -25,9 +24,9 @@ import {
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ListSearchModal, { ListSearchModalRef } from './ListSearchModal';
+import { ListGroupSearchModal } from './ListGroupSeacrhModal';
 
 export type SearchModalProps = {
 	readonly open: boolean;
@@ -35,27 +34,32 @@ export type SearchModalProps = {
 };
 
 function SearchModal({ open, onClose }: SearchModalProps) {
-	const { userProfile } = useAuth();
-	const [searchText, setSearchText] = useState('');
-	const accountId = userProfile?.user?.id ?? '';
-	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
-	const { createDirectMessageWithUser } = useDirect();
+	const dispatch = useAppDispatch();
 	const allClanUsersEntities = useSelector(selectEntitesUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
 	const allUsesInAllClansEntities = useSelector(selectAllUsesInAllClansEntities);
 	const previousChannels = useSelector(selectPreviousChannels);
-	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
-	const listDM = dmGroupChatList.filter(
-		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
+	const { userProfile } = useAuth();
+	const accountId = userProfile?.user?.id ?? '';
+
+	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
+	const { createDirectMessageWithUser } = useDirect();
+
+	const [searchText, setSearchText] = useState('');
+
+	const listGroup = useMemo(
+		() => dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1),
+		[dmGroupChatList]
 	);
 
-	const dispatch = useAppDispatch();
-	const [idActive, setIdActive] = useState('');
-	const boxRef = useRef<HTMLDivElement | null>(null);
-	const listItemWithoutPreviousRef = useRef<ListSearchModalRef | null>(null);
-	const listPreviousRef = useRef<ListSearchModalRef | null>(null);
-	const appearanceTheme = useSelector(selectTheme);
+	const listDM = useMemo(
+		() =>
+			dmGroupChatList.filter(
+				(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
+			),
+		[dmGroupChatList]
+	);
 
 	const listDirectSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
@@ -218,14 +222,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return totalListSortedWithoutPreviousList.slice(0, 50);
 	}, [channelSearchSorted, normalizeSearchText, totalListMembersSorted, totalListSortedWithoutPreviousList, totalListsSorted]);
 
-	const listItemDisplay = useMemo(() => {
-		return normalizeSearchText.length ? listItemWithoutRecent : [...listRecent, ...listItemWithoutRecent];
-	}, [normalizeSearchText, listItemWithoutRecent, listRecent]);
-
-	const isNoResult = useMemo(() => {
-		return !listItemDisplay?.length;
-	}, [listItemDisplay]);
-
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			const foundDirect = listDirectSearch.find((item) => item.id === user.id);
@@ -249,9 +245,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					navigate(directChat);
 				}
 			}
-			onClose();
 		},
-		[createDirectMessageWithUser, dispatch, listDirectSearch, navigate, onClose, toDmGroupPageFromMainApp]
+		[createDirectMessageWithUser, dispatch, listDirectSearch, navigate, toDmGroupPageFromMainApp]
 	);
 
 	const handleSelectChannel = useCallback(
@@ -264,88 +259,30 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 				window.open(urlVoice, '_blank', 'noreferrer');
 			}
-			onClose();
 		},
-		[dispatch, navigate, onClose, toChannelPage]
+		[dispatch, navigate, toChannelPage]
 	);
 
-	const handleSelect = useCallback(
-		async (isChannel: boolean, item: SearchItemProps) => {
-			if (isChannel) {
-				await handleSelectChannel(item);
-			} else {
-				await handleSelectMem(item);
-			}
-		},
-		[handleSelectMem, handleSelectChannel]
-	);
-
-	const handleInputKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
-			e.preventDefault();
-			e.stopPropagation();
-			travelItemByKeyBoard(e);
-		}
-	};
-
-	const handleEnter = useCallback(
-		(selectedItem: SearchItemProps) => {
-			if (!selectedItem) return;
-
-			if (selectedItem.subText) {
-				handleSelectChannel(selectedItem);
-				dispatch(messagesActions.setIsFocused(true));
-			} else {
-				handleSelectMem(selectedItem);
-			}
-		},
-		[dispatch, handleSelectChannel, handleSelectMem]
-	);
-
-	const scrollToTop = useCallback(() => {
-		boxRef.current?.scroll({ top: 0, behavior: 'smooth' });
-	}, []);
-
-	const scrollToItem = useCallback((id: string) => {
-		listPreviousRef.current?.scrollIntoItem(id);
-		listItemWithoutPreviousRef.current?.scrollIntoItem(id);
-	}, []);
-
-	const travelItemByKeyBoard = useCallback(
-		(event: React.KeyboardEvent) => {
-			event.preventDefault();
-			console.log('keydown event');
-			const index = listItemDisplay.findIndex((item) => item.id === idActive);
-			if (index === -1) {
-				scrollToTop();
-				setIdActive(listItemDisplay[0]?.id ?? '');
-				return;
-			}
-			const lastIndex = listItemDisplay.length - 1;
-			let newIndex;
-			switch (event.key) {
-				case 'ArrowDown': {
-					newIndex = index >= lastIndex ? 0 : index + 1;
-					break;
-				}
-				case 'ArrowUp': {
-					newIndex = index <= 0 ? lastIndex : index - 1;
-					break;
-				}
-				case 'Enter': {
-					handleEnter(listItemDisplay[index]);
+	const handleItemClick = useCallback(
+		(item: SearchItemProps) => {
+			try {
+				if (!item) {
 					return;
 				}
+				const isChannel = item?.typeChat === TypeSearch.Channel_Type;
+				if (isChannel) {
+					handleSelectChannel(item);
+					dispatch(messagesActions.setIsFocused(true));
+				} else {
+					handleSelectMem(item);
+				}
+			} catch (error) {
+				console.error({ error });
+			} finally {
+				onClose();
 			}
-			const focusItemId = listItemDisplay[newIndex ?? 0]?.id ?? '';
-			if (newIndex === 0) {
-				scrollToTop();
-			} else {
-				scrollToItem(focusItemId);
-			}
-			setIdActive(focusItemId);
 		},
-		[listItemDisplay, idActive, handleEnter, scrollToTop, scrollToItem]
+		[onClose, handleSelectChannel, dispatch, handleSelectMem]
 	);
 
 	return (
@@ -362,50 +299,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						placeholder="Where would you like to go?"
 						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
 						value={searchText}
-						onChange={(e) => {
-							setSearchText(e.target.value);
-							setIdActive('');
-							boxRef.current?.scroll({ top: 0, behavior: 'smooth' });
-						}}
-						onKeyUp={(e) => handleInputKeyUp(e)}
+						onChange={(e) => setSearchText(e.target.value)}
 					/>
 				</div>
-				<div
-					ref={boxRef}
-					onKeyUp={travelItemByKeyBoard}
-					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-				>
-					{!normalizeSearchText && listRecent.length > 0 && (
-						<>
-							<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2 ">Previous channels</div>
-							<ListSearchModal
-								ref={listPreviousRef}
-								listSearch={listRecent}
-								handleSelect={handleSelect}
-								searchText={normalizeSearchText}
-								idActive={idActive}
-								setIdActive={setIdActive}
-							/>
-						</>
-					)}
-					{!normalizeSearchText && (
-						<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Unread channels</div>
-					)}
-					<ListSearchModal
-						ref={listItemWithoutPreviousRef}
-						listSearch={listItemWithoutRecent}
-						handleSelect={handleSelect}
-						searchText={normalizeSearchText.startsWith('#') ? normalizeSearchText.slice(1) : normalizeSearchText}
-						idActive={idActive}
-						setIdActive={setIdActive}
-						isSearchByUsername={isSearchByUsername}
-					/>
-					{isNoResult && (
-						<span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">
-							Can't seem to find what you're looking for?
-						</span>
-					)}
-				</div>
+				<ListGroupSearchModal
+					listRecent={listRecent}
+					listItemWithoutRecent={listItemWithoutRecent}
+					normalizeSearchText={normalizeSearchText}
+					handleItemClick={handleItemClick}
+				/>
 				<FooterNoteModal />
 			</Modal.Body>
 		</Modal>

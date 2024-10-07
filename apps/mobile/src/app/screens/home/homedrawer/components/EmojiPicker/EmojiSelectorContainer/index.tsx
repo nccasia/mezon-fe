@@ -23,7 +23,7 @@ import { DeviceEventEmitter, Platform, Text, TextInput, TouchableOpacity, View }
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
-import { MezonClanAvatar } from '../../../../../../temp-ui';
+import { MezonClanAvatar } from '../../../../../../componentUI';
 import { style } from './styles';
 
 type EmojiSelectorContainerProps = {

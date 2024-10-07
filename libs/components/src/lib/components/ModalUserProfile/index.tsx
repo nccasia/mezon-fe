@@ -1,8 +1,17 @@
-import { useAppNavigation, useDirect, useFormatDate, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import {
+	useAppNavigation,
+	useDirect,
+	useEscapeKeyClose,
+	useFormatDate,
+	useMemberCustomStatus,
+	useOnClickOutside,
+	useSendInviteMessage,
+	useSettingFooter
+} from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AvatarProfile from './AvatarProfile';
@@ -32,6 +41,8 @@ type ModalUserProfileProps = {
 	user?: ChannelMembersEntity;
 	isDM?: boolean;
 	userStatusProfile?: string;
+	onClose: () => void;
+	rootRef?: RefObject<HTMLElement>;
 };
 
 export type OpenModalProps = {
@@ -56,9 +67,9 @@ const ModalUserProfile = ({
 	mode,
 	avatar,
 	positionType,
-	name,
 	isDM,
-	userStatusProfile
+	onClose,
+	rootRef
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
@@ -120,10 +131,15 @@ const ModalUserProfile = ({
 	const openSetting = () => {
 		setIsShowSettingFooterStatus(true);
 		setIsShowSettingFooterInitTab('Profiles');
+		onClose();
 	};
 
+	const profileRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(rootRef || profileRef, onClose);
+	useOnClickOutside(rootRef || profileRef, onClose);
+
 	return (
-		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
+		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
 				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}

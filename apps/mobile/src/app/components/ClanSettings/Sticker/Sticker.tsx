@@ -12,8 +12,8 @@ import { Keyboard, Platform, ScrollView, Text, TouchableWithoutFeedback, View } 
 import { openCropper } from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { handleSelectImage, IFile } from '../../../temp-ui';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
+import { handleSelectImage, IFile } from '../../../componentUI';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { StickerSettingItem } from './StickerItem';
 import { style } from './styles';
 

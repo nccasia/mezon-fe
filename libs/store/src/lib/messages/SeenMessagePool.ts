@@ -5,6 +5,7 @@ type SeenMessagePayload = {
 	clanId: string;
 	messageCreatedAt: number;
 	messageSeenAt?: number;
+	mode: number;
 };
 
 class SeenMessagePool {

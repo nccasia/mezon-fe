@@ -77,7 +77,7 @@ const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
-		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile']
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream']
 	},
 	appReducer
 );
@@ -274,6 +274,14 @@ const persisteduserChannelsReducer = persistReducer(
 	userChannelsReducer
 );
 
+const persistedStreamReducer = persistReducer(
+	{
+		key: 'stream',
+		storage
+	},
+	videoStreamReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -317,7 +325,7 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
-	videostream: videoStreamReducer,
+	videostream: persistedStreamReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

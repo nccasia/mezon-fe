@@ -7,7 +7,7 @@ type ChannelMediaProps = {
 };
 
 export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
-	if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+	if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 		return (
 			<ChannelMessages
 				clanId={currentChannel?.clan_id || ''}

@@ -1,4 +1,4 @@
-import { useFriends, useMenu } from '@mezon/core';
+import { useEscapeKey, useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
 	RootState,
@@ -75,17 +75,15 @@ const FriendsPage = () => {
 		});
 	};
 
-	const checkIsAlreadyFriend = (username: string) => {
-		return friends.some((user) => user.user?.username === username);
-	};
-
 	const toggleRequestFailedPopup = () => {
 		setShowRequestFailedPopup(!showRequestFailedPopup);
 	};
 
 	const handleAddFriend = async () => {
-		//used !== undefined be cause empty arrays always return truthy
-		if (requestAddFriend.usernames !== undefined && checkIsAlreadyFriend(requestAddFriend.usernames[0])) {
+		const checkIsAlreadyFriend = (username: string) => {
+			return friends.some((user) => user.user?.username === username);
+		};
+		if (requestAddFriend?.usernames?.length && checkIsAlreadyFriend(requestAddFriend.usernames[0])) {
 			setIsAlreadyFriend(true);
 			setShowRequestFailedPopup(true);
 			return;
@@ -214,9 +212,7 @@ const FriendsPage = () => {
 										needOutline={true}
 									/>
 									{isAlreadyFriend && (
-										<div className="text-red-500 dark:text-red-400 text-[14px] pb-5">
-											Hm, that didn’t work. Double-check that the username is correct.
-										</div>
+										<div className="text-red-500 dark:text-red-400 text-[14px] pb-5">You're already friends with that user!</div>
 									)}
 									<Button
 										label={'Send Friend Request'}
@@ -250,13 +246,14 @@ const FriendsPage = () => {
 };
 
 const RequestFailedPopup = ({ togglePopup }: { togglePopup: () => void }) => {
+	useEscapeKey(togglePopup);
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={togglePopup} className="fixed inset-0 bg-black opacity-50" />
-			<div className="relative z-10 w-[440px] text-center">
+			<div className="relative z-10 w-[440px] text-center animate-scale_up">
 				<div className="dark:bg-[#313338] bg-white dark:text-[#dbdee1] text-textLightTheme px-4 py-5 flex flex-col gap-5 items-center rounded-t-md">
 					<div className="text-textLightTheme dark:text-textDarkTheme uppercase font-semibold text-[20px]">Friend request failed</div>
-					<div>Hm, that didn’t work. Double-check that the username is correct.</div>
+					<div>You're already friends with that user!</div>
 				</div>
 				<div className="p-4 dark:bg-[#2b2d31] bg-[#f2f3f5] rounded-b-md">
 					<div

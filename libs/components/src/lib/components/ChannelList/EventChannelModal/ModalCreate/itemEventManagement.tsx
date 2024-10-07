@@ -12,6 +12,7 @@ import ModalDelEvent from './modalDelEvent';
 import PanelEventItem from './panelEventItem';
 
 export type ItemEventManagementProps = {
+	reviewDescription?: string;
 	option: string;
 	topic: string;
 	voiceChannel: string;
@@ -25,10 +26,28 @@ export type ItemEventManagementProps = {
 	createTime?: string;
 	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
+	openModelUpdate?: () => void;
+	onEventUpdateId?: (id: string) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, isReviewEvent, setOpenModalDetail } = props;
+	const {
+		topic,
+		voiceChannel,
+		reviewDescription,
+		titleEvent,
+		option,
+		address,
+		logo,
+		logoRight,
+		start,
+		end,
+		event,
+		isReviewEvent,
+		setOpenModalDetail,
+		openModelUpdate,
+		onEventUpdateId
+	} = props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
@@ -145,23 +164,33 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</Tooltip>
 					)}
 				</div>
-				<div className="flex justify-between">
-					<p className="hover:underline font-bold dark:text-white text-black flex-grow basis-3/5 text-base">{topic}</p>
+				<div className="flex justify-between gap-4">
+					<div className={`${isReviewEvent || !logoRight ? 'w-full' : 'w-3/5'}`}>
+						<p className="hover:underline font-bold dark:text-white text-black text-base">{topic}</p>
+						<div className="break-all max-h-[75px] eventDescriptionTruncate">
+							{isReviewEvent ? reviewDescription : event?.description}
+						</div>
+					</div>
 					{logoRight && <img src={logoRight} alt="logoRight" className="w-[60%] max-h-[100px] object-cover rounded flex-grow basis-2/5" />}
 				</div>
 			</div>
-			<div className="px-4 py-3 flex items-center gap-x-2 justify-between">
+			<div
+				onClick={(e) => {
+					handleStopPropagation(e);
+				}}
+				className="px-4 py-3 flex items-center gap-x-2 justify-between cursor-default"
+			>
 				<div className="flex gap-x-2">
 					{checkOptionVoice && (
-						<>
+						<a href={`https://meet.google.com/${channelVoice.meeting_code}`} rel="noreferrer" target="_blank" className="flex gap-x-2">
 							<Icons.Speaker />
 							<p>{channelVoice?.channel_label}</p>
-						</>
+						</a>
 					)}
 					{checkOptionLocation && (
 						<>
 							<Icons.Location />
-							<p>{titleEvent}</p>
+							<p>{address}</p>
 						</>
 					)}
 					{option === '' && !address && !channelVoice && (
@@ -212,7 +241,13 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					event={event}
 					coords={coords}
 					onHandle={handleStopPropagation}
+					setOpenModalUpdateEvent={openModelUpdate}
 					setOpenModalDelEvent={setOpenModalDelEvent}
+					onTrigerEventUpdateId={() => {
+						if (onEventUpdateId) {
+							onEventUpdateId(event?.id || '');
+						}
+					}}
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}

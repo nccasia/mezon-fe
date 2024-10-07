@@ -52,7 +52,8 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: channelLabel,
-			category_id: channel.category_id
+			category_id: channel.category_id,
+			app_url: ''
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 	};

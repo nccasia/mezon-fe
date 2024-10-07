@@ -42,6 +42,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
@@ -275,7 +276,7 @@ const MessageItem = React.memo(
 		}, []);
 
 		const handleChangeClan = useCallback(async (clanId: string) => {
-			navigation.navigate('HomeDefault');
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 			const store = await getStoreAsync();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);

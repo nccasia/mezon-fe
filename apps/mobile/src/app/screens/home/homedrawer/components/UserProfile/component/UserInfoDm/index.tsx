@@ -4,7 +4,7 @@ import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../../../../../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../../../../../../componentUI';
 import { style } from './UserInfoDm.styles';
 
 export default function UserInfoDm({ user, currentChannel }: { user: ChannelMembersEntity; currentChannel: ChannelsEntity }) {

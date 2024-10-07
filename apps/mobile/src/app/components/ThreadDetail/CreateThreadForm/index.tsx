@@ -29,6 +29,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { MezonInput, MezonSwitch } from '../../../componentUI';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
@@ -37,7 +38,6 @@ import AttachmentPicker from '../../../screens/home/homedrawer/components/Attach
 import BottomKeyboardPicker from '../../../screens/home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../../screens/home/homedrawer/components/EmojiPicker';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
-import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
 import { style } from './CreateThreadForm.style';
 import HeaderLeftThreadForm from './HeaderLeftThreadForm';

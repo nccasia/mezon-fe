@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, UsersClanEntity } from '@mezon/store-mobile';
 import { RefObject, memo } from 'react';
-import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
+import Backdrop from '../../../../../componentUI/MezonBottomSheet/backdrop';
 import { AddMemberBsContent } from './AddMemberBsContent';
 
 interface IAddMemberBSProps {

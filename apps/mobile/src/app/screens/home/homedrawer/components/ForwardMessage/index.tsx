@@ -21,8 +21,8 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { MezonInput } from '../../../../../componentUI';
 import { SeparatorWithLine } from '../../../../../components/Common';
-import { MezonInput } from '../../../../../temp-ui';
 import { styles } from './styles';
 
 interface IForwardIObject {

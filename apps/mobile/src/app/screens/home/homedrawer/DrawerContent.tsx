@@ -1,5 +1,4 @@
 import { useCategory } from '@mezon/core';
-import { cleanChannelData } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllClans, selectIsShowEmptyCategory } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
@@ -22,10 +21,7 @@ const ChannelListWrapper = React.memo(() => {
 			if (!isShowEmptyCategory && item?.channels?.length === 0) {
 				return null;
 			}
-			return {
-				...item,
-				channels: cleanChannelData(item.channels)
-			};
+			return item;
 		});
 	}, [categorizedChannelsRaw, isShowEmptyCategory]);
 

@@ -1,8 +1,8 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
+import { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
 import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
 import { style } from './styles';
@@ -21,10 +21,9 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(thread?.clan_id ?? '', thread?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useMemo(() => {
+		return thread?.count_mess_unread ? thread?.count_mess_unread : 0;
+	}, [thread?.count_mess_unread]);
 
 	const onPressThreadItem = () => {
 		onPress && onPress(thread);
@@ -67,7 +66,7 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 				</TouchableOpacity>
 			</View>
 
-			{numberNotification > 0 && isUnReadChannel && (
+			{Number(numberNotification || 0) > 0 && isUnReadChannel && (
 				<View style={[styles.channelDotWrapper]}>
 					<Text style={styles.channelDot}>{numberNotification}</Text>
 				</View>

@@ -6,7 +6,7 @@ import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
+import { MezonModal } from '../../../../../../../componentUI/MezonModal';
 import KickUserClanModal from '../KickUserClanModal';
 import { ManageUserModal } from '../ManageUserModal';
 import { style } from './UserSettingProfile.style';

@@ -2,8 +2,8 @@ import { ThemeMode, ThemeModeAuto, ThemeModeBase, themeColors, useTheme } from '
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Appearance, View } from 'react-native';
+import { IMezonSlideOptionsData, MezonSlideOption } from '../../../../componentUI';
 import { APP_SCREEN, SettingScreenProps } from '../../../../navigation/ScreenTypes';
-import { IMezonSlideOptionsData, MezonSlideOption } from '../../../../temp-ui';
 import { style } from './styles';
 
 type AppThemeScreen = typeof APP_SCREEN.SETTINGS.APP_THEME;

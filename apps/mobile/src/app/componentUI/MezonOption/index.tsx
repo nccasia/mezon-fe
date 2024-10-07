@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from '../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps } from '../MezonMenu';
+import { MezonMenu, MezonRadioButton } from '../index';
 
 export type IMezonOptionData = (Omit<IMezonMenuItemProps, 'onPress'> & {
 	value: number | string | boolean;

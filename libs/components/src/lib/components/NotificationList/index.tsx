@@ -1,18 +1,19 @@
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside } from '@mezon/core';
 import {
-	channelMetaActions,
-	clansActions,
 	notificationActions,
+	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
 	selectCurrentClan,
-	selectTheme
+	selectMentionAndReplyUnreadByClanId,
+	selectTheme,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -20,7 +21,6 @@ import NotificationItem from './NotificationItem';
 export type MemberListProps = { className?: string };
 
 export type NotificationProps = {
-	unReadReplyAndMentionList: NotificationEntity[];
 	rootRef?: RefObject<HTMLElement>;
 };
 
@@ -36,17 +36,25 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
-function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationProps) {
-	const dispatch = useDispatch();
+type ListCreatimeMessage = {
+	channelId: string;
+	messageId: string;
+	createdTime: number;
+};
 
-	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
+function NotificationList({ rootRef }: NotificationProps) {
+	const currentClan = useSelector(selectCurrentClan);
+	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
+	const unReadReplyAndMentionList = useSelector(selectMentionAndReplyUnreadByClanId(allLastSeenChannelAllChannelInClan));
+	const dispatch = useAppDispatch();
+
+	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.MENTIONS);
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
 
 	const getNotificationExcludeMentionAndReplyUnread = useSelector(selectAllNotificationExcludeMentionAndReply);
 	const getAllNotificationMentionAndReply = useSelector(selectAllNotificationMentionAndReply);
-	const currentClan = useSelector(selectCurrentClan);
 
 	const getExcludeMentionAndReply = useMemo(() => {
 		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
@@ -62,20 +70,7 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const getUnreadChannelIds = useMemo(() => {
-		const channelIds = unReadReplyAndMentionList.map((item) => item.content.channel_id);
-		return Array.from(new Set(channelIds));
-	}, [unReadReplyAndMentionList]);
-
-	const handleMarkAllAsRead = useCallback(() => {
-		const timestamp = Date.now() / 1000;
-		getUnreadChannelIds.forEach((channelId: string) => {
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
-		});
-		if (currentClan?.badge_count && currentClan?.badge_count > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
-		}
-	}, [getUnreadChannelIds, dispatch, currentClan?.badge_count]);
+	const { handleMarkAsReadClan } = useMarkAsRead();
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
@@ -116,7 +111,7 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 								placement="top"
 							>
 								<button
-									onClick={handleMarkAllAsRead}
+									onClick={handleMarkAsReadClan}
 									className="flex items-center p-1 rounded-sm justify-center dark:bg-bgTertiary bg-bgLightModeButton"
 								>
 									<Icons.MarkAllAsRead className="w-5 h-5" />

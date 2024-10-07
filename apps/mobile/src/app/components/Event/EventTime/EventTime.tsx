@@ -5,7 +5,7 @@ import { EEventStatus } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import MezonBadge from '../../../temp-ui/MezonBadge';
+import MezonBadge from '../../../componentUI/MezonBadge';
 import { style } from './styles';
 
 interface IEventTimeProps {

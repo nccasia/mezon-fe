@@ -1,8 +1,8 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
+import { MessagesEntity, selectCurrentChannel, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -89,6 +89,8 @@ function MessageWithUser({
 	const checkReplied = false;
 	const checkMessageTargetToMoved = false;
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 
 	const currentDmOrChannelId = useMemo(
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannelId : currentDmId),
@@ -224,11 +226,12 @@ function MessageWithUser({
 					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 					style={{
 						top: `${positionShortUser?.top}px`,
-						left: `${positionShortUser?.left}px`
+						...positionStyle
 					}}
 					ref={panelRef}
 				>
 					<ModalUserProfile
+						onClose={() => setIsShowPanelChannel(false)}
 						userID={shortUserId}
 						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 						message={message}

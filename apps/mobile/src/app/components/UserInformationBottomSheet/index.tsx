@@ -2,8 +2,8 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { User } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
+import { MezonBottomSheet } from '../../componentUI';
 import UserProfile from '../../screens/home/homedrawer/components/UserProfile';
-import { MezonBottomSheet } from '../../temp-ui';
 import { styles } from './styles';
 
 interface IUserInformationBottomSheetProps {

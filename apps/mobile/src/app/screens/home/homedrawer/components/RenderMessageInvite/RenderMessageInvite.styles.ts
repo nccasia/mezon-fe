@@ -16,15 +16,15 @@ export const style = (colors: Attributes) =>
 		offline: {
 			backgroundColor: baseColor.gray
 		},
-		textLink: { color: Colors.textLink },
+		textLink: { color: Colors.textLink, marginBottom: size.s_6 },
 		boxLink: { backgroundColor: Colors?.bgCharcoal, width: '100%', padding: size.s_10, borderRadius: size.s_10 },
 		title: {
 			color: Colors?.textGray,
-			fontSize: size.label,
+			fontSize: size.medium,
 			fontWeight: '600',
 			marginBottom: size.s_10
 		},
-		container: { flexDirection: 'row', gap: size.s_10, marginBottom: size.s_10 },
+		container: { flexDirection: 'row', gap: size.s_10, marginBottom: size.s_16, alignItems: 'center' },
 		clanName: { color: Colors?.white, fontSize: size.label, fontWeight: '600' },
 		boxStatus: { flexDirection: 'row', gap: size.s_10, marginTop: size.s_6, alignItems: 'center' },
 		memberStatus: { flexDirection: 'row', alignItems: 'center', gap: size.s_4 },

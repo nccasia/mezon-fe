@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { MezonBottomSheet } from '../../../../../../app/temp-ui';
+import { MezonBottomSheet } from '../../../../../componentUI';
 import { EMessageBSToShow } from '../../enums';
 import { IReplyBottomSheet } from '../../types/message.interface';
 import { ContainerModal } from './ContainerModal';

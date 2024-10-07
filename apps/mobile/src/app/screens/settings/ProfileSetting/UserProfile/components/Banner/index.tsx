@@ -3,7 +3,7 @@ import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useMixImageColor } from '../../../../../../../app/hooks/useMixImageColor';
-import { IMezonImagePickerHandler, IMezonMenuSectionProps, MezonBottomSheet, MezonImagePicker, MezonMenu } from '../../../../../../temp-ui';
+import { IMezonImagePickerHandler, IMezonMenuSectionProps, MezonBottomSheet, MezonImagePicker, MezonMenu } from '../../../../../../componentUI';
 import { style } from './styles';
 
 interface IBannerAvatarProps {

@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { MezonModal } from '../../../../../../app/temp-ui';
+import { MezonModal } from '../../../../../componentUI';
 import { SeparatorWithSpace } from '../../../../../components/Common';
 import MessageItem from '../../MessageItem';
 import { style } from './styles';

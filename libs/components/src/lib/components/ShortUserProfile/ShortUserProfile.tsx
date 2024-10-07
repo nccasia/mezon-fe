@@ -1,4 +1,3 @@
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
@@ -33,13 +32,8 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 		}
 	}, [coords?.distanceToBottom]);
 
-	useEscapeKeyClose(profileRef, closeProfileItem);
-	useOnClickOutside(profileRef, closeProfileItem);
-
 	return (
 		<div
-			ref={profileRef}
-			tabIndex={-1}
 			className={`outline-none dark:bg-black right-[15] bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
 			style={{
 				top: positionTop ? 'auto' : coords?.mouseY,
@@ -52,6 +46,7 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 			<div className="relative">
 				<div onClick={handleClickOutside} className="text-white w-full" role="button">
 					<ModalUserProfile
+						onClose={closeProfileItem}
 						userID={userID}
 						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 						message={message}

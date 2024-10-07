@@ -18,7 +18,8 @@ export function useSeenMessagePool() {
 				messagesActions.updateLastSeenMessage({
 					clanId: action.clanId,
 					channelId: action.channelId,
-					messageId: action.messageId
+					messageId: action.messageId,
+					mode: action.mode
 				})
 			);
 		});
@@ -40,7 +41,8 @@ export function useSeenMessagePool() {
 			channelLabel: message.channel_label,
 			messageId: message.id || '',
 			messageCreatedAt: message.create_time_seconds ? +message.create_time_seconds : 0,
-			messageSeenAt: +Date.now()
+			messageSeenAt: +Date.now(),
+			mode: message.mode as number
 		});
 	}, []);
 

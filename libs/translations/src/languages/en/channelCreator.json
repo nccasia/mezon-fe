@@ -23,6 +23,10 @@
             "voice": {
                 "title": "Voice",
                 "description": "Hang out together with voice, video, and screen share"
+            },
+            "stream": {
+                "title": "Stream",
+                "description": "Sharing hobbies activity"
             }
         }
     }

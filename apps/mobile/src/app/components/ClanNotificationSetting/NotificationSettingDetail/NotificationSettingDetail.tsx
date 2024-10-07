@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonOption } from '../../../temp-ui';
+import { MezonOption } from '../../../componentUI';
 import { MuteClanNotificationBS } from '../MuteClanNotificationBS';
 import { style } from './NotificationSettingDetail.styles';
 

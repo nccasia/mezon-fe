@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import { TextInput } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Toast from 'react-native-toast-message';
-import { MezonAvatar } from '../../../../temp-ui';
+import { MezonAvatar } from '../../../../componentUI';
 import { style } from './styles';
 
 interface IStickerItem {

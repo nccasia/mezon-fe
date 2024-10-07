@@ -1,4 +1,4 @@
-import { useChannelMembersOnlineStatus, useInvite } from '@mezon/core';
+import { useInvite } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -9,13 +9,12 @@ import {
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, channelsActions, clansActions, getStoreAsync, inviteActions, selectCurrentChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync, inviteActions, useAppDispatch } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { useSelector } from 'react-redux';
-import { MezonAvatar } from '../../../../../../../app/temp-ui';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { MezonAvatar } from '../../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../RenderMessageInvite.styles';
 
@@ -36,8 +35,6 @@ interface IResInvite {
 function LinkInvite({ content, part }: { content: string; part: string }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannelId });
 	const { inviteUser } = useInvite();
 	const navigation = useNavigation<any>();
 	const inviteID = useMemo(() => extractInviteIdFromUrl(content), [content]);
@@ -85,42 +82,21 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 	};
 
 	return (
-		<TouchableWithoutFeedback>
-			<View>
-				<Text style={styles.textLink}>{part}</Text>
-				<View style={styles.boxLink}>
-					<Text style={styles.title}>{t('title')}</Text>
-					<View style={styles.container}>
-						<MezonAvatar username={clanInvite?.clan_name} avatarUrl={clanInvite?.clan_avatar}></MezonAvatar>
-						<View>
-							<Text style={styles.clanName}>{clanInvite?.clan_name}</Text>
-							<View style={styles.boxStatus}>
-								<View style={styles.memberStatus}>
-									<View style={[styles.statusCircle, styles.online]} />
-									<Text style={styles.textStatus}>
-										{onlineMembers?.length} {t('online')}
-									</Text>
-								</View>
-								<View style={styles.memberStatus}>
-									<View style={[styles.statusCircle, styles.offline]} />
-									<Text style={styles.textStatus}>
-										{offlineMembers?.length} {t('offline')}
-									</Text>
-								</View>
-							</View>
-						</View>
+		<View>
+			<Text style={styles.textLink}>{part}</Text>
+			<View style={styles.boxLink}>
+				<Text style={styles.title}>{t('title')}</Text>
+				<View style={styles.container}>
+					<MezonAvatar username={clanInvite?.clan_name} avatarUrl={clanInvite?.clan_avatar}></MezonAvatar>
+					<View>
+						<Text style={styles.clanName}>{clanInvite?.clan_name}</Text>
 					</View>
-					<TouchableOpacity
-						style={styles.inviteClanBtn}
-						onPress={() => {
-							handleJoinClanInvite();
-						}}
-					>
-						<Text style={styles.inviteClanBtnText}>{t('join')}</Text>
-					</TouchableOpacity>
 				</View>
+				<TouchableOpacity style={styles.inviteClanBtn} onPress={handleJoinClanInvite}>
+					<Text style={styles.inviteClanBtnText}>{t('join')}</Text>
+				</TouchableOpacity>
 			</View>
-		</TouchableWithoutFeedback>
+		</View>
 	);
 }
 

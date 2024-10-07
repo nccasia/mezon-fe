@@ -40,16 +40,14 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_STREAMING),
 		[listChannelSearch]
 	);
-	const combinedListChannel = useMemo(() => {
-		return [
-			{ title: t('textChannels'), type: ChannelTypeHeader },
-			...listTextChannel,
-			{ title: t('voiceChannels'), type: ChannelTypeHeader },
-			...listVoiceChannel,
-			{ title: t('streamingChannels'), type: ChannelTypeHeader },
-			...listStreamingChannel
-		];
-	}, [listTextChannel, listVoiceChannel, listStreamingChannel, t]);
+	const combinedListChannel = useMemo(
+		() => [
+			...(listTextChannel?.length ? [{ title: t('textChannels'), type: ChannelTypeHeader }, ...listTextChannel] : []),
+			...(listVoiceChannel?.length ? [{ title: t('voiceChannels'), type: ChannelTypeHeader }, ...listVoiceChannel] : []),
+			...(listStreamingChannel?.length ? [{ title: t('streamingChannels'), type: ChannelTypeHeader }, ...listStreamingChannel] : [])
+		],
+		[listTextChannel, listVoiceChannel, listStreamingChannel, t]
+	);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
 		if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
@@ -71,7 +69,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (isTabletLandscape) {
 				navigation.goBack();
 			} else {
-				navigation.navigate('HomeDefault');
+				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 				navigation.dispatch(DrawerActions.closeDrawer());
 			}
 			const channelId = channelData?.channel_id;

@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 
 		inline: {
 			display: 'flex',
-			alignItems: 'center',
+			alignItems: 'flex-start',
 			justifyContent: 'flex-start',
 			flexDirection: 'row',
 			gap: Metrics.size.s

@@ -198,6 +198,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 								key={channel.id}
 								channel={channel as ChannelThreads}
 								permissions={permissions}
+								isCollapsed={!isShowAllCategoryChannels}
 							/>
 						);
 					})}

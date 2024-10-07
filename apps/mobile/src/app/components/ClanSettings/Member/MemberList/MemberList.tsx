@@ -3,7 +3,7 @@ import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { UsersClanEntity, selectAllUserClans, useAppSelector } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { MezonInput } from '../../../../temp-ui';
+import { MezonInput } from '../../../../componentUI';
 import { normalizeString } from '../../../../utils/helpers';
 import { SeparatorWithLine } from '../../../Common';
 import { UserItem } from '../UserItem';

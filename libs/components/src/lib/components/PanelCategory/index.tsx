@@ -1,7 +1,7 @@
-import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	defaultNotificationCategoryActions,
-	selectCurrentClanId,
+	selectCurrentClan,
 	selectDefaultNotificationCategory,
 	SetDefaultNotificationPayload,
 	useAppDispatch,
@@ -17,7 +17,7 @@ import {
 	FOR_24_HOURS,
 	FOR_3_HOURS,
 	FOR_8_HOURS,
-	ICategory,
+	ICategoryChannel,
 	MUTE
 } from '@mezon/utils';
 import { format } from 'date-fns';
@@ -31,7 +31,7 @@ import ItemPanel from '../PanelChannel/ItemPanel';
 
 interface IPanelCategoryProps {
 	coords: Coords;
-	category?: ICategory;
+	category?: ICategoryChannel;
 	onDeleteCategory?: () => void;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
@@ -43,7 +43,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const dispatch = useAppDispatch();
 	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
-	const currentClanId = useAppSelector(selectCurrentClanId);
+	const currentClan = useAppSelector(selectCurrentClan);
 	const [muteUntil, setMuteUntil] = useState('');
 
 	const handleDeleteCategory = () => {
@@ -66,7 +66,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 		const payload: SetDefaultNotificationPayload = {
 			category_id: category?.id,
 			notification_type: notificationType,
-			clan_id: currentClanId || ''
+			clan_id: currentClan?.clan_id || ''
 		};
 		dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
 	};
@@ -80,14 +80,14 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 				category_id: category?.id,
 				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
 				time_mute: muteTimeISO,
-				clan_id: currentClanId || ''
+				clan_id: currentClan?.clan_id || ''
 			};
 			dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
 		} else {
 			const payload: SetDefaultNotificationPayload = {
 				category_id: category?.id,
 				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
-				clan_id: currentClanId || '',
+				clan_id: currentClan?.clan_id || '',
 				active: 0
 			};
 			dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
@@ -98,7 +98,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 		const payload: SetDefaultNotificationPayload = {
 			category_id: category?.id,
 			notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
-			clan_id: currentClanId || '',
+			clan_id: currentClan?.clan_id || '',
 			active: active
 		};
 		dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
@@ -118,7 +118,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 					const payload: SetDefaultNotificationPayload = {
 						category_id: category?.id,
 						notification_type: defaultCategoryNotificationSetting?.notification_setting_type ?? NotificationType.ALL_MESSAGE,
-						clan_id: currentClanId || '',
+						clan_id: currentClan?.clan_id || '',
 						active: 1
 					};
 					dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
@@ -134,6 +134,13 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 	useEscapeKeyClose(panelRef, handClosePannel);
 	useOnClickOutside(panelRef, handClosePannel);
 
+	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
+	useEffect(() => {
+		if (statusMarkAsReadCategory === 'success' || statusMarkAsReadCategory === 'error') {
+			setIsShowPanelChannel(false);
+		}
+	}, [statusMarkAsReadCategory]);
+
 	return (
 		<div
 			ref={panelRef}
@@ -143,7 +150,12 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
 		>
 			<GroupPanels>
-				<ItemPanel children="Mark As Read" />
+				<ItemPanel
+					onClick={statusMarkAsReadCategory === 'pending' ? undefined : () => handleMarkAsReadCategory(category as ICategoryChannel)}
+					disabled={statusMarkAsReadCategory === 'pending'}
+				>
+					{statusMarkAsReadCategory === 'pending' ? 'Processing...' : 'Mark As Read'}
+				</ItemPanel>
 			</GroupPanels>
 			<GroupPanels>
 				<ItemPanel children="Collapse Category" type={'checkbox'} />

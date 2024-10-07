@@ -16,7 +16,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 	const time = useMemo(() => timeFomat(event?.start_time || ''), [event?.start_time]);
 
 	return (
-		<div className="px-4 py-8 space-y-2 dark:text-zinc-400 text-colorTextLightMode max-h-[250px] h-[250px] hide-scrollbar overflow-auto">
+		<div className="px-4 py-8 space-y-2 dark:text-zinc-400 text-colorTextLightMode max-h-[370px] h-fit hide-scrollbar overflow-auto">
 			<h4 className="font-semibold inline-flex gap-x-3">
 				<Icons.IconEvents />
 				{time}
@@ -49,6 +49,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 					Created by <span className="hover:underline">{userCreate?.user?.username}</span>
 				</p>
 			</div>
+			<div className="break-all">{event?.description}</div>
 		</div>
 	);
 };

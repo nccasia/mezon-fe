@@ -3,7 +3,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import React, { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSwitch, reserve } from '../../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSwitch, reserve } from '../../../componentUI';
 import { style } from './NotificationOption.styles';
 interface INotificationOptionProps {
 	selectedTabs: { mention: boolean; individual: boolean };

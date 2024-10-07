@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { UserGroupIcon } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectDirectsUnreadlist } from '@mezon/store-mobile';
+import { DirectEntity, selectDirectById, selectDirectsUnreadlist, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useMemo } from 'react';
@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
 
-const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
+const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -49,6 +49,8 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 		}
 	};
 
+	const dm = useAppSelector((state) => selectDirectById(state, dmId)) || ({} as DirectEntity);
+
 	const navigateToDirectMessageMDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
@@ -84,7 +86,7 @@ export const UnreadDMBadgeList = React.memo(() => {
 		<View style={[styles.container, !!unReadDM?.length && styles.containerBottom]}>
 			{!!unReadDM?.length &&
 				unReadDM?.map((dm: DirectEntity, index) => {
-					return <UnreadDMBadgeItem key={`${dm?.id}_${index}`} dm={dm} />;
+					return <UnreadDMBadgeItem key={`${dm?.id}_${index}`} dmId={dm?.id} />;
 				})}
 			{!!unReadDM?.length && <Block style={styles.lineBottom} />}
 		</View>

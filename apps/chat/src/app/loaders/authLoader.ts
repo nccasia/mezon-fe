@@ -23,7 +23,7 @@ function getRedirectTo(initialPath?: string): string {
 		return redirectParam;
 	}
 
-	if (initialPath && !initialPath.startsWith('/guess')) {
+	if (initialPath && !initialPath.startsWith('/desktop')) {
 		return initialPath;
 	}
 
@@ -52,7 +52,7 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 		} as IAuthLoaderData;
 	} catch (error) {
 		const redirectTo = getRedirectTo(initialPath);
-		const redirect = redirectTo ? `/guess/login?redirect=${redirectTo}` : '/guess/login';
+		const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
 		return {
 			isLogin: false,
 			redirect: redirect

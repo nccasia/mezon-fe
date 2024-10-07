@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { memo, useCallback } from 'react';
-import Backdrop from '../../../../temp-ui/MezonBottomSheet/backdrop';
+import Backdrop from '../../../../componentUI/MezonBottomSheet/backdrop';
 import { IAddMemberOrRoleBSProps } from '../../types/channelPermission.type';
 import { AddMemberOrRoleContent } from './AddMemberOrRoleContent';
 

@@ -1,7 +1,7 @@
-import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import React, { RefObject } from 'react';
+import React, { RefObject, useEffect } from 'react';
 import ItemModal from './ItemModal';
 
 type ModalPanelProps = {
@@ -33,6 +33,12 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 	useEscapeKeyClose(rootRef, () => setIsShowModalPanelClan(false));
 	useOnClickOutside(rootRef, () => setIsShowModalPanelClan(false));
 
+	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
+	useEffect(() => {
+		if (statusMarkAsReadClan === 'success' || statusMarkAsReadClan === 'error') {
+			setIsShowModalPanelClan(false);
+		}
+	}, [statusMarkAsReadClan]);
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
@@ -40,6 +46,13 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 		>
 			<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
 				{canManageClan && <ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
+				<ItemModal
+					onClick={statusMarkAsReadClan === 'pending' ? undefined : handleMarkAsReadClan}
+					disabled={statusMarkAsReadClan === 'pending'}
+				>
+					{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
+				</ItemModal>
+
 				<ItemModal
 					onClick={handleShowInviteClanModal}
 					children="Invite People"

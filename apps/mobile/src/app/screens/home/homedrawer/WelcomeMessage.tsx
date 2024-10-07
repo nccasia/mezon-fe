@@ -9,7 +9,7 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MezonAvatar } from '../../../temp-ui';
+import { MezonAvatar } from '../../../componentUI';
 import { style } from './styles';
 
 interface IWelcomeMessage {

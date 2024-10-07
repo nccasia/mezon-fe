@@ -2,6 +2,7 @@ import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
+	channelsActions,
 	clansActions,
 	selectAppChannelById,
 	selectChannelById,
@@ -9,15 +10,13 @@ import {
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useRef } from 'react';
+import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -26,11 +25,9 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
-
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(currentChannel.clan_id ?? '', currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useMemo(() => {
+		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
+	}, [currentChannel.count_mess_unread]);
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -39,6 +36,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		if (numberNotification && numberNotification > 0) {
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
 	}, [numberNotification]);
@@ -115,41 +113,39 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			</div>
 		)
 	) : (
-		currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-			<>
-				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-				<div
-					className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
-					id="mainChat"
-					onDragEnter={handleDragEnter}
-				>
-					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
+		<>
+			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			<div
+				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
+				id="mainChat"
+				onDragEnter={handleDragEnter}
+			>
+				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
+					<div
+						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
+					>
 						<div
-							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
+							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+							ref={messagesContainerRef}
 						>
-							<div
-								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
-								ref={messagesContainerRef}
-							>
-								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
-							</div>
-							<ChannelMainContentText channelId={currentChannel?.id as string} />
+							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
 						</div>
-						{isShowMemberList && (
-							<div
-								onContextMenu={(event) => event.preventDefault()}
-								className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-								id="memberList"
-							>
-								<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-								<MemberList />
-							</div>
-						)}
-						{isSearchMessage && <SearchMessageChannel />}
+						<ChannelMainContentText channelId={currentChannel?.id as string} />
 					</div>
+					{isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+						<div
+							onContextMenu={(event) => event.preventDefault()}
+							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							id="memberList"
+						>
+							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+							<MemberList />
+						</div>
+					)}
+					{isSearchMessage && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 				</div>
-			</>
-		)
+			</div>
+		</>
 	);
 };
 

@@ -11,6 +11,10 @@
             "label": "Tên hiển thị",
             "placeholder": ""
         },
+        "clanName": {
+            "label": "Tên Clan",
+            "placeholder": ""
+        },
         "pronouns": {
             "label": "Danh xưng",
             "placeholder": ""

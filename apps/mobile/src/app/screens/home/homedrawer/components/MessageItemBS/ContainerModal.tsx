@@ -502,7 +502,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			true,
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel?.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 		onClose();

@@ -5,9 +5,9 @@ import { EventManagementEntity, selectClanById, selectMemberClanByUserId } from 
 import { useRef } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonBottomSheet } from '../../../temp-ui';
-import MezonAvatar from '../../../temp-ui/MezonAvatar';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import { MezonBottomSheet } from '../../../componentUI';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
+import MezonButton from '../../../componentUI/MezonButton2';
 import { EventLocation } from '../EventLocation';
 import { EventMenu } from '../EventMenu';
 import { EventTime } from '../EventTime';

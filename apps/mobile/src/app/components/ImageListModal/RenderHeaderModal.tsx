@@ -5,8 +5,8 @@ import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { Platform, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import { MezonClanAvatar } from '../../componentUI';
 import { useImage } from '../../hooks/useImage';
-import { MezonClanAvatar } from '../../temp-ui';
 import { style } from './styles';
 
 interface IRenderFooterModalProps {

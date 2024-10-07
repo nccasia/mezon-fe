@@ -62,9 +62,13 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 			setSelectedItemId(item.id);
 			onSelect(item.id, item.type);
 			if (item.type === 0) {
-				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id, userId: '' }));
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id, userId: '', noCache: true })
+				);
 			} else {
-				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: '', userId: item.id }));
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: '', userId: item.id, noCache: true })
+				);
 			}
 		}
 	};

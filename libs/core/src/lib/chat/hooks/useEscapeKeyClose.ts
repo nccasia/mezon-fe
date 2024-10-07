@@ -1,14 +1,14 @@
 import { RefObject, useEffect } from 'react';
 
 export const useEscapeKeyClose = (
-	ref: RefObject<HTMLElement>,
+	ref: RefObject<HTMLElement> | undefined,
 	onClose: () => void,
 	options: Partial<{
 		notFocus: boolean;
 	}> = {}
 ) => {
 	useEffect(() => {
-		const element = ref.current;
+		const element = ref?.current;
 		if (!element) return;
 		const { notFocus } = options;
 		const handleKeyDown = (event: KeyboardEvent) => {

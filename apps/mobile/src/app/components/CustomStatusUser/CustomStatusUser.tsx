@@ -4,8 +4,8 @@ import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { Ref, forwardRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
+import { IMezonMenuSectionProps, IMezonOptionData, MezonBottomSheet, MezonMenu, MezonOption } from '../../componentUI';
 import { ETypeCustomUserStatus } from '../../screens/profile/ProfileScreen';
-import { IMezonMenuSectionProps, IMezonOptionData, MezonBottomSheet, MezonMenu, MezonOption } from '../../temp-ui';
 
 interface ICustomStatusUserProps {
 	onPressSetCustomStatus?: () => void;

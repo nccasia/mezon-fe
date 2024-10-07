@@ -129,6 +129,19 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [isOPenDeleteMessageModal, isCloseDeleteMessageModal] = useModal(() => {
 		return <ModalDeleteMess mess={currentMessage} closeModal={isCloseDeleteMessageModal} mode={mode} />;
 	}, [currentMessage]);
+
+	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
+		return (
+			<ModalAddPinMess
+				mess={message}
+				closeModal={closePinMessageModal}
+				handlePinMessage={handlePinMessage}
+				mode={activeMode || 0}
+				channelLabel={currentChannel?.channel_label || ''}
+			/>
+		);
+	}, [message]);
+
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = useMemo(() => {
@@ -403,7 +416,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(pinMessageStatus === true, (builder) => {
-			builder.addMenuItem('pinMessage', 'Pin Message', () => setOpenModalAddPin(true), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
+			builder.addMenuItem('pinMessage', 'Pin Message', openPinMessageModal, <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
@@ -582,20 +595,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		urlImage
 	]);
 
-	return (
-		<>
-			<DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />
-			{openModalAddPin && (
-				<ModalAddPinMess
-					mess={message}
-					closeModal={() => setOpenModalAddPin(false)}
-					handlePinMessage={handlePinMessage}
-					mode={activeMode || 0}
-					channelLabel={currentChannel?.channel_label || ''}
-				/>
-			)}
-		</>
-	);
+	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }
 
 export default MessageContextMenu;

@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IMezonOptionData, MezonInput, MezonOption, MezonSelect } from '../../../componentUI';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonOptionData, MezonInput, MezonOption, MezonSelect } from '../../../temp-ui';
-import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import { style } from './styles';
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;

@@ -19,9 +19,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { EventViewer } from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
+import { MezonBottomSheet } from '../../../../componentUI';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { MezonBottomSheet } from '../../../../temp-ui';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
@@ -53,6 +53,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const previousPositionRef = useRef(null);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -89,17 +90,19 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const handleCollapseCategory = useCallback((isCollapse: boolean) => {
 		setIsCollapseCategory(true);
 	}, []);
-
 	useEffect(() => {
 		const positionChannel = channelsPositionRef?.current?.[currentChannel?.id];
 		const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
 		const position = (positionChannel?.height || 0) + (categoryOffset || 0);
-		if (position && !isCollapseCategory) {
+		const previousPosition = previousPositionRef?.current;
+
+		if (Math.abs(position - previousPosition) > 100 && !isCollapseCategory) {
 			flashListRef?.current?.scrollTo({
 				x: 0,
 				y: position,
 				animated: true
 			});
+			previousPositionRef.current = position;
 		}
 	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId]);
 

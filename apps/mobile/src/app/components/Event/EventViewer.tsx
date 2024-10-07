@@ -7,7 +7,7 @@ import { EPermission } from '@mezon/utils';
 import React, { useMemo, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonBottomSheet, MezonTab } from '../../temp-ui';
+import { MezonBottomSheet, MezonTab } from '../../componentUI';
 import { EventDetail } from './EventDetail';
 import { EventItem } from './EventItem';
 import { EventMember } from './EventMember';

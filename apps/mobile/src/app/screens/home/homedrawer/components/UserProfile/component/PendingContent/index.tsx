@@ -10,7 +10,7 @@ import { FlatList } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { EFriendState } from '../..';
 import { SeparatorWithLine } from '../../../../../../../components/Common';
-import { MezonAvatar } from '../../../../../../../temp-ui';
+import { MezonAvatar } from '../../../../../../../componentUI';
 
 interface IPendingContentProps {
 	targetUser: FriendsEntity;

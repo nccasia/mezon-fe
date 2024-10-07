@@ -5,8 +5,8 @@ import { OptionEvent } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import { EventItem } from '../../Event/EventItem';
 import { style } from './styles';
 

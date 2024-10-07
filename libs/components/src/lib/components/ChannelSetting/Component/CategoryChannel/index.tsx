@@ -20,7 +20,8 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			category_id: category.id,
 			channel_id: channelID ?? '',
-			channel_label: channelLabel
+			channel_label: channelLabel,
+			app_url: ''
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
 			const channelLink = navigator.toChannelPage(channelID ?? '', channel.clan_id ?? '');

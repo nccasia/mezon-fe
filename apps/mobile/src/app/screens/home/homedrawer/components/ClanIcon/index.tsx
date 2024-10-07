@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllChannelLastSeenTimestampByClanId, selectCurrentClanId, selectMentionAndReplyUnreadByClanId } from '@mezon/store';
+import { selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store';
 import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -14,8 +14,7 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const allChannelLastSeenTimeStamp = useSelector(selectAllChannelLastSeenTimestampByClanId(props?.data?.clan_id ?? ''));
-	const notiUnreadClan = useSelector(selectMentionAndReplyUnreadByClanId(props?.data?.clan_id ?? '', allChannelLastSeenTimeStamp));
+	const badgeCountClan = useSelector(selectBadgeCountByClanId(props?.data?.clan_id ?? '')) || 0;
 
 	const isActive = currentClanId === props?.data?.clan_id;
 	return (
@@ -35,9 +34,9 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 				</View>
 			)}
 
-			{notiUnreadClan?.length > 0 && (
+			{badgeCountClan > 0 && (
 				<View style={styles.badge}>
-					<Text style={styles.badgeText}>{notiUnreadClan?.length}</Text>
+					<Text style={styles.badgeText}>{badgeCountClan}</Text>
 				</View>
 			)}
 			{!!isActive && <View style={styles.lineActiveClan} />}

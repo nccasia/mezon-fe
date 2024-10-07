@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../temp-ui';
+import { IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../componentUI';
 import NotificationSetting from '../NotificationSetting';
 import { style } from './MuteThreadDetailModal.styles';
 

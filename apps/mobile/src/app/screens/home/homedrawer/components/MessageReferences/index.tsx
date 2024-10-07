@@ -7,7 +7,7 @@ import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
-import { MezonAvatar } from '../../../../../temp-ui';
+import { MezonAvatar } from '../../../../../componentUI';
 import { RenderTextMarkdownContent } from '../RenderTextMarkdown';
 import { style } from './styles';
 

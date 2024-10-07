@@ -1,15 +1,18 @@
+import { selectIsLogin } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
 import debounce from 'lodash.debounce';
 import { memo, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-type SideBarProps = {
+interface SideBarProps {
 	sideBarIsOpen: boolean;
 	toggleSideBar: () => void;
 	scrollToSection: (id: string, event: React.MouseEvent) => void;
-};
+}
 
 export const SideBarMezon = memo((props: SideBarProps) => {
+	const isLogin = useSelector(selectIsLogin);
 	const { sideBarIsOpen, toggleSideBar, scrollToSection } = props;
 
 	const [bodySideBarRef, setBodySideBarRef] = useState(0);
@@ -53,27 +56,11 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 						height={32}
 						className="aspect-square object-cover"
 					/>
-					<div className="font-semibold text-[22.15px] leading-[26.58px]" style={{ fontFamily: 'Poppins' }}>
-						mezon
-					</div>
+					<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em] font-['Poppins']">mezon</div>
 				</Link>
 				<Icons.MenuClose className="w-[20px] max-lg:block" onClick={toggleSideBar} />
 
-				<div
-					className="hidden max-md:block"
-					style={{
-						position: 'absolute',
-						top: 0,
-						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						width: '300px',
-						height: '200px',
-						background: '#8D72C5',
-						filter: 'blur(70px)',
-						borderRadius: '50%',
-						mixBlendMode: 'color-dodge'
-					}}
-				></div>
+				<div className="hidden max-md:block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#8D72C5] rounded-[50%] filter blur-[70px] mix-blend-color-dodge"></div>
 			</div>
 
 			<div
@@ -108,10 +95,10 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					Features
 				</a>
 				<Link
-					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] focus:bg-[#281FB5]"
+					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
 					to={'/mezon'}
 				>
-					Login
+					{isLogin ? 'Open Mezon' : 'Login'}
 				</Link>
 			</div>
 

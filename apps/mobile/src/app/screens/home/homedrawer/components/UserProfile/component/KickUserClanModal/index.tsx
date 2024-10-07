@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSelector } from 'react-redux';
-import { MezonInput } from '../../../../../../../../app/temp-ui';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../../app/temp-ui/MezonButton2';
+import { MezonInput } from '../../../../../../../componentUI';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../componentUI/MezonButton2';
 import { style } from './KickUserClanModal.style';
 
 const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEntity; onRemoveUserClan: () => void }) => {

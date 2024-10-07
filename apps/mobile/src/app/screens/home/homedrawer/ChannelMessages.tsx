@@ -49,8 +49,13 @@ const ChannelMessages = React.memo(
 		const timeOutRef = useRef(null);
 
 		useEffect(() => {
+			const event = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT, () => {
+				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+			});
+
 			return () => {
 				if (timeOutRef?.current) clearTimeout(timeOutRef.current);
+				event.remove();
 			};
 		}, []);
 

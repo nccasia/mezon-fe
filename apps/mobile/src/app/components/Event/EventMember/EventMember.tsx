@@ -2,7 +2,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import MezonAvatar from '../../../temp-ui/MezonAvatar';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './styles';
 
 interface IEventMemberProps {

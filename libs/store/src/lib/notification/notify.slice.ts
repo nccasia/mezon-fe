@@ -166,47 +166,28 @@ export const selectAllNotificationMentionAndReply = createSelector(selectAllNoti
 	)
 );
 
-export const selectMentionAndReplyByClanId = (clanId: string) =>
-	createSelector(selectAllNotification, (notifications) =>
-		notifications.filter(
-			(notification) =>
-				notification.content.clan_id === clanId &&
-				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED)
-		)
-	);
-
-export const selectMentionAndReplyUnreadByChanneld = (clanId: string, channelId: string, lastSeenStamp: number) =>
-	createSelector(selectAllNotification, (notifications) => {
-		const clanFilteredNotifications = notifications.filter((notification) => notification.content.clan_id === clanId);
-
-		const filteredNotifications = clanFilteredNotifications.filter(
-			(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
-		);
-
-		return filteredNotifications.filter((notification) => {
+export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSeenStamp: number) =>
+	createSelector(selectAllNotificationMentionAndReply, (notifications) => {
+		const result = notifications.filter((notification) => {
 			if (!notification.create_time) {
 				return false;
 			}
-
 			const timeCreate = new Date(notification.create_time).getTime() / 1000;
 
 			return notification.content.channel_id === channelId && lastSeenStamp < timeCreate;
 		});
+
+		return result;
 	});
 
-export const selectMentionAndReplyUnreadByClanId = (clanId: string, listLastSeen: ChannelMetaEntity[]) =>
-	createSelector(selectAllNotification, (notifications) => {
-		const filteredNotifications = notifications.filter(
-			(notification) =>
-				notification.content.clan_id === clanId &&
-				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED)
-		);
+export const selectMentionAndReplyUnreadByClanId = (listLastSeen: ChannelMetaEntity[]) =>
+	createSelector(selectAllNotificationMentionAndReply, (notifications) => {
 		const lastSeenMap = new Map<string, number>();
 		listLastSeen.forEach((channel) => {
 			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
 		});
 
-		return filteredNotifications.filter((notification) => {
+		return notifications.filter((notification) => {
 			if (!notification.create_time) {
 				return false;
 			}

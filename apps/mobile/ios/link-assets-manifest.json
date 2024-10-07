@@ -48,6 +48,10 @@
     {
       "path": "src/assets/fonts/OpenSans-SemiBoldItalic.ttf",
       "sha1": "3add68a065e0eaa54ded5170348ffd811c409e63"
+    },
+    {
+      "path": "src/assets/fonts/icomoon.ttf",
+      "sha1": "26b060f5271907fdd1bef9fcf7f6dcddca736483"
     }
   ]
 }

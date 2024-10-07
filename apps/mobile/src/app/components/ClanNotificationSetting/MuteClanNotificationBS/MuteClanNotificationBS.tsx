@@ -9,8 +9,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { IMezonMenuSectionProps, MezonMenu } from '../../../temp-ui';
-import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
+import { IMezonMenuSectionProps, MezonMenu } from '../../../componentUI';
+import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import { style } from './MuteClanNotificationBS.styles';
 
 type MuteClanNotificationBSProps = {

@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton from '../../../componentUI/MezonButton2';
 import { EventLocation } from '../EventLocation';
 import { EventTime } from '../EventTime';
 import { style } from './styles';

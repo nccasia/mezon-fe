@@ -2,8 +2,8 @@ import { useTheme } from '@mezon/mobile-ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
+import { IMezonMenuSectionProps, IMezonOptionData, MezonMenu, MezonOption, MezonSwitch } from '../../../componentUI';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, IMezonOptionData, MezonMenu, MezonOption, MezonSwitch } from '../../../temp-ui';
 import { style } from './styles';
 
 type AppearanceSettingScreen = typeof APP_SCREEN.SETTINGS.APPEARANCE;

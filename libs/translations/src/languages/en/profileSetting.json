@@ -11,6 +11,10 @@
             "label": "Display name",
             "placeholder": ""
         },
+        "clanName": {
+            "label": "Clan Name",
+            "placeholder": ""
+        },
         "pronouns": {
             "label": "Pronouns",
             "placeholder": ""

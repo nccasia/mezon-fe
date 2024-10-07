@@ -4,7 +4,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
 import { ChannelStatusEnum, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import { style } from './SuggestItem.styles';
@@ -20,24 +20,26 @@ type SuggestItemProps = {
 	channel?: ChannelsEntity;
 };
 
-const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, channel }: SuggestItemProps) => {
+const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, channel }: SuggestItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
 	const { t } = useTranslation(['clan']);
-	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream } = useMemo(() => {
+	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
 		const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
 		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_TEXT;
 		const isThread = channel?.parrent_id !== '0';
 		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 		const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+		const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;
 
 		return {
 			isChannelPrivate,
 			isChannelText,
 			isThread,
 			isChannelVoice,
-			isChannelStream
+			isChannelStream,
+			isChannelApp
 		};
 	}, [channel]);
 
@@ -82,6 +84,9 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 				{!isChannelPrivate && isChannelStream && (
 					<Icons.StreamIcon style={styles.streamIcon} height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
 				)}
+				{!isChannelPrivate && isChannelApp && (
+					<Icons.AppChannelIcon style={styles.streamIcon} height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
+				)}
 				{isRoleUser || name.startsWith('here') ? (
 					<Text style={[styles.roleText, name.startsWith('here') && styles.textHere]}>{`@${name}`}</Text>
 				) : (
@@ -94,6 +99,6 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 			<Text style={styles.subText}>{subText}</Text>
 		</View>
 	);
-};
+});
 
 export default SuggestItem;

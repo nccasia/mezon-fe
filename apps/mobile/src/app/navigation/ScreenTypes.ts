@@ -13,6 +13,7 @@ export const APP_SCREEN = {
 	AUTHORIZE: 'AUTHORIZE',
 	BOTTOM_BAR: 'BOTTOM_BAR',
 	DRAWER_BAR: 'DRAWER_BAR',
+	HOME_DEFAULT: 'HOME_DEFAULT',
 	HOME: 'HOME',
 
 	SERVERS: {
@@ -219,7 +220,7 @@ type SettingStackParamList = {
 	[APP_SCREEN.SETTINGS.BLOCKED_USERS]: undefined;
 };
 
-type AppStackParamList = {
+export type AppStackParamList = {
 	[APP_SCREEN.UN_AUTHORIZE]: undefined;
 	[APP_SCREEN.LOGIN]: undefined;
 	[APP_SCREEN.REGISTER]: undefined;
@@ -227,6 +228,7 @@ type AppStackParamList = {
 	[APP_SCREEN.BOTTOM_BAR]: undefined;
 	[APP_SCREEN.DRAWER_BAR]: undefined;
 	[APP_SCREEN.HOME]: undefined;
+	[APP_SCREEN.HOME_DEFAULT]: undefined;
 	[APP_SCREEN.SERVERS.STACK]: NavigatorScreenParams<ServerStackParamList>;
 	[APP_SCREEN.NOTIFICATION.STACK]: NavigatorScreenParams<NotificationStackParamList>;
 	[APP_SCREEN.MESSAGES.STACK]: NavigatorScreenParams<MessagesStackParamList>;

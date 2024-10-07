@@ -7,7 +7,7 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { MezonInput } from '../../../../../temp-ui';
+import { MezonInput } from '../../../../../componentUI';
 import { normalizeString } from '../../../../../utils/helpers';
 import { MemberItem } from '../MemberItem';
 

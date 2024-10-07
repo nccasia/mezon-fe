@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { MezonConfirm, MezonInput } from '../../../componentUI';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonConfirm, MezonInput } from '../../../temp-ui';
 
 enum EActionType {
 	permissions,

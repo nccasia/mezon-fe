@@ -1,43 +1,18 @@
 import { Icons, Image } from '@mezon/ui';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
-type LayoutProps = {
+interface LayoutProps {
 	sideBarIsOpen: boolean;
-};
+}
 
-export const Layout = memo((props: LayoutProps) => {
+const Layout = memo((props: LayoutProps) => {
 	const { sideBarIsOpen } = props;
 
 	return (
 		<div>
 			<section id="overview" className="flex flex-col items-center relative">
-				<div
-					className="max-lg:hidden"
-					style={{
-						position: 'absolute',
-						left: 0,
-						top: 0,
-						width: '400px',
-						height: '400px',
-						background: '#8D72C5',
-						filter: 'blur(130px)',
-						mixBlendMode: 'color-dodge',
-						transform: 'translateY(50%)'
-					}}
-				></div>
-				<div
-					className="max-lg:hidden"
-					style={{
-						position: 'absolute',
-						right: 0,
-						width: '400px',
-						height: '400px',
-						background: '#8D72C5',
-						filter: 'blur(130px)',
-						mixBlendMode: 'color-dodge',
-						transform: 'translateY(50%)'
-					}}
-				></div>
+				<div className="max-lg:hidden absolute top-0 left-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+				<div className="max-lg:hidden absolute right-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
 				<div
 					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'}`}
 				>
@@ -53,7 +28,7 @@ export const Layout = memo((props: LayoutProps) => {
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/blockchain-intergration.svg`} alt={'blockChainIntergration'} width={48} height={48} />
+							<Image src={`assets/blockchain-intergration.svg`} alt={'blockChainIntergration'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -79,7 +54,7 @@ export const Layout = memo((props: LayoutProps) => {
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/developer-empowerment.svg`} alt={'developerEmpowerment'} width={48} height={48} />
+							<Image src={`assets/developer-empowerment.svg`} alt={'developerEmpowerment'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -104,7 +79,7 @@ export const Layout = memo((props: LayoutProps) => {
 							className="relative border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} width={48} height={48} />
+							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -125,29 +100,14 @@ export const Layout = memo((props: LayoutProps) => {
 							</div>
 						</AnimatedSection>
 					</div>
-					<div
-						className="hidden max-lg:block"
-						style={{
-							position: 'absolute',
-							right: 0,
-							bottom: '0px',
-							width: '300px',
-							height: '300px',
-							background: '#8D72C5',
-							mixBlendMode: 'color-dodge',
-							filter: 'blur(100px)'
-						}}
-					></div>
+					<div className="hidden max-lg:block absolute right-0 bottom-0 w-[300px] h-[300px] bg-[#8D72C5] filter blur-[100px] mix-blend-color-dodge"></div>
 				</div>
 			</section>
 			<section id="feature" className="flex flex-col items-center">
 				<div
 					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
-					<h2
-						style={{ fontFamily: 'Poppins' }}
-						className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px]"
-					>
+					<h2 className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px] font-['Poppins']">
 						Our features
 					</h2>
 
@@ -156,18 +116,7 @@ export const Layout = memo((props: LayoutProps) => {
 							className="rounded-[20px] border p-[64px] bg-[#0B0E2D] border-[#4465FF4D] flex flex-col gap-[52px] max-md:rounded-[12px] max-md:py-[32px] max-md:px-[16px] max-md:gap-[20px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<h3
-								className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] px-[20px]"
-								style={{
-									background: 'linear-gradient(#1D5AFA, #F8E4F0)',
-									WebkitBackgroundClip: 'text',
-									backgroundClip: 'text',
-									color: 'transparent',
-									fontFamily: 'Poppins'
-								}}
-							>
-								Comprehensive Communication Tools
-							</h3>
+							<HeaderFeature content="Comprehensive Communication Tools" className="px-[20px]" />
 							<IconGrid />
 						</div>
 
@@ -181,18 +130,13 @@ export const Layout = memo((props: LayoutProps) => {
 											window.innerWidth > 768 ? 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Decentralized <br></br> Token-Based Economy
-									</h3>
+									<HeaderFeature
+										content={
+											<>
+												Decentralized <br></br> Token-Based Economy
+											</>
+										}
+									/>
 									<Image src={`../../../assets/multiple-block.png`} alt={'blockDecentralized'} />
 								</AnimatedSection>
 								<AnimatedSection
@@ -202,29 +146,15 @@ export const Layout = memo((props: LayoutProps) => {
 										background: window.innerWidth > 768 ? 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Advanced Developer <br></br> API Platform
-									</h3>
-									<div
-										className={`${sideBarIsOpen ? 'unset' : 'relative'}`}
-										style={{
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-											justifyContent: 'center',
-											width: '100%'
-										}}
-									>
-										<Image src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
+									<HeaderFeature
+										content={
+											<>
+												Advanced Developer <br></br> API Platform
+											</>
+										}
+									/>
+									<div className={`${sideBarIsOpen ? 'unset' : 'relative'} flex flex-col items-center justify-center w-full`}>
+										<Image className="w-full" src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
 									</div>
 								</AnimatedSection>
 							</div>
@@ -237,43 +167,18 @@ export const Layout = memo((props: LayoutProps) => {
 										background: window.innerWidth > 768 ? 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Gaming & Entertainment
-									</h3>
+									<HeaderFeature content="Gaming & Entertainment" />
 									<div className="flex flex-col gap-[23px] max-md:gap-[12px] max-md:items-center">
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Game Rooms & Channels
-											</span>
-										</div>
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Developer-Driven Game Creation
-											</span>
-										</div>
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Token-Driven Gaming Economy
-											</span>
-										</div>
+										{['Game Rooms & Channels', 'Developer-Driven Game Creation', 'Token-Driven Gaming Economy'].map((text) => (
+											<div
+												className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
+												style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
+											>
+												<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
+													{text}
+												</span>
+											</div>
+										))}
 									</div>
 									<Image
 										src={`../../../assets/cube.png`}
@@ -295,18 +200,7 @@ export const Layout = memo((props: LayoutProps) => {
 											window.innerWidth > 768 ? 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Customizable & Scalable <br></br> Platform
-									</h3>
+									<HeaderFeature content="Customizable & Scalable Platform" />
 									<div className="flex flex-col gap-[12px] p-[19.23px] rounded-[12px] border border-[#445FA34D] bg-[#0D0935] max-md:border-[1.2px] max-w-[241.39px]">
 										<div className="font-semibold text-[12.38px] text-center leading-[14.85px] text-[#FFFFFF]">
 											Customize Your Clan
@@ -329,7 +223,7 @@ export const Layout = memo((props: LayoutProps) => {
 											</span>
 											<span className="font-normal text-[9.9px] leading-[11.88px] text-[#5865F2]">Community Guidelines.</span>
 										</div>
-										<button className="border-0 p-[7.43px] rounded-[618.32px] bg-[#4477FC] text-center font-semibold text-[11.14px] leading-[13.37px] text-[#FFFFFF]">
+										<button className="border-0 p-[7.43px] rounded-[618.32px] bg-[#4477FC] text-center font-semibold text-[11.14px] leading-[13.37px] text-[#FFFFFF] cursor-default">
 											Create Clan
 										</button>
 									</div>
@@ -337,86 +231,17 @@ export const Layout = memo((props: LayoutProps) => {
 							</div>
 
 							{!sideBarIsOpen && (
-								<div
-									className="hidden md:block"
-									style={{
-										position: 'absolute',
-										top: '50%',
-										left: '50%',
-										transform: 'translate(-50%, -50%)',
-										width: '400px',
-										height: '400px',
-										background: '#8D72C5',
-										filter: 'blur(190px)',
-										borderRadius: '50%',
-										mixBlendMode: 'color-dodge'
-									}}
-								></div>
+								<div className="hidden md:block absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[190px] mix-blend-color-dodge"></div>
 							)}
 						</div>
 					</div>
 
 					{!sideBarIsOpen && (
 						<div>
-							<div
-								className="hidden md:block"
-								style={{
-									position: 'absolute',
-									top: '8%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(140px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									top: 0,
-									right: '50%',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(130px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									bottom: 0,
-									right: '50%',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(130px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									top: '40%',
-									right: 0,
-									width: '200px',
-									height: '400px',
-									background: '#8D72C5',
-									filter: 'blur(100px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
+							<div className="hidden md:block absolute top-[8%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[140px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[100px] mix-blend-color-dodge"></div>
 						</div>
 					)}
 				</div>
@@ -424,6 +249,27 @@ export const Layout = memo((props: LayoutProps) => {
 		</div>
 	);
 });
+
+export default Layout;
+
+interface HeaderFeatureProps {
+	content: React.ReactNode;
+	className?: string;
+}
+
+export const HeaderFeature: React.FC<HeaderFeatureProps> = ({ content, className }) => {
+	return (
+		<h3
+			className={`text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] text-transparent font-['Poppins'] bg-[linear-gradient(349.47deg,_#1D5AFA_-9.25%,_#F8E4F0_90.24%)] ${className}`}
+			style={{
+				WebkitBackgroundClip: 'text',
+				backgroundClip: 'text'
+			}}
+		>
+			{content}
+		</h3>
+	);
+};
 
 interface IconCardProps {
 	icon: JSX.Element;

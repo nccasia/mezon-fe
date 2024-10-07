@@ -1,10 +1,11 @@
 import { debounce } from '@mezon/mobile-components';
+import { size } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion } from '@mezon/store';
 import { selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo, useState } from 'react';
-import { FlatList, LayoutAnimation, Pressable } from 'react-native';
+import { FlatList, LayoutAnimation, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
 import { EMessageActionType } from '../../screens/home/homedrawer/enums';
@@ -67,20 +68,30 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 			<FlatList
 				style={{ maxHeight: 200 }}
 				data={listMentionData}
-				renderItem={({ item }) => (
-					<Pressable onPress={() => handleSuggestionPress(item)}>
-						<SuggestItem
-							isRoleUser={item?.isRoleUser}
-							isDisplayDefaultAvatar={true}
-							name={item?.display ?? ''}
-							avatarUrl={item.avatarUrl}
-							subText={item?.username}
-						/>
-					</Pressable>
-				)}
-				keyExtractor={(_, index) => index.toString()}
+				renderItem={({ item }) => {
+					if (!item?.display) return <View />;
+					return (
+						<Pressable onPress={() => handleSuggestionPress(item)}>
+							<SuggestItem
+								isRoleUser={item?.isRoleUser}
+								isDisplayDefaultAvatar={true}
+								name={item?.display ?? ''}
+								avatarUrl={item.avatarUrl}
+								subText={item?.username}
+							/>
+						</Pressable>
+					);
+				}}
+				keyExtractor={(_, index) => `${index}_mention_suggestion`}
 				onEndReachedThreshold={0.1}
 				keyboardShouldPersistTaps="handled"
+				windowSize={10}
+				removeClippedSubviews={true}
+				getItemLayout={(_, index) => ({
+					length: size.s_50,
+					offset: size.s_50 * index,
+					index
+				})}
 			/>
 		);
 	}
@@ -102,7 +113,7 @@ export interface MentionHashtagSuggestionsProps {
 	mode: number;
 }
 
-const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect, directMessageId, mode }) => {
+const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = memo(({ keyword, onSelect, directMessageId, mode }) => {
 	const channels = useSelector(selectAllChannels);
 	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [channelsMentionData, setChannelsMentionData] = useState([]);
@@ -155,19 +166,26 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 					/>
 				</Pressable>
 			)}
-			keyExtractor={(_, index) => index.toString()}
+			keyExtractor={(_, index) => `${index}_hashtag_suggestion`}
 			onEndReachedThreshold={0.1}
 			keyboardShouldPersistTaps="handled"
+			windowSize={10}
+			removeClippedSubviews={true}
+			getItemLayout={(_, index) => ({
+				length: size.s_50,
+				offset: size.s_50 * index,
+				index
+			})}
 		/>
 	);
-};
+});
 
 export interface IEmojiSuggestionProps {
 	keyword?: string;
 	onSelect: (emoji: any) => void;
 }
 
-const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
+const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const dispatch = useAppDispatch();
 	const [formattedEmojiData, setFormattedEmojiData] = useState([]);
@@ -212,11 +230,18 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />
 				</Pressable>
 			)}
-			keyExtractor={(_, index) => index.toString()}
 			onEndReachedThreshold={0.1}
 			keyboardShouldPersistTaps="handled"
+			keyExtractor={(_, index) => `${index}_emoji_suggestion`}
+			windowSize={10}
+			removeClippedSubviews={true}
+			getItemLayout={(_, index) => ({
+				length: size.s_50,
+				offset: size.s_50 * index,
+				index
+			})}
 		/>
 	);
-};
+});
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };

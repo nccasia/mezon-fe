@@ -9,7 +9,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
@@ -34,6 +34,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const isChannelThread = selectedChannel?.parrent_id !== ChannelIsNotThread.TRUE;
 	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
+	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
@@ -46,6 +47,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 						classNameSubtext={classNameSubtext}
 						showName={showName}
 						channelPrivate={Boolean(selectedChannel?.channel_private)}
+						isChatStream={isChatStream}
 					/>
 				))}
 			{(isDm || isDmGroup) && (
@@ -69,14 +71,21 @@ type WelComeChannelProps = {
 	classNameSubtext: string;
 	showName: JSX.Element;
 	channelPrivate: boolean;
+	isChatStream?: boolean;
 };
 
 const WelComeChannel = (props: WelComeChannelProps) => {
-	const { name = '', classNameSubtext, showName, channelPrivate } = props;
+	const { name = '', classNameSubtext, showName, channelPrivate, isChatStream } = props;
 	return (
 		<>
-			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-				<Icons.Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
+			<div
+				className={`h-[75px] w-[75px] rounded-full dark:bg-zinc-700 flex items-center justify-center ${!isChatStream ? 'bg-bgLightModeButton pl-2' : 'bg-gray-500'}`}
+			>
+				{isChatStream ? (
+					<Icons.Chat defaultFill="#ffffff" defaultSize="w-10 h-10 " />
+				) : (
+					<Icons.Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
+				)}
 			</div>
 			<div>
 				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>

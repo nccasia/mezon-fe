@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { IClanProfileValue } from '..';
-import { MezonInput } from '../../../../../app/temp-ui';
+import { MezonInput } from '../../../../componentUI';
 import { styles } from './styles';
 
 interface IClanProfileDetailProps {

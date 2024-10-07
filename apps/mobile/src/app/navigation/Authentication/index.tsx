@@ -88,7 +88,9 @@ export const Authentication = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						await navigateToNotification(store, remoteMessage, navigation);
+						requestAnimationFrame(async () => {
+							await navigateToNotification(store, remoteMessage, navigation);
+						});
 					}
 				});
 			}
@@ -97,21 +99,18 @@ export const Authentication = () => {
 			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 		});
 
-		const timeout = setTimeout(() => {
-			// To get All Received Urls
-			loadFileSharing();
-		}, 2000);
+		// To get All Received Urls
+		loadFileSharing();
 
 		// To clear Intents
 		return () => {
-			clearTimeout(timeout);
 			unsubscribe();
 		};
 	}, []);
 
-	const loadFileSharing = async () => {
+	const loadFileSharing = () => {
 		try {
-			await ReceiveSharingIntent.getReceivedFiles(
+			ReceiveSharingIntent.getReceivedFiles(
 				(files: any) => {
 					setFileShared(files);
 				},

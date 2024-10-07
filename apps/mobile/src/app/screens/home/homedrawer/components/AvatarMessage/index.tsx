@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { MezonAvatar } from '../../../../../temp-ui';
+import { MezonAvatar } from '../../../../../componentUI';
 import { style } from './styles';
 
 interface IProps {

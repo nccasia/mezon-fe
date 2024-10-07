@@ -1,38 +1,32 @@
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessage } from 'mezon-js';
+import { ApiChannelMessageHeader } from 'mezon-js/api.gen';
 import { MessagesEntity } from '../messages/messages.slice';
 import { DirectEntity } from './direct.slice';
 
 export const DIRECT_META_FEATURE_KEY = 'directmeta';
 
-export interface DirectMetaEntity extends IChannel {
+export interface DMMetaEntity {
 	id: string;
-}
-interface DMMeta {
-	id: string;
+	channel_label?: string;
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
-	notifiCount: number;
+	count_mess_unread: number;
+	last_sent_message?: ApiChannelMessageHeader;
+	last_seen_message?: ApiChannelMessageHeader;
+	active?: number;
 }
 
-const dmMetaAdapter = createEntityAdapter<DMMeta>();
+const dmMetaAdapter = createEntityAdapter<DMMetaEntity>();
 
-export interface DirectMetaState extends EntityState<DirectMetaEntity, string> {
+export interface DirectMetaState extends EntityState<DMMetaEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	dmMetadata: EntityState<DMMeta, string>;
 }
-export const directMetaAdapter = createEntityAdapter<DirectMetaEntity>();
+export const directMetaAdapter = createEntityAdapter<DMMetaEntity>();
 
-export const initialDirectMetaState: DirectMetaState = directMetaAdapter.getInitialState({
-	loadingStatus: 'not loaded',
-	socketStatus: 'not loaded',
-	error: null,
-	dmMetadata: dmMetaAdapter.getInitialState()
-});
-
-function extractDMMeta(channel: DirectEntity): DMMeta {
+function extractDMMeta(channel: DirectEntity): DMMetaEntity {
 	const lastSeenTimestamp = Number(channel?.last_seen_message?.timestamp_seconds);
 	const lastSentTimestamp = Number(channel?.last_sent_message?.timestamp_seconds);
 
@@ -40,20 +34,22 @@ function extractDMMeta(channel: DirectEntity): DMMeta {
 		id: channel.id,
 		lastSeenTimestamp: isNaN(lastSeenTimestamp) ? lastSentTimestamp : lastSeenTimestamp,
 		lastSentTimestamp: lastSentTimestamp,
-		notifiCount: Number(channel.count_mess_unread || 0)
+		count_mess_unread: Number(channel.count_mess_unread || 0),
+		active: channel.active,
+		channel_label: channel.channel_label
 	};
 }
 
 export const directMetaSlice = createSlice({
 	name: DIRECT_META_FEATURE_KEY,
-	initialState: initialDirectMetaState,
+	initialState: dmMetaAdapter.getInitialState(),
 	reducers: {
 		add: directMetaAdapter.addOne,
 		removeAll: directMetaAdapter.removeAll,
 		remove: directMetaAdapter.removeOne,
 		update: directMetaAdapter.updateOne,
 		setDirectLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.dmMetadata.entities[action.payload.channelId];
+			const channel = state.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
 			}
@@ -61,7 +57,7 @@ export const directMetaSlice = createSlice({
 		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
 			const payload = action.payload;
 			const timestamp = Date.now() / 1000;
-			const dmChannel = directMetaAdapter.getSelectors().selectById(state, payload.channel_id);
+			const dmChannel = state.entities[payload.channel_id];
 
 			directMetaAdapter.updateOne(state, {
 				id: payload.channel_id,
@@ -100,7 +96,8 @@ export const directMetaSlice = createSlice({
 			directMetaAdapter.updateOne(state, {
 				id: action.payload.channelId,
 				changes: {
-					count_mess_unread: 0
+					count_mess_unread: 0,
+					lastSeenTimestamp: action.payload.timestamp
 				}
 			});
 		},
@@ -119,20 +116,11 @@ export const directMetaSlice = createSlice({
 				}
 			});
 		},
-		setDirectMetaLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.dmMetadata.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSeenTimestamp = action.payload.timestamp;
-				channel.notifiCount = 0;
-			}
-		},
-
 		setDirectMetaEntities: (state, action: PayloadAction<IChannel[]>) => {
 			const channels = action.payload;
 			if (channels) {
 				const meta = channels.map((ch) => extractDMMeta(ch));
-				directMetaAdapter.setAll(state, channels);
-				state.dmMetadata = dmMetaAdapter.upsertMany(state.dmMetadata, meta);
+				dmMetaAdapter.upsertMany(state, meta);
 			}
 		}
 	}
@@ -147,21 +135,20 @@ const { selectAll, selectEntities } = directMetaAdapter.getSelectors();
 
 export const getDirectMetaState = (rootState: { [DIRECT_META_FEATURE_KEY]: DirectMetaState }): DirectMetaState => rootState[DIRECT_META_FEATURE_KEY];
 
-export const selectAllDirectMetaMessages = createSelector(getDirectMetaState, selectAll);
-
 export const selectEntitiesDirectMeta = createSelector(getDirectMetaState, selectEntities);
+
+export const selectAllDMMeta = createSelector(getDirectMetaState, (state) => selectAll(state));
 
 export const selectIsUnreadDMById = (channelId: string) =>
 	createSelector(getDirectMetaState, (state) => {
-		const channel = state.dmMetadata.entities[channelId];
+		const channel = state.entities[channelId];
 		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 	});
 
-export const selectDirectsUnreadlist = createSelector(selectAllDirectMetaMessages, getDirectMetaState, (directMessages, state) => {
-	return directMessages.filter((dm) => {
-		const channel = state.dmMetadata.entities[dm.id];
-		return channel ? channel.lastSeenTimestamp < channel.lastSentTimestamp : false;
-	});
+export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) => {
+	return state.filter(
+		(item) => item.count_mess_unread && ((item.lastSeenTimestamp && item.lastSeenTimestamp < item.lastSentTimestamp) || !item.lastSeenTimestamp)
+	);
 });
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {

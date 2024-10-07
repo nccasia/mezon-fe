@@ -5,10 +5,12 @@ import ItemEventManagement from '../ModalCreate/itemEventManagement';
 type ListEventManagementProps = {
 	allEventManagement: EventManagementEntity[];
 	onOpenDetailItem: (status: boolean) => void;
+	openModelUpdate: () => void;
+	onUpdateEventId: (id: string) => void;
 };
 
 const ListEventManagement = (props: ListEventManagementProps) => {
-	const { allEventManagement, onOpenDetailItem } = props;
+	const { allEventManagement, onOpenDetailItem, openModelUpdate, onUpdateEventId } = props;
 	return allEventManagement.map((event, index) => {
 		return (
 			<div key={index}>
@@ -24,6 +26,8 @@ const ListEventManagement = (props: ListEventManagementProps) => {
 					event={event}
 					setOpenModalDetail={onOpenDetailItem}
 					createTime={event.create_time}
+					openModelUpdate={openModelUpdate}
+					onEventUpdateId={onUpdateEventId}
 				/>
 			</div>
 		);

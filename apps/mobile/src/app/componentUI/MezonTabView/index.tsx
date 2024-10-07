@@ -19,7 +19,7 @@ export default function MezonTabView({ views, onChange, pageIndex }: IMezonTabVi
 			setPageIns(pageIndex);
 			ref && ref.current && ref.current.scrollTo({ x: pageIndex * windowWidth, animated: true });
 		}
-	}, [pageIndex]);
+	}, [pageIndex, pageIns]);
 
 	function handleScrollTabView(event: NativeSyntheticEvent<NativeScrollEvent>) {
 		const currentOffsetX = event.nativeEvent.contentOffset.x;

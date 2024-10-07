@@ -16,8 +16,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text } from 'react-native';
 import { useSelector } from 'react-redux';
+import { MezonConfirm } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { MezonConfirm } from '../../temp-ui';
 import { styles } from './DeleteClanModal.styles';
 
 const DeleteClanModal = ({

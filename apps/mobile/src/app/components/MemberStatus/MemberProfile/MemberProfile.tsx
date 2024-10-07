@@ -4,7 +4,7 @@ import { ChannelMembersEntity } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
 import { Text, View } from 'react-native';
-import { MezonAvatar } from '../../../temp-ui';
+import { MezonAvatar } from '../../../componentUI';
 import { threadDetailContext } from '../../ThreadDetail/MenuThreadDetail';
 import { style } from './style';
 interface IProps {

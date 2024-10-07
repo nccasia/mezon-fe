@@ -1,5 +1,5 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, usePermissionChecker } from '@mezon/core';
+import { useCategory, useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import {
 	ENotificationActive,
 	ENotificationChannelId,
@@ -22,12 +22,12 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
 import { style } from './styles';
 
 interface IChannelMenuProps {
@@ -49,6 +49,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
 		channel?.channel_id ?? ''
 	);
+
 	const { categorizedChannels } = useCategory();
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
@@ -67,11 +68,17 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const { dismiss } = useBottomSheetModal();
 
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
+	const { handleMarkAsReadChannel } = useMarkAsRead();
+
+	const handleMarkAsRead = useCallback(() => {
+		handleMarkAsReadChannel(channel);
+		dismiss();
+	}, [channel.channel_id, channel?.clan_id]);
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.watchMenu.markAsRead'),
-			onPress: () => reserve(),
+			onPress: () => handleMarkAsRead(),
 			icon: <Icons.EyeIcon color={themeValue.textStrong} />
 		}
 	];
@@ -258,9 +265,9 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	];
 
 	const mainThreadMenu: IMezonMenuSectionProps[] = [
-		// {
-		// 	items: watchMenu
-		// },
+		{
+			items: watchMenu
+		},
 		{
 			items: manageThreadMenu
 		},
@@ -272,7 +279,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const handleFocusDefaultChannel = async () => {
 		const firstTextChannel = categorizedChannels[0]?.channels?.filter((channel) => channel?.type === 1)?.[0];
 		if (!firstTextChannel) return;
-		const { clan_id: clanId, channel_id: channelId, category_id: channelCateId } = firstTextChannel || {};
+		const { clan_id: clanId, channel_id: channelId } = firstTextChannel || {};
 		const store = await getStoreAsync();
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		await Promise.all([

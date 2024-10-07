@@ -2,7 +2,7 @@ import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus,
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest, ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
@@ -45,7 +45,8 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	return {
 		...channelRes,
 		id: channelRes.channel_id || '',
-		status: channelRes.meeting_code ? 1 : 0
+		status: channelRes.meeting_code ? 1 : 0,
+		badgeCount: channelRes.count_mess_unread ? channelRes.count_mess_unread : 0
 	};
 };
 
@@ -96,6 +97,13 @@ type JoinChatPayload = {
 export const joinChat = createAsyncThunk(
 	'channels/joinChat',
 	async ({ clanId, parentId, channelId, channelType, isPublic, isParentPublic }: JoinChatPayload, thunkAPI) => {
+		if (
+			channelType !== ChannelType.CHANNEL_TYPE_TEXT &&
+			channelType !== ChannelType.CHANNEL_TYPE_DM &&
+			channelType !== ChannelType.CHANNEL_TYPE_GROUP
+		) {
+			return null;
+		}
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const channel = await mezon.socketRef.current?.joinChat(clanId, parentId, channelId, channelType, isPublic, isParentPublic);
@@ -115,7 +123,8 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
-			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
+			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId, noCache: true }));
+
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
 			} else {
@@ -227,7 +236,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
-			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id, noCache: true }));
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }));
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: clanID,
@@ -329,6 +338,27 @@ export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', as
 	const appChannelEntities = response.channel_apps;
 	return appChannelEntities || [];
 });
+
+export const markAsReadProcessing = createAsyncThunk(
+	'channels/markAsRead',
+	async ({ clan_id, category_id, channel_id }: ApiMarkAsReadRequest, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.markAsRead(mezon.session, {
+				clan_id,
+				category_id,
+				channel_id
+			});
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			return response;
+		} catch (error: any) {
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
+		}
+	}
+);
 
 export const initialChannelsState: ChannelsState = channelsAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -444,6 +474,18 @@ export const channelsSlice = createSlice({
 			state.previousChannels.unshift(action.payload.channelId);
 			if (state.previousChannels.length > 3) {
 				state.previousChannels.pop();
+			}
+		},
+		updateChannelBadgeCount: (state: ChannelsState, action: PayloadAction<{ channelId: string; count: number; isReset?: boolean }>) => {
+			const { channelId, count, isReset = false } = action.payload;
+			const entity = state.entities[channelId];
+			if (entity) {
+				channelsAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: isReset ? 0 : (entity.count_mess_unread ?? 0) + count
+					}
+				});
 			}
 		}
 	},

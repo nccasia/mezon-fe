@@ -26,7 +26,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		mainSection: {
-			gap: Metrics.size.s
+			gap: Metrics.size.m
 		},
 
 		inline: {

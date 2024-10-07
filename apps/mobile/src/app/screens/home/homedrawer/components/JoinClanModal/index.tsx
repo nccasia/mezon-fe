@@ -14,8 +14,8 @@ import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobil
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { MezonInput, MezonModal } from '../../../../../componentUI';
 import { ErrorInput } from '../../../../../components/ErrorInput';
-import { MezonInput, MezonModal } from '../../../../../temp-ui';
 import { styles } from './JoinClanModal.styles';
 
 type JoinClanModalProps = {

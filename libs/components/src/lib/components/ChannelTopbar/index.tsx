@@ -1,20 +1,20 @@
-import { useAppNavigation, usePermissionChecker, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
-	selectAllChannelLastSeenTimestampByClanId,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
+	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectMentionAndReplyUnreadByClanId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -84,16 +84,22 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
 	const isShowSettingChannel = hasChannelManagePermission;
 	const param = useParams();
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClanId || '');
+
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
 			</div>
-			{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-				<div className="items-center h-full ml-auto flex">
+			<div className="items-center h-full ml-auto flex">
+				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
@@ -117,8 +123,10 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 							<ChannelListButton />
 						</div>
 					</div>
-				</div>
-			)}
+				) : (
+					!isShowChatStream && memberPath !== currentURL && <ChatButton isLightMode={appearanceTheme === 'light'} />
+				)}
+			</div>
 		</>
 	);
 }
@@ -257,14 +265,15 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
 
-	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
-	const getNotificationMentionAndReplyUnread = useSelector(
-		selectMentionAndReplyUnreadByClanId(currentClan?.clan_id ?? '', allLastSeenChannelAllChannelInClan)
-	);
-
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
+
+	useEffect(() => {
+		if (isShowInbox) {
+			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
+		}
+	}, [isShowInbox]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
@@ -274,7 +283,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
+			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
 }
@@ -321,6 +330,22 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 			>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
+				</button>
+			</Tooltip>
+		</div>
+	);
+}
+
+function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
+	const dispatch = useDispatch();
+	const handleClick = () => {
+		dispatch(appActions.setIsShowChatStream(true));
+	};
+	return (
+		<div className="relative leading-5 h-5">
+			<Tooltip className="w-max" content="Show Chat" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+				<button onClick={handleClick}>
+					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 				</button>
 			</Tooltip>
 		</div>

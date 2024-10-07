@@ -8,11 +8,16 @@ type ItemModalProps = {
 	type?: 'radio' | 'checkbox' | 'none';
 	endIcon?: ReactNode;
 	onClick?: () => void;
+	disabled?: boolean;
 };
 
-const ItemModal = ({ children, dropdown, type, endIcon, onClick }: ItemModalProps) => {
+const ItemModal = ({ children, dropdown, type, endIcon, onClick, disabled }: ItemModalProps) => {
 	return (
-		<button onClick={onClick} className="flex items-center w-full justify-between rounded-sm hover:bg-bgSelectItem group pr-2">
+		<button
+			onClick={onClick}
+			disabled={disabled}
+			className="flex items-center w-full justify-between rounded-sm hover:bg-bgSelectItem group pr-2"
+		>
 			<li className="text-[14px] dark:text-[#B5BAC1] text-colorTextLightMode group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
 				{children}
 			</li>

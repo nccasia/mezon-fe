@@ -50,7 +50,6 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
@@ -227,11 +226,13 @@ const DirectMessage = () => {
 							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
 						</div>
 					)}
-					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
+					{Number(type) === ChannelType.CHANNEL_TYPE_DM && isUseProfileDM && (
 						<div
 							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
 						>
 							<ModalUserProfile
+								// eslint-disable-next-line @typescript-eslint/no-empty-function
+								onClose={() => {}}
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
 								classWrapper="w-full"
 								classBanner="h-[120px]"

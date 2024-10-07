@@ -1,5 +1,13 @@
 import { useMenu } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectCurrentChannelId, threadsActions, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	referencesActions,
+	selectChannelMetaEntities,
+	selectCloseMenu,
+	selectCurrentChannelId,
+	threadsActions,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -7,16 +15,17 @@ import ThreadLink, { ThreadLinkRef } from './ThreadLink';
 
 type ThreadListChannelProps = {
 	threads: IChannel[];
+	isCollapsed: boolean;
 };
 
 export type ListThreadChannelRef = {
 	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
 };
 
-const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChannelProps>(({ threads }: ThreadListChannelProps, ref) => {
+const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChannelProps>(({ threads, isCollapsed }: ThreadListChannelProps, ref) => {
 	const dispatch = useAppDispatch();
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
-
+	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 
@@ -43,10 +52,18 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		dispatch(threadsActions.setValueThread(null));
 	};
 
+	const isShowThread = (thread: IChannel) => {
+		const threadId = thread.id;
+		return allChannelMetaEntities[threadId].lastSeenTimestamp < allChannelMetaEntities[threadId].lastSentTimestamp;
+	};
+
 	return (
 		<div className="flex flex-col ml-6">
 			{threads
-				.filter((thread) => thread?.active === 1)
+				.filter((thread) => {
+					if (!isCollapsed) return thread?.active === 1;
+					return isShowThread(thread);
+				})
 				.map((thread) => {
 					const isFirstThread = threads.indexOf(thread) === 0;
 					return (

@@ -35,7 +35,6 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch, lastMessage]);
 }
@@ -47,7 +46,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const from = route.params?.from;
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
-	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -130,7 +128,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	useEffect(() => {
 		return () => {
 			if (!isFetchMemberChannelDmRef.current) {
-				fetchMemberChannel();
+				requestAnimationFrame(async () => {
+					await fetchMemberChannel();
+				});
 			}
 		};
 	}, [fetchMemberChannel, isFetchMemberChannelDmRef]);
@@ -139,14 +139,16 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		let timeout: NodeJS.Timeout;
 		if (directMessageId) {
 			timeout = setTimeout(() => {
-				directMessageLoader();
+				requestAnimationFrame(async () => {
+					await directMessageLoader();
+				});
 			}, 100);
 		}
 
 		return () => {
 			timeout && clearTimeout(timeout);
 		};
-	}, [directMessageId]);
+	}, [directMessageId, directMessageLoader]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);

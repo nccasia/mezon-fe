@@ -17,8 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import MezonTabHeader from '../../../temp-ui/MezonTabHeader';
-import MezonTabView from '../../../temp-ui/MezonTabView';
+import MezonTabHeader from '../../../componentUI/MezonTabHeader';
+import MezonTabView from '../../../componentUI/MezonTabView';
 import ServerProfile from './ServerProfile';
 import UserProfile from './UserProfile';
 import { style } from './styles';
@@ -102,7 +102,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	}, [userProfile, tab]);
 
 	useEffect(() => {
-		if (profileTab) setTab(profileTab);
+		if (profileTab >= 0) setTab(profileTab);
 	}, []);
 
 	useEffect(() => {

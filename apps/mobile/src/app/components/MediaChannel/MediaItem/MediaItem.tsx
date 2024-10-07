@@ -5,7 +5,7 @@ import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import MezonAvatar from '../../../temp-ui/MezonAvatar';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { isImage, isVideo } from '../../../utils/helpers';
 import styles from './MediaItem.styles';
 

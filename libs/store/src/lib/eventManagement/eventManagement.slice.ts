@@ -1,6 +1,6 @@
 import { EEventStatus, IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiEventManagement } from 'mezon-js/api.gen';
+import { ApiEventManagement, ApiUpdateEventRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
@@ -51,7 +51,19 @@ export const fetchEventManagement = createAsyncThunk(
 	}
 );
 
-type CreateEventManagementyload = {
+type CreateEventManagementpayload = {
+	clan_id: string;
+	channel_id: string;
+	address: string;
+	title: string;
+	start_time: string;
+	end_time: string;
+	description: string;
+	logo: string;
+};
+
+export type UpdateEventManagementPayload = {
+	event_id: string;
 	clan_id: string;
 	channel_id: string;
 	address: string;
@@ -77,7 +89,7 @@ export type EventManagementOnGogoing = {
 
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
-	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
+	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementpayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			clan_id: clan_id,
@@ -103,6 +115,33 @@ type fetchDeleteEventManagementPayload = {
 	eventID: string;
 	clanId: string;
 };
+
+export const updateEventManagement = createAsyncThunk(
+	'updateEventManagement/updateEventManagement',
+	async ({ event_id, clan_id, channel_id, address, title, start_time, end_time, description, logo }: UpdateEventManagementPayload, thunkAPI) => {
+		try {
+			const body: ApiUpdateEventRequest = {
+				address: address,
+				channel_id: channel_id,
+				event_id: event_id,
+				description: description,
+				end_time: end_time,
+				logo: logo,
+				start_time: start_time,
+				title: title,
+				clan_id: clan_id
+			};
+
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateEvent(mezon.session, event_id, body);
+			if (response) {
+				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clan_id || '', noCache: true }));
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
 
 export const fetchDeleteEventManagement = createAsyncThunk(
 	'deleteEventManagement/fetchDeleteEventManagement',
@@ -188,7 +227,8 @@ export const eventManagementActions = {
 	...eventManagementSlice.actions,
 	fetchEventManagement,
 	fetchCreateEventManagement,
-	fetchDeleteEventManagement
+	fetchDeleteEventManagement,
+	updateEventManagement
 };
 
 const { selectAll, selectEntities } = eventManagementAdapter.getSelectors();
@@ -205,3 +245,9 @@ export const selectNumberEvent = createSelector(selectAllEventManagement, (event
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
 
 export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);
+
+export const selectEventById = (eventId: string) =>
+	createSelector(getEventManagementState, (state) => {
+		const entities = selectEventManagementEntities({ eventmanagement: state });
+		return entities[eventId] || null;
+	});

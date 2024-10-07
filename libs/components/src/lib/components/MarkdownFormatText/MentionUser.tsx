@@ -1,9 +1,8 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
-import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
+import { selectChannelMemberByUserIds, selectCurrentChannel, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { RefObject, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
 
@@ -29,6 +28,7 @@ type UserProfilePopupProps = {
 	mode?: number;
 	positionShortUser: { top: number; left: number } | null;
 	isDm?: boolean;
+	rootRef: RefObject<HTMLElement>;
 	onClose: () => void;
 };
 
@@ -90,12 +90,11 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		setIsShowPanelChannel(false);
 	}, []);
 
-	useOnClickOutside(mentionRef, handleClickOutside);
-
 	return (
 		<span ref={mentionRef}>
 			{showProfileUser && (
 				<UserProfilePopup
+					rootRef={mentionRef}
 					userID={tagUserId ?? ''}
 					channelId={channelId ?? ''}
 					mode={mode}
@@ -124,7 +123,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
-					className={`font-medium px-0.1 rounded-sm
+					className={`outline-none font-medium px-0.1 rounded-sm
 				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
@@ -137,10 +136,12 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose, rootRef }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
+	const currentChannel = useSelector(selectCurrentChannel);
+	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const prioritizeName = getNameForPrioritize(
 		getUserByUserId.clan_nick ?? '',
 		getUserByUserId.user?.display_name ?? '',
@@ -153,21 +154,18 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 		prioritizeName,
 		prioritizeAvt
 	};
-	const panelRef = useRef<HTMLDivElement | null>(null);
-
-	useEscapeKeyClose(panelRef, onClose);
 
 	return (
 		<div
-			tabIndex={-1}
-			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
+			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
 			style={{
 				top: `${positionShortUser?.top}px`,
-				left: `${positionShortUser?.left}px`
+				...positionStyle
 			}}
-			ref={panelRef}
 		>
 			<ModalUserProfile
+				rootRef={rootRef}
+				onClose={onClose}
 				userID={userID}
 				classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 				mode={mode}

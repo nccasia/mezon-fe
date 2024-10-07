@@ -10,7 +10,7 @@ import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { IFile } from '../../../../../../temp-ui';
+import { IFile } from '../../../../../../componentUI';
 import { style } from './styles';
 export const { height } = Dimensions.get('window');
 interface IProps {

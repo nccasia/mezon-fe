@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainEvent } from 'electron';
+import { ipcMain, IpcMainEvent, nativeImage } from 'electron';
 import { SET_BADGE_COUNT } from '../../events/constants';
 import { BADGE_DESCRIPTION } from './constants';
 import { BadgeIconGenerator } from './icon';
@@ -42,7 +42,7 @@ export class WindowBadge implements IBadge {
 
 	constructor(win: Electron.BrowserWindow) {
 		this.mainWindow = win;
-		this.generator = new BadgeIconGenerator();
+		this.generator = new BadgeIconGenerator(win);
 		this.initListeners();
 	}
 
@@ -60,7 +60,8 @@ export class WindowBadge implements IBadge {
 
 	public setBadgeCount(badgeNumber: number) {
 		if (badgeNumber || badgeNumber === null) {
-			this.generator.generate(badgeNumber).then((image) => {
+			this.generator.generate(badgeNumber).then((base64) => {
+				const image = nativeImage.createFromDataURL(base64);
 				this.currentOverlayIcon.image = image;
 				this.mainWindow.setOverlayIcon(this.currentOverlayIcon.image, this.currentOverlayIcon.badgeDescription);
 			});

@@ -7,8 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMenu, reserve } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMenu, reserve } from '../../temp-ui';
 import CustomGroupDm from './CustomGroupDm';
 import style from './MenuCustomDm.styles';
 

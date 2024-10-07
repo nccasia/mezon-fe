@@ -8,7 +8,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import { IFile } from '../../../../../temp-ui';
+import { IFile } from '../../../../../componentUI';
 import Gallery from './Gallery';
 import { style } from './styles';
 

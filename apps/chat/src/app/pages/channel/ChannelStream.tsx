@@ -1,6 +1,8 @@
-import { AvatarImage, getColorAverageFromURL } from '@mezon/components';
+import { AvatarImage } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
+	appActions,
+	selectIsShowChatStream,
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId,
 	selectStatusStream,
@@ -14,7 +16,7 @@ import { Icons } from '@mezon/ui';
 import { IChannelMember, IStreamInfo, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import Hls from 'hls.js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface MediaPlayerProps {
@@ -202,21 +204,21 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 	return (
 		<div
 			ref={containerRef}
-			className="relative w-full overflow-hidden rounded-lg"
+			className="relative w-full h-full overflow-hidden rounded-lg"
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onMouseMove={handleMouseMoveOrClick}
 			onClick={handleMouseMoveOrClick}
 		>
-			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full" />
+			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full object-cover" />
 
 			{isLoading && (
-				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
+				<div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex justify-center items-center text-white text-xl z-50">
 					Loading...
 				</div>
 			)}
 			{errorLimitReached && (
-				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
+				<div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex justify-center items-center text-white text-xl z-50">
 					Cannot play video. Please try again later.
 				</div>
 			)}
@@ -262,39 +264,49 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 export type UserListStreamChannelProps = {
 	readonly memberJoin: IChannelMember[];
 	readonly memberMax?: number;
+	readonly isShowChat?: boolean;
 };
 
-function UserListStreamChannel({ memberJoin, memberMax }: UserListStreamChannelProps) {
-	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin || []);
+function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserListStreamChannelProps) {
+	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin);
+
+	const handleSizeWidth = useCallback(() => {
+		let membersToShow = [...memberJoin];
+
+		if (window.innerWidth < 1000) {
+			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 1 : 2));
+		} else if (window.innerWidth < 1200) {
+			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 2 : 3));
+		} else if (window.innerWidth < 1300) {
+			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 3 : 4));
+		} else if (window.innerWidth < 1400) {
+			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 4 : 5));
+		} else if (window.innerWidth < 1700) {
+			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 5 : 6));
+		} else {
+			membersToShow = membersToShow.slice(0, memberMax ?? 7);
+		}
+		setDisplayedMembers(membersToShow);
+	}, [memberJoin, memberMax, isShowChat]);
 
 	useEffect(() => {
-		const handleSizeWidth = () => {
-			let membersToShow = memberJoin || [];
-			if (window.innerWidth < 900) {
-				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 3);
-			} else if (window.innerWidth < 1000) {
-				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 4);
-			} else if (window.innerWidth < 1200) {
-				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 5);
-			} else if (window.innerWidth > 1200) {
-				membersToShow = membersToShow.slice(0, memberMax ? memberMax : 7);
-			}
-			setDisplayedMembers(membersToShow);
-		};
-
 		handleSizeWidth();
 		window.addEventListener('resize', handleSizeWidth);
 
 		return () => {
 			window.removeEventListener('resize', handleSizeWidth);
 		};
-	}, [memberJoin, memberMax]);
+	}, [handleSizeWidth]);
 
-	return displayedMembers.map((item: IChannelMember) => (
-		<div key={item.id} className="w-[250px] h-[100px] min-w-[100px] min-h-[100px]">
-			<UserItem user={item} />
-		</div>
-	));
+	return (
+		<>
+			{displayedMembers.map((item: IChannelMember) => (
+				<div key={item.id} className="flex items-center">
+					<UserItem user={item} />
+				</div>
+			))}
+		</>
+	);
 }
 
 function UserItem({ user }: { user: IChannelMember }) {
@@ -308,42 +320,13 @@ function UserItem({ user }: { user: IChannelMember }) {
 	const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
 	const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
 
-	const checkUrl = (url: string | undefined) => url !== undefined && url !== '';
-
-	const [color, setColor] = useState<string>('');
-
-	useEffect(() => {
-		const getColor = async () => {
-			if (checkUrl(avatarUrl)) {
-				const colorImg = await getColorAverageFromURL(avatarUrl || '');
-				if (colorImg) setColor(colorImg);
-			}
-		};
-
-		getColor();
-	}, [avatarUrl]);
-
 	return (
-		<div
-			className="relative w-full h-full flex p-1 justify-center items-center gap-3 cursor-pointer rounded-lg"
-			style={{ backgroundColor: color || 'grey' }}
-		>
-			<div className="w-14 h-14 rounded-full">
-				<div className="w-14 h-14">
-					{member || userStream ? (
-						<AvatarImage alt={userName || ''} userName={userName} className="min-w-14 min-h-14 max-w-14 max-h-14" src={avatar} />
-					) : (
-						<Icons.AvatarUser />
-					)}
-				</div>
-			</div>
-			<div className="absolute left-1 bottom-1">
+		<div className="w-14 h-14 rounded-full">
+			<div className="w-14 h-14">
 				{member || userStream ? (
-					<div className="bg-black bg-opacity-10 rounded-lg px-2 py-[4px]">
-						<p className="text-sm font-medium text-white">{name && name.length > 20 ? `${name.substring(0, 20)}...` : name}</p>
-					</div>
+					<AvatarImage alt={userName || ''} userName={userName} className="min-w-14 min-h-14 max-w-14 max-h-14" src={avatar} />
 				) : (
-					<p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant}</p>
+					<Icons.AvatarUser />
 				)}
 			</div>
 		</div>
@@ -363,12 +346,17 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const [showMembers, setShowMembers] = useState(true);
+	const [showEndCallButton, setShowEndCallButton] = useState(true);
+	const [showMembersButton, setShowMembersButton] = useState(true);
+	const hideButtonsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
 		dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
+		dispatch(appActions.setIsShowChatStream(false));
 		setShowMembers(true);
 	};
 
@@ -379,6 +367,32 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	const toggleMembers = () => {
 		setShowMembers((prev) => !prev);
 	};
+
+	const resetHideButtonsTimer = () => {
+		if (hideButtonsTimeoutRef.current) {
+			clearTimeout(hideButtonsTimeoutRef.current);
+		}
+		setShowEndCallButton(true);
+		setShowMembersButton(true);
+		hideButtonsTimeoutRef.current = setTimeout(() => {
+			setShowEndCallButton(false);
+			setShowMembersButton(false);
+		}, 3000);
+	};
+
+	const handleMouseMoveOrClick = () => {
+		resetHideButtonsTimer();
+	};
+
+	useEffect(() => {
+		resetHideButtonsTimer();
+
+		return () => {
+			if (hideButtonsTimeoutRef.current) {
+				clearTimeout(hideButtonsTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	return !streamPlay ? (
 		<div className="w-full h-full bg-black flex justify-center items-center">
@@ -396,11 +410,11 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 			</div>
 		</div>
 	) : (
-		<div className="w-full h-full flex relative group">
-			<div className="flex flex-col justify-center gap-1 w-full">
+		<div className="w-full h-full flex relative group" onMouseMove={handleMouseMoveOrClick} onClick={handleMouseMoveOrClick}>
+			<div className="flex flex-col justify-center gap-2 w-full bg-black">
 				<div className="relative min-h-40 items-center flex justify-center">
 					{hlsUrl ? (
-						<div className={`transition-all duration-300 w-${showMembers ? '[70%]' : '[100%]'}`}>
+						<div className={`transition-all duration-300 h-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}>
 							<HLSPlayer src={hlsUrl} />
 						</div>
 					) : (
@@ -410,7 +424,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 					)}
 					{memberJoin.length > 0 && (
 						<div
-							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-14' : 'bottom-14 max-[1700px]:bottom-2'} group-hover:opacity-100`}
+							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-10' : `${isShowChatStream ? 'bottom-2' : 'bottom-20 max-[1700px]:bottom-2'}`} group-hover:opacity-100`}
 						>
 							<Tooltip
 								content={`${showMembers ? 'Hide Members' : 'Show Members'}`}
@@ -421,30 +435,32 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 							>
 								<div
 									onClick={toggleMembers}
-									className="flex gap-1 items-center cursor-pointer bg-neutral-700 hover:bg-bgSecondary600 rounded-3xl px-2 py-[6px]"
+									className={`flex gap-1 items-center cursor-pointer bg-neutral-700 hover:bg-bgSecondary600 rounded-3xl px-2 py-[6px] ${showMembersButton ? 'opacity-100' : 'opacity-0'}`}
 								>
 									<Icons.ArrowDown
 										defaultFill="white"
 										defaultSize={`size-6 transition-all duration-300 ${showMembers ? '' : '-rotate-180'}`}
-									></Icons.ArrowDown>
-									<Icons.MemberList isWhite />
+									/>
+									<Icons.MemberList defaultFill="text-white" />
 								</div>
 							</Tooltip>
 						</div>
 					)}
 				</div>
-				{memberJoin.length > 0 && (
+				{memberJoin.length > 0 && showMembers && (
 					<div
 						className={`w-full flex gap-2 justify-center p-2 transition-opacity duration-300 ${showMembers ? 'opacity-100' : 'opacity-0'}`}
 					>
-						{showMembers && <UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>}
+						<UserListStreamChannel isShowChat={isShowChatStream} memberJoin={memberJoin}></UserListStreamChannel>
 					</div>
 				)}
 			</div>
 			<div className="absolute z-50 bottom-4 left-1/2 transform -translate-x-1/2 translate-y-5 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-				<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3 hover:bg-red-500">
-					<Icons.EndCall className="w-6 h-6" />
-				</button>
+				{showEndCallButton && (
+					<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3 hover:bg-red-500">
+						<Icons.EndCall className="w-6 h-6" />
+					</button>
+				)}
 			</div>
 		</div>
 	);

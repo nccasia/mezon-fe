@@ -6,6 +6,8 @@ import {
 	RootState,
 	channelMembersActions,
 	channelMetaActions,
+	channelsActions,
+	clansActions,
 	selectAllClans,
 	selectChannelById,
 	selectCurrentChannel,
@@ -18,11 +20,11 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
@@ -34,10 +36,21 @@ import { style } from './styles';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
+	const numberNotification = useMemo(() => {
+		return currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
+	}, [currentChannel?.count_mess_unread]);
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch]);
+	}, [channelId, currentChannel, dispatch, numberNotification]);
+
+	useEffect(() => {
+		if (numberNotification && numberNotification > 0) {
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
+	}, [channelId, currentChannel?.clan_id, dispatch, numberNotification]);
 }
 
 const HomeDefault = React.memo((props: any) => {
@@ -63,6 +76,7 @@ const HomeDefault = React.memo((props: any) => {
 	}, []);
 
 	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
+	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
@@ -144,7 +158,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && !isChannelStream && (
+			{currentChannel && isFocusChannelView && !isChannelStream && !isChannelApp && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -218,6 +232,10 @@ const HomeDefaultHeader = React.memo(
 
 			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				return <Icons.StreamIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_APP) {
+				return <Icons.AppChannelIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
 			return <Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;

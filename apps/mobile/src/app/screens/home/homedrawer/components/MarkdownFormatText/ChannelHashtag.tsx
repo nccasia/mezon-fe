@@ -33,6 +33,12 @@ export const ChannelHashtag = ({ channelHashtagId, directMessageId, mode, hashta
 	if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
 		return `[${channel.channel_label}](##voice${JSON.stringify(dataPress)})`;
 	}
+	if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+		return `[${channel.channel_label}](#stream${JSON.stringify(dataPress)})`;
+	}
+	if (channel.parrent_id !== '0') {
+		return `[${channel.channel_label}](#thread${JSON.stringify(dataPress)})`;
+	}
 	return channel['channel_id']
 		? `[#${channel.channel_label}](#${JSON.stringify(dataPress)})`
 		: `[\\# ${channel.channel_label}](#${JSON.stringify(dataPress)})`;

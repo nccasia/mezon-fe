@@ -141,7 +141,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
-			console.log('ooo', selectedObjectIdSend);
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {

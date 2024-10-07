@@ -3,7 +3,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan, selectMemberClanByUserId, useAppSelector, UsersClanEntity } from '@mezon/store-mobile';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { MezonAvatar } from '../../../../temp-ui';
+import { MezonAvatar } from '../../../../componentUI';
 import { style } from './styles';
 
 interface IUserItem {

@@ -25,9 +25,10 @@
         "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "E9Y2J54ZH3.app.mezon.ai",
         "category": "public.app-category.productivity",
-        "target": [
-          "default"
-        ],
+        "target": {
+          "arch": "universal",
+          "target": "default"
+        },
         "publish": [
           {
             "provider": "generic",
@@ -166,9 +167,10 @@
           "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
-          "target": [
-            "default"
-          ],
+          "target": {
+            "arch": "universal",
+            "target": "default"
+          },
           "publish": [
             {
               "provider": "generic",
@@ -247,9 +249,10 @@
           "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "E9Y2J54ZH3.app.mezon.ai",
           "category": "public.app-category.productivity",
-          "target": [
-            "default"
-          ],
+          "target": {
+            "arch": "universal",
+            "target": "default"
+          },
           "publish": [
             {
               "provider": "generic",

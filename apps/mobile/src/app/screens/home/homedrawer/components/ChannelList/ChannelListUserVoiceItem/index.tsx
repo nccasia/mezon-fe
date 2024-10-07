@@ -4,7 +4,7 @@ import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@m
 import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import MezonAvatar from '../../../../../../temp-ui/MezonAvatar';
+import MezonAvatar from '../../../../../../componentUI/MezonAvatar';
 import { style } from './styles';
 
 interface IUserVoiceProps {

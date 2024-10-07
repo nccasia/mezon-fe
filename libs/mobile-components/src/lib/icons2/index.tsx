@@ -1,4 +1,4 @@
-import { ClipPath, Defs, G, Mask, Path, Svg, SvgProps } from 'react-native-svg';
+import { ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
 
 export const ActivityIcon = ({ width, height, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
@@ -1296,8 +1296,8 @@ export const ShareIcon = ({ width = 24, height = 24, color = 'white', ...props }
 );
 
 export const LocationIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
-	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-		<Path clipRule="evenodd" d="M36 69c9 0 27-24.09 27-39a27 27 0 00-54 0c0 14.91 18 39 27 39zm0-30a9 9 0 100-18 9 9 0 000 18z" />
+	<Svg viewBox="0 0 24 24" fill={color} width={width} height={height} {...props}>
+		<Path fillRule="evenodd" clipRule="evenodd" d="M12 23c3 0 9-8.03 9-13a9 9 0 1 0-18 0c0 4.97 6 13 9 13Zm0-10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
 	</Svg>
 );
 
@@ -1505,6 +1505,16 @@ export function StreamIcon({ width = 24, height = 24, color = 'white', ...props 
 				fill={color}
 			/>
 			<Path d="M8 20a1 1 0 100 2h8a1 1 0 100-2H8z" fill="currentColor" />
+		</Svg>
+	);
+}
+
+export function AppChannelIcon({ width = 20, height = 20, color = 'white', ...props }) {
+	return (
+		<Svg height={height} viewBox="0 0 24 24" width={width} fill={color}>
+			<Rect height="8" rx="1" width="8" x="2" y="2" />
+			<Rect height="8" rx="1" width="8" x="2" y="14" />
+			<Rect height="8" rx="1" width="8" x="14" y="14" />
 		</Svg>
 	);
 }

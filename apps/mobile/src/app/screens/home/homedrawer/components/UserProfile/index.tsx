@@ -12,7 +12,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
-import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
+import MezonAvatar from '../../../../../componentUI/MezonAvatar';
 import { style } from './UserProfile.styles';
 import EditUserProfileBtn from './component/EditUserProfileBtn';
 import { PendingContent } from './component/PendingContent';

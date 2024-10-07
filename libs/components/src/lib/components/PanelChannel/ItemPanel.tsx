@@ -13,6 +13,7 @@ type ItemPanelProps = {
 	checked?: boolean;
 	name?: string;
 	subText?: string;
+	disabled?: boolean;
 };
 
 const ItemPanel = ({
@@ -26,10 +27,12 @@ const ItemPanel = ({
 	defaultChecked,
 	checked,
 	name,
-	subText
+	subText,
+	disabled
 }: ItemPanelProps) => {
 	return (
 		<button
+			disabled={disabled}
 			onClick={onClick}
 			className={`flex flex-col justify-center w-full rounded-sm hover:[&>*]:text-[#fff] pr-2 ${danger ? 'hover:bg-colorDanger' : 'hover:bg-bgSelectItem'}`}
 		>

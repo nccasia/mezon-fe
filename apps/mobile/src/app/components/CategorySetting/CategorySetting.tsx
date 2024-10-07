@@ -17,8 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonInput, MezonMenu } from '../../componentUI';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonInput, MezonMenu } from '../../temp-ui';
 import { style } from './styles';
 
 type ScreenCategorySetting = typeof APP_SCREEN.MENU_CLAN.CATEGORY_SETTING;

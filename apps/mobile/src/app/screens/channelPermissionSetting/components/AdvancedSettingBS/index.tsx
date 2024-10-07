@@ -1,7 +1,7 @@
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
-import Backdrop from '../../../../temp-ui/MezonBottomSheet/backdrop';
+import Backdrop from '../../../../componentUI/MezonBottomSheet/backdrop';
 import { EAdvancedPermissionSetting } from '../../types/channelPermission.enum';
 import { IAdvancedSettingBSProps } from '../../types/channelPermission.type';
 

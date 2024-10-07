@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../componentUI';
+import MezonSlider, { IMezonSliderData } from '../../componentUI/MezonSlider';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../temp-ui';
-import MezonSlider, { IMezonSliderData } from '../../temp-ui/MezonSlider';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 

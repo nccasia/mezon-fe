@@ -6,9 +6,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { IMezonMenuSectionProps, MezonMenu, MezonSwitch } from '../../componentUI';
+import MezonInput from '../../componentUI/MezonInput2';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, MezonMenu, MezonSwitch } from '../../temp-ui';
-import MezonInput from '../../temp-ui/MezonInput2';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 

@@ -4,9 +4,9 @@ import { OptionEvent } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { MezonDateTimePicker, MezonInput, MezonSelect } from '../../../componentUI';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonDateTimePicker, MezonInput, MezonSelect } from '../../../temp-ui';
-import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import { ErrorInput } from '../../ErrorInput';
 import { style } from './styles';
 

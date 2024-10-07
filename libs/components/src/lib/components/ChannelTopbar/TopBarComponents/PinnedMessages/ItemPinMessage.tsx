@@ -38,6 +38,15 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 
 	const message = useSelector(selectMessageByMessageId(pinMessage.message_id as string));
 
+	const messageContentObject = useMemo(() => {
+		try {
+			return JSON.parse(pinMessage.content || '{}');
+		} catch (e) {
+			console.error({ e });
+		}
+		return {};
+	}, [pinMessage.content]);
+
 	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
 		return (
 			<ModalDeletePinMess
@@ -71,12 +80,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						</span>
 					</div>
 					<div className="leading-6">
-						<MessageLine
-							isEditted={false}
-							content={JSON.parse(pinMessage.content || '{}')}
-							isJumMessageEnabled={false}
-							isTokenClickAble={false}
-						/>
+						<MessageLine isEditted={false} content={messageContentObject} isJumMessageEnabled={false} isTokenClickAble={false} />
 					</div>
 					{message?.attachments?.length ? <ListPinAttachment attachments={message?.attachments} /> : <></>}
 				</div>

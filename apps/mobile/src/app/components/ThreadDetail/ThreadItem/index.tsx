@@ -1,22 +1,23 @@
-import { AngleRightIcon } from '@mezon/mobile-components';
+import { AngleRightIcon, getUpdateOrAddClanChannelCache, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
-	ChannelsEntity,
-	MessagesEntity,
 	channelsActions,
+	ChannelsEntity,
 	getStoreAsync,
+	MessagesEntity,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { convertTimeMessage, IChannel, IChannelMember } from '@mezon/utils';
+import { DrawerActions, NavigationProp, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
+import { APP_SCREEN, AppStackParamList } from '../../../navigation/ScreenTypes';
 import { style } from './ThreadItem.style';
 
 interface IThreadItemProps {
@@ -25,21 +26,30 @@ interface IThreadItemProps {
 const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const navigation = useNavigation();
+	const navigation = useNavigation<NavigationProp<AppStackParamList>>();
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread?.channel_id as string));
 	const message = useAppSelector(
 		(state) => selectMessageEntityById(state, thread?.channel_id as string, messageId || thread?.last_sent_message?.id) as MessagesEntity
 	);
 	const user = useSelector(selectMemberClanByUserId((message?.user?.id || thread?.last_sent_message?.sender_id) as string)) as IChannelMember;
+	const isTabletLandscape = useTabletLandscape();
 
 	const { username } = useMessageSender(user);
 	const handleNavigateThread = async (thread?: IChannel) => {
-		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME as never);
-		navigation.dispatch(DrawerActions.closeDrawer());
-		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		const store = await getStoreAsync();
+		if (isTabletLandscape) {
+			navigation.goBack();
+		} else {
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+			navigation.dispatch(DrawerActions.closeDrawer());
+		}
+		const channelId = thread?.channel_id;
+		requestAnimationFrame(async () => {
+			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		});
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 	};
 
 	const timeMessage = useMemo(() => {

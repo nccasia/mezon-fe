@@ -31,7 +31,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const { deepLinkUrl, notificationPath } = result;
 
 	if (deepLinkUrl) {
-		redirectTo = '/guess/login?deepLinkUrl=' + deepLinkUrl;
+		redirectTo = '/desktop/login?deepLinkUrl=' + deepLinkUrl;
 		const data = JSON.parse(decodeURIComponent(deepLinkUrl));
 		await dispatch(authActions.setSession(data));
 	}

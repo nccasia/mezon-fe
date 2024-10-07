@@ -1,11 +1,20 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo } from '@mezon/components';
-import { useApp, useThreads } from '@mezon/core';
-import { selectAllAccount, selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectStatusMenu, selectStatusStream } from '@mezon/store';
+import { useApp, useAppNavigation, useAppParams, useThreads } from '@mezon/core';
+import {
+	selectAllAccount,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectIsShowChatStream,
+	selectStatusMenu,
+	selectStatusStream
+} from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
+import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
 
@@ -16,6 +25,10 @@ const ClanLayout = () => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const streamPlay = useSelector(selectStatusStream);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClan?.clan_id || '');
 
 	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
@@ -46,12 +59,20 @@ const ClanLayout = () => {
 				/>
 			</div>
 			<div
-				className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+				className={`flex gap-2 w-full ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}
 			>
-				{/* {currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && ( */}
-				<ChannelTopbar channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
-				{/* )} */}
-				<Outlet />
+				<div
+					className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+				>
+					<ChannelTopbar channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+					{(currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING || memberPath === currentURL) && <Outlet />}
+				</div>
+
+				{isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL && (
+					<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+						<ChatStream currentChannel={currentChannel} />
+					</div>
+				)}
 			</div>
 			{isShowCreateThread && (
 				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">

@@ -1,5 +1,5 @@
 import { useEventManagement } from '@mezon/core';
-import { selectCurrentClanId, selectVoiceChannelAll } from '@mezon/store';
+import { selectChannelById, selectCurrentClanId, selectEventById, selectVoiceChannelAll } from '@mezon/store';
 import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,14 +12,19 @@ import ReviewModal from './reviewModal';
 export type ModalCreateProps = {
 	onClose: () => void;
 	onCloseEventModal: () => void;
+	clearEventId: () => void;
+	eventId?: string;
 };
 
 const ModalCreate = (props: ModalCreateProps) => {
-	const { onClose, onCloseEventModal } = props;
+	const { onClose, onCloseEventModal, eventId, clearEventId } = props;
 	const currentClanId = useSelector(selectCurrentClanId);
 	const voicesChannel = useSelector(selectVoiceChannelAll);
 	const tabs = ['Location', 'Event Info', 'Review'];
 	const [currentModal, setCurrentModal] = useState(0);
+	const currentEvent = useSelector(selectEventById(eventId || ''));
+	const eventChannel = useSelector(selectChannelById(currentEvent ? currentEvent.channel_id || '' : ''));
+
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
 		topic: '',
 		titleEvent: '',
@@ -35,7 +40,22 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const [option, setOption] = useState('');
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
-	const { createEventManagement } = useEventManagement();
+
+	const { createEventManagement, updateEventManagement } = useEventManagement();
+
+	useEffect(() => {
+		if (currentEvent) {
+			if (currentEvent.channel_id === '0') {
+				setOption('Location');
+			}
+
+			if (eventChannel) {
+				if (eventChannel.type === 4) {
+					setOption('Speaker');
+				}
+			}
+		}
+	}, []);
 
 	const choiceSpeaker = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const choiceLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
@@ -77,10 +97,33 @@ const ModalCreate = (props: ModalCreateProps) => {
 			title,
 			contentSubmit.topic,
 			timeValueStart,
-			choiceSpeaker ? timeValueStart : timeValueEnd,
+			timeValueEnd,
 			contentSubmit.description,
 			contentSubmit.logo
 		);
+
+		hanldeCloseModal();
+	};
+
+	const handleUpdate = async () => {
+		const title = choiceLocation ? contentSubmit.titleEvent : '';
+		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
+
+		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
+		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
+
+		await updateEventManagement(
+			eventId || '',
+			currentClanId || '',
+			voiceChannel,
+			title,
+			contentSubmit.topic,
+			timeValueStart,
+			timeValueEnd,
+			contentSubmit.description,
+			contentSubmit.logo
+		);
+
 		hanldeCloseModal();
 	};
 
@@ -88,6 +131,22 @@ const ModalCreate = (props: ModalCreateProps) => {
 		onClose();
 		onCloseEventModal();
 	};
+
+	useEffect(() => {
+		if (eventId !== '') {
+			setContentSubmit({
+				topic: currentEvent.title || '',
+				titleEvent: currentEvent.title || '',
+				timeStart: currentEvent.start_time || '00:00',
+				timeEnd: currentEvent.end_time || '00:00',
+				selectedDateStart: new Date(),
+				selectedDateEnd: new Date(),
+				voiceChannel: currentEvent.channel_id || '',
+				logo: currentEvent.logo || '',
+				description: currentEvent.description || ''
+			});
+		}
+	}, [eventId, currentEvent]);
 
 	useEffect(() => {
 		if (currentModal >= 1) {
@@ -153,17 +212,33 @@ const ModalCreate = (props: ModalCreateProps) => {
 					Back
 				</button>
 				<div className="flex justify-end gap-x-4 w-full">
-					<button className="px-4 py-2 rounded bg-slate-500 font-semibold" onClick={onClose}>
+					<button
+						className="px-4 py-2 rounded bg-slate-500 font-semibold"
+						onClick={() => {
+							onClose();
+							clearEventId();
+						}}
+					>
 						Cancel
 					</button>
 					{currentModal === Tabs_Option.REVIEW ? (
-						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
-							// eslint-disable-next-line @typescript-eslint/no-empty-function
-							onClick={option === '' || errorOption ? () => {} : () => handleSubmit()}
-						>
-							Create Event
-						</button>
+						eventId !== '' ? (
+							<button
+								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								// eslint-disable-next-line @typescript-eslint/no-empty-function
+								onClick={option === '' || errorOption ? () => {} : () => handleUpdate()}
+							>
+								Update Event
+							</button>
+						) : (
+							<button
+								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								// eslint-disable-next-line @typescript-eslint/no-empty-function
+								onClick={option === '' || errorOption ? () => {} : () => handleSubmit()}
+							>
+								Create Event
+							</button>
+						)
 					) : (
 						<button
 							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}

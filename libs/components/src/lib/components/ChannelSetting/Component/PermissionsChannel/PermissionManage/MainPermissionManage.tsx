@@ -6,6 +6,7 @@ import {
 	selectAllRolesClan,
 	selectAllUserChannel,
 	selectAllUserClans,
+	selectCurrentClanId,
 	selectPermissionChannel,
 	selectRolesByChannelId,
 	useAppDispatch
@@ -42,6 +43,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const rolesClan = useSelector(selectAllRolesClan);
 	const rolesInChannel = useSelector(selectRolesByChannelId(channelId));
 	const rawMembers = useSelector(selectAllUserChannel);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const combinedArray = [
 		...rolesInChannel.map((role) => ({
 			id: role.id,
@@ -69,7 +71,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 
 	const handleSelect = useCallback(
 		(id: string, option: number, active?: boolean) => {
-			const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === id);
+			const matchingRoleChannel = listPermissionRoleChannel?.permission_role_channel?.find((roleChannel) => roleChannel.permission_id === id);
 
 			if (active !== undefined) {
 				if (matchingRoleChannel && matchingRoleChannel.active === active) {
@@ -119,7 +121,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 			return !permissionsArray.some((y) => x.id === y.permission_id);
 		});
 		intersection.forEach((p) => {
-			const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === p.id);
+			const matchingRoleChannel = listPermissionRoleChannel?.permission_role_channel?.find((roleChannel) => roleChannel.permission_id === p.id);
 			permissionsArray.push({
 				permission_id: p.id,
 				slug: p.slug,
@@ -133,7 +135,8 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 					roleId: id || '',
 					permission: permissionsArray,
 					maxPermissionId: maxPermissionId,
-					userId: ''
+					userId: '',
+					clanId: currentClanId || ''
 				})
 			);
 		} else {
@@ -143,7 +146,8 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 					roleId: '',
 					permission: permissionsArray,
 					maxPermissionId: maxPermissionId,
-					userId: id || ''
+					userId: id || '',
+					clanId: currentClanId || ''
 				})
 			);
 		}
