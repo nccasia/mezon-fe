@@ -31,6 +31,7 @@ import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
+import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -337,7 +338,8 @@ const reducer = {
 	integrationWebhook: integrationWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
-	giveCoffee: giveCoffeeReducer
+	giveCoffee: giveCoffeeReducer,
+	settingClanChannel: settingChannelReducer
 };
 
 let storeInstance = configureStore({

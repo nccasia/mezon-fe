@@ -1,13 +1,26 @@
 import { useCategory } from '@mezon/core';
-import { selectChannelMemberByUserIds } from '@mezon/store';
+import { fetchChannelByUserId, selectAllChannelSuggestion, selectChannelMemberByUserIds, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 const ListChannelSetting = () => {
 	const { categorizedChannels } = useCategory();
-
+	const dispatch = useAppDispatch();
+	const selectClanId = useSelector(selectCurrentClanId);
+	const clanId = selectClanId == null || selectClanId === undefined ? '' : selectClanId;
+	const channelList = useSelector(selectAllChannelSuggestion);
+	useEffect(() => {
+		async function fetchChannelSetting() {
+			await dispatch(
+				fetchChannelByUserId({
+					clanId: clanId
+				})
+			);
+		}
+		fetchChannelSetting();
+	}, []);
 	const memoizedCategorizedChannels = useMemo(() => {
 		return categorizedChannels.map((category: ICategoryChannel) => {
 			if (category.channels.length === 0) {
@@ -60,6 +73,7 @@ const ListThreadByChannel = ({ channel }: ListThreadByChannelProps) => {
 				<div className="flex flex-col gap-1 pl-10">
 					{channel.threads.map((thread) => (
 						<ItemInfor
+							isThread={true}
 							creatorId={thread.category_id as string}
 							label={thread.channel_label || ''}
 							privateChannel={thread.channel_private as number}
@@ -71,15 +85,23 @@ const ListThreadByChannel = ({ channel }: ListThreadByChannelProps) => {
 	);
 };
 
-const ItemInfor = ({ avatar, label, creatorId, privateChannel }: { avatar?: string; label: string; creatorId: string; privateChannel: number }) => {
+const ItemInfor = ({
+	isThread,
+	label,
+	creatorId,
+	privateChannel
+}: {
+	isThread?: boolean;
+	label: string;
+	creatorId: string;
+	privateChannel: number;
+}) => {
 	const creatorChannel = useSelector((state) => selectChannelMemberByUserIds(state, creatorId as string));
 
 	return (
 		<div className='overflow-hidden flex object-cover items-center py-3 px-3 gap-3 w-full relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0'>
-			<div className="h-10 w-10 rounded-full overflow-hidden flex object-cover">
-				<img src={avatar || 'https://img.freepik.com/free-photo/digital-art-moon-tree-wallpaper_23-2150918811.jpg'} />
-			</div>
-			<div className="w-44">{label}</div>
+			<div className="h-6 w-6">{isThread ? <Icons.ThreadIcon /> : privateChannel ? <Icons.HashtagLocked /> : <Icons.Hashtag />}</div>
+			<div className="flex-1">{label}</div>
 			<div className="h-10 w-10 rounded-full overflow-hidden flex object-cover">
 				<img
 					src={
@@ -89,7 +111,6 @@ const ItemInfor = ({ avatar, label, creatorId, privateChannel }: { avatar?: stri
 					}
 				/>
 			</div>
-			<div className="w-6 h-6">{privateChannel ? <Icons.LockIcon /> : <Icons.PublicIcon defaultSize="w-6 h-6" />}</div>
 		</div>
 	);
 };
