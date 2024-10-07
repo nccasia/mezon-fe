@@ -100,7 +100,7 @@ export const Routes = memo(() => {
 							element: <AppDirectory />
 						},
 						{
-							path: 'guess',
+							path: 'desktop',
 							element: <GuessLayout />,
 							children: [
 								{

@@ -13,7 +13,7 @@ function getRedirectTo(initialPath?: string): string {
 		return redirectParam;
 	}
 
-	if (initialPath && !initialPath.startsWith('/guess')) {
+	if (initialPath && !initialPath.startsWith('/desktop')) {
 		return initialPath;
 	}
 

@@ -181,31 +181,29 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<TimePicker value={contentSubmit.timeStart} name="timeStart" handleChangeTime={handleChangeTimeStart} />
 				</div>
 			</div>
-			{choiceLocation && (
-				<div className="mb-4 flex gap-x-4">
-					<div className="w-1/2">
-						<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
-							End Date
-							<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
-						</h3>
-						<DatePicker
-							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
-							wrapperClassName="w-full"
-							selected={contentSubmit.selectedDateEnd}
-							onChange={handleDateChangeEnd}
-							dateFormat="dd/MM/yyyy"
-							minDate={new Date()}
-						/>
-					</div>
-					<div className="w-1/2">
-						<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
-							End Time
-							<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
-						</h3>
-						<TimePicker value={contentSubmit.timeEnd} name="timeEnd" handleChangeTime={handleChangeTimeEnd} />
-					</div>
+			<div className="mb-4 flex gap-x-4">
+				<div className="w-1/2">
+					<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+						End Date
+						<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+					</h3>
+					<DatePicker
+						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
+						wrapperClassName="w-full"
+						selected={contentSubmit.selectedDateEnd}
+						onChange={handleDateChangeEnd}
+						dateFormat="dd/MM/yyyy"
+						minDate={new Date()}
+					/>
 				</div>
-			)}
+				<div className="w-1/2">
+					<h3 className="uppercase text-[11px] font-semibold inline-flex gap-x-2">
+						End Time
+						<p className="w-fit h-fit text-left text-xs font-medium leading-[150%] text-[#dc2626]">✱</p>
+					</h3>
+					<TimePicker value={contentSubmit.timeEnd} name="timeEnd" handleChangeTime={handleChangeTimeEnd} />
+				</div>
+			</div>
 			<div className="mb-4">
 				<h3 className="uppercase text-[11px] font-semibold">Event Frequency</h3>
 				<select

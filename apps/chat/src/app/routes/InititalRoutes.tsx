@@ -7,7 +7,7 @@ const InitialRoutes = () => {
 	const isLogin = useSelector(selectIsLogin);
 
 	if (!isLogin) {
-		return <Navigate to="/guess/login" replace />;
+		return <Navigate to="/desktop/login" replace />;
 	}
 
 	return <Navigate to="/chat/direct/friends" replace />;

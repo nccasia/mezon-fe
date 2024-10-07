@@ -20,6 +20,7 @@
 		"src/**/*.tsx",
 		"src/**/*.js",
 		"src/**/*.jsx",
-    "src/**/*.json"
+    "src/**/*.json",
+	"*.json"
 	]
 }

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import DetailItemEvent from '../DetailItemEvent';
 import ModalCreate from './ModalCreate';
 import { StartEventModal } from './StartEvent';
@@ -13,11 +13,22 @@ export type EventModalProps = {
 const EventModal = (props: EventModalProps) => {
 	const { numberEventManagement, onClose, openModalDetail, setOpenModalDetail } = props;
 	const [openModal, setOpenModal] = useState(false);
+	const [eventUpdateId, setEventUpdatedId] = useState<string>('');
 
 	const handleModalDetail = useCallback((status: boolean) => {
 		setOpenModalDetail(status);
 	}, []);
 	const modalRef = useRef<HTMLDivElement>(null);
+	const onEventUpdateId = (id: string) => {
+		setEventUpdatedId(id);
+	};
+
+	const clearEventId = () => {
+		setEventUpdatedId('');
+	};
+	useEffect(() => {
+		setEventUpdatedId(eventUpdateId || '');
+	}, [eventUpdateId]);
 	return (
 		<div
 			ref={modalRef}
@@ -34,11 +45,17 @@ const EventModal = (props: EventModalProps) => {
 								onOpenCreate={() => setOpenModal(true)}
 								onOpenDetailItem={handleModalDetail}
 								numberEventManagement={numberEventManagement}
+								onEventUpdateId={onEventUpdateId}
 							/>
 						</div>
 					) : (
 						<div className="rounded-lg text-sm">
-							<ModalCreate onClose={() => setOpenModal(false)} onCloseEventModal={onClose} />
+							<ModalCreate
+								onClose={() => setOpenModal(false)}
+								onCloseEventModal={onClose}
+								eventId={eventUpdateId}
+								clearEventId={clearEventId}
+							/>
 						</div>
 					)}
 				</div>

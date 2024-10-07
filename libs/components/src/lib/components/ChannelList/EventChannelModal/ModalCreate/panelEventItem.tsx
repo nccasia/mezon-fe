@@ -1,7 +1,7 @@
 import { useAuth, usePermissionChecker } from '@mezon/core';
 import { EventManagementEntity, selectUserMaxPermissionLevel } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../../../ChannelLink';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
@@ -10,12 +10,14 @@ type PanelEventItemProps = {
 	coords: Coords;
 	event?: EventManagementEntity;
 	onHandle: (e: unknown) => void;
-	setOpenModalDelEvent: React.Dispatch<React.SetStateAction<boolean>>;
+	setOpenModalUpdateEvent?: () => void;
+	onTrigerEventUpdateId?: () => void;
+	setOpenModalDelEvent?: React.Dispatch<React.SetStateAction<boolean>>;
 	onClose: () => void;
 };
 
 function PanelEventItem(props: PanelEventItemProps) {
-	const { coords, event, onHandle, setOpenModalDelEvent, onClose } = props;
+	const { coords, event, onHandle, setOpenModalDelEvent, setOpenModalUpdateEvent, onClose, onTrigerEventUpdateId } = props;
 	const { userProfile } = useAuth();
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
@@ -33,10 +35,19 @@ function PanelEventItem(props: PanelEventItemProps) {
 	}, [event?.creator_id, event?.max_permission, isClanOwner, userMaxPermissionLevel, userProfile?.user?.id]);
 
 	const handleDeleteEvent = async () => {
-		setOpenModalDelEvent(true);
-		onClose();
+		if (setOpenModalDelEvent) {
+			setOpenModalDelEvent(true);
+			onClose();
+		}
 	};
 
+	const handleUpdateEvent = async () => {
+		if (setOpenModalUpdateEvent && onTrigerEventUpdateId) {
+			setOpenModalUpdateEvent();
+			onTrigerEventUpdateId();
+			onClose();
+		}
+	};
 	return (
 		<div
 			className="fixed dark:bg-bgProfileBody bg-gray-100 rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
@@ -50,7 +61,7 @@ function PanelEventItem(props: PanelEventItemProps) {
 			{canModifyEvent && (
 				<>
 					<ItemPanel children="Start Event" />
-					<ItemPanel children="Edit Event" />
+					<ItemPanel children="Edit Event" onClick={handleUpdateEvent} />
 					<ItemPanel children="Cancel Event" danger={true} onClick={handleDeleteEvent} />
 				</>
 			)}

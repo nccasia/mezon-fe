@@ -1,7 +1,8 @@
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiPermission } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
+import { fetchMaxChannelPermissionCached } from '../policies/overriddenPolicies.slice';
 
 export const MAX_PERMISSION_ROLE_CHANNEL_FEATURE_KEY = 'maxpermissionrolechannel';
 
@@ -18,6 +19,7 @@ const maxPermissionRoleChannelAdapter = createEntityAdapter({
 type FetchMaxPermissionChannelsArgs = {
 	channelId: string;
 	clanId: string;
+	noCache?: boolean;
 };
 
 /**
@@ -25,11 +27,14 @@ type FetchMaxPermissionChannelsArgs = {
  */
 export const fetchMaxPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchMaxPermissionRoleChannel',
-	async ({ clanId, channelId }: FetchMaxPermissionChannelsArgs, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: FetchMaxPermissionChannelsArgs, thunkAPI) => {
 		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
-			if (response && response.permissions.permissions) {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchMaxChannelPermissionCached.clear(mezon, clanId, channelId);
+			}
+			const response = await fetchMaxChannelPermissionCached(mezon, clanId, channelId);
+			if (response && response.permissions?.permissions) {
 				await thunkAPI.dispatch(maxPermissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
 				return response?.permissions.permissions;
 			}

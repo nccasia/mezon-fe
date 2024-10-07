@@ -12,8 +12,8 @@ export type UseThreadMessage = {
 
 export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
+	const parent = useSelector(selectCurrentChannel);
+	const thread = useSelector(selectChannelById(channelId));
 	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -40,7 +40,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				thread.channel_id as string,
 				mode,
 				thread ? !thread.channel_private : false,
-				currentChannel ? !currentChannel.channel_private : false,
+				parent ? !parent.channel_private : false,
 				{ t: content.t },
 				mentions,
 				attachments,
@@ -50,7 +50,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			const timestamp = Date.now() / 1000;
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, mode, currentChannel, dispatch, channelId]
+		[sessionRef, clientRef, socketRef, currentClanId, mode, parent, dispatch, channelId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -58,15 +58,15 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			dispatch(
 				messagesActions.sendTypingUser({
 					clanId: currentClanId || '',
-					parentId: currentChannel?.parrent_id || '',
+					parentId: parent?.parrent_id || '',
 					channelId,
 					mode,
-					isPublic: currentChannel ? !currentChannel.channel_private : false,
+					isPublic: thread ? !thread.channel_private : false,
 					isParentPublic: parent ? !parent.channel_private : false
 				})
 			);
 		}
-	}, [channelId, currentChannel?.channel_private, currentClanId, dispatch, mode]);
+	}, [channelId, dispatch, currentClanId, parent, mode, thread]);
 
 	const editSendMessage = React.useCallback(
 		async (content: string, messageId: string) => {
@@ -82,16 +82,16 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			}
 			await socket.updateChatMessage(
 				currentClanId,
-				currentChannel?.parrent_id || '',
+				parent?.parrent_id || '',
 				channelId,
 				mode,
-				currentChannel ? !currentChannel.channel_private : false,
+				thread ? !thread.channel_private : false,
 				parent ? !parent.channel_private : false,
 				messageId,
 				editMessage
 			);
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, currentChannel?.channel_private]
+		[sessionRef, clientRef, socketRef, currentClanId, parent, channelId, mode, thread]
 	);
 
 	return useMemo(

@@ -10,11 +10,12 @@ type StartEventModalProps = {
 	onClose: () => void;
 	onOpenCreate: () => void;
 	onOpenDetailItem: (status: boolean) => void;
+	onEventUpdateId: (eventId: string) => void;
 	rootRef: RefObject<HTMLElement>;
 };
 
 export const StartEventModal = (props: StartEventModalProps) => {
-	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement } = props;
+	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement, onEventUpdateId } = props;
 	const allEventManagement = useSelector(selectAllEventManagement);
 
 	useEscapeKeyClose(props.rootRef, onClose);
@@ -43,7 +44,12 @@ export const StartEventModal = (props: StartEventModalProps) => {
 
 			{allEventManagement.length !== 0 ? (
 				<div className="dark:bg-[#313339] bg-white h-fit min-h-80 max-h-[80vh]  overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col">
-					<ListEventManagement allEventManagement={allEventManagement} onOpenDetailItem={onOpenDetailItem} />
+					<ListEventManagement
+						allEventManagement={allEventManagement}
+						onOpenDetailItem={onOpenDetailItem}
+						openModelUpdate={onOpenCreate}
+						onUpdateEventId={onEventUpdateId}
+					/>
 				</div>
 			) : (
 				<div className="dark:bg-[#313339] bg-white h-80 flex justify-center items-center">

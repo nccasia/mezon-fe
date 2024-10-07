@@ -36,7 +36,7 @@ const GoogleButtonLogin: React.FC<GoogleButtonLoginProps> = ({ mode }) => {
 			{isElectron() && (
 				<Link
 					target="_blank"
-					to={process.env.NX_CHAT_APP_REDIRECT_URI + '/guess/login-desktop'}
+					to={process.env.NX_CHAT_APP_REDIRECT_URI + '/desktop/login-desktop'}
 					className="flex justify-center w-full h-fit p-3 rounded-[4px] bg-[#d1e0ff]"
 				>
 					<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />

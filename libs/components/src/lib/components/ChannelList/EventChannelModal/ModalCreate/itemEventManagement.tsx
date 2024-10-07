@@ -26,6 +26,8 @@ export type ItemEventManagementProps = {
 	createTime?: string;
 	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
+	openModelUpdate?: () => void;
+	onEventUpdateId?: (id: string) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
@@ -42,7 +44,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		end,
 		event,
 		isReviewEvent,
-		setOpenModalDetail
+		setOpenModalDetail,
+		openModelUpdate,
+		onEventUpdateId
 	} = props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
@@ -186,7 +190,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					{checkOptionLocation && (
 						<>
 							<Icons.Location />
-							<p>{titleEvent}</p>
+							<p>{address}</p>
 						</>
 					)}
 					{option === '' && !address && !channelVoice && (
@@ -237,7 +241,13 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					event={event}
 					coords={coords}
 					onHandle={handleStopPropagation}
+					setOpenModalUpdateEvent={openModelUpdate}
 					setOpenModalDelEvent={setOpenModalDelEvent}
+					onTrigerEventUpdateId={() => {
+						if (onEventUpdateId) {
+							onEventUpdateId(event?.id || '');
+						}
+					}}
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}

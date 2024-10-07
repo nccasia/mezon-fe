@@ -1,5 +1,5 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
@@ -8,8 +8,8 @@ import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
-import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
+import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
@@ -42,7 +42,9 @@ export const TYPE_MENTION = {
 	userMention: '@',
 	hashtag: '#',
 	voiceChannel: '##voice',
-	userRoleMention: '@role'
+	userRoleMention: '@role',
+	thread: '#thread',
+	stream: '#stream'
 };
 /**
  * custom style for markdown
@@ -153,8 +155,10 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
+			color: colors.textRoleLink,
 			backgroundColor: colors.darkMossGreen
-		}
+		},
+		threadIcon: { marginBottom: size.s_2 }
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -237,7 +241,27 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<Text>
-							<FontAwesome name="volume-2" size={14} color={baseColor.gray} />{' '}
+							<CustomIcon name="volume-up" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />{' '}
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+					</Text>
+				);
+			}
+			if (payload.includes(TYPE_MENTION.stream)) {
+				return (
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
+						<Text>
+							<CustomIcon name="stream-video" size={size.s_14} color={Colors.textLink} />{' '}
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+					</Text>
+				);
+			}
+			if (payload.includes(TYPE_MENTION.thread)) {
+				return (
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
+						<Text>
+							<CustomIcon name="thread-icon" size={size.s_16} color={Colors.textLink} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>

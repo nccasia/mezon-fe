@@ -8,7 +8,7 @@ import {
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store';
-import { ICategoryChannel, TIME_OFFSET } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel, TIME_OFFSET } from '@mezon/utils';
 import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -72,6 +72,12 @@ export function useMarkAsRead() {
 
 				setStatusMarkAsReadChannel('success');
 				resetCountChannelBadge(channel);
+
+				const allThreadsInChannel = getThreadWithBadgeCount(channel);
+				if (allThreadsInChannel && allThreadsInChannel.length > 0)
+					allThreadsInChannel.forEach((channel: ChannelsEntity) => {
+						resetCountChannelBadge(channel);
+					});
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadChannel('error');
@@ -143,7 +149,7 @@ export function useMarkAsRead() {
 }
 
 function getChannelsWithBadgeCountCategory(cat: ICategoryChannel) {
-	const allChannelsAndThreads = cat.channels.flatMap((channel: any) => {
+	const allChannelsAndThreads = cat.channels.flatMap((channel: ChannelThreads) => {
 		const threads = channel.threads || [];
 		return [channel, ...threads];
 	});
@@ -169,4 +175,18 @@ function getChannelsWithBadgeCountClan(channels: ChannelsEntity[]) {
 		);
 
 	return channelsWithBadge;
+}
+
+function getThreadWithBadgeCount(channel: ChannelThreads) {
+	const getThreads = channel.threads;
+	const getThreadsWithBadge = getThreads
+		?.flat()
+		.filter(
+			(item: ChannelsEntity) =>
+				item?.last_seen_message?.timestamp_seconds &&
+				item?.last_sent_message?.timestamp_seconds &&
+				item.last_seen_message?.timestamp_seconds <= item.last_sent_message?.timestamp_seconds
+		);
+
+	return getThreadsWithBadge;
 }

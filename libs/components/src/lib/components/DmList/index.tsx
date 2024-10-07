@@ -1,3 +1,4 @@
+import { useFriends } from '@mezon/core';
 import { selectDirectsOpenlistOrder, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
@@ -13,11 +14,17 @@ export type CategoriesState = Record<string, boolean>;
 function DirectMessageList() {
 	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const appearanceTheme = useSelector(selectTheme);
+	const { quantityPendingRequest } = useFriends();
 	return (
 		<>
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
 					<FriendsButton navigateToFriend={dmGroupChatList?.length === 0} />
+					{quantityPendingRequest > 0 ? (
+						<div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center right-[25px]">
+							{quantityPendingRequest}
+						</div>
+					) : null}
 				</div>
 
 				<div className="text-xs font-semibold tracking-wide left-sp dark:text-[#AEAEAE] text-[#585858] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default dark:hover:text-white hover:text-black">
