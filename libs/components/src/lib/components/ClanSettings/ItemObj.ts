@@ -17,7 +17,8 @@ export const ItemSetting = {
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
 	APP_DIRECTORY: 'app-directory',
-	CATEGORY_ORDER: 'category-order'
+	CATEGORY_ORDER: 'category-order',
+	CHANNEL_SETTING: 'channel-setting'
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -26,7 +27,8 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
 	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
-	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+	{ id: ItemSetting.CHANNEL_SETTING, name: 'Channel Setting' }
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [

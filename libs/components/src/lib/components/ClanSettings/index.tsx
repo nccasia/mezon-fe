@@ -55,6 +55,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
+			case ItemSetting.CHANNEL_SETTING:
+				return <CategoryOrderSetting />;
 		}
 	};
 	const dispatch = useAppDispatch();

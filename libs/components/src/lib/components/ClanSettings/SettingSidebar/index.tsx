@@ -20,6 +20,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const currentClan = useSelector(selectCurrentClan);
 	const [isClanOwner, hasClanPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const navigate = useNavigate();
+	console.log('sideBarListItem: ', sideBarListItem);
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
 			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS].includes(item.id)) {
