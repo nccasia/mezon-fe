@@ -13,7 +13,6 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 			<MessageWithUser
 				allowDisplayShortProfile={true}
 				message={message}
-				isMessNotifyMention={true}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 				isMention={true}
 				isShowFull={true}
