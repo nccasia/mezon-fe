@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IScrollOptions, SCROLL_DEFAULT_OPTIONS } from './scroll-options';
+import { IUseScrollResponse } from './types';
 
 /**
  * React hook for controlling scrollable HTML element.
@@ -78,11 +79,11 @@ export const useScroll = <TElement extends Element>(
 
 		const el = targetRef.current;
 
-		el?.addEventListener('scroll', handler);
+		el?.addEventListener('wheel', handler);
 
 		return () => {
 			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
-			el?.removeEventListener('scroll', handler);
+			el?.removeEventListener('wheel', handler);
 		};
 	}, [handlerId, targetRef, options]);
 
@@ -101,74 +102,3 @@ export const useScroll = <TElement extends Element>(
 		setScrollEventHandler
 	};
 };
-
-/**
- * Scroll event handler.
- */
-export type IScrollEventHandler = (event: Event) => void;
-
-/**
- * Flags and methods provided by useScroll hook.
- */
-export interface IUseScrollResponse {
-	/**
-	 * Verifies whether target element is currently fetching data.
-	 */
-	isFetching: () => boolean;
-
-	/**
-	 * Marks target element as currently fetching data.
-	 */
-	setFetching: () => void;
-
-	/**
-	 * Marks target element as currently not fetching data.
-	 */
-	setFetched: () => void;
-
-	/**
-	 * Gathers current scroll height for target element.
-	 */
-	getCurrentScrollHeight: () => number;
-
-	/**
-	 * Gathers current scroll position of target element.
-	 */
-	getScrollTop: () => number;
-
-	/**
-	 * Gathers height of target element client area.
-	 */
-	getClientHeight: () => number;
-
-	/**
-	 * Scrolls target element.
-	 * @param offset Scroll position from the top.
-	 */
-	setScrollTop: (offset: number) => void;
-
-	/**
-	 * Gathers last stored value of target element scroll height.
-	 */
-	getStoredScrollHeight: () => number;
-
-	/**
-	 * Stores current scroll height of target element for later use.
-	 */
-	storeCurrentScrollHeight: () => void;
-
-	/**
-	 * Gathers last stored value of target element scroll top offset.
-	 */
-	getStoredScrollTop: () => number;
-
-	/**
-	 * Stores current scroll offset of target element for later use.
-	 */
-	storeCurrentScrollTop: () => void;
-
-	/**
-	 * Overrides scroll event handler to a new one.
-	 */
-	setScrollEventHandler: (newScrollHandler: IScrollEventHandler) => void;
-}

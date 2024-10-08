@@ -60,7 +60,6 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
-			console.log('load more....');
 			if (isFetching) {
 				return;
 			}

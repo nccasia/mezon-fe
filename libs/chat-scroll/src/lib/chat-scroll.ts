@@ -1,5 +1,6 @@
-import { ILoadMoreCb, IUseReverseInfiniteScrollOptions, useReverseInfiniteScroll } from './reverse-infinite-scroll';
+import { useReverseInfiniteScroll } from './reverse-infinite-scroll';
 import { IChatScrollData } from './sticky-scroll';
+import { ILoadMoreCb, IUseChatScrollOptions, IUseChatScrollReturn } from './types';
 
 /**
  * React hook for making HTML element scroll behaved like chat.
@@ -32,38 +33,3 @@ export const useChatScroll = <TElement extends Element>(
 		updateLoadMoreCb
 	};
 };
-
-/**
- * Options for customizing behavior of useChatScroll hook.
- */
-export interface IUseChatScrollOptions {
-	/**
-	 * Options for reverse infinite scroll behavior.
-	 */
-	reverseInfiniteScroll: IUseReverseInfiniteScrollOptions;
-}
-
-/**
- * Flags and methods provided by useChatScroll hook.
- */
-export interface IUseChatScrollReturn {
-	/**
-	 * Indicates whether reverse infinite scroll behavior is enabled.
-	 */
-	reverseInfiniteScrollEnabled: boolean;
-
-	/**
-	 * Enables reverse infinite scroll behavior.
-	 */
-	enableReverseInfiniteScroll: () => void;
-
-	/**
-	 * Disables reverse infinite scroll behavior.
-	 */
-	disableReverseInfiniteScroll: () => void;
-
-	/**
-	 * Overrides callback for loading more data with a new one.
-	 */
-	updateLoadMoreCb: (newLoadMoreCb: ILoadMoreCb) => void;
-}
