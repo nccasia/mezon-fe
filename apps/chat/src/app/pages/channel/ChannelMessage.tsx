@@ -116,7 +116,7 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 				{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 				{!mess.isFirst && (
-					<div ref={messageRef} className="fullBoxText relative group ">
+					<div ref={messageRef} className="fullBoxText relative group">
 						<MessageWithUser
 							allowDisplayShortProfile={true}
 							message={mess as IMessageWithUser}
@@ -137,11 +137,7 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 );
 
 ChannelMessage.Skeleton = function () {
-	return (
-		<div>
-			<MessageWithUser.Skeleton />
-		</div>
-	);
+	return <MessageWithUser.Skeleton />;
 };
 
 export const MemorizedChannelMessage = memo(ChannelMessage);

@@ -176,7 +176,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
 			<AnchorScroll ref={chatRef} anchorId={channelId}>
-				{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+				{isFetching && <ChannelMessages.Skeleton />}
 				<div className="min-h-0 overflow-hidden">
 					{messages.map((messageId) => {
 						return (
@@ -206,6 +206,9 @@ ChannelMessages.Skeleton = () => {
 	if (ChannelMessage.Skeleton) {
 		return (
 			<>
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
