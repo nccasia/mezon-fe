@@ -129,8 +129,7 @@ const Flow = () => {
 			return;
 		}
 		try {
-			const response = await flowService.deleteFlow(flowId);
-			console.log(response);
+			await flowService.deleteFlow(flowId);
 			toast.success('Delete flow success');
 			navigate(`/applications/${applicationId}/flow`);
 		} catch {
@@ -196,6 +195,7 @@ const Flow = () => {
 			};
 			listNodeInFlow.push(newNode);
 		});
+		// loop through all edges to get connection
 		const listEdgeInFlow: IEdge[] = [];
 		edges.forEach((edge: Edge) => {
 			const newEdge = {
@@ -243,9 +243,7 @@ const Flow = () => {
 		try {
 			if (flowId) {
 				// toast.info('Api update flow is updating');
-				console.log({ ...flowDataSave, flowId });
-				const response = await flowService.updateFlow({ ...flowDataSave, flowId });
-				console.log(response);
+				await flowService.updateFlow({ ...flowDataSave, flowId });
 				toast.success('Update flow success');
 				// call api update flow
 			} else {

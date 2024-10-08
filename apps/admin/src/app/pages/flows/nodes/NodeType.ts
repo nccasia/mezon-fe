@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import CodeEditorField from '../../../components/InputField/CodeEditorField';
+import CustomSelectField from '../../../components/InputField/CustomSelectField';
 import CustomTextField from '../../../components/InputField/CustomTextField';
 import MultiImageUploadField from '../../../components/MultiImageUploadField';
 
@@ -76,7 +77,19 @@ const NodeTypes = [
 			type: 'object',
 			properties: {
 				url: { type: 'string', uniforms: { component: CustomTextField, label: 'Api Url', name: 'url' } },
-				method: { type: 'string', uniforms: { component: CustomTextField, label: 'Method (GET | POST)', name: 'method' } }
+				method: {
+					type: 'string',
+					uniforms: {
+						component: CustomSelectField,
+						label: 'Method (GET | POST)',
+						name: 'method',
+						defaultValue: 'GET',
+						options: [
+							{ label: 'GET', value: 'GET' },
+							{ label: 'POST', value: 'POST' }
+						]
+					}
+				}
 			},
 			required: []
 		},
