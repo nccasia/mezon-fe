@@ -17,5 +17,8 @@ contextBridge.exposeInMainWorld('electron', {
 	senderId: (senderId: string) => ipcRenderer.invoke(SENDER_ID, senderId),
 	setBadgeCount: (badgeCount: number) => {
 		ipcRenderer.send(SET_BADGE_COUNT, badgeCount);
+	},
+	onWindowMinimized: (callback: () => void) => {
+		ipcRenderer.on('window-minimized', callback);
 	}
 });

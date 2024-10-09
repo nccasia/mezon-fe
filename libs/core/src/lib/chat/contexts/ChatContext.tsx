@@ -52,6 +52,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
+import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -278,8 +279,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const isFriendPageView = location.pathname === '/chat/direct/friends';
 	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
 
+	const [isMinimized, setIsMinimized] = useState(false); // desktop app
+
 	const onnotification = useCallback(
 		async (notification: Notification) => {
+			console.log('notification: ', notification);
+			console.log('isElectron(): ', isElectron());
+			if (isElectron()) {
+				window.electron.onWindowMinimized(() => {
+					console.log('123');
+					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
+					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
+				});
+			}
+
 			if (
 				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
 				isDirectViewPage ||

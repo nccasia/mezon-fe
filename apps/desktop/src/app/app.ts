@@ -82,6 +82,10 @@ export default class App {
 		App.mainWindow.setMenuBarVisibility(false);
 		App.mainWindow.center();
 
+		App.mainWindow.on('minimize', () => {
+			App.mainWindow.webContents.send('window-minimized', true);
+		});
+
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
@@ -111,7 +115,7 @@ export default class App {
 			return;
 		}
 
-		// App.mainWindow.webContents.openDevTools();
+		App.mainWindow.webContents.openDevTools();
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
