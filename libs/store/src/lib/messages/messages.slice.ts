@@ -67,7 +67,7 @@ export interface MessagesEntity extends IMessageWithUser {
 	channel_id: string;
 	isStartedMessageGroup?: boolean;
 	isStartedMessageOfTheDay?: boolean;
-	hideEditted?: boolean;
+	hide_editted?: boolean;
 }
 
 export interface UserTypingState {
@@ -182,6 +182,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
+		console.log('response: ', response);
 
 		if (!response.messages) {
 			return {
@@ -736,7 +737,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hide_editted,
+							hide_editted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});

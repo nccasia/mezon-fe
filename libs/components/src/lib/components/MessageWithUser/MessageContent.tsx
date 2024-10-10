@@ -74,8 +74,9 @@ const MessageText = ({
 	}, [attachmentOnMessage, contentToMessage]);
 
 	const showEditted = useMemo(() => {
-		return message.hideEditted === false;
-	}, [message.hideEditted]);
+		console.log('message: ', message);
+		return message.hide_editted === undefined;
+	}, [message.hide_editted]);
 
 	return (
 		<>

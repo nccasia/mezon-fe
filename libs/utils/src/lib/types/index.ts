@@ -184,7 +184,7 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
-	hideEditted?: boolean;
+	hide_editted?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {

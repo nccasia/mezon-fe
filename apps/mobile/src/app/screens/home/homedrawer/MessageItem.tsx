@@ -167,11 +167,11 @@ const MessageItem = React.memo(
 				const updateDate = new Date(message?.update_time);
 				const createDate = new Date(message?.create_time);
 				return updateDate > createDate;
-			} else if (message.hideEditted === false && !!message?.content?.t) {
+			} else if (message.hide_editted === false && !!message?.content?.t) {
 				return true;
 			}
 			return false;
-		}, [message?.update_time, message.hideEditted, message?.content?.t, message?.create_time]);
+		}, [message?.update_time, message.hide_editted, message?.content?.t, message?.create_time]);
 
 		useEffect(() => {
 			if (props?.messageId) {
@@ -468,7 +468,7 @@ const MessageItem = React.memo(
 				<NewMessageRedLine
 					channelId={props?.channelId}
 					messageId={props?.messageId}
-					isEdited={message?.hideEditted}
+					isEdited={message?.hide_editted}
 					isSending={message?.isSending}
 					isMe={message.sender_id === userProfile?.user?.id}
 				/>
