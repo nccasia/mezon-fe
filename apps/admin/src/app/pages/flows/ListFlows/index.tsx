@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import flowService from '../../../services/flowService';
 import { IFlow } from '../../../stores/flow/flow.interface';
 import ExampleFlow from '../ExampleFlows';
@@ -12,8 +13,8 @@ const ListFlow = () => {
 			try {
 				const res: IFlow[] = await flowService.getAllFlowByApplication(applicationId ?? '');
 				setListFlow(res);
-			} catch (error) {
-				console.log(error);
+			} catch {
+				toast.error('Get list flow error');
 			}
 		};
 		getListFlow();

@@ -14,7 +14,6 @@ const getAllFlowByApplication = async (applicationId: string): Promise<IFlow[]> 
 		const listFlow = await apiInstance.get(`/flow/getAllByApplication?appId=${applicationId}`);
 		return listFlow.data as IFlow[];
 	} catch (error) {
-		console.log('error', error);
 		throw (error as IError).response.data;
 	}
 };

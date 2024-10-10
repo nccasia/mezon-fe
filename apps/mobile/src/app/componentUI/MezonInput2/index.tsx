@@ -8,7 +8,7 @@ import { style } from './styles';
 interface IMezonInput2 {
 	placeHolder?: string;
 	label?: string;
-	message?: string;
+	errorMessage?: string;
 	value: string;
 	onTextChange?: (value: string) => void;
 }

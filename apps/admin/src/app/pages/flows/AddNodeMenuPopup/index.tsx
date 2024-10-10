@@ -19,12 +19,12 @@ const AddNodeMenuPopup = () => {
 			description: 'Sends the bot’s reply based on the input and processing.'
 		},
 		{
-			title: 'Format Function',
+			title: 'Custom JS Function',
 			nodeType: 'formatFunction',
 			description: 'Executes custom logic or processes for flexible responses.'
 		},
 		{
-			title: 'Custom JS Function',
+			title: 'API Loader',
 			nodeType: 'apiLoader',
 			description: 'Fetches data from external APIs for integration into bot responses.'
 		}

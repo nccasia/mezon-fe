@@ -7,8 +7,8 @@ type flowDispatch = Dispatch<FlowActionType>;
 export const FlowContext = createContext<{ flowState: IFlowState; flowDispatch: flowDispatch }>({
 	flowState: initFlowState,
 	flowDispatch: () => {
-		console.log('hello');
-	} // Provide a default function to avoid TypeScript errors
+		// Provide a default function to avoid TypeScript errors
+	}
 });
 
 const FlowProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {

@@ -9,7 +9,6 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	console.log('value', value);
 	const handleChooseFiles = async (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			const client = clientRef.current;

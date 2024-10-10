@@ -75,7 +75,6 @@ const FlowChatPopup = () => {
 			}, 0);
 		}
 	}, [messages]);
-	console.log('messages', messages);
 	return (
 		<div className="text-sm text-gray-500 dark:text-gray-200 max-w-[350px] w-[95vw]">
 			<div className="flex items-center gap-2 p-2  bg-gray-200 dark:bg-gray-600">

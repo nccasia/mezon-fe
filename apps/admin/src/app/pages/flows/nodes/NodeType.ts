@@ -68,7 +68,7 @@ const NodeTypes = [
 	},
 	{
 		type: 'apiLoader',
-		label: 'Custom JS Function',
+		label: 'API Loader',
 		schema: yup.object().shape({
 			url: yup.string().required('Url is required'),
 			method: yup.string().required('Method is required').oneOf(['GET', 'POST'], 'Method must be either GET or POST')
@@ -94,13 +94,13 @@ const NodeTypes = [
 			required: []
 		},
 		anchors: {
-			source: [{ id: 'api-loader-source-1', text: 'Format Function' }],
+			source: [{ id: 'api-loader-source-1', text: 'Custom JS Function' }],
 			target: [{ id: 'api-loader-target-1', text: 'Splitter Text' }]
 		}
 	},
 	{
 		type: 'formatFunction',
-		label: 'Format Function',
+		label: 'Custom JS Function',
 		schema: yup.object().shape({
 			variable: yup.string(),
 			functionName: yup.string().required('Function Name is required'),
@@ -116,6 +116,7 @@ const NodeTypes = [
 			required: []
 		},
 		anchors: {
+			source: [],
 			target: [{ id: 'format-function-target-1', text: 'Api Loader' }]
 		}
 	}

@@ -84,9 +84,9 @@ const Flow = () => {
 							anchors={item.anchors}
 							ref={(el: HTMLElement | null) => {
 								if (el) {
-									nodeRefs.current[props.data.id] = el;
+									nodeRefs.current[props.data.id] = el; // assign ref to nodeRefs when node is created
 								} else {
-									delete nodeRefs.current[props.data.id]; // Xóa ref khi node bị xóa
+									delete nodeRefs.current[props.data.id]; // delete ref when node is deleted
 								}
 							}}
 						/>
@@ -221,8 +221,6 @@ const Flow = () => {
 			referralId: userProfile?.user?.id,
 			applicationId: applicationId ?? '',
 			applicationToken: appDetail?.token ?? '',
-			// applicationId: '1842062828475781120',
-			// applicationToken: '4b3152783648644e4358534f54387131',
 			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
@@ -242,7 +240,6 @@ const Flow = () => {
 
 		try {
 			if (flowId) {
-				// toast.info('Api update flow is updating');
 				await flowService.updateFlow({ ...flowDataSave, flowId });
 				toast.success('Update flow success');
 				// call api update flow
