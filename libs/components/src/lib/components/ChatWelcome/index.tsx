@@ -138,6 +138,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 	return (
 		<>
 			<AvatarImage
+				height={'75px'}
 				alt={userName}
 				userName={userName}
 				className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"

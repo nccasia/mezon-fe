@@ -85,9 +85,20 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const tokenClickAble = () => {
 		if (!isJumMessageEnabled || isTokenClickAble) {
 			handleClick();
+			if (channelPath) {
+				setTimeout(() => {
+					const channelCallElement = document.getElementById(channelPath);
+					if (channelCallElement) {
+						channelCallElement.scrollIntoView({ behavior: 'smooth' });
+					}
+				}, 0);
+			}
 		}
 	};
-	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) && getChannelById() ? (
+	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+		(channelHastagId && directId)) &&
+		getChannelById() ? (
 		<Link
 			onClick={tokenClickAble}
 			style={{ textDecoration: 'none' }}

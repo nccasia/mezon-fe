@@ -1,6 +1,9 @@
 import { useDragAndDrop } from '@mezon/core';
-import { referencesActions, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store';
+import { processFile } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { DragEvent } from 'react';
+import { useSelector } from 'react-redux';
 import DragAndDropUI from './DragAndDropUI';
 
 type FileUploadByDnDOpt = {
@@ -9,7 +12,9 @@ type FileUploadByDnDOpt = {
 
 function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const dispatch = useAppDispatch();
-	const { setDraggingState } = useDragAndDrop();
+	const uploadedAttachmentsInChannel = useSelector(selectAttachmentByChannelId(currentId))?.files || [];
+
+	const { setDraggingState, setOverUploadingState } = useDragAndDrop();
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -28,21 +33,21 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		setDraggingState(false);
 	};
 
-	const handleDrop = (e: DragEvent<HTMLElement>) => {
+	const handleDrop = async (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(false);
 		const files = e.dataTransfer.files;
 		const filesArray = Array.from(files);
+		if (filesArray.length + uploadedAttachmentsInChannel.length > 10) {
+			setOverUploadingState(true);
+			return;
+		}
+		const updatedFiles = await Promise.all(filesArray.map(processFile<ApiMessageAttachment>));
 		dispatch(
 			referencesActions.setAtachmentAfterUpload({
 				channelId: currentId,
-				files: filesArray.map((file) => ({
-					filename: file.name,
-					filetype: file.type,
-					size: file.size,
-					url: URL.createObjectURL(file)
-				}))
+				files: updatedFiles
 			})
 		);
 	};

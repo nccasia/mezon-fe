@@ -310,12 +310,14 @@ export function MemberProfile({
 							<>
 								{customStatus && (isFooter || isListFriend) ? (
 									<span
-										className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[13px]`}
+										className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 ${isFooter ? 'leading-[14px]' : ''}`}
 									>
 										{customStatus}
 									</span>
 								) : (
-									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode leading-[18px]`}>
+									<span
+										className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode ${isFooter ? 'leading-[18px]' : ''}`}
+									>
 										{!status ? 'Offline' : 'Online'}
 									</span>
 								)}
@@ -332,7 +334,7 @@ export function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'top-0 leading-[24px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'top-0 leading-[18px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}

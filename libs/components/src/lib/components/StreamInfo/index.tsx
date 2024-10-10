@@ -34,6 +34,12 @@ const StreamInfo = () => {
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
+		setTimeout(() => {
+			const channelCallElement = document.getElementById(channelPath);
+			if (channelCallElement) {
+				channelCallElement.scrollIntoView({ behavior: 'smooth' });
+			}
+		}, 0);
 	};
 
 	const streamAddress = `${currentStreamInfo?.streamName + ' / ' + currentStreamInfo?.clanName}`;

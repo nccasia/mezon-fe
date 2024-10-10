@@ -219,12 +219,12 @@ ChannelMessages.Skeleton = () => {
 	if (ChannelMessage.Skeleton) {
 		return (
 			<>
+				{/* <ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
 				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
-				<ChannelMessage.Skeleton />
+				<ChannelMessage.Skeleton /> */}
 			</>
 		);
 	}

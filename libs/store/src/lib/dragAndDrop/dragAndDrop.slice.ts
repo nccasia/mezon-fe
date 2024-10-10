@@ -6,12 +6,14 @@ export interface DragAndDropState {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	draggingState: boolean;
+	isOverLimitUpload: boolean;
 }
 
 export const initialDragAndDropState: DragAndDropState = {
 	loadingStatus: 'not loaded',
 	error: null,
-	draggingState: false
+	draggingState: false,
+	isOverLimitUpload: false
 };
 
 export const dragAndDropSlice = createSlice({
@@ -20,6 +22,9 @@ export const dragAndDropSlice = createSlice({
 	reducers: {
 		setDraggingState: (state, action) => {
 			state.draggingState = action.payload;
+		},
+		setOverLimitUploadState: (state, action) => {
+			state.isOverLimitUpload = action.payload;
 		}
 	}
 });
@@ -32,3 +37,4 @@ export const getDragAndDropState = (rootState: { [DRAG_AND_DROP_FEATURE_KEY]: Dr
 	rootState[DRAG_AND_DROP_FEATURE_KEY];
 
 export const selectDragAndDropState = createSelector(getDragAndDropState, (state) => state.draggingState);
+export const selectOverLimitUploadState = createSelector(getDragAndDropState, (state) => state.isOverLimitUpload);

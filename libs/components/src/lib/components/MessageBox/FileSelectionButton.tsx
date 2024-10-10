@@ -1,5 +1,9 @@
-import { referencesActions, useAppDispatch } from '@mezon/store';
+import { useDragAndDrop } from '@mezon/core';
+import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { processFile } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -9,25 +13,25 @@ export type FileSelectionButtonProps = {
 
 function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdit }: FileSelectionButtonProps) {
 	const dispatch = useAppDispatch();
-
+	const uploadedAttachmentsInChannel = useSelector(selectAttachmentByChannelId(currentChannelId))?.files || [];
+	const { setOverUploadingState } = useDragAndDrop();
 	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			const fileArr = Array.from(e.target.files);
+			if (fileArr.length + uploadedAttachmentsInChannel.length > 10) {
+				setOverUploadingState(true);
+				return;
+			}
+			const updatedFiles = await Promise.all(fileArr.map(processFile<ApiMessageAttachment>));
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					files: fileArr.map((file) => ({
-						filename: file.name,
-						filetype: file.type,
-						size: file.size,
-						url: URL.createObjectURL(file)
-					}))
+					files: updatedFiles
 				})
 			);
-			e.target.value = ''; // Reset the input value after processing
+			e.target.value = '';
 		}
 	};
-
 	return (
 		<label className="pl-2 flex items-center h-11">
 			<input id="preview_img" type="file" onChange={handleChange} className="w-full hidden" multiple />

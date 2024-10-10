@@ -75,13 +75,14 @@ export const referencesSlice = createSlice({
 				return;
 			}
 
-			if (!state.attachmentAfterUpload[channelId]) {
+			if (!state.attachmentAfterUpload[channelId] && files?.length <= 10) {
 				state.attachmentAfterUpload[channelId] = {
 					channelId: channelId,
 					files: files
 				};
 			} else {
-				if (files && files.length > 0) {
+				// eslint-disable-next-line prettier/prettier
+				if (files && files.length > 0 && (state.attachmentAfterUpload[channelId].files.length + files.length <= 10)) {
 					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
 				}
 			}

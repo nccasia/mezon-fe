@@ -2,6 +2,12 @@ import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
+export class CustomFile extends File {
+	url?: string;
+	width?: number;
+	height?: number;
+}
+
 export const isValidUrl = (urlString: string) => {
 	let url;
 	try {
@@ -63,7 +69,7 @@ export async function handleUploadFile(
 	currentClanId: string,
 	currentChannelId: string,
 	filename: string,
-	file: File,
+	file: CustomFile,
 	index?: number
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
@@ -80,7 +86,9 @@ export async function handleUploadFile(
 			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, false, index);
 			const buf = await file?.arrayBuffer();
 
-			resolve(uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename));
+			resolve(
+				uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename, file.width, file.height)
+			);
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -152,7 +160,9 @@ export async function uploadFile(
 	size: number,
 	buf: Buffer,
 	isMobile?: boolean,
-	originalFilename?: string
+	originalFilename?: string,
+	width?: number,
+	height?: number
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
@@ -160,7 +170,9 @@ export async function uploadFile(
 			const data = await client.uploadAttachmentFile(session, {
 				filename: filename,
 				filetype: type,
-				size: size
+				size: size,
+				width,
+				height
 			});
 			if (!data?.url) {
 				reject(new Error('Failed to upload file. URL not available.'));
@@ -176,8 +188,8 @@ export async function uploadFile(
 				url: url,
 				filetype: type,
 				size: size,
-				width: 0,
-				height: 0
+				width,
+				height
 			});
 		} catch (error) {
 			reject(new Error(`${error}`));

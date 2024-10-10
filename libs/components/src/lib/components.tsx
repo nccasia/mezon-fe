@@ -25,6 +25,7 @@ export { default as StreamInfo } from './components/StreamInfo';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
 
+export { default as TooManyUpload } from './components/DragAndDrop/TooManyUpload';
 export { default as ChannelHashtag } from './components/MarkdownFormatText/HashTag';
 export { default as MentionUser } from './components/MarkdownFormatText/MentionUser';
 export { default as MemberList } from './components/MemberList';

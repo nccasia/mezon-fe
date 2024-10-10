@@ -21,12 +21,8 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
 		};
 
 		if (el) {
-			const isTouchDevice = 'ontouchstart' in window || navigator?.maxTouchPoints > 0;
-			if (isTouchDevice) {
-				document.addEventListener('touchstart', listener);
-			} else {
-				document.addEventListener('mousedown', listener);
-			}
+			document.addEventListener('touchstart', listener);
+			document.addEventListener('mousedown', listener);
 		}
 
 		return () => {

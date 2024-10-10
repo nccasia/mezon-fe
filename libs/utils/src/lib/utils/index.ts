@@ -1,4 +1,4 @@
-import { handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
+import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -36,6 +36,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
+export { processFile } from './file';
 export { mergeRefs } from './mergeRefs';
 
 export const convertTimeString = (dateString: string) => {
@@ -681,7 +682,10 @@ export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | nul
 
 			const response = await fetch(file.url);
 			const blob = await response.blob();
-			const createdFile = new File([blob], file.filename ?? 'untitled', { type: file.filetype || 'application/octet-stream' });
+			const createdFile = new CustomFile([blob], file.filename ?? 'untitled', { type: file.filetype || 'application/octet-stream' });
+			createdFile.url = file.url;
+			createdFile.width = file.width || 0;
+			createdFile.height = file.height || 0;
 			return createdFile;
 		})
 	);

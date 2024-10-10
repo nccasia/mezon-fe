@@ -273,31 +273,31 @@ MessageWithUser.Skeleton = () => {
 	return (
 		<div role="status" className="flex items-start space-x-4 p-4 animate-pulse">
 			{/* Avatar Skeleton with animation */}
-			<div className="w-10 h-10 bg-gray-500 rounded-full"></div>
+			<div className="w-10 h-10 dark:bg-gray-500 bg-gray-200 rounded-full"></div>
 
 			{/* Message Content Skeleton with animation */}
 			<div className="flex-1 space-y-4 py-1">
 				{/* Username Skeleton */}
-				<div className="w-1/3 h-4 bg-gray-500 rounded-lg"></div>
+				<div className="w-1/3 h-4 dark:bg-gray-500 bg-gray-200 rounded-lg"></div>
 
 				{/* Text lines Skeleton */}
 				<div className="space-y-2">
 					<div className="w-full flex items-start space-x-2">
-						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
-						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
-						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
-						<div className="h-4 bg-gray-500 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-500 bg-gray-200 rounded-lg w-1/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-500 bg-gray-200 rounded-lg w-2/6"></div>
 					</div>
 					<div className="w-full flex items-start space-x-2">
-						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
-						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
-						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
-						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-500 bg-gray-200 rounded-lg w-1/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-500 bg-gray-200 rounded-lg w-1/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-2/6"></div>
 					</div>
 					<div className="w-5/6 flex items-start space-x-2">
-						<div className="h-4 bg-gray-600 rounded-lg w-3/6"></div>
-						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
-						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-3/6"></div>
+						<div className="h-4 dark:bg-gray-600 bg-gray-300 rounded-lg w-2/6"></div>
+						<div className="h-4 dark:bg-gray-500 bg-gray-200 rounded-lg w-1/6"></div>
 					</div>
 				</div>
 			</div>

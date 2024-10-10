@@ -37,8 +37,8 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				autoPlay={false}
 				className={`object-contain`}
 				style={{
-					width: showControl ? 'auto' : MIN_WIDTH_VIDEO_SHOW,
-					height: showControl ? DEFAULT_HEIGHT_VIDEO_SHOW : `auto`
+					width: 350 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)),
+					height: 350
 				}}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}

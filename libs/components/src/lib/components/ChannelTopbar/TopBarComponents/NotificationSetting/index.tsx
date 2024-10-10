@@ -128,7 +128,7 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px] dark:bg-black bg-white">
 				<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] dark:border-b-[#6A6A6A] border-b-[#E1E1E1] last:border-b-0 last:mb-0 last:pb-0">
-					{getNotificationChannelSelected?.active === undefined || getNotificationChannelSelected?.active === 1 ? (
+					{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
 						<Dropdown
 							trigger="hover"
 							dismissOnClick={false}
@@ -138,7 +138,7 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 										children={nameChildren}
 										subText={mutedUntil}
 										dropdown="change here"
-										onClick={() => muteOrUnMuteChannel(1)}
+										onClick={() => muteOrUnMuteChannel(0)}
 									/>
 								</div>
 							)}

@@ -1,5 +1,5 @@
 import { useAppParams, useGifsStickersEmoji } from '@mezon/core';
-import { selectIdMessageRefReaction } from '@mezon/store';
+import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
@@ -25,6 +25,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 	const { setValueInputSearch } = useGifsStickersEmoji();
 	const [isShowSetting, setIsShowSetting] = useState(false);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -68,7 +69,7 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 			<div
 				onClick={(e) => e.stopPropagation()}
 				className={`w-[370px] max-sm:w-full max-sm:pt-0 max-sm:rounded-none max-sm:mt-[-0.5rem]
-			sbm:w-[500px] max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30
+			${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'sbm:w-[430px]' : 'sbm:w-[500px]'} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30
 			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : isShowEmojiPicker() ? 'min-h-[350px]' : 'min-h-[500px]'}`}
 			>
 				<div className="w-full">
@@ -97,25 +98,36 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 					<InputSearch />
 				</div>
 
-				<div className="w-full min-h-[400px] text-center md:w-[500px]" ref={emojiRefParentDiv}>
+				<div
+					className={`w-full min-h-[400px] text-center ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'md:w-[430px]' : 'md:w-[500px]'}`}
+					ref={emojiRefParentDiv}
+				>
 					{subPanelActive === SubPanelName.GIFS && (
-						<div className="flex h-full pr-1 w-full md:w-[500px]">
+						<div
+							className={`flex h-full pr-1 w-full ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'md:w-[430px]' : 'md:w-[500px]'}`}
+						>
 							<TenorGifCategories activeTab={SubPanelName.EMOJI} channelOrDirect={channelOrDirect} mode={mod} onClose={closePannel} />
 						</div>
 					)}
 
 					{subPanelActive === SubPanelName.STICKERS && (
-						<div className="flex h-full pr-2 w-full md:w-[500px]">
+						<div
+							className={`flex h-full pr-2 w-full ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'md:w-[430px]' : 'md:w-[500px]'}`}
+						>
 							<ImageSquare channel={channelOrDirect} mode={mod} onClose={closePannel} />
 						</div>
 					)}
 					{subPanelActive === SubPanelName.EMOJI && (
-						<div className="flex h-full pr-2 w-full md:w-[500px] sbm:w-[312px]">
+						<div
+							className={`flex h-full pr-2 w-full sbm:w-[312px] ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'md:w-[430px]' : 'md:w-[500px]'}`}
+						>
 							<EmojiPickerComp onClickAddButton={handleOpenSetting} onClose={closePannel} />
 						</div>
 					)}
 					{isShowEmojiPicker() && (
-						<div className="flex h-full pr-2 w-full md:w-[500px]">
+						<div
+							className={`flex h-full pr-2 w-full ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? 'md:w-[430px]' : 'md:w-[500px]'}`}
+						>
 							<EmojiPickerComp
 								mode={mode}
 								messageEmojiId={idMessageRefReaction}

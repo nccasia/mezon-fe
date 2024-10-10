@@ -119,7 +119,7 @@ export type MentionReactInputProps = {
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
 	readonly handlePaste?: any;
-	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
+	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;

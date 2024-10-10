@@ -1,5 +1,5 @@
 export const SCROLL_DEFAULT_OPTIONS: IScrollOptions = {
-	debounce: 100
+	debounce: null
 };
 
 export interface IScrollOptions {
