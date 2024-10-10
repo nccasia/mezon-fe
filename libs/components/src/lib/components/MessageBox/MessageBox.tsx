@@ -35,25 +35,28 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
-	const onConvertToFiles = useCallback((content: string) => {
-		if (content.length > MIN_THRESHOLD_CHARS) {
-			const fileContent = new Blob([content], { type: 'text/plain' });
-			const now = Date.now();
-			const filename = now + '.txt';
-			const file = new File([fileContent], filename, { type: 'text/plain' });
-			dispatch(
-				referencesActions.setAtachmentAfterUpload({
-					channelId: currentChannelId,
-					files: [file].map((file) => ({
-						filename: file.name,
-						filetype: file.type,
-						size: file.size,
-						url: URL.createObjectURL(file)
-					}))
-				})
-			);
-		}
-	}, []);
+	const onConvertToFiles = useCallback(
+		(content: string) => {
+			if (content.length > MIN_THRESHOLD_CHARS) {
+				const fileContent = new Blob([content], { type: 'text/plain' });
+				const now = Date.now();
+				const filename = now + '.txt';
+				const file = new File([fileContent], filename, { type: 'text/plain' });
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannelId,
+						files: [file].map((file) => ({
+							filename: file.name,
+							filetype: file.type,
+							size: file.size,
+							url: URL.createObjectURL(file)
+						}))
+					})
+				);
+			}
+		},
+		[currentChannelId]
+	);
 
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
