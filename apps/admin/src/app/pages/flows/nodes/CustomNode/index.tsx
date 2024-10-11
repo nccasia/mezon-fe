@@ -34,6 +34,7 @@ interface CustomNodeProps {
 		source: IAnchor[];
 		target: IAnchor[];
 	};
+	initialValue?: Record<string, unknown>;
 }
 interface ValidationError {
 	path: string;
@@ -43,7 +44,7 @@ interface ValidatorResult {
 	details: ValidationError[];
 }
 
-const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, label }: CustomNodeProps, ref) => {
+const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, label, initialValue }: CustomNodeProps, ref) => {
 	const { flowDispatch } = useContext(FlowContext);
 	const validator = (model: unknown): ValidatorResult | null => {
 		try {
@@ -127,7 +128,7 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 							</div>
 						);
 					})}
-					<AutoForm model={data.defaultValue} ref={formRef} schema={bridge}></AutoForm>
+					<AutoForm model={data.defaultValue ?? initialValue} ref={formRef} schema={bridge}></AutoForm>
 				</div>
 			</div>
 			<div className="mt-1">

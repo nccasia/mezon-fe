@@ -26,6 +26,9 @@ const NodeTypes = [
 		anchors: {
 			source: [{ id: 'command-input-source-1', text: 'Command Output' }],
 			target: []
+		},
+		initialValue: {
+			commandName: '*'
 		}
 	},
 	{
@@ -46,6 +49,10 @@ const NodeTypes = [
 		anchors: {
 			source: [],
 			target: [{ id: 'command-output-target-1', text: 'Command Input' }]
+		},
+		initialValue: {
+			message: '',
+			image: []
 		}
 	},
 	{
@@ -66,6 +73,10 @@ const NodeTypes = [
 		anchors: {
 			source: [],
 			target: [{ id: 'command-output-target-1', text: 'Command Input' }]
+		},
+		initialValue: {
+			message: '',
+			image: []
 		}
 	},
 	{
@@ -98,6 +109,10 @@ const NodeTypes = [
 		anchors: {
 			source: [{ id: 'api-loader-source-1', text: 'Custom JS Function' }],
 			target: [{ id: 'api-loader-target-1', text: 'Splitter Text' }]
+		},
+		initialValue: {
+			url: '',
+			method: 'GET'
 		}
 	},
 	{
@@ -120,6 +135,11 @@ const NodeTypes = [
 		anchors: {
 			source: [],
 			target: [{ id: 'format-function-target-1', text: 'Api Loader' }]
+		},
+		initialValue: {
+			functionName: '',
+			variable: '',
+			functionBody: ''
 		}
 	}
 ];

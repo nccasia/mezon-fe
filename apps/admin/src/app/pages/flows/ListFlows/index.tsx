@@ -24,10 +24,10 @@ const ListFlow = () => {
 			}
 		};
 		getListFlow();
-	}, [applicationId]);
+	}, [applicationId, flowDispatch]);
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-			{listFlow.map((flow) => (
+			{listFlow?.map((flow) => (
 				<Link
 					to={`/applications/${applicationId}/flow/${flow.id}`}
 					key={flow.id}

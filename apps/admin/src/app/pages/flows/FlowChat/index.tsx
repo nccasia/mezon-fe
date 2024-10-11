@@ -99,7 +99,7 @@ const FlowChatPopup = () => {
 								style={message.type === 'output' ? { fontFamily: 'monospace', whiteSpace: 'pre' } : {}}
 								className="overflow-x-auto [&::-webkit-scrollbar]:[height:3px] [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-200"
 							>
-								{message.message.message}
+								{typeof message.message.message === 'string' ? message.message.message : JSON.stringify(message.message.message)}
 							</div>
 							{message.message?.urlImage && message.message.urlImage?.length > 0 && (
 								<div className="mt-2">

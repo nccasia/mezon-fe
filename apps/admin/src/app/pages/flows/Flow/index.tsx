@@ -80,6 +80,7 @@ const Flow = () => {
 							{...props}
 							schema={item.schema}
 							label={item.label}
+							initialValue={item.initialValue}
 							bridgeSchema={item.bridgeSchema}
 							anchors={item.anchors}
 							ref={(el: HTMLElement | null) => {
@@ -128,14 +129,17 @@ const Flow = () => {
 			toast.info('Flow has not been created yet');
 			return;
 		}
+		flowDispatch(changeLoading(true));
 		try {
 			await flowService.deleteFlow(flowId);
 			toast.success('Delete flow success');
 			navigate(`/applications/${applicationId}/flow`);
 		} catch {
 			toast.error('Delete flow failed');
+		} finally {
+			flowDispatch(changeLoading(false));
 		}
-	}, [flowId, navigate, applicationId]);
+	}, [flowId, flowDispatch, navigate, applicationId]);
 
 	const handleClickSaveFlow = useCallback(async () => {
 		let checkValidate = true;
@@ -237,7 +241,7 @@ const Flow = () => {
 			toast.error('Flow must have at least one connection');
 			return;
 		}
-
+		flowDispatch(changeLoading(true));
 		try {
 			if (flowId) {
 				await flowService.updateFlow({ ...flowDataSave, flowId });
@@ -251,6 +255,8 @@ const Flow = () => {
 			}
 		} catch (error) {
 			toast.error('Save flow failed');
+		} finally {
+			flowDispatch(changeLoading(false));
 		}
 	}, [
 		appDetail?.token,
@@ -258,6 +264,7 @@ const Flow = () => {
 		edges,
 		flowData?.description,
 		flowData?.flowName,
+		flowDispatch,
 		flowId,
 		navigate,
 		nodes,
