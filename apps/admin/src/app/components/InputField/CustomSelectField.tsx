@@ -13,7 +13,6 @@ function CustomSelectField({
 	showInlineError,
 	fieldType,
 	changed,
-	defaultValue,
 	options = [],
 	...props
 }: CustomFormFieldProps) {
@@ -26,7 +25,6 @@ function CustomSelectField({
 				}}
 				value={value || ''}
 				disabled={props.disabled}
-				defaultValue={defaultValue}
 				name={props.name}
 				ref={undefined}
 				required

@@ -29,7 +29,9 @@ const Flows = () => {
 				</div>
 			</div>
 			{flowState.isLoading && (
-				<Spinner className="fixed top-2 left-[48%] z-[1000]" size="xl" color="success" aria-label="Success spinner example" />
+				<div className="fixed top-0 left-0 pt-2 right-0 bottom-0 bg-[#83818169] z-[999] text-center">
+					<Spinner size="xl" color="success" aria-label="Success spinner example" />
+				</div>
 			)}
 			<div className="mt-5 list-flows">
 				<ListFlow />
