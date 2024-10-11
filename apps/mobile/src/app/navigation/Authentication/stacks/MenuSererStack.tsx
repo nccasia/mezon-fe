@@ -9,6 +9,9 @@ import { NotificationOverrides } from '../../../components/ClanNotificationSetti
 import { ClanNotificationSetting as NotificationSettingDetail } from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
 import { ClanSetting } from '../../../components/ClanSettings';
 import { ClanEmojiSetting } from '../../../components/ClanSettings/Emoji';
+import { Integrations } from '../../../components/ClanSettings/Integrations';
+import { Webhooks } from '../../../components/ClanSettings/Integrations/Webhooks';
+import { WebhooksEdit } from '../../../components/ClanSettings/Integrations/Webhooks/WebhooksEdit';
 import { MemberSetting } from '../../../components/ClanSettings/Member';
 import { ClanOverviewSetting } from '../../../components/ClanSettings/Overview';
 import { StickerSetting } from '../../../components/ClanSettings/Sticker';
@@ -202,6 +205,21 @@ export const MenuClanStacks = () => {
 					headerTitle: t('menuClanStack.notificationSetting')
 				}}
 			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.INTEGRATIONS}
+				component={Integrations}
+				options={{
+					headerTitle: t('menuClanStack.integrations')
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.WEBHOOKS}
+				component={Webhooks}
+				options={{
+					headerTitle: t('menuClanStack.webhooks')
+				}}
+			/>
+			<Stack.Screen name={APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT} component={WebhooksEdit} />
 		</Stack.Navigator>
 	);
 };

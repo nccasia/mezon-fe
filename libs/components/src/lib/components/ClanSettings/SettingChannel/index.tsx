@@ -184,7 +184,7 @@ const ItemInfor = ({
 
 				<Tooltip content={'Copy Channel Id'} placement="left">
 					<div
-						className=" overflow-hidden flex w-12 items-center justify-center rounded-full aspect-square hover:bg-bgHover"
+						className=" overflow-hidden flex w-6 items-center justify-center rounded-full aspect-square hover:bg-bgHover"
 						onClick={handleCopyChannelId}
 					>
 						<Icons.CopyIcon />

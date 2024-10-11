@@ -109,7 +109,7 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 							<RenderImageChat
 								disable={checkImage}
 								image={image}
-								images={images}
+								isMultiple={images?.length >= 2}
 								key={`${image?.url}_${index}`}
 								onPress={onPressImage}
 								onLongPress={onLongPressImage}
@@ -119,7 +119,7 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 				{remainingImagesCount > 0 && (
 					<View>
 						<RenderImageChat
-							images={images}
+							isMultiple={images?.length >= 2}
 							remainingImagesCount={remainingImagesCount}
 							image={images[3]}
 							onPress={onPressImage}

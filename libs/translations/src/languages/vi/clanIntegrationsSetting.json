@@ -1,0 +1,32 @@
+{
+  "integration": {
+    "title": "Webhooks",
+    "automatedMessage": "Tin nhắn và cập nhật tự động"
+  },
+  "webhooks": {
+    "description": "Webhooks là một cách dễ dàng để nhận tin nhắn tự động và cập nhật dữ liệu được gửi đến kênh văn bản trong máy chủ bằng phép thuật Internet.",
+    "learnMore": "Tìm hiểu thêm."
+  },
+  "webhooksEdit": {
+    "title": "Chỉnh sửa Webhooks",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "channel": "Kênh",
+    "recommendImage": "Chúng tôi khuyên bạn nên sử dụng hình ảnh có kích thước tối thiểu 128x128",
+    "webhookURL": "URL Webhook",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "delete": "Xóa",
+    "selectAChannel": "Chọn một kênh",
+    "yes": "Có",
+    "deleteCaptionHook": "Xóa Tiêu đề Hook",
+    "deleteWebhookConfirmation": "Bạn có chắc chắn muốn xóa webhook {{webhookName}}? Hành động này không thể hoàn tác."
+  },
+  "webhooksEmpty": {
+    "noWebhooks": "KHÔNG CÓ WEBHOOKS",
+    "webhooksEmptyDes": "Hiện tại, webhooks chỉ có thể được tạo trên web hoặc desktop."
+  },
+  "webhooksItem": {
+    "createdBy": "Được tạo vào {{webhookCreateTime}} bởi {{webhookUserOwnerName}}"
+  }
+}

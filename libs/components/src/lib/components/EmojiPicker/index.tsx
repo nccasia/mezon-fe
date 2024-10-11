@@ -6,7 +6,7 @@ import {
 	selectChannelById,
 	selectCurrentChannel,
 	selectDirectById,
-	selectMessageByMessageId,
+	selectMessageByMessageIdAndChannelId,
 	selectModeResponsive,
 	selectReactionPlaceActive,
 	selectTheme,
@@ -28,8 +28,10 @@ export type EmojiCustomPanelOptions = {
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
-
-	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
+	const currentChannel = useSelector(selectCurrentChannel);
+	const messageEmoji = useSelector(
+		selectMessageByMessageIdAndChannelId({ messageId: props.messageEmojiId ?? '', channelId: currentChannel?.channel_id })
+	);
 	const { categoryEmoji, categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -79,7 +81,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
-	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const { directId } = useAppParams();
 	const [channelID, setChannelID] = useState('');

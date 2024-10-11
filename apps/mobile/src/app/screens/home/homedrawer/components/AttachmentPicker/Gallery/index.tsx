@@ -195,7 +195,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				type: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
 				size: size,
 				name,
-				fileData: filePath
+				fileData: filePath,
+				width: image?.width,
+				height: image?.height
 			};
 
 			onPickGallery(fileFormat);
@@ -223,7 +225,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					name: file?.fileName,
 					type: file?.type,
 					size: file?.fileSize,
-					fileData: file?.uri
+					fileData: file?.uri,
+					width: file?.width,
+					height: file?.height
 				};
 
 				onPickGallery(fileFormat);

@@ -741,6 +741,8 @@ export async function getMobileUploadedAttachments(payload: {
 				type: att?.filetype,
 				uri: att?.url,
 				size: att?.size,
+				height: att?.height,
+				width: att?.width,
 				fileData
 			};
 			return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);

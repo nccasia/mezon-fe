@@ -20,8 +20,18 @@ function formatFileSize(bytes: number) {
 }
 
 function MessageLinkFile({ attachmentData, mode }: MessageImage) {
-	const handleDownload = () => {
-		window.open(attachmentData.url);
+	const handleDownload = async () => {
+		// window.open(attachmentData.);
+		const response = await fetch(attachmentData.url as string);
+		if (!response.ok) {
+			return;
+		}
+		const blob = await response.blob();
+		const dataUrl = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = dataUrl;
+		a.download = attachmentData.filename as string;
+		a.click();
 	};
 	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
 

@@ -17,7 +17,7 @@ import {
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
-	selectMessageByMessageId,
+	selectMessageByMessageIdAndChannelId,
 	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
@@ -78,14 +78,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const messageParent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
-	const message = useSelector(selectMessageByMessageId(messageId));
+	const message = useSelector(selectMessageByMessageIdAndChannelId({ messageId: messageId, channelId: currentChannel?.id }));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDm = useSelector(selectDmGroupCurrent(currentDmId || ''));
 	const modeResponsive = useSelector(selectModeResponsive);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
-	const currentMessage = useAppSelector(selectMessageByMessageId(messageId));
+	const currentMessage = useAppSelector(selectMessageByMessageIdAndChannelId({ messageId: messageId, channelId: currentChannel?.id }));
 	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();

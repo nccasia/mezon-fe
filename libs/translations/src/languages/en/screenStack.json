@@ -12,7 +12,10 @@
         "eventCreator": "Create Event",
         "serverRoles": "Clan Roles",
         "notificationSetting": "Notification settings",
-        "newOverride": "New Override"
+        "newOverride": "New Override",
+        "webhooks": "Webhooks",
+        "integrations": "Integrations",
+        "webhooksEdit": "Webhooks Edit"
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings",

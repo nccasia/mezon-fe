@@ -9,6 +9,7 @@ import channelMenu from './channelMenu.json';
 import channelSetting from './channelSetting.json';
 import clan from './clan.json';
 import clanEmojiSetting from './clanEmojiSetting.json';
+import clanIntegrationsSetting from './clanIntegrationsSetting.json';
 import clanMenu from './clanMenu.json';
 import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
@@ -40,7 +41,6 @@ import setting from './setting.json';
 import streamingRoom from './streamingRoom.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
-
 export default {
 	inviteToChannel,
 	notification,
@@ -83,5 +83,6 @@ export default {
 	clanStickerSetting,
 	menuCustomDM,
 	linkMessageInvite,
-	streamingRoom
+	streamingRoom,
+	clanIntegrationsSetting
 };

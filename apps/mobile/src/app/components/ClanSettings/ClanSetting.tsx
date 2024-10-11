@@ -66,12 +66,15 @@ export function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSetti
 		// 	expandable: true,
 		// 	icon: <Icons.ChannelListIcon color={themeValue.text} />,
 		// },
-		// {
-		// 	title: t('menu.settings.integrations'),
-		// 	onPress: () => reserve(),
-		// 	expandable: true,
-		// 	icon: <Icons.GameControllerIcon color={themeValue.text} />,
-		// },
+		{
+			title: t('menu.settings.integrations'),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.INTEGRATIONS);
+			},
+			expandable: true,
+			icon: <Icons.GameControllerIcon color={themeValue.text} />,
+			isShow: hasAdminPermission
+		},
 		{
 			title: t('menu.settings.emoji'),
 			onPress: () => {
@@ -87,13 +90,13 @@ export function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSetti
 			},
 			expandable: true,
 			icon: <Icons.Sticker color={themeValue.text} />
-		},
-		{
-			title: t('menu.settings.webhooks'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.WebhookIcon color={themeValue.text} />
 		}
+		// {
+		// 	title: t('menu.settings.webhooks'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.WebhookIcon color={themeValue.text} />
+		// }
 		// {
 		// 	title: t('menu.settings.security'),
 		// 	onPress: () => reserve(),

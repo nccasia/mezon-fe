@@ -46,10 +46,8 @@ const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBotto
 			enableDynamicSizing={heightFitContent}
 			handleIndicatorStyle={styles.handleIndicator}
 		>
-			<BottomSheetScrollView>
-				{renderHeader()}
-				{children}
-			</BottomSheetScrollView>
+			{renderHeader()}
+			<BottomSheetScrollView>{children}</BottomSheetScrollView>
 		</OriginalBottomSheet>
 	);
 });

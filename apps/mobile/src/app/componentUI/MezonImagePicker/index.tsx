@@ -18,6 +18,8 @@ export interface IFile {
 	type: string;
 	size: number | string;
 	fileData: any;
+	height?: number;
+	width?: number;
 }
 
 interface IMezonImagePickerProps {

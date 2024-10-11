@@ -119,7 +119,7 @@ export async function handleUploadFileMobile(
 					return;
 				}
 				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
-				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename));
+				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename, file?.width, file?.height));
 			}
 		} catch (error) {
 			console.log('handleUploadFileMobile Error: ', error);

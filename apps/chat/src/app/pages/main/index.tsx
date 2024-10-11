@@ -74,7 +74,7 @@ function MyApp() {
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
 	const { toMembersPage } = useAppNavigation();
-	const { currentURL } = useAppParams();
+	const { currentURL, directId } = useAppParams();
 	const memberPath = toMembersPage(currentClanId || '');
 
 	useEffect(() => {
@@ -132,11 +132,11 @@ function MyApp() {
 				event.preventDefault();
 				openSearchModal();
 			}
-			if (event[prefixKey] && event.shiftKey && event.key === 'Enter') {
+			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
 				dispatch(accountActions.setAnonymousMode());
 			}
 		},
-		[openSearchModal]
+		[openSearchModal, currentURL]
 	);
 
 	useEffect(() => {

@@ -1,5 +1,5 @@
 name: Deploy Mezon FE Prod
-on: 
+on:
   release:
     types: [published]
 
@@ -24,15 +24,13 @@ jobs:
       - name: Build
         run: |
           echo "Build"
-          rm apps/chat/.env
-          mv apps/chat/prod.env apps/chat/.env
           yarn build:chat
       - name: Compress build artifact
         run: |
           echo "Compress Artifact"
           cd ./dist/apps/chat/
           zip -r mezon-fe-prod.zip *
-      
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -57,7 +55,7 @@ jobs:
         with:
           name: mezon-fe-prod
           path: /var/www/mezon-fe/
-        
+
       - name: Extract and check files
         run: |
           cd /var/www/mezon-fe/

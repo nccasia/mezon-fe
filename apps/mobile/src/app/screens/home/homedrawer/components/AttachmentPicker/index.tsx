@@ -90,7 +90,9 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 						filename: file.name,
 						url: file.uri,
 						filetype: file.type,
-						size: file.size as number
+						size: file.size as number,
+						width: file?.width,
+						height: file?.height
 					}
 				]
 			})

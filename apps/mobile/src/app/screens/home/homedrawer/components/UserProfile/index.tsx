@@ -63,7 +63,7 @@ const UserProfile = React.memo(
 		}, [userById]);
 
 		const targetUser = useMemo(() => {
-			return allUser.find((targetUser) => [user?.id, userId].includes(targetUser?.user?.id));
+			return allUser?.find?.((targetUser) => [user?.id, userId].includes(targetUser?.user?.id));
 		}, [user?.id, userId, allUser]);
 
 		const userRolesClan = useMemo(() => {
@@ -78,7 +78,7 @@ const UserProfile = React.memo(
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
-				const directMessage = listDM.find((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
+				const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
 				if (directMessage?.id) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,

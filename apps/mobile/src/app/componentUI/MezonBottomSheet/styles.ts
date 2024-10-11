@@ -1,4 +1,4 @@
-import { Attributes, Fonts } from '@mezon/mobile-ui';
+import { Attributes, Fonts, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -8,11 +8,10 @@ export const style = (colors: Attributes) =>
 		},
 
 		header: {
-			display: 'flex',
-			flex: 1,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			alignItems: 'center'
+			alignItems: 'center',
+			paddingBottom: size.s_10
 		},
 
 		section: {

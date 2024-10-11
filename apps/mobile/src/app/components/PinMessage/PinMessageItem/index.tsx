@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { PinMessageEntity, selectMessageByMessageId } from '@mezon/store-mobile';
+import { PinMessageEntity, selectMessageByMessageIdAndChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -19,7 +19,10 @@ interface IPinMessageItemProps {
 const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const message = useSelector(selectMessageByMessageId(pinMessageItem?.message_id as string)) || {};
+	const message =
+		useSelector(
+			selectMessageByMessageIdAndChannelId({ messageId: pinMessageItem?.message_id as string, channelId: pinMessageItem?.channel_id })
+		) || {};
 	return (
 		<View style={styles.pinMessageItemWrapper}>
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>

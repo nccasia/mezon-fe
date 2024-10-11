@@ -52,11 +52,11 @@ const StreamInfo = () => {
 						<Icons.NetworkStatus defaultSize="w-4 h-4 dark:text-channelTextLabel" />
 						<div className="text-green-700 font-bold text-base">Stream Connected</div>
 					</div>
-					<div onClick={handleClick}>
+					<button className="w-fit" onClick={handleClick}>
 						<div className="hover:underline font-medium dark:text-channelTextLabel text-colorTextLightMode text-xs dark:text-contentSecondary">
 							{streamAddress && streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>
-					</div>
+					</button>
 				</div>
 				<button
 					className="opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hover:rounded-md p-1"

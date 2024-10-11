@@ -4,6 +4,7 @@ import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { StackScreenProps } from '@react-navigation/stack';
+import { ApiWebhook } from 'mezon-js/api.gen';
 
 export const APP_SCREEN = {
 	UN_AUTHORIZE: 'UN_AUTHORIZE',
@@ -77,7 +78,10 @@ export const APP_SCREEN = {
 		NOTIFICATION_SETTING: 'ROUTES.MENU_CLAN.NOTIFICATION_SETTING',
 		NOTIFICATION_OVERRIDES: 'ROUTES.MENU_CLAN.NOTIFICATION_OVERRIDES',
 		NOTIFICATION_SETTING_DETAIL: 'ROUTES.MENU_CLAN.NOTIFICATION_SETTING_DETAIL',
-		CATEGORY_SETTING: 'ROUTES.MENU_CLAN.CATEGORY_SETTING'
+		CATEGORY_SETTING: 'ROUTES.MENU_CLAN.CATEGORY_SETTING',
+		INTEGRATIONS: 'INTEGRATIONS',
+		WEBHOOKS: 'WEBHOOKS',
+		WEBHOOKS_EDIT: 'WEBHOOKS_EDIT'
 	},
 
 	MENU_CHANNEL: {
@@ -209,6 +213,11 @@ type MenuClanStackParamList = {
 	};
 	[APP_SCREEN.MENU_CLAN.CATEGORY_SETTING]: {
 		categoryId: string;
+	};
+	[APP_SCREEN.MENU_CLAN.INTEGRATIONS]: undefined;
+	[APP_SCREEN.MENU_CLAN.WEBHOOKS]: undefined;
+	[APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT]: {
+		webhook: ApiWebhook;
 	};
 };
 

@@ -8,6 +8,7 @@ import { default as channelCreator, default as channelMenu } from './channelCrea
 import channelSetting from './channelSetting.json';
 import clan from './clan.json';
 import clanEmojiSetting from './clanEmojiSetting.json';
+import clanIntegrationsSetting from './clanIntegrationsSetting.json';
 import clanMenu from './clanMenu.json';
 import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
@@ -82,5 +83,6 @@ export default {
 	clanStickerSettings,
 	menuCustomDM,
 	linkMessageInvite,
-	streamingRoom
+	streamingRoom,
+	clanIntegrationsSetting
 };

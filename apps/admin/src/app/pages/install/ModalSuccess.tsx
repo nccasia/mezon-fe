@@ -17,7 +17,7 @@ const ModalSuccess = (props: ModalSuccessProps) => {
 	const { toClanPage } = useAppNavigation();
 	const navigate = useNavigate();
 	const handleNavigate = () => {
-		navigate(toClanPage(clan?.clanId || ''));
+		window.location.href = `${process.env.NX_CHAT_APP_REDIRECT_URI}${toClanPage(clan?.clanId || '')}`;
 	};
 
 	const appearanceTheme = useSelector(selectTheme);

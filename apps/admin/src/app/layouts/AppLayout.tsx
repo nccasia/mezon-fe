@@ -2,15 +2,17 @@ import { ToastController } from '@mezon/components';
 import { MezonUiProvider } from '@mezon/ui';
 import { Outlet } from 'react-router-dom';
 import { AppearanceProvider } from '../context/AppearanceContext';
-const theme = 'dark';
+import FlowProvider from '../context/FlowContext';
 const AppLayout = () => {
 	return (
 		<MezonUiProvider>
 			<AppearanceProvider>
-				<div id="app-layout">
-					<ToastController />
-					<Outlet />
-				</div>
+				<FlowProvider>
+					<div id="app-layout">
+						<ToastController />
+						<Outlet />
+					</div>
+				</FlowProvider>
 			</AppearanceProvider>
 		</MezonUiProvider>
 	);

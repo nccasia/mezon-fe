@@ -40,7 +40,7 @@ import {
 	selectCurrentStreamInfo,
 	selectDirectById,
 	selectDmGroupCurrentId,
-	selectMessageByMessageId,
+	selectMessageByMessageIdAndChannelId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -749,7 +749,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
-	const messageCoffee = useSelector(selectMessageByMessageId(messageIdCoffee ?? ''));
+	const messageCoffee = useSelector(selectMessageByMessageIdAndChannelId({ messageId: messageIdCoffee ?? '', channelId: channelId }));
 	const channelCoffee = useAppSelector(selectChannelById(channelIdCoffee));
 	const directCoffee = useAppSelector((state) => selectDirectById(state, channelIdCoffee));
 	const parentChannelCoffee = useAppSelector(selectChannelById(channelCoffee?.parrent_id ?? ''));

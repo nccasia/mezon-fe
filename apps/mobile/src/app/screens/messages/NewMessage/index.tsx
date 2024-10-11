@@ -50,7 +50,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 
 	const directMessageWithUser = useCallback(
 		async (userId: string) => {
-			const directMessage = listDM.find((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
+			const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
 			if (directMessage?.id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,

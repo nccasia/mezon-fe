@@ -211,7 +211,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			<div
 				onContextMenu={handleMouseClick}
 				role="button"
-				className={`relative group ${(!channel.is_mute && isUnReadChannel && isNotVoiceOrAppChannel) || (numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+				className={`relative group ${(!channel.is_mute && isUnReadChannel && isNotVoiceOrAppChannel) || (!channel.is_mute && numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>
 				{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 					<span
@@ -261,7 +261,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
 							</div>
 							<p
-								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(isActive && isNotVoiceOrAppChannel) || (!channel.is_mute && isUnReadChannel && isNotVoiceOrAppChannel) || (numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(isActive && isNotVoiceOrAppChannel) || (!channel.is_mute && isUnReadChannel && isNotVoiceOrAppChannel) || (!channel.is_mute && numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 								title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 							>
 								{channel.channel_label && channel?.channel_label.length > 20

@@ -1,0 +1,32 @@
+{
+  "integration": {
+    "title": "Webhooks",
+    "automatedMessage":"Automated messages and updates"
+  },
+  "webhooks": {
+    "description":"Webhooks are an easy way to get automated messages and data updates sent to text channel in the server using internet magic.",
+    "learnMore":"Learn more."
+  },
+  "webhooksEdit": {
+    "title": "Webhooks Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "channel": "Channel",
+    "recommendImage": "We recommend an image of at least 128x128",
+    "webhookURL":"Webhook URL",
+    "copy":"Copy",
+    "copied":"Copied",
+    "delete": "Delete",
+    "selectAChannel":"select a channel",
+    "yes":"Yes",
+    "deleteCaptionHook":"Delete Caption Hook",
+    "deleteWebhookConfirmation": "Are you sure you want to delete the {{webhookName}} webhook? This action cannot be undone."
+  },
+  "webhooksEmpty": {
+    "noWebhooks":"NO WEBHOOKS",
+    "webhooksEmptyDes": "For now, webhooks can only be created on web or desktop"
+  },
+  "webhooksItem": {
+    "createdBy": "Created on {{webhookCreateTime}} by {{webhookUserOwnerName}}"
+  }
+}

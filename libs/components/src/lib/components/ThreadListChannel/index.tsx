@@ -57,26 +57,25 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 		return allChannelMetaEntities[threadId].lastSeenTimestamp < allChannelMetaEntities[threadId].lastSentTimestamp;
 	};
 
+	const filteredThreads = threads.filter((thread) => {
+		return !isCollapsed ? thread?.active === 1 : isShowThread(thread);
+	});
+
 	return (
 		<div className="flex flex-col ml-6">
-			{threads
-				.filter((thread) => {
-					if (!isCollapsed) return thread?.active === 1;
-					return isShowThread(thread);
-				})
-				.map((thread) => {
-					const isFirstThread = threads.indexOf(thread) === 0;
-					return (
-						<ThreadLink
-							ref={(node) => (threadLinkRefs.current[thread.id] = node)}
-							isActive={currentChannelId === thread.id}
-							key={thread.id}
-							thread={thread}
-							isFirstThread={isFirstThread}
-							handleClick={handleClickLink}
-						/>
-					);
-				})}
+			{filteredThreads.map((thread) => {
+				const isFirstThread = filteredThreads.indexOf(thread) === 0;
+				return (
+					<ThreadLink
+						ref={(node) => (threadLinkRefs.current[thread.id] = node)}
+						isActive={currentChannelId === thread.id}
+						key={thread.id}
+						thread={thread}
+						isFirstThread={isFirstThread}
+						handleClick={handleClickLink}
+					/>
+				);
+			})}
 		</div>
 	);
 });

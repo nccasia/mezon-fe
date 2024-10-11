@@ -26,7 +26,7 @@ export const style = (colors: Attributes) =>
 		btnDescription: {
 			marginTop: Metrics.size.s,
 			color: colors.text,
-			fontSize: Fonts.size.tiny
+			fontSize: Fonts.size.small
 		},
 
 		btnTitleWrapper: {

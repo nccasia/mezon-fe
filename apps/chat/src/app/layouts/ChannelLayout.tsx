@@ -35,7 +35,7 @@ const ChannelLayout = () => {
 	}
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
+		<div className="z-0 flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
 			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (

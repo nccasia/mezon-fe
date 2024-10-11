@@ -1047,14 +1047,28 @@ export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) 
 	return +aid - +bid;
 }
 
-export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
-	let res: Record<string, MessagesEntity> = {};
-	Object.values(messageState.channelMessages || {}).forEach((item) => {
-		res = { ...res, ...item.entities };
-	});
+// old function
+// export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
+// 	let res: Record<string, MessagesEntity> = {};
+// 	Object.values(messageState.channelMessages || {}).forEach((item) => {
+// 		res = { ...res, ...item.entities };
+// 	});
+//
+// 	return res;
+// });
 
-	return res;
-});
+export const selectMessagesEntities = (channelId?: string) =>
+	createSelector(getMessagesState, (messageState) => {
+		if (channelId) {
+			return messageState.channelMessages?.[channelId]?.entities;
+		}
+		let res: Record<string, MessagesEntity> = {};
+		Object.values(messageState.channelMessages || {}).forEach((item) => {
+			res = { ...res, ...item.entities };
+		});
+
+		return res;
+	});
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
@@ -1117,9 +1131,15 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 		return param[channelId]?.lastLoadMessageId;
 	});
 
-export const selectMessageByMessageId = (messageId: string) =>
-	createSelector(selectMessagesEntities, (messageEntities) => {
-		return messageEntities[messageId];
+// old function
+// export const selectMessageByMessageId = (messageId: string) =>
+// 	createSelector(selectMessagesEntities, (messageEntities) => {
+// 		return messageEntities[messageId];
+// 	});
+
+export const selectMessageByMessageIdAndChannelId = ({ messageId, channelId }: { messageId: string; channelId?: string }) =>
+	createSelector(selectMessagesEntities(channelId), (messageEntities) => {
+		return messageEntities?.[messageId];
 	});
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);

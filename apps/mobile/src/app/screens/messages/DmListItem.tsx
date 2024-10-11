@@ -58,7 +58,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		if (!content) return null;
 		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
-		const lastMessageSender = otherMemberList.find((it) => it.userId === directMessage?.last_sent_message?.sender_id);
+		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 		const isUnread = Boolean(lastMessageSender) && isUnReadChannel;
 
 		if (!text) {
