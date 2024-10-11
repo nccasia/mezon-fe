@@ -48,7 +48,6 @@ const ExampleFlow: IExampleFlow[] = [
 						}
 					],
 					data: {
-						label: undefined,
 						id: ''
 					},
 					selected: false
@@ -63,7 +62,7 @@ const ExampleFlow: IExampleFlow[] = [
 						{
 							nodeId: '1f076ab8-034a-4f3c-b8e3-963c269e9586',
 							parameterKey: 'message',
-							parameterValue: 'hello, this is an example flow',
+							parameterValue: 'hello, this is an example command flow example',
 							id: '69206788-5bc9-4fc4-9873-1d2163ea198c'
 						},
 						{
@@ -75,7 +74,6 @@ const ExampleFlow: IExampleFlow[] = [
 						}
 					],
 					data: {
-						label: undefined,
 						id: ''
 					},
 					selected: false
@@ -85,7 +83,7 @@ const ExampleFlow: IExampleFlow[] = [
 		message: {
 			input: '*example command flow',
 			output: {
-				message: 'hello, this is an example flow',
+				message: 'hello, this is an example command flow example',
 				image: [
 					'https://cdn.mezon.vn/0/0/1831890355411226600/932_undefinedtin_tuc_3.jpg',
 					'https://cdn.mezon.vn/0/0/1831890355411226600/634_undefinedtin_tuc_4.jpg',
@@ -138,7 +136,6 @@ const ExampleFlow: IExampleFlow[] = [
 						}
 					],
 					data: {
-						label: undefined,
 						id: ''
 					},
 					selected: false
@@ -164,7 +161,6 @@ const ExampleFlow: IExampleFlow[] = [
 						}
 					],
 					data: {
-						label: undefined,
 						id: ''
 					},
 					selected: false
@@ -197,7 +193,6 @@ const ExampleFlow: IExampleFlow[] = [
 						}
 					],
 					data: {
-						label: undefined,
 						id: ''
 					},
 					selected: false

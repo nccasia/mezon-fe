@@ -29,6 +29,7 @@ const FlowChatPopup = () => {
 		setMessages([...messages, { message: { message: input, urlImage: undefined }, type: 'input' }]);
 		setInput('');
 		try {
+			// check if message is into an example flow, return output message of that flow.
 			const checkMessageIsIntoExampleFlow = ExampleFlow.find((flow) => flow.message.input === input?.trim());
 			if (checkMessageIsIntoExampleFlow) {
 				setMessages((prev) => [
@@ -63,12 +64,14 @@ const FlowChatPopup = () => {
 		}
 	};
 	const scrollToBottom = () => {
+		// scroll to bottom of chat
 		if (messagesEndRef.current) {
 			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
 		}
 	};
 
 	useEffect(() => {
+		// scroll to bottom of chat when new message is added
 		if (messages.length > 0) {
 			setTimeout(() => {
 				scrollToBottom();
@@ -79,11 +82,7 @@ const FlowChatPopup = () => {
 		<div className="text-sm text-gray-500 dark:text-gray-200 max-w-[350px] w-[95vw]">
 			<div className="flex items-center gap-2 p-2  bg-gray-200 dark:bg-gray-600">
 				<div className="w-[40px] h-[40px]">
-					<img
-						alt="avt"
-						src="https://st3.depositphotos.com/8950810/17657/v/1600/depositphotos_176577870-stock-illustration-cute-smiling-funny-robot-chat.jpg"
-						className="w-[40px] h-[40px] rounded-full"
-					/>
+					<img alt="avt" src="../../../../assets/robot.png" className="w-[40px] h-[40px] rounded-full" />
 				</div>
 				<div>
 					<span>Hi there! How can I help?</span>
@@ -103,9 +102,9 @@ const FlowChatPopup = () => {
 								{message.message.message}
 							</div>
 							{message.message?.urlImage && message.message.urlImage?.length > 0 && (
-								<div className="">
+								<div className="mt-2">
 									{message.message.urlImage?.map((img, index) => (
-										<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] rounded-lg mb-1">
+										<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] dark:bg-[#83818169] rounded-lg mb-1">
 											<img src={img} alt="img" className="max-w-[100%] object-cover rounded-md" />
 										</div>
 									))}

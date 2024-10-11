@@ -63,3 +63,9 @@ export const changeOpenModalNodeDetail = (open: boolean): FlowActionType => {
 		payload: open
 	};
 };
+export const changeLoading = (loading: boolean): FlowActionType => {
+	return {
+		type: FLOW_ACTION_TYPE.CHANGE_LOADING,
+		payload: loading
+	};
+};

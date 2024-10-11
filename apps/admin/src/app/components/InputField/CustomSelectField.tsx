@@ -21,7 +21,6 @@ function CustomSelectField({
 		<div className="ImageField mt-2">
 			{label && <label className="block text-sm">{label}</label>}
 			<Select
-				className=""
 				onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
 					onChange(event.target.value);
 				}}
@@ -31,9 +30,10 @@ function CustomSelectField({
 				name={props.name}
 				ref={undefined}
 				required
+				style={{ backgroundColor: 'transparent', border: '1px solid #e5e7eb', borderRadius: '0.375rem' }}
 			>
 				{options.map((option, index) => (
-					<option key={index} value={option.value}>
+					<option className="bg-white text-gray-800 dark:bg-gray-700 dark:text-white" key={index} value={option.value}>
 						{option.label}
 					</option>
 				))}

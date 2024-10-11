@@ -11,7 +11,8 @@ export enum FLOW_ACTION_TYPE {
 	COPY_NODE = 'COPY_NODE',
 	CHANGE_NODE_TYPE = 'CHANGE_NODE_TYPE',
 	CHANGE_SELECTED_NODE = 'CHANGE_SELECTED_NODE',
-	CHANGE_OPEN_MODAL_NODE_DETAIL = 'CHANGE_OPEN_MODAL_NODE_DETAIL'
+	CHANGE_OPEN_MODAL_NODE_DETAIL = 'CHANGE_OPEN_MODAL_NODE_DETAIL',
+	CHANGE_LOADING = 'CHANGE_LOADING'
 }
 export interface IFlowState {
 	nodes: Node[];
@@ -19,6 +20,7 @@ export interface IFlowState {
 	nodeType: INodeType;
 	selectedNode: ISelectedNode | null;
 	openModalNodeDetail: boolean;
+	isLoading: boolean;
 }
 export interface FlowActionType {
 	type: FLOW_ACTION_TYPE;

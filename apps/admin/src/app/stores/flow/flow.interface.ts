@@ -23,7 +23,6 @@ export interface INode {
 	nodeType: INodeType;
 	nodeName: string;
 	data: {
-		label?: string;
 		id: string;
 	};
 	parameters: IParameter[];

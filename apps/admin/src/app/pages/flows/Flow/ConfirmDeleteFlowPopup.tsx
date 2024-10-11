@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 const ConfirmDeleteFlowPopup = ({ onConfirm }: { onConfirm: () => void }) => {
 	return (
 		<div className="text-sm text-gray-500 dark:text-gray-400 w-[240px]">
@@ -15,4 +17,4 @@ const ConfirmDeleteFlowPopup = ({ onConfirm }: { onConfirm: () => void }) => {
 	);
 };
 
-export default ConfirmDeleteFlowPopup;
+export default memo(ConfirmDeleteFlowPopup);

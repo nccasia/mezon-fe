@@ -6,7 +6,8 @@ export const initFlowState: IFlowState = {
 	edges: [],
 	nodeType: 'default',
 	selectedNode: null,
-	openModalNodeDetail: false
+	openModalNodeDetail: false,
+	isLoading: false
 };
 
 const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState => {
@@ -20,6 +21,11 @@ const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState 
 			return {
 				...state,
 				nodes: action.payload
+			};
+		case FLOW_ACTION_TYPE.CHANGE_LOADING:
+			return {
+				...state,
+				isLoading: action.payload
 			};
 		case FLOW_ACTION_TYPE.ADD_NODE: {
 			const newNodeId: string = uuidv4();

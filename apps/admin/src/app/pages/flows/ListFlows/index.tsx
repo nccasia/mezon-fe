@@ -1,20 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
+import { changeLoading } from '../../../stores/flow/flow.action';
 import { IFlow } from '../../../stores/flow/flow.interface';
 import ExampleFlow from '../ExampleFlows';
 
 const ListFlow = () => {
 	const { applicationId } = useParams();
 	const [listFlow, setListFlow] = useState<IFlow[]>([]);
+	const { flowDispatch } = useContext(FlowContext);
 	useEffect(() => {
 		const getListFlow = async () => {
+			flowDispatch(changeLoading(true));
 			try {
 				const res: IFlow[] = await flowService.getAllFlowByApplication(applicationId ?? '');
 				setListFlow(res);
 			} catch {
 				toast.error('Get list flow error');
+			} finally {
+				flowDispatch(changeLoading(false));
 			}
 		};
 		getListFlow();

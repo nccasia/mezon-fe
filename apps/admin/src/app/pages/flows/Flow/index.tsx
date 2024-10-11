@@ -16,14 +16,14 @@ import {
 	useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Popover, Tooltip } from 'flowbite-react';
+import { Popover, Spinner, Tooltip } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
-import { addEdge, addNode, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flow/flow.action';
+import { addEdge, addNode, changeLoading, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flow/flow.action';
 import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../stores/flow/flow.interface';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
 import ExampleFlow from '../ExampleFlows';
@@ -123,7 +123,7 @@ const Flow = () => {
 		flowDispatch(setEdgesContext([]));
 		navigate(`/applications/${applicationId}/flow`);
 	};
-	const handleClickDeleteButton = async () => {
+	const handleClickDeleteButton = useCallback(async () => {
 		if (!flowId) {
 			toast.info('Flow has not been created yet');
 			return;
@@ -135,9 +135,9 @@ const Flow = () => {
 		} catch {
 			toast.error('Delete flow failed');
 		}
-	};
+	}, [flowId, navigate, applicationId]);
 
-	const handleClickSaveFlow = async () => {
+	const handleClickSaveFlow = useCallback(async () => {
 		let checkValidate = true;
 		// get data from all nodes
 		const formData: {
@@ -252,7 +252,18 @@ const Flow = () => {
 		} catch (error) {
 			toast.error('Save flow failed');
 		}
-	};
+	}, [
+		appDetail?.token,
+		applicationId,
+		edges,
+		flowData?.description,
+		flowData?.flowName,
+		flowId,
+		navigate,
+		nodes,
+		userProfile?.user?.id,
+		userProfile?.user?.username
+	]);
 	useEffect(() => {
 		// set flow data is empty when flowId is empty
 		if (!flowId) {
@@ -310,7 +321,9 @@ const Flow = () => {
 
 		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
+			flowDispatch(changeLoading(true));
 			try {
+				// check if flow is an example flow, set flow detail from example flow. Otherwise, get flow detail from api
 				if (checkIsExampleFlow) {
 					setFlowDetail(checkIsExampleFlow.flowDetail);
 					setIsExampleFlow(true);
@@ -321,6 +334,8 @@ const Flow = () => {
 				}
 			} catch (error) {
 				toast.error('Get flow detail failed');
+			} finally {
+				flowDispatch(changeLoading(false));
 			}
 		};
 		getDetailFlow();
@@ -418,7 +433,9 @@ const Flow = () => {
 					<Icons.IconChat className="w-6 h-6" />
 				</button>
 			</Popover>
-
+			{flowState.isLoading && (
+				<Spinner className="fixed top-2 left-[48%] z-[1000]" size="xl" color="success" aria-label="Success spinner example" />
+			)}
 			<SaveFlowModal
 				flowData={flowData}
 				changeFlowData={setFlowData}

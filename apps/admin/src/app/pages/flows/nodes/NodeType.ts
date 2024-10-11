@@ -4,6 +4,8 @@ import CustomSelectField from '../../../components/InputField/CustomSelectField'
 import CustomTextField from '../../../components/InputField/CustomTextField';
 import MultiImageUploadField from '../../../components/MultiImageUploadField';
 
+// list of node types with their schema, bridge schema, and anchors. This is used to render the node in the flow editor
+// add more node types in this list
 const NodeTypes = [
 	{
 		type: 'commandInput',

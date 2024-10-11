@@ -1,9 +1,13 @@
+import { Spinner } from 'flowbite-react';
+import { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FlowContext } from '../../context/FlowContext';
 import ListFlow from './ListFlows';
 
 const Flows = () => {
 	const { applicationId } = useParams();
 	const navigate = useNavigate();
+	const { flowState } = useContext(FlowContext);
 	const handleGoToAddFlowPage = () => {
 		navigate(`/applications/${applicationId}/add-flow`);
 	};
@@ -24,6 +28,9 @@ const Flows = () => {
 					</button>
 				</div>
 			</div>
+			{flowState.isLoading && (
+				<Spinner className="fixed top-2 left-[48%] z-[1000]" size="xl" color="success" aria-label="Success spinner example" />
+			)}
 			<div className="mt-5 list-flows">
 				<ListFlow />
 			</div>

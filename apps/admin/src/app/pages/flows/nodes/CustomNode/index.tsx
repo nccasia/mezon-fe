@@ -17,7 +17,6 @@ interface IAnchor {
 
 interface CustomNodeProps {
 	data: {
-		label: string;
 		type: string;
 		id: string;
 		defaultValue: {
