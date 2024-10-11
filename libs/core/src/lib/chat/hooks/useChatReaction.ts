@@ -39,10 +39,29 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				saveRecentEmojiMobile(emojiLastest);
 			}
 
+			const clanid = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (clanId ?? '') : '0';
+			console.log('clanid: ', clanid);
+
+			console.log({
+				id,
+				clanid,
+				parentId,
+				channelId,
+				mode,
+				messageId,
+				emoji_id,
+				emoji,
+				count,
+				message_sender_id,
+				action_delete,
+				is_public,
+				is_parent_public
+			});
+
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
-					clanId: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanId : '',
+					clanId: clanid,
 					parentId,
 					channelId,
 					mode,
