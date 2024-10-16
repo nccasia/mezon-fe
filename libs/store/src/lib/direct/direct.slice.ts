@@ -331,3 +331,8 @@ export const selectDirectsOpenlistOrder = createSelector(selectDirectsOpenlist, 
 });
 
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);
+export const selectDirectByUserId = createSelector([selectAllDirectMessages, (state, userId) => userId], (directMessages, userId) => {
+	return directMessages.find((message) => {
+		return Array.isArray(message?.user_id) && message.user_id.includes(userId) && message.type === ChannelType.CHANNEL_TYPE_DM;
+	});
+});

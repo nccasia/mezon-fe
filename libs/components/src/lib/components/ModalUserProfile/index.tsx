@@ -8,9 +8,18 @@ import {
 	useSendInviteMessage,
 	useSettingFooter
 } from '@mezon/core';
-import { selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
+import {
+	directActions,
+	selectAccountCustomStatus,
+	selectAllAccount,
+	selectCurrentUserId,
+	selectDirectByUserId,
+	selectFriendStatus,
+	selectMemberClanByUserId,
+	useAppDispatch
+} from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -81,8 +90,10 @@ const ModalUserProfile = ({
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 	const displayCustomStatus = userID === currentUserId ? currentUserCustomStatus : userCustomStatus;
-
 	const [content, setContent] = useState<string>('');
+	const dispatch = useAppDispatch();
+
+	const foundDirectMessages = useSelector((state) => selectDirectByUserId(state, userID));
 
 	const initOpenModal = {
 		openFriend: false,
@@ -93,13 +104,33 @@ const ModalUserProfile = ({
 	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
 
 	const sendMessage = async (userId: string) => {
-		const response = await createDirectMessageWithUser(userId);
-		if (response.channel_id) {
-			const channelMode = ChannelStreamMode.STREAM_MODE_DM;
-			sendInviteMessage(content, response.channel_id, channelMode);
-			setContent('');
-			const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
-			navigate('/' + directChat);
+		if (foundDirectMessages) {
+			console.log('foundDirectMessages: ', foundDirectMessages);
+			dispatch(directActions.openDirectMessage({ channelId: foundDirectMessages.channel_id as string, clanId: '0' }));
+			const result = await dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: foundDirectMessages.channel_id as string,
+					channelName: '',
+					type: foundDirectMessages?.type as number,
+					noCache: true
+				})
+			);
+			console.log('result: ', result);
+			if (result) {
+				navigate(
+					toDmGroupPageFromMainApp(foundDirectMessages.channel_id as string, foundDirectMessages?.type ?? ChannelType.CHANNEL_TYPE_DM)
+				);
+			}
+		} else {
+			console.log('2');
+			const response = await createDirectMessageWithUser(userId);
+			if (response.channel_id) {
+				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
+				sendInviteMessage(content, response.channel_id, channelMode);
+				setContent('');
+				const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
+				navigate('/' + directChat);
+			}
 		}
 	};
 	const handleContent = (e: React.ChangeEvent<HTMLInputElement>) => {

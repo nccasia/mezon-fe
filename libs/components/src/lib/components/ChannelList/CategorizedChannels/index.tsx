@@ -131,7 +131,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	};
 
 	const isUnreadChannel = (channelId: string) => {
-		console.log(allChannelMetaEntities[channelId], ' ', channelId);
 		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
 
