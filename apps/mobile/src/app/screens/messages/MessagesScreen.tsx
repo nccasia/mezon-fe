@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { sortChannelsByLastActivity } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppState, FlatList, Pressable, Text, TextInput, View } from 'react-native';
@@ -17,20 +17,12 @@ import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DmListItem } from './DmListItem';
 import { style } from './styles';
 
-const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
-	return notSortedArr.sort((a, b) => {
-		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
-		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
-		return timestampB - timestampA;
-	});
-};
-
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
 	const directsOpenList = useSelector(selectDirectsOpenlist);
-	const dmGroupChatList = sortDMItem(directsOpenList);
+	const dmGroupChatList = sortChannelsByLastActivity(directsOpenList);
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);

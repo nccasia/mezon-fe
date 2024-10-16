@@ -22,6 +22,7 @@ import {
 	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
+	IChannel,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
@@ -835,3 +836,11 @@ export function removeUndefinedAndEmpty(obj: Record<string, any[]>) {
 		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
 	);
 }
+
+export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => {
+	return channels.sort((a, b) => {
+		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
+		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
+		return timestampB - timestampA;
+	});
+};

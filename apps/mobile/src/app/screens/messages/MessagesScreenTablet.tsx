@@ -12,7 +12,7 @@ import {
 	selectDmGroupCurrentId,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { sortChannelsByLastActivity } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppState, FlatList, Pressable, Text, TextInput, View } from 'react-native';
@@ -31,21 +31,13 @@ import { DirectMessageDetailTablet } from './DirectMessageDetailTablet';
 import { DmListItem } from './DmListItem';
 import { style } from './styles';
 
-const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
-	return notSortedArr.sort((a, b) => {
-		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
-		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
-		return timestampB - timestampA;
-	});
-};
-
 const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
 	const [searchText, setSearchText] = useState<string>('');
 	const directsOpenList = useSelector(selectDirectsOpenlist);
-	const dmGroupChatList = sortDMItem(directsOpenList);
+	const dmGroupChatList = sortChannelsByLastActivity(directsOpenList);
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
