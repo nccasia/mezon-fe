@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
+import { useAppNavigation, useAppParams } from '@mezon/core';
 import {
 	appActions,
 	selectChannelById,
@@ -28,7 +28,6 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
 	const { toChannelPage, navigate } = useAppNavigation();
-	const { currentChannelId } = useMessageValue();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const hashtagDm = useSelector(selectHashtagDmById(channelHastagId.slice(2, -1)));
 	const hashtagChannel = useSelector(selectChannelById(channelHastagId.slice(2, -1)));
