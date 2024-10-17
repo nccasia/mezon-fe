@@ -174,7 +174,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (query.length === 0) return;
 		const seenIds = new Set();
 		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => emoji.shortname && emoji.shortname.toLowerCase().indexOf(query.toLowerCase()) > -1)
 			.filter((emoji) => {
 				if (emoji.id && !seenIds.has(emoji.id)) {
 					seenIds.add(emoji.id);
