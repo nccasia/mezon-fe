@@ -140,8 +140,7 @@ function MessageWithUser({
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'bg-blue-500': checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#FFDB88] bg-[#FFDB88]': hasIncludeMention },
+		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
