@@ -90,10 +90,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 
-		useEffect(() => {
-			console.log('state: ', state);
-		}, []);
-
 		useImperativeHandle(ref, () => ({
 			scrollIntoView: (options?: ScrollIntoViewOptions) => {
 				channelLinkRef.current?.scrollIntoView(options);
