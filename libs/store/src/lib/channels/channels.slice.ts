@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ApiChannelMessageHeaderWithChannel,
 	checkIsThread,
@@ -25,6 +26,7 @@ import { selectEntiteschannelCategorySetting } from '../notificationSetting/noti
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
+import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
 import { threadsActions } from '../threads/threads.slice';
@@ -127,6 +129,7 @@ export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
 	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
+			thunkAPI.dispatch(reactionActions.removeAll());
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
@@ -662,6 +665,8 @@ export const selectAllChannels = createSelector(getChannelsState, selectAll);
 export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
 
 export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (channelsEntities) => channelsEntities[id] || null);
+
+export const selectChannelById2 = createSelector([selectChannelsEntities, (state, id) => id], (channelsEntities, id) => channelsEntities[id] || null);
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 

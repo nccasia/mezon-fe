@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -170,6 +171,7 @@ export const reactionSlice = createSlice({
 	name: REACTION_FEATURE_KEY,
 	initialState: initialReactionState,
 	reducers: {
+		removeAll: reactionAdapter.removeAll,
 		setEmojiHover(state, action) {
 			state.emojiHover = action.payload;
 		},

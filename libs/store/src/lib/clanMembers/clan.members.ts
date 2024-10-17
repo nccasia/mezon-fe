@@ -154,6 +154,11 @@ export const selectEntitesUserClans = createSelector(getUsersClanState, selectEn
 // with DM group use selector: selectMembeGroupByUserId
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 
+export const selectMemberClanByUserId2 = createSelector(
+	[selectEntitesUserClans, (state, userId: string) => userId],
+	(entities, userId) => entities[userId]
+);
+
 export const selectMemberClanByGoogleId = (googleId: string) =>
 	createSelector(selectAllUserClans, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);

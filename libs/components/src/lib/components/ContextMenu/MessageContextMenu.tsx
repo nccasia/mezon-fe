@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useCallback, useMemo, useState } from 'react';
 
 import { useAppParams, useAuth, usePermissionChecker, useReference, useThreads } from '@mezon/core';
@@ -11,7 +12,6 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllDirectMessages,
-	selectChannelById,
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -76,7 +76,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const messageParent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
