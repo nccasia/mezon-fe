@@ -1,4 +1,5 @@
 import {
+	useAppParams,
 	useChannelMembers,
 	useChannels,
 	useClickUpToEdit,
@@ -152,9 +153,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
+	const { directId, channelId } = useAppParams();
 	const currentDmOrChannelId = useMemo(
 		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
+		[currentChannel?.channel_id, currentDmId, props.mode, directId || channelId]
 	);
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
