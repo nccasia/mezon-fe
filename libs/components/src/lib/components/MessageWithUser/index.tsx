@@ -3,7 +3,9 @@ import {
 	MessagesEntity,
 	selectCurrentChannel,
 	selectDataReferences,
+	selectIdMessageToJump,
 	selectJumpPinMessageId,
+	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	useAppSelector
 } from '@mezon/store';
@@ -87,8 +89,10 @@ function MessageWithUser({
 	const { userId } = useAuth();
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
 	const messageReplyHighlight = dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id;
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, message?.channel_id ?? ''));
 
-	const checkMessageTargetToMoved = false;
+	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
 	const isMeMessage = message.isMe;
@@ -142,8 +146,8 @@ function MessageWithUser({
 		'flex h-15 flex-col w-auto px-3',
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
-		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': (checkMessageIncludeMention || checkJumpPinMessage || checkReplied) && !messageReplyHighlight },
+		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved || checkJumpPinMessage },
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': (checkMessageIncludeMention || checkReplied) && !messageReplyHighlight && !checkJumpPinMessage },
 		{
 			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
 				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
@@ -153,8 +157,8 @@ function MessageWithUser({
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'bg-blue-500': messageReplyHighlight },
-		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'bg-blue-500': messageReplyHighlight || checkMessageTargetToMoved },
+		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied },
 		{
 			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
 				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight

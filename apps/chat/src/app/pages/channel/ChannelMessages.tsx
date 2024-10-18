@@ -133,7 +133,6 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 			const messageRef = listMessageRefs.current[idMessageToJump];
 			if (messageRef) {
 				messageRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				dispatch(messagesActions.setIdMessageToJump(null));
 			}
 		}
 	}, [dispatch, idMessageToJump, isMessageExist, chatScrollRef]);
