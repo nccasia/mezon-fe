@@ -36,7 +36,6 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 			userIds: userIds,
 			clanId: clanId
 		};
-
 		await dispatch(channelUsersActions.addChannelUsers(body));
 		dispatch(
 			channelMetaActions.updateBulkChannelMetadata([
