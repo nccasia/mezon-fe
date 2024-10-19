@@ -53,19 +53,18 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 
 	const addMemberToThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
-			if (currentChannel?.parrent_id === '0' || currentChannel?.parrent_id === '') return;
-			const userIds = uniqueUsers(mentions, membersOfChild, rolesClan);
-			const existingUserIds = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
-			if (existingUserIds.length > 0) {
-				await updateChannelUsers(currentChannel, existingUserIds, currentChannel?.clan_id as string);
+			const userIds = await uniqueUsers(mentions, membersOfChild || [], rolesClan || []);
+			if (!userIds || userIds.length === 0) return;
+			const notExistingUserIds = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
+			if (notExistingUserIds.length > 0 && currentChannel?.clan_id) {
+				await updateChannelUsers(currentChannel, notExistingUserIds, currentChannel.clan_id);
 			}
 		},
-		[dispatch, membersOfChild]
+		[dispatch, membersOfChild, membersOfParent, rolesClan]
 	);
 
 	const joinningToThread = useCallback(
 		async (targetThread: ThreadsEntity | null, user: string[]) => {
-			if (targetThread?.parrent_id === '0' || targetThread?.parrent_id === '') return;
 			await updateChannelUsers(targetThread as ChannelsEntity, user, targetThread?.clan_id as string);
 		},
 		[dispatch]
