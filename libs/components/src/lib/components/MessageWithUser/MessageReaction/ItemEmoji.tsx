@@ -217,9 +217,23 @@ type ItemDetailProps = {
 const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 	({ onMouse, onLeave, userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
 		const strCount = useMemo(() => {
-			const s = ['', 'K', 'M', 'G', 'T', 'P'];
-			const e = Math.floor(Math.log(totalCount) / Math.log(1000));
-			return totalCount / Math.pow(1000, e) + ' ' + s[e];
+			const thresh = 1000;
+
+			if (Math.abs(totalCount) < thresh) {
+				return totalCount;
+			}
+
+			const units = ['K', 'M', 'G', 'T'];
+			let u = -1;
+			const r = 10 ** 1;
+
+			let num = totalCount;
+			do {
+				num /= thresh;
+				++u;
+			} while (Math.round(Math.abs(num) * r) / r >= thresh && u < units.length - 1);
+
+			return num.toFixed(0) + units[u];
 		}, [totalCount]);
 
 		return (
