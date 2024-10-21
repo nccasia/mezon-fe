@@ -73,12 +73,12 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true, '0');
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
 			sessionRef.current = session2;
 
 			return session;
 		},
-		[createSocket]
+		[createSocket, isFromMobile]
 	);
 
 	const authenticateGoogle = useCallback(
@@ -96,12 +96,12 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true, '0');
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
 			sessionRef.current = session2;
 
 			return session;
 		},
-		[createSocket]
+		[createSocket, isFromMobile]
 	);
 
 	const authenticateApple = useCallback(
@@ -119,12 +119,12 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true, '0');
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
 			sessionRef.current = session2;
 
 			return session;
 		},
-		[createSocket]
+		[createSocket, isFromMobile]
 	);
 
 	const logOutMezon = useCallback(async () => {
@@ -171,11 +171,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return newSession;
 			}
 
-			const session2 = await socketRef.current.connect(newSession, true, '0');
+			const session2 = await socketRef.current.connect(newSession, true, isFromMobile ? '1' : '0');
 			sessionRef.current = session2;
 			return newSession;
 		},
-		[clientRef, socketRef]
+		[clientRef, socketRef, isFromMobile]
 	);
 
 	const abortControllerRef = React.useRef<AbortController | null>(null);
