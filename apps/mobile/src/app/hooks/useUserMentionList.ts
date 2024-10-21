@@ -1,19 +1,34 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { useChannelMembers } from '@mezon/core';
-import { ID_MENTION_HERE } from '@mezon/mobile-components';
-import { selectAllRolesClan } from '@mezon/store-mobile';
-import { ChannelMembersEntity, EVERYONE_ROLE_ID, getNameForPrioritize, MentionDataProps } from '@mezon/utils';
+import { ChannelMembersEntity, selectAllRolesClan, selectChannelById, selectRolesByChannelId } from '@mezon/store';
+import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+
 interface UserMentionListProps {
 	channelID: string;
 	channelMode?: number;
 }
+
 function UseMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
 	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
+	const channel = useSelector(selectChannelById(channelID));
+	const channelparrent = useSelector(selectChannelById(channel?.parrent_id || ''));
+	const rolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const filteredRoles = rolesInClan.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	const rolesToUse = useMemo(() => {
+		if (channel?.parrent_id !== '0' && channelparrent?.channel_private === 1) {
+			return rolesChannel;
+		} else {
+			return rolesInClan;
+		}
+	}, [channel?.parrent_id, channelparrent?.channel_private, rolesChannel, rolesInClan]);
+
+	const filteredRoles = useMemo(() => {
+		return rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	}, [rolesToUse]);
 	const newUserMentionList = useMemo(() => {
 		if (!membersOfParent || membersOfParent.length === 0) {
 			return [];
@@ -54,7 +69,7 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [channelMode, filteredRoles, membersOfParent]);
+	}, [channelMode, membersOfParent, rolesToUse]);
 
 	return newUserMentionList;
 }

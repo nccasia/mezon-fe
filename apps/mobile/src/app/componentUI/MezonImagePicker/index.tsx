@@ -59,9 +59,9 @@ export async function handleSelectImage() {
 	});
 
 	if (response.didCancel) {
-		console.log('User cancelled camera');
+		//
 	} else if (response.errorCode) {
-		console.log('Camera Error: ', response.errorMessage);
+		//
 	} else {
 		const file = response.assets[0];
 		return {
