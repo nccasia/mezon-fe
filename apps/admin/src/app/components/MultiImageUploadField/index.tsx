@@ -56,7 +56,7 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 		<div className="MultiImageField mt-2">
 			<label className="block text-sm">Upload Images</label>
 			<div className="my-1 w-full flex flex-col items-center p-2 gap-4 bg-[#f2f3f5] dark:bg-[#2b2d31] border dark:border-[#4d4f52] rounded-md">
-				<input type="file" ref={fileInputRef} hidden onChange={handleChooseFiles} accept="image/*" multiple />
+				<input type="file" ref={fileInputRef} hidden onChange={handleChooseFiles} accept="video/*|image/*" multiple />
 				<div
 					className="relative w-full h-12 cursor-pointer flex justify-center items-center bg-bgLightModeThird dark:bg-[#141416] hover:bg-[#c6ccd2] transition-colors duration-200 rounded-md"
 					onClick={() => fileInputRef.current?.click()}

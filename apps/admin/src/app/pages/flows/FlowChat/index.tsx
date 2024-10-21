@@ -1,6 +1,6 @@
 import { selectAppDetail } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -14,6 +14,9 @@ interface IMessage {
 	};
 	type: 'input' | 'output';
 }
+
+const VideoFileExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv'];
+
 const FlowChatPopup = () => {
 	const { flowId, applicationId } = useParams();
 	const appDetail = useSelector(selectAppDetail);
@@ -70,6 +73,14 @@ const FlowChatPopup = () => {
 		}
 	};
 
+	const checkIsVideo = useCallback((url: string) => {
+		const ext = url.split('.').pop();
+		if (ext && VideoFileExtensions.includes(`.${ext}`)) {
+			return true;
+		}
+		return false;
+	}, []);
+
 	useEffect(() => {
 		// scroll to bottom of chat when new message is added
 		if (messages.length > 0) {
@@ -105,7 +116,13 @@ const FlowChatPopup = () => {
 								<div className="mt-2">
 									{message.message.urlImage?.map((img, index) => (
 										<div key={index} className="p-2 shadow-inner bg-[#ebeaead4] dark:bg-[#83818169] rounded-lg mb-1">
-											<img src={img} alt="img" className="max-w-[100%] object-cover rounded-md" />
+											{checkIsVideo(img) ? (
+												<video controls autoPlay className="w-full rounded-md">
+													<source src={img} type="video/mp4" />
+												</video>
+											) : (
+												<img src={img} alt="img" className="max-w-[100%] object-cover rounded-md" />
+											)}
 										</div>
 									))}
 								</div>

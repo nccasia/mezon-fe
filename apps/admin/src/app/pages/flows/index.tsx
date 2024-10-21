@@ -12,7 +12,7 @@ const Flows = () => {
 		navigate(`/applications/${applicationId}/add-flow`);
 	};
 	return (
-		<div className="">
+		<div className="relative">
 			<div className="flex justify-between items-center">
 				<h4 className="text-xl font-semibold">Chat Flows</h4>
 				<div className="flex gap-2">
@@ -29,7 +29,7 @@ const Flows = () => {
 				</div>
 			</div>
 			{flowState.isLoading && (
-				<div className="fixed top-0 left-0 pt-2 right-0 bottom-0 bg-[#83818169] z-[999] text-center">
+				<div className="absolute top-0 left-0 right-0 bottom-0 z-[999] text-center">
 					<Spinner size="xl" color="success" aria-label="Success spinner example" />
 				</div>
 			)}
