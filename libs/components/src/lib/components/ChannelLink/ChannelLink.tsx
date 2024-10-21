@@ -216,6 +216,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		return (
 			<div
 				onContextMenu={handleMouseClick}
+				id={channel.channel_id}
 				role="button"
 				className={`relative group ${(!channel.is_mute && isUnReadChannel && isNotVoiceOrAppChannel) || (!channel.is_mute && numberNotification && numberNotification > 0 && isNotVoiceOrAppChannel) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>

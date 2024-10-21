@@ -43,7 +43,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 				const store = await getStoreAsync();
 				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
-				console.log('error messageLoaderBackground', error);
+				console.error('error messageLoaderBackground', error);
 			}
 		}
 	};

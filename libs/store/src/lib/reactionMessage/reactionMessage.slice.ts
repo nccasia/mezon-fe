@@ -66,7 +66,7 @@ export const updateReactionMessage = createAsyncThunk(
 		try {
 			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }));
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}

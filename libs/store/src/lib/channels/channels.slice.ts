@@ -11,7 +11,13 @@ import {
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, GetThunkAPI, PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest, ApiMarkAsReadRequest } from 'mezon-js/api.gen';
+import {
+	ApiAddFavoriteChannelRequest,
+	ApiChangeChannelPrivateRequest,
+	ApiChannelDescription,
+	ApiCreateChannelDescRequest,
+	ApiMarkAsReadRequest
+} from 'mezon-js/api.gen';
 import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
@@ -78,6 +84,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
 	threadsNotJoinedByUser: EntityState<ChannelsEntity, string>;
+	favoriteChannels: string[];
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -106,6 +113,15 @@ type JoinChatPayload = {
 	isPublic: boolean;
 };
 
+export interface FetchChannelFavoriteArgs {
+	clanId: string;
+	noCache?: boolean;
+}
+
+export interface RemoveChannelFavoriteArgs {
+	channelId: string;
+	clanId: string;
+}
 export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, channelId, channelType, isPublic }: JoinChatPayload, thunkAPI) => {
 	if (
 		channelType !== ChannelType.CHANNEL_TYPE_TEXT &&
@@ -276,6 +292,60 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 	}
 });
 
+export const fetchListFavoriteChannelCache = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.getListFavoriteChannel(mezon.session, clanId);
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: LIST_CHANNEL_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[0].session.username;
+		}
+	}
+);
+
+export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', async ({ clanId, noCache }: FetchChannelFavoriteArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchListFavoriteChannelCache.clear(mezon, clanId);
+	}
+
+	const response = await fetchListFavoriteChannelCache(mezon, clanId);
+
+	return response;
+});
+
+export const addFavoriteChannel = createAsyncThunk('channels/favorite/add', async (body: ApiAddFavoriteChannelRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.addFavoriteChannel(mezon.session, body.channel_id || '', body.clan_id || '');
+		if (response) {
+			thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: body.clan_id || '', noCache: true }));
+			return response;
+		}
+		return;
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
+export const removeFavoriteChannel = createAsyncThunk(
+	'channels/favorite/remove',
+	async ({ channelId, clanId }: RemoveChannelFavoriteArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.removeFavoriteChannel(mezon.session, channelId);
+			if (response) {
+				thunkAPI.dispatch(fetchListFavoriteChannel({ clanId: clanId || '', noCache: true }));
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
+
 type fetchChannelsArgs = {
 	clanId: string;
 	cursor?: string;
@@ -425,7 +495,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	previousChannels: [],
 	appChannelsList: {},
 	fetchChannelSuccess: false,
-	threadsNotJoinedByUser: channelsAdapter.getInitialState()
+	threadsNotJoinedByUser: channelsAdapter.getInitialState(),
+	favoriteChannels: []
 });
 
 export const channelsSlice = createSlice({
@@ -610,6 +681,33 @@ export const channelsSlice = createSlice({
 				return acc;
 			}, {});
 		});
+
+		builder
+			.addCase(fetchListFavoriteChannel.pending, (state) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchListFavoriteChannel.fulfilled, (state, action) => {
+				state.loadingStatus = 'loaded';
+				if (action.payload) {
+					state.favoriteChannels = action.payload.channel_ids;
+				} else {
+					state.favoriteChannels = [];
+				}
+				state.fetchChannelSuccess = true;
+			})
+			.addCase(fetchListFavoriteChannel.rejected, (state, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			})
+			.addCase(addFavoriteChannel.fulfilled, (state, action) => {
+				if (!state.favoriteChannels) {
+					state.favoriteChannels = [];
+				}
+				state.favoriteChannels.push(action.payload?.channel_id || '');
+			})
+			.addCase(removeFavoriteChannel.fulfilled, (state, action) => {
+				state.favoriteChannels = state.favoriteChannels.filter((id) => id !== action.meta.arg.channelId);
+			});
 	}
 });
 
@@ -647,7 +745,10 @@ export const channelsActions = {
 	deleteChannel,
 	updateChannel,
 	updateChannelPrivate,
-	fetchAppChannels
+	fetchAppChannels,
+	fetchListFavoriteChannel,
+	addFavoriteChannel,
+	removeFavoriteChannel
 };
 
 /*
@@ -749,6 +850,8 @@ export const selectIdChannelSelectedByClanId = (clanId: string) =>
 	});
 
 export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
+
+export const selectAllChannelsFavorite = createSelector(getChannelsState, (state) => state.favoriteChannels);
 
 export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);
 

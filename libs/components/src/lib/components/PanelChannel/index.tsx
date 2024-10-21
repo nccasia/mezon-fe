@@ -5,6 +5,7 @@ import {
 	channelsActions,
 	hasGrandchildModal,
 	notificationSettingActions,
+	selectAllChannelsFavorite,
 	selectCategoryById,
 	selectChannelById,
 	selectCurrentChannelId,
@@ -91,6 +92,26 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
 	const hasModalInChild = useSelector(hasGrandchildModal);
+	const favoriteChannel = useSelector(selectAllChannelsFavorite);
+	const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (favoriteChannel && favoriteChannel.length > 0) {
+			const isFav = favoriteChannel.some((channelId) => channelId === channel.id);
+
+			setIsFavorite(isFav);
+		}
+	}, [favoriteChannel, channel.id]);
+
+	const maskFavoriteChannel = () => {
+		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel.id, clan_id: currentClan?.id }));
+		setIsShowPanelChannel(false);
+	};
+
+	const removeFavoriteChannel = () => {
+		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel.id, clanId: currentClan?.id || '' }));
+		setIsShowPanelChannel(false);
+	};
 
 	const handleEditChannel = () => {
 		openSetting();
@@ -353,6 +374,11 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 									/>
 								))}
 							</Dropdown>
+						)}
+						{isFavorite ? (
+							<ItemPanel children="Unmask Favorite" onClick={removeFavoriteChannel} />
+						) : (
+							<ItemPanel children="Mask Favorite" onClick={maskFavoriteChannel} />
 						)}
 					</GroupPanels>
 

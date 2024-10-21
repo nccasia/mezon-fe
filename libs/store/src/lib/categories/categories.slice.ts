@@ -85,7 +85,6 @@ export const checkDuplicateCategoryInClan = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(categoryName, clanId, TypeCheck.TYPECATEGORY);
-			console.log('isDuplicateCategoryName', isDuplicateName);
 
 			if (isDuplicateName?.type === TypeCheck.TYPECATEGORY) {
 				return isDuplicateName.exist;
@@ -136,7 +135,6 @@ export const deleteCategoriesOrder = createAsyncThunk('categories/deleteCategori
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteCategoryOrder(mezon.session, clanId);
 		thunkAPI.dispatch(fetchCategories({ clanId: clanId }));
-		console.log(response);
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
 	}
