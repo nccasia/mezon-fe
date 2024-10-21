@@ -1,13 +1,6 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import {
-	categoriesActions,
-	selectCategoryExpandStateByCategoryId,
-	selectCategoryIdSortChannel,
-	selectChannelMetaEntities,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { categoriesActions, selectCategoryExpandStateByCategoryId, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -31,7 +24,6 @@ const ChannelListSection = memo(
 		const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 		const dispatch = useAppDispatch();
 		const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(data?.clan_id || '', data?.category_id));
-		const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 
 		const handleOnPressSortChannel = useCallback(() => {
 			dispatch(
@@ -89,9 +81,6 @@ const ChannelListSection = memo(
 			};
 		};
 
-		const isUnreadChannel = (channelId: string) => {
-			return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
-		};
 		return (
 			<View style={styles.channelListSection}>
 				<ChannelListSectionHeader
@@ -104,22 +93,18 @@ const ChannelListSection = memo(
 				/>
 
 				{data?.channels?.map((item: IChannel, index: number) => {
-					const shouldRender = categoryExpandState || isUnreadChannel(item?.id) || item.type === ChannelType.CHANNEL_TYPE_VOICE;
-					if (shouldRender) {
-						return (
-							<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
-								<ChannelListItem
-									data={item}
-									key={`${item.id}_channel_item` + index}
-									onLongPress={() => {
-										onLongPressChannel(item);
-									}}
-									onLongPressThread={onLongPressThread}
-								/>
-							</View>
-						);
-					}
-					return null;
+					return (
+						<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
+							<ChannelListItem
+								data={item}
+								key={`${item.id}_channel_item` + index}
+								onLongPress={() => {
+									onLongPressChannel(item);
+								}}
+								onLongPressThread={onLongPressThread}
+							/>
+						</View>
+					);
 				})}
 			</View>
 		);

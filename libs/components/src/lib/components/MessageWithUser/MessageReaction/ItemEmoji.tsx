@@ -3,7 +3,7 @@ import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmoji
 import { Icons } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -213,8 +213,29 @@ type ItemDetailProps = {
 	getUrlItem: string;
 	totalCount: number;
 };
+
 const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 	({ onMouse, onLeave, userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
+		const strCount = useMemo(() => {
+			const thresh = 1000;
+
+			if (Math.abs(totalCount) < thresh) {
+				return totalCount;
+			}
+
+			const units = ['K', 'M', 'G', 'T'];
+			let u = -1;
+			const r = 10 ** 1;
+
+			let num = totalCount;
+			do {
+				num /= thresh;
+				++u;
+			} while (Math.round(Math.abs(num) * r) / r >= thresh && u < units.length - 1);
+
+			return num.toFixed(0) + units[u];
+		}, [totalCount]);
+
 		return (
 			<div className="flex flex-row gap-1">
 				<div
@@ -230,7 +251,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
 					</span>
 					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-						<p>{totalCount}</p>
+						<p>{strCount}</p>
 					</div>
 				</div>
 			</div>

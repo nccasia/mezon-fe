@@ -1,13 +1,21 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
-import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectMessagesByChannel } from '@mezon/store';
+import {
+	selectHasMoreBottomByChannelId,
+	selectHasMoreMessageByChannelId,
+	selectIdMessageToJump,
+	selectIsMessageIdExist,
+	selectIsViewingOlderMessagesByChannelId,
+	selectMessageIsLoading,
+	selectMessagesByChannel
+} from '@mezon/store';
 import { messagesActions, RootState, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { Direction_Mode } from '@mezon/utils';
+import { Direction_Mode, LIMIT_MESSAGE } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, View } from 'react-native';
+import { DeviceEventEmitter, LayoutAnimation, Platform, TouchableOpacity, UIManager, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import ChannelMessageList from './components/ChannelMessageList';
@@ -29,8 +37,14 @@ type ChannelMessagesProps = {
 
 const getEntitiesArray = (state: any) => {
 	if (!state?.ids) return [];
-	return state.ids.map((id) => state?.entities?.[id]);
+	return state.ids.map((id) => state?.entities?.[id])?.reverse();
 };
+
+if (Platform.OS === 'android') {
+	if (UIManager.setLayoutAnimationEnabledExperimental) {
+		UIManager.setLayoutAnimationEnabledExperimental(true);
+	}
+}
 
 const ChannelMessages = React.memo(
 	({ channelId, clanId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
@@ -41,23 +55,30 @@ const ChannelMessages = React.memo(
 		const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
 		const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 		const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
-		const isLoadMore = useRef<boolean>(false);
+		const isLoadMore = useRef({});
 		const [, setTriggerRender] = useState<boolean>(false);
+		const isFetching = useSelector(selectMessageIsLoading);
+		const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
+		const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
+		const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId ?? ''));
+		const idMessageToJump = useSelector(selectIdMessageToJump);
+		const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
 
-		// const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
 		const flatListRef = useRef(null);
 		const timeOutRef = useRef(null);
 
 		useEffect(() => {
 			const event = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT, () => {
-				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+				if (!isViewingOldMessage && !hasMoreBottom) {
+					flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+				}
 			});
 
 			return () => {
 				if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 				event.remove();
 			};
-		}, []);
+		}, [hasMoreBottom, isViewingOldMessage]);
 
 		useEffect(() => {
 			const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
@@ -68,64 +89,78 @@ const ChannelMessages = React.memo(
 			};
 		}, []);
 
-		const jumpToRepliedMessage = useCallback(
-			(messageId: string) => {
-				const indexToJump = messages?.findIndex?.((message) => message.id === messageId);
+		useEffect(() => {
+			if (idMessageToJump && isMessageExist) {
+				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump);
 				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
-					flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
+					const offsetBefore = flatListRef.current?.state.layoutProvider.getLayoutManager()?.getOffsetForIndex(indexToJump);
+					if (offsetBefore) {
+						flatListRef?.current?.scrollToOffset?.({ animated: true, offset: offsetBefore?.y });
+					} else {
+						flatListRef?.current?.scrollToIndex?.({ animated: true, index: indexToJump });
+					}
 				}
-			},
-			[messages]
-		);
+			}
+		}, [dispatch, idMessageToJump, isMessageExist, messages]);
+
+		const scrollChannelMessageToIndex = (index: number) => {
+			if (flatListRef.current) {
+				const offsetBefore = flatListRef.current?.state.layoutProvider.getLayoutManager()?.getOffsetForIndex(index);
+				timeOutRef.current = setTimeout(() => {
+					flatListRef?.current?.scrollToOffset?.({ animated: true, offset: offsetBefore?.y });
+				}, 300);
+			}
+		};
 
 		const onLoadMore = useCallback(
 			async (direction: ELoadMoreDirection) => {
-				if (isLoadMore.current) return;
-				isLoadMore.current = true;
+				if (isLoadMore?.current?.[direction] || isFetching) return;
+				if (direction === ELoadMoreDirection.bottom && !hasMoreBottom) {
+					return;
+				}
+				if (direction === ELoadMoreDirection.top && !hasMoreTop) {
+					return;
+				}
+				LayoutAnimation.configureNext({
+					duration: 200,
+					create: {
+						type: LayoutAnimation.Types.easeInEaseOut,
+						property: LayoutAnimation.Properties.opacity
+					},
+					update: {
+						type: LayoutAnimation.Types.easeInEaseOut
+					}
+				});
+				isLoadMore.current[direction] = true;
 				setTriggerRender(true);
 				if (direction === ELoadMoreDirection.bottom) {
 					await dispatch(
 						messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.AFTER_TIMESTAMP, fromMobile: true })
 					);
-					isLoadMore.current = false;
+					isLoadMore.current[direction] = false;
 					setTriggerRender(false);
+					if (messages?.length >= LIMIT_MESSAGE * 4) {
+						scrollChannelMessageToIndex(LIMIT_MESSAGE);
+					}
 					return;
 				}
 				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.BEFORE_TIMESTAMP, fromMobile: true }));
-				isLoadMore.current = false;
+				isLoadMore.current[direction] = false;
 				setTriggerRender(false);
+				// if (messages?.length >= LIMIT_MESSAGE * 4) {
+				// 	scrollChannelMessageToIndex(LIMIT_MESSAGE * 3);
+				// }
+
 				return true;
 			},
-			[dispatch, clanId, channelId]
+			[isFetching, hasMoreBottom, hasMoreTop, dispatch, clanId, channelId, messages?.length]
 		);
-
-		// const handleScroll = useCallback(
-		// 	(event: { nativeEvent: { contentOffset: { y: any } } }) => {
-		// 		const offsetY = event.nativeEvent.contentOffset.y;
-		// 		const threshold = 300; // Adjust this value to determine when to show the button
-		// 		if (offsetY > threshold && showScrollToBottomButton) {
-		// 			setShowScrollToBottomButton(false);
-		// 		} else if (offsetY <= threshold && !showScrollToBottomButton) {
-		// 			setShowScrollToBottomButton(true);
-		// 		}
-		//
-		// 		if (offsetY <= 0) {
-		// 			onLoadMore(ELoadMoreDirection.bottom);
-		// 		}
-		// 	},
-		// 	[showScrollToBottomButton, onLoadMore]
-		// );
-
-		// const scrollToBottom = () => {
-		// 	flatListRef.current.scrollToEnd({ animated: true });
-		// };
 
 		const renderItem = useCallback(
 			({ item, index }) => {
 				const previousMessage = messages?.[index + 1];
 				return (
 					<MessageItem
-						jumpToRepliedMessage={jumpToRepliedMessage}
 						message={item}
 						previousMessage={previousMessage}
 						messageId={item.id}
@@ -137,7 +172,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[messages, jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, setIsOnlyEmojiPicker]
+			[messages, mode, channelId, onOpenImage, onMessageAction, setIsOnlyEmojiPicker]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {
@@ -153,6 +188,15 @@ const ChannelMessages = React.memo(
 			return isCached;
 		}, [channelId]);
 
+		const handleJumpToPresent = useCallback(async () => {
+			// Jump to present
+			await dispatch(messagesActions.fetchMessages({ clanId, channelId, isFetchingLatestMessages: true, noCache: true, isClearMessage: true }));
+			await dispatch(messagesActions.setIdMessageToJump(null));
+			timeOutRef.current = setTimeout(() => {
+				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+			}, 200);
+		}, [clanId, channelId, dispatch]);
+
 		return (
 			<View style={styles.wrapperChannelMessage}>
 				{isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
@@ -162,19 +206,22 @@ const ChannelMessages = React.memo(
 				<ChannelMessageList
 					flatListRef={flatListRef}
 					messages={messages}
-					handleScroll={() => {
-						// eslint-disable-next-line no-empty-function
+					handleScroll={async ({ nativeEvent }) => {
+						if (nativeEvent.contentOffset.y <= 0) {
+							await onLoadMore(ELoadMoreDirection.bottom);
+						}
 					}}
 					renderItem={renderItem}
 					onLoadMore={onLoadMore}
-					isLoadMore={isLoadMore.current}
+					isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
+					isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
 				/>
 				<Block height={size.s_8} />
-				{/*{showScrollToBottomButton && (*/}
-				{/*	<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>*/}
-				{/*		<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />*/}
-				{/*	</TouchableOpacity>*/}
-				{/*)}*/}
+				{(isViewingOldMessage || hasMoreBottom) && (
+					<TouchableOpacity style={styles.btnScrollDown} onPress={handleJumpToPresent} activeOpacity={0.8}>
+						<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={size.s_20} width={size.s_20} />
+					</TouchableOpacity>
+				)}
 
 				<MessageUserTyping channelId={channelId} isDM={isDM} isPublic={isPublic} mode={mode} />
 			</View>

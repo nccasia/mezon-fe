@@ -1,4 +1,4 @@
-import { ICanvas, LoadingStatus } from '@mezon/utils';
+import { CanvasUpdate, ICanvas, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -48,7 +48,7 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
-		return response;
+		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content };
 	} catch (error: any) {
 		const errstream = await error.json();
 		return thunkAPI.rejectWithValue(errstream.message);
@@ -95,9 +95,9 @@ const handleSetManyCanvas = ({
 	channelId,
 	adapterPayload
 }: {
-	state: CanvasAPIState; // Đảm bảo kiểu state là CanvasAPIState
+	state: CanvasAPIState;
 	channelId?: string;
-	adapterPayload: CanvasAPIEntity[]; // Đảm bảo adapterPayload là mảng CanvasAPIEntity
+	adapterPayload: CanvasAPIEntity[];
 }) => {
 	if (!channelId) return;
 	if (!state.channelCanvas[channelId]) {
@@ -105,9 +105,9 @@ const handleSetManyCanvas = ({
 			id: channelId
 		});
 	}
-	// Sử dụng setMany đúng cách
+
 	const updatedChannelCanvas = canvasAPIAdapter.setMany(state.channelCanvas[channelId], adapterPayload);
-	state.channelCanvas[channelId] = updatedChannelCanvas; // Cập nhật lại state
+	state.channelCanvas[channelId] = updatedChannelCanvas;
 };
 
 export const canvasAPISlice = createSlice({
@@ -115,13 +115,15 @@ export const canvasAPISlice = createSlice({
 	initialState: initialCanvasAPIState,
 	reducers: {
 		// ...
-		updateCanvas: (state: any, action: PayloadAction<any>) => {
-			const { channelId, results } = action.payload;
+		updateCanvas: (state, action: PayloadAction<{ channelId: string; dataUpdate: CanvasUpdate }>) => {
+			const { channelId, dataUpdate } = action.payload;
+			const { id, title, content, creator_id } = dataUpdate;
 			canvasAPIAdapter.updateOne(state.channelCanvas[channelId], {
-				id: results.payload.id,
+				id: id,
 				changes: {
-					title: results.payload.title,
-					content: results.payload.content
+					title: title,
+					content: content,
+					creator_id: creator_id
 				}
 			});
 		}
@@ -133,6 +135,8 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(createEditCanvas.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
+				const { channel_id } = action.payload;
+				canvasAPIAdapter.upsertOne(state.channelCanvas[channel_id], action.payload);
 			})
 			.addCase(createEditCanvas.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
@@ -162,13 +166,6 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(getChannelCanvasDetail.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
-				// canvasAPIAdapter.updateOne(state, {
-				// 	id: action.payload?.id ?? '',
-				// 	changes: {
-				// 		title: action.payload?.title,
-				// 		content: action.payload?.content
-				// 	}
-				// });
 			})
 			.addCase(getChannelCanvasDetail.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
@@ -240,7 +237,7 @@ export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, get
 
 export const selectCanvasEntityById = createSelector(
 	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, canvasId) => canvasId],
-	(messagesState, channelId, canvasId) => {
-		return messagesState.channelCanvas[channelId]?.entities?.[canvasId];
+	(canvasState, channelId, canvasId) => {
+		return canvasState.channelCanvas[channelId]?.entities?.[canvasId];
 	}
 );

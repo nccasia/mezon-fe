@@ -141,7 +141,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const handleClick = () => {
 			setTurnOffThreadMessage();
-			dispatch(appActions.setIsShowCanvas(false));
 			if (closeMenu) {
 				setStatusMenu(false);
 			}
@@ -201,6 +200,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				);
 				dispatch(appActions.setIsShowChatStream(false));
 			}
+			dispatch(appActions.setIsShowCanvas(false));
 		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, currentStreamInfo?.clanId, currentStreamInfo?.streamId, dispatch]);
 
 		const isNotVoiceOrAppOrStreamChannel = useMemo(
@@ -211,6 +211,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			[channel.channel_id]
 		);
 
+		const handleOpenSetting = () => {
+			setOpenSetting(true);
+		};
 		return (
 			<div
 				onContextMenu={handleMouseClick}
@@ -333,7 +336,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						onDeleteChannel={handleOpenModalConfirm}
 						channel={channel}
 						coords={coords}
-						setOpenSetting={setOpenSetting}
+						openSetting={handleOpenSetting}
 						setIsShowPanelChannel={setIsShowPanelChannel}
 					/>
 				)}

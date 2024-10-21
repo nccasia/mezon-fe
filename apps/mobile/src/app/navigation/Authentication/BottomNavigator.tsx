@@ -2,6 +2,7 @@ import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-componen
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigationState } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import { Animated, LayoutAnimation, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +22,7 @@ const BottomNavigator = () => {
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 	const tabBarTranslateY = useRef(new Animated.Value(0)).current;
+	const isHomeActive = useNavigationState((state) => state?.routes?.[state?.index]?.state?.index === 0);
 
 	useEffect(() => {
 		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
@@ -32,7 +34,7 @@ const BottomNavigator = () => {
 	}, [hiddenBottomTab, tabBarTranslateY]);
 
 	return (
-		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: isHomeActive ? themeValue.primary : themeValue.secondary }}>
 			<TabStack.Navigator
 				screenOptions={{
 					tabBarHideOnKeyboard: true,
@@ -55,7 +57,7 @@ const BottomNavigator = () => {
 					component={HomeScreen}
 					options={{
 						headerShown: false,
-						title: 'Servers',
+						title: 'Clans',
 						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} width={size.s_22} height={size.s_22} />)
 					}}
 				/>

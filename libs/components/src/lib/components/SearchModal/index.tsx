@@ -1,6 +1,7 @@
 import { useAppNavigation, useAuth, useDirect } from '@mezon/core';
 import {
 	DirectEntity,
+	appActions,
 	categoriesActions,
 	channelsActions,
 	directActions,
@@ -270,6 +271,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				if (!item) {
 					return;
 				}
+				dispatch(appActions.setIsShowCanvas(false));
 				const isChannel = item?.typeChat === TypeSearch.Channel_Type;
 				if (isChannel) {
 					handleSelectChannel(item);

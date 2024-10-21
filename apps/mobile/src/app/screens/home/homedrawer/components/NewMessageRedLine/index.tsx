@@ -27,7 +27,7 @@ export const NewMessageRedLine = memo((props: INewMessageRedLineProps) => {
 			{isUnread && (
 				<Block height={1} width={'95%'} backgroundColor={Colors.red} margin={size.s_10}>
 					<Block position="absolute" left={0} alignItems="center" width={'100%'}>
-						<Block paddingHorizontal={size.s_10} marginTop={-size.s_10} backgroundColor={themeValue.secondary}>
+						<Block paddingHorizontal={size.s_10} marginTop={-size.s_10} backgroundColor={themeValue.primary}>
 							<Text color={Colors.red} style={{ top: Platform.OS === 'ios' ? size.s_4 : 0 }}>
 								{t('newMessages')}
 							</Text>

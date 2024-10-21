@@ -13,7 +13,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			gap: 10,
 			padding: 6,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondary,
 			borderRadius: 50
 		},
 		selected: {
@@ -40,6 +40,6 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: 10,
 			borderRadius: 10,
 			gap: 10,
-			backgroundColor: colors.primary
+			backgroundColor: colors.secondary
 		}
 	});

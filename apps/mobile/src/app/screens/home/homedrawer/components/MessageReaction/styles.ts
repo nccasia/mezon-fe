@@ -92,9 +92,9 @@ export const style = (colors: Attributes) =>
 			gap: size.s_10
 		},
 		imageWrapper: {
-			width: size.s_40,
-			height: size.s_40,
-			borderRadius: size.s_40,
+			width: size.s_36,
+			height: size.s_36,
+			borderRadius: size.s_36,
 			overflow: 'hidden',
 			backgroundColor: Colors.bgGrayDark
 		},

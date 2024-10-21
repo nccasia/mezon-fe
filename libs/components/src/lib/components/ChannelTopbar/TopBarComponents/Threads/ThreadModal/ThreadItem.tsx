@@ -1,34 +1,43 @@
-import { useAppNavigation } from '@mezon/core';
+import { useAppNavigation, useChannels } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ThreadsEntity,
+	appActions,
 	channelsActions,
 	selectAllChannelMembers,
+	selectChannelById,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
+import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
-import { useMemo } from 'react';
+import { ChannelType } from 'mezon-js';
+import { useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Coords } from '../../../../ChannelLink';
+import SettingChannel from '../../../../ChannelSetting';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
+import ModalConfirm from '../../../../ModalConfirm';
+import PanelChannel from '../../../../PanelChannel';
 import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
 	thread: ThreadsEntity;
 	setIsShowThread: () => void;
 	isPublicThread?: boolean;
+	isHasContext?: boolean;
 };
 
-const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasContext = true }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const dispatch = useDispatch();
 	const threadMembers = useSelector((state) => selectAllChannelMembers(state, thread.channel_id));
-
+	const channelThread = useSelector(selectChannelById(thread.id));
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread.channel_id as string));
 	const message = useAppSelector((state) =>
 		selectMessageEntityById(state, thread.channel_id as string, messageId || thread?.last_sent_message?.id)
@@ -72,15 +81,39 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
 		dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
+		dispatch(appActions.setIsShowCanvas(false));
 		navigate(toChannelPage(channelId, clanId));
 		setIsShowThread();
+	};
+
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0
+	});
+
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+
+	const handlePannelThread = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		if (!isHasContext) {
+			return;
+		}
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+		const windowHeight = window.innerHeight;
+		const distanceToBottom = windowHeight - event.clientY;
+		setCoords({ mouseX, mouseY, distanceToBottom });
+		setIsShowPanelChannel((s) => !s);
 	};
 
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			className="relative overflow-y-hidden p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
+			ref={panelRef}
+			onContextMenu={handlePannelThread}
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
@@ -116,8 +149,59 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 					)}
 				</div>
 			</div>
+			{isShowPanelChannel && (
+				<PannelThreadItem
+					channelThread={{ ...channelThread, type: ChannelType.CHANNEL_TYPE_THREAD }}
+					coords={coords}
+					panelRef={panelRef}
+					setIsShowPanelChannel={setIsShowPanelChannel}
+				/>
+			)}
 		</div>
 	);
 };
 
+const PannelThreadItem = ({
+	channelThread,
+	coords,
+	setIsShowPanelChannel,
+	panelRef
+}: {
+	panelRef: React.MutableRefObject<HTMLDivElement | null>;
+	channelThread: IChannel;
+	coords: Coords;
+	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+	const [openSettingThread, closeSettingThread] = useModal(() => {
+		return <SettingChannel onClose={closeSettingThread} channel={channelThread} />;
+	}, [channelThread?.id]);
+	const { handleConfirmDeleteChannel } = useChannels();
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(channelThread?.channel_id as string, channelThread?.clan_id as string);
+		closeConfirmDelete();
+	};
+	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={closeConfirmDelete}
+				handleConfirm={handleDeleteChannel}
+				title="delete"
+				modalName={`${channelThread?.channel_label}`}
+			/>
+		);
+	}, [channelThread?.id]);
+	return (
+		<div onClick={(e) => e.stopPropagation()}>
+			<PanelChannel
+				selectedChannel={channelThread?.id}
+				onDeleteChannel={openConfirmDelete}
+				channel={channelThread as IChannel}
+				coords={coords}
+				openSetting={openSettingThread}
+				setIsShowPanelChannel={setIsShowPanelChannel}
+				rootRef={panelRef}
+			/>
+		</div>
+	);
+};
 export default ThreadItem;

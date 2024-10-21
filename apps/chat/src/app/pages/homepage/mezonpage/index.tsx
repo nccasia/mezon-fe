@@ -1,5 +1,5 @@
 import mezonPackage from '@mezon/package-js';
-import { Icons } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Footer from './footer';
@@ -154,6 +154,10 @@ function MezonPage() {
 										</div>
 									)}
 								</div>
+							) : platform === 'Linux' ? (
+								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+									<Image src={`assets/linux.svg`} alt={'linux'} className="max-w-full max-md:h-[32px] max-md:w-full" />
+								</a>
 							) : (
 								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
 									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />

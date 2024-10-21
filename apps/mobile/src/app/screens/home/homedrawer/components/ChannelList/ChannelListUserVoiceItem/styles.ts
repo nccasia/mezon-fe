@@ -15,5 +15,11 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.h85,
 			fontWeight: '400'
+		},
+		titleNumberMem: {
+			color: colors.text,
+			fontWeight: 'bold',
+			fontSize: size.s_10,
+			flexShrink: 1
 		}
 	});

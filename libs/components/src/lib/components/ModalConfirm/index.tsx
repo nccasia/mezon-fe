@@ -41,9 +41,9 @@ const ModalConfirm = ({
 	useEscapeKeyClose(modalRef, handleCancel);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
+		<div ref={modalRef} tabIndex={-1} className="fixed inset-0 flex items-center justify-center z-50" onClick={handleCancel}>
 			<div className="fixed inset-0 bg-black opacity-80" />
-			<div className="relative z-10 w-[440px]">
+			<div className="relative z-10 w-[440px]" onClick={(e) => e.stopPropagation()}>
 				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px] rounded-t-md">
 					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold pb-[16px]">
 						<span className="capitalize mr-1">{title}</span>

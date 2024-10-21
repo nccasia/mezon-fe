@@ -1,13 +1,22 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { appActions, channelsActions, clansActions, getStoreAsync, notificationActions, selectCurrentClanId } from '@mezon/store-mobile';
+import { getUpdateOrAddClanChannelCache, Icons, save, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
+import { size, useTheme } from '@mezon/mobile-ui';
+import {
+	appActions,
+	channelsActions,
+	clansActions,
+	getStoreAsync,
+	messagesActions,
+	notificationActions,
+	selectCurrentClanId
+} from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../componentUI';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -29,12 +38,15 @@ const Notifications = () => {
 	const navigation = useNavigation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const bottomSheetOptionsRef = useRef<BottomSheetModal>(null);
+	const timeoutRef = useRef(null);
 
 	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
 	useEffect(() => {
-		initLoader();
+		if (currentClanId && currentClanId !== '0') {
+			initLoader();
+		}
 	}, [currentClanId]);
 
 	useEffect(() => {
@@ -91,7 +103,13 @@ const Notifications = () => {
 		);
 	}, [selectedTabs.individual, selectedTabs.mention]);
 
-	const openBottomSheet = (type: ENotifyBsToShow, notify?: INotification) => {
+	useEffect(() => {
+		return () => {
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
+
+	const openBottomSheet = useCallback((type: ENotifyBsToShow, notify?: INotification) => {
 		switch (type) {
 			case ENotifyBsToShow.notification:
 				bottomSheetRef.current?.present();
@@ -104,7 +122,7 @@ const Notifications = () => {
 				bottomSheetRef.current?.present();
 				break;
 		}
-	};
+	}, []);
 
 	const handleDeleteNotify = (notify?: INotification) => {
 		notify && deleteNotify(notify.id, currentClanId || '0');
@@ -132,21 +150,37 @@ const Notifications = () => {
 				);
 
 				await Promise.all(promises);
+
+				const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
+				save(STORAGE_CLAN_ID, notify?.content?.clan_id);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				navigation.navigate(APP_SCREEN.HOME as never);
 				navigation.dispatch(DrawerActions.closeDrawer());
-				store.dispatch(appActions.setLoadingMainMobile(false));
+				timeoutRef.current = setTimeout(() => {
+					store.dispatch(
+						messagesActions.jumpToMessage({
+							clanId: notify?.content?.clan_id,
+							channelId: notify?.content?.channel_id,
+							messageId: notify?.content?.message_id
+						})
+					);
+					store.dispatch(appActions.setLoadingMainMobile(false));
+				}, 200);
 				resolve();
 			});
 		});
 	};
 
-	const handleOnPressNotify = async (notify: INotification) => {
-		if (!notify?.content?.channel_id) {
-			return;
-		}
-		const store = await getStoreAsync();
-		await handleNotification(notify, currentClanId, store, navigation);
-	};
+	const handleOnPressNotify = useCallback(
+		async (notify: INotification) => {
+			if (!notify?.content?.channel_id) {
+				return;
+			}
+			const store = await getStoreAsync();
+			await handleNotification(notify, currentClanId, store, navigation);
+		},
+		[currentClanId, navigation]
+	);
 
 	const closeBottomSheet = () => {
 		bottomSheetRef.current?.dismiss();
@@ -164,26 +198,21 @@ const Notifications = () => {
 				</Pressable>
 			</View>
 
-			<View style={styles.notificationsList}>
-				{notificationsFilter?.length > 0 ? (
-					<FlatList
-						data={notificationsFilter}
-						renderItem={({ item }) => {
-							return (
-								<NotificationItem
-									notify={item}
-									onLongPressNotify={openBottomSheet}
-									onPressNotify={handleOnPressNotify}
-								></NotificationItem>
-							);
-						}}
-						keyExtractor={(item) => item.id}
-					/>
-				) : (
-					<EmptyNotification />
-				)}
-			</View>
-
+			{notificationsFilter?.length > 0 ? (
+				<FlashList
+					data={notificationsFilter}
+					renderItem={({ item }) => {
+						return <NotificationItem notify={item} onLongPressNotify={openBottomSheet} onPressNotify={handleOnPressNotify} />;
+					}}
+					contentContainerStyle={{
+						paddingBottom: size.s_100 * 2
+					}}
+					estimatedItemSize={200}
+					keyExtractor={(item) => `${item.id}_item_noti`}
+				/>
+			) : (
+				<EmptyNotification />
+			)}
 			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize="md">
 				<NotificationOption onChangeTab={handleTabChange} selectedTabs={selectedTabs} />
 			</MezonBottomSheet>

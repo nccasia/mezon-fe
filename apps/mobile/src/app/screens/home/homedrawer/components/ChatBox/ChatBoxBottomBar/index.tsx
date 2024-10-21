@@ -265,7 +265,7 @@ export const ChatBoxBottomBar = memo(
 		function keyboardWillShow(event) {
 			if (keyboardHeight !== event.endCoordinates.height) {
 				setIsShowEmojiNativeIOS(event.endCoordinates.height >= 380 && Platform.OS === 'ios');
-				setKeyboardHeight(event.endCoordinates.height <= 345 ? 345 : event.endCoordinates.height);
+				setKeyboardHeight(event.endCoordinates.height <= 300 ? 300 : event.endCoordinates.height);
 			}
 		}
 

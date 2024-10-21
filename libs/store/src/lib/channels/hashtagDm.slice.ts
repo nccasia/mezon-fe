@@ -86,8 +86,7 @@ export const selectAllHashtagDm = createSelector(gethashtagDmState, selectAll);
 
 export const selectHashtagDmEntities = createSelector(gethashtagDmState, selectEntities);
 
-export const selectHashtagDmById = (id: string) =>
-	createSelector(gethashtagDmState, (state) => {
-		const hashtag = selectById(state, id);
-		return { ...hashtag, id: hashtag?.channel_id || '' };
-	});
+export const selectHashtagDmById = createSelector([gethashtagDmState, (state, id: string) => id], (state, id) => {
+	const hashtag = selectById(state, id);
+	return { ...hashtag, id: hashtag?.channel_id || '' };
+});

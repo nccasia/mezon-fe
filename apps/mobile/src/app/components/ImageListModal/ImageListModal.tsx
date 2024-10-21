@@ -43,7 +43,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}, [allImageList, imageSelected]);
 
 	const formattedImageList = useMemo(() => {
-		const index = allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
+		const index = allImageList.findIndex((file) => file?.url === imageSelected?.url);
 		return index === -1 ? [{ ...imageSelected, id: `${Snowflake.generate()}` }, ...allImageList] : allImageList;
 	}, []);
 

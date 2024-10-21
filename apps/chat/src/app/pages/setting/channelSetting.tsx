@@ -86,7 +86,7 @@ const ChannelSetting = () => {
 						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
 					/>
 					<label htmlFor="private_filter">
-						Only Private Channel <span className="font-semibold italic">({countChannel})</span>
+						Only Private <span className="font-semibold italic">({countChannel})</span>
 					</label>
 				</div>
 				<div className="flex items-center gap-2">

@@ -5,13 +5,13 @@ export const CANVAS_FEATURE_KEY = 'canvas';
 export interface CanvasState {
 	title: string;
 	content: string;
-	idCanvas: string;
+	idCanvas: string | null;
 }
 
 const initialState: CanvasState = {
 	title: '',
 	content: '',
-	idCanvas: ''
+	idCanvas: null
 };
 
 const canvasSlice = createSlice({
@@ -24,7 +24,7 @@ const canvasSlice = createSlice({
 		setContent: (state, action: PayloadAction<string>) => {
 			state.content = action.payload;
 		},
-		setIdCanvas: (state, action: PayloadAction<string>) => {
+		setIdCanvas: (state, action: PayloadAction<string | null>) => {
 			state.idCanvas = action.payload;
 		}
 	}

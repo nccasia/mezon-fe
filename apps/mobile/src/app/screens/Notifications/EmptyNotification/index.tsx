@@ -11,7 +11,7 @@ const EmptyNotification = () => {
 
 	return (
 		<Block position="relative" width={'100%'} height={'100%'}>
-			<Block position="absolute" left={size.s_10} right={size.s_10} top={'30%'} flexDirection="column" alignItems="center" gap={size.s_10}>
+			<Block position="absolute" left={size.s_10} right={size.s_10} top={'20%'} flexDirection="column" alignItems="center" gap={size.s_10}>
 				<BellIcon width={size.s_100} height={size.s_100} color={themeValue.text} />
 				<Text style={styles.title}>{t('nothingHere')}</Text>
 				<Text style={styles.description}>{t('comeBackNotify')}</Text>

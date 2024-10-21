@@ -25,7 +25,7 @@ export type Attributes = {
 	channelNormal: HexColor;
 	midnightBlue: HexColor;
 	textLink: HexColor;
-	reactionBg: HexColor;
+	reactionBg: string;
 	reactionBorder: HexColor;
 	selectedOverlay: HexColor;
 	bgViolet: HexColor;
@@ -78,7 +78,7 @@ export const themeColors: ThemeColor = {
 		channelNormal: '#aeaeae',
 		midnightBlue: '#3b426e',
 		textLink: '#3297ff',
-		reactionBg: '#373a54',
+		reactionBg: 'rgba(55,58,84,0.5)',
 		reactionBorder: '#2563eb',
 		selectedOverlay: '#00000096',
 		bgViolet: '#5a62f4',
@@ -96,7 +96,7 @@ export const themeColors: ThemeColor = {
 		borderHighlight: '#e0e1e3',
 		borderDim: '#f4f4f4',
 		borderRadio: '#4d4d54',
-		text: '#5d5c64',
+		text: '#29292b',
 		textStrong: '#070709',
 		textDisabled: '#a0a1a6',
 		textNormal: '#e0e1e3',
@@ -111,7 +111,7 @@ export const themeColors: ThemeColor = {
 		channelNormal: '#6c7077',
 		midnightBlue: '#d1e0ff',
 		textLink: '#3297ff',
-		reactionBg: '#e5e7eb',
+		reactionBg: 'rgba(229,231,235,0.6)',
 		reactionBorder: '#2563eb',
 		selectedOverlay: '#FFFFFF96',
 		bgViolet: '#5a62f4',

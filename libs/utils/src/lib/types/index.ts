@@ -192,6 +192,7 @@ export type IMessage = ChannelMessage & {
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
 	hide_editted?: boolean;
+	isErrorRetry?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -843,4 +844,14 @@ export type ICanvas = {
 	channel_id: string;
 	title?: string;
 	content?: string;
+	is_default?: boolean;
+	creator_id?: string;
+};
+
+export type CanvasUpdate = {
+	content: string;
+	creator_id: string;
+	editor_id: string;
+	id: string;
+	title: string;
 };

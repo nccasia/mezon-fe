@@ -22,6 +22,7 @@ import {
 	MessagesEntity,
 	directActions,
 	directMetaActions,
+	gifsStickerEmojiActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
@@ -56,6 +57,10 @@ function useChannelSeen(channelId: string) {
 	};
 
 	useEffect(() => {
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [channelId]);
+
+	useEffect(() => {
 		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
 			updateChannelSeenState(channelId, lastMessage);
 		}
@@ -81,6 +86,7 @@ const DirectMessage = () => {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const isSearchMessage = useSelector(selectIsSearchMessage(directId || ''));
+	const dispatch = useAppDispatch();
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -91,7 +97,6 @@ const DirectMessage = () => {
 	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
-
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -106,6 +111,16 @@ const DirectMessage = () => {
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
 	let topPositionEmojiPanel: string;
+
+	useEffect(() => {
+		dispatch(
+			directActions.joinDirectMessage({
+				directMessageId: currentDmGroup?.channel_id ?? '',
+				channelName: '',
+				type: Number(type)
+			})
+		);
+	}, [currentDmGroup?.channel_id]);
 
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
 		topPositionEmojiPanel = 'auto';
@@ -141,7 +156,7 @@ const DirectMessage = () => {
 
 	return (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
+			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent

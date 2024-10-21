@@ -22,7 +22,7 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 
 	const onHandlerStateChange = useCallback((event: { nativeEvent: { translationX: any; velocityX: any } }) => {
 		const { translationX, velocityX } = event.nativeEvent;
-		if (translationX > 5 && velocityX > 200) {
+		if (translationX > 50 && velocityX > 300) {
 			handleBack?.();
 		}
 	}, []);

@@ -7,7 +7,7 @@ export const style = (colors: Attributes) =>
 		notifications: {
 			width: WIDTH,
 			height: HEIGHT,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondary,
 			paddingVertical: size.s_10
 		},
 

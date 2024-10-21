@@ -1,10 +1,10 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { EOpenSearchChannelFrom, hasNonEmptyChannels, Icons } from '@mezon/mobile-components';
+import { hasNonEmptyChannels } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
+	RootState,
 	appActions,
 	channelsActions,
-	RootState,
 	selectAllEventManagement,
 	selectCategoryChannelOffsets,
 	selectCurrentChannel,
@@ -13,22 +13,22 @@ import {
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
+import { MezonBottomSheet } from '../../../../componentUI';
 import { EventViewer } from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
-import { MezonBottomSheet } from '../../../../componentUI';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
+import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
+import ChannelListBackground from '../components/ChannelList/ChannelListBackground';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
-import { ChannelListContext } from '../Reusables';
 import { style } from './styles';
 export type ChannelsPositionRef = {
 	current: {
@@ -44,7 +44,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
-	const { t } = useTranslation(['searchMessageChannel']);
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
@@ -68,6 +67,15 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
+	}, []);
+
+	const onOpenEvent = useCallback(() => {
+		bottomSheetEventRef?.current?.present();
+	}, []);
+
+	const onOpenInvite = useCallback(() => {
+		setIsUnKnownChannel(false);
+		bottomSheetInviteRef?.current?.present?.();
 	}, []);
 
 	const handleLongPressCategory = useCallback((category: ICategoryChannel) => {
@@ -99,7 +107,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		if (Math.abs(position - previousPosition) > 100 && !isCollapseCategory) {
 			flashListRef?.current?.scrollTo({
 				x: 0,
-				y: position,
+				y: position - size.s_150,
 				animated: true
 			});
 			previousPositionRef.current = position;
@@ -145,49 +153,20 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		});
 	}, []);
 
-	const navigateToSearchPage = () => {
-		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
-			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
-				currentChannel
-			}
-		});
-	};
-
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
-				<ChannelListHeader onPress={handlePress} />
+				<ScrollView
+					stickyHeaderIndices={[1]}
+					showsVerticalScrollIndicator={false}
+					ref={flashListRef}
+					scrollEventThrottle={16}
+					bounces={false}
+				>
+					<ChannelListBackground onPress={handlePress} />
+					<ChannelListHeader onPress={handlePress} onOpenEvent={onOpenEvent} onOpenInvite={onOpenInvite} />
 
-				<View style={styles.channelListSearch}>
-					<TouchableOpacity onPress={() => navigateToSearchPage()} style={styles.searchBox}>
-						<Icons.MagnifyingIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
-						<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
-					</TouchableOpacity>
-					<Pressable
-						style={styles.inviteIconWrapper}
-						onPress={() => {
-							setIsUnKnownChannel(false);
-							bottomSheetInviteRef?.current?.present?.();
-						}}
-					>
-						<Icons.UserPlusIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
-					</Pressable>
-					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
-				</View>
-
-				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
-					<TouchableOpacity
-						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
-						onPress={() => bottomSheetEventRef?.current?.present()}
-					>
-						<Icons.CalendarIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
-						<Text style={styles.titleEvent}>{allEventManagement?.length > 0 ? `${allEventManagement?.length} Events` : 'Events'}</Text>
-					</TouchableOpacity>
-				</View>
-				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<ScrollView ref={flashListRef} scrollEventThrottle={16} bounces={false}>
+					{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 					{!!categorizedChannels?.length &&
 						categorizedChannels?.map((item) => {
 							return renderItemChannelList({ item });
@@ -215,6 +194,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			<MezonBottomSheet ref={bottomSheetNotifySettingRef} snapPoints={['50%']}>
 				<NotificationSetting channel={currentPressedChannel} />
 			</MezonBottomSheet>
+			<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 		</ChannelListContext.Provider>
 	);
 });

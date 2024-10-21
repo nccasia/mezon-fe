@@ -3,13 +3,13 @@ import {
 	accountActions,
 	appActions,
 	authActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
@@ -211,6 +211,7 @@ const NavigationMain = () => {
 			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 			promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
+			promises.push(store.dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			await Promise.all(promises);
 			return null;
 		} catch (error) {
@@ -223,6 +224,7 @@ const NavigationMain = () => {
 		async ({ isFromFCM = false }) => {
 			const store = await getStoreAsync();
 			try {
+				store.dispatch(appActions.setLoadingMainMobile(false));
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
@@ -232,7 +234,6 @@ const NavigationMain = () => {
 						save(STORAGE_CLAN_ID, clanId);
 						promises.push(store.dispatch(clansActions.joinClan({ clanId })));
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId, noCache: true })));
-						promises.push(store.dispatch(channelsActions.fetchChannels({ clanId, noCache: true })));
 					}
 				}
 				const results = await Promise.all(promises);

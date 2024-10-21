@@ -54,7 +54,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	return (
 		<Block>
 			<Block
-				backgroundColor={themeValue.secondary}
+				backgroundColor={themeValue.primary}
 				borderTopWidth={1}
 				borderTopColor={themeValue.border}
 				flexDirection="column"

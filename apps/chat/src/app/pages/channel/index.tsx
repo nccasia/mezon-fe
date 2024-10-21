@@ -4,6 +4,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	gifsStickerEmojiActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
@@ -14,10 +15,11 @@ import {
 	selectIsShowCanvas,
 	selectIsShowMemberList,
 	selectStatusMenu,
+	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
+import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -34,6 +36,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
@@ -100,10 +103,12 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
+		if (isShowCanvas) return;
 		if (e.dataTransfer?.types.includes('Files')) {
 			setDraggingState(true);
 		}
@@ -137,7 +142,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		)
 	) : (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			{!isShowCanvas && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
@@ -170,7 +175,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					)}
 
 					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div className="w-full">
+						<div
+							className={`w-full flex justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
 							<Canvas />
 						</div>
 					)}
@@ -197,6 +204,6 @@ export default function ChannelMain() {
 }
 
 const SearchMessageChannel = () => {
-	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+	const { totalResult, currentPage, searchMessages } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
 };

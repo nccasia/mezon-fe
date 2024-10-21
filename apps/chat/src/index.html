@@ -41,8 +41,7 @@
       z-index: 9999;
       font-size: 14px;
       color: white;
-    }   
-
+    }
   </style>
 </head>
 
@@ -55,10 +54,14 @@
     const path = window.location.pathname;
     window?.electron?.on('reload-app', () => {
       const authData = localStorage.getItem('persist:auth');
+      const appData = localStorage.getItem('persist:apps');
+      const categoriesData = localStorage.getItem('persist:categories');
       localStorage.clear();
-      if (authData) {
-        localStorage.setItem('persist:auth', authData);
-      }
+
+      authData && localStorage.setItem('persist:auth', authData);
+      appData && localStorage.setItem('persist:apps', appData);
+      categoriesData && localStorage.setItem('persist:categories', categoriesData);
+
       const isCrashScreen = document.getElementById('error-crash');
       if (isCrashScreen) {
         return window.location.replace(path);

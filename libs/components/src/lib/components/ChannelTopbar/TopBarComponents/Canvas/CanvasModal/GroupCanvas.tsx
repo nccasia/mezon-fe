@@ -23,13 +23,18 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps)
 				clan_id: clanId
 			};
 			const results = await dispatch(canvasAPIActions.getChannelCanvasDetail(body));
-			dispatch(canvasAPIActions.updateCanvas({ channelId, results }));
+			const dataUpdate = results?.payload;
+			dispatch(canvasAPIActions.updateCanvas({ channelId, dataUpdate }));
 		}
 	};
 
 	return (
-		<div className="cursor-pointer" onClick={handleOpenCanvas}>
-			<div className="mt-2 mb-2 h-6 text-xs font-semibold leading-6 uppercase dark:text-bgLightPrimary text-bgPrimary">
+		<div
+			className="p-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			onClick={handleOpenCanvas}
+			role="button"
+		>
+			<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
 				{canvas.title ? canvas.title : 'Untitled'}
 			</div>
 		</div>

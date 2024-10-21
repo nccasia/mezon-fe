@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		dmMessageContainer: {
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.primary,
 			flex: 1
 		},
 		headerWrapper: {

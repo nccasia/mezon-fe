@@ -111,9 +111,9 @@ export const fetchDirectMessage = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
-			fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
+			fetchChannelsCached.clear(mezon, 500, 1, '', channelType);
 		}
-		const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
+		const response = await fetchChannelsCached(mezon, 500, 1, '', channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
@@ -200,7 +200,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				})
 			);
 		} catch (error) {
-			console.log(error);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}

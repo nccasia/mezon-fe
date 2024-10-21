@@ -150,7 +150,7 @@ const colors = {
 	goldenrodYellow: '#f2b13a',
 	green: 'green',
 	bgDarkCharcoal: '#323232',
-	bgMessageHighlight: '#c99d072b',
+	bgMessageHighlight: 'rgba(201,157,7,0.1)',
 	bgDarkMidnightBlue: '#141c2a',
 	midnightIndigoBg: '#3b426e',
 	bgReply: '#383B47',

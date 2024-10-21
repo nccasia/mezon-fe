@@ -38,7 +38,7 @@ export const MessageUserTyping = React.memo(({ channelId, isDM, mode, isPublic }
 			paddingHorizontal={size.s_10}
 			position={'absolute'}
 			bottom={0}
-			backgroundColor={themeValue.secondary}
+			backgroundColor={themeValue.primary}
 		>
 			<LottieView source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE} autoPlay loop style={styles.threeDot} />
 			<Text style={styles.typingLabel}>{typingLabel}</Text>

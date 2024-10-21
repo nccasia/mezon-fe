@@ -1,5 +1,5 @@
 import { useAppParams, useMenu } from '@mezon/core';
-import { channelsActions, directActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import { channelsActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -44,17 +44,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 			dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: DMid, timestamp: timestamp }));
-			const result = await dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: DMid,
-					channelName: '',
-					type: type
-				})
-			);
-
-			if (result) {
-				navigate(`/chat/direct/message/${DMid}/${type}`);
-			}
+			navigate(`/chat/direct/message/${DMid}/${type}`);
 
 			if (closeMenu) {
 				setStatusMenu(false);

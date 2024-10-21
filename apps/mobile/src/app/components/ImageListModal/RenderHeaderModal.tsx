@@ -57,7 +57,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				{!!uploader && (
 					<Block flexDirection={'row'} alignItems={'center'} gap={size.s_6}>
 						<Block style={styles.wrapperAvatar}>
-							<MezonClanAvatar alt={uploader?.user?.username} image={uploader?.user?.avatar_url} />
+							<MezonClanAvatar image={uploader?.clan_avatar || uploader?.user?.avatar_url} />
 						</Block>
 						<Block style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{uploader?.user?.username || 'Anonymous'}</Text>

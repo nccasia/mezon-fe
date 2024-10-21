@@ -4,7 +4,7 @@ import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selec
 import { ChannelThreads } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -49,42 +49,45 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		[listTextChannel, listVoiceChannel, listStreamingChannel, t]
 	);
 
-	const handleRouteData = async (channelData: ChannelThreads) => {
-		if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
-			const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
-			await Linking.openURL(urlVoice);
-			navigation.navigate(APP_SCREEN.HOME);
-			navigation.dispatch(DrawerActions.openDrawer());
-		}
-		const clanId = channelData?.clan_id;
-		const store = await getStoreAsync();
-		// Join clan
-		if (currentClanId !== clanId) {
-			requestAnimationFrame(async () => {
-				store.dispatch(clansActions.joinClan({ clanId: clanId }));
-				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-			});
-		}
-		if (channelData?.type !== ChannelType.CHANNEL_TYPE_VOICE) {
-			if (isTabletLandscape) {
-				navigation.goBack();
-			} else {
-				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-				navigation.dispatch(DrawerActions.closeDrawer());
+	const handleRouteData = useCallback(
+		async (channelData: ChannelThreads) => {
+			if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
+				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
+				await Linking.openURL(urlVoice);
+				navigation.navigate(APP_SCREEN.HOME);
+				navigation.dispatch(DrawerActions.openDrawer());
 			}
-			const channelId = channelData?.channel_id;
-
-			timeoutRef.current = setTimeout(async () => {
+			const clanId = channelData?.clan_id;
+			const store = await getStoreAsync();
+			// Join clan
+			if (currentClanId !== clanId) {
 				requestAnimationFrame(async () => {
-					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					store.dispatch(clansActions.joinClan({ clanId: clanId }));
+					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 				});
-			}, 0);
+			}
+			if (channelData?.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				if (isTabletLandscape) {
+					navigation.goBack();
+				} else {
+					navigation.goBack();
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
+				const channelId = channelData?.channel_id;
 
-			// Set cache
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-		}
-	};
+				timeoutRef.current = setTimeout(async () => {
+					requestAnimationFrame(async () => {
+						await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					});
+				}, 0);
+
+				// Set cache
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			}
+		},
+		[currentClanId, isTabletLandscape, navigation]
+	);
 
 	const renderItem = ({ item }) => {
 		if (item?.type === ChannelTypeHeader) {

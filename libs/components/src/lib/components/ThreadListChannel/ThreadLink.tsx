@@ -60,7 +60,9 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		setShowModal(true);
 		setIsShowPanelChannel(false);
 	};
-
+	const handleOpenSetting = () => {
+		setOpenSetting(true);
+	};
 	return (
 		<div
 			className="flex flex-row items-center h-[34px] relative "
@@ -96,7 +98,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					onDeleteChannel={handleDeleteChannel}
 					channel={thread}
 					coords={coords}
-					setOpenSetting={setOpenSetting}
+					openSetting={handleOpenSetting}
 					setIsShowPanelChannel={setIsShowPanelChannel}
 					rootRef={panelRef}
 				/>

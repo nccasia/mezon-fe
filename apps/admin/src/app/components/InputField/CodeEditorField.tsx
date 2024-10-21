@@ -19,6 +19,7 @@ function CodeEditorField({ onChange, value, label, errorMessage, showInlineError
 				value={value || ''}
 				className="my-1 block w-full text-[12px] px-3 py-2 border-[1px] focus:border-[1px] dark:bg-gray-600 focus:border-gray-500 focus-visible:border-0 focus:ring-0 focus-visible:ring-gray-100 focus-within:ring-0 focus:ring-transparent "
 				onValueChange={(newCode) => onChange(newCode)}
+				onDragStart={(e) => e.preventDefault()}
 				highlight={highlight}
 				padding={10}
 				autoCapitalize="off"

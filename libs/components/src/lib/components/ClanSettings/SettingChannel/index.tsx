@@ -1,9 +1,10 @@
 import { selectChannelSuggestionEntities, selectMemberClanByGoogleId, selectMemberClanByUserId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize } from '@mezon/utils';
+import { formatDistance } from 'date-fns';
 import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { ApiChannelSettingItem } from 'mezon-js/api.gen';
+import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -33,6 +34,7 @@ const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 				<span className="flex-1">Name</span>
 				<span className="flex-1">Members</span>
 				<span className="flex-1">Messages count</span>
+				<span className="flex-1">Last Sent</span>
 				<span className="pr-1">Creator</span>
 			</div>
 			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth pb-10" ref={parentRef}>
@@ -63,6 +65,7 @@ const RenderChannelAndThread = ({
 				channelId={channelParrent.id as string}
 				isVoice={channelParrent.channel_type === ChannelType.CHANNEL_TYPE_VOICE}
 				messageCount={channelParrent.message_count || 0}
+				lastMessage={channelParrent.last_sent_message}
 			/>
 			<div className="flex flex-col pl-8">
 				{listChannelGroup.map((thread) => (
@@ -75,6 +78,7 @@ const RenderChannelAndThread = ({
 						userIds={thread?.user_ids || []}
 						channelId={thread.id as string}
 						messageCount={thread.message_count || 0}
+						lastMessage={channelParrent.last_sent_message}
 					/>
 				))}
 			</div>
@@ -91,7 +95,8 @@ const ItemInfor = ({
 	onClick,
 	channelId,
 	isVoice,
-	messageCount
+	messageCount,
+	lastMessage
 }: {
 	isThread?: boolean;
 	label: string;
@@ -102,6 +107,7 @@ const ItemInfor = ({
 	channelId: string;
 	isVoice?: boolean;
 	messageCount?: number | string;
+	lastMessage?: ApiChannelMessageHeader;
 }) => {
 	const creatorChannel = useSelector(selectMemberClanByUserId(creatorId));
 
@@ -110,6 +116,41 @@ const ItemInfor = ({
 		e.preventDefault();
 		navigator.clipboard.writeText(channelId);
 	};
+	const mumberformatter = Intl.NumberFormat('en-US', {
+		notation: 'compact',
+		compactDisplay: 'short'
+	});
+	const date = lastMessage?.timestamp_seconds
+		? formatDistance((lastMessage?.timestamp_seconds as number) * 1000, new Date(), { addSuffix: true })
+		: null;
+
+	const handleShowAllMemberList = () => {
+		if (userIds.length > 0) {
+			openModalAllMember();
+		}
+	};
+
+	const [openModalAllMember, closeModalAllMember] = useModal(() => {
+		return (
+			<div
+				className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-black bg-opacity-75 z-30"
+				onClick={closeModalAllMember}
+			>
+				<div
+					className="w-450 max-h-[80vh] min-h-250 bg-bgTertiary rounded-lg flex flex-col gap-2 p-4 overflow-y-auto hide-scrollbar"
+					onClick={(e) => e.stopPropagation()}
+				>
+					<div className="font-semibold pb-3 text-channelActiveLightColor dark:text-channelTextareaLight">List Member</div>
+					{userIds.map((member) => (
+						<div className="flex gap-3">
+							<AvatarUserShort id={member} key={member} hiddenTooltip={true} size={'md'} showName={true} />
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}, [channelId]);
+
 	return (
 		<div
 			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
@@ -135,8 +176,10 @@ const ItemInfor = ({
 
 					{isVoice && <Icons.Speaker />}
 				</div>
-				<div className={`flex-1`}>{label}</div>
-				<div className="flex-1 flex ">
+				<div className={`flex-1 box-border flex overflow-hidden`}>
+					<span className="truncate pr-8">{label}</span>
+				</div>
+				<div className="flex-1 flex " onClick={handleShowAllMemberList}>
 					{privateChannel ? (
 						<Avatar.Group className={`flex flex-1 items-center gap-3 ${isThread ? '-ml-8' : ''}`}>
 							{userIds.slice(0, 2).map((member) => (
@@ -153,7 +196,15 @@ const ItemInfor = ({
 						<p className={`italic text-xs ${isThread ? '-ml-8' : ''}`}>(All Members)</p>
 					)}
 				</div>
-				<div className={`flex-1 font-semibold ${isThread ? '-ml-8' : ''}`}>{messageCount}</div>
+				<div className={`flex-1 font-semibold ${isThread ? '-ml-8' : ''}`}>{mumberformatter.format(Number(messageCount || 0))}</div>
+				<div className={`flex-1 flex gap-1 items-center`}>
+					{lastMessage?.sender_id ? (
+						<>
+							<AvatarUserShort id={lastMessage?.sender_id as string} />
+							<div>{date}</div>
+						</>
+					) : null}
+				</div>
 
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					{(creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url) && (
@@ -173,7 +224,17 @@ const ItemInfor = ({
 	);
 };
 export default ListChannelSetting;
-export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id: string; hiddenTooltip?: boolean; size?: keyof AvatarSizes }) => {
+export const AvatarUserShort = ({
+	id,
+	hiddenTooltip = false,
+	size = 'xs',
+	showName = false
+}: {
+	id: string;
+	hiddenTooltip?: boolean;
+	size?: keyof AvatarSizes;
+	showName?: boolean;
+}) => {
 	const member = useSelector(selectMemberClanByUserId(id));
 	const voiceClan = useSelector(selectMemberClanByGoogleId(id ?? ''));
 	const clanAvatar = voiceClan?.clan_avatar || member?.clan_avatar;
@@ -181,7 +242,7 @@ export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id
 	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
 
 	return (
-		<>
+		<div className="flex items-center gap-3">
 			{hiddenTooltip ? (
 				<Avatar img={avatarUrl} rounded size={size} />
 			) : (
@@ -189,6 +250,11 @@ export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id
 					<Avatar img={avatarUrl} rounded size={size} />
 				</Tooltip>
 			)}
-		</>
+			{showName ? (
+				<div className="text-channelActiveColor dark:text-channelTextareaLight">
+					{member?.clan_nick || member?.user?.display_name || member?.user?.username}
+				</div>
+			) : null}
+		</div>
 	);
 };

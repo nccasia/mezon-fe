@@ -1,4 +1,3 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { TrashIcon } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { EmojiDataOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
@@ -6,6 +5,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { ScrollView } from 'react-native-gesture-handler';
 import { style } from '../styles';
 import { ReactionMember } from './ReactionMember';
 
@@ -74,7 +74,7 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 
 	const getTabHeader = () => {
 		return (
-			<BottomSheetScrollView horizontal showsHorizontalScrollIndicator={false}>
+			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 				{allReactionDataOnOneMessage.map((emojiItem) => {
 					return (
 						<Pressable
@@ -93,7 +93,7 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 						</Pressable>
 					);
 				})}
-			</BottomSheetScrollView>
+			</ScrollView>
 		);
 	};
 

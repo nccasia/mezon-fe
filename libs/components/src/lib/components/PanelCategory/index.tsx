@@ -204,7 +204,10 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 						name="NotificationSetting"
 						defaultNotifi={true}
 						onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
-						checked={defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT}
+						checked={
+							defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT ||
+							defaultCategoryNotificationSetting?.notification_setting_type === undefined
+						}
 					/>
 					{notificationTypesList.map((notification) => (
 						<ItemPanel

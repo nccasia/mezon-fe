@@ -186,7 +186,7 @@ export default function EmojiSelectorContainer({
 			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
-			<View style={{ backgroundColor: theme === 'dark' || isReactMessage ? themeValue.secondary : themeValue.tertiary }}>
+			<View style={{ backgroundColor: theme === 'dark' || isReactMessage ? themeValue.primary : themeValue.tertiary }}>
 				<View style={styles.textInputWrapper}>
 					<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
 					<TextInput

@@ -1,29 +1,20 @@
 import { RefObject, useEffect } from 'react';
 
-export const useEscapeKeyClose = (
-	ref: RefObject<HTMLElement> | undefined,
-	onClose: () => void,
-	options: Partial<{
-		notFocus: boolean;
-	}> = {}
-) => {
+export const useEscapeKeyClose = (ref: RefObject<HTMLElement> | undefined, onClose: () => void) => {
 	useEffect(() => {
 		const element = ref?.current;
 		if (!element) return;
-		const { notFocus } = options;
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape' || event.key === 'Esc') {
 				onClose();
 			}
 		};
-		if (element) {
-			!notFocus && element.focus();
-			element.addEventListener('keydown', handleKeyDown);
+		if (document.activeElement !== element && !element?.contains(document.activeElement)) {
+			element.focus();
 		}
+		document.addEventListener('keydown', handleKeyDown);
 		return () => {
-			if (element) {
-				element.removeEventListener('keydown', handleKeyDown);
-			}
+			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [onClose, options, ref]);
+	}, [ref, onClose]);
 };

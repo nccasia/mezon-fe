@@ -3,6 +3,7 @@ import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
 	channelsActions,
+	hasGrandchildModal,
 	notificationSettingActions,
 	selectCategoryById,
 	selectChannelById,
@@ -12,6 +13,7 @@ import {
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectSelectedChannelNotificationSetting,
+	stickerSettingActions,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -42,7 +44,7 @@ type PanelChannel = {
 	channel: IChannel;
 	onDeleteChannel: () => void;
 	selectedChannel?: string;
-	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
+	openSetting: () => void;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	rootRef?: RefObject<HTMLElement>;
 	isUnread?: boolean;
@@ -73,16 +75,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({
-	coords,
-	channel,
-	setOpenSetting,
-	setIsShowPanelChannel,
-	onDeleteChannel,
-	rootRef,
-	selectedChannel,
-	isUnread
-}: PanelChannel) => {
+const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -96,10 +89,11 @@ const PanelChannel = ({
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentChannel = useSelector(selectChannelById(selectedChannel || ''));
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
+	const hasModalInChild = useSelector(hasGrandchildModal);
 
 	const handleEditChannel = () => {
-		setOpenSetting(true);
+		openSetting();
 		setIsShowPanelChannel(false);
 	};
 
@@ -109,19 +103,29 @@ const PanelChannel = ({
 
 	const handleLeaveChannel = () => {
 		dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: selectedChannel || '' }));
+		handleCloseModalConfirm();
 	};
-	const modalConfirm = useRef(null);
+
 	const [openModelConfirm, closeModelConfirm] = useModal(() => (
-		<div ref={modalConfirm}>
-			<ModalConfirm
-				handleCancel={closeModelConfirm}
-				handleConfirm={handleLeaveChannel}
-				title="Leave Thread"
-				buttonName="Leave thread"
-				message={`You can't receive message from thread when leave this thread`}
-			/>
-		</div>
+		<ModalConfirm
+			handleCancel={handleCloseModalConfirm}
+			handleConfirm={handleLeaveChannel}
+			title="Leave Thread"
+			buttonName="Leave thread"
+			message={`You can't receive message from thread when leave this thread`}
+		/>
 	));
+
+	const handleOpenModalConfirm = () => {
+		dispatch(stickerSettingActions.openModalInChild());
+		openModelConfirm();
+	};
+
+	const handleCloseModalConfirm = () => {
+		dispatch(stickerSettingActions.closeModalInChild());
+		closeModelConfirm();
+		handClosePannel();
+	};
 
 	const handleScheduleMute = (duration: number) => {
 		if (duration !== Infinity) {
@@ -189,10 +193,18 @@ const PanelChannel = ({
 
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0') {
-			setNameChildren('Mute Channel');
+			if (channel.parrent_id === '0') {
+				setNameChildren('Mute Channel');
+			} else {
+				setNameChildren('Mute Thread');
+			}
 			setmutedUntil('');
 		} else {
-			setNameChildren('Unmute Channel');
+			if (channel.parrent_id === '0') {
+				setNameChildren('Unmute Channel');
+			} else {
+				setNameChildren('Unmute Thread');
+			}
 			if (getNotificationChannelSelected?.time_mute) {
 				const timeMute = new Date(getNotificationChannelSelected.time_mute);
 				const currentTime = new Date();
@@ -234,7 +246,7 @@ const PanelChannel = ({
 	useOnClickOutside(
 		panelRef,
 		() => {
-			if (!modalConfirm.current) {
+			if (!hasModalInChild) {
 				handClosePannel();
 			}
 		},
@@ -304,7 +316,7 @@ const PanelChannel = ({
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
-						{channel.type === typeChannel.text && (
+						{channel?.type === typeChannel.text && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}
@@ -322,7 +334,10 @@ const PanelChannel = ({
 									type="radio"
 									name="NotificationSetting"
 									defaultNotifi={true}
-									checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
+									checked={
+										getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
+										getNotificationChannelSelected?.notification_setting_type === undefined
+									}
 									subText={defaultNotifiName}
 									onClick={() => setNotification(ENotificationTypes.DEFAULT)}
 								/>
@@ -355,25 +370,29 @@ const PanelChannel = ({
 			) : (
 				<>
 					<GroupPanels>
-						<Dropdown
-							trigger="hover"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div>
-									<ItemPanel children="Mute Thread" dropdown="change here" />
-								</div>
-							)}
-							label=""
-							placement="right-start"
-							className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
-						>
-							<ItemPanel children="For 15 Minutes" />
-							<ItemPanel children="For 1 Hour" />
-							<ItemPanel children="For 3 Hour" />
-							<ItemPanel children="For 8 Hour" />
-							<ItemPanel children="For 24 Hour" />
-							<ItemPanel children="Until I turn it back on" />
-						</Dropdown>
+						{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
+							<Dropdown
+								trigger="hover"
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<div>
+										<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
+									</div>
+								)}
+								label=""
+								placement="right-start"
+								className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+							>
+								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
+								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
+								<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
+								<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
+								<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
+								<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+							</Dropdown>
+						) : (
+							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
+						)}
 						{channel.type === typeChannel.text && (
 							<Dropdown
 								trigger="hover"
@@ -387,13 +406,32 @@ const PanelChannel = ({
 								placement="right-start"
 								className="dark:bg-[#323232] bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
-								<ItemPanel children="Use Category Default" type="radio" />
-								<ItemPanel children="All Messages" type="radio" />
-								<ItemPanel children="Only @mentions" type="radio" />
-								<ItemPanel children="Nothing" type="radio" />
+								<ItemPanel
+									children="Use Category Default"
+									type="radio"
+									name="NotificationSetting"
+									defaultNotifi={true}
+									checked={
+										getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
+										getNotificationChannelSelected?.notification_setting_type === undefined
+									}
+									subText={defaultNotifiName}
+									onClick={() => setNotification(ENotificationTypes.DEFAULT)}
+								/>
+								{notificationTypesList.map((notification) => (
+									<ItemPanel
+										children={notification.label}
+										notificationId={notification.value}
+										type="radio"
+										name="NotificationSetting"
+										key={notification.value}
+										checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+										onClick={() => setNotification(notification.value)}
+									/>
+								))}
 							</Dropdown>
 						)}
-						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={openModelConfirm} children="Leave Thread" danger />}
+						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />}
 					</GroupPanels>
 
 					{canManageThread && (

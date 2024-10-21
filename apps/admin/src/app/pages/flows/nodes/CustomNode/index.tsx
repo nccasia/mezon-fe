@@ -113,16 +113,16 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 
 	return (
 		<div className="w-[250px] border-2 rounded-lg bg-slate-50 dark:bg-gray-600 relative group hover:border-blue-300">
-			<div className="p-2 flex">
+			<div className="p-2 flex custom-drag-handle">
 				<span className="ml-2 font-medium flex items-center">{label}</span>
 			</div>
 			<div className="mt-1">
-				<div className="font-medium bg-gray-100 dark:bg-gray-700 text-center p-2">Inputs</div>
+				<div className="font-medium bg-gray-100 dark:bg-gray-700 text-center p-2 custom-drag-handle">Inputs</div>
 				<div className="p-2 hidden-submit-field">
 					{/* render text label of target anchors */}
 					{anchors.target?.map((item, index) => {
 						return (
-							<div key={index} className="flex mt-1">
+							<div key={index} className="flex mt-1 custom-drag-handle">
 								<span className="text-sm">{item.text}</span>
 								<span className="text-red-600 ml-2">*</span>
 							</div>
@@ -132,12 +132,12 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 				</div>
 			</div>
 			<div className="mt-1">
-				<div className="font-medium bg-gray-100 dark:bg-gray-700 text-center p-2">Outputs</div>
+				<div className="font-medium bg-gray-100 dark:bg-gray-700 text-center p-2 custom-drag-handle">Outputs</div>
 				<div className="p-2">
 					{/* render text label of source anchors */}
 					{anchors.source?.map((item, index) => {
 						return (
-							<div key={index} className="flex justify-end">
+							<div key={index} className="flex justify-end custom-drag-handle">
 								<span className="text-sm">{item.text}</span>
 							</div>
 						);

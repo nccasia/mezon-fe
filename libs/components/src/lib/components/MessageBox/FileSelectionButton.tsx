@@ -37,7 +37,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdi
 			<input id="preview_img" type="file" onChange={handleChange} className="w-full hidden" multiple />
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb cursor-pointer">
 				<Icons.AddCircle
-					className={`w-6 h-6 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}
+					className={`w-6 h-6 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary`}
 				/>
 			</div>
 		</label>

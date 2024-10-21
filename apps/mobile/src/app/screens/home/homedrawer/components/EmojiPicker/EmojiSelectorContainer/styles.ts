@@ -37,7 +37,7 @@ export const style = (colors: Attributes) =>
 		},
 		textInputWrapper: {
 			flexDirection: 'row',
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondary,
 			marginVertical: 10,
 			alignItems: 'center',
 			paddingHorizontal: 10,

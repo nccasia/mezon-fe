@@ -8,10 +8,12 @@ function CustomTextField({ onChange, value, label, errorMessage, showInlineError
 		<div className="ImageField mt-2">
 			{label && <label className="block text-sm">{label}</label>}
 			<input
-				className="my-1 block w-full px-3 py-2 border-[1px] focus:border-[1px] bg-transparent focus-visible:border-0 focus:ring-0 focus-visible:ring-gray-100 focus-within:ring-0 focus:ring-transparent rounded-lg"
+				className="my-1 block w-full px-3 py-2 rounded-md border-[1px] focus:border-[1px] bg-transparent focus-visible:outline-none focus-visible:border-[1px] focus-visible:border-gray-400"
 				onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 					onChange(event.target.value);
 				}}
+				onDragStart={(e) => e.preventDefault()}
+				draggable={false}
 				value={value || ''}
 				type={props.type}
 				placeholder={props.placeholder}

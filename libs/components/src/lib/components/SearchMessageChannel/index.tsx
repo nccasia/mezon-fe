@@ -112,22 +112,15 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
 			// TODO: check logic below code
-			if (mentions.length === 0) {
-				filter.push(
-					{
-						field_name: 'content',
-						field_value: value
-					},
-					{ field_name: 'channel_id', field_value: channelId },
-					{ field_name: 'clan_id', field_value: currentClanId as string }
-				);
+			if (value) {
+				filter.push({
+					field_name: 'content',
+					field_value: value
+				});
 			}
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
-				filter.push(
-					{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
-					{ field_name: 'channel_id', field_value: channelId }
-				);
+				filter.push({ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] });
 			}
 			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 		},
@@ -160,7 +153,13 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
 				if (isUseProfileDM) dispatch(appActions.setIsUseProfileDM(!isUseProfileDM));
 				if (search) {
-					fetchSearchMessages(search);
+					const requestFilter = [
+						...(search.filters || []),
+						{ field_name: 'channel_id', field_value: channelId },
+						{ field_name: 'clan_id', field_value: currentClanId as string }
+					];
+					const requestBody = { ...search, filters: requestFilter };
+					fetchSearchMessages(requestBody);
 				}
 			}
 
@@ -190,7 +189,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			dispatch(
 				searchMessagesActions.setValueInputSearch({
 					channelId,
-					value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
+					value: !valueInputSearch ? value : valueInputSearch + value
 				})
 			);
 			searchRef.current?.focus();

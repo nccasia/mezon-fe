@@ -1,9 +1,17 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { friendsActions, selectChannelById, selectDmGroupCurrent, selectFriendStatus, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import {
+	EStateFriend,
+	friendsActions,
+	selectChannelById,
+	selectDmGroupCurrent,
+	selectFriendStatus,
+	selectMemberClanByUserId,
+	useAppSelector
+} from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -130,22 +138,22 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 					{/* TODO: Mutual server */}
 					{!isDMGroup && (
 						<View style={styles.friendActions}>
-							{checkAddFriend.noFriend && (
+							{!checkAddFriend && (
 								<TouchableOpacity style={styles.addFriendButton} onPress={handleAddFriend}>
 									<Text style={styles.buttonText}>{t('userAction.addFriend')}</Text>
 								</TouchableOpacity>
 							)}
-							{checkAddFriend.friend && (
+							{checkAddFriend === EStateFriend.FRIEND && (
 								<TouchableOpacity style={styles.deleteFriendButton} onPress={handleRemoveFriend}>
 									<Text style={styles.buttonText}>{t('userAction.removeFriend')}</Text>
 								</TouchableOpacity>
 							)}
-							{checkAddFriend.otherPendingFriend && (
+							{checkAddFriend === EStateFriend.OTHER_PENDING && (
 								<View style={[styles.addFriendButton, { opacity: 0.6 }]}>
 									<Text style={styles.buttonText}>{t('sendAddFriendSuccess')}</Text>
 								</View>
 							)}
-							{checkAddFriend.myPendingFriend && (
+							{checkAddFriend === EStateFriend.MY_PENDING && (
 								<View style={styles.friendActions}>
 									<TouchableOpacity style={styles.addFriendButton} onPress={handleAcceptFriend}>
 										<Text style={styles.buttonText}>{t('accept')}</Text>
@@ -155,9 +163,9 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 									</TouchableOpacity>
 								</View>
 							)}
-							{/*<Pressable style={styles.blockButton}>*/}
-							{/*	<Text style={styles.buttonText}>{t('pendingContent.block')}</Text>*/}
-							{/*</Pressable>*/}
+							<Pressable style={styles.blockButton}>
+								<Text style={styles.buttonText}>{t('pendingContent.block')}</Text>
+							</Pressable>
 						</View>
 					)}
 				</View>

@@ -72,13 +72,13 @@ export const style = (colors: Attributes) =>
 			backgroundColor: Colors.secondary
 		},
 		homeDefault: {
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.primary,
 			flex: 1
 		},
 		wrapperChannelMessage: {
 			flex: 1,
 			justifyContent: 'space-between',
-			backgroundColor: colors.secondary
+			backgroundColor: colors.primary
 		},
 		listChannels: {
 			paddingTop: size.s_14,
@@ -210,9 +210,10 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border,
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.primary,
 			paddingHorizontal: size.s_14,
-			paddingVertical: size.s_8
+			paddingVertical: size.s_8,
+			paddingBottom: size.s_12
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
@@ -341,7 +342,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.reactionBg,
 			borderLeftColor: Colors.textLink,
 			borderLeftWidth: 2,
-			paddingTop: size.s_2
+			paddingTop: size.s_4
 		},
 		highlightMessageReply: {
 			backgroundColor: Colors.bgMessageHighlight,
@@ -464,7 +465,7 @@ export const style = (colors: Attributes) =>
 		},
 		channelView: {
 			flex: 1,
-			backgroundColor: colors.secondary
+			backgroundColor: colors.primary
 		},
 		iconWelcomeMessage: {
 			backgroundColor: colors.primary,

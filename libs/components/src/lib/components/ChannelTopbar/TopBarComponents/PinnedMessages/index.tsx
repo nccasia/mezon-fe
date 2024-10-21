@@ -1,4 +1,4 @@
-import { useAppParams, useOnClickOutside } from '@mezon/core';
+import { useAppParams, useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { PinMessageEntity, pinMessageActions, selectCurrentChannelId, selectTheme, useAppDispatch } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject, useRef, useState } from 'react';
@@ -64,6 +64,8 @@ const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 		},
 		rootRef
 	);
+
+	useEscapeKeyClose(modalRef, onClose);
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-10 animate-scale_up origin-top-right">

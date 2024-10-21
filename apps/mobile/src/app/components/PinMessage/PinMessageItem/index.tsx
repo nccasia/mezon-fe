@@ -1,10 +1,21 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { PinMessageEntity, selectMessageByMessageId, useAppSelector } from '@mezon/store-mobile';
+import {
+	PinMessageEntity,
+	messagesActions,
+	pinMessageActions,
+	selectCurrentClanId,
+	selectMessageByMessageId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { MessageAttachment } from '../../../screens/home/homedrawer/components/MessageAttachment';
 import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components/RenderTextMarkdown';
 import { style } from './PinMessageItem.styles';
@@ -19,8 +30,28 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessageItem?.channel_id, pinMessageItem?.message_id)) || {};
+	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
+	const navigation = useNavigation<any>();
+
+	const handleJumpMess = () => {
+		dispatch(pinMessageActions.setJumpPinMessageId(pinMessageItem.message_id));
+
+		if (pinMessageItem.message_id && pinMessageItem.channel_id) {
+			dispatch(
+				messagesActions.jumpToMessage({
+					clanId: currentClanId,
+					messageId: pinMessageItem.message_id ?? '',
+					channelId: pinMessageItem.channel_id ?? ''
+				})
+			);
+		}
+
+		navigation.navigate(APP_SCREEN.HOME);
+	};
+
 	return (
-		<View style={styles.pinMessageItemWrapper}>
+		<TouchableOpacity onPress={handleJumpMess} style={styles.pinMessageItemWrapper}>
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>
 			<View style={styles.pinMessageItemBox}>
 				<Text style={styles.pinMessageItemName}>{pinMessageItem?.username}</Text>
@@ -37,7 +68,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 					<Icons.CircleXIcon color={themeValue.text} />
 				</TouchableOpacity>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 });
 

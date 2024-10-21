@@ -170,6 +170,7 @@ export const reactionSlice = createSlice({
 	name: REACTION_FEATURE_KEY,
 	initialState: initialReactionState,
 	reducers: {
+		removeAll: reactionAdapter.removeAll,
 		setEmojiHover(state, action) {
 			state.emojiHover = action.payload;
 		},

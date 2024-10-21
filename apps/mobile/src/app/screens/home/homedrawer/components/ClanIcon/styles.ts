@@ -52,14 +52,14 @@ export const style = (colors: Attributes) =>
 		badge: {
 			backgroundColor: Colors.red,
 			position: 'absolute',
-			borderRadius: size.s_14,
+			borderRadius: size.s_24,
 			borderWidth: 3,
 			borderColor: Colors.secondary,
-			minWidth: size.s_22,
-			height: size.s_22,
+			minWidth: size.s_24,
+			height: size.s_24,
 			alignItems: 'center',
 			justifyContent: 'center',
-			bottom: -3,
+			bottom: -5,
 			right: -5
 		},
 		badgeText: {

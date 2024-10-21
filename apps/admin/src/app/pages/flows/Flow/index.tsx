@@ -16,41 +16,46 @@ import {
 	useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Popover, Spinner, Tooltip } from 'flowbite-react';
+import { Popover, Spinner } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 import { FlowContext } from '../../../context/FlowContext';
 import flowService from '../../../services/flowService';
 import { addEdge, addNode, changeLoading, deleteNode, setEdgesContext, setNodesContext } from '../../../stores/flow/flow.action';
 import { IEdge, IFlowDataRequest, IFlowDetail, INode, INodeType, IParameter } from '../../../stores/flow/flow.interface';
+import ExampleFlow from '../../flowExamples/ExampleFlows';
 import AddNodeMenuPopup from '../AddNodeMenuPopup';
-import ExampleFlow from '../ExampleFlows';
 import FlowChatPopup from '../FlowChat';
 import CustomNode from '../nodes/CustomNode';
 import NodeTypes from '../nodes/NodeType';
-import ConfirmDeleteFlowPopup from './ConfirmDeleteFlowPopup';
+import FlowHeaderBar from './FlowHeaderBar';
 import NodeDetailModal from './NodeDetailModal';
 import SaveFlowModal from './SaveFlowModal';
 
 const Flow = () => {
-	const { flowState, flowDispatch } = React.useContext(FlowContext);
-	const { flowId, applicationId } = useParams();
 	const { userProfile } = useAuth();
-	const navigate = useNavigate();
 	const reactFlowWrapper = useRef(null);
+	const navigate = useNavigate();
+	const { screenToFlowPosition } = useReactFlow();
+	const appDetail = useSelector(selectAppDetail);
+
+	const { flowState, flowDispatch } = React.useContext(FlowContext);
+	const { flowId, applicationId, exampleFlowId } = useParams();
 	const [openModalSaveFlow, setOpenModalSaveFlow] = React.useState(false);
 	const [isExampleFlow, setIsExampleFlow] = React.useState(true);
 	const [nodes, setNodes, onNodesChange] = useNodesState(flowState.nodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState(flowState.edges);
-	const { screenToFlowPosition } = useReactFlow();
-	const appDetail = useSelector(selectAppDetail);
+
 	const nodeRefs = useRef<{ [key: string]: HTMLElement | null }>({} as { [key: string]: HTMLElement });
+
 	const [flowData, setFlowData] = React.useState<{ flowName: string; description: string }>({
 		flowName: 'Untitled Flow',
 		description: ''
 	});
+
 	useEffect(() => {
 		setNodes(flowState.nodes);
 	}, [flowState.nodes, setNodes]);
@@ -70,6 +75,7 @@ const Flow = () => {
 		event.dataTransfer.dropEffect = 'move';
 	}, []);
 
+	// create list node type from NodeType and CustomNode to use in ReactFlow
 	const listNodeType = useMemo(() => {
 		const obj: { [key: string]: (props: any) => JSX.Element } = {};
 		NodeTypes.forEach((item, index) => {
@@ -98,50 +104,7 @@ const Flow = () => {
 		return obj;
 	}, []);
 
-	const onChangeNode = (changes: NodeChange[]) => {
-		onNodesChange(changes);
-		flowDispatch(setNodesContext(nodes));
-	};
-	const onChangeEdge = (changes: EdgeChange[]) => {
-		onEdgesChange(changes);
-		flowDispatch(setEdgesContext(edges));
-	};
-	const onDrop = useCallback(
-		(event: React.DragEvent<HTMLDivElement>) => {
-			event.preventDefault();
-			const position = screenToFlowPosition({
-				x: event.clientX + 50,
-				y: event.clientY + 50
-			});
-			flowDispatch(addNode(position));
-		},
-		[screenToFlowPosition, flowDispatch]
-	);
-
-	const handleClickBackButton = () => {
-		// reset flow data when click back button
-		flowDispatch(setNodesContext([]));
-		flowDispatch(setEdgesContext([]));
-		navigate(`/applications/${applicationId}/flow`);
-	};
-	const handleClickDeleteButton = useCallback(async () => {
-		if (!flowId) {
-			toast.info('Flow has not been created yet');
-			return;
-		}
-		flowDispatch(changeLoading(true));
-		try {
-			await flowService.deleteFlow(flowId);
-			toast.success('Delete flow success');
-			navigate(`/applications/${applicationId}/flow`);
-		} catch {
-			toast.error('Delete flow failed');
-		} finally {
-			flowDispatch(changeLoading(false));
-		}
-	}, [flowId, flowDispatch, navigate, applicationId]);
-
-	const handleClickSaveFlow = useCallback(async () => {
+	const handleClickSaveFlow = React.useCallback(async () => {
 		let checkValidate = true;
 		// get data from all nodes
 		const formData: {
@@ -271,22 +234,38 @@ const Flow = () => {
 		userProfile?.user?.id,
 		userProfile?.user?.username
 	]);
+
+	const onChangeNode = (changes: NodeChange[]) => {
+		onNodesChange(changes);
+		flowDispatch(setNodesContext(nodes));
+	};
+	const onChangeEdge = (changes: EdgeChange[]) => {
+		onEdgesChange(changes);
+		flowDispatch(setEdgesContext(edges));
+	};
+
+	// handle drop node from menu to flow, add new node to flow
+	const onDrop = useCallback(
+		(event: React.DragEvent<HTMLDivElement>) => {
+			event.preventDefault();
+			const position = screenToFlowPosition({
+				x: event.clientX + 50,
+				y: event.clientY + 50
+			});
+			flowDispatch(addNode(position));
+		},
+		[screenToFlowPosition, flowDispatch]
+	);
+
 	useEffect(() => {
-		// set flow data is empty when flowId is empty
-		if (!flowId) {
-			flowDispatch(setNodesContext([]));
-			flowDispatch(setEdgesContext([]));
-			setIsExampleFlow(false);
-			return;
-		}
-
-		const checkIsExampleFlow = ExampleFlow.find((item) => item.id === flowId);
-
 		const setFlowDetail = (flowDetail: IFlowDetail) => {
 			setFlowData({
 				flowName: flowDetail?.flowName,
 				description: flowDetail?.description
 			});
+			const nodeId: {
+				[key: string]: string;
+			} = {};
 			const listNode = flowDetail.nodes?.map((node: INode) => {
 				const params: {
 					[key: string]: string;
@@ -300,15 +279,18 @@ const Flow = () => {
 					}
 					params[param.parameterKey] = value;
 				});
+				const id = uuidv4();
+				nodeId[node.id] = id;
 				return {
-					id: node.id,
+					id,
 					type: node.nodeType,
 					nodeName: node.nodeName,
 					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
 					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
+					dragHandle: '.custom-drag-handle',
 					data: {
 						label: node.nodeName,
-						id: node.id,
+						id,
 						defaultValue: params
 					}
 				};
@@ -316,9 +298,9 @@ const Flow = () => {
 			flowDispatch(setNodesContext(listNode));
 			const listEdge: Edge[] = flowDetail.connections?.map((edge: IEdge) => {
 				return {
-					id: edge.id ?? '',
-					source: edge.sourceNodeId,
-					target: edge.targetNodeId,
+					id: uuidv4(),
+					source: nodeId[edge.sourceNodeId],
+					target: nodeId[edge.targetNodeId],
 					sourceHandle: edge.sourceHandleId ?? '',
 					targetHandle: edge.targetHandleId ?? ''
 				};
@@ -326,27 +308,46 @@ const Flow = () => {
 			flowDispatch(setEdgesContext(listEdge));
 		};
 
+		const checkIsExampleFlow = ExampleFlow.find((item) => item.id === flowId || item.id === exampleFlowId);
+		// set flow data from example flow => use example flow template to create new flow
+		if (exampleFlowId && checkIsExampleFlow) {
+			setFlowDetail(checkIsExampleFlow.flowDetail);
+			setIsExampleFlow(false);
+			return;
+		}
+
+		// set flow data is empty when flowId is empty => create new flow
+		if (!flowId) {
+			flowDispatch(setNodesContext([]));
+			flowDispatch(setEdgesContext([]));
+			setIsExampleFlow(false);
+			return;
+		}
+
+		// get flow detail from example flow to display in flow editor
+		if (checkIsExampleFlow) {
+			setFlowDetail(checkIsExampleFlow.flowDetail);
+			setIsExampleFlow(true);
+			return;
+		}
+
 		// get flow detail when flowId is not empty
 		const getDetailFlow = async () => {
 			flowDispatch(changeLoading(true));
 			try {
-				// check if flow is an example flow, set flow detail from example flow. Otherwise, get flow detail from api
-				if (checkIsExampleFlow) {
-					setFlowDetail(checkIsExampleFlow.flowDetail);
-					setIsExampleFlow(true);
-				} else {
-					const response: IFlowDetail = await flowService.getFlowDetail(flowId);
-					setIsExampleFlow(false);
-					setFlowDetail(response);
-				}
+				const response: IFlowDetail = await flowService.getFlowDetail(flowId);
+				setIsExampleFlow(false);
+				setFlowDetail(response);
 			} catch (error) {
 				toast.error('Get flow detail failed');
 			} finally {
 				flowDispatch(changeLoading(false));
 			}
 		};
+		// get flow detail from api to display in flow editor
 		getDetailFlow();
-	}, [flowId, flowDispatch]);
+	}, [flowId, flowDispatch, exampleFlowId]);
+
 	useEffect(() => {
 		// handle delete node when press delete key
 		const onKeyUp = (event: KeyboardEvent) => {
@@ -365,49 +366,16 @@ const Flow = () => {
 			document.removeEventListener('keyup', onKeyUp);
 		};
 	}, [nodes, edges, flowDispatch]);
+
 	return (
 		<div ref={reactFlowWrapper} className={'w-full transition-all fixed top-0 left-0 right-0 bottom-0 z-50 h-[calc(100vh-50px)]'}>
 			<div className="px-4">
-				<div className="top-1 left-3 right-3 z-10 bg-gray-50 dark:bg-gray-600 h-[50px] flex items-center justify-between px-3 my-1 rounded-full">
-					<div className="flex items-center gap-2">
-						<button
-							onClick={handleClickBackButton}
-							className="w-[40px] h-[40px] ml-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
-						>
-							<Icons.LeftArrowIcon className="w-full" />
-						</button>
-						<div className="flex items-center text-[24px] font-semibold ml-[20px] pl-[10px] border-l-[1px] border-l-gray-300">
-							<span>{flowData?.flowName ?? 'Untitle Flow'}</span>
-							<button
-								onClick={() => setOpenModalSaveFlow(true)}
-								className="ml-3 w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-500 "
-							>
-								<Icons.PenEdit />
-							</button>
-						</div>
-					</div>
-					<div className="rightbox flex items-center gap-2">
-						<Tooltip content="Save Flow" style={'light'}>
-							<button
-								onClick={handleClickSaveFlow}
-								disabled={isExampleFlow}
-								className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200"
-							>
-								<Icons.IconTick />
-							</button>
-						</Tooltip>
-						<Tooltip content="Delete Flow" style={'light'}>
-							<Popover content={<ConfirmDeleteFlowPopup onConfirm={handleClickDeleteButton} />} trigger="click">
-								<button
-									disabled={!flowId || isExampleFlow}
-									className="w-[40px] h-[40px] mr-2  rounded-md flex items-center justify-center cursor-pointer bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-600 dark:bg-blue-500 border-[1px] transition-all active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-								>
-									<Icons.DeleteMessageRightClick />
-								</button>
-							</Popover>
-						</Tooltip>
-					</div>
-				</div>
+				<FlowHeaderBar
+					onSaveFlow={handleClickSaveFlow}
+					isExampleFlow={isExampleFlow}
+					flowData={flowData}
+					changeOpenModalSaveFlowData={setOpenModalSaveFlow}
+				/>
 			</div>
 			<ReactFlow
 				nodes={nodes}
@@ -421,16 +389,22 @@ const Flow = () => {
 				minZoom={0.5}
 				maxZoom={3}
 				defaultViewport={{ x: 100, y: 100, zoom: 1 }}
+				nodesDraggable={!isExampleFlow} // disable drag node if current flow is example flow
+				nodesConnectable={!isExampleFlow} // disable connect node if current flow is example flow
+				elementsSelectable={!isExampleFlow} // disable select node if current flow is example flow
+				zoomOnScroll={!isExampleFlow} // disable zoom on scroll if current flow is example flow
 				// fitView
 				colorMode="light"
 			>
-				<Panel position="top-left">
-					<Popover content={<AddNodeMenuPopup />} trigger="click">
-						<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
-							<Icons.AddIcon className="w-6 h-6" />
-						</button>
-					</Popover>
-				</Panel>
+				{!isExampleFlow && (
+					<Panel position="top-left">
+						<Popover content={<AddNodeMenuPopup />} trigger="click">
+							<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
+								<Icons.AddIcon className="w-6 h-6" />
+							</button>
+						</Popover>
+					</Panel>
+				)}
 				<Controls />
 				<Background className="dark:bg-bgPrimary bg-bgLightPrimary text-gray-500 dark:text-gray-100" variant={BackgroundVariant.Dots} />
 			</ReactFlow>

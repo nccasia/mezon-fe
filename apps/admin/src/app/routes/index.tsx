@@ -12,6 +12,7 @@ import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
 import { applicationLoader } from '../loader/applicationLoader';
+import FlowExamples from '../pages/flowExamples';
 import Flows from '../pages/flows';
 import Flow from '../pages/flows/Flow';
 import InitialRoutes from './InititalRoutes';
@@ -109,6 +110,18 @@ export const Routes = () => {
 										},
 										{
 											path: 'flow/:flowId',
+											element: (
+												<ReactFlowProvider>
+													<Flow />
+												</ReactFlowProvider>
+											)
+										},
+										{
+											path: 'flow-examples',
+											element: <FlowExamples />
+										},
+										{
+											path: 'use-flow-example/:exampleFlowId',
 											element: (
 												<ReactFlowProvider>
 													<Flow />

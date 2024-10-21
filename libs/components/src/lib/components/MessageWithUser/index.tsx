@@ -1,5 +1,14 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannel, selectJumpPinMessageId } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannel,
+	selectDataReferences,
+	selectIdMessageToJump,
+	selectJumpPinMessageId,
+	selectLastMessageIdByChannelId,
+	selectMemberClanByUserId,
+	useAppSelector
+} from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -52,30 +61,28 @@ function MessageWithUser({
 	const userLogin = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const {
-		senderId,
-		username,
-		userClanAvatar,
-		userClanNickname,
-		userDisplayName,
-		senderIdMessageRef,
-		avatarSender,
-		messageAvatarSenderRef,
-		messageDisplayNameSenderRef,
-		messageUsernameSenderRef
-	} = useMessageParser(message);
+	const user = useAppSelector(selectMemberClanByUserId(userLogin.userProfile?.user?.id || ''));
+	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef, avatarSender, messageAvatarSenderRef } =
+		useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
-	const [shortUserId, setShortUserId] = useState(senderId);
+	const [shortUserId, setShortUserId] = useState('');
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const dataReferences = useSelector(selectDataReferences(message?.channel_id ?? ''));
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	// Computed values
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = false;
-	const checkMessageTargetToMoved = false;
+
+	const { userId } = useAuth();
+	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+	const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id) || false;
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, message?.channel_id ?? ''));
+
+	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
 	const isMeMessage = message.isMe;
@@ -93,8 +100,9 @@ function MessageWithUser({
 			includesHere = message.content.t?.includes('@here');
 		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
-		return includesHere || includesUser;
-	}, [message.content?.t, userLogin.userProfile?.user?.id, message.mentions]);
+		const includesRole = mentionOnMessage?.some((item) => user?.role_id?.includes(item?.role_id as string));
+		return includesHere || includesUser || includesRole;
+	}, [message.content?.t, userLogin.userProfile?.user?.id, message.mentions, user]);
 
 	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
@@ -128,16 +136,26 @@ function MessageWithUser({
 		'flex h-15 flex-col w-auto px-3',
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
-		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved || checkJumpPinMessage },
+		{
+			'dark:bg-[#403D38] bg-[#EAB3081A]':
+				(checkMessageIncludeMention || checkReplied) && !messageReplyHighlight && !checkJumpPinMessage && !checkMessageTargetToMoved
+		},
+		{
+			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
+				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		},
+		{ 'bg-bgMessageReplyHighline': messageReplyHighlight }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'bg-[#403D38]': hasIncludeMention },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{ 'bg-blue-500': messageReplyHighlight },
+		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied },
+		{
+			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
+				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		}
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
@@ -177,6 +195,7 @@ function MessageWithUser({
 			return userClanAvatar || avatarSender;
 		}
 	}, [userClanAvatar, avatarSender, shortUserId]);
+
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -237,7 +256,7 @@ function MessageWithUser({
 					</div>
 				</HoverStateWrapper>
 			)}
-			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && (
+			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && shortUserId && (
 				<div
 					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 					style={{

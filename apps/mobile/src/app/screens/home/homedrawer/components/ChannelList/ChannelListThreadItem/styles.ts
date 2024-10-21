@@ -1,4 +1,4 @@
-import { Attributes, Metrics, baseColor, size } from '@mezon/mobile-ui';
+import {Attributes, Metrics, baseColor, size, verticalScale} from '@mezon/mobile-ui';
 import { Platform, StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -37,10 +37,10 @@ export const style = (colors: Attributes) =>
 		},
 		titleThread: {
 			flex: 1,
-			fontSize: size.s_14,
+			fontSize: size.s_15,
 			fontWeight: '600',
 			color: colors.channelNormal,
-			top: size.s_4,
+			top: verticalScale(3),
 			paddingBottom: size.s_2
 		},
 

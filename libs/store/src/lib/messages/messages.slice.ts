@@ -585,11 +585,13 @@ export const updateTypingUsers = createAsyncThunk(
 		// set user typing to true
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
 
-		if (typingTimeouts[userId]) {
-			clearTimeout(typingTimeouts[userId]);
+		const typingKey = channelId + userId;
+
+		if (typingTimeouts[typingKey]) {
+			clearTimeout(typingTimeouts[typingKey]);
 		}
 
-		typingTimeouts[userId] = setTimeout(() => {
+		typingTimeouts[typingKey] = setTimeout(() => {
 			thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
 			delete typingTimeouts[userId];
 		}, TYPING_TIMEOUT + 100);

@@ -87,8 +87,6 @@ export function MemberProfile({
 		distanceToBottom: 0
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
-	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
-
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
@@ -236,7 +234,6 @@ export function MemberProfile({
 		modalState.current.userProfile = true;
 		return (
 			<UserProfileModalInner
-				openModal={isOpenProfileModal}
 				userId={user?.user?.id || user?.user_id?.[0]}
 				directId={(user as any)?.channel_id || user?.channelId}
 				onClose={() => closeModal(ModalType.UserProfile)}

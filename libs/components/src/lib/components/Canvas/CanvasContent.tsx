@@ -14,13 +14,21 @@ interface ActiveFormats {
 	header?: string;
 }
 
-function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content: string }) {
+type CanvasContentProps = {
+	isLightMode: boolean;
+	content: string;
+	idCanvas: string;
+	isEditCanvas: boolean;
+};
+
+function CanvasContent({ isLightMode, content, idCanvas, isEditCanvas }: CanvasContentProps) {
 	const [toolbarVisible, setToolbarVisible] = useState(false);
 	const quillRef = useRef<Quill | null>(null);
 	const editorRef = useRef<HTMLDivElement | null>(null);
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
+	const placeholderColor = isLightMode ? 'rgba(0,0,0,0.6)' : '#ffffff';
 
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
 		bold: false,
@@ -33,30 +41,56 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	});
 
 	useEffect(() => {
-		// Initialize Quill
+		if (content && quillRef.current) {
+			const selection = quillRef.current.getSelection();
+			quillRef.current.setContents(JSON.parse(content));
+			if (selection) {
+				quillRef.current.setSelection(selection.index, selection.length);
+			}
+		}
+	}, [content]);
+
+	useEffect(() => {
 		quillRef.current = new Quill('#editor', {
 			theme: 'snow',
 			modules: {
-				toolbar: false // Disable default toolbar
+				toolbar: false,
+				clipboard: {
+					matchVisual: false
+				}
 			},
 			placeholder: 'Type / to insert...'
 		});
 		setQuill(quillRef.current);
 
-		if (content) {
+		quillRef.current.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+			delta.ops.forEach((op) => {
+				if (op.attributes && op.attributes.background) {
+					delete op.attributes.background;
+				}
+				// if (op.attributes && op.attributes.color) {
+				// 	op.attributes.color = isLightMode ? 'black' : 'white';
+				// }
+			});
+			return delta;
+		});
+
+		if (content && quillRef.current) {
 			quillRef.current.setContents(JSON.parse(content));
 		}
 
-		// Handle content changes
 		quillRef.current.on('text-change', () => {
-			handleContentChange(quillRef.current!);
+			if (isEditCanvas) {
+				const data = JSON.stringify(quillRef.current?.getContents());
+				handleContentChange(data);
+			} else {
+				quillRef.current?.disable();
+			}
 		});
 
-		// Handle selection changes
-		const handleSelectionChange = (range: any, oldRange: any, source: string) => {
+		const handleSelectionChange = (range: any) => {
 			if (range && range.length > 0) {
 				setToolbarVisible(true);
-				// Get current formats and update activeFormats state
 				const formats = quillRef.current?.getFormat(range) || {};
 				setActiveFormats({
 					bold: !!formats.bold,
@@ -80,15 +114,13 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 			}
 		};
 
-		// Handle keydown events
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Enter') {
-				event.preventDefault(); // Prevent default Enter behavior
+				event.preventDefault();
 				setToolbarVisible(false);
 			}
 		};
 
-		// Handle clicks outside the editor and toolbar
 		const handleClickOutside = (event: MouseEvent) => {
 			if (editorRef.current && !editorRef.current.contains(event.target as Node) && !toolbarRef.current) {
 				setToolbarVisible(false);
@@ -104,31 +136,27 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 			}
 		};
 
-		// Attach event listeners
 		quillRef.current.on('selection-change', handleSelectionChange);
 		quillRef.current.root.addEventListener('keydown', handleKeyDown);
 		document.addEventListener('mousedown', handleClickOutside);
 
-		// Cleanup event listeners on unmount
 		return () => {
 			quillRef.current?.off('selection-change', handleSelectionChange);
 			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, []);
+	}, [isEditCanvas]);
 
-	const handleContentChange = (content: Quill) => {
-		const data = JSON.stringify(content.getContents());
-		dispatch(canvasActions.setContent(data)); // Save content
+	const handleContentChange = (content: string) => {
+		dispatch(canvasActions.setContent(content));
 	};
 
-	// Function to toggle text formatting
 	const formatText = (format: keyof ActiveFormats) => {
-		if (quillRef.current) {
+		if (quillRef.current && isEditCanvas) {
 			const currentFormat = quillRef.current.getFormat();
 			const isActive = !!currentFormat[format];
 			quillRef.current.format(format, !isActive);
-			// Update activeFormats state after formatting
+
 			setActiveFormats((prev) => ({
 				...prev,
 				[format]: !isActive
@@ -138,8 +166,7 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 
 	const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
-		if (quill) {
-			// Apply header formatting based on selection
+		if (quill && isEditCanvas) {
 			if (value === 'h1') {
 				quill.format('header', 1);
 			} else if (value === 'h2') {
@@ -172,13 +199,16 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	const getStyle = (type: 'button' | 'option', value: string | keyof ActiveFormats) => {
 		if (type === 'button') {
 			const format = value as keyof ActiveFormats;
+			// active ? black : !light ? black : white
+
 			return {
 				padding: '5px',
 				fontWeight: format === 'bold' ? 600 : 'normal',
 				fontStyle: format === 'italic' ? 'italic' : 'normal',
 				textDecoration: format === 'underline' ? 'underline' : format === 'strike' ? 'line-through' : 'none',
 				backgroundColor: activeFormats[format] ? (isLightMode ? '#d3d3d3' : '#555') : 'transparent',
-				color: isLightMode ? 'black' : 'white',
+				color:
+					activeFormats[format] && isLightMode ? 'rgb(51, 51, 51)' : !activeFormats[format] && !isLightMode ? 'rgb(51, 51, 51)' : 'white',
 				border: 'none',
 				cursor: 'pointer',
 				borderRadius: '5px'
@@ -186,11 +216,22 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 		} else if (type === 'option') {
 			const optionValue = value as string;
 			return {
-				backgroundColor: activeFormats.header === optionValue ? 'gray' : 'white'
+				backgroundColor: activeFormats.header === optionValue ? (isLightMode ? '#d3d3d3' : '#555') : 'transparent',
+				color:
+					activeFormats.header === optionValue && isLightMode
+						? 'rgb(51, 51, 51)'
+						: !(activeFormats.header === optionValue) && !isLightMode
+							? 'rgb(51, 51, 51)'
+							: 'white'
 			};
 		}
 		return {};
 	};
+
+	useEffect(() => {
+		quillRef?.current?.setContents(quillRef.current.getContents());
+		quillRef?.current?.formatText(0, quillRef.current.getLength(), { color: isLightMode ? 'rgb(51, 51, 51)' : 'white' });
+	}, [isLightMode, idCanvas]);
 
 	return (
 		<div className="note-canvas" style={{ position: 'relative' }}>
@@ -207,8 +248,8 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 						display: 'flex',
 						alignItems: 'center',
 						gap: '4px',
-						background: isLightMode ? '#f0f0f0' : '#333',
-						color: isLightMode ? 'black' : 'white',
+						background: isLightMode ? '#333' : '#f0f0f0',
+						color: isLightMode ? 'white' : 'rgb(51, 51, 51)',
 						borderRadius: '5px',
 						zIndex: 99,
 						boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
@@ -221,8 +262,8 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 							padding: '5px',
 							borderRadius: '3px',
 							border: 'none',
-							background: isLightMode ? '#f0f0f0' : '#333',
-							color: isLightMode ? 'black' : 'white'
+							background: isLightMode ? '#333' : '#f0f0f0',
+							color: isLightMode ? 'white' : 'rgb(51, 51, 51)'
 						}}
 						value={activeFormats.header || 'paragraph'}
 						onChange={handleSelectChange}
@@ -267,7 +308,7 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 						<option value="check-list" style={getStyle('option', 'check-list')}>
 							Checked list
 						</option>
-						<option value="orderList" style={getStyle('option', 'order-list')}>
+						<option value="order-list" style={getStyle('option', 'order-list')}>
 							Ordered list
 						</option>
 						<option value="bullet-list" style={getStyle('option', 'bullet-list')}>
@@ -283,11 +324,10 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 					</select>
 
 					<span
-						className={`separator ${isLightMode ? 'bg-[#8080808f]' : 'bg-white'}`}
+						className={`separator ${isLightMode ? 'bg-white' : 'bg-[#8080808f]'}`}
 						style={{ height: '20px', width: '1px', margin: '0 4px' }}
 					></span>
 
-					{/* Bold Button */}
 					<button type="button" onClick={() => formatText('bold')} style={getStyle('button', 'bold')} title="Bold">
 						<svg data-5iu="true" data-qa="bold" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
@@ -299,7 +339,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 						</svg>
 					</button>
 
-					{/* Italic Button */}
 					<button type="button" onClick={() => formatText('italic')} style={getStyle('button', 'italic')} title="Italic">
 						<svg data-5iu="true" data-qa="italic" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
@@ -311,7 +350,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 						</svg>
 					</button>
 
-					{/* Strikethrough Button */}
 					<button type="button" onClick={() => formatText('strike')} style={getStyle('button', 'strike')} title="Strikethrough">
 						<svg data-5iu="true" data-qa="strikethrough" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
@@ -324,11 +362,10 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 					</button>
 
 					<span
-						className={`separator ${isLightMode ? 'bg-[#8080808f]' : 'bg-white'}`}
+						className={`separator ${isLightMode ? 'bg-white' : 'bg-[#8080808f]'}`}
 						style={{ height: '20px', width: '1px', margin: '0 4px' }}
 					></span>
 
-					{/* Code Block Button */}
 					<button type="button" onClick={() => formatText('code-block')} style={getStyle('button', 'code-block')} title="Code Block">
 						<svg data-5iu="true" data-qa="code" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
@@ -340,7 +377,7 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 						</svg>
 					</button>
 					<span
-						className={`separator ${isLightMode ? 'bg-[#8080808f]' : 'bg-white'}`}
+						className={`separator ${isLightMode ? 'bg-white' : 'bg-[#8080808f]'}`}
 						style={{ height: '20px', width: '1px', margin: '0 4px' }}
 					></span>
 					<button type="button" onClick={() => formatText('link')} style={getStyle('button', 'link')} title="Link">
@@ -349,20 +386,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 								fill="currentColor"
 								fill-rule="evenodd"
 								d="M12.306 3.756a2.75 2.75 0 0 1 3.889 0l.05.05a2.75 2.75 0 0 1 0 3.889l-3.18 3.18a2.75 2.75 0 0 1-3.98-.095l-.03-.034a.75.75 0 0 0-1.11 1.009l.03.034a4.25 4.25 0 0 0 6.15.146l3.18-3.18a4.25 4.25 0 0 0 0-6.01l-.05-.05a4.25 4.25 0 0 0-6.01 0L9.47 4.47a.75.75 0 1 0 1.06 1.06zm-4.611 12.49a2.75 2.75 0 0 1-3.89 0l-.05-.051a2.75 2.75 0 0 1 0-3.89l3.18-3.179a2.75 2.75 0 0 1 3.98.095l.03.034a.75.75 0 1 0 1.11-1.01l-.03-.033a4.25 4.25 0 0 0-6.15-.146l-3.18 3.18a4.25 4.25 0 0 0 0 6.01l.05.05a4.25 4.25 0 0 0 6.01 0l1.775-1.775a.75.75 0 0 0-1.06-1.06z"
-								clip-rule="evenodd"
-							></path>
-						</svg>
-					</button>
-					<span
-						className={`separator ${isLightMode ? 'bg-[#8080808f]' : 'bg-white'}`}
-						style={{ height: '20px', width: '1px', margin: '0 4px' }}
-					></span>
-					<button type="button">
-						<svg data-5iu="true" data-qa="add-comment" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
-							<path
-								fill="currentColor"
-								fill-rule="evenodd"
-								d="M3 10a7 7 0 1 1 13.124 3.394.75.75 0 0 0-.074.542l.68 2.794-2.794-.68a.75.75 0 0 0-.542.073A7 7 0 0 1 3 10m7-8.5a8.5 8.5 0 1 0 3.859 16.075l3.714.904a.75.75 0 0 0 .906-.906l-.904-3.714A8.5 8.5 0 0 0 10 1.5m.75 5.25a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5z"
 								clip-rule="evenodd"
 							></path>
 						</svg>
@@ -376,10 +399,26 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 					height: 'auto',
 					width: '100%',
 					fontSize: '15px',
-					color: isLightMode ? 'white' : 'black',
+					color: isLightMode ? 'black' : 'white',
 					border: 'none'
 				}}
 			/>
+			<style>
+				{`
+				.ql-editor.ql-blank::before {
+					color: ${placeholderColor};
+					opacity: 1; 
+				}
+
+				.ql-snow .ql-editor code {
+					background-color: #23241f;
+					color: #f0f0f0 !important;
+				}
+					span, strong {
+						color: ${placeholderColor} !important;
+					}
+        `}
+			</style>
 		</div>
 	);
 }

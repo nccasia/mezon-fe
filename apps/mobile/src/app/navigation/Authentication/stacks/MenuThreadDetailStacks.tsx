@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
+import { createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
 import CreateThreadModal from '../../../components/ThreadDetail';
 import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm';
@@ -28,8 +28,7 @@ export const MenuThreadDetailStacks = () => {
 				headerStyle: {
 					backgroundColor: themeValue.secondary
 				},
-				cardStyle: { backgroundColor: 'transparent' },
-				cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS
+				cardStyle: { backgroundColor: 'transparent' }
 			}}
 		>
 			<Stack.Screen

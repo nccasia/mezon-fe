@@ -25,9 +25,11 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channel?.channel_id ?? ''));
+
 	const channelId = useMemo(() => {
-		return channel.channel_id;
-	}, [channel.channel_id]);
+		return channel?.channel_id;
+	}, [channel?.channel_id]);
+
 	const dispatch = useDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -109,12 +111,13 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 						<ChannelJumpToPresent clanId={clanId || ''} channelId={channelId ?? ''} className="pb-[10px]" />
 					</div>
 				)}
-				{dataReferences.message_ref_id && (
-					<div className="relative z-1 pb-[4px]">
-						<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
-					</div>
-				)}
 			</div>
+
+			{dataReferences.message_ref_id && (
+				<div className="relative z-1 pb-[4px]">
+					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
+				</div>
+			)}
 
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}

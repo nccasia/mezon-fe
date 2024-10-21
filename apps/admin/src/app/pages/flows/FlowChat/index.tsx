@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import flowService from '../../../services/flowService';
-import ExampleFlow from '../ExampleFlows';
+import ExampleFlow from '../../flowExamples/ExampleFlows';
 
 interface IMessage {
 	message: {

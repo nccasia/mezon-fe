@@ -77,3 +77,16 @@ export function isMezonThunk(thunkAPI: GetThunkAPI<any>): thunkAPI is GetThunkAP
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const restoreLocalStorage = (keys: string[]) => {
+	const data: Record<string, string | null> = {};
+	keys.forEach((key) => {
+		data[key] = localStorage.getItem(key);
+	});
+	localStorage.clear();
+	keys.forEach((key) => {
+		if (data[key]) {
+			localStorage.setItem(key, data[key]!);
+		}
+	});
+};

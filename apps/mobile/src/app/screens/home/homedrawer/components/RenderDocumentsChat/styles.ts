@@ -11,7 +11,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			borderRadius: size.s_6,
 			flexDirection: 'row',
-			backgroundColor: colors.primary
+			backgroundColor: colors.secondaryLight
 		},
 		fileName: {
 			fontSize: size.small,

@@ -1,12 +1,11 @@
-import { useShowName } from '@mezon/core';
-import { messagesActions, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
+import { useShowName, useUserById } from '@mezon/core';
+import { messagesActions, selectClanView, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
-import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { MessageLine } from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
@@ -28,7 +27,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		messageIdRef,
 		hasAttachmentInMessageRef
 	} = useMessageParser(message);
-	const messageSender = useSelector(selectMemberClanByUserId(senderIdMessageRef ?? '')) as ChannelMembersEntity;
+	const messageSender = useUserById(senderIdMessageRef);
 
 	const dispatch = useAppDispatch();
 
@@ -50,7 +49,8 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? ''
 	);
-	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
+
+	const isClanView = useSelector(selectClanView);
 
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
@@ -63,7 +63,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={isDM ? messageAvatarSenderRef : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
+								src={!isClanView ? messageAvatarSenderRef : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
 							/>
 						</div>
 
@@ -72,7 +72,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								onClick={onClick}
 								className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap"
 							>
-								{isDM ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
+								{!isClanView ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
 							</span>
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">

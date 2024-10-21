@@ -1,9 +1,9 @@
-import { Metrics } from '@mezon/mobile-ui';
+import { Metrics, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Keyboard, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { Keyboard, StatusBar, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -17,6 +17,22 @@ const HomeScreen = React.memo((props: any) => {
 	const dispatch = useDispatch();
 	const isTabletLandscape = useTabletLandscape();
 	const navigation = useNavigation();
+	const { themeValue, themeBasic } = useTheme();
+
+	useEffect(() => {
+		const focusedListener = navigation.addListener('focus', () => {
+			StatusBar.setBackgroundColor(themeValue.primary);
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		const blurListener = navigation.addListener('blur', () => {
+			StatusBar.setBackgroundColor(themeValue.secondary);
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		return () => {
+			focusedListener();
+			blurListener();
+		};
+	}, [navigation, themeBasic, themeValue.primary, themeValue.secondary]);
 
 	if (isTabletLandscape) {
 		return (

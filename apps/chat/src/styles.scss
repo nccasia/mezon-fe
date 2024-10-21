@@ -121,7 +121,11 @@ body {
 	--tw-bg-opacity: 1;
 	background-color: rgb(30 30 30 / var(--tw-bg-opacity));
 	font-family: 'gg sans', sans-serif;
-  user-select: none;
+	user-select: none;
+}
+
+.enableSelectText {
+	user-select: text;
 }
 
 //button voice control pannel
@@ -518,6 +522,21 @@ input:-webkit-autofill:active {
 	}
 }
 
+.pre::-webkit-scrollbar {
+	height: 5px;
+}
+
+.pre::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.pre::-webkit-scrollbar-thumb {
+	background: transparent;
+}
+
+.pre::-webkit-scrollbar-thumb:hover {
+	background: #151515;
+}
 // thread-scroll
 .thread-scroll::-webkit-scrollbar {
 	width: 4px;
@@ -851,35 +870,33 @@ input:-webkit-autofill:active {
 	}
 }
 
-.eventDescriptionTruncate{
+.eventDescriptionTruncate {
 	overflow: hidden;
-   display: -webkit-box;
-   -webkit-line-clamp: 4; /* number of lines to show */
-           line-clamp: 4; 
-   -webkit-box-orient: vertical;
+	display: -webkit-box;
+	-webkit-line-clamp: 4; /* number of lines to show */
+	line-clamp: 4;
+	-webkit-box-orient: vertical;
 }
-
 
 @keyframes pulse {
 	50% {
-		opacity: .5;
+		opacity: 0.5;
 	}
-  }
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
 }
 
+.animate-pulse {
+	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
 @keyframes fadeIn {
 	from {
-	  opacity: 0;
+		opacity: 0;
 	}
 	to {
-	  opacity: 1;
+		opacity: 1;
 	}
-  }
-  
+}
+
 .fade-in {
 	animation: fadeIn 1.5s ease-in;
 }

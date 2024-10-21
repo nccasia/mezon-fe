@@ -1,6 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useChannelMembers } from '@mezon/core';
-import { ChannelMembersEntity, selectAllRolesClan } from '@mezon/store';
+import { ChannelMembersEntity, selectAllRolesClan, selectChannelById, selectRolesByChannelId } from '@mezon/store';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
@@ -14,8 +14,21 @@ interface UserMentionListProps {
 
 export function UserMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
 	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
+	const channel = useSelector(selectChannelById(channelID));
+	const channelparrent = useSelector(selectChannelById(channel?.parrent_id || ''));
+	const rolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const filteredRoles = rolesInClan.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	const rolesToUse = useMemo(() => {
+		if (channel?.parrent_id !== '0' && channelparrent?.channel_private === 1) {
+			return rolesChannel;
+		} else {
+			return rolesInClan;
+		}
+	}, [channel?.parrent_id, channelparrent?.channel_private, rolesChannel, rolesInClan]);
+
+	const filteredRoles = useMemo(() => {
+		return rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	}, [rolesToUse]);
 	const newUserMentionList = useMemo(() => {
 		if (!membersOfParent || membersOfParent.length === 0) {
 			return [];
@@ -56,7 +69,7 @@ export function UserMentionList({ channelID, channelMode }: UserMentionListProps
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [channelMode, membersOfParent, rolesInClan]);
+	}, [channelMode, membersOfParent, rolesToUse]);
 
 	return newUserMentionList;
 }

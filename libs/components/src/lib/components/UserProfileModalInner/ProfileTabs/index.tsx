@@ -7,7 +7,7 @@ export const typeTab = {
 	ABOUT_ME: 'About Me',
 	ACTIVITY: 'Activity',
 	MUTUAL_FRIENDS: 'Mutual Friends',
-	MUTUAL_SERVERS: 'Mutual Servers'
+	MUTUAL_SERVERS: 'Mutual Clans'
 };
 
 const profileTabs = [

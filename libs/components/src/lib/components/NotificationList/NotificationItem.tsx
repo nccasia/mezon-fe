@@ -69,12 +69,7 @@ function NotificationItem({ notify }: NotifyProps) {
 				</button>
 			</div>
 			{openUserProfileModalInner && (
-				<UserProfileModalInner
-					notify={notify}
-					userId={notify.sender_id}
-					openModal={openUserProfileModalInner}
-					onClose={handleCloseUserProfileModalInner}
-				/>
+				<UserProfileModalInner notify={notify} userId={notify.sender_id} onClose={handleCloseUserProfileModalInner} />
 			)}
 		</>
 	);

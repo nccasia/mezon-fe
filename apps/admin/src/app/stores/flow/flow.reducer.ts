@@ -33,6 +33,7 @@ const flowReducer = (state = initFlowState, action: FlowActionType): IFlowState 
 				id: newNodeId,
 				type: state.nodeType,
 				position: action.payload,
+				dragHandle: '.custom-drag-handle',
 				data: {
 					label: state.nodeType,
 					id: newNodeId

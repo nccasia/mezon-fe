@@ -4,10 +4,9 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		aboveMessage: {
 			flexDirection: 'row',
-			marginTop: size.s_6,
+			paddingTop: size.s_6,
 			paddingLeft: size.s_10,
-			gap: 15,
-			height: size.s_24
+			gap: 15
 		},
 		iconReply: {
 			width: size.s_34,

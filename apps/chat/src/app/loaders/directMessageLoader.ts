@@ -7,7 +7,7 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 		throw new Error('DirectMessage ID null');
 	}
 
-	dispatch(
+	await dispatch(
 		directActions.joinDirectMessage({
 			directMessageId: directId,
 			channelName: '',

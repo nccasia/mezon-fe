@@ -45,13 +45,14 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		const fetchThreads = async () => {
 			const body = {
 				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
-				clanId: currentChannel?.clan_id ?? ''
+				clanId: currentChannel?.clan_id ?? '',
+				noCache: true
 			};
 			await dispatch(threadsActions.fetchThreads(body));
 		};
 
 		fetchThreads();
-	}, [currentChannel]);
+	}, [currentChannel, dispatch, isThread]);
 
 	const isEmpty = useSelector(selectShowEmptyStatus());
 	const getActiveThreads = useSelector(selectActiveThreads);

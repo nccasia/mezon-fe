@@ -3,6 +3,7 @@ import {
 	ChannelsEntity,
 	channelUsersActions,
 	selectAllChannelMembers,
+	selectAllRolesClan,
 	selectChannelById,
 	ThreadsEntity,
 	useAppDispatch,
@@ -22,6 +23,7 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 	const channel = useSelector(selectChannelById(channelId ?? ''));
 	const membersOfChild = useAppSelector((state) => (channelId ? selectAllChannelMembers(state, channelId as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel.parrent_id as string) : null));
+	const rolesClan = useSelector(selectAllRolesClan);
 
 	const dispatch = useAppDispatch();
 
@@ -52,12 +54,13 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 	const addMemberToThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
 			if (currentChannel?.parrent_id === '0' || currentChannel?.parrent_id === '') return;
-			const userIds = uniqueUsers(mentions, membersOfChild);
-			if (userIds.length > 0) {
-				await updateChannelUsers(currentChannel, userIds, currentChannel?.clan_id as string);
+			const userIds = uniqueUsers(mentions, membersOfChild, rolesClan);
+			const existingUserIds = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
+			if (existingUserIds.length > 0) {
+				await updateChannelUsers(currentChannel, existingUserIds, currentChannel?.clan_id as string);
 			}
 		},
-		[dispatch]
+		[dispatch, membersOfChild]
 	);
 
 	const joinningToThread = useCallback(

@@ -3,8 +3,8 @@ import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	selectAllInfoChannels,
+	selectAllMessageSearch,
 	selectAllUsersByUser,
-	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage
 } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
@@ -30,7 +30,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
+	const messageSearchByChannelId = useSelector(selectAllMessageSearch);
 
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;

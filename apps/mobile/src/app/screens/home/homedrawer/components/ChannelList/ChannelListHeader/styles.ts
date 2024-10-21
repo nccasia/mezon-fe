@@ -5,35 +5,25 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		listHeader: {
-			width: '100%',
-			flexDirection: 'row',
-			justifyContent: 'space-between',
-			alignItems: 'center',
-			position: 'absolute',
-			top: 2,
-			left: 0,
-			padding: Metrics.size.m,
-			gap: Metrics.size.s
+			width: '100%'
 		},
-
 		titleNameWrapper: {
-			maxWidth: '85%',
 			display: 'flex',
-			backgroundColor: colors.primary,
-			paddingHorizontal: size.s_10,
-			paddingVertical: size.s_4,
-			borderRadius: 20,
 			flexDirection: 'row',
-			justifyContent: 'space-between',
 			gap: IS_TABLET ? Metrics.size.m : Metrics.size.s,
-			alignItems: 'center'
+			alignItems: 'center',
+			paddingBottom: size.s_4
 		},
-
 		titleServer: {
 			color: colors.text,
 			fontWeight: 'bold',
 			fontSize: size.s_15,
 			flexShrink: 1
+		},
+		subTitle: {
+			color: colors.textDisabled,
+			fontSize: size.s_12,
+			fontWeight: '600'
 		},
 
 		infoHeader: {
@@ -48,16 +38,42 @@ export const style = (colors: Attributes) =>
 			color: Colors.gray72,
 			fontSize: Fonts.size.h9
 		},
-
 		actions: {
 			padding: 4,
 			borderRadius: 999
 		},
-
 		container: {
-			height: 150,
 			width: '100%',
-			position: 'relative',
-			marginBottom: Metrics.size.xl
-		}
+			borderBottomWidth: 1,
+			paddingVertical: size.s_14,
+			borderBottomColor: colors.border,
+			backgroundColor: colors.secondary,
+			paddingHorizontal: size.s_12
+		},
+		wrapperSearch: {
+			flex: 1,
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'center',
+			height: size.s_36,
+			gap: size.s_8,
+			borderRadius: size.s_20,
+			backgroundColor: colors.primary,
+			borderWidth: 1,
+			borderColor: colors.secondaryLight
+		},
+		placeholderSearchBox: {
+			textTransform: 'capitalize',
+			color: colors.text,
+			fontSize: size.s_14,
+			lineHeight: size.s_18
+		},
+		iconWrapper: {
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderRadius: size.s_36,
+			backgroundColor: colors.primary,
+			width: size.s_36,
+			height: size.s_36
+		},
 	});

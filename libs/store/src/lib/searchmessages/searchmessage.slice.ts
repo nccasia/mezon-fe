@@ -92,7 +92,7 @@ export const searchMessageSlice = createSlice({
 						.filter((message) => message.channel_id === channelId)
 						.map((message) => message.id);
 					SearchMessageAdapter.removeMany(state, ids);
-					SearchMessageAdapter.upsertMany(state, action.payload);
+					SearchMessageAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				}
 			)

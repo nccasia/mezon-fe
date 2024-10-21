@@ -1,8 +1,20 @@
-import { reactionActions, selectClanView, useAppDispatch } from '@mezon/store';
+import {
+	channelMetaActions,
+	ChannelsEntity,
+	channelUsersActions,
+	reactionActions,
+	selectAllChannelMembers,
+	selectChannelById,
+	selectClanView,
+	selectCurrentChannelId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useAuth } from '../../auth/hooks/useAuth';
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
@@ -12,8 +24,46 @@ interface ChatReactionProps {
 
 export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
+	const { userId } = useAuth();
 	const isClanView = useSelector(selectClanView);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const channel = useSelector(selectChannelById(currentChannelId ?? ''));
+	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
+	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
+	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
+		const timestamp = Date.now() / 1000;
 
+		const body = {
+			channelId: currentChannel?.channel_id as string,
+			channelType: currentChannel?.type,
+			userIds: userIds,
+			clanId: clanId
+		};
+
+		await dispatch(channelUsersActions.addChannelUsers(body));
+		dispatch(
+			channelMetaActions.updateBulkChannelMetadata([
+				{
+					id: currentChannel?.channel_id ?? '',
+					lastSeenTimestamp: timestamp,
+					lastSentTimestamp: timestamp,
+					lastSeenPinMessage: '',
+					clanId: currentChannel?.clan_id ?? ''
+				}
+			])
+		);
+	};
+	const addMemberToThread = useCallback(
+		async (userId: string) => {
+			if (channel?.parrent_id === '0' || channel?.parrent_id === '') return;
+			const existingUserIdOfParrent = membersOfParent?.some((member) => member.id === userId);
+			const existingUserIdOfChild = membersOfChild?.some((member) => member.id === userId);
+			if (existingUserIdOfParrent && !existingUserIdOfChild) {
+				await updateChannelUsers(channel, [userId], channel?.clan_id as string);
+			}
+		},
+		[channel, membersOfParent, membersOfChild]
+	);
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
@@ -38,7 +88,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				};
 				saveRecentEmojiMobile(emojiLastest);
 			}
-
+			addMemberToThread(userId || '');
 			const payload = transformPayloadWriteSocket({
 				clanId,
 				isPublicChannel: is_public,
@@ -61,7 +111,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				})
 			).unwrap();
 		},
-		[dispatch, isMobile, isClanView]
+		[dispatch, isMobile, isClanView, userId]
 	);
 
 	return useMemo(

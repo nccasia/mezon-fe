@@ -3,14 +3,17 @@ import { AnchorScroll, MessageContextMenuProvider } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	messagesActions,
+	pinMessageActions,
 	selectAllChannelMemberIds,
 	selectAllRoleIds,
+	selectDataReferences,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
+	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
@@ -50,6 +53,9 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	const listMessageRefs = useRef<Record<string, MessageRef | null>>({});
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, channelId as string));
 	const allRolesInClan = useSelector(selectAllRoleIds);
+	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
+	const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
+	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const dispatch = useAppDispatch();
 
 	const chatRefData = useMemo(() => {
@@ -127,13 +133,38 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		[lastMessage?.id, scrollToMessageById]
 	);
 
+	useEffect(() => {
+		if (dataReferences && getChatScrollBottomOffset() <= 51) {
+			scrollToLastMessage({ behavior: 'instant' });
+		}
+	}, [dataReferences, scrollToLastMessage, getChatScrollBottomOffset]);
+
+	// Jump to message when user is jumping to message from pin message
+	useEffect(() => {
+		if (jumpPinMessageId && isPinMessageExist) {
+			const messageRef = listMessageRefs.current[jumpPinMessageId];
+			if (messageRef) {
+				messageRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				const timeoutId = setTimeout(() => {
+					dispatch(pinMessageActions.setJumpPinMessageId(null));
+				}, 1000);
+
+				return () => timeoutId && clearTimeout(timeoutId);
+			}
+		}
+	}, [dispatch, jumpPinMessageId, isPinMessageExist, chatScrollRef]);
+
 	// Jump to message when user is jumping to message
 	useEffect(() => {
 		if (idMessageToJump && isMessageExist) {
 			const messageRef = listMessageRefs.current[idMessageToJump];
 			if (messageRef) {
 				messageRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				dispatch(messagesActions.setIdMessageToJump(null));
+				const timeoutId = setTimeout(() => {
+					dispatch(messagesActions.setIdMessageToJump(null));
+				}, 1000);
+
+				return () => timeoutId && clearTimeout(timeoutId);
 			}
 		}
 	}, [dispatch, idMessageToJump, isMessageExist, chatScrollRef]);

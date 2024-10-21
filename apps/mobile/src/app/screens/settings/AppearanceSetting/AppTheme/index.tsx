@@ -32,17 +32,17 @@ export default function AppThemeSetting({ navigation }: SettingScreenProps<AppTh
 					element: <BoxSelector color={themeColors.light.primary} border={themeColors.light.border} />,
 					value: ThemeModeBase.LIGHT,
 					title: t('fields.light')
-				},
-				{
-					element: (
-						<BoxSelector
-							color={systemTheme == 'light' ? themeColors.light.primary : themeColors.dark.primary}
-							border={systemTheme == 'light' ? themeColors.light.border : themeColors.dark.border}
-						/>
-					),
-					value: ThemeModeAuto.AUTO,
-					title: t('fields.system')
 				}
+				// {
+				// 	element: (
+				// 		<BoxSelector
+				// 			color={systemTheme == 'light' ? themeColors.light.primary : themeColors.dark.primary}
+				// 			border={systemTheme == 'light' ? themeColors.light.border : themeColors.dark.border}
+				// 		/>
+				// 	),
+				// 	value: ThemeModeAuto.AUTO,
+				// 	title: t('fields.system')
+				// }
 			] satisfies IMezonSlideOptionsData[],
 		[]
 	);

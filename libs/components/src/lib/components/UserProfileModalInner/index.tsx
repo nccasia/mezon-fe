@@ -1,12 +1,9 @@
-import { useAppNavigation, useDirect, useEscapeKeyClose, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useEscapeKeyClose, useMemberCustomStatus, useOnClickOutside, useSettingFooter, useUserById } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	notificationActions,
-	selectClanView,
 	selectCurrentUserId,
 	selectFriendStatus,
-	selectMembeGroupByUserId,
-	selectMemberClanByUserId,
 	selectModeResponsive,
 	useAppDispatch,
 	useAppSelector
@@ -27,7 +24,6 @@ import MutualServers from './MutualServers';
 import ProfileTabs, { typeTab } from './ProfileTabs';
 
 type UserProfileModalInnerProps = {
-	openModal: boolean;
 	onClose?: () => void;
 	userId?: string;
 	notify?: INotification;
@@ -41,15 +37,11 @@ const initOpenModal = {
 	openOption: false
 };
 
-const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, isDM, user }: UserProfileModalInnerProps) => {
+const UserProfileModalInner = ({ userId, directId, notify, onClose, isDM, user }: UserProfileModalInnerProps) => {
 	const dispatch = useAppDispatch();
 	const userProfileRef = useRef<HTMLDivElement | null>(null);
 	const modeResponsive = useAppSelector(selectModeResponsive);
-	const isClanView = useSelector(selectClanView);
-	const clanUser = useSelector(selectMemberClanByUserId(userId as string));
-	const directUser = useSelector((state) => selectMembeGroupByUserId(state, directId, userId as string));
-	const userById = ((isClanView ? clanUser : directUser) || user) as ChannelMembersEntity;
-
+	const userById = useUserById(userId);
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || userId || ''));
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [openGroupIconBanner, setGroupIconBanner] = useState<OpenModalProps>(initOpenModal);
@@ -152,7 +144,7 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 							checkAddFriend={checkAddFriend}
 							openModal={openGroupIconBanner}
 							setOpenModal={setGroupIconBanner}
-							user={userById}
+							user={userById as ChannelMembersEntity}
 						/>
 					</div>
 					<div className="flex absolute bottom-[-60px] w-full">

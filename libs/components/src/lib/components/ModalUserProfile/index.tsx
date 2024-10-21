@@ -6,16 +6,10 @@ import {
 	useMemberCustomStatus,
 	useOnClickOutside,
 	useSendInviteMessage,
-	useSettingFooter
+	useSettingFooter,
+	useUserById
 } from '@mezon/core';
-import {
-	EStateFriend,
-	selectAccountCustomStatus,
-	selectAllAccount,
-	selectCurrentUserId,
-	selectFriendStatus,
-	selectMemberClanByUserId
-} from '@mezon/store';
+import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
@@ -82,7 +76,8 @@ const ModalUserProfile = ({
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
-	const userById = useSelector(selectMemberClanByUserId(userID ?? '')) as ChannelMembersEntity;
+	const userById = useUserById(userID);
+
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
 	const currentUserId = useSelector(selectCurrentUserId);
@@ -176,7 +171,7 @@ const ModalUserProfile = ({
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
@@ -184,7 +179,7 @@ const ModalUserProfile = ({
 						checkAddFriend={checkAddFriend}
 						openModal={openModal}
 						setOpenModal={setOpenModal}
-						user={userById}
+						user={userById as ChannelMembersEntity}
 						showPopupLeft={showPopupLeft}
 						kichUser={message?.user}
 					/>
@@ -209,14 +204,14 @@ const ModalUserProfile = ({
 						<p className="font-medium tracking-wide text-sm my-0">{userNameShow}</p>
 					</div>
 
-					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById} />}
+					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}
 
 					{mode !== 4 && mode !== 3 && !isFooterProfile && (
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 					{isFooterProfile ? (
-						<StatusProfile userById={userById} isDM={isDM} />
+						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} />
 					) : (
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}

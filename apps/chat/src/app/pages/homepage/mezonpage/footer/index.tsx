@@ -162,6 +162,10 @@ const Footer = ({ downloadUrl, universalUrl }: FooterProps) => {
 											</div>
 										)}
 									</div>
+								) : platform === 'Linux' ? (
+									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+										<Image src={`assets/linux.svg`} alt={'linux'} className="max-w-[135px]" />
+									</a>
 								) : (
 									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
 										<Image src={`assets/microsoft.svg`} alt={'microsoft'} className="max-w-[135px]" />

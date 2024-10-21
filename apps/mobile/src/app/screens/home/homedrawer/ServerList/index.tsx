@@ -34,7 +34,7 @@ const ServerList = React.memo(() => {
 				{theme === 'light' ? <LogoMezonLight width={size.s_50} height={size.s_50} /> : <LogoMezonDark width={size.s_50} height={size.s_50} />}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>
-						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>
+						<Text style={styles.badgeText}>{quantityPendingRequest > 99 ? `+99` : quantityPendingRequest}</Text>
 					</View>
 				) : null}
 			</TouchableOpacity>

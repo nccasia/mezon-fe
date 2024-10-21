@@ -63,18 +63,22 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	return (
 		<div
 			key={pinMessage.id}
-			className="relative flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
+			className="relative flex flex-row justify-between dark:bg-bgPrimary bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-default rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
 		>
-			<div className="flex items-start gap-2 w-full">
-				<MemberProfile
-					isHideUserName={true}
-					avatar={priorityAvatar ? priorityAvatar : pinMessage.avatar || ''}
-					name={namePriority ? namePriority : pinMessage.username || ''}
-					isHideStatus={true}
-					isHideIconStatus={true}
-					textColor="#fff"
-				/>
-				<div className="flex flex-col gap-1 text-left w-[85%]">
+			<div className="flex items-start gap-2 w-full cursor-default ">
+				<div className="pointer-events-none">
+					{' '}
+					<MemberProfile
+						isHideUserName={true}
+						avatar={priorityAvatar ? priorityAvatar : pinMessage.avatar || ''}
+						name={namePriority ? namePriority : pinMessage.username || ''}
+						isHideStatus={true}
+						isHideIconStatus={true}
+						textColor="#fff"
+					/>
+				</div>
+
+				<div className="flex flex-col gap-1 text-left w-[85%] enableSelectText cursor-text">
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
 							{namePriority ? namePriority : pinMessage.username || ''}
@@ -93,12 +97,12 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				</div>
 			</div>
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
-				<p
+				<button
 					onClick={handleJumpMess}
 					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit dark:text-white text-colorTextLightMode"
 				>
 					Jump
-				</p>
+				</button>
 				<button
 					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
 					onClick={handleUnpinConfirm}
