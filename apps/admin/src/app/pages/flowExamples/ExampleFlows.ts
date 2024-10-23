@@ -43,7 +43,7 @@ const ExampleFlow: IExampleFlow[] = [
 						{
 							nodeId: 'e3d0ac76-5ca9-4f2f-9f8c-3464f0eaa066',
 							parameterKey: 'commandName',
-							parameterValue: '*example command flow',
+							parameterValue: '*exampleCommandFlow',
 							id: '01188a03-38a3-42a5-8efa-0966c7a851e5'
 						}
 					],
@@ -81,7 +81,7 @@ const ExampleFlow: IExampleFlow[] = [
 			]
 		},
 		message: {
-			input: '*example command flow',
+			input: '*exampleCommandFlow',
 			output: {
 				message: 'hello, this is an example command flow example',
 				image: [
@@ -131,7 +131,7 @@ const ExampleFlow: IExampleFlow[] = [
 						{
 							nodeId: '56c978da-d138-461f-8226-afdd36108d44',
 							parameterKey: 'commandName',
-							parameterValue: '*example api loader flow',
+							parameterValue: '*exampleApiLoaderFlow',
 							id: '8f391774-12bf-476f-9fbf-01c12407fabd'
 						}
 					],
@@ -200,7 +200,7 @@ const ExampleFlow: IExampleFlow[] = [
 			]
 		},
 		message: {
-			input: '*example api loader flow',
+			input: '*exampleApiLoaderFlow',
 			output: {
 				message:
 					'| ID    | Title                | Is Completed |\n|-------|----------------------|------------|\n| 6     | title 6              | Yes        |\n| 7     | title 7              | Yes        |\n| 8     | title 8              | Yes        |\n| 9     | title 9              | Yes        |\n| 11    | title 11             | Yes        |\n| 12    | title 12             | Yes        |\n| 13    | title 13             | No         |\n| 14    | title 14             | No         |\n| 15    | title 15             | No         |\n| 16    | title 16             | No         |\n|',
