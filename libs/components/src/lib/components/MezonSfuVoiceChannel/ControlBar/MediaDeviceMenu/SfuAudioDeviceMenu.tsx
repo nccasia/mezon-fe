@@ -10,6 +10,7 @@ export interface SfuAudioDeviceMenuProps {
 	hasSetSinkId?: boolean;
 	onSelectInputDevice: (deviceId: string) => void;
 	onSelectOutputDevice?: (deviceId: string) => void;
+	onOpenChange?: (open: boolean) => void;
 }
 
 function getAudioDeviceSubtitle(devices: MediaDeviceInfo[], selectedDeviceId: string | undefined, systemDefaultLabel: string): string {
@@ -38,13 +39,18 @@ export const SfuAudioDeviceMenu = ({
 	selectedOutputDeviceId,
 	hasSetSinkId: propHasSetSinkId,
 	onSelectInputDevice,
-	onSelectOutputDevice
+	onSelectOutputDevice,
+	onOpenChange
 }: SfuAudioDeviceMenuProps) => {
 	const { t } = useTranslation('channelVoice');
 	const [isOpen, setIsOpen] = useState(false);
 	const [expandedDevice, setExpandedDevice] = useState<'input' | 'output' | null>(null);
 	const [flyoutSide, setFlyoutSide] = useState<'right' | 'left'>('right');
 	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		onOpenChange?.(isOpen);
+	}, [isOpen, onOpenChange]);
 
 	const hasSetSinkId = useMemo(() => {
 		if (typeof propHasSetSinkId === 'boolean') {
