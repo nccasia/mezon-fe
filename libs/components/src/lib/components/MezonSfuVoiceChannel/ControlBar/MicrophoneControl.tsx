@@ -12,6 +12,7 @@ interface MicrophoneControlProps {
 	onToggle: () => void;
 	onSelect: (deviceId: string) => void;
 	onSelectOutput?: (deviceId: string) => void;
+	onDeviceMenuOpenChange?: (open: boolean) => void;
 	permissionState?: 'granted' | 'denied' | 'prompt' | null;
 	hasMicrophoneAccess?: boolean;
 	onPermissionRequest?: () => Promise<void>;
@@ -27,6 +28,7 @@ export const MicrophoneControl = ({
 	onToggle,
 	onSelect,
 	onSelectOutput,
+	onDeviceMenuOpenChange,
 	permissionState,
 	hasMicrophoneAccess,
 	onPermissionRequest,
@@ -67,6 +69,7 @@ export const MicrophoneControl = ({
 				selectedOutputDeviceId={selectedOutputDeviceId}
 				onSelectInputDevice={onSelect}
 				onSelectOutputDevice={onSelectOutput}
+				onOpenChange={onDeviceMenuOpenChange}
 			/>
 		</div>
 	);

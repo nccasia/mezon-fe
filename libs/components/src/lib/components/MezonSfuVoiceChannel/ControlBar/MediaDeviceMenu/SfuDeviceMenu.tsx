@@ -7,12 +7,17 @@ interface SfuDeviceMenuProps {
 	devices: MediaDeviceInfo[];
 	selectedDeviceId: string;
 	onSelect: (deviceId: string) => void;
+	onOpenChange?: (open: boolean) => void;
 }
 
-export const SfuDeviceMenu = ({ label, devices, selectedDeviceId, onSelect }: SfuDeviceMenuProps) => {
+export const SfuDeviceMenu = ({ label, devices, selectedDeviceId, onSelect, onOpenChange }: SfuDeviceMenuProps) => {
 	const { t } = useTranslation('channelVoice');
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		onOpenChange?.(isOpen);
+	}, [isOpen, onOpenChange]);
 
 	useEffect(() => {
 		if (!isOpen) return;

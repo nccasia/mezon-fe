@@ -6,6 +6,7 @@ import {
 	selectStreamAudioToken,
 	selectStreamMembersByChannelId,
 	selectStreamMuted,
+	selectStreamSfuUrl,
 	selectStreamVolume,
 	useAppDispatch,
 	useAppSelector,
@@ -47,16 +48,18 @@ export function StreamAudioSession() {
 	}, []);
 
 	const members = useAppSelector((state) => selectStreamMembersByChannelId(state, streamInfo?.streamId || ''));
-	const serverUrl = process.env.NX_CHAT_APP_SFU_WS_URL;
+	const sfuUrl = useSelector(selectStreamSfuUrl);
+	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
 
 	const refreshToken = useCallback(async () => {
 		if (!streamInfo?.streamId) throw new Error('Stream channel is unavailable');
-		const nextToken = await dispatch(
+		const result = await dispatch(
 			generateMeetToken({
 				channelId: streamInfo.streamId,
 				roomName: ''
 			})
 		).unwrap();
+		const nextToken = result?.token;
 		if (!nextToken) throw new Error('SFU audio token is empty');
 		dispatch(videoStreamActions.setToken(nextToken));
 		return nextToken;
