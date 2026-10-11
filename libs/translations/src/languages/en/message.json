@@ -157,6 +157,7 @@
 		"sticker": "Stickers"
 	},
 	"turnOffAnonymous": "Turn off Anonymous",
+	"turnOffAnonymousToCreateTopic": "Turn off Anonymous mode before creating a topic",
 	"turnOnAnonymous": "Turn on Anonymous",
 	"goToTopic": "Go to Topic",
 	"creator": "Creator",
