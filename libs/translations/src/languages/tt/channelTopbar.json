@@ -103,7 +103,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "Башлану датасы тәмамлану датасыннан иртәрәк яки тигез булырга тиеш"
+			"startDateBeforeEnd": "Башлану датасы тәмамлану датасыннан иртәрәк яки тигез булырга тиеш",
+			"dateOutOfRange": "Дата {{minDate}} һәм бүгенге көн арасында булырга тиеш"
 		},
 		"buttons": {
 			"clearAll": "Барысын чистарту",
@@ -168,5 +169,12 @@
 		"limit": "Бу клан өчен каналларның максималь санына ирешелде"
 	},
 	"moreFile": "яңа файл",
-	"moreFiles": "яңа файл"
+	"moreFiles": "яңа файл",
+	"topics": "Темалар",
+	"pinnedMessage": "Ныгытылган хәбәр",
+	"latestPin": "Соңгы ныгыту",
+	"poll": "Тавыш бирү",
+	"pollDiscussion": "Тавыш бирү",
+	"pollWithQuestion": "Сораштыру: {{question}}",
+	"messageFrom": "{{username}} хәбәре: {{message}}"
 }

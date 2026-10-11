@@ -125,9 +125,11 @@ export { default as ModalInputMessageBuzz } from './components/ModalInputMessage
 export * from './components/MezonSfuVoiceChannel';
 export * from './components/virtual-core/useVirtualizer';
 
+export * from './components/PreJoinCalling/BackgroundSelector';
 export * from './components/PreJoinCalling/ControlButton';
 export * from './components/PreJoinCalling/JoinForm';
 export * from './components/PreJoinCalling/VideoPreview';
+export * from './components/PreJoinCalling/mediaPipeBackground';
 
 export * from './components/ButtonSwitchCustom';
 export { default as ButtonCopy } from './components/ButtonSwitchCustom/CopyButtonComponent';
@@ -136,6 +138,7 @@ export * from './components/DmCall';
 export { DmCallManager } from './components/DmCall/DmCallManager';
 export { default as InternetStatusPopover } from './components/InternetStatusPopover';
 export { MediaChannel } from './components/MediaChannel';
+export { MediaPermissionPrompt } from './components/MediaPermissionPrompt';
 export { default as ModalLayout } from './components/Modal';
 export { default as ModalEditGroup } from './components/ModalEditGroup';
 export { OtpConfirm } from './components/OtpConfirm/index';

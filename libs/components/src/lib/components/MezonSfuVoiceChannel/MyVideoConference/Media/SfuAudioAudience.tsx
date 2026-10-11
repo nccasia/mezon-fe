@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { SfuSignalMessage } from '../../types';
 import { meetTokenNeedsRefresh } from '../meetToken';
 import { canReactivateMid, getDepartedMids, getMsidOccupantsByMidFromSdp, isReceivingRemoteTrack, type RetiredSource } from '../remoteMediaLifecycle';
+import { sfuCloseAction, sfuReconnectDelay } from '../sfuReconnect';
+import { SfuSlotAssignments } from '../sfuSlotAssignments';
 import { SfuAudioTrack } from './SfuAudioTrack';
 
 export type SfuAudioAudienceState = 'joining' | 'connected' | 'reconnecting' | 'failed' | 'closed';
@@ -17,8 +19,7 @@ export interface SfuAudioAudienceProps {
 	onError?: (error: Error) => void;
 }
 
-const reconnectDelay = (attempt: number) => Math.min(1000 * 2 ** Math.min(attempt, 4), 15000);
-const MAX_RECONNECT_ATTEMPTS = 40;
+const MAX_RECONNECT_ATTEMPTS = 4;
 const MAX_TOKEN_REFRESH_ATTEMPTS = 3;
 const HEALTHY_CONNECTION_RESET_MS = 30_000;
 
@@ -63,7 +64,9 @@ export function SfuAudioAudience({
 	const onConnectionStateChangeRef = useRef(onConnectionStateChange);
 	const onErrorRef = useRef(onError);
 
-	tokenRef.current = token;
+	useEffect(() => {
+		tokenRef.current = token;
+	}, [token]);
 	onRefreshTokenRef.current = onRefreshToken;
 	onConnectionStateChangeRef.current = onConnectionStateChange;
 	onErrorRef.current = onError;
@@ -79,17 +82,24 @@ export function SfuAudioAudience({
 		let connecting = false;
 		let closingIntentionally = false;
 		let disposed = false;
+		let reconnectAllowed = true;
+		let transportDeadline: number | undefined;
 		let tokenRefreshAttempts = 0;
 		let tokenRejected = false;
 		const owners = new Map<string, string>();
 		const users = new Map<string, string>();
 		const retired = new Map<string, RetiredSource>();
+		const slots = new SfuSlotAssignments();
 		const syncAudio = (pc: RTCPeerConnection) => {
 			if (disposed || pcRef.current !== pc || negotiatingRef.current) return;
+			const assignedAudio = slots.enabled
+				? new Set([...slots.getMedia(pc.getTransceivers()).values()].flatMap((media) => (media.audio ? [media.audio] : [])))
+				: undefined;
 			const nextByMid = new Map<string, MediaStreamTrack>();
 			for (const transceiver of pc.getTransceivers()) {
 				const mid = transceiver.mid;
-				if (!mid || Number(mid) < 3 || retired.has(mid) || !isReceivingRemoteTrack(transceiver)) continue;
+				if (!mid || Number(mid) < 3 || (!slots.enabled && retired.has(mid)) || !isReceivingRemoteTrack(transceiver)) continue;
+				if (assignedAudio && !assignedAudio.has(transceiver.receiver.track)) continue;
 				if (transceiver.receiver.track.kind !== 'audio') continue;
 				applyReceiverJitterTarget(transceiver.receiver);
 				nextByMid.set(mid, transceiver.receiver.track);
@@ -105,6 +115,8 @@ export function SfuAudioAudience({
 
 		const closeTransport = () => {
 			closingIntentionally = true;
+			if (transportDeadline !== undefined) window.clearTimeout(transportDeadline);
+			transportDeadline = undefined;
 			const ws = wsRef.current;
 			wsRef.current = null;
 			if (ws && ws.readyState !== WebSocket.CLOSED) ws.close();
@@ -123,23 +135,30 @@ export function SfuAudioAudience({
 			owners.clear();
 			users.clear();
 			retired.clear();
+			slots.reset();
 			setAudioTracks([]);
 			closingIntentionally = false;
 		};
 		const scheduleReconnect = () => {
-			if (disposed || disposedRef.current || connecting || closingIntentionally || reconnectTimerRef.current !== undefined) return;
+			if (disposed || disposedRef.current || !reconnectAllowed || connecting || closingIntentionally || reconnectTimerRef.current !== undefined)
+				return;
+			closeTransport();
+			if (navigator.onLine === false) return;
 			if (reconnectAttemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
+				reconnectAllowed = false;
 				reportError('SFU audio reconnect limit reached');
 				reportState('failed');
 				closeTransport();
 				return;
 			}
-			reconnectAttemptRef.current += 1;
+			const delayMs = sfuReconnectDelay(reconnectAttemptRef.current);
 			reportState('reconnecting');
 			reconnectTimerRef.current = window.setTimeout(() => {
 				reconnectTimerRef.current = undefined;
+				if (navigator.onLine === false || disposed || !reconnectAllowed) return;
+				reconnectAttemptRef.current += 1;
 				void connect(true);
-			}, reconnectDelay(reconnectAttemptRef.current));
+			}, delayMs);
 		};
 
 		const handleOffer = async (offer: { sdp: string; offer_generation: number }) => {
@@ -156,6 +175,7 @@ export function SfuAudioAudience({
 			negotiatingRef.current = true;
 			try {
 				if (!pc || !ws || ws.readyState !== WebSocket.OPEN) return;
+				slots.observeOffer(offer.sdp);
 				await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: offer.sdp }));
 				if (disposed || disposedRef.current || pcRef.current !== pc || wsRef.current !== ws) return;
 				const offeredKinds = offer.sdp
@@ -197,13 +217,14 @@ export function SfuAudioAudience({
 		};
 
 		const connect = async (refreshToken: boolean) => {
-			if (disposed || disposedRef.current || connecting) return;
+			if (disposed || disposedRef.current || !reconnectAllowed || connecting) return;
 			connecting = true;
 			closeTransport();
 			let nextToken = tokenRef.current;
 			const wantsRefresh = refreshToken && (tokenRejected || meetTokenNeedsRefresh(nextToken));
 			if (wantsRefresh && tokenRefreshAttempts >= MAX_TOKEN_REFRESH_ATTEMPTS) {
 				connecting = false;
+				reconnectAllowed = false;
 				reportError('SFU audio token refresh limit reached');
 				reportState('failed');
 				return;
@@ -239,9 +260,22 @@ export function SfuAudioAudience({
 					track.addEventListener('unmute', refresh);
 					track.addEventListener('mute', refresh);
 				};
+				pc.oniceconnectionstatechange = () => {
+					if (disposed || pcRef.current !== pc || transportDeadline !== undefined || pc.connectionState === 'connected') return;
+					if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+						transportDeadline = window.setTimeout(() => {
+							transportDeadline = undefined;
+							if (pcRef.current === pc && pc.connectionState !== 'connected') scheduleReconnect();
+						}, 15_000);
+					}
+				};
 				pc.onconnectionstatechange = () => {
 					if (pcRef.current !== pc) return;
+					if (stableConnectionTimerRef.current !== undefined) window.clearTimeout(stableConnectionTimerRef.current);
+					stableConnectionTimerRef.current = undefined;
 					if (pc.connectionState === 'connected') {
+						if (transportDeadline !== undefined) window.clearTimeout(transportDeadline);
+						transportDeadline = undefined;
 						if (stableConnectionTimerRef.current !== undefined) window.clearTimeout(stableConnectionTimerRef.current);
 						stableConnectionTimerRef.current = window.setTimeout(() => {
 							stableConnectionTimerRef.current = undefined;
@@ -278,6 +312,12 @@ export function SfuAudioAudience({
 					} catch {
 						return;
 					}
+					if (message.type === 'slot_assigned' || message.type === 'slot_released') {
+						if (slots.handle(message)) {
+							syncAudio(pc);
+						}
+						return;
+					}
 					if (message.type === 'ping' && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'pong' }));
 					if (message.type === 'offer' && message.sdp && message.offer_generation != null) {
 						void handleOffer({ sdp: message.sdp, offer_generation: message.offer_generation });
@@ -288,6 +328,10 @@ export function SfuAudioAudience({
 							: (message.type === 'peer_joined' || message.type === 'peer_updated') && message.peer
 								? [message.peer]
 								: undefined;
+					if (peers) {
+						slots.seedMembers(peers);
+						if (slots.enabled) syncAudio(pc);
+					}
 					for (const peer of peers || []) {
 						for (const mid of [peer.mid_audio, peer.mid_video, peer.mid_screen]
 							.filter((mid) => mid != null && Number(mid) >= 3)
@@ -297,6 +341,11 @@ export function SfuAudioAudience({
 						}
 					}
 					if (message.type === 'peer_left') {
+						if (slots.enabled) {
+							slots.removePeer(message);
+							syncAudio(pc);
+							return;
+						}
 						const peerId = message.peer_id == null ? undefined : String(message.peer_id);
 						for (const mid of getDepartedMids(
 							peerId,
@@ -316,7 +365,7 @@ export function SfuAudioAudience({
 					}
 					if (message.type === 'error') {
 						if (message.message === 'stale_offer_generation' || message.message === 'future_offer_generation') return;
-						if (message.message === 'invalid_token') tokenRejected = true;
+						if (message.message === 'invalid_token' || message.message === 'missing_token') tokenRejected = true;
 						reportError(message.message === 'invalid_token' ? 'SFU audio token rejected' : 'SFU audio signaling failed');
 						scheduleReconnect();
 					}
@@ -324,13 +373,20 @@ export function SfuAudioAudience({
 				ws.onerror = () => {
 					if (disposed || wsRef.current !== ws) return;
 					reportError('SFU audio signaling failed');
-					if (wsRef.current === ws && ws.readyState !== WebSocket.CLOSED) ws.close();
+					// onclose supplies the close code, including synthetic 1006 for a network drop.
 				};
-				ws.onclose = () => {
-					if (wsRef.current === ws) {
-						wsRef.current = null;
-						scheduleReconnect();
+				ws.onclose = (event) => {
+					if (disposed || wsRef.current !== ws) return;
+					wsRef.current = null;
+					const action = sfuCloseAction(event.code);
+					if (action === 'stop') {
+						reconnectAllowed = false;
+						closeTransport();
+						reportState('closed');
+						return;
 					}
+					if (action === 'refresh-token') tokenRejected = true;
+					scheduleReconnect();
 				};
 				connecting = false;
 			} catch {
@@ -340,8 +396,13 @@ export function SfuAudioAudience({
 			}
 		};
 
+		const handleOnline = () => {
+			if (!wsRef.current) scheduleReconnect();
+		};
+		window.addEventListener('online', handleOnline);
 		void connect(false);
 		return () => {
+			window.removeEventListener('online', handleOnline);
 			disposed = true;
 			window.clearInterval(syncTimer);
 			disposedRef.current = true;

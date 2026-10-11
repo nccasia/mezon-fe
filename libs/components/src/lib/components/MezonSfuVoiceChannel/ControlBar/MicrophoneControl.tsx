@@ -9,9 +9,11 @@ interface MicrophoneControlProps {
 	selectedDeviceId: string;
 	onToggle: () => void;
 	onSelect: (deviceId: string) => void;
+	onDeviceMenuOpenChange?: (open: boolean) => void;
 	permissionState?: 'granted' | 'denied' | 'prompt' | null;
 	hasMicrophoneAccess?: boolean;
 	onPermissionRequest?: () => Promise<void>;
+	weakNetwork?: boolean;
 }
 
 export const MicrophoneControl = ({
@@ -20,15 +22,17 @@ export const MicrophoneControl = ({
 	selectedDeviceId,
 	onToggle,
 	onSelect,
+	onDeviceMenuOpenChange,
 	permissionState,
 	hasMicrophoneAccess,
-	onPermissionRequest
+	onPermissionRequest,
+	weakNetwork
 }: MicrophoneControlProps) => {
 	const { t } = useTranslation('channelVoice');
 	const showWarning = permissionState === 'denied' || hasMicrophoneAccess === false;
-
+	const label = showWarning ? t('mediaPermission.needed.microphone') : t(enabled ? 'turnOffMicrophone' : 'turnOnMicrophone');
 	const handleClick = async () => {
-		if ((permissionState !== 'granted' || hasMicrophoneAccess === false) && onPermissionRequest) {
+		if (!enabled && (permissionState !== 'granted' || hasMicrophoneAccess === false) && onPermissionRequest) {
 			await onPermissionRequest();
 			return;
 		}
@@ -37,14 +41,7 @@ export const MicrophoneControl = ({
 
 	return (
 		<div className="relative">
-			<button
-				id="btn-meet-micro"
-				type="button"
-				title={t(enabled ? 'turnOffMicrophone' : 'turnOnMicrophone')}
-				aria-label={t(enabled ? 'turnOffMicrophone' : 'turnOnMicrophone')}
-				className={SFU_CONTROL_BUTTON_CLASS}
-				onClick={handleClick}
-			>
+			<button id="btn-meet-micro" type="button" title={label} aria-label={label} className={SFU_CONTROL_BUTTON_CLASS} onClick={handleClick}>
 				{enabled ? (
 					<Icons.VoiceMicIcon className="h-6 w-6 max-lg:h-5 max-lg:w-5 max-md:h-5 max-md:w-5" scale={2.5} />
 				) : (
@@ -56,7 +53,16 @@ export const MicrophoneControl = ({
 					<span className="text-black text-xs font-bold">!</span>
 				</div>
 			)}
-			<SfuDeviceMenu label="Microphone" devices={devices} selectedDeviceId={selectedDeviceId} onSelect={onSelect} />
+			{!showWarning && weakNetwork && (
+				<div className="pointer-events-none absolute -right-0.5 -top-0.5 z-10 h-3.5 w-3.5 rounded-full border-2 border-[#11111b] bg-orange-500" />
+			)}
+			<SfuDeviceMenu
+				label="Microphone"
+				devices={devices}
+				selectedDeviceId={selectedDeviceId}
+				onSelect={onSelect}
+				onOpenChange={onDeviceMenuOpenChange}
+			/>
 		</div>
 	);
 };

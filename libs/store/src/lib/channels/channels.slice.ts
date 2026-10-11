@@ -29,6 +29,7 @@ import { appActions } from '../app/app.slice';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { fetchCategoriesCached, mapCategoryToEntity } from '../categories/categories.slice';
+import { cdnSignatureActions } from '../cdnSignature/cdnSignature.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { selectClansEntities } from '../clans/clans.slice';
 import type { MezonValueContext } from '../helpers';
@@ -329,6 +330,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '0', channelId }));
+			thunkAPI.dispatch(cdnSignatureActions.fetchCdnSignature({ channelId }));
 
 			let state = thunkAPI.getState() as RootState;
 
@@ -834,7 +836,7 @@ export const fetchChannels = createAsyncThunk(
 							channel_id: channel.channel_id
 						})) ?? [];
 
-					const lastChannelMessagesTruthy = lastChannelMessages.filter((message) => message);
+					const lastChannelMessagesTruthy = lastChannelMessages.filter((message) => message.id);
 
 					thunkAPI.dispatch(messagesActions.setManyLastMessages(lastChannelMessagesTruthy as ApiChannelMessageHeaderWithChannel[]));
 				}
@@ -1163,6 +1165,9 @@ export const channelsSlice = createSlice({
 				state.byClans[clanId] = getInitialClanState();
 			}
 			state.byClans[clanId].currentChannelId = channelId;
+			if (state.byClans[clanId].buzzState?.[channelId]) {
+				state.byClans[clanId].buzzState[channelId] = null;
+			}
 		},
 
 		setSelectedChannelId: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {

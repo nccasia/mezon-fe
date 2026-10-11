@@ -269,6 +269,14 @@ it('does not assume an existing topic with uncached history has no older replies
 	expect(selectHasMoreMessageByChannelId(store.getState() as any, 'existing-topic')).toBe(true);
 });
 
+it('keeps the caller message code on a topic send so a buzz reaches the topic', async () => {
+	const { store, client } = setup();
+	await store.dispatch(handleSendTopic({ ...payload, content: { t: 'Buzz' }, attachments: [], topicId: 'topic', code: 8 })).unwrap();
+	const args = client.writeChatMessage.mock.calls[0];
+	expect(args[12]).toBe(8);
+	expect(args[13]).toBe('topic');
+});
+
 it.each(['presign', 'upload'])('marks a topic send as failed on %s failure and can retry it', async (stage) => {
 	const { store, client } = setup();
 	const failedStage = stage === 'presign' ? jest.mocked(generatePathAttachments) : jest.mocked(getWebUploadedAttachments);
@@ -731,5 +739,53 @@ describe.each(['channel', 'topic'])('distant jump pagination in %s', (scope) => 
 		expect(client.listChannelMessages.mock.calls.at(-1)?.[3]).toBe(msg(150).id);
 		expect(store.getState().messages.channelViewPortMessageIds[scope].at(-1)).toBe(msg(200).id);
 		expect(selectHasMoreBottomByChannelId(store.getState() as any, scope)).toBe(true);
+	});
+});
+
+describe('reopening a channel that missed messages while offline', () => {
+	const args = { clanId: 'clan', channelId: 'channel' };
+	const sequenceOf = (id: string) => Number((BigInt(id) >> BigInt(22)) - BigInt(438845456274));
+	const msg = (n: number) => ({ ...serverReply(n), channel_id: 'channel', create_time_seconds: n > 1000 ? 5000 : n });
+	const page = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => msg(to - i));
+	const ids = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => msg(from + i).id);
+
+	async function openThenMiss(latest: number) {
+		const { store, client } = setup();
+		const server = { latest: 1000 };
+		client.listChannelMessages.mockImplementation(async (_session, _clan, _channel, cursor, direction, limit = 50) => {
+			if (!cursor || cursor === '0') return { messages: page(server.latest - limit + 1, server.latest) };
+			const sequence = sequenceOf(cursor);
+			if (direction === Direction_Mode.AFTER_TIMESTAMP) return { messages: page(sequence, Math.min(sequence + limit - 1, server.latest)) };
+			return { messages: page(Math.max(1, sequence - limit), sequence - 1) };
+		});
+		await store.dispatch(fetchMessages({ ...args, noCache: true, toPresent: true })).unwrap();
+		server.latest = latest;
+		return { store, client };
+	}
+
+	it('fetches the missed messages in order instead of the page before its newest cached row', async () => {
+		const { store, client } = await openThenMiss(1003);
+		await store.dispatch(fetchMessages(args)).unwrap();
+		expect(client.listChannelMessages.mock.calls.at(-1)).toEqual([{}, 'clan', 'channel', '0', undefined, 50, undefined]);
+		expect(store.getState().messages.channelViewPortMessageIds.channel.slice(-4)).toEqual(ids(1000, 1003));
+		expect(store.getState().messages.lastMessageByChannel.channel?.id).toBe(msg(1003).id);
+		expect(selectHasMoreBottomByChannelId(store.getState() as any, 'channel')).toBe(false);
+	});
+
+	it('replaces a cache that no longer connects to the latest page', async () => {
+		const { store } = await openThenMiss(1200);
+		await store.dispatch(fetchMessages(args)).unwrap();
+		expect(store.getState().messages.channelViewPortMessageIds.channel).toEqual(ids(1151, 1200));
+		expect(store.getState().messages.channelMessages.channel.entities[msg(1000).id]).toBeUndefined();
+		expect(selectHasMoreMessageByChannelId(store.getState() as any, 'channel')).toBe(true);
+	});
+
+	it('keeps the reading position of a user viewing older messages', async () => {
+		const { store } = await openThenMiss(1200);
+		store.dispatch(messagesActions.setViewingOlder({ channelId: 'channel', status: true }));
+		await store.dispatch(fetchMessages(args)).unwrap();
+		expect(store.getState().messages.channelViewPortMessageIds.channel).toEqual(ids(951, 1000));
+		expect(store.getState().messages.lastMessageByChannel.channel?.id).toBe(msg(1200).id);
+		expect(selectHasMoreBottomByChannelId(store.getState() as any, 'channel')).toBe(true);
 	});
 });

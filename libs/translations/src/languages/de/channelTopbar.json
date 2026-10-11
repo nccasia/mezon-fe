@@ -103,7 +103,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "Das Startdatum muss vor oder am Enddatum liegen"
+			"startDateBeforeEnd": "Das Startdatum muss vor oder am Enddatum liegen",
+			"dateOutOfRange": "Das Datum muss zwischen dem {{minDate}} und heute liegen"
 		},
 		"buttons": {
 			"clearAll": "Alles löschen",
@@ -168,5 +169,12 @@
 		"limit": "Maximale Kanalanzahl für diesen Clan erreicht"
 	},
 	"moreFile": "weitere Dateien",
-	"moreFiles": "weitere Dateien"
+	"moreFiles": "weitere Dateien",
+	"topics": "Themen",
+	"pinnedMessage": "Angeheftete Nachricht",
+	"latestPin": "Neueste Anheftung",
+	"poll": "Abstimmung",
+	"pollDiscussion": "Abstimmung",
+	"pollWithQuestion": "Umfrage: {{question}}",
+	"messageFrom": "Nachricht von {{username}}: {{message}}"
 }

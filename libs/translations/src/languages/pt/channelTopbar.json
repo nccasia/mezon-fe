@@ -103,7 +103,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "A data de início deve ser anterior ou igual à data de término"
+			"startDateBeforeEnd": "A data de início deve ser anterior ou igual à data de término",
+			"dateOutOfRange": "A data deve estar entre {{minDate}} e hoje"
 		},
 		"buttons": {
 			"clearAll": "Limpar tudo",
@@ -168,5 +169,12 @@
 		"limit": "O número máximo de canais para este clã foi atingido"
 	},
 	"moreFile": "mais arquivos",
-	"moreFiles": "mais arquivos"
+	"moreFiles": "mais arquivos",
+	"topics": "Tópicos",
+	"pinnedMessage": "Mensagem fixada",
+	"latestPin": "Fixação mais recente",
+	"poll": "Votação",
+	"pollDiscussion": "Votação",
+	"pollWithQuestion": "Enquete: {{question}}",
+	"messageFrom": "Mensagem de {{username}}: {{message}}"
 }

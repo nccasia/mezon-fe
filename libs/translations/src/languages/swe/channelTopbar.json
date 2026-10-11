@@ -103,7 +103,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "Startdatum måste vara före eller samma som slutdatum"
+			"startDateBeforeEnd": "Startdatum måste vara före eller samma som slutdatum",
+			"dateOutOfRange": "Datumet måste vara mellan {{minDate}} och idag"
 		},
 		"buttons": {
 			"clearAll": "Rensa allt",
@@ -168,5 +169,12 @@
 		"limit": "Det maximala antalet kanaler för denna klan har uppnåtts"
 	},
 	"moreFile": "fler filer",
-	"moreFiles": "fler filer"
+	"moreFiles": "fler filer",
+	"topics": "Ämnen",
+	"pinnedMessage": "Fäst meddelande",
+	"latestPin": "Senaste fästningen",
+	"poll": "Röstning",
+	"pollDiscussion": "Röstning",
+	"pollWithQuestion": "Omröstning: {{question}}",
+	"messageFrom": "Meddelande från {{username}}: {{message}}"
 }

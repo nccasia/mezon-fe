@@ -101,7 +101,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "La date de début doit être antérieure ou égale à la date de fin"
+			"startDateBeforeEnd": "La date de début doit être antérieure ou égale à la date de fin",
+			"dateOutOfRange": "La date doit être comprise entre le {{minDate}} et aujourd'hui"
 		},
 		"buttons": {
 			"clearAll": "Tout effacer",
@@ -168,5 +169,12 @@
 	"moreFile": "autre fichier",
 	"moreFiles": "autres fichiers",
 	"joinedThreads": "Fils rejoints",
-	"archivedThreads": "Fils plus anciens"
+	"archivedThreads": "Fils plus anciens",
+	"topics": "Sujets",
+	"pinnedMessage": "Message épinglé",
+	"latestPin": "Dernier épinglage",
+	"poll": "Vote",
+	"pollDiscussion": "Vote",
+	"pollWithQuestion": "Sondage : {{question}}",
+	"messageFrom": "Message de {{username}} : {{message}}"
 }

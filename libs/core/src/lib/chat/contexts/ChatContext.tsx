@@ -66,21 +66,26 @@ import {
 	selectCurrentStreamInfo,
 	selectCurrentTopicId,
 	selectCurrentUserId,
+	selectDMVoiceEntities,
 	selectDataReferences,
 	selectDefaultChannelIdByClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectDmMetaEntities,
 	selectEntitesUserClans,
+	selectEntitiesChannelsByUser,
+	selectEstablishedCall,
 	selectFriendById,
 	selectIsInCall,
 	selectIsJoin,
+	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
 	selectLoadingStatus,
 	selectMessageByMessageId,
+	selectThreadCurrentChannel,
 	selectUserCallId,
 	selectVoiceInfo,
 	selectWelcomeChannelByClanId,
@@ -201,6 +206,7 @@ import { Observable, Subject } from 'rxjs';
 import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { isKnownPeerSession, readSignalSessionId, rememberPeerSession } from '../hooks/useWebRTCCall';
 import {
 	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	beginReconnectWave,
@@ -259,6 +265,24 @@ function reconnectJitterTicker$(): Observable<number> {
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'WAVE_COOLDOWN' | 'SKIP';
 
+async function isRepeatedCallOffer(event: WebrtcSignalingFwd, state: RootState) {
+	const isInCall = selectIsInCall(state);
+	const establishedPeerId = selectEstablishedCall(state)?.peerId;
+	const callerEntity = selectDMVoiceEntities(state)[event.caller_id];
+	const isFromCurrentCallPeer =
+		isInCall && (establishedPeerId ? event.caller_id === establishedPeerId : event.caller_id === selectUserCallId(state) || !!callerEntity);
+	if (isFromCurrentCallPeer) {
+		return false;
+	}
+	const sessionId = await readSignalSessionId(event.json_data);
+	const isRingingOfferUpdate = !isInCall && callerEntity?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER;
+	if (!isRingingOfferUpdate && isKnownPeerSession(event.caller_id, sessionId)) {
+		return true;
+	}
+	rememberPeerSession(event.caller_id, sessionId);
+	return false;
+}
+
 type ChatContextProviderProps = {
 	children: React.ReactNode;
 	isMobile?: boolean;
@@ -290,7 +314,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	);
 
 	const onvoicejoined = useCallback(
-		(voice: VoiceJoinedEvent & { peer_id?: number }) => {
+		(voice: VoiceJoinedEvent) => {
 			if (voice) {
 				const store = getStore();
 				const state = store.getState();
@@ -330,8 +354,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						clan_id: voice.clan_id,
 						user_id: voice.user_id,
 						user_name: voice.participant,
-						user_avatar: voice.last_screenshot,
-						peer_id: voice.peer_id
+						user_avatar: voice.last_screenshot
 					})
 				);
 			}
@@ -387,7 +410,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch]
 	);
 
-	const handleBuzz = useCallback((channelId: string, senderId: string, isReset: boolean, mode: ChannelStreamMode | undefined) => {
+	const handleBuzz = useCallback((message: ChannelMessage, isMe: boolean) => {
 		const audio = new Audio('/assets/audio/buzz.mp3');
 
 		const cleanup = () => {
@@ -404,25 +427,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			cleanup();
 		});
 
-		const timestamp = Math.round(Date.now() / 1000);
+		// The badge stays until the channel is opened, so skip it only for our own buzz and for a buzz the user is looking at right now.
+		if (isMe) return;
+
+		const { channel_id: channelId, sender_id: senderId, mode, topic_id: topicId } = message;
+		const state = getStore().getState() as unknown as RootState;
+		const isClanView = selectClanView(state);
+		const isFocused = !isBackgroundModeActive();
+		const buzzState = { isReset: true, senderId, timestamp: Math.round(Date.now() / 1000) };
 
 		if (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			const store = getStore();
-			const currentClanId = selectCurrentClanId(store.getState());
+			const currentChannelId = selectCurrentChannelId(state);
+			const isThreadBoxOpen =
+				!!currentChannelId &&
+				selectIsShowCreateThread(state, currentChannelId) &&
+				selectThreadCurrentChannel(state)?.channel_id === channelId;
+			const isOnScreen =
+				topicId && topicId !== '0'
+					? selectIsShowCreateTopic(state) && selectCurrentTopicId(state) === topicId
+					: currentChannelId === channelId || isThreadBoxOpen;
+			if (isFocused && isClanView && isOnScreen) return;
+
 			dispatch(
 				channelsActions.setBuzzState({
-					clanId: currentClanId as string,
+					clanId: message.clan_id || (selectCurrentClanId(state) as string),
 					channelId,
-					buzzState: { isReset: true, senderId, timestamp }
+					buzzState
 				})
 			);
 		} else if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-			dispatch(
-				directActions.setBuzzStateDirect({
-					channelId,
-					buzzState: { isReset: true, senderId, timestamp }
-				})
-			);
+			const isFriendPageView = window.location.pathname.includes('/chat/direct/friends');
+			if (isFocused && !isClanView && !isFriendPageView && selectDmGroupCurrentId(state) === channelId) return;
+
+			dispatch(directActions.setBuzzStateDirect({ channelId, buzzState }));
 		}
 	}, []);
 
@@ -440,7 +477,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 
 			if (message.code === TypeMessage.MessageBuzz) {
-				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
+				handleBuzz(message, message.sender_id === userId);
 			}
 
 			if (message.topic_id && message.topic_id !== '0') {
@@ -1088,7 +1125,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						user.channel_type === ChannelType.CHANNEL_TYPE_THREAD ? selectChannelById(currentState, user.channel_id) : null;
 
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
-					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: clanId as string }));
+					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: user.clan_id || (clanId as string) }));
 
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 						if (threadToRemove && threadToRemove.channel_private === ChannelStatusEnum.isPrivate) {
@@ -1138,6 +1175,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					})
 				);
 			}
+			dispatch(userChannelsActions.markAccessChanged(user.channel_id));
 		},
 		[userId, isMobile]
 	);
@@ -1323,6 +1361,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (userAdds.status !== ADD_ROLE_CHANNEL_STATUS) {
 				dispatch(userChannelsActions.addUserChannel({ channelId: channel_desc.channel_id as string, userAdds: userIds }));
 			}
+			dispatch(userChannelsActions.markAccessChanged(channel_desc.channel_id as string));
 		},
 		[userId, dispatch]
 	);
@@ -2037,6 +2076,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					})
 				);
 			}
+			let lostAccess = false;
 			if (channelUpdated.channel_private && channelExist && channelExist.channel_private !== channelUpdated.channel_private) {
 				const result = await dispatch(
 					updateChannelActions.switchPublicToPrivate({
@@ -2044,6 +2084,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						userId: userId as string
 					})
 				).unwrap();
+				lostAccess = result;
 
 				if (result && currentChannelId === channelUpdated.channel_id) {
 					navigate(`/chat/clans/${channelUpdated.clan_id}/member-safety`);
@@ -2058,7 +2099,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				);
 			}
 
-			if (!channelUpdated.channel_private && !channelExist && channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+			if (
+				!channelUpdated.channel_private &&
+				!channelExist &&
+				(channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL ||
+					channelUpdated.channel_type === ChannelType.CHANNEL_TYPE_MEZON_VOICE)
+			) {
 				dispatch(
 					updateChannelActions.addChannelNotExist({
 						channel: channelUpdated
@@ -2094,7 +2140,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						}
 					})
 				);
-				dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
+				// A private channel reaches the whole clan: only refresh an entry this user already has.
+				const listedForUser = !!selectEntitiesChannelsByUser(store.getState() as unknown as RootState)[channelUpdated.channel_id];
+				if (!lostAccess && listedForUser) {
+					dispatch(listChannelsByUserActions.upsertOne({ ...channel }));
+				}
 			} else {
 				dispatch(channelsActions.updateChannelSocket(channelPayload as ChannelUpdatedEvent));
 				dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelPayload }));
@@ -2472,25 +2522,68 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		}
 
 		const store = await getStoreAsync();
-		const userCallId = selectUserCallId(store.getState() as unknown as RootState);
-		const isInCall = selectIsInCall(store.getState() as unknown as RootState);
 		const signalingType = event?.data_type;
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_ANSWER) {
+			void readSignalSessionId(event.json_data).then((sessionId) => rememberPeerSession(event.caller_id, sessionId));
+		}
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_OFFER && (await isRepeatedCallOffer(event, store.getState() as unknown as RootState))) {
+			return;
+		}
+		const state = store.getState() as unknown as RootState;
+		const userCallId = selectUserCallId(state);
+		const isInCall = selectIsInCall(state);
+		const establishedCall = selectEstablishedCall(state);
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL && isInCall) return;
+		if (signalingType === WEBRTC_CLEAR_CALL) {
+			if (isInCall) return;
+			const ringingCall = selectDMVoiceEntities(state)[event.caller_id];
+			const offer = ringingCall?.signalingData;
+			if (offer?.data_type !== WebrtcSignalingType.WEBRTC_SDP_OFFER || offer.channel_id !== event.channel_id) return;
+			const syncData = safeJSONParse(event.json_data || '{}');
+			if (syncData?.callSessionId) {
+				const sessionId = await readSignalSessionId(offer.json_data);
+				const latest = store.getState() as unknown as RootState;
+				if (sessionId !== syncData.callSessionId || selectIsInCall(latest) || selectDMVoiceEntities(latest)[event.caller_id] !== ringingCall)
+					return;
+			}
+		}
+		if (establishedCall) {
+			const isQuitFromEstablishedPeer =
+				signalingType === WebrtcSignalingType.WEBRTC_SDP_QUIT &&
+				event.caller_id === establishedCall.peerId &&
+				(!event.channel_id || event.channel_id === '0' || !establishedCall.channelId || event.channel_id === establishedCall.channelId);
+			const isCallEndingSignal = [
+				WebrtcSignalingType.WEBRTC_SDP_QUIT,
+				WebrtcSignalingType.WEBRTC_SDP_TIMEOUT,
+				WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL,
+				WEBRTC_CLEAR_CALL
+			].includes(signalingType);
+			if (isCallEndingSignal && !isQuitFromEstablishedPeer) {
+				return;
+			}
+		}
 		if (!isInCall && [WebrtcSignalingType.WEBRTC_SDP_ANSWER, WebrtcSignalingType.WEBRTC_ICE_CANDIDATE].includes(signalingType)) {
 			return;
 		}
 
 		if (userCallId && userCallId !== event?.caller_id && sessionRef.current) {
-			clientRef.current?.forwardWebrtcSignaling(
-				sessionRef.current,
-				event?.caller_id,
-				WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL,
-				'',
-				event?.channel_id,
-				userId || ''
-			);
+			if (signalingType === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
+				clientRef.current?.forwardWebrtcSignaling(
+					sessionRef.current,
+					event?.caller_id,
+					WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL,
+					'',
+					event?.channel_id,
+					userId || ''
+				);
+			}
 			return;
 		}
-		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_QUIT || event.data_type === WEBRTC_CLEAR_CALL) {
+		if (
+			signalingType === WebrtcSignalingType.WEBRTC_SDP_QUIT ||
+			signalingType === WebrtcSignalingType.WEBRTC_SDP_TIMEOUT ||
+			event.data_type === WEBRTC_CLEAR_CALL
+		) {
 			dispatch(DMCallActions.removeAll());
 			dispatch(audioCallActions.reset());
 			dispatch(DMCallActions.cancelCall({}));
@@ -2498,16 +2591,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			dispatch(audioCallActions.setUserCallId(''));
 			dispatch(audioCallActions.setIsJoinedCall(false));
 			dispatch(DMCallActions.setOtherCall({}));
-			if (event.data_type !== WEBRTC_CLEAR_CALL && sessionRef.current) {
-				clientRef.current?.forwardWebrtcSignaling(
-					sessionRef.current,
-					event?.caller_id,
-					WEBRTC_CLEAR_CALL,
-					'',
-					event?.channel_id,
-					userId || ''
-				);
-			} else if (event.data_type === WEBRTC_CLEAR_CALL) {
+			if (event.data_type === WEBRTC_CLEAR_CALL) {
 				dispatch(DMCallActions.setIsForceQuitCallNative(true));
 			}
 		}

@@ -15,7 +15,10 @@ import {
 	selectCurrentClanName,
 	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
-	selectMemberClanByUserId,
+	selectMemberByIdAndClanId,
+	selectSfuUrlJoinVoice,
+	selectShowCamera,
+	selectShowMicrophone,
 	selectStatusMenu,
 	selectTokenJoinVoice,
 	selectVoiceFullScreen,
@@ -29,9 +32,13 @@ import {
 import { useLastCallback } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import type { ReactNode, RefObject } from 'react';
-import React, { Suspense, memo, useCallback, useRef, useState, type ErrorInfo } from 'react';
+import React, { Suspense, memo, useCallback, useEffect, useRef, useState, type ErrorInfo } from 'react';
+import { flushSync } from 'react-dom';
 import { useSelector } from 'react-redux';
 import ChatStream from '../chatStream';
+import { SfuReconnectModal } from './SfuReconnectModal';
+
+type VoiceJoinTarget = NonNullable<ReturnType<typeof selectVoiceInfo>>;
 
 interface VoicePreJoinWrapperProps {
 	loading: boolean;
@@ -61,8 +68,8 @@ const VoicePreJoinWrapper = memo(({ loading, handleJoinRoom }: VoicePreJoinWrapp
 
 interface VoiceConferenceContainerProps {
 	containerRef: RefObject<HTMLDivElement>;
-	token: string;
 	isOpenPopOut?: boolean;
+	rejoinTarget: VoiceJoinTarget | null;
 	children: ReactNode;
 }
 
@@ -72,6 +79,7 @@ interface VoiceConferenceContentProps {
 	serverUrl: string;
 	voiceInfo: ReturnType<typeof selectVoiceInfo>;
 	handleLeaveRoom: (self?: boolean) => Promise<void>;
+	onReconnectRequired: (networkLost: boolean) => void;
 	handleFullScreen: () => void;
 	isShowChatVoice: boolean;
 	isVoiceFullScreen: boolean;
@@ -86,6 +94,7 @@ const VoiceConferenceContent = memo(
 		serverUrl,
 		voiceInfo,
 		handleLeaveRoom,
+		onReconnectRequired,
 		handleFullScreen,
 		isShowChatVoice,
 		isVoiceFullScreen,
@@ -103,6 +112,7 @@ const VoiceConferenceContent = memo(
 					isChatOpen={isShowChatVoice}
 					isFullScreen={isVoiceFullScreen}
 					onLeaveRoom={() => void handleLeaveRoom()}
+					onReconnectRequired={onReconnectRequired}
 					onFullScreen={handleFullScreen}
 					onToggleChat={handleToggleChat}
 					isPrivateVoice={isPrivateVoice}
@@ -119,19 +129,20 @@ const VoiceConferenceContent = memo(
 	}
 );
 
-const VoiceConferenceContainer = memo(({ containerRef, token, isOpenPopOut, children }: VoiceConferenceContainerProps) => {
+const VoiceConferenceContainer = memo(({ containerRef, isOpenPopOut, rejoinTarget, children }: VoiceConferenceContainerProps) => {
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const isJoined = useSelector(selectVoiceJoined);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const isShow = isJoined && voiceInfo?.channelId === currentChannelId;
+	const displayedVoiceInfo = rejoinTarget ?? voiceInfo;
+	const isShow = (isJoined || !!rejoinTarget) && displayedVoiceInfo?.channelId === currentChannelId;
 
 	return (
 		<div
 			ref={containerRef}
 			id="mezonSfuRoom"
-			key={token}
-			className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex flex-1 min-w-0 w-full h-full`}
+			key={displayedVoiceInfo?.channelId}
+			className={`${!isShow || isOpenPopOut ? '!hidden' : ''} relative flex flex-1 min-w-0 w-full h-full bg-bgPrimary`}
 		>
 			{children}
 		</div>
@@ -140,11 +151,16 @@ const VoiceConferenceContainer = memo(({ containerRef, token, isOpenPopOut, chil
 
 const MezonSfuChannelVoiceInner = () => {
 	const token = useSelector(selectTokenJoinVoice);
+	const sfuUrl = useSelector(selectSfuUrlJoinVoice);
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [joinRole, setJoinRole] = useState<SfuJoinRole>('speaker');
+	const [rejoinTarget, setRejoinTarget] = useState<VoiceJoinTarget | null>(null);
+	const [rejoinNetworkLost, setRejoinNetworkLost] = useState(false);
+	const joinRequestRef = useRef(0);
+	const joiningRef = useRef(false);
 	const dispatch = useAppDispatch();
-	const serverUrl = process.env.NX_CHAT_APP_SFU_WS_URL;
+	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const isShowChatVoice = useSelector(selectIsShowChatVoice);
 	const currentChannelType = useSelector(selectCurrentChannelType);
@@ -158,50 +174,70 @@ const MezonSfuChannelVoiceInner = () => {
 	const isDisconnectingRef = useRef(false);
 	const isPrivateVoice = !!useSelector((state) => selectChannelById(state, voiceInfo?.channelId || ''))?.channel_private;
 
-	const handleJoinRoom = useLastCallback(async (role: SfuJoinRole) => {
+	useEffect(
+		() => () => {
+			joinRequestRef.current += 1;
+		},
+		[]
+	);
+
+	const handleJoinRoom = useLastCallback(async (role: SfuJoinRole, target?: VoiceJoinTarget) => {
+		if (joiningRef.current) return;
+		joiningRef.current = true;
+		const request = ++joinRequestRef.current;
+		const previousState = getStore().getState();
+		const restoreMicrophone = !!target && selectShowMicrophone(previousState);
+		const restoreCamera = !!target && selectShowCamera(previousState);
+		if (!target) setRejoinTarget(null);
 		setJoinRole(role);
-		if (token) {
+		if (target) {
+			flushSync(() => {
+				dispatch(voiceActions.resetVoiceControl());
+				dispatch(channelAppActions.clearAppInteractiveData());
+			});
+		} else if (token) {
 			dispatch(voiceActions.setJoined(false));
 			dispatch(voiceActions.setToken(''));
 		}
 		dispatch(voiceActions.setOpenPopOut(false));
 		dispatch(voiceActions.setShowScreen(false));
 		dispatch(voiceActions.setStreamScreen(null));
-		dispatch(voiceActions.setShowMicrophone(false));
+		dispatch(voiceActions.setShowMicrophone(restoreMicrophone));
+		if (target) dispatch(voiceActions.setShowCamera(restoreCamera));
 		if (role === 'audience') dispatch(voiceActions.setShowCamera(false));
 
 		const storeState = getStore().getState();
 		const userProfile = storeState.account.userProfile;
-		const currentClanId = selectCurrentClanId(storeState);
-		const currentClanName = selectCurrentClanName(storeState);
-		const currentChannelId = selectCurrentChannelId(storeState);
-		const currentChannelLabel = selectCurrentChannelLabel(storeState);
-		const currentChannelPrivate = selectCurrentChannelPrivate(storeState);
-		const clanMember = selectMemberClanByUserId(storeState, userProfile?.user?.id || '');
+		const currentClanId = target?.clanId ?? selectCurrentClanId(storeState);
+		const currentClanName = target?.clanName ?? selectCurrentClanName(storeState);
+		const currentChannelId = target?.channelId ?? selectCurrentChannelId(storeState);
+		const currentChannelLabel = target?.channelLabel ?? selectCurrentChannelLabel(storeState);
+		const currentChannelPrivate = target?.channelPrivate ?? selectCurrentChannelPrivate(storeState);
 
-		if (!currentClanId) return;
+		if (!currentClanId || !currentChannelId) {
+			joiningRef.current = false;
+			return;
+		}
 		setLoading(true);
 
 		try {
+			const clanMember = selectMemberByIdAndClanId(storeState, currentClanId, userProfile?.user?.id || '');
 			const username = clanMember?.clan_nick || clanMember?.prioritizeName || userProfile?.user?.display_name || userProfile?.user?.username;
 
 			const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
 
-			const metadata = {
-				...(username ? { username } : {}),
-				...(avatar ? { avatar } : {})
-			};
+			const metadata = username || avatar ? `${username};${avatar}` : '';
 			const result = await dispatch(
 				generateMeetToken({
 					channelId: currentChannelId as string,
 					roomName: '',
-					metadata: JSON.stringify(metadata)
+					metadata
 				})
 			).unwrap();
+			if (request !== joinRequestRef.current) return;
 
-			if (result) {
+			if (result?.token) {
 				dispatch(voiceActions.setJoined(true));
-				dispatch(voiceActions.setToken(result));
 				dispatch(
 					voiceActions.setVoiceInfo({
 						clanId: currentClanId as string,
@@ -212,15 +248,38 @@ const MezonSfuChannelVoiceInner = () => {
 						joinRole: role
 					})
 				);
+				dispatch(voiceActions.setSfuUrl(result.url));
+				dispatch(voiceActions.setToken(result.token));
+				setRejoinTarget(null);
 			} else {
 				dispatch(voiceActions.setToken(''));
 			}
 		} catch (err) {
+			if (request !== joinRequestRef.current) return;
 			console.error('Failed to generate token room:', err);
 			dispatch(voiceActions.setToken(''));
 		} finally {
-			setLoading(false);
+			if (request === joinRequestRef.current) {
+				joiningRef.current = false;
+				setLoading(false);
+			}
 		}
+	});
+
+	const handleReconnectRequired = useLastCallback((networkLost: boolean) => {
+		if (!voiceInfo) return;
+		setRejoinNetworkLost(networkLost);
+		setRejoinTarget({ ...voiceInfo, joinRole });
+		dispatch(voiceActions.setOpenPopOut(false));
+		dispatch(voiceActions.setVoiceConnectionState(false));
+	});
+	const handleExitReconnect = useLastCallback(() => {
+		joinRequestRef.current += 1;
+		joiningRef.current = false;
+		setLoading(false);
+		setRejoinTarget(null);
+		dispatch(voiceActions.resetVoiceControl());
+		dispatch(channelAppActions.clearAppInteractiveData());
 	});
 
 	const handleLeaveRoom = useLastCallback(async (_self?: boolean) => {
@@ -228,6 +287,10 @@ const MezonSfuChannelVoiceInner = () => {
 
 		if (isDisconnectingRef.current) return;
 		isDisconnectingRef.current = true;
+		joinRequestRef.current += 1;
+		joiningRef.current = false;
+		setLoading(false);
+		setRejoinTarget(null);
 
 		dispatch(voiceActions.resetVoiceControl());
 		dispatch(channelAppActions.clearAppInteractiveData());
@@ -248,24 +311,39 @@ const MezonSfuChannelVoiceInner = () => {
 				className={`${isOpenPopOut ? 'pointer-events-none' : ''} ${!isChannelMezonVoice || isShowSettingFooter?.status ? 'hidden' : ''} ${isVoiceFullScreen ? 'fixed inset-0 z-[100]' : `absolute bottom-0 right-0 ${isOnMenu ? 'max-sbm:z-1 z-30' : 'z-30'}`} ${!isOnMenu && !isVoiceFullScreen ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''}`}
 				style={!isVoiceFullScreen ? { width: 'calc(100% - 72px - 272px)', height: '100%' } : { width: '100vw', height: '100vh' }}
 			>
-				{token === '' || !serverUrl || voiceInfo?.clanId === '0' ? (
+				{!rejoinTarget && (token === '' || !serverUrl || voiceInfo?.clanId === '0') ? (
 					isChannelMezonVoice && <VoicePreJoinWrapper loading={loading} handleJoinRoom={handleJoinRoom} />
 				) : (
 					<>
-						{isChannelMezonVoice && <VoicePreJoinWrapper loading={loading} handleJoinRoom={handleJoinRoom} />}
-						<VoiceConferenceContainer containerRef={containerRef} token={token} isOpenPopOut={isOpenPopOut}>
-							<VoiceConferenceContent
-								token={token}
-								joinRole={joinRole}
-								serverUrl={serverUrl}
-								voiceInfo={voiceInfo}
-								isPrivateVoice={isPrivateVoice}
-								handleLeaveRoom={handleLeaveRoom}
-								handleFullScreen={handleFullScreen}
-								isShowChatVoice={isShowChatVoice}
-								isVoiceFullScreen={!!isVoiceFullScreen}
-								handleToggleChat={handleToggleChat}
-							/>
+						{isChannelMezonVoice && !rejoinTarget && <VoicePreJoinWrapper loading={loading} handleJoinRoom={handleJoinRoom} />}
+						<VoiceConferenceContainer containerRef={containerRef} isOpenPopOut={isOpenPopOut} rejoinTarget={rejoinTarget}>
+							{token && serverUrl ? (
+								<VoiceConferenceContent
+									token={token}
+									joinRole={joinRole}
+									serverUrl={serverUrl}
+									voiceInfo={voiceInfo}
+									isPrivateVoice={isPrivateVoice}
+									handleLeaveRoom={handleLeaveRoom}
+									onReconnectRequired={handleReconnectRequired}
+									handleFullScreen={handleFullScreen}
+									isShowChatVoice={isShowChatVoice}
+									isVoiceFullScreen={!!isVoiceFullScreen}
+									handleToggleChat={handleToggleChat}
+								/>
+							) : (
+								<div className="flex h-full w-full flex-col p-5 text-textSecondary">
+									<span className="text-sm font-medium">{rejoinTarget?.channelLabel}</span>
+								</div>
+							)}
+							{rejoinTarget && (
+								<SfuReconnectModal
+									loading={loading}
+									networkLost={rejoinNetworkLost}
+									onRejoin={() => void handleJoinRoom(rejoinTarget.joinRole || 'speaker', rejoinTarget)}
+									onExit={handleExitReconnect}
+								/>
+							)}
 						</VoiceConferenceContainer>
 					</>
 				)}

@@ -18,6 +18,7 @@ export interface UsersByAddChannelState extends EntityState<IUserChannel, string
 	cacheByChannels: Record<string, CacheMetadata>;
 	userIdToChannelIds: Record<string, string[]>;
 	listSearch: EntityState<SearchItemProps, string>;
+	accessVersionByChannel: Record<string, number>;
 }
 
 export const UserChannelAdapter = createEntityAdapter({
@@ -33,7 +34,8 @@ export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapte
 	error: null,
 	cacheByChannels: {},
 	userIdToChannelIds: {},
-	listSearch: ItemSearchCtrlKAdapter.getInitialState({})
+	listSearch: ItemSearchCtrlKAdapter.getInitialState({}),
+	accessVersionByChannel: {}
 });
 
 const cacheSearchKey = new Set<string>();
@@ -262,6 +264,26 @@ export const userChannelsSlice = createSlice({
 			});
 			ItemSearchCtrlKAdapter.removeOne(state.listSearch, channelId);
 		},
+		// Access changed on the server (private <-> public): drop the list so the next read refetches it.
+		invalidateUserChannel: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			state.entities[channelId]?.user_ids?.forEach((userId) => {
+				const channelIds = state.userIdToChannelIds[userId]?.filter((id) => id !== channelId);
+				if (channelIds?.length) {
+					state.userIdToChannelIds[userId] = channelIds;
+				} else {
+					delete state.userIdToChannelIds[userId];
+				}
+			});
+			UserChannelAdapter.removeOne(state, channelId);
+			delete state.cacheByChannels[channelId];
+		},
+		// The server added or removed someone's access (as a member or through a role); an open Permissions view
+		// rereads its lists, since the event names neither the role nor whether the user is a direct member.
+		markAccessChanged: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			state.accessVersionByChannel[channelId] = (state.accessVersionByChannel[channelId] ?? 0) + 1;
+		},
 		removeOneCtrlK: (state, action: PayloadAction<{ channelId: string }>) => {
 			const { channelId } = action.payload;
 
@@ -375,6 +397,9 @@ export const selectUserChannelIds = createSelector(
 	[getUserChannelsState, (state, channelId: string) => channelId],
 	(state, channelId) => selectById(state, channelId)?.user_ids || []
 );
+
+export const selectChannelAccessVersion = (rootState: { [ALL_USERS_BY_ADD_CHANNEL]: UsersByAddChannelState }, channelId: string) =>
+	getUserChannelsState(rootState).accessVersionByChannel?.[channelId] ?? 0;
 
 export const selectRawDataUserGroup = createSelector([getUserChannelsState, (state, channelId: string) => channelId], (state, channelId) =>
 	selectById(state, channelId)

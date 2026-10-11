@@ -1,4 +1,3 @@
-// eslint-disable-next-line @nx/enforce-module-boundaries
 import { clansActions, getStore, inviteActions, selectCanvasIdsByChannelId, selectClanById, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { IExtendedMessage } from '@mezon/utils';
@@ -32,6 +31,7 @@ interface RenderContentProps {
 	isSending?: boolean;
 	onContextMenu?: (event: React.MouseEvent<HTMLElement>) => void;
 	senderId?: string;
+	topicId?: string;
 	onCloseTooltip?: () => void;
 }
 
@@ -48,6 +48,7 @@ export interface ElementToken {
 	clanId?: string;
 	parentId?: string;
 	channelLabel?: string;
+	channelType?: number;
 	title?: string;
 	image?: string;
 	description?: string;
@@ -330,6 +331,7 @@ export const MessageLine = ({
 	isSending,
 	onContextMenu,
 	senderId,
+	topicId,
 	onCloseTooltip
 }: RenderContentProps) => {
 	const { t: translate } = useTranslation('common');
@@ -385,6 +387,7 @@ export const MessageLine = ({
 						isJumMessageEnabled={isJumMessageEnabled}
 						channelHastagId={element.channelId || ''}
 						channelLabel={element.channelLabel}
+						channelType={element.channelType}
 						clanId={element.clanId}
 						parentId={element.parentId}
 						channelId={element.channelId}
@@ -483,16 +486,19 @@ export const MessageLine = ({
 								/>
 							);
 						} else if (!isCanvas && contentHasChannelLink) {
+							const isSentForThisLink =
+								(!element.clanId || element.clanId === clanId) && (!element.channelId || element.channelId === channelId);
 							componentToRender = (
 								<ChannelHashtag
 									key={`linkChannel${s}-${messageId}`}
 									isTokenClickAble={isTokenClickAble}
 									isJumMessageEnabled={isJumMessageEnabled}
 									channelHastagId={channelId}
-									channelLabel={element.channelLabel || contentInElement}
-									clanId={element.clanId || clanId}
-									parentId={element.parentId}
-									channelId={element.channelId}
+									channelLabel={(isSentForThisLink && element.channelLabel) || contentInElement}
+									channelType={isSentForThisLink ? element.channelType : undefined}
+									clanId={clanId}
+									parentId={isSentForThisLink ? element.parentId : undefined}
+									channelId={channelId}
 									isLink={true}
 								/>
 							);
@@ -562,6 +568,8 @@ export const MessageLine = ({
 									image={element.image}
 									title={element.title}
 									messageId={messageId}
+									topicId={topicId}
+									isSearchMessage={isSearchMessage}
 								/>
 							);
 						}
@@ -661,6 +669,7 @@ export const MessageLine = ({
 					: {
 							whiteSpace: 'break-spaces',
 							overflowWrap: 'break-word',
+							fontFeatureSettings: "'mkmk' 0",
 							minHeight: 30,
 							textAlign: 'left'
 						}

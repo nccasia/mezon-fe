@@ -1,7 +1,7 @@
 import { useChatSending, useCurrentInbox } from '@mezon/core';
 import { referencesActions } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { blobToFile, getChannelMode, processFilesForAttachment } from '@mezon/utils';
+import { blobToFile, getChannelMode, processFilesForAttachment, reportMediaAccessError } from '@mezon/utils';
 import type { ApiChannelDescription, ApiMessageAttachment } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -55,6 +55,7 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 			setSeconds(0);
 			timerRef.current = setInterval(() => setSeconds((prev) => prev + 1), 1000);
 		} catch (err) {
+			reportMediaAccessError('microphone', err);
 			console.error('Không thể truy cập microphone:', err);
 		}
 	}, []);
@@ -118,7 +119,15 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 		if (!client || !session) return;
 
 		const timestamp = new Date().getTime();
-		const fileUploaded = await handleUploadFile(client, session, `${currentInbox?.id}${timestamp}voice_record.mp3`, blobToFile(blob));
+		const fileUploaded = await handleUploadFile(
+			client,
+			session,
+			`${currentInbox?.id}${timestamp}voice_record.mp3`,
+			blobToFile(blob),
+			undefined,
+			undefined,
+			currentInbox?.id
+		);
 
 		const attachmentsArray = [fileUploaded];
 		setAudioList(attachmentsArray);
@@ -174,6 +183,7 @@ const AudioRecorderControl: React.FC<AudioRecorderProps> = React.memo(({ onSendR
 				try {
 					recorderRef.current.stop();
 				} catch {
+					// Continue releasing the media tracks even if stopping the recorder fails.
 				}
 			}
 			if (streamRef.current) {

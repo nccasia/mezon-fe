@@ -1,8 +1,11 @@
+import type { RootState } from '@mezon/store';
 import {
 	getStore,
 	messagesActions,
 	selectAllAccount,
+	selectAllChannelsInAllClans,
 	selectAnonymousMode,
+	selectChannelDetailById,
 	selectCurrentTopicId,
 	selectInitTopicMessageId,
 	selectMemberClanByUserId,
@@ -15,7 +18,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import type { IMessageSendPayload } from '@mezon/utils';
-import { getMessageCreateTimeSeconds, withCreateTimeSecondsInUpdateContent } from '@mezon/utils';
+import { TypeMessage, getMessageCreateTimeSeconds, withCreateTimeSecondsInUpdateContent } from '@mezon/utils';
 import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef } from 'react';
@@ -56,6 +59,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector((state) => selectAnonymousMode(state, channelOrDirect?.channel_id as string));
 	const topicAnonymousMode = useSelector(selectTopicAnonymousMode);
+	const isAnonymousSend = getClanId !== '0' && (fromTopic ? !!currentTopicId && topicAnonymousMode : anonymousMode);
 	const initTopicMessageId = useSelector(selectInitTopicMessageId);
 	const { clientRef, sessionRef } = useMezon();
 	const isCreatingTopicRef = useRef(false);
@@ -85,40 +89,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 		) => {
 			const moreContent = content;
 
-			if (content.t && moreContent?.mk && moreContent?.mk?.length > 0) {
-				const store = getStore();
-				moreContent.mk = moreContent.mk.map((item) => {
-					const path = content.t?.slice(item.s, item.e);
-					if (!path) return item;
-					const channelId = isValidChatChannel(path);
-					if (!channelId) return item;
-					const channel = selectSearchChannelById(store.getState(), channelId);
-					if (!channel?.parent_id || channel?.parent_id === '0' || channel?.channel_private) return item;
-					return {
-						...item,
-						...(channel?.clan_id && { clanId: channel.clan_id }),
-						...(channel?.channel_label && { channelLabel: channel.channel_label }),
-						...(channel?.channel_id && { channelId: channel.channel_id }),
-						...(channel?.parent_id && channel.parent_id !== '0' && { parentId: channel.parent_id })
-					};
-				});
-			}
-
-			if (content.t && moreContent?.hg && moreContent?.hg?.length > 0) {
-				const store = getStore();
-				moreContent.hg = moreContent.hg.map((item) => {
-					if (!item.channelId) return item;
-					const channel = selectSearchChannelById(store.getState(), item.channelId);
-					if (!channel?.parent_id || channel?.parent_id === '0' || channel?.channel_private) return item;
-					return {
-						...item,
-						...(channel?.clan_id && { clanId: channel.clan_id }),
-						...(channel?.channel_label && { channelLabel: channel.channel_label }),
-						...(channel?.channel_id && { channelId: channel.channel_id }),
-						...(channel?.parent_id && channel.parent_id !== '0' && { parentId: channel.parent_id })
-					};
-				});
-			}
+			addChannelLinkDetails(moreContent);
 
 			if (ephemeralReceiverId) {
 				await dispatch(
@@ -137,6 +108,10 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 						username: priorityNameToShow
 					})
 				);
+				return;
+			}
+
+			if (code === TypeMessage.MessageBuzz && isAnonymousSend) {
 				return;
 			}
 
@@ -161,7 +136,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 								mode,
 								anonymous: false,
 								attachments,
-								code: 0,
+								code: code ?? 0,
 								content,
 								isMobile,
 								isPublic,
@@ -188,7 +163,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 						mode,
 						anonymous: getClanId !== '0' ? topicAnonymousMode : false,
 						attachments,
-						code: 0,
+						code: code ?? 0,
 						content,
 						isMobile,
 						isPublic,
@@ -236,7 +211,8 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			currentTopicId,
 			createTopic,
 			anonymousMode,
-			topicAnonymousMode
+			topicAnonymousMode,
+			isAnonymousSend
 		]
 	);
 
@@ -282,6 +258,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 				...content,
 				t: content.t?.trim()
 			};
+			addChannelLinkDetails(trimContent);
 			if (hasExistingAttachments && !isAttachmentFieldUpdate) {
 				trimContent = withCreateTimeSecondsInUpdateContent(trimContent, messageCreateTimeSeconds);
 			}
@@ -313,10 +290,50 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 		() => ({
 			sendMessage,
 			sendMessageTyping,
-			editSendMessage
+			editSendMessage,
+			isAnonymousSend
 		}),
-		[sendMessage, sendMessageTyping, editSendMessage]
+		[sendMessage, sendMessageTyping, editSendMessage, isAnonymousSend]
 	);
+}
+
+function findLinkedChannel(state: RootState, channelId: string): ApiChannelDescription | null | undefined {
+	const clans = selectAllChannelsInAllClans(state);
+	for (const clanId in clans) {
+		const channel = clans[clanId]?.entities?.entities?.[channelId];
+		if (channel) return channel;
+	}
+	return selectSearchChannelById(state, channelId) || selectChannelDetailById(state, channelId);
+}
+
+function channelLinkDetails(channel: ApiChannelDescription | null | undefined) {
+	if (!channel?.channel_id || !channel.clan_id || !channel.channel_label || channel.channel_private) return undefined;
+	return {
+		clanId: channel.clan_id,
+		channelLabel: channel.channel_label,
+		channelId: channel.channel_id,
+		...(channel.type !== undefined && { channelType: channel.type }),
+		...(channel.parent_id && channel.parent_id !== '0' && { parentId: channel.parent_id })
+	};
+}
+
+function addChannelLinkDetails(content: IMessageSendPayload) {
+	if (!content.t || (!content.mk?.length && !content.hg?.length)) return;
+	const text = content.t;
+	const state = getStore().getState() as RootState;
+	if (content.mk?.length) {
+		content.mk = content.mk.map((item) => {
+			const channelId = isValidChatChannel(text.slice(item.s, item.e));
+			const details = channelId ? channelLinkDetails(findLinkedChannel(state, channelId)) : undefined;
+			return details ? { ...item, ...details } : item;
+		});
+	}
+	if (content.hg?.length) {
+		content.hg = content.hg.map((item) => {
+			const details = item.channelId ? channelLinkDetails(findLinkedChannel(state, item.channelId)) : undefined;
+			return details ? { ...item, ...details } : item;
+		});
+	}
 }
 
 function isValidChatChannel(link: string) {

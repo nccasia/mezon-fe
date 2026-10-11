@@ -103,7 +103,8 @@
 			"range": "{{startDate}} - {{endDate}}"
 		},
 		"validation": {
-			"startDateBeforeEnd": "開始日は終了日以前または同じである必要があります"
+			"startDateBeforeEnd": "開始日は終了日以前または同じである必要があります",
+			"dateOutOfRange": "日付は{{minDate}}から今日までの範囲で指定してください"
 		},
 		"buttons": {
 			"clearAll": "すべてクリア",
@@ -168,5 +169,12 @@
 		"limit": "このクランのチャンネル数が上限に達しました"
 	},
 	"moreFile": "ファイル",
-	"moreFiles": "ファイル"
+	"moreFiles": "ファイル",
+	"topics": "トピック",
+	"pinnedMessage": "ピン留めされたメッセージ",
+	"latestPin": "最新のピン留め",
+	"poll": "投票",
+	"pollDiscussion": "投票",
+	"pollWithQuestion": "投票: {{question}}",
+	"messageFrom": "{{username}}からのメッセージ: {{message}}"
 }
