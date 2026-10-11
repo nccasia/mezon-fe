@@ -35,6 +35,20 @@ import { useLocation } from 'react-router-dom';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import { parsePollData } from '../../MessageWithUser/parsePollData';
 
+type TopicSenderSourceFields = {
+	sender_id?: string;
+	username?: string;
+	display_name?: string;
+	isAnonymous?: boolean;
+};
+
+const pickTopicSenderSource = (message: TopicSenderSourceFields | null | undefined): TopicSenderSourceFields | null => {
+	if (!message?.sender_id) {
+		return null;
+	}
+	return message;
+};
+
 const extractPollQuestion = (content: any): string => {
 	if (!content) return '';
 	if (content instanceof Uint8Array) {
@@ -460,30 +474,24 @@ export const ChannelTopicPinBanner = memo(() => {
 		dispatch
 	]);
 
+	const topicSenderSourceMessage = useMemo((): TopicSenderSourceFields | null => {
+		return (
+			pickTopicSenderSource(latestTopic?.last_sent_message) ||
+			pickTopicSenderSource(topicLastMessageInStore) ||
+			pickTopicSenderSource(latestTopic?.message) ||
+			pickTopicSenderSource(topicOriginalMessage)
+		);
+	}, [latestTopic?.last_sent_message, topicLastMessageInStore, latestTopic?.message, topicOriginalMessage]);
+
 	const topicSenderId = useMemo(() => {
-		if (latestTopic?.last_sent_message?.sender_id) {
-			return String(latestTopic.last_sent_message.sender_id);
-		}
-		if (topicLastMessageInStore?.sender_id) {
-			return String(topicLastMessageInStore.sender_id);
+		if (topicSenderSourceMessage?.sender_id) {
+			return String(topicSenderSourceMessage.sender_id);
 		}
 		if (latestTopic?.creator_id) {
 			return String(latestTopic.creator_id);
 		}
-		if (latestTopic?.message?.sender_id) {
-			return String(latestTopic.message.sender_id);
-		}
-		if (topicOriginalMessage?.sender_id) {
-			return String(topicOriginalMessage.sender_id);
-		}
 		return '';
-	}, [
-		latestTopic?.last_sent_message?.sender_id,
-		topicLastMessageInStore?.sender_id,
-		latestTopic?.creator_id,
-		latestTopic?.message?.sender_id,
-		topicOriginalMessage?.sender_id
-	]);
+	}, [topicSenderSourceMessage, latestTopic?.creator_id]);
 
 	const {
 		namePriority: topicSenderNamePriority,
@@ -494,10 +502,7 @@ export const ChannelTopicPinBanner = memo(() => {
 	const topicSenderMember = useAppSelector((state) => (topicSenderId ? selectMemberClanByUserId(state, topicSenderId) : null));
 
 	const isTopicSenderAnonymous = Boolean(
-		isTopicAnonymous ||
-			topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID ||
-			(topicLastMessageInStore as any)?.isAnonymous ||
-			(topicOriginalMessage as any)?.isAnonymous
+		isTopicAnonymous || topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID || topicSenderSourceMessage?.isAnonymous
 	);
 
 	const topicSenderName = useMemo(() => {
@@ -505,31 +510,15 @@ export const ChannelTopicPinBanner = memo(() => {
 		if (isTopicSenderAnonymous) return 'Anonymous';
 		return (
 			topicSenderNamePriority ||
-			(latestTopic?.last_sent_message as any)?.username ||
-			(latestTopic?.last_sent_message as any)?.display_name ||
-			(topicLastMessageInStore as any)?.display_name ||
-			(topicLastMessageInStore as any)?.username ||
-			(topicOriginalMessage as any)?.display_name ||
-			(topicOriginalMessage as any)?.username ||
-			(latestTopic?.message as any)?.display_name ||
-			(latestTopic?.message as any)?.username ||
+			topicSenderSourceMessage?.display_name ||
+			topicSenderSourceMessage?.username ||
 			topicSenderUsername ||
 			topicSenderMember?.clan_nick ||
 			topicSenderMember?.user?.display_name ||
 			topicSenderMember?.user?.username ||
 			''
 		);
-	}, [
-		topicSenderId,
-		isTopicSenderAnonymous,
-		topicSenderNamePriority,
-		latestTopic?.last_sent_message,
-		topicLastMessageInStore,
-		topicOriginalMessage,
-		latestTopic?.message,
-		topicSenderUsername,
-		topicSenderMember
-	]);
+	}, [topicSenderId, isTopicSenderAnonymous, topicSenderNamePriority, topicSenderSourceMessage, topicSenderUsername, topicSenderMember]);
 
 	const topicTitle = useMemo(() => {
 		if (!latestTopic) return '';
@@ -630,41 +619,8 @@ export const ChannelTopicPinBanner = memo(() => {
 
 	const isPinPoll = useMemo(() => {
 		if (!latestPin) return false;
-		if ((latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll) {
-			return true;
-		}
-		if (pollQuestionFromContent) {
-			return true;
-		}
-		let raw: any = pinMessageInStore?.content || latestPin.content;
-		if (raw instanceof Uint8Array) {
-			try {
-				raw = new TextDecoder().decode(raw);
-			} catch {
-				return false;
-			}
-		}
-		let parsed: any = raw;
-		if (typeof raw === 'string') {
-			try {
-				parsed = safeJSONParse(raw);
-			} catch {
-				parsed = null;
-			}
-		}
-		if (typeof raw === 'string' && raw.startsWith('📊')) {
-			return true;
-		}
-		if (parsed && typeof parsed === 'object') {
-			if ('poll_id' in parsed || 'question' in parsed || 'answer_counts' in parsed || 'answers' in parsed) {
-				return true;
-			}
-			if (typeof parsed.t === 'string' && parsed.t.startsWith('📊')) {
-				return true;
-			}
-		}
-		return false;
-	}, [latestPin, pinMessageInStore, pollQuestionFromContent]);
+		return (latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll;
+	}, [latestPin, pinMessageInStore]);
 
 	useEffect(() => {
 		if (!isPinPoll || pollQuestionFromContent) return;
@@ -672,17 +628,26 @@ export const ChannelTopicPinBanner = memo(() => {
 		const pinChannelId = String(latestPin?.channel_id || currentChannelId || '');
 		if (!pinMessageId || !pinChannelId) return;
 
+		let cancelled = false;
+
 		dispatch(getPoll({ message_id: pinMessageId, channel_id: pinChannelId }))
 			.unwrap()
 			.then((res: any) => {
+				if (cancelled) return;
 				const q = res?.question || res?.poll?.question || res?.data?.question;
 				if (q) {
 					setFetchedPollQuestion(String(q));
 				}
 			})
 			.catch(() => {
-				setFetchedPollQuestion('');
+				if (!cancelled) {
+					setFetchedPollQuestion('');
+				}
 			});
+
+		return () => {
+			cancelled = true;
+		};
 	}, [isPinPoll, pollQuestionFromContent, latestPin?.message_id, latestPin?.channel_id, currentChannelId, dispatch]);
 
 	const pinPollQuestion = pollQuestionFromContent || fetchedPollQuestion;
