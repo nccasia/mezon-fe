@@ -84,6 +84,7 @@ interface VoiceConferenceContentProps {
 	isVoiceFullScreen: boolean;
 	handleToggleChat: () => void;
 	isPrivateVoice?: boolean;
+	onRefreshToken?: () => Promise<string | undefined>;
 }
 
 const VoiceConferenceContent = memo(
@@ -98,7 +99,8 @@ const VoiceConferenceContent = memo(
 		isShowChatVoice,
 		isVoiceFullScreen,
 		handleToggleChat,
-		isPrivateVoice
+		isPrivateVoice,
+		onRefreshToken
 	}: VoiceConferenceContentProps) => {
 		return (
 			<div className="flex-1 relative flex overflow-hidden">
@@ -115,6 +117,7 @@ const VoiceConferenceContent = memo(
 					onFullScreen={handleFullScreen}
 					onToggleChat={handleToggleChat}
 					isPrivateVoice={isPrivateVoice}
+					onRefreshToken={onRefreshToken}
 				/>
 				<EmojiSuggestionProvider>
 					{isShowChatVoice && (
@@ -221,9 +224,7 @@ const MezonSfuChannelVoiceInner = () => {
 		try {
 			const clanMember = selectMemberByIdAndClanId(storeState, currentClanId, userProfile?.user?.id || '');
 			const username = clanMember?.clan_nick || clanMember?.prioritizeName || userProfile?.user?.display_name || userProfile?.user?.username;
-
 			const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
-
 			const metadata = username || avatar ? `${username};${avatar}` : '';
 			const result = await dispatch(
 				generateMeetToken({
@@ -261,6 +262,30 @@ const MezonSfuChannelVoiceInner = () => {
 				joiningRef.current = false;
 				setLoading(false);
 			}
+		}
+	});
+
+	const handleRefreshToken = useLastCallback(async () => {
+		const channelId = voiceInfo?.channelId;
+		const clanId = voiceInfo?.clanId;
+		if (!channelId || !clanId) return undefined;
+		const storeState = getStore().getState();
+		const userProfile = storeState.account.userProfile;
+		const clanMember = selectMemberByIdAndClanId(storeState, clanId, userProfile?.user?.id || '');
+		const username = clanMember?.clan_nick || clanMember?.prioritizeName || userProfile?.user?.display_name || userProfile?.user?.username;
+		const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
+		const metadata = username || avatar ? `${username};${avatar}` : '';
+		try {
+			return await dispatch(
+				generateMeetToken({
+					channelId,
+					roomName: '',
+					metadata
+				})
+			).unwrap();
+		} catch (err) {
+			console.error('Failed to refresh voice token:', err);
+			return undefined;
 		}
 	});
 
@@ -327,6 +352,7 @@ const MezonSfuChannelVoiceInner = () => {
 									isShowChatVoice={isShowChatVoice}
 									isVoiceFullScreen={!!isVoiceFullScreen}
 									handleToggleChat={handleToggleChat}
+									onRefreshToken={handleRefreshToken}
 								/>
 							) : (
 								<div className="flex h-full w-full flex-col p-5 text-textSecondary">
