@@ -67,17 +67,29 @@ import {
 	type ScreenShareMode
 } from './screenShareQuality';
 
-import { SfuMediaHealth } from './sfuMediaHealth';
+import { SfuMediaHealth, SfuNetworkQuality } from './sfuMediaHealth';
 import { SfuMuteSync, sfuCloseAction, sfuReconnectDelay, withSfuTimeout } from './sfuReconnect';
+import { SfuSlotAssignments } from './sfuSlotAssignments';
 
 const ICE_RECOVERY_GRACE_MS = 4000;
+const NETWORK_QUALITY_INTERVAL_MS = 5000;
 const TRANSPORT_CONNECT_DEADLINE_MS = 15_000;
 const MAX_TOKEN_REFRESH_ATTEMPTS = 3;
 const MAX_RECONNECT_ATTEMPTS = 4;
 const MAX_RECOVERY_MS = 120_000;
+const SFU_SERVER_RESTART_CLOSE_CODE = 1001;
 const SFU_ALONE_TIMEOUT_CLOSE_CODE = 4011;
 const SFU_DUPLICATE_SESSION_CLOSE_CODE = 4012;
 const PREFERRED_MICROPHONE_STORAGE_KEY = 'mezon.voice.inputDeviceId';
+const AGENT_HINT_DISMISSED_STORAGE_KEY = 'mezon.voice.agentHintDismissed';
+
+const readAgentHintDismissed = () => {
+	try {
+		return localStorage.getItem(AGENT_HINT_DISMISSED_STORAGE_KEY) === '1';
+	} catch {
+		return false;
+	}
+};
 const microphoneDeviceConstraint = (deviceId: string) => ({ deviceId: { exact: deviceId } });
 const getNativeMicrophoneCaptureOptions = () => {
 	const options = getNoiseSuppressionAudioCaptureOptions(true);
@@ -432,11 +444,12 @@ export interface MezonSfuVoiceRoomProps {
 	isExternalCalling?: boolean;
 	onRefreshToken?: () => Promise<string | undefined>;
 	onLeaveRoom: () => void;
-	onReconnectRequired?: () => void;
+	onReconnectRequired?: (networkLost: boolean) => void;
 	onFullScreen: () => void;
 	onToggleChat: () => void;
 	username?: string;
 	isPrivateVoice?: boolean;
+	customVideoTrack?: MediaStreamTrack | null;
 }
 
 type SfuOffer = { sdp: string; offer_generation: number };
@@ -458,7 +471,8 @@ export function MezonSfuVoiceRoom({
 	onFullScreen,
 	onToggleChat,
 	username,
-	isPrivateVoice
+	isPrivateVoice,
+	customVideoTrack
 }: MezonSfuVoiceRoomProps) {
 	const { t } = useTranslation('channelVoice');
 	const dispatch = useAppDispatch();
@@ -540,6 +554,7 @@ export function MezonSfuVoiceRoom({
 	const [selfPeerId, setSelfPeerId] = useState<string>();
 	const selfPeerIdRef = useRef<string>();
 	const peerStateByIdRef = useRef(new Map<string, SfuPeer>());
+	const slotAssignmentsRef = useRef(new SfuSlotAssignments());
 	const currentSfuRoleRef = useRef(joinRole);
 	const microphonePermissionRevokedRef = useRef(false);
 	const desiredMediaRef = useRef({ microphoneEnabled, cameraEnabled });
@@ -576,6 +591,9 @@ export function MezonSfuVoiceRoom({
 		onRefreshTokenRef.current = onRefreshToken;
 	}, [onRefreshToken]);
 	const [connectionState, setConnectionState] = useState<ConnectionState>('connecting');
+	const [weakNetwork, setWeakNetwork] = useState(false);
+	const weakNetworkRef = useRef(weakNetwork);
+	weakNetworkRef.current = weakNetwork;
 	const [error, setError] = useState<string>();
 	const [localPreview, setLocalPreview] = useState<MediaStream>();
 	const [localAudioTrack, setLocalAudioTrack] = useState<MediaStreamTrack>();
@@ -614,6 +632,15 @@ export function MezonSfuVoiceRoom({
 	useEffect(() => {
 		setPushToTalkHintDismissed(false);
 	}, [roomId, joinRole]);
+	const [agentHintDismissed, setAgentHintDismissed] = useState(readAgentHintDismissed);
+	const dismissAgentHint = useCallback(() => {
+		setAgentHintDismissed(true);
+		try {
+			localStorage.setItem(AGENT_HINT_DISMISSED_STORAGE_KEY, '1');
+		} catch {
+			return;
+		}
+	}, []);
 	const holdToTalkRef = useRef(false);
 	const microphoneEnabledRef = useRef(microphoneEnabled);
 	microphoneEnabledRef.current = microphoneEnabled;
@@ -708,6 +735,28 @@ export function MezonSfuVoiceRoom({
 		dispatch(toastActions.addToast({ message: error, type: 'error', autoClose: 3000 }));
 	}, [dispatch, error]);
 
+	useEffect(() => {
+		if (connectionState !== 'connected') {
+			setWeakNetwork(false);
+			return;
+		}
+		let cancelled = false;
+		const quality = new SfuNetworkQuality();
+		const timer = window.setInterval(() => {
+			const pc = pcRef.current;
+			if (!pc) return;
+			void withSfuTimeout(pc.getStats(), 2000)
+				.then((report) => {
+					if (!cancelled && pcRef.current === pc) setWeakNetwork(quality.isWeak(report));
+				})
+				.catch(() => undefined);
+		}, NETWORK_QUALITY_INTERVAL_MS);
+		return () => {
+			cancelled = true;
+			window.clearInterval(timer);
+		};
+	}, [connectionState]);
+
 	const findUplinkVideoSender = useCallback((mid = '1') => {
 		const pc = pcRef.current;
 		if (!pc) return null;
@@ -798,6 +847,18 @@ export function MezonSfuVoiceRoom({
 		if (pcRef.current !== pc || negotiatingRef.current) return;
 		setRemoteMedia((current) => {
 			if (pcRef.current !== pc || negotiatingRef.current) return current;
+			if (slotAssignmentsRef.current.enabled) {
+				const next = new Map<string, RemoteMedia>();
+				for (const [peerId, peer] of peerStateByIdRef.current) {
+					const id = `sfu-peer-${peerId}`;
+					next.set(id, mergeRemotePeerState({ id }, peer));
+				}
+				for (const [peerId, media] of slotAssignmentsRef.current.getMedia(pc.getTransceivers())) {
+					const previous = next.get(media.id);
+					next.set(media.id, { ...previous, ...media, userId: media.userId ?? previous?.userId, peerId });
+				}
+				return next;
+			}
 			const next = new Map(current);
 			for (const transceiver of pc.getTransceivers()) {
 				const mid = transceiver.mid;
@@ -842,6 +903,11 @@ export function MezonSfuVoiceRoom({
 				peerStateByIdRef.current.set(peerId, updated);
 				return updated;
 			});
+			slotAssignmentsRef.current.seedMembers(peers);
+			if (slotAssignmentsRef.current.enabled) {
+				if (pcRef.current) syncRemoteMedia(pcRef.current);
+				return;
+			}
 			for (const peer of peers) {
 				for (const mid of [peer.mid_audio, peer.mid_video, peer.mid_screen].filter((mid) => mid != null && Number(mid) >= 3).map(String)) {
 					peerIdsByMidRef.current.set(mid, String(peer.peer_id));
@@ -982,7 +1048,7 @@ export function MezonSfuVoiceRoom({
 
 	useEffect(() => {
 		if (!localMediaPreparedRef.current) return;
-		let cancelled = false;
+		const cancelled = false;
 		const ws = wsRef.current;
 		const pc = pcRef.current;
 
@@ -990,16 +1056,20 @@ export function MezonSfuVoiceRoom({
 			try {
 				let cameraTrack = cameraTrackRef.current;
 				if (cameraEnabled && cameraTrack?.readyState !== 'live') {
-					const video = getCameraConstraints(cameraQualityTierRef.current);
-					const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video }).catch((cause) => {
-						if (reportMediaAccessError('camera', cause)) dispatch(voiceActions.setShowCamera(false));
-						throw cause;
-					});
-					if (cancelled) {
-						stream.getTracks().forEach((track) => track.stop());
-						return;
+					if (customVideoTrack && customVideoTrack.readyState === 'live') {
+						cameraTrack = customVideoTrack;
+					} else {
+						const video = getCameraConstraints(cameraQualityTierRef.current);
+						const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video }).catch((cause) => {
+							if (reportMediaAccessError('camera', cause)) dispatch(voiceActions.setShowCamera(false));
+							throw cause;
+						});
+						if (cancelled) {
+							stream.getTracks().forEach((track) => track.stop());
+							return;
+						}
+						cameraTrack = stream.getVideoTracks()[0];
 					}
-					cameraTrack = stream.getVideoTracks()[0];
 					if (cancelled || pcRef.current !== pc || wsRef.current !== ws) return;
 					if (cameraTrack) {
 						const localStream = localStreamRef.current || new MediaStream();
@@ -1041,10 +1111,22 @@ export function MezonSfuVoiceRoom({
 				ws.send(JSON.stringify(signal));
 			}
 		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [cameraEnabled, dispatch, findUplinkVideoSender, joinRole, hasCameraAccess, localMediaPrepared]);
+	}, [cameraEnabled, customVideoTrack, dispatch, findUplinkVideoSender, joinRole, hasCameraAccess, localMediaPrepared]);
+
+	useEffect(() => {
+		if (customVideoTrack && customVideoTrack.readyState === 'live') {
+			cameraTrackRef.current = customVideoTrack;
+			const localStream = localStreamRef.current || new MediaStream();
+			localStream.getVideoTracks().forEach((track) => localStream.removeTrack(track));
+			localStream.addTrack(customVideoTrack);
+			localStreamRef.current = localStream;
+			setLocalPreview(new MediaStream(localStream.getTracks()));
+			const videoSender = findUplinkVideoSender();
+			if (videoSender && cameraEnabled) {
+				void videoSender.replaceTrack(customVideoTrack);
+			}
+		}
+	}, [customVideoTrack, cameraEnabled, findUplinkVideoSender]);
 
 	const handleMezonNsFailure = useCallback(
 		(cause: unknown, pipeline?: MezonNsAudioPipeline) => {
@@ -1285,6 +1367,7 @@ export function MezonSfuVoiceRoom({
 		let sessionToken = signalingTokenRef.current;
 		let tokenRejected = false;
 		let everJoined = false;
+		let serverRestarting = false;
 		let removeVisibilityListener: () => void = () => undefined;
 		let removeNetworkListeners: () => void = () => undefined;
 		const mediaSyncInterval = setInterval(() => {
@@ -1338,7 +1421,7 @@ export function MezonSfuVoiceRoom({
 		let reconnectAttempts = 0;
 		let tokenRefreshAttempts = 0;
 		let requestReconnect: () => void = () => undefined;
-		const endCallAfterReconnectFailure = () => {
+		const endCallAfterReconnectFailure = (networkLost = false) => {
 			if (!reconnectAllowed || disposed) return;
 			reconnectAllowed = false;
 
@@ -1354,12 +1437,12 @@ export function MezonSfuVoiceRoom({
 			localMediaPreparedRef.current = false;
 			setLocalMediaPrepared(false);
 			if (onReconnectRequiredRef.current) {
-				onReconnectRequiredRef.current();
+				onReconnectRequiredRef.current(networkLost);
 				return;
 			}
 			dispatch(
 				toastActions.addToast({
-					message: tRef.current('toast.disconnectedRejoin'),
+					message: tRef.current(networkLost ? 'toast.weakNetworkDisconnected' : 'toast.disconnectedRejoin'),
 					type: 'warning',
 					autoClose: 5000
 				})
@@ -1402,6 +1485,7 @@ export function MezonSfuVoiceRoom({
 			if (!joinedRef.current) return;
 
 			clearRecoveryDeadline();
+			serverRestarting = false;
 
 			reconnectAttempts = 0;
 		};
@@ -1413,7 +1497,7 @@ export function MezonSfuVoiceRoom({
 			if (disposed || !reconnectAllowed || reconnectTimer !== undefined || refreshingTokenRef.current) return;
 
 			const ws = wsRef.current;
-			wsRef.current = null; // Invalidate old signaling callbacks before closing.
+			wsRef.current = null;
 			ws?.close();
 			discardPeerConnection();
 			requestReconnect();
@@ -1421,13 +1505,14 @@ export function MezonSfuVoiceRoom({
 
 		restartSessionRef.current = restartSession;
 
+		const handleNetworkLoss = () => endCallAfterReconnectFailure(true);
+
 		const armTransportDeadline = (pc: RTCPeerConnection) => {
 			if (transportDeadlineTimer !== undefined) return;
 			transportDeadlineTimer = setTimeout(() => {
 				transportDeadlineTimer = undefined;
 				if (disposed || pcRef.current !== pc || pc.connectionState === 'connected') return;
-				setConnectionState('disconnected');
-				restartSession();
+				handleNetworkLoss();
 			}, TRANSPORT_CONNECT_DEADLINE_MS);
 		};
 
@@ -1438,8 +1523,12 @@ export function MezonSfuVoiceRoom({
 		const prepareLocalMedia = async () => {
 			let stream: MediaStream;
 			let usingMezonNsCapture = noiseSuppressionEnabledRef.current && !mezonNsUnavailableRef.current;
+			const shouldOpenNativeCamera = !customVideoTrack || customVideoTrack.readyState !== 'live';
 			try {
-				stream = await openPreferredMicrophone(getMicrophoneCaptureOptions(), getCameraConstraints(cameraQualityTierRef.current));
+				stream = await openPreferredMicrophone(
+					getMicrophoneCaptureOptions(),
+					shouldOpenNativeCamera ? getCameraConstraints(cameraQualityTierRef.current) : false
+				);
 			} catch {
 				usingMezonNsCapture = false;
 				try {
@@ -1452,11 +1541,19 @@ export function MezonSfuVoiceRoom({
 				}
 			}
 			if (disposed) {
-				stream.getTracks().forEach((track) => track.stop());
+				stream.getTracks().forEach((track) => {
+					if (track !== customVideoTrack) track.stop();
+				});
 				return stream;
 			}
 			const audioTrack = stream.getAudioTracks()[0];
-			const videoTrack = stream.getVideoTracks()[0];
+			let videoTrack = stream.getVideoTracks()[0];
+			if (customVideoTrack && customVideoTrack.readyState === 'live') {
+				if (videoTrack && videoTrack !== customVideoTrack) videoTrack.stop();
+				videoTrack = customVideoTrack;
+				stream.getVideoTracks().forEach((t) => stream.removeTrack(t));
+				stream.addTrack(customVideoTrack);
+			}
 			if (audioTrack) {
 				microphoneCaptureModeRef.current.set(audioTrack, usingMezonNsCapture ? 'mezon-ns' : 'native');
 				setAudioTrackEnabled(audioTrack, desiredMediaRef.current.microphoneEnabled);
@@ -1502,6 +1599,7 @@ export function MezonSfuVoiceRoom({
 			peerIdsByMid.clear();
 			rolesByMid.clear();
 			peerStateByIdRef.current.clear();
+			slotAssignmentsRef.current.reset();
 			setRemoteMedia(new Map());
 		};
 
@@ -1527,8 +1625,7 @@ export function MezonSfuVoiceRoom({
 					return;
 				}
 				if (iceState === 'failed') {
-					setConnectionState('disconnected');
-					restartSession();
+					handleNetworkLoss();
 					return;
 				}
 				if (iceState === 'disconnected') {
@@ -1536,7 +1633,7 @@ export function MezonSfuVoiceRoom({
 					if (iceRecoveryTimer !== undefined) return;
 					iceRecoveryTimer = setTimeout(() => {
 						iceRecoveryTimer = undefined;
-						restartSession();
+						handleNetworkLoss();
 					}, ICE_RECOVERY_GRACE_MS);
 				}
 			};
@@ -1549,9 +1646,7 @@ export function MezonSfuVoiceRoom({
 					return;
 				}
 				if (pc.connectionState === 'failed') {
-					clearTransportDeadlineTimer();
-					setConnectionState('disconnected');
-					restartSession();
+					handleNetworkLoss();
 				}
 			};
 			pc.ontrack = ({ track, transceiver }) => {
@@ -1587,12 +1682,17 @@ export function MezonSfuVoiceRoom({
 				const localStream = localStreamRef.current || (await prepareLocalMedia());
 				if (disposed || pcRef.current !== pc || wsRef.current !== ws) return;
 				const stabilizedSdp = stabilizeInactiveVideoSections(offer.sdp, pc.currentRemoteDescription?.sdp);
+				slotAssignmentsRef.current.observeOffer(offer.sdp);
 				await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: stabilizedSdp }));
 				if (disposed || pcRef.current !== pc || wsRef.current !== ws) return;
 				const uplinkVideoTransceiver = pc.getTransceivers().find((item) => item.mid === '1');
 				if (uplinkVideoTransceiver) forceVideoCodec(uplinkVideoTransceiver, CAMERA_CODEC);
 				const screenTransceiver = pc.getTransceivers().find((item) => item.mid === '2');
 				if (screenTransceiver) forceVideoCodec(screenTransceiver, SCREEN_CODEC);
+				if (slotAssignmentsRef.current.enabled && joinRole === 'speaker') {
+					if (uplinkVideoTransceiver) uplinkVideoTransceiver.direction = 'sendonly';
+					if (screenTransceiver) screenTransceiver.direction = 'sendonly';
+				}
 
 				if (!localTracksAddedRef.current) {
 					const audioTrack = localStream.getAudioTracks()[0];
@@ -1721,7 +1821,9 @@ export function MezonSfuVoiceRoom({
 				Promise.resolve().then(() =>
 					onRefreshTokenRef.current
 						? onRefreshTokenRef.current()
-						: dispatch(generateMeetToken({ channelId: roomId, roomName: '' })).unwrap()
+						: dispatch(generateMeetToken({ channelId: roomId, roomName: '' }))
+								.unwrap()
+								.then((result) => result?.token)
 				),
 				10_000
 			)
@@ -1759,7 +1861,9 @@ export function MezonSfuVoiceRoom({
 			!(wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED);
 
 		const openSignaling = () => {
-			if (!canOpenSignaling()) return;
+			if (!canOpenSignaling()) {
+				return;
+			}
 			resetAndCreatePeerConnection();
 			const secureServerUrl =
 				window.location.protocol === 'https:' && serverUrl.startsWith('ws://') ? `wss://${serverUrl.slice(5)}` : serverUrl;
@@ -1808,6 +1912,20 @@ export function MezonSfuVoiceRoom({
 				try {
 					message = JSON.parse(data) as SignalMessage;
 				} catch {
+					return;
+				}
+				if (message.type === 'slot_assigned' || message.type === 'slot_released') {
+					if (slotAssignmentsRef.current.handle(message)) {
+						if (message.type === 'slot_assigned' && message.peer_id != null) {
+							const peerId = String(message.peer_id);
+							peerStateByIdRef.current.set(peerId, {
+								...peerStateByIdRef.current.get(peerId),
+								peer_id: message.peer_id,
+								user_id: message.user_id ?? peerStateByIdRef.current.get(peerId)?.user_id
+							});
+						}
+						if (pcRef.current) syncRemoteMedia(pcRef.current);
+					}
 					return;
 				}
 				if (typeof message.participant_count === 'number') {
@@ -1864,7 +1982,7 @@ export function MezonSfuVoiceRoom({
 					everJoined = true;
 					tokenRefreshAttempts = 0;
 					const resumePushToTalk = joinRole === 'audience' && pushToTalkRequestedRef.current;
-					sendMute(!desiredMediaRef.current.microphoneEnabled && !resumePushToTalk);
+					if (desiredMediaRef.current.microphoneEnabled || resumePushToTalk) sendMute(false);
 					if (resumePushToTalk) {
 						ws.send(JSON.stringify({ type: 'push_to_talk', active: true }));
 					}
@@ -1900,6 +2018,11 @@ export function MezonSfuVoiceRoom({
 				if (message.type === 'peer_left') {
 					const leavingPeerId = message.peer_id != null ? String(message.peer_id) : undefined;
 					if (leavingPeerId) peerStateByIdRef.current.delete(leavingPeerId);
+					if (slotAssignmentsRef.current.enabled) {
+						slotAssignmentsRef.current.removePeer(message);
+						if (pcRef.current) syncRemoteMedia(pcRef.current);
+						return;
+					}
 					const mids = getDepartedMids(
 						leavingPeerId,
 						message.user_id,
@@ -1980,6 +2103,11 @@ export function MezonSfuVoiceRoom({
 				wsRef.current = null;
 				if (disposed || !reconnectAllowed) return;
 				const action = sfuCloseAction(event.code);
+				if (action === 'network-lost' && !serverRestarting) {
+					handleNetworkLoss();
+					return;
+				}
+				if (event.code === SFU_SERVER_RESTART_CLOSE_CODE) serverRestarting = true;
 
 				discardPeerConnection();
 				reconnectAllowed = action !== 'stop';
@@ -2028,6 +2156,10 @@ export function MezonSfuVoiceRoom({
 		requestReconnect = () => {
 			if (disposed || !reconnectAllowed || refreshingTokenRef.current || (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED))
 				return;
+			if (weakNetworkRef.current) {
+				handleNetworkLoss();
+				return;
+			}
 			beginRecovery();
 			if (!canOpenSignaling() || refreshingTokenRef.current || reconnectTimer !== undefined) return;
 			if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -2054,25 +2186,12 @@ export function MezonSfuVoiceRoom({
 			if (pcRef.current?.connectionState === 'connected' && wsRef.current?.readyState === WebSocket.OPEN) return;
 			restartSession();
 		};
-		const handleOffline = () => {
-			if (disposed || !reconnectAllowed) return;
-
-			beginRecovery();
-			if (reconnectTimer !== undefined) clearTimeout(reconnectTimer);
-			reconnectTimer = undefined;
-			setConnectionState('disconnected');
-			const ws = wsRef.current;
-			wsRef.current = null;
-			ws?.close();
-			discardPeerConnection();
-		};
 		window.addEventListener('online', handleOnline);
-		window.addEventListener('offline', handleOffline);
+		window.addEventListener('offline', handleNetworkLoss);
 		removeNetworkListeners = () => {
 			window.removeEventListener('online', handleOnline);
-			window.removeEventListener('offline', handleOffline);
+			window.removeEventListener('offline', handleNetworkLoss);
 		};
-
 		void prepareLocalMedia().finally(() => {
 			if (disposed || !reconnectAllowed) return;
 			localMediaPreparedRef.current = true;
@@ -2089,9 +2208,7 @@ export function MezonSfuVoiceRoom({
 						now - lastSignalingAt >= 60_000 ||
 						muteTimeout !== undefined)
 				) {
-					if (muteTimeout !== undefined && monitorMediaRecovery && joinedRef.current && pcRef.current?.connectionState === 'connected')
-						endCallAfterReconnectFailure();
-					else restartSession();
+					handleNetworkLoss();
 					return;
 				}
 				if (ws?.readyState === WebSocket.OPEN) {
@@ -2100,7 +2217,7 @@ export function MezonSfuVoiceRoom({
 						try {
 							ws.send(JSON.stringify({ type: 'ping', timestamp: now }));
 						} catch {
-							restartSession();
+							handleNetworkLoss();
 						}
 					}
 					return;
@@ -2139,7 +2256,9 @@ export function MezonSfuVoiceRoom({
 			mezonNsPipelineRef.current?.dispose();
 			mezonNsPipelineRef.current = null;
 			dispatch(voiceActions.setNoiseSuppressionReady(false));
-			localStreamRef.current?.getTracks().forEach((track) => track.stop());
+			localStreamRef.current?.getTracks().forEach((track) => {
+				if (track !== customVideoTrack) track.stop();
+			});
 			screenStreamRef.current?.getTracks().forEach((track) => track.stop());
 			wsRef.current = null;
 			pcRef.current = null;
@@ -2150,6 +2269,7 @@ export function MezonSfuVoiceRoom({
 			peerIdsByMid.clear();
 			rolesByMid.clear();
 			peerStateById.clear();
+			slotAssignmentsRef.current.reset();
 			userIdsByMid.clear();
 			retiredMidsRef.current.clear();
 			setRemoteMedia(new Map());
@@ -2192,7 +2312,12 @@ export function MezonSfuVoiceRoom({
 			if (sender) {
 				await sender.replaceTrack(null);
 				const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
-				if (transceiver && transceiver.direction !== 'recvonly' && transceiver.direction !== 'inactive') {
+				if (
+					!slotAssignmentsRef.current.enabled &&
+					transceiver &&
+					transceiver.direction !== 'recvonly' &&
+					transceiver.direction !== 'inactive'
+				) {
 					transceiver.direction = 'recvonly';
 				}
 			}
@@ -2760,6 +2885,8 @@ export function MezonSfuVoiceRoom({
 	const handleWriteChatExternal = (message: string) => {
 		wsRef.current?.send(JSON.stringify({ type: 'send_message', message }));
 	};
+	const connectionLabel =
+		connectionState === 'connected' && weakNetwork ? t('weakNetwork') : connectionState === 'awaiting offer' ? 'connecting' : connectionState;
 
 	return (
 		<>
@@ -2791,10 +2918,14 @@ export function MezonSfuVoiceRoom({
 						<strong className="text-base">{channelLabel || roomId}</strong>
 						<span
 							className={
-								connectionState === 'connected' ? 'text-green-400' : connectionState === 'failed' ? 'text-red-400' : 'text-yellow-300'
+								connectionState === 'failed'
+									? 'text-red-400'
+									: connectionState === 'connected' && !weakNetwork
+										? 'text-green-400'
+										: 'text-yellow-300'
 							}
 						>
-							· {connectionState}
+							· {connectionLabel}
 						</span>
 					</div>
 					<div className="flex items-center gap-4 text-[var(--bg-icon-theme)]">
@@ -2979,6 +3110,9 @@ export function MezonSfuVoiceRoom({
 					onPushToTalk={(active) => void setPushToTalk(active)}
 					pushToTalkHintDismissed={pushToTalkHintDismissed}
 					onDismissPushToTalkHint={() => setPushToTalkHintDismissed(true)}
+					agentHintDismissed={agentHintDismissed}
+					onDismissAgentHint={dismissAgentHint}
+					weakNetwork={connectionState === 'connected' && weakNetwork}
 					onMicrophoneToggle={() => {
 						holdToTalkRef.current = false;
 						dispatch(voiceActions.setShowMicrophone(!microphoneEnabled));

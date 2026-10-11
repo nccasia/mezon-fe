@@ -16,6 +16,7 @@ import {
 	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
 	selectMemberByIdAndClanId,
+	selectSfuUrlJoinVoice,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectStatusMenu,
@@ -78,7 +79,7 @@ interface VoiceConferenceContentProps {
 	serverUrl: string;
 	voiceInfo: ReturnType<typeof selectVoiceInfo>;
 	handleLeaveRoom: (self?: boolean) => Promise<void>;
-	onReconnectRequired: () => void;
+	onReconnectRequired: (networkLost: boolean) => void;
 	handleFullScreen: () => void;
 	isShowChatVoice: boolean;
 	isVoiceFullScreen: boolean;
@@ -153,14 +154,16 @@ const VoiceConferenceContainer = memo(({ containerRef, isOpenPopOut, rejoinTarge
 
 const MezonSfuChannelVoiceInner = () => {
 	const token = useSelector(selectTokenJoinVoice);
+	const sfuUrl = useSelector(selectSfuUrlJoinVoice);
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [joinRole, setJoinRole] = useState<SfuJoinRole>('speaker');
 	const [rejoinTarget, setRejoinTarget] = useState<VoiceJoinTarget | null>(null);
+	const [rejoinNetworkLost, setRejoinNetworkLost] = useState(false);
 	const joinRequestRef = useRef(0);
 	const joiningRef = useRef(false);
 	const dispatch = useAppDispatch();
-	const serverUrl = process.env.NX_CHAT_APP_SFU_WS_URL;
+	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const isShowChatVoice = useSelector(selectIsShowChatVoice);
 	const currentChannelType = useSelector(selectCurrentChannelType);
@@ -191,7 +194,6 @@ const MezonSfuChannelVoiceInner = () => {
 		if (!target) setRejoinTarget(null);
 		setJoinRole(role);
 		if (target) {
-			// Rejoin must unmount the paused room before obtaining a fresh token.
 			flushSync(() => {
 				dispatch(voiceActions.resetVoiceControl());
 				dispatch(channelAppActions.clearAppInteractiveData());
@@ -235,7 +237,7 @@ const MezonSfuChannelVoiceInner = () => {
 			).unwrap();
 			if (request !== joinRequestRef.current) return;
 
-			if (result) {
+			if (result?.token) {
 				dispatch(voiceActions.setJoined(true));
 				dispatch(
 					voiceActions.setVoiceInfo({
@@ -247,8 +249,8 @@ const MezonSfuChannelVoiceInner = () => {
 						joinRole: role
 					})
 				);
-				// Publish the token last so the new room mounts with its final channel and role.
-				dispatch(voiceActions.setToken(result));
+				dispatch(voiceActions.setSfuUrl(result.url));
+				dispatch(voiceActions.setToken(result.token));
 				setRejoinTarget(null);
 			} else {
 				dispatch(voiceActions.setToken(''));
@@ -276,21 +278,24 @@ const MezonSfuChannelVoiceInner = () => {
 		const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
 		const metadata = username || avatar ? `${username};${avatar}` : '';
 		try {
-			return await dispatch(
+			const result = await dispatch(
 				generateMeetToken({
 					channelId,
 					roomName: '',
 					metadata
 				})
 			).unwrap();
+			if (result?.url) dispatch(voiceActions.setSfuUrl(result.url));
+			return result?.token;
 		} catch (err) {
 			console.error('Failed to refresh voice token:', err);
 			return undefined;
 		}
 	});
 
-	const handleReconnectRequired = useLastCallback(() => {
+	const handleReconnectRequired = useLastCallback((networkLost: boolean) => {
 		if (!voiceInfo) return;
+		setRejoinNetworkLost(networkLost);
 		setRejoinTarget({ ...voiceInfo, joinRole });
 		dispatch(voiceActions.setOpenPopOut(false));
 		dispatch(voiceActions.setVoiceConnectionState(false));
@@ -362,6 +367,7 @@ const MezonSfuChannelVoiceInner = () => {
 							{rejoinTarget && (
 								<SfuReconnectModal
 									loading={loading}
+									networkLost={rejoinNetworkLost}
 									onRejoin={() => void handleJoinRoom(rejoinTarget.joinRole || 'speaker', rejoinTarget)}
 									onExit={handleExitReconnect}
 								/>
