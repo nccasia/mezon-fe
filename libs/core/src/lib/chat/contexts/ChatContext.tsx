@@ -13,6 +13,7 @@ import {
 	badgeService,
 	canvasAPIActions,
 	categoriesActions,
+	cdnSignatureActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -1126,6 +1127,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: user.clan_id || (clanId as string) }));
+					// A file forwarded out of this channel must stop loading for this user now, not when the signature expires.
+					dispatch(cdnSignatureActions.removeByChannelId(user.channel_id));
 
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 						if (threadToRemove && threadToRemove.channel_private === ChannelStatusEnum.isPrivate) {
@@ -1206,6 +1209,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						dispatch(videoStreamActions.resetPlayback());
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+					channels.forEach((channel) => dispatch(cdnSignatureActions.removeByChannelId(channel.id)));
 					dispatch(listChannelsByUserActions.remove(id));
 					dispatch(topicsActions.removeClanTopics(user?.clan_id));
 					dispatch(channelsActions.removeByClanId(user.clan_id));

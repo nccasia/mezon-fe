@@ -1,4 +1,13 @@
-import { cdnSignatureActions, selectCdnSignatureEntry, selectIsCdnSignaturePending, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	cdnSignatureActions,
+	selectCdnSignatureEntry,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectDmGroupCurrentId,
+	selectIsCdnSignaturePending,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { appendCdnSignature, getCdnSignatureChannelId, parseSignedCdnMediaSrc } from '@mezon/utils';
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
@@ -14,13 +23,21 @@ export interface CdnUrlSigner {
 
 /**
  * Signs each CDN url in `urls` with the signature of the channel its file was uploaded to, read from the url
- * itself, so a forwarded file or a topic reply is not signed with the channel showing it. Opening a channel already
- * requests that channel's signature; this requests the others and a fresh one once a cached signature expires.
- * Pass every url the component signs: a url missing from `urls` is left unsigned.
+ * itself, so a forwarded file or a topic reply is not signed with the channel showing it. An older upload, filed
+ * under no channel folder, takes the signature of `shownInChannelId`, the channel showing it: the open channel or DM unless
+ * given. Opening a channel already requests that channel's signature; this requests the others and a fresh one once
+ * a cached signature expires. Pass every url the component signs: a url missing from `urls` is left unsigned.
  */
-export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>): CdnUrlSigner {
+export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>, shownInChannelId?: string): CdnUrlSigner {
 	const dispatch = useAppDispatch();
-	const channelKey = useMemo(() => Array.from(new Set(urls.map(getCdnSignatureChannelId).filter(Boolean))).join(','), [urls]);
+	const openChannelId = useAppSelector((state) =>
+		selectCurrentClanId(state) === '0' ? selectDmGroupCurrentId(state) : selectCurrentChannelId(state)
+	);
+	const fallbackChannelId = shownInChannelId ?? openChannelId ?? undefined;
+	const channelKey = useMemo(
+		() => Array.from(new Set(urls.map((url) => getCdnSignatureChannelId(url, fallbackChannelId)).filter(Boolean))).join(','),
+		[urls, fallbackChannelId]
+	);
 	const channelIds = useMemo(() => (channelKey ? channelKey.split(',') : []), [channelKey]);
 	const entries = useAppSelector((state) => channelIds.map((channelId) => selectCdnSignatureEntry(state, channelId)), shallowEqual);
 	const pending = useAppSelector((state) => channelIds.map((channelId) => selectIsCdnSignaturePending(state, channelId)), shallowEqual);
@@ -43,25 +60,25 @@ export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>): CdnUrl
 		const deniedChannelIds = new Set(channelIds.filter((_, index) => entries[index]?.denied));
 		return {
 			signCdnUrl: <T extends string | undefined>(url: T) => {
-				const channelId = getCdnSignatureChannelId(url);
-				return (channelId ? appendCdnSignature(url, signatureByChannelId.get(channelId)) : url) as T;
+				const signingChannelId = getCdnSignatureChannelId(url, fallbackChannelId);
+				return (signingChannelId ? appendCdnSignature(url, signatureByChannelId.get(signingChannelId)) : url) as T;
 			},
 			isAwaitingSignature: (url?: string) => {
-				const channelId = getCdnSignatureChannelId(url);
-				return !!channelId && pendingChannelIds.has(channelId);
+				const signingChannelId = getCdnSignatureChannelId(url, fallbackChannelId);
+				return !!signingChannelId && pendingChannelIds.has(signingChannelId);
 			},
 			isSignatureDenied: (url?: string) => {
-				const channelId = getCdnSignatureChannelId(url);
-				return !!channelId && deniedChannelIds.has(channelId);
+				const signingChannelId = getCdnSignatureChannelId(url, fallbackChannelId);
+				return !!signingChannelId && deniedChannelIds.has(signingChannelId);
 			}
 		};
-	}, [channelIds, entries, pending]);
+	}, [channelIds, entries, pending, fallbackChannelId]);
 }
 
 /**
- * Asks for a new signature when the CDN refuses signed media, e.g. a signature it expired sooner than expected. Mount it
- * once for the app: it hears every media load error in the document. A file that still fails on a newer signature is
- * broken for another reason, such as a deleted file, and asks no more.
+ * Asks for a new signature when the CDN refuses signed media whose signature is past its own expiry, e.g. after the tab
+ * slept through the 5-hour refresh. Mount it once for the app: it hears every media load error in the document. Media
+ * failing on a signature still in date is broken for another reason, such as a deleted file, and asks for nothing.
  */
 export function useCdnSignatureRefreshOnMediaError() {
 	const dispatch = useAppDispatch();

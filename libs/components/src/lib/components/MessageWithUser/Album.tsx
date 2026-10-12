@@ -1,4 +1,3 @@
-import type { CdnUrlSigner } from '@mezon/core';
 import type { ApiPhoto, IAlbum, IAlbumLayout, ObserveFn, PreSendMediaAttachment } from '@mezon/utils';
 import { AlbumRectPart, generateAttachmentId } from '@mezon/utils';
 import type { ApiMessageAttachment } from 'mezon-js';
@@ -20,7 +19,6 @@ type OwnProps = {
 	isMobile?: boolean;
 	messageId?: string;
 	images?: ApiMessageAttachment[];
-	cdnSigner?: CdnUrlSigner;
 };
 
 const Album: FC<OwnProps> = ({
@@ -37,8 +35,7 @@ const Album: FC<OwnProps> = ({
 	isPresignPendingForUrl,
 	isMobile,
 	messageId,
-	images,
-	cdnSigner
+	images
 }) => {
 	const mediaCount = (album as any)?.length;
 
@@ -84,7 +81,6 @@ const Album: FC<OwnProps> = ({
 					localSource={(attachment as PreSendMediaAttachment)?.local_source}
 					loadWhenUnpending={!isPresignPending}
 					isInSearchMessage={isInSearchMessage}
-					cdnSigner={cdnSigner}
 				/>
 			);
 		} else if (video) {

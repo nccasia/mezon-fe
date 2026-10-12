@@ -50,8 +50,7 @@ const MessageModalImage = () => {
 	const currentClanId = useAppSelector(selectCurrentClanId) ?? '';
 	const channelAttachments = useAppSelector((state) => selectAllListAttachmentByChannel(state, (directId ?? currentChannelId) as string));
 	const channelAttachmentUrls = useMemo(() => channelAttachments?.map((att) => att.url) ?? [], [channelAttachments]);
-	const { isSignatureDenied } = useCdnUrlSigner(channelAttachmentUrls);
-	// A file forwarded from a private channel the user is not in cannot load: it stays out of the list and the navigation.
+	const { isSignatureDenied } = useCdnUrlSigner(channelAttachmentUrls, directId ?? currentChannelId ?? undefined);
 	const attachments = useMemo(() => channelAttachments?.filter((att) => !isSignatureDenied(att.url)), [channelAttachments, isSignatureDenied]);
 	const paginationState = useAppSelector((state) => selectAttachmentPaginationByChannel(state, (directId ?? currentChannelId) as string));
 	const { setOpenModalAttachment } = useAttachments();
@@ -93,7 +92,7 @@ const MessageModalImage = () => {
 			: undefined
 	);
 	const isMainPresignPending = isAttachmentPresignPendingForMessage(urlImg ?? currentAttachment?.url, sourceMessage);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([urlImg]);
+	const { signCdnUrl } = useCdnUrlSigner([urlImg]);
 	const signedUrlImg = signCdnUrl(urlImg ?? '');
 
 	const getSourceMessageForAttachment = useCallback(
@@ -286,7 +285,7 @@ const MessageModalImage = () => {
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
 			showMessageContextMenu(event, messageId, mode ?? 2, false, props);
 			setPositionShow(SHOW_POSITION.IN_VIEWER);
-			setImageURL(urlImg ?? '');
+			setImageURL(urlImg);
 		},
 		[showMessageContextMenu, messageId, mode, setPositionShow, setImageURL, urlImg]
 	);
@@ -468,7 +467,7 @@ const MessageModalImage = () => {
 							<span className="sr-only">Loading...</span>
 						</div>
 					)}
-					{isMainPresignPending || isAwaitingSignature(urlImg ?? '') ? (
+					{isMainPresignPending ? (
 						<div
 							className="max-h-full max-w-full rounded-[10px] bg-bgLightSecondary dark:bg-bgSecondary animate-pulse"
 							style={{
