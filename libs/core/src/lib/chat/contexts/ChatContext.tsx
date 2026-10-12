@@ -58,6 +58,7 @@ import {
 	selectChannelsByClanId,
 	selectClanMemberByClanId,
 	selectClanView,
+	selectClansEntities,
 	selectClansLoadingStatus,
 	selectClickedOnTopicStatus,
 	selectCurrentChannel,
@@ -1369,6 +1370,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	const onuserclanadded = useCallback(
 		async (userJoinClan: AddClanUserEvent) => {
 			const store = await getStoreAsync();
+
+			if (userJoinClan?.user?.user_id === userId && !selectClansEntities(store.getState() as unknown as RootState)[userJoinClan.clan_id]) {
+				dispatch(clansActions.fetchClans({ noCache: true }));
+			}
 
 			const clanMemberStore = selectClanMemberByClanId(store.getState() as unknown as RootState, userJoinClan.clan_id);
 
