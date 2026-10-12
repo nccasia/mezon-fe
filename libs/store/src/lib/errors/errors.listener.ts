@@ -184,8 +184,7 @@ errorListenerMiddleware.startListening({
 			listenerApi.dispatch(
 				toastActions.addToastError({
 					message: toast.message as string,
-					errType: action.payload?.errType,
-					code: action.payload?.error?.code
+					errType: action.payload?.errType
 				})
 			);
 		}

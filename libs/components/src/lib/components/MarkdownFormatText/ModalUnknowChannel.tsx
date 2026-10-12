@@ -1,11 +1,11 @@
 import { FRIEND_PAGE_LINK, toChannelPage, useAppNavigation } from '@mezon/core';
 
 import type { RootState } from '@mezon/store';
-import { getStoreAsync, selectClanById, selectCurrentClanId, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
+import { getStoreAsync, selectClanById, selectCurrentClan, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 type ModalUnknowChannelProps = {
@@ -13,7 +13,6 @@ type ModalUnknowChannelProps = {
 	isError?: boolean;
 	errMessage?: string;
 	idErr?: string;
-	code?: number;
 	errorType?: 'connection' | 'permission' | 'critical' | 'unknown';
 };
 
@@ -39,14 +38,15 @@ const getErrorConfig = (errMessage?: string) => {
 		shouldAutoRetry: detectedType === 'connection'
 	};
 };
-const INVALID_JOIN_ERROR = 400;
 
 function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const { t } = useTranslation('common');
 	const dispatch = useDispatch();
-	const { onClose, isError = false, errMessage, idErr, code } = props;
+	const { onClose, isError = false, errMessage, idErr } = props;
 	const { toClanPage, navigate } = useAppNavigation();
 	const location = useLocation();
+	const currentClan = useSelector(selectCurrentClan);
+	const currentClanId = currentClan?.id;
 
 	const errorConfig = getErrorConfig(errMessage);
 
@@ -63,8 +63,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const directToWelcomeChannel = async () => {
 		clearAllToastError();
 		const store = await getStoreAsync();
-		const currentClanId = selectCurrentClanId(store.getState() as RootState);
-		if (!currentClanId || currentClanId === '0' || code === INVALID_JOIN_ERROR) {
+		if (!currentClanId || currentClanId === '0') {
 			navigate(FRIEND_PAGE_LINK);
 			return;
 		}
@@ -89,7 +88,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	};
 
 	const onCloseAndReset = () => {
-		if (code === INVALID_JOIN_ERROR) {
+		if (!currentClanId) {
 			return;
 		}
 		if (isError) {
@@ -140,7 +139,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 							>
 								{t('modalUnknowChannel.goToWelcomeChannel')}
 							</button>
-							{code !== INVALID_JOIN_ERROR && (
+							{currentClanId && (
 								<button
 									onClick={onCloseAndReset}
 									className="px-4 py-2.5 text-theme-primary hover:underline rounded transition-colors duration-200"
