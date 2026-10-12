@@ -9,7 +9,7 @@ interface ErrorAction {
 	type: string;
 	payload?: {
 		status?: number;
-		error?: { status?: number; code?: number };
+		error?: { status?: number };
 		errType?: EErrorType;
 		json?: () => Promise<{ message: string }>;
 		[key: string]: unknown;

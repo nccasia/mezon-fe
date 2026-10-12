@@ -137,7 +137,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 								className="flex-1 bg-[#5865f2] hover:bg-[#4752c4] text-white font-medium py-2.5 px-4 rounded transition-colors duration-200"
 								data-e2e={generateE2eId('clan_page.settings.modal.permission.confirm')}
 							>
-								{t('modalUnknowChannel.goToWelcomeChannel')}
+								{currentClanId ? t('modalUnknowChannel.goToWelcomeChannel') : t('modalUnknowChannel.goToFriendPage')}
 							</button>
 							{currentClanId && (
 								<button
