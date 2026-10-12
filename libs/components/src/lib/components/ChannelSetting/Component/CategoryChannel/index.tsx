@@ -3,6 +3,7 @@ import type { CategoriesEntity, IUpdateChannelRequest } from '@mezon/store';
 import { channelsActions, selectAllCategories, selectChannelById, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import type { IChannel } from '@mezon/utils';
+import { generateE2eId } from '@mezon/utils';
 import type { ReactElement } from 'react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +62,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 					className={'bg-item-theme-hover text-theme-primary-hover uppercase font-medium text-left cursor-pointer truncate'}
 					onClick={() => handleMoveChannelToNewCategory(category)}
 				>
-					{category.category_name ?? ''}
+					<span data-e2e={generateE2eId('channel_setting_page.category.item')}>{category.category_name ?? ''}</span>
 				</Menu.Item>
 			);
 		});
@@ -75,13 +76,19 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 				<h3 className="font-semibold text-xl text-theme-primary-active">{t('categoryManagement.title')}</h3>
 
 				<p className="text-xs font-bold text-theme-primary">{t('categoryManagement.channelName')}</p>
-				<div className="bg-input-secondary border-theme-primary rounded-lg pl-3 py-2 w-full  outline-none text-theme-message">
+				<div
+					className="bg-input-secondary border-theme-primary rounded-lg pl-3 py-2 w-full  outline-none text-theme-message"
+					data-e2e={generateE2eId('channel_setting_page.category.channel_name')}
+				>
 					{realTimeChannel.channel_label}
 				</div>
 				<p className="text-xs font-bold text-theme-primary mt-4">{t('categoryManagement.category')}</p>
 
 				<Menu menu={menu}>
-					<div className="w-full h-12 rounded-md border-theme-primary text-theme-message bg-input-secondary  flex flex-row px-3 justify-between items-center uppercase">
+					<div
+						className="w-full h-12 rounded-md border-theme-primary text-theme-message bg-input-secondary  flex flex-row px-3 justify-between items-center uppercase"
+						data-e2e={generateE2eId('channel_setting_page.category.dropdown')}
+					>
 						<p>{categoryName}</p>
 						<Icons.ArrowDownFill />
 					</div>
