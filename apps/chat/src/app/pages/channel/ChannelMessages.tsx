@@ -20,6 +20,7 @@ import {
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefEdit,
 	selectIdMessageToJump,
+	selectIsMessageIdExist,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
@@ -1106,7 +1107,10 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 			if (idMessageToJump) {
 				if (idMessageToJump.id === 'temp') return;
+				const store = getStore();
+				const isMessageExist = selectIsMessageIdExist(store.getState() as RootState, effectiveChannelId, idMessageToJump?.id);
 				scrollToMessage(idMessageToJump.id);
+				if (isMessageExist && idMessageToJump.navigate) return;
 				msgIdJumpHightlight.current = idMessageToJump.id;
 				dispatch(messagesActions.setIdMessageToJump(null));
 
