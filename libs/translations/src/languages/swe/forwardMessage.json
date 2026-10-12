@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Ange önskat meddelande..."
 	},
 	"successMessage": "Vidarebefordra meddelande framgångsrikt",
-	"errorMessage": "Kunde inte vidarebefordra meddelande"
+	"errorMessage": "Kunde inte vidarebefordra meddelande",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Enter message to send with..."
 	},
 	"successMessage": "Message forwarded successfully",
-	"errorMessage": "Failed to forward message"
+	"errorMessage": "Failed to forward message",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

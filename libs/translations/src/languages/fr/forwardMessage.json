@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Entrez le message que vous souhaitez envoyer en plus..."
 	},
 	"successMessage": "Message transféré avec succès",
-	"errorMessage": "Impossible de transférer le message"
+	"errorMessage": "Impossible de transférer le message",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

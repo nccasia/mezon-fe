@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Inserisci un messaggio da allegare..."
 	},
 	"successMessage": "Messaggio inoltrato con successo",
-	"errorMessage": "Impossibile inoltrare il messaggio"
+	"errorMessage": "Impossibile inoltrare il messaggio",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

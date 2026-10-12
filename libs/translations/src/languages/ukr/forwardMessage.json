@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Введіть додаткове повідомлення..."
 	},
 	"successMessage": "Повідомлення успішно переслано",
-	"errorMessage": "Не вдалося переслати повідомлення"
+	"errorMessage": "Не вдалося переслати повідомлення",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }
