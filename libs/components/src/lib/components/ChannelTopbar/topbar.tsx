@@ -3,6 +3,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannelChannelId,
 	selectCurrentChannelClanId,
+	selectCurrentChannelId,
 	selectCurrentChannelType,
 	selectCurrentClanId,
 	selectIsShowCreateThread,
@@ -37,30 +38,37 @@ const Topbar = memo(({ isHidden = false, children }: { isHidden?: boolean; child
 	const isJoined = useSelector(selectVoiceJoined);
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const currentChannelClanId = useSelector(selectCurrentChannelClanId);
-	const currentChannelId = useSelector(selectCurrentChannelChannelId);
-	const currentChannelType = useSelector(selectCurrentChannelType);
+	const currentChannelChannelId = useSelector(selectCurrentChannelChannelId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelType = useSelector(selectCurrentChannelType);
 	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
-	const isShowCreateThread = useAppSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
+	// Thread panel flag is keyed by routing channel id (ClanLayout / useThreads), not voice channel_id.
+	const channelIdForThreadPanel = currentChannelId ?? currentChannelChannelId ?? '';
+	const isShowCreateThread = useAppSelector((state) => selectIsShowCreateThread(state, channelIdForThreadPanel));
 
-	const isSidePanelOpen = useMemo(() => {
-		return Boolean(
-			currentClanId &&
-				currentClanId !== '0' &&
-				currentChannelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
-				currentChannelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
-				(isShowCreateTopic || isShowCreateThread)
-		);
-	}, [currentClanId, currentChannelType, isShowCreateTopic, isShowCreateThread]);
+	// Mirror exactly the two panel conditions used in ClanLayout:
+	//   thread panel: isShowCreateThread && !isShowCreateTopic (no channel-type guard)
+	//   topic panel:  isShowCreateTopic && !isShowCreateThread && not streaming/voice
+	const isThreadPanelOpen = Boolean(currentClanId && currentClanId !== '0') && isShowCreateThread && !isShowCreateTopic;
+
+	const isTopicPanelOpen =
+		Boolean(currentClanId && currentClanId !== '0') &&
+		isShowCreateTopic &&
+		!isShowCreateThread &&
+		currentChannelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
+		currentChannelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
+
+	const isSidePanelOpen = isThreadPanelOpen || isTopicPanelOpen;
 
 	const isInCurrentVoiceChannel = useMemo(() => {
-		return isJoined && voiceInfo?.clanId === currentChannelClanId && voiceInfo?.channelId === currentChannelId;
-	}, [isJoined, voiceInfo, currentChannelClanId, currentChannelId]);
+		return isJoined && voiceInfo?.clanId === currentChannelClanId && voiceInfo?.channelId === currentChannelChannelId;
+	}, [isJoined, voiceInfo, currentChannelClanId, currentChannelChannelId]);
 
 	return (
 		<div
 			className={`${isFriendPath || isHidden || (closeMenu && statusMenu) || isInCurrentVoiceChannel ? 'hidden' : ''} border-b-theme-primary bg-theme-chat max-sbm:bg-transparent max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center ${
-				isSidePanelOpen ? 'sbm:right-[510px] sbm:w-[calc(100%_-_72px_-_272px_-_510px)]' : 'sbm:right-0 sbm:w-widthThumnailAttachment'
+				isSidePanelOpen ? 'sbm:left-[344px] sbm:right-[510px] sbm:w-auto' : 'sbm:right-0 sbm:w-widthThumnailAttachment'
 			} max-sbm:w-full max-sbm:h-[50px] max-sbm:right-0 flex-shrink fixed z-10 border-b-theme-nav text-theme-primary`}
 		>
 			<ChannelTopbar>{children}</ChannelTopbar>
