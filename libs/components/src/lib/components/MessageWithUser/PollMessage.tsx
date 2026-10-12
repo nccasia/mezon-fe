@@ -444,10 +444,10 @@ export const PollMessage = ({
 								)}
 								<div className="relative z-10 flex items-center gap-2 min-w-0 flex-1 justify-center">
 									<span
-										className={`text-sm font-medium ${hasVoted && isVoted ? 'text-theme-primary-active' : 'text-theme-primary-active'} break-all min-w-0 flex-1 truncate`}
+										className={`text-sm font-medium ${hasVoted && isVoted ? 'text-theme-primary-active' : 'text-theme-primary-active'} break-words min-w-0 flex-1 line-clamp-3`}
 									>
 										{renderPollTextWithEmoji(answer, {
-											textPartClassName: 'poll-option-text ml-1 ',
+											textPartClassName: 'poll-option-text ml-1 block',
 											emojiPartClassName: 'poll-option-emoji '
 										})}
 									</span>
