@@ -3,6 +3,14 @@ import type { ApiConfirmLoginRequest, ApiLinkAccountConfirmRequest, ApiLoginIDRe
 import type { DongClient, IndexerClient, MmnClient, ZkClient } from 'mmn-client-js';
 import React, { useCallback } from 'react';
 
+import type { HealthyEndpointResult } from '../healthyEndpoint';
+import {
+	beginHealthyEndpointAsk,
+	canAskHealthyEndpoint,
+	fetchHealthyEndpoint,
+	noteHealthyEndpointAsked,
+	resetHealthyEndpointThrottle
+} from '../healthyEndpoint';
 import type { CreateMezonClientOptions } from '../mezon';
 import {
 	createClient as createMezonClient,
@@ -11,6 +19,7 @@ import {
 	createMmnClient as createMezonMmnClient,
 	createZkClient as createMezonZkClient
 } from '../mezon';
+import { isRealtimeServerPinned, pinnedRealtimeServerHost } from '../realtimeServer';
 import { publishSessionUpdate, subscribeSessionUpdate } from '../sessionBridge';
 import { socketState } from '../socketState';
 
@@ -27,6 +36,8 @@ export type ConnectSocketOptions = {
 	createStatus?: boolean;
 	verbose?: boolean;
 	useToken?: boolean;
+	/** Start a new connect even if one is in flight — the caller has just dropped that socket. */
+	force?: boolean;
 };
 
 let sessionRefreshFailCount = 0;
@@ -133,6 +144,17 @@ export function resolveSessionWsUrl(session: Pick<ApiSession, 'ws_url'>): string
 	return ((session.ws_url ?? '').trim() || cfg.ws_url || DEFAULT_WS_URL) as string;
 }
 
+// The node the socket actually dials. A pinned server wins over the one the gateway handed out,
+// but it is never written back into the session: switching to Auto has to find the gateway's node
+// still there.
+export function resolveConnectWsUrl(session: Pick<ApiSession, 'ws_url'>): string {
+	const pinned = pinnedRealtimeServerHost();
+	if (pinned && isAllowedHost(pinned)) {
+		return pinned;
+	}
+	return resolveSessionWsUrl(session);
+}
+
 export const extractAndSaveConfig = (session: ApiSession | null, isFromMobile?: boolean) => {
 	if (!session || !session.api_url) return null;
 	try {
@@ -180,6 +202,7 @@ export type MezonContextValue = {
 	createSocket: () => Promise<any>;
 	connectSocket: (options?: ConnectSocketOptions) => Promise<ApiSession | null>;
 	reconnectSocket: () => Promise<ReconnectSocketResult>;
+	askHealthyEndpoint: (options?: { force?: boolean }) => Promise<HealthyEndpointResult>;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -214,7 +237,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const sr = sessionRef.current as ApiSession;
 			const wsUrl = resolveSessionWsUrl(sr);
 			sessionRef.current = { ...sr, ws_url: wsUrl };
-			return clientRef.current.connect(sessionRef.current.session_id || sessionRef.current.token || '', wsUrl);
+			return clientRef.current.connect(
+				sessionRef.current.session_id || sessionRef.current.token || '',
+				resolveConnectWsUrl(sessionRef.current)
+			);
 		}
 	}, [clientRef]);
 
@@ -353,7 +379,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				throw new Error('Mezon connect lost data');
 			}
 			try {
-				await clientRef.current.connect(merged.session_id || merged.token || '', wsUrl, true);
+				await clientRef.current.connect(merged.session_id || merged.token || '', resolveConnectWsUrl(merged), true);
 			} catch (error) {
 				console.error('error: ', error);
 			}
@@ -377,7 +403,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!merged.token && !merged.session_id) {
 				throw new Error('Mezon connect lost data');
 			}
-			await clientRef.current.connect(merged.session_id || merged.token || '', wsUrl);
+			await clientRef.current.connect(merged.session_id || merged.token || '', resolveConnectWsUrl(merged));
 			socketState.status = 'connected';
 			return merged;
 		},
@@ -409,7 +435,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!merged.token && !merged.session_id) {
 				throw new Error('Mezon connect lost data');
 			}
-			await clientRef.current.connect(merged.session_id || merged.token || '', wsUrl);
+			await clientRef.current.connect(merged.session_id || merged.token || '', resolveConnectWsUrl(merged));
 			socketState.status = 'connected';
 			return merged;
 		},
@@ -432,11 +458,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!client || !sessionRef.current) {
 			return Promise.resolve(null);
 		}
-		if (connectInFlight) {
+		if (connectInFlight && !options.force) {
 			return connectInFlight;
 		}
 
-		connectInFlight = (async () => {
+		const attempt = (async () => {
 			const sr = sessionRef.current;
 			if (!sr) return null;
 
@@ -448,16 +474,103 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				throw new Error('Missing Mezon session credential');
 			}
 
-			await client.connect(credential, wsUrl, options.createStatus ?? true);
+			await client.connect(credential, resolveConnectWsUrl(sessionRef.current), options.createStatus ?? true);
 
+			resetHealthyEndpointThrottle();
 			socketState.status = 'connected';
 			return sessionRef.current;
-		})().finally(() => {
-			connectInFlight = null;
-		});
+		})();
 
-		return connectInFlight;
+		connectInFlight = attempt;
+		// Registered straight on `attempt` so the handle is gone before the caller's `await`
+		// resumes — otherwise a caller retrying inside its own catch (bootstrap's token fallback)
+		// gets handed this very rejection again instead of a fresh connect.
+		attempt
+			.finally(() => {
+				if (connectInFlight === attempt) {
+					connectInFlight = null;
+				}
+			})
+			.catch(() => undefined);
+
+		return attempt;
 	}, []);
+
+	// Auto only: the node the gateway handed out is not answering, so ask the gateway which one is.
+	// A pinned server is the user's call and is never moved by this.
+	const askHealthyEndpoint = useCallback(
+		async ({ force = false }: { force?: boolean } = {}): Promise<HealthyEndpointResult> => {
+			if (isRealtimeServerPinned()) {
+				return 'skipped';
+			}
+			const session = sessionRef.current;
+			// The gateway takes either credential; the session id is the one that stays fresh while the
+			// socket is down (nothing refreshes the JWT on that path).
+			const sessionId = session?.session_id?.trim();
+			const token = session?.token?.trim();
+			const credential = sessionId || token;
+			if (!session || !credential || !canAskHealthyEndpoint(force)) {
+				return 'skipped';
+			}
+
+			const cfg = getMezonConfig();
+			const basePath = `${cfg.ssl ? 'https://' : 'http://'}${cfg.host}:${cfg.port}`;
+			beginHealthyEndpointAsk(force);
+			let { status, payload } = await fetchHealthyEndpoint(basePath, credential);
+			// A session id can be retired on its own (the gateway reuses slots) while the JWT is
+			// still good, so a refused session id is not proof that the session is gone.
+			if (!payload && (status === 401 || status === 403) && token && credential !== token) {
+				({ status, payload } = await fetchHealthyEndpoint(basePath, token));
+			}
+			if (!payload) {
+				noteHealthyEndpointAsked(true);
+				// 401/403 is the gateway saying this session is gone. No status at all means we never
+				// reached it. Any other status (rate limit, 5xx) is the gateway being unhappy, which
+				// says nothing about the session or the network.
+				if (status === 401 || status === 403) {
+					return 'rejected';
+				}
+				return status === 0 ? 'unreachable' : 'failed';
+			}
+			noteHealthyEndpointAsked(false);
+
+			const host = (payload.ws_url ?? '').trim();
+			// The gateway answers with `host` on production but `host:port` elsewhere; the allowlist
+			// only knows hostnames.
+			if (host && !isAllowedHost(host.split(':')[0])) {
+				console.error('[healthyEndpoint] gateway named a host we do not talk to:', host);
+				return 'failed';
+			}
+
+			const previousHost = resolveSessionWsUrl(session);
+			// The gateway mints a session id for every answer and may retire the old one, so the new
+			// session id has to be adopted even when it keeps us on the same node.
+			const next: ApiSession = {
+				...session,
+				ws_url: host || session.ws_url,
+				api_url: (payload.api_url ?? '').trim() || session.api_url,
+				session_id: (payload.session_id ?? '').trim() || session.session_id
+			};
+			sessionRef.current = next;
+			try {
+				const raw = localStorage.getItem('persist:auth');
+				const outer = raw ? JSON.parse(raw) : {};
+				outer.session = JSON.stringify(next);
+				localStorage.setItem('persist:auth', JSON.stringify(outer));
+			} catch (error) {
+				console.error('[healthyEndpoint] could not persist the new session', error);
+			}
+			extractAndSaveConfig(next, isFromMobile);
+			publishSessionUpdate(next, 'refresh');
+
+			if (host && host !== previousHost) {
+				console.warn(`[healthyEndpoint] gateway moved us from ${previousHost} to ${host}`);
+				return 'changed';
+			}
+			return 'same';
+		},
+		[isFromMobile]
+	);
 
 	const reconnectSocket = useCallback(async (): Promise<ReconnectSocketResult> => {
 		if (reconnectInFlight) {
@@ -483,6 +596,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const logOutMezon = useCallback(async (device_id?: string, platform?: string, clearSession?: boolean) => {
 		resetSessionRefreshBlock();
+		resetHealthyEndpointThrottle();
 		reconnectInFlight = false;
 		connectInFlight = null;
 		clearSessionRefreshFromStorage();
@@ -515,7 +629,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return merged;
 			}
 
-			await clientRef.current.connect(merged.session_id || merged.token || '', wsUrl);
+			await clientRef.current.connect(merged.session_id || merged.token || '', resolveConnectWsUrl(merged));
 			socketState.status = 'connected';
 			return merged;
 		},
@@ -547,7 +661,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			confirmAuthenticateOTP,
 			authenticateSMSOTPRequest,
 			connectSocket,
-			reconnectSocket
+			reconnectSocket,
+			askHealthyEndpoint
 		}),
 		[
 			clientRef,
@@ -573,7 +688,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			confirmAuthenticateOTP,
 			authenticateSMSOTPRequest,
 			connectSocket,
-			reconnectSocket
+			reconnectSocket,
+			askHealthyEndpoint
 		]
 	);
 

@@ -47,7 +47,18 @@
 		"advanced": "고급",
 		"appVersion": "앱 버전",
 		"startUp": "시작",
-		"quitApp": "앱 종료"
+		"quitApp": "앱 종료",
+		"server": "서버"
+	},
+	"server": {
+		"auto": "자동",
+		"autoHint": "서버를 자동으로 선택합니다",
+		"inUse": "{{region}} 사용 중",
+		"vietnam": "베트남",
+		"unitedStates": "미국",
+		"connectedTo": "{{region}}에 연결됨",
+		"connectingTo": "{{region}}에 연결 중…",
+		"footer": "자동: 서버를 자동으로 선택합니다. 항상 같은 서버를 사용하려면 서버를 선택하세요."
 	},
 	"autoStart": {
 		"title": "앱 자동 시작",

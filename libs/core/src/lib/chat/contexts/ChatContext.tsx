@@ -108,7 +108,17 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
+import {
+	CHECK_HEALTHY_EVENT,
+	REALTIME_SERVER_CHANGED_EVENT,
+	RECONNECT_NETWORK_PROBE_TIMEOUT_MS,
+	disableSlowReports,
+	isRealtimeServerPinned,
+	probeNetworkReachability,
+	publishSessionUpdate,
+	shouldReportSlowNode,
+	useMezon
+} from '@mezon/transport';
 import type { IMessageSendPayload, INotification, IUserProfileActivity } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -298,7 +308,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isMobile = false }) => {
 	const { t } = useTranslation('token');
 	const { t: tChannelMenu } = useTranslation('channelMenu');
-	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
+	const { clientRef, sessionRef, mmnRef, askHealthyEndpoint, connectSocket, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
 	const reconnectRecoveryPendingRef = useRef(false);
@@ -2837,14 +2847,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, [dispatch]);
 
 	const onServerDisconnectStreakLogout = useCallback(
-		(_evt: Event, streak: number) => {
+		async (_evt: Event, streak: number) => {
 			captureSentryError(new Error(`serverDisconnectStreak=${String(streak)}`), 'SERVER_DISCONNECT_STREAK_LOGOUT');
+			// A node the user pinned by hand closing the socket is not evidence the session is gone.
+			// `ondisconnect` already started a reconnect wave; logging them out would be the wrong answer.
+			if (isRealtimeServerPinned()) {
+				return;
+			}
+			// A node refusing us three times says nothing about the session. Ask the gateway
+			// (ignoring the usual throttle): if it still answers us, the session is alive and the
+			// node is the problem — keep the user in the app and let the wave, or Settings → Server,
+			// deal with it. Only an outright rejection means the session is really gone.
+			if ((await askHealthyEndpoint({ force: true })) !== 'rejected') {
+				return;
+			}
 			resetRefreshState();
 			dispatch(authActions.setLogout());
 			dispatch(walletActions.setLogout());
 			publishSessionUpdate(null, 'logout');
 		},
-		[dispatch]
+		[dispatch, askHealthyEndpoint]
 	);
 
 	const onscreenshare = useCallback(
@@ -3111,9 +3133,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 								return 'SKIP';
 							}
 
+							// The first attempt already failed on the node we have: ask the gateway
+							// whether it wants to move us before burning the rest of the wave on it.
+							if (getReconnectWaveAttempts() >= 1 && (await askHealthyEndpoint()) === 'changed') {
+								// A node we have never tried deserves a full budget instead of the
+								// cooldown this wave was about to hit.
+								resetReconnectWave();
+							}
+
 							if (!consumeReconnectAttempt()) {
-								const exhaustedWaves = noteReconnectWaveExhausted();
-								if (exhaustedWaves >= MAX_RECONNECT_WAVES_BEFORE_LOGOUT) {
+								// A pinned server that never answers must not cost the user their session.
+								const exhaustedWaves = isRealtimeServerPinned() ? 0 : noteReconnectWaveExhausted();
+								if (
+									exhaustedWaves >= MAX_RECONNECT_WAVES_BEFORE_LOGOUT &&
+									(await askHealthyEndpoint({ force: true })) === 'rejected'
+								) {
 									reconnectRecoveryPendingRef.current = false;
 									socketState.status = 'disconnected';
 									resetRefreshState();
@@ -3152,7 +3186,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [reconnect$, executeReconnect, clientRef, dispatch, runPostReconnectActions]);
+	}, [reconnect$, executeReconnect, clientRef, dispatch, runPostReconnectActions, askHealthyEndpoint]);
 
 	useEffect(() => {
 		const onWaveReset = () => {
@@ -3182,6 +3216,71 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		console.error('HEARTBEATTIMEOUT');
 		socketState.status = 'disconnected';
 	}, [handleReconnect]);
+
+	// Bootstrap can hand us a dead socket (a pinned node that is down, or a gateway that only knows
+	// the node that just refused us). Nothing else starts a wave in that case, so the app would sit
+	// silently offline until the window regained focus.
+	useEffect(() => {
+		if (socketState.status === 'connected' || !sessionRef.current) {
+			return;
+		}
+		handleReconnect('Socket was not connected at startup, attempting to reconnect...');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// mezon-js says our requests have gone slow. That can be the node or it can be the user's link,
+	// so this only reaches the gateway once we have been on the node long enough to blame it — and
+	// if the gateway keeps naming the same node, we stop asking about slowness until we reconnect.
+	useEffect(() => {
+		const onSlowNode = async () => {
+			if (socketState.status !== 'connected' || !shouldReportSlowNode()) {
+				return;
+			}
+			const verdict = await askHealthyEndpoint();
+			if (verdict === 'changed') {
+				window.dispatchEvent(new CustomEvent(REALTIME_SERVER_CHANGED_EVENT));
+			} else if (verdict === 'same') {
+				disableSlowReports();
+			}
+		};
+		window.addEventListener(CHECK_HEALTHY_EVENT, onSlowNode);
+		return () => {
+			window.removeEventListener(CHECK_HEALTHY_EVENT, onSlowNode);
+		};
+	}, [askHealthyEndpoint]);
+
+	// The Server page lives in a modal portal outside this provider, so it asks for the move by event.
+	// A wave may be cooling down after the node the user is leaving went bad, and `exhaustMap` would make
+	// them wait it out, so the move gets one immediate connect and only falls back to the wave if it fails.
+	useEffect(() => {
+		const onRealtimeServerChanged = () => {
+			clientRef.current?.disconnect(false);
+			socketState.status = 'connecting';
+			resetReconnectWave();
+			resetExhaustedWaveCount();
+			reconnectRecoveryPendingRef.current = true;
+			setTimeout(() => {
+				connectSocket({ createStatus: true, force: true })
+					.then((session) => {
+						if (!session) {
+							// No client or no session to connect with — do not claim we are online.
+							socketState.status = 'disconnected';
+							return;
+						}
+						socketState.status = 'connected';
+						runPostReconnectActions();
+					})
+					.catch(() => {
+						socketState.status = 'disconnected';
+						handleReconnect('Realtime server changed, reconnecting...');
+					});
+			}, 0);
+		};
+		window.addEventListener(REALTIME_SERVER_CHANGED_EVENT, onRealtimeServerChanged);
+		return () => {
+			window.removeEventListener(REALTIME_SERVER_CHANGED_EVENT, onRealtimeServerChanged);
+		};
+	}, [clientRef, connectSocket, handleReconnect, runPostReconnectActions]);
 
 	useEffect(() => {
 		const socket = clientRef.current;

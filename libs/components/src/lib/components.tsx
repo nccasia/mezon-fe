@@ -81,6 +81,7 @@ export { default as SettingDevices } from './components/SettingDevices';
 export { SettingLanguage } from './components/SettingLanguage';
 export { default as SettingNotifications } from './components/SettingNotifications';
 export * from './components/SettingProfile';
+export { SettingServer } from './components/SettingServer';
 export { SettingVoice } from './components/SettingVoice';
 export { default as MzToast } from './components/ToastController/MzToast';
 export { default as ToastController } from './components/ToastController/ToastController';
