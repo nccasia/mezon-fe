@@ -48,6 +48,7 @@ import type { RefObject } from 'react';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useVideoSource } from '../MessageWithUser/useVideoSource';
 import InfiniteScroll from './InfiniteScroll';
 
 const DatePickerWrapper = lazy(() => import('../ChannelList/EventChannelModal/ModalCreate/DatePickerWrapper'));
@@ -756,6 +757,8 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 		const [hasError, setHasError] = useState(false);
 		const [isInView, setIsInView] = useState(!isVideo);
 		const containerRef = useRef<HTMLDivElement>(null);
+		const videoRef = useRef<HTMLVideoElement>(null);
+		const { failed: isVideoFailed, handleError: handleVideoError } = useVideoSource(videoRef, src, !!isVideo && isInView, { preview: true });
 
 		useEffect(() => {
 			setIsLoading(true);
@@ -798,7 +801,7 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 
 		return (
 			<div ref={containerRef} className="aspect-square relative cursor-pointer" onClick={onClick}>
-				{isLoading && (
+				{isLoading && !isVideoFailed && (
 					<div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
 						<svg
 							className="w-8 h-8 text-gray-400 dark:text-gray-500"
@@ -815,7 +818,7 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 					</div>
 				)}
 
-				{hasError && (
+				{(hasError || isVideoFailed) && (
 					<div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
 						<div className="text-center">
 							<svg
@@ -841,10 +844,10 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 					<div className="relative w-full h-full bg-gray-900">
 						{isInView ? (
 							<video
-								src={src}
+								ref={videoRef}
 								className={`w-full h-full object-cover ${isLoading ? 'opacity-0' : 'opacity-100'} ${className}`}
 								onLoadedData={handleLoad}
-								onError={handleError}
+								onError={handleVideoError}
 								preload="metadata"
 								muted
 								playsInline

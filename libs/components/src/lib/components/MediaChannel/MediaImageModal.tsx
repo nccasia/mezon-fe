@@ -3,6 +3,7 @@ import type { ChannelTimelineAttachment } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, handleSaveImage } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useVideoSource } from '../MessageWithUser/useVideoSource';
 
 export const MAX_SCALE_IMAGE = 5;
 
@@ -46,6 +47,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 		}
 		return false;
 	}, [currentAttachment?.file_type, currentUrl]);
+	const { failed: isVideoFailed, handleError: handleVideoError } = useVideoSource(videoRef, currentUrl, isVideo);
 
 	const resetView = useCallback(() => {
 		setScale(1);
@@ -66,6 +68,10 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 		setShowSkeleton(false);
 		setIsMediaLoading(false);
 	}, []);
+
+	useEffect(() => {
+		if (isVideoFailed) handleMediaLoaded();
+	}, [isVideoFailed, handleMediaLoaded]);
 
 	useEffect(() => {
 		setIsMediaLoading(true);
@@ -259,7 +265,6 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 					{isVideo ? (
 						<video
 							ref={videoRef}
-							src={currentUrl}
 							className={`max-h-full max-w-full object-scale-down rounded-[10px] cursor-pointer transition-opacity duration-300 ${isMediaLoading ? 'opacity-0' : 'opacity-100'}`}
 							controls
 							onClick={(e) => {
@@ -269,7 +274,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 							onPlay={() => setIsPlaying(true)}
 							onPause={() => setIsPlaying(false)}
 							onLoadedData={handleMediaLoaded}
-							onError={handleMediaLoaded}
+							onError={handleVideoError}
 						/>
 					) : (
 						<img

@@ -35,6 +35,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import type { MessageContextMenuProps } from '../../ContextMenu';
 import { useMessageContextMenu } from '../../ContextMenu';
+import { useVideoSource } from '../useVideoSource';
 import ListAttachment from './listAttachment';
 export const MAX_SCALE_IMAGE = 5;
 
@@ -94,6 +95,7 @@ const MessageModalImage = () => {
 	const isMainPresignPending = isAttachmentPresignPendingForMessage(urlImg ?? currentAttachment?.url, sourceMessage);
 	const { signCdnUrl } = useCdnUrlSigner([urlImg]);
 	const signedUrlImg = signCdnUrl(urlImg ?? '');
+	const { failed: isVideoFailed, handleError: handleVideoError } = useVideoSource(videoRef, signedUrlImg, isVideo && !isMainPresignPending);
 
 	const getSourceMessageForAttachment = useCallback(
 		(att: AttachmentEntity | undefined) => {
@@ -211,6 +213,10 @@ const MessageModalImage = () => {
 		setShowSkeleton(false);
 		setIsMediaLoading(false);
 	}, []);
+
+	useEffect(() => {
+		if (isVideoFailed) handleMediaLoaded();
+	}, [isVideoFailed, handleMediaLoaded]);
 
 	useEffect(() => {
 		if (!currentAttachment) return;
@@ -480,7 +486,6 @@ const MessageModalImage = () => {
 					) : isVideo ? (
 						<video
 							ref={videoRef}
-							src={signedUrlImg}
 							className={`max-h-full max-w-full object-scale-down rounded-[10px] cursor-pointer transition-opacity duration-300 ${isMediaLoading ? 'opacity-0' : 'opacity-100'}`}
 							controls
 							onContextMenu={handleContextMenu}
@@ -491,7 +496,7 @@ const MessageModalImage = () => {
 							onPlay={() => setIsPlaying(true)}
 							onPause={() => setIsPlaying(false)}
 							onLoadedData={handleMediaLoaded}
-							onError={handleMediaLoaded}
+							onError={handleVideoError}
 						/>
 					) : (
 						<img

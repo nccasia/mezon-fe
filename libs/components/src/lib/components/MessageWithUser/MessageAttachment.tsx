@@ -22,6 +22,7 @@ import {
 	hasActivePresignPendingAttachments,
 	isMediaTypeNotSupported,
 	isPresignAttachmentPending,
+	isTranscodedVideoContainer,
 	parsePresignFinishKeys,
 	useAppLayout
 } from '@mezon/utils';
@@ -108,7 +109,8 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 		if (
 			((attachment.filetype?.includes(EMimeTypes.mp4) || attachment.filetype?.includes(EMimeTypes.mov)) &&
 				!attachment.url?.includes(EMimeTypes.tenor)) ||
-			(attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) && !attachment.filetype?.endsWith(ETypeLinkMedia.VIDEO_TS_FILE))
+			(attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) && !attachment.filetype?.endsWith(ETypeLinkMedia.VIDEO_TS_FILE)) ||
+			isTranscodedVideoContainer(attachment.url)
 		) {
 			videos.push(attachment);
 			return;

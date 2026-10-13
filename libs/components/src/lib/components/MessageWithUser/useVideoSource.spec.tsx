@@ -1,0 +1,316 @@
+import { useRef } from 'react';
+import type { ReactTestRenderer } from 'react-test-renderer';
+import { act, create } from 'react-test-renderer';
+import { useVideoSource } from './useVideoSource';
+
+jest.mock('@mezon/utils', () => jest.requireActual('../../../../../utils/src/lib/utils/videoSource'), { virtual: true });
+
+type HlsErrorListener = (event: string, data: { fatal: boolean }) => void;
+
+const mockHlsInstances: MockHls[] = [];
+let mockHlsSupported = true;
+
+class MockHls {
+	static Events = { ERROR: 'hlsError' };
+	static isSupported = () => mockHlsSupported;
+	source?: string;
+	media?: unknown;
+	destroyed = false;
+	private errorListener?: HlsErrorListener;
+
+	constructor(readonly config: Record<string, unknown>) {
+		mockHlsInstances.push(this);
+	}
+
+	on(_event: string, listener: HlsErrorListener) {
+		this.errorListener = listener;
+	}
+
+	loadSource(url: string) {
+		this.source = url;
+	}
+
+	attachMedia(media: unknown) {
+		this.media = media;
+	}
+
+	destroy() {
+		this.destroyed = true;
+	}
+
+	fail(fatal: boolean) {
+		this.errorListener?.('hlsError', { fatal });
+	}
+}
+
+jest.mock('hls.js', () => ({ __esModule: true, default: MockHls }));
+
+const VIDEO = 'https://cdn.mezon.ai/1cf93b197d401000/2080000000000000001_clip.mp4';
+const SIGNED = `${VIDEO}?1791900000-c2lnbmF0dXJl`;
+const PLAYLIST = `${VIDEO}/master.m3u8?1791900000-c2lnbmF0dXJl`;
+const MASTER = '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=3137344,RESOLUTION=1280x720\nstream_0/playlist.m3u8\n';
+
+class FakeVideo {
+	src = '';
+	nativeHls = '';
+	paused = true;
+	play = jest.fn(() => {
+		this.paused = false;
+		return Promise.resolve();
+	});
+	canPlayType(type: string) {
+		return type === 'application/vnd.apple.mpegurl' ? this.nativeHls : '';
+	}
+}
+
+function Player({ url, enabled = true, preview = false }: { url?: string; enabled?: boolean; preview?: boolean }) {
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const { failed, handleError } = useVideoSource(videoRef, url, enabled, { preview });
+	return enabled ? <video ref={videoRef} data-failed={failed} onError={handleError} /> : null;
+}
+
+let video: FakeVideo;
+let fetchMock: jest.SpyInstance;
+let renderer: ReactTestRenderer;
+
+function render(element: React.ReactElement) {
+	act(() => {
+		renderer = create(element, { createNodeMock: (node) => (node.type === 'video' ? video : null) });
+	});
+}
+
+async function settle() {
+	await act(async () => {
+		for (let i = 0; i < 5; i += 1) await new Promise((resolve) => setTimeout(resolve, 0));
+	});
+}
+
+function mediaError() {
+	act(() => renderer.root.findByType('video').props.onError());
+}
+
+function isFailed() {
+	return renderer.root.findByType('video').props['data-failed'];
+}
+
+function serveStream(exists: boolean) {
+	fetchMock.mockImplementation(async () =>
+		exists ? new Response(MASTER, { status: 200 }) : new Response('<Error><Code>NoSuchKey</Code></Error>', { status: 404 })
+	);
+}
+
+beforeEach(() => {
+	video = new FakeVideo();
+	mockHlsInstances.length = 0;
+	mockHlsSupported = true;
+	fetchMock = jest.spyOn(globalThis, 'fetch');
+});
+
+afterEach(() => {
+	act(() => renderer?.unmount());
+	jest.restoreAllMocks();
+});
+
+it('plays a file outside the transcoding hosts as it is, without probing', async () => {
+	render(<Player url="https://cdn.komu.vn/1cf93b197d401000/clip.mp4" />);
+	await settle();
+
+	expect(video.src).toBe('https://cdn.komu.vn/1cf93b197d401000/clip.mp4');
+	expect(fetchMock).not.toHaveBeenCalled();
+});
+
+it('plays the converted stream natively where the browser can', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+
+	expect(video.src).toBe(PLAYLIST);
+	expect(mockHlsInstances).toHaveLength(0);
+});
+
+it('plays the converted stream through hls.js where the browser cannot', async () => {
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+
+	expect(video.src).toBe('');
+	expect(mockHlsInstances).toHaveLength(1);
+	expect(mockHlsInstances[0].source).toBe(PLAYLIST);
+	expect(mockHlsInstances[0].media).toBe(video);
+	expect(mockHlsInstances[0].config).toEqual({ capLevelToPlayerSize: true });
+});
+
+it('tries the stream once when an unconverted original fails, then gives up', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(false);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	expect(video.src).toBe(SIGNED);
+
+	mediaError();
+	await settle();
+	expect(video.src).toBe(PLAYLIST);
+	expect(isFailed()).toBe(false);
+
+	mediaError();
+	await settle();
+	expect(isFailed()).toBe(true);
+	expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+
+it('falls back to the original when the converted stream fails', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	mediaError();
+	await settle();
+	expect(video.src).toBe(SIGNED);
+
+	mediaError();
+	await settle();
+	expect(isFailed()).toBe(true);
+});
+
+it('keeps playing on the other source when the viewer had pressed play', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(false);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	video.paused = false;
+	mediaError();
+	await settle();
+
+	expect(video.src).toBe(PLAYLIST);
+	expect(video.play).toHaveBeenCalledTimes(1);
+});
+
+it('leaves a paused video paused on the other source', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	mediaError();
+	await settle();
+
+	expect(video.src).toBe(SIGNED);
+	expect(video.play).not.toHaveBeenCalled();
+});
+
+it('fails at once for a file that cannot have been converted', async () => {
+	render(<Player url="https://cdn.komu.vn/1cf93b197d401000/clip.mp4" />);
+	await settle();
+
+	mediaError();
+	expect(isFailed()).toBe(true);
+});
+
+it('leaves recoverable hls.js errors to hls.js and falls back to the original on a fatal one', async () => {
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	const [hls] = mockHlsInstances;
+
+	mediaError();
+	act(() => hls.fail(false));
+	await settle();
+	expect(hls.destroyed).toBe(false);
+	expect(video.src).toBe('');
+
+	act(() => hls.fail(true));
+	await settle();
+	expect(hls.destroyed).toBe(true);
+	expect(video.src).toBe(SIGNED);
+	expect(isFailed()).toBe(false);
+});
+
+it('plays the original when the browser has no Media Source Extensions', async () => {
+	mockHlsSupported = false;
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+
+	expect(mockHlsInstances).toHaveLength(0);
+	expect(video.src).toBe(SIGNED);
+});
+
+it('buffers a single segment of the smallest rendition for a preview', async () => {
+	serveStream(true);
+
+	render(<Player url={SIGNED} preview />);
+	await settle();
+
+	expect(mockHlsInstances[0].config).toEqual({ capLevelToPlayerSize: true, startLevel: 0, maxBufferLength: 1, maxMaxBufferLength: 1 });
+});
+
+it('drops the probe and releases hls.js once the video goes away', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+	render(<Player url={SIGNED} />);
+	act(() => renderer.update(<Player url={SIGNED} enabled={false} />));
+	await settle();
+	expect(video.src).toBe('');
+	expect((fetchMock.mock.calls[0][1] as RequestInit).signal?.aborted).toBe(true);
+
+	video.nativeHls = '';
+	render(<Player url={SIGNED} />);
+	await settle();
+	const [hls] = mockHlsInstances;
+	act(() => renderer.unmount());
+	expect(hls.destroyed).toBe(true);
+});
+
+it('keeps the loaded source when only the CDN signature is renewed', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	act(() => renderer.update(<Player url={`${VIDEO}?1791999999-ZnJlc2g`} />));
+	await settle();
+
+	expect(video.src).toBe(PLAYLIST);
+	expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+
+it('signs the next source with the renewed signature', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(true);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	act(() => renderer.update(<Player url={`${VIDEO}?1791999999-ZnJlc2g`} />));
+	mediaError();
+	await settle();
+
+	expect(video.src).toBe(`${VIDEO}?1791999999-ZnJlc2g`);
+});
+
+it('stays failed through a renewed signature and starts over for another file', async () => {
+	video.nativeHls = 'maybe';
+	serveStream(false);
+
+	render(<Player url={SIGNED} />);
+	await settle();
+	mediaError();
+	await settle();
+	mediaError();
+	act(() => renderer.update(<Player url={`${VIDEO}?1791999999-ZnJlc2g`} />));
+	expect(isFailed()).toBe(true);
+
+	serveStream(true);
+	const other = 'https://cdn.mezon.ai/1cf93b197d401000/2080000000000000002_other.mp4';
+	act(() => renderer.update(<Player url={other} />));
+	expect(isFailed()).toBe(false);
+	await settle();
+	expect(video.src).toBe(`${other}/master.m3u8`);
+});

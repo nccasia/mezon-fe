@@ -74,6 +74,7 @@ export * from './signals';
 export * from './timeFormatterI18n';
 export * from './toggleSelection';
 export * from './transform';
+export * from './videoSource';
 export * from './windowEnvironment';
 export * from './windowSize';
 
