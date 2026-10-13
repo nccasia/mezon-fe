@@ -47,7 +47,18 @@
 		"advanced": "Avancerad",
 		"appVersion": "Appversion",
 		"startUp": "Starta upp",
-		"quitApp": "Avsluta app"
+		"quitApp": "Avsluta app",
+		"server": "Server"
+	},
+	"server": {
+		"auto": "Automatiskt",
+		"autoHint": "Väljer en server åt dig",
+		"inUse": "Använder {{region}}",
+		"vietnam": "Vietnam",
+		"unitedStates": "USA",
+		"connectedTo": "Ansluten till {{region}}",
+		"connectingTo": "Ansluter till {{region}}…",
+		"footer": "Automatiskt: Väljer en server åt dig. Välj en server om du alltid vill stanna på den."
 	},
 	"autoStart": {
 		"title": "Starta app automatiskt",

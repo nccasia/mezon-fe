@@ -1,3 +1,4 @@
+import { isRealtimeServerOffered } from '@mezon/transport';
 import { LogoutModal } from '@mezon/ui';
 import { EUserSettings, generateE2eId } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -122,6 +123,21 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 					{t('setting:language.title')}
 				</button>
 				<br />
+				{isRealtimeServerOffered() && (
+					<>
+						<button
+							className={`p-2 pl-2 ml-[-8px] font-medium ${selectedButton === EUserSettings.SERVER ? 'bg-button-secondary text-theme-primary-active bg-item-theme' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px]`}
+							onClick={() => {
+								handleButtonClick(EUserSettings.SERVER);
+								onItemClick && onItemClick(EUserSettings.SERVER);
+							}}
+							data-e2e={generateE2eId(`user_setting.server.tab_server`)}
+						>
+							{t('setting:appSettings.server')}
+						</button>
+						<br />
+					</>
+				)}
 				<button
 					className={`p-2 pl-2 ml-[-8px] font-medium ${selectedButton === EUserSettings.VOICE ? 'bg-button-secondary text-theme-primary-active bg-item-theme' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {

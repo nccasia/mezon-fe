@@ -323,6 +323,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					onChange={handleDisplayChannelLabel}
 					className="pl-3 border-theme-primary bg-input-secondary  py-2 w-full  outline-none rounded-lg"
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
+					data-e2e={generateE2eId('channel_setting_page.overview.input.channel_name')}
 				/>
 				{(checkValidateEmpty || checkValidate) && (
 					<p className="text-[#e44141] text-xs italic font-thin">{checkValidateEmpty || checkValidate}</p>
@@ -346,7 +347,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 
 				<hr className="border-t-theme-primary my-10" />
 				<p className="text-xs font-bold mb-2">{isThread ? t('fields.threadDescription.title') : t('fields.channelDescription.title')}</p>
-				<div className="relative">
+				<div className="relative" data-e2e={generateE2eId('channel_setting_page.overview.input.channel_topic')}>
 					<TextArea
 						placeholder={isThread ? t('fields.threadDescription.placeholder') : t('fields.channelDescription.placeholder')}
 						className="resize-none bg-theme-input h-auto min-h-[87px] w-full overflow-y-hidden outline-none py-2 pl-3 pr-5 border-theme-primary"
