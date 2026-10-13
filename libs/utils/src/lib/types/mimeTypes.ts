@@ -16,6 +16,6 @@ export enum EMimeTypes {
 	sticker = 'sticker'
 }
 export enum ETypesCDN {
-	KOMU = 2,
+	CLOUDFLARE = 2,
 	MEZON = 1
 }
