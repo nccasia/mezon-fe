@@ -26,14 +26,7 @@ export function isTenorUrl(url: string | undefined): boolean {
 	return isFromAllowedDomain(url, ['https://static.klipy.com']);
 }
 
-export const MEZON_CDN_DOMAINS = [
-	'https://cdn.komu.vn',
-	'https://cdn.komu.ai',
-	'https://cdn.mezon.ai',
-	'https://cdn.mezon.vn',
-	...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : []),
-	...(process.env.NX_CLOUDFLARE_CDN_URL ? [process.env.NX_CLOUDFLARE_CDN_URL] : [])
-];
+export const MEZON_CDN_DOMAINS = [...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : [])];
 
 export function isMezonCdnUrl(url: string | undefined): boolean {
 	return isFromAllowedDomain(url, MEZON_CDN_DOMAINS);
