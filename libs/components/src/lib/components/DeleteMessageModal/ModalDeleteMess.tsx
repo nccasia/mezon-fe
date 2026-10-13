@@ -61,8 +61,9 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 	const handleDeleteMessage = useCallback(async () => {
 		const isInitTopicMessage = mess.id === initTopicMessageId;
+		const isTopicReply = !!isTopic && !isInitTopicMessage;
 
-		if (!mess?.content?.tp && !isInitTopicMessage) {
+		if (isTopicReply || (!mess?.content?.tp && !isInitTopicMessage)) {
 			await deleteSendMessage(mess.id);
 			setIsLoading(false);
 			return;
@@ -76,7 +77,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 			dispatch(topicsActions.setOpenTopicMessageState(false));
 			dispatch(topicsActions.setInitTopicMessageId(''));
 		}
-	}, [mess, deleteSendMessage, currentTopicId, initTopicMessageId, dispatch]);
+	}, [mess, deleteSendMessage, currentTopicId, initTopicMessageId, dispatch, isTopic]);
 
 	const handleAction = useCallback(async () => {
 		if (isRemoveAttachmentNoContent) {

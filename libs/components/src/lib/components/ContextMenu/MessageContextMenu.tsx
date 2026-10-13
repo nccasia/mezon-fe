@@ -616,7 +616,10 @@ function MessageContextMenu({
 	}, [checkPos, activeMode, canManageThread, currentChannelType, isTopic]);
 
 	const enableDelMessageItem = useMemo(() => {
-		if (!checkPos || message?.content?.tp) return false;
+		if (!checkPos) return false;
+		// content.tp on a channel message means that message owns a topic.
+		// Replies inside a topic also get content.tp when they contain mentions, so only block outside the topic.
+		if (!isTopic && message?.content?.tp) return false;
 
 		const isFirstTopicMessage = isTopic && topicMessageIds?.length > 0 && messageId === topicMessageIds[0];
 		const isInitTopicMessage = !isTopic && messageId === initTopicMessageId;
