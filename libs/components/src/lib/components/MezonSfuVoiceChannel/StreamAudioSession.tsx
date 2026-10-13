@@ -12,9 +12,10 @@ import {
 	useAppSelector,
 	videoStreamActions
 } from '@mezon/store';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { SfuAudioAudience, type SfuAudioAudienceState } from './MyVideoConference/Media/SfuAudioAudience';
+import { usePreferredOutputDevice } from './usePreferredOutputDevice';
 
 /**
  * Keeps stream-channel SFU audio alive while the user is joined, including
@@ -28,28 +29,10 @@ export function StreamAudioSession() {
 	const token = useSelector(selectStreamAudioToken);
 	const volume = useSelector(selectStreamVolume);
 	const muted = useSelector(selectStreamMuted);
-	const [outputDeviceId, setOutputDeviceId] = useState(() => localStorage.getItem('mezon.voice.outputDeviceId') || 'default');
-
-	useEffect(() => {
-		const handleStorage = (e?: Event) => {
-			const customEvent = e as CustomEvent<string | { deviceId?: string }>;
-			const nextId =
-				typeof customEvent?.detail === 'string'
-					? customEvent.detail
-					: (customEvent?.detail as { deviceId?: string })?.deviceId || localStorage.getItem('mezon.voice.outputDeviceId') || 'default';
-			setOutputDeviceId(nextId);
-		};
-		window.addEventListener('storage', handleStorage);
-		window.addEventListener('mezon:outputDeviceChange', handleStorage);
-		return () => {
-			window.removeEventListener('storage', handleStorage);
-			window.removeEventListener('mezon:outputDeviceChange', handleStorage);
-		};
-	}, []);
-
 	const members = useAppSelector((state) => selectStreamMembersByChannelId(state, streamInfo?.streamId || ''));
 	const sfuUrl = useSelector(selectStreamSfuUrl);
 	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
+	const { outputDeviceId, handleSinkIdFailure } = usePreferredOutputDevice();
 
 	const refreshToken = useCallback(async () => {
 		if (!streamInfo?.streamId) throw new Error('Stream channel is unavailable');
@@ -91,6 +74,7 @@ export function StreamAudioSession() {
 			volume={volume}
 			muted={muted}
 			sinkId={outputDeviceId}
+			onSinkIdFailure={handleSinkIdFailure}
 			onRefreshToken={refreshToken}
 			onConnectionStateChange={handleConnectionStateChange}
 		/>

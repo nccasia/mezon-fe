@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { setPreferredOutputDeviceId, sinkIdForHtmlMediaElement } from '../../preferredOutputDevice';
 import { attachAudioPlayback, type AudioPlaybackFailure } from './audioPlayback';
 
 export const SfuAudioTrack = ({
@@ -14,7 +15,7 @@ export const SfuAudioTrack = ({
 	volume?: number;
 	sinkId?: string;
 	onPlaybackFailure?: AudioPlaybackFailure;
-	onSinkIdFailure?: (sinkId: string) => void;
+	onSinkIdFailure?: (failedSinkId?: string) => void;
 }) => {
 	const ref = useRef<HTMLAudioElement>(null);
 	useEffect(() => {
@@ -31,29 +32,23 @@ export const SfuAudioTrack = ({
 		let cleanupPlayback: (() => void) | undefined;
 
 		const applySinkId = async (targetSink: string) => {
-			const targetSinkId = targetSink === 'default' ? '' : targetSink;
+			const targetSinkId = sinkIdForHtmlMediaElement(targetSink);
 			const audioWithSink = el as HTMLAudioElement & { setSinkId?: (id: string) => Promise<void> };
-			if (typeof audioWithSink.setSinkId === 'function') {
-				try {
-					await audioWithSink.setSinkId(targetSinkId);
-				} catch (err: unknown) {
-					// eslint-disable-next-line no-console
-					console.warn('[MezonSFU] failed to setSinkId', err);
-					if (targetSinkId !== '') {
-						try {
-							await audioWithSink.setSinkId('');
-						} catch (fallbackErr: unknown) {
-							// eslint-disable-next-line no-console
-							console.warn('[MezonSFU] fallback to default sinkId failed', fallbackErr);
-						}
-						try {
-							localStorage.setItem('mezon.voice.outputDeviceId', 'default');
-							window.dispatchEvent(new CustomEvent('mezon:outputDeviceChange', { detail: 'default' }));
-						} catch {
-							// ignore
-						}
-						onSinkIdFailure?.(targetSink);
+			if (typeof audioWithSink.setSinkId !== 'function') return;
+			try {
+				await audioWithSink.setSinkId(targetSinkId);
+			} catch (err: unknown) {
+				// eslint-disable-next-line no-console
+				console.warn('[MezonSFU] failed to setSinkId', err);
+				if (targetSinkId !== '') {
+					try {
+						await audioWithSink.setSinkId('');
+					} catch (fallbackErr: unknown) {
+						// eslint-disable-next-line no-console
+						console.warn('[MezonSFU] fallback to default sinkId failed', fallbackErr);
 					}
+					setPreferredOutputDeviceId('default');
+					onSinkIdFailure?.(targetSink);
 				}
 			}
 		};

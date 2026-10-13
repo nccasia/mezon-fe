@@ -1,6 +1,7 @@
 import { getNoiseSuppressionAudioCaptureOptions, requestMediaPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PREFERRED_OUTPUT_DEVICE_STORAGE_KEY, setPreferredOutputDeviceId } from '../MezonSfuVoiceChannel/preferredOutputDevice';
 import { DeviceSelector } from './DeviceSelector';
 import { MicTest } from './MicTest';
 import { NoiseSuppressionControl, type NoiseSuppressionControlRef } from './NoiseSuppressionControl';
@@ -8,7 +9,7 @@ import { VolumeSlider } from './VolumeSlider';
 
 const LS_KEYS = {
 	inputDeviceId: 'mezon.voice.inputDeviceId',
-	outputDeviceId: 'mezon.voice.outputDeviceId',
+	outputDeviceId: PREFERRED_OUTPUT_DEVICE_STORAGE_KEY,
 	micVolume: 'mezon.voice.micVolume',
 	speakerVolume: 'mezon.voice.speakerVolume'
 } as const;
@@ -129,11 +130,18 @@ export const SettingVoice = ({ menuIsOpen, noiseSuppressionEnabled = false }: IS
 			const first = nextInputs[0];
 			return nextInputs.some((d) => d.deviceId === prev) ? prev : first ? first.deviceId : '';
 		});
-		setOutputDeviceId((prev) => {
-			if (nextOutputs.length === 0) return '';
-			const first = nextOutputs[0];
-			return nextOutputs.some((d) => d.deviceId === prev) ? prev : first ? first.deviceId : '';
-		});
+
+		const previousOutputId = outputDeviceIdRef.current;
+		const nextOutputId =
+			nextOutputs.length === 0
+				? ''
+				: nextOutputs.some((d) => d.deviceId === previousOutputId)
+					? previousOutputId
+					: nextOutputs[0]?.deviceId || '';
+		setOutputDeviceId(nextOutputId);
+		if (nextOutputId !== previousOutputId) {
+			setPreferredOutputDeviceId(nextOutputId || 'default');
+		}
 	}, []);
 
 	useEffect(() => {
@@ -160,6 +168,11 @@ export const SettingVoice = ({ menuIsOpen, noiseSuppressionEnabled = false }: IS
 		localStorage.setItem(LS_KEYS.micVolume, String(micVolume));
 		localStorage.setItem(LS_KEYS.speakerVolume, String(speakerVolume));
 	}, [inputDeviceId, outputDeviceId, micVolume, speakerVolume]);
+
+	const handleOutputDeviceChange = useCallback((deviceId: string) => {
+		setOutputDeviceId(deviceId);
+		setPreferredOutputDeviceId(deviceId);
+	}, []);
 
 	const startLevelMeter = useCallback(() => {
 		const analyser = analyserRef.current;
@@ -306,7 +319,7 @@ export const SettingVoice = ({ menuIsOpen, noiseSuppressionEnabled = false }: IS
 						<DeviceSelector
 							devices={outputDevices}
 							value={outputDeviceId}
-							onChange={setOutputDeviceId}
+							onChange={handleOutputDeviceChange}
 							label={t('setting:voice.speaker')}
 							disabled={outputDevices.length === 0}
 							t={t}

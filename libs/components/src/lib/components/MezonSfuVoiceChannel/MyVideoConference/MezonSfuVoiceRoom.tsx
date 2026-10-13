@@ -1335,6 +1335,12 @@ export function MezonSfuVoiceRoom({
 	const changeInputDevice = useCallback(
 		async (kind: 'audioinput' | 'videoinput', deviceId: string) => {
 			let stream: MediaStream | null = null;
+			let acquiredTrackCommitted = false;
+			const releaseAcquiredStream = () => {
+				if (acquiredTrackCommitted || !stream) return;
+				stream.getTracks().forEach((track) => track.stop());
+				stream = null;
+			};
 			try {
 				if (kind === 'audioinput') {
 					if (microphonePermissionStateRef.current !== 'granted' && !(await ensureMediaPermission('microphone'))) {
@@ -1359,7 +1365,7 @@ export function MezonSfuVoiceRoom({
 				});
 				const nextTrack = kind === 'audioinput' ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0];
 				if (!nextTrack) {
-					stream.getTracks().forEach((t) => t.stop());
+					releaseAcquiredStream();
 					return;
 				}
 
@@ -1373,7 +1379,7 @@ export function MezonSfuVoiceRoom({
 							: microphoneEnabled;
 
 					if (joinRole === 'audience' && !isAudioActive) {
-						stream.getTracks().forEach((t) => t.stop());
+						releaseAcquiredStream();
 						const previousTrack = localStream.getAudioTracks()[0];
 						if (previousTrack) {
 							localStream.removeTrack(previousTrack);
@@ -1406,6 +1412,7 @@ export function MezonSfuVoiceRoom({
 					preferredMicrophoneIdRef.current = deviceId;
 					localStorage.setItem(PREFERRED_MICROPHONE_STORAGE_KEY, deviceId);
 					setSelectedMicrophone(deviceId);
+					acquiredTrackCommitted = true;
 				} else {
 					const previousTrack = cameraTrackRef.current;
 					nextTrack.enabled = cameraEnabled;
@@ -1418,11 +1425,10 @@ export function MezonSfuVoiceRoom({
 					localStream.addTrack(nextTrack);
 					if (!screenStreamRef.current) setLocalPreview(new MediaStream(localStream.getTracks()));
 					setSelectedCamera(deviceId);
+					acquiredTrackCommitted = true;
 				}
 			} catch (cause) {
-				if (stream) {
-					stream.getTracks().forEach((t) => t.stop());
-				}
+				releaseAcquiredStream();
 				setError(cause instanceof Error ? cause.message : 'Unable to switch device');
 			}
 		},
