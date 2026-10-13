@@ -47,7 +47,18 @@
 		"advanced": "Nâng cao",
 		"appVersion": "Phiên bản ứng dụng",
 		"startUp": "Khởi chạy",
-		"quitApp": "Thoát ứng dụng"
+		"quitApp": "Thoát ứng dụng",
+		"server": "Máy chủ"
+	},
+	"server": {
+		"auto": "Tự động",
+		"autoHint": "Tự chọn máy chủ phù hợp",
+		"inUse": "Đang dùng {{region}}",
+		"vietnam": "Việt Nam",
+		"unitedStates": "Hoa Kỳ",
+		"connectedTo": "Đã kết nối {{region}}",
+		"connectingTo": "Đang kết nối {{region}}…",
+		"footer": "Tự động: Tự chọn máy chủ phù hợp. Chọn một máy chủ nếu bạn muốn luôn dùng cố định."
 	},
 	"autoStart": {
 		"title": "Tự động khởi động ứng dụng",

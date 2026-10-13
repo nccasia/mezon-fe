@@ -31,7 +31,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 
 	const currentAttachment = attachments[currentIndex];
 	const cdnUrls = useMemo(() => attachments.flatMap((att) => [att.file_url, att.thumbnail]), [attachments]);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner(cdnUrls);
+	const { signCdnUrl } = useCdnUrlSigner(cdnUrls);
 	const currentUrl = signCdnUrl(currentAttachment?.file_url || '');
 
 	const isVideo = useMemo(() => {
@@ -256,7 +256,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 						</div>
 					)}
 
-					{isAwaitingSignature(currentAttachment?.file_url) ? null : isVideo ? (
+					{isVideo ? (
 						<video
 							ref={videoRef}
 							src={currentUrl}
@@ -318,8 +318,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 					<div ref={thumbnailListRef} className="w-[100px] overflow-y-auto thread-scroll bg-[#1a1a1a]">
 						{attachments.map((att, idx) => {
 							const isSelected = idx === currentIndex;
-							const rawThumbUrl = att.thumbnail || att.file_url || '';
-							const thumbUrl = signCdnUrl(rawThumbUrl);
+							const thumbUrl = signCdnUrl(att.thumbnail || att.file_url || '');
 							const attIsVideo =
 								att.file_type?.startsWith('video/') ||
 								['.mp4', '.webm', '.ogg', '.mov'].some((ext) => (att.file_url || '').toLowerCase().includes(ext));
@@ -330,9 +329,7 @@ export function MediaImageModal({ attachments, initialIndex, onClose }: MediaIma
 										className={`rounded-md cursor-pointer overflow-hidden border-2 ${isSelected ? 'border-white' : 'border-transparent'}`}
 										onClick={() => selectImage(idx)}
 									>
-										{isAwaitingSignature(rawThumbUrl) ? (
-											<div className={`w-full h-[80px] bg-[#2a2a2a] ${!isSelected ? 'brightness-[0.3]' : ''}`} />
-										) : attIsVideo ? (
+										{attIsVideo ? (
 											<div className="relative">
 												<video
 													src={thumbUrl}

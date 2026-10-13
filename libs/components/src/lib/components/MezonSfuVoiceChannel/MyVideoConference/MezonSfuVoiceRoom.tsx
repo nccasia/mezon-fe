@@ -1870,6 +1870,12 @@ export function MezonSfuVoiceRoom({
 						.find((item) => item.mid === '1')
 						?.sender.replaceTrack(null);
 				}
+				if (joinRole === 'audience' && !pushToTalkRequestedRef.current) {
+					await pc
+						.getTransceivers()
+						.find((item) => item.mid === '0')
+						?.sender.replaceTrack(null);
+				}
 			} catch (cause) {
 				if (disposed || pcRef.current !== pc || wsRef.current !== ws) return;
 				setError(cause instanceof Error ? cause.message : 'WebRTC negotiation failed');
@@ -2105,9 +2111,15 @@ export function MezonSfuVoiceRoom({
 					screenKeyframeRecovery.wake();
 				}
 				if (message.type === 'push_to_talk_changed' && typeof message.active === 'boolean') {
+					const granted = message.active && pushToTalkRequestedRef.current;
 					const audioTrack = localStreamRef.current?.getAudioTracks()[0];
-					if (audioTrack) setAudioTrackEnabled(audioTrack, message.active && pushToTalkRequestedRef.current);
-					setPushToTalkActive(message.active && pushToTalkRequestedRef.current);
+					if (audioTrack) setAudioTrackEnabled(audioTrack, granted);
+					const audioSender = pcRef.current?.getTransceivers().find((item) => item.mid === '0')?.sender;
+					const outgoing = granted ? getOutgoingAudioTrack(audioTrack) : null;
+					if (audioSender && audioSender.track !== outgoing && (outgoing || !granted)) {
+						void audioSender.replaceTrack(outgoing).catch(() => undefined);
+					}
+					setPushToTalkActive(granted);
 				}
 				if (message.type === 'role_changed' && message.role) {
 					void handleRoleChanged(message.role).catch((cause) => {
@@ -2176,6 +2188,10 @@ export function MezonSfuVoiceRoom({
 					const errorMsg = message.message || 'SFU signaling error';
 					if (screenKeyframeRecovery.isRecentRequestError(errorMsg)) return;
 					if (errorMsg === 'invalid_push_to_talk' || errorMsg === 'push_to_talk_rejected') {
+						const audioTrack = localStreamRef.current?.getAudioTracks()[0];
+						if (audioTrack) setAudioTrackEnabled(audioTrack, false);
+						const audioSender = pcRef.current?.getTransceivers().find((item) => item.mid === '0')?.sender;
+						void audioSender?.replaceTrack(null).catch(() => undefined);
 						setPushToTalkActive(false);
 						return;
 					}
@@ -2508,8 +2524,8 @@ export function MezonSfuVoiceRoom({
 					return;
 				}
 			}
+			const audioTransceiver = pcRef.current?.getTransceivers().find((item) => item.mid === '0' || item.receiver.track.kind === 'audio');
 			if (active && audioTrack) {
-				const audioTransceiver = pcRef.current?.getTransceivers().find((item) => item.mid === '0' || item.receiver.track.kind === 'audio');
 				if (!audioTransceiver) {
 					setError('Audio sender is not negotiated');
 					return;
@@ -2518,6 +2534,8 @@ export function MezonSfuVoiceRoom({
 				if (audioTransceiver.direction !== 'sendonly' && audioTransceiver.direction !== 'sendrecv') {
 					audioTransceiver.direction = 'sendonly';
 				}
+			} else if (!active && audioTransceiver?.sender.track) {
+				await audioTransceiver.sender.replaceTrack(null);
 			}
 			if (!isCurrent()) return;
 			if (audioTrack) setAudioTrackEnabled(audioTrack, active);

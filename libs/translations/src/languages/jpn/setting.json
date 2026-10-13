@@ -47,7 +47,18 @@
 		"advanced": "詳細",
 		"appVersion": "アプリバージョン",
 		"startUp": "起動",
-		"quitApp": "アプリを終了"
+		"quitApp": "アプリを終了",
+		"server": "サーバー"
+	},
+	"server": {
+		"auto": "自動",
+		"autoHint": "サーバーを自動で選択します",
+		"inUse": "{{region}} を使用中",
+		"vietnam": "ベトナム",
+		"unitedStates": "アメリカ合衆国",
+		"connectedTo": "{{region}} に接続済み",
+		"connectingTo": "{{region}} に接続中…",
+		"footer": "自動：サーバーを自動で選択します。常に同じサーバーを使いたい場合はサーバーを選んでください。"
 	},
 	"autoStart": {
 		"title": "アプリを自動起動",

@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { getCdnSignatureTtlMs } from '@mezon/utils';
+import { getCdnSignatureTtlMs, isCdnSignatureExpired } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { CacheMetadata } from '../cache-metadata';
@@ -33,7 +33,6 @@ type CdnSignatureRootState = { [CDN_SIGNATURE_FEATURE_KEY]?: CdnSignatureState }
 type FetchCdnSignaturePayload = {
 	channelId: string;
 	noCache?: boolean;
-	/** The signature of media the CDN refused: asks for a new one only while it is still the current one. */
 	failedSignature?: string;
 };
 
@@ -87,9 +86,10 @@ export const fetchCdnSignature = createAsyncThunk(
 			if (state.requestIdByChannelId[channelId]) return false;
 			const entry = state.byChannelId[channelId];
 			if (failedSignature !== undefined) {
-				// N refused images make one request: the first replaces the signature they share, and the rest no longer
-				// match it. One younger than the retry interval is kept, its age cannot be why the media was refused.
-				return entry?.signature === failedSignature && Date.now() - entry.cache.lastFetched >= CDN_SIGNATURE_RETRY_MS;
+				return (
+					entry?.signature === failedSignature &&
+					(isCdnSignatureExpired(failedSignature) ?? Date.now() - entry.cache.lastFetched >= CDN_SIGNATURE_RETRY_MS)
+				);
 			}
 			return noCache || !isCacheValid(entry?.cache);
 		}
@@ -102,6 +102,7 @@ export const cdnSignatureSlice = createSlice({
 	reducers: {
 		removeByChannelId: (state, action: PayloadAction<string>) => {
 			delete state.byChannelId[action.payload];
+			delete state.requestIdByChannelId[action.payload];
 		},
 		removeAll: () => initialCdnSignatureState
 	},
