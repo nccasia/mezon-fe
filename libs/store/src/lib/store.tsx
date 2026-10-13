@@ -94,15 +94,6 @@ const persistedPollsReducer = persistReducer(
 	pollsReducer
 );
 
-const persistedCdnSignatureReducer = persistReducer(
-	{
-		key: CDN_SIGNATURE_FEATURE_KEY,
-		storage,
-		whitelist: ['byChannelId']
-	},
-	cdnSignatureReducer
-);
-
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -411,7 +402,7 @@ const reducer = {
 	[USER_STATUS_FEATURE_KEY]: statusReducer,
 	[DEVICES_FEATURE_KEY]: devicesReducer,
 	[POLLS_FEATURE_KEY]: persistedPollsReducer,
-	[CDN_SIGNATURE_FEATURE_KEY]: persistedCdnSignatureReducer
+	[CDN_SIGNATURE_FEATURE_KEY]: cdnSignatureReducer
 };
 
 let storeInstance = configureStore({

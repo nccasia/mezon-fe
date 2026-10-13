@@ -1,10 +1,19 @@
 import { isMezonCdnUrl } from './urlSanitization';
 
 export const CDN_SIGNATURE_TTL_MS = 5 * 60 * 60 * 1000;
+const CDN_SIGNATURE_REFRESH_MARGIN_MS = 5 * 60 * 1000;
 
-export function isCdnSignatureExpired(signature: string, now = Date.now()): boolean {
+export function getCdnSignatureTtlMs(signature: string, now = Date.now()): number {
+	const expiresIn = Number(/^(\d+)-/.exec(signature)?.[1]) * 1000 - now;
+	return expiresIn > 2 * CDN_SIGNATURE_REFRESH_MARGIN_MS
+		? Math.min(expiresIn - CDN_SIGNATURE_REFRESH_MARGIN_MS, CDN_SIGNATURE_TTL_MS)
+		: CDN_SIGNATURE_TTL_MS;
+}
+
+export function isCdnSignatureExpired(signature: string, now = Date.now()): boolean | undefined {
 	const expiresAtSeconds = Number(/^(\d+)-/.exec(signature)?.[1]);
-	return Number.isFinite(expiresAtSeconds) && expiresAtSeconds > 0 && expiresAtSeconds * 1000 <= now;
+	if (!Number.isFinite(expiresAtSeconds) || expiresAtSeconds <= 0) return undefined;
+	return expiresAtSeconds * 1000 <= now;
 }
 
 const CHANNEL_FOLDER_RE = /\/([0-9a-fA-F]{16})\/[^/]+$/;
@@ -23,7 +32,7 @@ function readCdnChannelFolder(url?: string): string | null | undefined {
 
 	if (PUBLIC_CDN_FOLDERS.has(pathname.split('/')[1]?.toLowerCase())) return '0';
 	const hex = CHANNEL_FOLDER_RE.exec(pathname)?.[1];
-	return hex ? BigInt(`0x${hex}`).toString() : null;
+	return hex && /[^0]/.test(hex) ? BigInt(`0x${hex}`).toString() : null;
 }
 
 export function getCdnSignatureChannelId(url?: string, fallbackChannelId?: string): string | undefined {
@@ -37,7 +46,7 @@ export function needsCdnSignature(url?: string, fallbackChannelId?: string): url
 	return getCdnSignatureChannelId(url, fallbackChannelId) !== undefined;
 }
 
-export function parseSignedCdnMediaSrc(src?: string): { url: string; channelId: string; signature: string } | undefined {
+export function parseSignedCdnMediaSrc(src?: string, fallbackChannelId?: string): { url: string; channelId: string; signature: string } | undefined {
 	if (!src) return undefined;
 
 	let source = src;
@@ -54,7 +63,7 @@ export function parseSignedCdnMediaSrc(src?: string): { url: string; channelId: 
 	if (queryIndex === -1) return undefined;
 	const url = source.slice(0, queryIndex);
 	const signature = source.slice(queryIndex + 1);
-	const channelId = getCdnSignatureChannelId(url);
+	const channelId = getCdnSignatureChannelId(url, fallbackChannelId);
 	return signature && channelId ? { url, channelId, signature } : undefined;
 }
 

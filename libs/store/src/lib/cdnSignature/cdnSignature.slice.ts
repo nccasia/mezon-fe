@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { CDN_SIGNATURE_TTL_MS, isCdnSignatureExpired } from '@mezon/utils';
+import { getCdnSignatureTtlMs, isCdnSignatureExpired } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { CacheMetadata } from '../cache-metadata';
@@ -86,7 +86,10 @@ export const fetchCdnSignature = createAsyncThunk(
 			if (state.requestIdByChannelId[channelId]) return false;
 			const entry = state.byChannelId[channelId];
 			if (failedSignature !== undefined) {
-				return entry?.signature === failedSignature && isCdnSignatureExpired(failedSignature);
+				return (
+					entry?.signature === failedSignature &&
+					(isCdnSignatureExpired(failedSignature) ?? Date.now() - entry.cache.lastFetched >= CDN_SIGNATURE_RETRY_MS)
+				);
 			}
 			return noCache || !isCacheValid(entry?.cache);
 		}
@@ -113,7 +116,7 @@ export const cdnSignatureSlice = createSlice({
 				if (state.requestIdByChannelId[channelId] !== action.meta.requestId) return;
 				delete state.requestIdByChannelId[channelId];
 				if (outcome === 'signed') {
-					state.byChannelId[channelId] = { signature, cache: createCacheMetadata(CDN_SIGNATURE_TTL_MS) };
+					state.byChannelId[channelId] = { signature, cache: createCacheMetadata(getCdnSignatureTtlMs(signature)) };
 					return;
 				}
 				state.byChannelId[channelId] = {

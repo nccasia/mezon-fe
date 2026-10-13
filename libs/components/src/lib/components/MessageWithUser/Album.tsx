@@ -16,6 +16,7 @@ type OwnProps = {
 	isInSearchMessage?: boolean;
 	isSending?: boolean;
 	isPresignPendingForUrl?: (url?: string) => boolean;
+	isAwaitingSignatureForUrl?: (url?: string) => boolean;
 	isMobile?: boolean;
 	messageId?: string;
 	images?: ApiMessageAttachment[];
@@ -33,6 +34,7 @@ const Album: FC<OwnProps> = ({
 	isInSearchMessage,
 	isSending,
 	isPresignPendingForUrl,
+	isAwaitingSignatureForUrl,
 	isMobile,
 	messageId,
 	images
@@ -81,6 +83,7 @@ const Album: FC<OwnProps> = ({
 					localSource={(attachment as PreSendMediaAttachment)?.local_source}
 					loadWhenUnpending={!isPresignPending}
 					isInSearchMessage={isInSearchMessage}
+					isAwaitingSignature={isAwaitingSignatureForUrl?.(images?.[index]?.url)}
 				/>
 			);
 		} else if (video) {

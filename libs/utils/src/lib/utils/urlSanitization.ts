@@ -31,8 +31,6 @@ export const MEZON_CDN_DOMAINS = [
 	'https://cdn.komu.ai',
 	'https://cdn.mezon.ai',
 	'https://cdn.mezon.vn',
-	'https://cdn-dev.tx8.vn',
-	'https://pub-35517170c1554a008bed9d7565fa4bb2.r2.dev',
 	...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : []),
 	...(process.env.NX_CLOUDFLARE_CDN_URL ? [process.env.NX_CLOUDFLARE_CDN_URL] : [])
 ];

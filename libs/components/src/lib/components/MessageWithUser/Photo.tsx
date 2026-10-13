@@ -56,6 +56,8 @@ export type OwnProps<T> = {
 	localSource?: string;
 	loadWhenUnpending?: boolean;
 	isMobile?: boolean;
+	/** The CDN signature has not arrived yet: the photo stays behind its skeleton instead of loading unsigned. */
+	isAwaitingSignature?: boolean;
 };
 const Photo = <T,>({
 	id,
@@ -86,7 +88,8 @@ const Photo = <T,>({
 	isPresignPending = false,
 	localSource,
 	loadWhenUnpending = false,
-	isMobile
+	isMobile,
+	isAwaitingSignature = false
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -107,7 +110,12 @@ const Photo = <T,>({
 	const showLocalPreview = !!localSource && !localFailed;
 	const onLocalPreviewError = useCallback(() => setLocalFailed(true), []);
 
-	const shouldLoad = canAutoLoad && !isPresignPending && !showLocalPreview && (isSending || isIntersecting || isRecentlySent || loadWhenUnpending);
+	const shouldLoad =
+		canAutoLoad &&
+		!isPresignPending &&
+		!isAwaitingSignature &&
+		!showLocalPreview &&
+		(isSending || isIntersecting || isRecentlySent || loadWhenUnpending);
 
 	if (isSending && photo?.url) {
 		lastSentUrl = photo.url;
@@ -310,6 +318,7 @@ const PhotoImage = React.memo(
 
 		useEffect(() => {
 			setAspectType('square');
+			setHasError(false);
 		}, [url]);
 
 		const imgSrc = useMemo(() => {

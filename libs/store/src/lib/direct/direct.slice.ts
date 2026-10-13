@@ -417,7 +417,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			if (directMessageId !== '') {
 				thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 				thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
-				await thunkAPI.dispatch(cdnSignatureActions.fetchCdnSignature({ channelId: directMessageId }));
+				thunkAPI.dispatch(cdnSignatureActions.fetchCdnSignature({ channelId: directMessageId }));
 				thunkAPI.dispatch(
 					messagesActions.fetchMessages({
 						clanId: '0',

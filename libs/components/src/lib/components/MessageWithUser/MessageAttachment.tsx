@@ -146,11 +146,16 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 };
 
 type SignCdnUrl = <T extends string | undefined>(url: T) => T;
+type IsAwaitingSignature = (url?: string) => boolean;
 
-const signAttachment = (attachment: ApiMessageAttachment, signCdnUrl: SignCdnUrl): ApiMessageAttachment => ({
+const signAttachment = (
+	attachment: ApiMessageAttachment,
+	signCdnUrl: SignCdnUrl,
+	isAwaitingSignature?: IsAwaitingSignature
+): ApiMessageAttachment => ({
 	...attachment,
 	url: signCdnUrl(attachment.url),
-	thumbnail: signCdnUrl(attachment.thumbnail)
+	thumbnail: isAwaitingSignature?.(attachment.thumbnail) ? undefined : signCdnUrl(attachment.thumbnail)
 });
 
 const PrivateChannelMediaPlaceholder = () => {
@@ -175,16 +180,21 @@ const Attachments: React.FC<{
 	defaultMaxWidth?: number;
 }> = memo(
 	({ attachments, message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage, defaultMaxWidth }) => {
+		const classified = useMemo(() => classifyAttachments(attachments, message), [attachments, message]);
 		const cdnUrls = useMemo(() => attachments.flatMap((attachment) => [attachment.url, attachment.thumbnail]), [attachments]);
 		const { signCdnUrl, isAwaitingSignature, isSignatureDenied } = useCdnUrlSigner(cdnUrls, message.channel_id);
-		const signableAttachments = useMemo(
-			() => attachments.filter((attachment) => !isAwaitingSignature(attachment.url) && !isSignatureDenied(attachment.url)),
-			[attachments, isAwaitingSignature, isSignatureDenied]
-		);
-		const hasPrivateChannelMedia = attachments.some((attachment) => isSignatureDenied(attachment.url));
-		const classified = useMemo(() => classifyAttachments(signableAttachments, message), [signableAttachments, message]);
 
 		const { videos, images, documents, audio } = classified;
+		const isForwarded = !!message.content?.fwd;
+		const visibleVideos = useMemo(
+			() => (isForwarded ? videos.filter((video) => !isSignatureDenied(video.url)) : videos),
+			[isForwarded, videos, isSignatureDenied]
+		);
+		const visibleImages = useMemo(
+			() => (isForwarded ? images.filter((image) => !isSignatureDenied(image.url)) : images),
+			[isForwarded, images, isSignatureDenied]
+		);
+		const hasPrivateChannelMedia = visibleVideos.length < videos.length || visibleImages.length < images.length;
 		const presignFinishKeys = useMemo(() => parsePresignFinishKeys(message.content), [message.content]);
 		const presignAttachmentSource = message.attachments ?? attachments;
 		const isPresignPendingForUrl = useCallback(
@@ -197,12 +207,12 @@ const Attachments: React.FC<{
 			<>
 				{hasPrivateChannelMedia && <PrivateChannelMediaPlaceholder />}
 
-				{videos.length > 0 && (
+				{visibleVideos.length > 0 && (
 					<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
-						{videos.map((video, index) => (
+						{visibleVideos.map((video, index) => (
 							<div key={index} className="gap-y-2 max-w-full min-w-0">
 								<MessageVideo
-									attachmentData={signAttachment(video, signCdnUrl)}
+									attachmentData={signAttachment(video, signCdnUrl, isAwaitingSignature)}
 									isMobile={isMobile}
 									isSending={message.isSending}
 									isPresignPending={isPresignPendingForUrl(video.url)}
@@ -213,10 +223,10 @@ const Attachments: React.FC<{
 					</div>
 				)}
 
-				{images.length > 0 && (
+				{visibleImages.length > 0 && (
 					<ImageAlbum
 						observeIntersectionForLoading={observeIntersectionForLoading}
-						images={images}
+						images={visibleImages}
 						message={message}
 						mode={mode}
 						onContextMenu={onContextMenu}
@@ -225,6 +235,7 @@ const Attachments: React.FC<{
 						isMobile={isMobile}
 						isPresignPendingForUrl={isPresignPendingForUrl}
 						signCdnUrl={signCdnUrl}
+						isAwaitingSignature={isAwaitingSignature}
 					/>
 				)}
 
@@ -235,7 +246,8 @@ const Attachments: React.FC<{
 					documents.map((document, index) => (
 						<MessageLinkFile
 							key={`${index}_${document.url}`}
-							attachmentData={signAttachment(document, signCdnUrl)}
+							attachmentData={signAttachment(document, signCdnUrl, isAwaitingSignature)}
+							isCdnSignaturePending={isAwaitingSignature(document.url)}
 							mode={mode}
 							message={message}
 							isPresignPending={isPresignPendingForUrl(document.url)}
@@ -246,7 +258,7 @@ const Attachments: React.FC<{
 					audio.map((audioItem, index) => (
 						<MessageAudio
 							key={`${index}_${audioItem.url}`}
-							audioUrl={signCdnUrl(audioItem.url || '')}
+							audioUrl={isAwaitingSignature(audioItem.url) ? '' : signCdnUrl(audioItem.url || '')}
 							isPresignPending={isPresignPendingForUrl(audioItem.url)}
 						/>
 					))}
@@ -337,7 +349,8 @@ const ImageAlbum = memo(
 		defaultMaxWidth,
 		isMobile,
 		isPresignPendingForUrl,
-		signCdnUrl
+		signCdnUrl,
+		isAwaitingSignature
 	}: {
 		images: ApiMessageAttachment[];
 		message: IMessageWithUser;
@@ -349,6 +362,7 @@ const ImageAlbum = memo(
 		isMobile?: boolean;
 		isPresignPendingForUrl?: (url?: string) => boolean;
 		signCdnUrl: SignCdnUrl;
+		isAwaitingSignature: IsAwaitingSignature;
 	}) => {
 		const dispatch = useAppDispatch();
 
@@ -451,6 +465,7 @@ const ImageAlbum = memo(
 						isInSearchMessage={isInSearchMessage}
 						isSending={message.isSending}
 						isPresignPendingForUrl={isPresignPendingForUrl}
+						isAwaitingSignatureForUrl={isAwaitingSignature}
 						isMobile={isMobile}
 						messageId={message.id}
 						images={images}
@@ -479,6 +494,7 @@ const ImageAlbum = memo(
 						localSource={(firstImage as PreSendMediaAttachment)?.local_source}
 						loadWhenUnpending={!isPresignPending}
 						isMobile={isMobile}
+						isAwaitingSignature={isAwaitingSignature(firstImage?.url)}
 					/>
 				</div>
 			);

@@ -1,5 +1,7 @@
+import type { RootState } from '@mezon/store';
 import {
 	cdnSignatureActions,
+	getStore,
 	selectCdnSignatureEntry,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -21,6 +23,9 @@ export interface CdnUrlSigner {
 	isSignatureDenied: (url?: string) => boolean;
 }
 
+const selectOpenChannelId = (state: RootState) =>
+	(selectCurrentClanId(state) === '0' ? selectDmGroupCurrentId(state) : selectCurrentChannelId(state)) || undefined;
+
 /**
  * Signs each CDN url in `urls` with the signature of the channel its file was uploaded to, read from the url
  * itself, so a forwarded file or a topic reply is not signed with the channel showing it. An older upload, filed
@@ -30,10 +35,8 @@ export interface CdnUrlSigner {
  */
 export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>, shownInChannelId?: string): CdnUrlSigner {
 	const dispatch = useAppDispatch();
-	const openChannelId = useAppSelector((state) =>
-		selectCurrentClanId(state) === '0' ? selectDmGroupCurrentId(state) : selectCurrentChannelId(state)
-	);
-	const fallbackChannelId = shownInChannelId ?? openChannelId ?? undefined;
+	const openChannelId = useAppSelector(selectOpenChannelId);
+	const fallbackChannelId = shownInChannelId ?? openChannelId;
 	const channelKey = useMemo(
 		() => Array.from(new Set(urls.map((url) => getCdnSignatureChannelId(url, fallbackChannelId)).filter(Boolean))).join(','),
 		[urls, fallbackChannelId]
@@ -78,7 +81,8 @@ export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>, shownIn
 /**
  * Asks for a new signature when the CDN refuses signed media whose signature is past its own expiry, e.g. after the tab
  * slept through the 5-hour refresh. Mount it once for the app: it hears every media load error in the document. Media
- * failing on a signature still in date is broken for another reason, such as a deleted file, and asks for nothing.
+ * failing on a signature still in date is broken for another reason, such as a deleted file, and asks for nothing. A
+ * signature stating no expiry is renewed at most once per retry interval.
  */
 export function useCdnSignatureRefreshOnMediaError() {
 	const dispatch = useAppDispatch();
@@ -90,7 +94,8 @@ export function useCdnSignatureRefreshOnMediaError() {
 			let src: string | undefined;
 			if (target instanceof HTMLSourceElement) src = target.src;
 			else if (target instanceof HTMLImageElement || target instanceof HTMLMediaElement) src = target.currentSrc || target.src;
-			const media = parseSignedCdnMediaSrc(src);
+			// A folder-less older upload was signed with the channel showing it, taken here as the open one.
+			const media = parseSignedCdnMediaSrc(src, selectOpenChannelId(getStore().getState() as RootState));
 			if (!media) return;
 
 			const firstFailedSignature = firstFailedSignatureByUrl.get(media.url);

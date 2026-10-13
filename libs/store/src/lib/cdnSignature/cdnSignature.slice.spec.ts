@@ -23,6 +23,7 @@ jest.mock('../helpers', () => ({
 const {
 	appendCdnSignature,
 	getCdnSignatureChannelId,
+	getCdnSignatureTtlMs,
 	isCdnSignatureExpired,
 	needsCdnSignature,
 	parseSignedCdnMediaSrc,
@@ -179,13 +180,20 @@ describe('after the CDN refuses media', () => {
 		now.mockRestore();
 	});
 
-	it('leaves a signature that states no expiry to its 5-hour TTL', async () => {
+	it('renews a signature that states no expiry once the retry interval has passed', async () => {
+		const now = jest.spyOn(Date, 'now').mockReturnValue(1_000);
 		const store = createStore();
 		await signFirst(store, 'Expires=never&Signature=x');
 
+		now.mockReturnValue(30_999);
 		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: 'Expires=never&Signature=x' }));
-
 		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(1);
+
+		now.mockReturnValue(31_000);
+		mockGenerateCDNSignature.mockResolvedValueOnce({ signature: 'Expires=never&Signature=y' });
+		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: 'Expires=never&Signature=x' }));
+		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(2);
+		now.mockRestore();
 	});
 });
 
@@ -314,7 +322,10 @@ describe('getCdnSignatureChannelId', () => {
 		expect(getCdnSignatureChannelId('https://cdn.mezon.vn/0/1843962578301095936/1829065039080853500/dog.jpg', '42')).toBe('42');
 		expect(getCdnSignatureChannelId('https://cdn.mezon.ai/abc.png', '42')).toBe('42');
 		expect(getCdnSignatureChannelId('https://cdn.mezon.ai/abc.png', '0')).toBeUndefined();
-		expect(getCdnSignatureChannelId('https://cdn.mezon.ai/0000000000000000/abc.png', '42')).toBeUndefined();
+		expect(getCdnSignatureChannelId('https://cdn.mezon.ai/0000000000000000/abc.png', '42')).toBe('42');
+		expect(
+			getCdnSignatureChannelId('https://pub-35517170c1554a008bed9d7565fa4bb2.r2.dev/0000000000000000/2107048337029992454_Screenshot.png', '42')
+		).toBe('42');
 		expect(getCdnSignatureChannelId('https://cdn.mezon.ai/stickers/1779484504377790464.webp', '42')).toBeUndefined();
 		expect(getCdnSignatureChannelId('https://cdn.komu.vn/stickers/hellomezon.gif', '42')).toBeUndefined();
 		expect(getCdnSignatureChannelId('https://example.com/abc.png', '42')).toBeUndefined();
@@ -340,10 +351,31 @@ describe('isCdnSignatureExpired', () => {
 		expect(isCdnSignatureExpired(`${NOW / 1000 + 1}-x`, NOW)).toBe(false);
 	});
 
-	it('is false for a signature that states no expiry', () => {
-		expect(isCdnSignatureExpired('abc', NOW)).toBe(false);
-		expect(isCdnSignatureExpired('Expires=1&Signature=x', NOW)).toBe(false);
-		expect(isCdnSignatureExpired('', NOW)).toBe(false);
+	it('is undefined for a signature that states no expiry', () => {
+		expect(isCdnSignatureExpired('abc', NOW)).toBeUndefined();
+		expect(isCdnSignatureExpired('Expires=1&Signature=x', NOW)).toBeUndefined();
+		expect(isCdnSignatureExpired('', NOW)).toBeUndefined();
+	});
+});
+
+describe('getCdnSignatureTtlMs', () => {
+	const NOW = 1_791_259_679_000;
+	const MARGIN = 5 * 60 * 1000;
+
+	it('is 5 hours while the signature outlives them', () => {
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 24 * 3600}-x`, NOW)).toBe(TTL_MS);
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 5 * 3600 + MARGIN / 1000}-x`, NOW)).toBe(TTL_MS);
+	});
+
+	it('ends a margin before an earlier expiry the signature starts with', () => {
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 5 * 3600}-x`, NOW)).toBe(TTL_MS - MARGIN);
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 3600}-x`, NOW)).toBe(3600 * 1000 - MARGIN);
+	});
+
+	it('is 5 hours without a believable expiry', () => {
+		expect(getCdnSignatureTtlMs('abc', NOW)).toBe(TTL_MS);
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 - 60}-x`, NOW)).toBe(TTL_MS);
+		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 6 * 60}-x`, NOW)).toBe(TTL_MS);
 	});
 });
 
@@ -365,6 +397,16 @@ describe('parseSignedCdnMediaSrc', () => {
 		expect(parseSignedCdnMediaSrc('https://cdn.mezon.ai/0000000000000000/abc.png?sig=1')).toBeUndefined();
 		expect(parseSignedCdnMediaSrc('https://example.com/198b4ed087001000/abc.png?sig=1')).toBeUndefined();
 		expect(parseSignedCdnMediaSrc(undefined)).toBeUndefined();
+	});
+
+	it('gives a folder-less older upload the fallback channel', () => {
+		expect(parseSignedCdnMediaSrc('https://cdn.mezon.ai/abc.png?sig=1', '42')).toEqual({
+			url: 'https://cdn.mezon.ai/abc.png',
+			channelId: '42',
+			signature: 'sig=1'
+		});
+		expect(parseSignedCdnMediaSrc('https://cdn.mezon.ai/abc.png?sig=1')).toBeUndefined();
+		expect(parseSignedCdnMediaSrc(SIGNED, '42')).toEqual(MEDIA);
 	});
 });
 
@@ -389,13 +431,16 @@ describe('appendCdnSignature', () => {
 		expect(appendCdnSignature('https://cdn.mezon.ai/1775731111020111321/abc.png', 'sig=1')).toBe(
 			'https://cdn.mezon.ai/1775731111020111321/abc.png?sig=1'
 		);
+		expect(appendCdnSignature('https://cdn.mezon.ai/0000000000000000/abc.png', 'sig=1')).toBe(
+			'https://cdn.mezon.ai/0000000000000000/abc.png?sig=1'
+		);
 	});
 
 	it('leaves non-CDN, already signed, channel-less and unsigned urls alone', () => {
 		expect(appendCdnSignature('https://example.com/abc.png', 'sig=1')).toBe('https://example.com/abc.png');
 		expect(appendCdnSignature('blob:http://localhost/123', 'sig=1')).toBe('blob:http://localhost/123');
 		expect(appendCdnSignature(`${CHANNEL_FILE}?sig=1`, 'sig=2')).toBe(`${CHANNEL_FILE}?sig=1`);
-		expect(appendCdnSignature('https://cdn.mezon.ai/0000000000000000/abc.png', 'sig=1')).toBe('https://cdn.mezon.ai/0000000000000000/abc.png');
+		expect(appendCdnSignature('https://cdn.mezon.ai/stickers/hello.webp', 'sig=1')).toBe('https://cdn.mezon.ai/stickers/hello.webp');
 		expect(appendCdnSignature(CHANNEL_FILE, undefined)).toBe(CHANNEL_FILE);
 		expect(appendCdnSignature(undefined, 'sig=1')).toBeUndefined();
 	});
