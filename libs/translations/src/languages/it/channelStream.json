@@ -6,5 +6,6 @@
 	"joinStream": "Partecipa alla diretta",
 	"noStreamToday": "Nessuna diretta oggi",
 	"hideMembers": "Nascondi membri",
-	"showMembers": "Mostra membri"
+	"showMembers": "Mostra membri",
+	"duplicateSessionDisconnected": "Disconnesso perché il tuo account ha partecipato a una diretta o a un canale vocale in un’altra sessione."
 }

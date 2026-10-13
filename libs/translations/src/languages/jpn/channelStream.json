@@ -6,5 +6,6 @@
 	"joinStream": "ストリームに参加",
 	"noStreamToday": "今日ストリームはありません",
 	"hideMembers": "メンバーを非表示",
-	"showMembers": "メンバーを表示"
+	"showMembers": "メンバーを表示",
+	"duplicateSessionDisconnected": "アカウントが別のセッションでストリームまたはボイスチャンネルに参加したため、切断されました。"
 }

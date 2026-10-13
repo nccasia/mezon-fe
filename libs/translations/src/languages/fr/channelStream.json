@@ -6,5 +6,6 @@
 	"joinStream": "Rejoindre le streaming",
 	"noStreamToday": "Aucun streaming aujourd'hui",
 	"hideMembers": "Masquer les membres",
-	"showMembers": "Afficher les membres"
+	"showMembers": "Afficher les membres",
+	"duplicateSessionDisconnected": "Déconnecté, car votre compte a rejoint un streaming ou un salon vocal dans une autre session."
 }
