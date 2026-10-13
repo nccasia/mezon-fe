@@ -26,10 +26,16 @@ export function isTenorUrl(url: string | undefined): boolean {
 	return isFromAllowedDomain(url, ['https://static.klipy.com']);
 }
 
-export const MEZON_CDN_DOMAINS = [...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : [])];
+export const MEZON_CDN_DOMAINS = [...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : ['https://cdn.mezon.ai'])];
+
+export const CLOUDFLARE_CDN_DOMAINS = [...(process.env.NX_CLOUDFLARE_CDN_URL ? [process.env.NX_CLOUDFLARE_CDN_URL] : ['https://cdn.komu.vn'])];
 
 export function isMezonCdnUrl(url: string | undefined): boolean {
-	return isFromAllowedDomain(url, MEZON_CDN_DOMAINS);
+	return isFromAllowedDomain(url, MEZON_CDN_DOMAINS) || isCloudflareCdnUrl(url);
+}
+
+export function isCloudflareCdnUrl(url: string | undefined): boolean {
+	return isFromAllowedDomain(url, CLOUDFLARE_CDN_DOMAINS);
 }
 
 export function sanitizeUrl(url: string | undefined, options: SecureURLOptions = {}): string {

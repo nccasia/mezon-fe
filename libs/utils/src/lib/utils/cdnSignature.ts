@@ -1,4 +1,4 @@
-import { isMezonCdnUrl } from './urlSanitization';
+import { isCloudflareCdnUrl, isMezonCdnUrl } from './urlSanitization';
 
 export const CDN_SIGNATURE_TTL_MS = 5 * 60 * 60 * 1000;
 const CDN_SIGNATURE_REFRESH_MARGIN_MS = 5 * 60 * 1000;
@@ -21,7 +21,7 @@ const CHANNEL_FOLDER_RE = /\/([0-9a-fA-F]{16})\/[^/]+$/;
 const PUBLIC_CDN_FOLDERS = new Set(['stickers', 'emojis', 'sounds']);
 
 function readCdnChannelFolder(url?: string): string | null | undefined {
-	if (!url || url.includes('?') || !isMezonCdnUrl(url)) return undefined;
+	if (!url || url.includes('?') || !isMezonCdnUrl(url) || isCloudflareCdnUrl(url)) return undefined;
 
 	let pathname: string;
 	try {
