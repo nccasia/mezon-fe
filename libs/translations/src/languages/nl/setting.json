@@ -47,7 +47,18 @@
 		"advanced": "Geavanceerd",
 		"appVersion": "App-versie",
 		"startUp": "Opstarten",
-		"quitApp": "App afsluiten"
+		"quitApp": "App afsluiten",
+		"server": "Server"
+	},
+	"server": {
+		"auto": "Automatisch",
+		"autoHint": "Kiest een server voor je",
+		"inUse": "Gebruikt {{region}}",
+		"vietnam": "Vietnam",
+		"unitedStates": "Verenigde Staten",
+		"connectedTo": "Verbonden met {{region}}",
+		"connectingTo": "Verbinden met {{region}}…",
+		"footer": "Automatisch: Kiest een server voor je. Kies een server als je er altijd op wilt blijven."
 	},
 	"autoStart": {
 		"title": "App automatisch starten",

@@ -1044,6 +1044,10 @@ export const DATA_E2E_IDENTIFIER = {
 				language_name: ''
 			}
 		},
+		server: {
+			tab_server: '',
+			server_item: ''
+		},
 		profile: {
 			button_setting: '',
 			tab_profile: '',

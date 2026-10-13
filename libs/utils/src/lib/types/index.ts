@@ -1111,6 +1111,7 @@ export enum EUserSettings {
 	NOTIFICATIONS = 'Notifications',
 	KEYBINDS = 'Keybinds',
 	LANGUAGE = 'Language',
+	SERVER = 'Server',
 	VOICE = 'Voice',
 	STREAMER_MODE = 'Streamer Mode',
 	ADVANCED = 'Advanced',
