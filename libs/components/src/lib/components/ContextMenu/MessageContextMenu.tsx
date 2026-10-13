@@ -659,8 +659,7 @@ function MessageContextMenu({
 		}
 		return '';
 	}, [imageSrc, message?.content?.embed]);
-	// `urlImage` stays unsigned so a copied link does not expire with its signature; open, copy image and save sign it on use.
-	const { signCdnUrl } = useCdnUrlSigner([urlImage]);
+	const { signCdnUrl } = useCdnUrlSigner([urlImage], message?.channel_id);
 
 	useMemo(() => {
 		if (isClickedEmoji) {
@@ -955,7 +954,8 @@ function MessageContextMenu({
 		builder.when(enableCopyLinkItem, (builder) => {
 			builder.addMenuItem('copyLink', t('copyLink'), async () => {
 				try {
-					const contentToCopy = isLinkContent && linkContent ? linkContent : checkElementIsImage ? urlImage : (message?.content?.t ?? '');
+					const contentToCopy =
+						isLinkContent && linkContent ? linkContent : checkElementIsImage ? signCdnUrl(urlImage) : (message?.content?.t ?? '');
 					await handleCopyLink(contentToCopy);
 				} catch (error) {
 					console.error(t('errors.failedToCopyLink'), error);

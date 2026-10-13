@@ -79,7 +79,7 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 
 	const isPresignPendingForUrl = useCallback((url?: string) => isAttachmentPresignPendingForMessage(url, message), [message]);
 	const cdnUrls = useMemo(() => validateAttachment.flatMap((attachment) => [attachment.url, attachment.thumbnail]), [validateAttachment]);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner(cdnUrls);
+	const { signCdnUrl } = useCdnUrlSigner(cdnUrls, message.channel_id);
 
 	// Topic rows are the ones users reported stuck: the presign update lands on the
 	// parent channel copy and the topic copy never hears about it.
@@ -170,9 +170,9 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 							item.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) ||
 							item.filetype?.includes(EMimeTypes.mp4) ||
 							item.filetype?.includes(EMimeTypes.mov);
-						const isMediaPending = isPresignPendingForUrl(item.url) || isAwaitingSignature(item.url);
+						const isPresignPending = isPresignPendingForUrl(item.url);
 
-						const thumbnailUrl = isMediaPending
+						const thumbnailUrl = isPresignPending
 							? undefined
 							: isVideo
 								? item.thumbnail
@@ -198,13 +198,13 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 							<div
 								key={`${item.url}-${index}`}
 								className={`relative w-[50px] h-[50px] rounded-lg overflow-hidden transition-opacity ${
-									isMediaPending ? 'cursor-default' : 'cursor-pointer hover:opacity-90'
+									isPresignPending ? 'cursor-default' : 'cursor-pointer hover:opacity-90'
 								}`}
 								onClick={() => handleClick(item)}
 							>
 								{thumbnailUrl ? (
 									<img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
-								) : isVideo && item.url && !isMediaPending ? (
+								) : isVideo && item.url && !isPresignPending ? (
 									<video src={signCdnUrl(item.url)} className="w-full h-full object-cover" muted playsInline preload="none" />
 								) : (
 									<div className="w-full h-full bg-bgLightSecondary dark:bg-bgSecondary" />
@@ -229,12 +229,7 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 			{audio.length > 0 &&
 				audio
 					.filter((audioItem) => !isPresignPendingForUrl(audioItem.url))
-					.map((audioItem, index) => (
-						<MessageAudio
-							key={`${index}_${audioItem.url}`}
-							audioUrl={isAwaitingSignature(audioItem.url) ? '' : signCdnUrl(audioItem.url || '')}
-						/>
-					))}
+					.map((audioItem, index) => <MessageAudio key={`${index}_${audioItem.url}`} audioUrl={signCdnUrl(audioItem.url || '')} />)}
 		</div>
 	);
 });

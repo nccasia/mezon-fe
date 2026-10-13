@@ -26,22 +26,16 @@ export function isTenorUrl(url: string | undefined): boolean {
 	return isFromAllowedDomain(url, ['https://static.klipy.com']);
 }
 
-/**
- * Hosts that serve attachments uploaded through a presigned URL. Keep this in
- * step with `createImgproxyUrl`: an attachment the proxy is willing to fetch but
- * this list does not cover would slip past the presign gate and let imgproxy
- * cache a not-found for an object that has not finished uploading.
- */
-export const MEZON_CDN_DOMAINS = [
-	'https://cdn.komu.vn',
-	'https://cdn.komu.ai',
-	'https://cdn.mezon.ai',
-	'https://cdn.mezon.vn',
-	...(process.env.NX_CLOUDFLARE_CDN_URL ? [process.env.NX_CLOUDFLARE_CDN_URL] : [])
-];
+export const MEZON_CDN_DOMAINS = [...(process.env.NX_MEZON_CDN_URL ? [process.env.NX_MEZON_CDN_URL] : ['https://cdn.mezon.ai'])];
+
+export const CLOUDFLARE_CDN_DOMAINS = [...(process.env.NX_CLOUDFLARE_CDN_URL ? [process.env.NX_CLOUDFLARE_CDN_URL] : ['https://cdn.komu.vn'])];
 
 export function isMezonCdnUrl(url: string | undefined): boolean {
-	return isFromAllowedDomain(url, MEZON_CDN_DOMAINS);
+	return isFromAllowedDomain(url, MEZON_CDN_DOMAINS) || isCloudflareCdnUrl(url);
+}
+
+export function isCloudflareCdnUrl(url: string | undefined): boolean {
+	return isFromAllowedDomain(url, CLOUDFLARE_CDN_DOMAINS);
 }
 
 export function sanitizeUrl(url: string | undefined, options: SecureURLOptions = {}): string {
