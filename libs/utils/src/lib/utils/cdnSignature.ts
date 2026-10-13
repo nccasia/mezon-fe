@@ -32,7 +32,7 @@ function readCdnChannelFolder(url?: string): string | null | undefined {
 
 	if (PUBLIC_CDN_FOLDERS.has(pathname.split('/')[1]?.toLowerCase())) return '0';
 	const hex = CHANNEL_FOLDER_RE.exec(pathname)?.[1];
-	return hex && /[^0]/.test(hex) ? BigInt(`0x${hex}`).toString() : null;
+	return hex ? BigInt(`0x${hex}`).toString() : null;
 }
 
 export function getCdnSignatureChannelId(url?: string, fallbackChannelId?: string): string | undefined {
