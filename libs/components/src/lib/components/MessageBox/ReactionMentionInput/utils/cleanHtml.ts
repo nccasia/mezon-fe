@@ -70,7 +70,7 @@ export function escapeHtml(html: string) {
 export const clearMentionReplacer = (html: string) => {
 	const doc = new DOMParser().parseFromString(html, 'text/html');
 
-	doc.querySelectorAll('a.text-entity-link.mention[data-user-id]').forEach((element) => {
+	doc.querySelectorAll('a[data-entity-type="MessageEntityMentionName"][data-user-id]').forEach((element) => {
 		element.replaceWith(doc.createTextNode(element.textContent ?? ''));
 	});
 

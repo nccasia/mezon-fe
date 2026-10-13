@@ -983,7 +983,10 @@ const MentionsInputComponent = forwardRef<MentionsInputHandle, MentionsInputProp
 
 				if (containsMentionEntities && htmlContent) {
 					const cleanedHtml = preparePastedHtml(htmlContent);
-					contentToInsert = clearMentionReplacer(cleanedHtml);
+					contentToInsert = cleanedHtml;
+					if (cleanedHtml.trim() !== inputRef.current?.innerHTML.trim()) {
+						contentToInsert = clearMentionReplacer(cleanedHtml);
+					}
 				} else if (htmlContent) {
 					contentToInsert = (renderText(plainText || '', ['escape_html', 'br_html']) as string[]).join('').replace(/\u200b+/g, '\u200b');
 				} else {
