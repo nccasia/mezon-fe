@@ -1,3 +1,4 @@
+import { useCdnUrlSigner } from '@mezon/core';
 import {
 	attachmentActions,
 	getStore,
@@ -77,6 +78,8 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 	}, [message.attachments, message.content, messageCreateTimeSeconds]);
 
 	const isPresignPendingForUrl = useCallback((url?: string) => isAttachmentPresignPendingForMessage(url, message), [message]);
+	const cdnUrls = useMemo(() => validateAttachment.flatMap((attachment) => [attachment.url, attachment.thumbnail]), [validateAttachment]);
+	const { signCdnUrl } = useCdnUrlSigner(cdnUrls, message.channel_id);
 
 	// Topic rows are the ones users reported stuck: the presign update lands on the
 	// parent channel copy and the topic copy never hears about it.
@@ -173,19 +176,19 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 							? undefined
 							: isVideo
 								? item.thumbnail
-									? createImgproxyUrl(item.thumbnail, {
+									? createImgproxyUrl(signCdnUrl(item.thumbnail), {
 											width: 120,
 											height: 120,
 											resizeType: 'fill'
 										})
 									: item.url
-										? createImgproxyUrl(item.url, {
+										? createImgproxyUrl(signCdnUrl(item.url), {
 												width: 120,
 												height: 120,
 												resizeType: 'fill'
 											})
 										: undefined
-								: createImgproxyUrl(item.url || '', {
+								: createImgproxyUrl(signCdnUrl(item.url || ''), {
 										width: 120,
 										height: 120,
 										resizeType: 'fill'
@@ -202,7 +205,7 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 								{thumbnailUrl ? (
 									<img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
 								) : isVideo && item.url && !isPresignPending ? (
-									<video src={item.url} className="w-full h-full object-cover" muted playsInline preload="none" />
+									<video src={signCdnUrl(item.url)} className="w-full h-full object-cover" muted playsInline preload="none" />
 								) : (
 									<div className="w-full h-full bg-bgLightSecondary dark:bg-bgSecondary" />
 								)}
@@ -226,7 +229,7 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 			{audio.length > 0 &&
 				audio
 					.filter((audioItem) => !isPresignPendingForUrl(audioItem.url))
-					.map((audioItem, index) => <MessageAudio key={`${index}_${audioItem.url}`} audioUrl={audioItem.url || ''} />)}
+					.map((audioItem, index) => <MessageAudio key={`${index}_${audioItem.url}`} audioUrl={signCdnUrl(audioItem.url || '')} />)}
 		</div>
 	);
 });

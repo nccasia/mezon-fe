@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import type { IAttachmentEntity, IChannelAttachment, LoadingStatus } from '@mezon/utils';
-import { AttachmentTypeUpload, EMimeTypes, ETypeLinkMedia } from '@mezon/utils';
+import { AttachmentTypeUpload, EMimeTypes, ETypeLinkMedia, isMediaTypeNotSupported } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type { ApiChannelAttachment, ChannelStreamMode } from 'mezon-js';
@@ -183,7 +183,8 @@ export const multipartUploadAttachmentFileStart = createAsyncThunk(
 			size,
 			width = 0,
 			height = 0,
-			partCount = 1
+			partCount = 1,
+			channelId
 		}: {
 			filename: string;
 			filetype: string;
@@ -191,6 +192,7 @@ export const multipartUploadAttachmentFileStart = createAsyncThunk(
 			width?: number;
 			height?: number;
 			partCount?: number;
+			channelId?: string;
 		},
 		thunkAPI
 	) => {
@@ -200,7 +202,8 @@ export const multipartUploadAttachmentFileStart = createAsyncThunk(
 			size,
 			...(width > 0 ? { width } : {}),
 			...(height > 0 ? { height } : {}),
-			...(partCount > 0 ? { part_count: partCount } : {})
+			...(partCount > 0 ? { part_count: partCount } : {}),
+			...(channelId ? { channel_id: channelId } : {})
 		};
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -349,6 +352,20 @@ export const attachmentSlice = createSlice({
 				hasMoreAfter: true,
 				limit: 50
 			};
+		},
+		setChannelAttachments: (
+			state,
+			action: PayloadAction<{ channelId: string; attachments: AttachmentEntity[]; hasMoreBefore: boolean; hasMoreAfter: boolean }>
+		) => {
+			const { channelId, attachments, hasMoreBefore, hasMoreAfter } = action.payload;
+			if (!state.listAttachmentsByChannel[channelId]) {
+				state.listAttachmentsByChannel[channelId] = getInitialChannelState();
+			}
+			const channelState = state.listAttachmentsByChannel[channelId];
+			channelState.attachments = attachments;
+			channelState.cache = undefined;
+			channelState.pagination = { isLoading: false, hasMoreBefore, hasMoreAfter, limit: channelState.pagination?.limit ?? 50 };
+			attachmentAdapter.setAll(state, attachments);
 		},
 		clearAttachmentChannel: (state, action: PayloadAction<{ channelId: string }>) => {
 			const { channelId } = action.payload;
@@ -504,10 +521,11 @@ export const selectAllListAttachmentByChannel = createSelector([getAttachmentSta
 	}
 	return state.listAttachmentsByChannel[channelId]?.attachments?.filter(
 		(att) =>
-			att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) ||
-			att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) ||
-			att?.filetype?.includes(EMimeTypes.mp4) ||
-			att?.filetype?.includes(EMimeTypes.mov)
+			!isMediaTypeNotSupported(att?.filetype, att?.url) &&
+			(att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) ||
+				att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) ||
+				att?.filetype?.includes(EMimeTypes.mp4) ||
+				att?.filetype?.includes(EMimeTypes.mov))
 	);
 });
 

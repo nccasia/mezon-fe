@@ -1,5 +1,5 @@
 import { useAppNavigation, useAuth } from '@mezon/core';
-import { authActions, selectIsLogin, toastActions } from '@mezon/store';
+import { authActions, cdnSignatureActions, selectIsLogin, toastActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 
 import { QRSection } from '@mezon/components';
@@ -31,6 +31,7 @@ function Login() {
 			sessionRef.current = null;
 		}
 		dispatch(authActions.resetSession());
+		dispatch(cdnSignatureActions.removeAll());
 		dispatch(toastActions.clearAllToastErrors());
 	}, []);
 

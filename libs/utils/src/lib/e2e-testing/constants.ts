@@ -559,6 +559,8 @@ export const DATA_E2E_IDENTIFIER = {
 				icon: {
 					hashtag: '',
 					hashtag_lock: '',
+					speaker: '',
+					speaker_lock: '',
 					voice: '',
 					stream: ''
 				},
@@ -611,7 +613,12 @@ export const DATA_E2E_IDENTIFIER = {
 					kick: '',
 					mute_mic: '',
 					record: '',
-					open_context: ''
+					open_context: '',
+					open_interactive_apps: ''
+				},
+				interactive_apps: {
+					item: '',
+					window: ''
 				},
 				time_record: '',
 				username: ''
@@ -641,6 +648,17 @@ export const DATA_E2E_IDENTIFIER = {
 			item: '',
 			channel_label: ''
 		},
+		overview: {
+			input: {
+				channel_name: '',
+				channel_topic: ''
+			}
+		},
+		category: {
+			channel_name: '',
+			dropdown: '',
+			item: ''
+		},
 		permissions: {
 			button: {
 				change_status: ''
@@ -666,10 +684,12 @@ export const DATA_E2E_IDENTIFIER = {
 						}
 					},
 					role_list: {
-						role_item: ''
+						role_item: '',
+						button_remove: ''
 					},
 					member_list: {
-						member_item: ''
+						member_item: '',
+						button_remove: ''
 					}
 				},
 				advanced_permissions: '',
@@ -1023,6 +1043,10 @@ export const DATA_E2E_IDENTIFIER = {
 			language_item: {
 				language_name: ''
 			}
+		},
+		server: {
+			tab_server: '',
+			server_item: ''
 		},
 		profile: {
 			button_setting: '',

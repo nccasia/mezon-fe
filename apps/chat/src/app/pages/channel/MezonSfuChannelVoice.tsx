@@ -16,6 +16,7 @@ import {
 	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
 	selectMemberByIdAndClanId,
+	selectSfuUrlJoinVoice,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectStatusMenu,
@@ -84,6 +85,7 @@ interface VoiceConferenceContentProps {
 	isVoiceFullScreen: boolean;
 	handleToggleChat: () => void;
 	isPrivateVoice?: boolean;
+	onRefreshToken?: () => Promise<string | undefined>;
 }
 
 const VoiceConferenceContent = memo(
@@ -98,7 +100,8 @@ const VoiceConferenceContent = memo(
 		isShowChatVoice,
 		isVoiceFullScreen,
 		handleToggleChat,
-		isPrivateVoice
+		isPrivateVoice,
+		onRefreshToken
 	}: VoiceConferenceContentProps) => {
 		return (
 			<div className="flex-1 relative flex overflow-hidden">
@@ -115,6 +118,7 @@ const VoiceConferenceContent = memo(
 					onFullScreen={handleFullScreen}
 					onToggleChat={handleToggleChat}
 					isPrivateVoice={isPrivateVoice}
+					onRefreshToken={onRefreshToken}
 				/>
 				<EmojiSuggestionProvider>
 					{isShowChatVoice && (
@@ -150,6 +154,7 @@ const VoiceConferenceContainer = memo(({ containerRef, isOpenPopOut, rejoinTarge
 
 const MezonSfuChannelVoiceInner = () => {
 	const token = useSelector(selectTokenJoinVoice);
+	const sfuUrl = useSelector(selectSfuUrlJoinVoice);
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [joinRole, setJoinRole] = useState<SfuJoinRole>('speaker');
@@ -158,7 +163,7 @@ const MezonSfuChannelVoiceInner = () => {
 	const joinRequestRef = useRef(0);
 	const joiningRef = useRef(false);
 	const dispatch = useAppDispatch();
-	const serverUrl = process.env.NX_CHAT_APP_SFU_WS_URL;
+	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
 	const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 	const isShowChatVoice = useSelector(selectIsShowChatVoice);
 	const currentChannelType = useSelector(selectCurrentChannelType);
@@ -221,9 +226,7 @@ const MezonSfuChannelVoiceInner = () => {
 		try {
 			const clanMember = selectMemberByIdAndClanId(storeState, currentClanId, userProfile?.user?.id || '');
 			const username = clanMember?.clan_nick || clanMember?.prioritizeName || userProfile?.user?.display_name || userProfile?.user?.username;
-
 			const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
-
 			const metadata = username || avatar ? `${username};${avatar}` : '';
 			const result = await dispatch(
 				generateMeetToken({
@@ -234,7 +237,7 @@ const MezonSfuChannelVoiceInner = () => {
 			).unwrap();
 			if (request !== joinRequestRef.current) return;
 
-			if (result) {
+			if (result?.token) {
 				dispatch(voiceActions.setJoined(true));
 				dispatch(
 					voiceActions.setVoiceInfo({
@@ -246,7 +249,8 @@ const MezonSfuChannelVoiceInner = () => {
 						joinRole: role
 					})
 				);
-				dispatch(voiceActions.setToken(result));
+				dispatch(voiceActions.setSfuUrl(result.url));
+				dispatch(voiceActions.setToken(result.token));
 				setRejoinTarget(null);
 			} else {
 				dispatch(voiceActions.setToken(''));
@@ -260,6 +264,32 @@ const MezonSfuChannelVoiceInner = () => {
 				joiningRef.current = false;
 				setLoading(false);
 			}
+		}
+	});
+
+	const handleRefreshToken = useLastCallback(async () => {
+		const channelId = voiceInfo?.channelId;
+		const clanId = voiceInfo?.clanId;
+		if (!channelId || !clanId) return undefined;
+		const storeState = getStore().getState();
+		const userProfile = storeState.account.userProfile;
+		const clanMember = selectMemberByIdAndClanId(storeState, clanId, userProfile?.user?.id || '');
+		const username = clanMember?.clan_nick || clanMember?.prioritizeName || userProfile?.user?.display_name || userProfile?.user?.username;
+		const avatar = clanMember?.clan_avatar || userProfile?.user?.avatar_url;
+		const metadata = username || avatar ? `${username};${avatar}` : '';
+		try {
+			const result = await dispatch(
+				generateMeetToken({
+					channelId,
+					roomName: '',
+					metadata
+				})
+			).unwrap();
+			if (result?.url) dispatch(voiceActions.setSfuUrl(result.url));
+			return result?.token;
+		} catch (err) {
+			console.error('Failed to refresh voice token:', err);
+			return undefined;
 		}
 	});
 
@@ -327,6 +357,7 @@ const MezonSfuChannelVoiceInner = () => {
 									isShowChatVoice={isShowChatVoice}
 									isVoiceFullScreen={!!isVoiceFullScreen}
 									handleToggleChat={handleToggleChat}
+									onRefreshToken={handleRefreshToken}
 								/>
 							) : (
 								<div className="flex h-full w-full flex-col p-5 text-textSecondary">

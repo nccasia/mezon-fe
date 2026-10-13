@@ -81,6 +81,7 @@ export { default as SettingDevices } from './components/SettingDevices';
 export { SettingLanguage } from './components/SettingLanguage';
 export { default as SettingNotifications } from './components/SettingNotifications';
 export * from './components/SettingProfile';
+export { SettingServer } from './components/SettingServer';
 export { SettingVoice } from './components/SettingVoice';
 export { default as MzToast } from './components/ToastController/MzToast';
 export { default as ToastController } from './components/ToastController/ToastController';
@@ -125,9 +126,11 @@ export { default as ModalInputMessageBuzz } from './components/ModalInputMessage
 export * from './components/MezonSfuVoiceChannel';
 export * from './components/virtual-core/useVirtualizer';
 
+export * from './components/PreJoinCalling/BackgroundSelector';
 export * from './components/PreJoinCalling/ControlButton';
 export * from './components/PreJoinCalling/JoinForm';
 export * from './components/PreJoinCalling/VideoPreview';
+export * from './components/PreJoinCalling/mediaPipeBackground';
 
 export * from './components/ButtonSwitchCustom';
 export { default as ButtonCopy } from './components/ButtonSwitchCustom/CopyButtonComponent';

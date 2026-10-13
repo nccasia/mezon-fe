@@ -58,12 +58,55 @@ export const canReactivateMid = (retired: RetiredSource | undefined, next: MsidO
 export const isRemoteScreenSharing = (participant: SfuRemoteMedia) =>
 	participant.screen?.readyState === 'live' && participant.screenActive === true && participant.screenRequested !== false;
 
+const normalizeMetadataField = (value: unknown): string | undefined => {
+	if (typeof value !== 'string') return undefined;
+	const trimmed = value.trim();
+	if (!trimmed || trimmed === 'undefined') return undefined;
+	return trimmed;
+};
+
+const parsePeerMetadataJson = (raw: string): { username?: string; avatar?: string } | null | 'invalid-json' => {
+	const trimmed = raw.trim();
+	if (!trimmed.startsWith('{')) return 'invalid-json';
+	const json = safeJSONParse(trimmed);
+	if (!json || typeof json !== 'object' || Array.isArray(json)) return 'invalid-json';
+	const record = json as Record<string, unknown>;
+	const username = normalizeMetadataField(record.username);
+	const avatar = normalizeMetadataField(record.avatar);
+	if (!username && !avatar) return null;
+	return { username, avatar };
+};
+
+const parsePeerMetadataLegacy = (raw: string): { username?: string; avatar?: string } | null => {
+	const trimmed = raw.trim();
+	if (!trimmed) return null;
+	const sep = trimmed.lastIndexOf(';');
+	if (sep === -1) {
+		const username = normalizeMetadataField(trimmed);
+		return username ? { username } : null;
+	}
+	const username = normalizeMetadataField(trimmed.slice(0, sep));
+	const avatar = normalizeMetadataField(trimmed.slice(sep + 1));
+	if (!username && !avatar) return null;
+	return { username, avatar };
+};
+
+const parsePeerMetadata = (raw?: string): { username?: string; avatar?: string } | null => {
+	if (!raw) return null;
+	const trimmed = raw.trim();
+	if (!trimmed) return null;
+
+	const jsonResult = parsePeerMetadataJson(trimmed);
+	if (jsonResult !== 'invalid-json') return jsonResult;
+	return parsePeerMetadataLegacy(trimmed);
+};
+
 export const mergeRemotePeerState = (participant: SfuRemoteMedia, peer: SfuPeer): SfuRemoteMedia => {
 	const peerId = String(peer.peer_id);
 	const changedOwner =
 		(participant.peerId && participant.peerId !== peerId) || (participant.userId && peer.user_id && participant.userId !== peer.user_id);
 	const current: SfuRemoteMedia = changedOwner ? { id: participant.id } : participant;
-	const metaPeer = peer.metadata ? (safeJSONParse(peer.metadata) as { username?: string; avatar?: string }) : null;
+	const metaPeer = parsePeerMetadata(peer.metadata);
 	return {
 		...current,
 		peerId,

@@ -1,3 +1,4 @@
+import { useCdnUrlSigner } from '@mezon/core';
 import type { AttachmentEntity } from '@mezon/store';
 import { attachmentActions, selectMessageByMessageId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { EMimeTypes, ETypeLinkMedia, createImgproxyUrl, isAttachmentPresignPendingForMessage } from '@mezon/utils';
@@ -24,6 +25,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 		attachment.message_id && channelId ? selectMessageByMessageId(state, channelId, attachment.message_id) : undefined
 	);
 	const isPresignPending = isAttachmentPresignPendingForMessage(attachment.url, sourceMessage);
+	const { signCdnUrl } = useCdnUrlSigner([attachment.url], channelId);
 
 	const handleSelectImage = () => {
 		if (isPresignPending) return;
@@ -38,15 +40,14 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 		attachment.filetype?.includes(EMimeTypes.mp4) ||
 		attachment.filetype?.includes(EMimeTypes.mov);
 
-	const thumbnailClassName = `size-[88px] max-w-[88px] max-h-[88px] max-[480px]:size-16 w-full mx-auto gap-5 object-cover rounded-md ${
+	const thumbnailClassName = `block w-[120px] h-[90px] max-sbm:w-16 max-sbm:h-12 object-cover rounded ${
 		isPresignPending ? 'cursor-default' : 'cursor-pointer'
-	} ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`;
+	} ${isSelected ? '' : 'overlay'}`;
 
 	return (
 		<div className={`attachment-item`} ref={isSelected ? selectedImageRef : null}>
-			{showDate && <div className={`dark:text-white text-black mb-1 text-center`}>{previousDate}</div>}
 			<div
-				className={`rounded-md ${isPresignPending ? 'cursor-default' : 'cursor-pointer'} ${isSelected ? 'flex items-center border-2 border-white' : 'relative'}`}
+				className={`relative flex w-fit mx-auto rounded-md border-2 ${isPresignPending ? 'cursor-default' : 'cursor-pointer'} ${isSelected ? 'border-buttonPrimary' : 'border-transparent'}`}
 				onClick={handleSelectImage}
 			>
 				{isPresignPending ? (
@@ -54,7 +55,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 				) : isVideo ? (
 					<div className="relative">
 						<video
-							src={attachment.url ?? ''}
+							src={signCdnUrl(attachment.url ?? '')}
 							className={thumbnailClassName}
 							muted
 							playsInline
@@ -74,7 +75,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 					</div>
 				) : (
 					<img
-						src={createImgproxyUrl(attachment.url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+						src={createImgproxyUrl(signCdnUrl(attachment.url ?? ''), { width: 300, height: 300, resizeType: 'fit' })}
 						alt={attachment.url}
 						className={thumbnailClassName}
 						onDragStart={handleDrag}
@@ -85,8 +86,9 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 						}}
 					/>
 				)}
-				{!isSelected && <div className="absolute inset-0 bg-black opacity-80 rounded"></div>}
+				{!isSelected && <div className="absolute inset-0 bg-black opacity-30 rounded"></div>}
 			</div>
+			{showDate && <div className={`dark:text-white text-black mt-1 text-center max-sbm:text-xs`}>{previousDate}</div>}
 		</div>
 	);
 };

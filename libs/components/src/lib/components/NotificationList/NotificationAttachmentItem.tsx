@@ -1,3 +1,4 @@
+import { useCdnUrlSigner } from '@mezon/core';
 import { attachmentActions, useAppDispatch } from '@mezon/store';
 import { Button, Icons } from '@mezon/ui';
 import type { ApiMessageAttachment } from 'mezon-js';
@@ -40,9 +41,15 @@ export type NotificationAttachmentItemProps = {
 	readonly attachment: ApiMessageAttachment;
 	readonly index: number;
 	readonly compact?: boolean;
+	readonly channelId?: string;
 };
 
-export const NotificationAttachmentItem = ({ attachment, index, compact = false }: NotificationAttachmentItemProps) => {
+export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, compact = false, channelId }: NotificationAttachmentItemProps) => {
+	const { signCdnUrl } = useCdnUrlSigner([rawAttachment?.url, rawAttachment?.thumbnail], channelId);
+	const attachment = useMemo<ApiMessageAttachment>(
+		() => ({ ...rawAttachment, url: signCdnUrl(rawAttachment?.url), thumbnail: signCdnUrl(rawAttachment?.thumbnail) }),
+		[rawAttachment, signCdnUrl]
+	);
 	const { t } = useTranslation(['channelTopbar', 'common']);
 	const dispatch = useAppDispatch();
 	const isPDF = Boolean(attachment?.filetype === 'application/pdf' || attachment?.filename?.toLowerCase().endsWith('.pdf'));
@@ -120,17 +127,17 @@ export const NotificationAttachmentItem = ({ attachment, index, compact = false 
 		event.stopPropagation();
 		if (isPDF) {
 			openPDFViewer();
-		} else if (isImageOrVideo && attachment?.url) {
+		} else if (isImageOrVideo && rawAttachment?.url) {
 			dispatch(
 				attachmentActions.setCurrentAttachment({
-					id: attachment.url,
-					url: attachment.url,
+					id: rawAttachment.url,
+					url: rawAttachment.url,
 					filetype: attachment.filetype || '',
 					filename: attachment.filename || '',
 					filesize: String(attachment.size || 0)
 				})
 			);
-			dispatch(attachmentActions.setAttachment(attachment.url));
+			dispatch(attachmentActions.setAttachment(rawAttachment.url));
 			dispatch(attachmentActions.setOpenModalAttachment(true));
 		} else if (attachment?.url) {
 			handleDownload(event);

@@ -212,6 +212,7 @@ const ItemMemberPermission = memo((props: ItemMemberPermissionProps) => {
 						title={removeLabel}
 						aria-label={removeLabel}
 						className="flex items-center justify-center size-8 rounded-md hover:text-red-500"
+						data-e2e={generateE2eId('channel_setting_page.permissions.section.member_role_management.member_list.button_remove')}
 					>
 						<Icons.EscIcon className="size-[15px]" />
 					</button>
