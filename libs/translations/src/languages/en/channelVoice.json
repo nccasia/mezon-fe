@@ -176,5 +176,10 @@
 	"agentHint": {
 		"title": "Turn on KOMU Agent",
 		"body": "Click the KOMU Agent icon to add the AI agent to this call."
+	},
+	"dmCall": {
+		"you": "You",
+		"enlarge": "Enlarge {{name}}",
+		"restoreLayout": "Back to side-by-side view"
 	}
 }
