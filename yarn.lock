@@ -11970,28 +11970,28 @@ metro@0.80.12:
     ws "^7.5.10"
     yargs "^17.6.2"
 
-mezon-js-protobuf@1.10.70:
-  version "1.10.70"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.70.tgz#054ba2e453ee861207c5bf9b64bafa92811de4b7"
-  integrity sha512-l/LDSBVKusxNppvz4C5SrWiEs/cjSVYnc43NQHYLAsVQJzcSMBVOG8OQe9vfPWEBHmbWHRN/XrekHIAJ8oEpWw==
+mezon-js-protobuf@1.10.74:
+  version "1.10.74"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.74.tgz#3b05c45ea20e3060cb20163ff6d1fd4ddb4a2e0c"
+  integrity sha512-fEzPVobVPxhaFRbGKNDfGcKSy+FvKSdyWNNSR2KxjW6VrT0TZeBCMVrLv2kStwHAJNrV79JEkNV8aq2g/WcoDA==
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js-protobuf@^1.10.70:
-  version "1.10.73"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.73.tgz#d5d38f15d42f52b72d61b1ee5554014125487181"
-  integrity sha512-oQwpzjuu+5KRdm6iOFzaN3Yvf7Rn8t7NViT7NH5av4H8ZeoQKpPhbYtNBBdnxNWa27A23QRv6znFK74o6H6iCQ==
+mezon-js-protobuf@^1.10.74:
+  version "1.10.76"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.76.tgz#19d7cd832d90ccbaafc4bc146b2f47c52ee1f3f0"
+  integrity sha512-iRVsbOQPHjk55fFPdo6Xd+yfqsKAa1uganKoMPXOHzGty0hP7budvz/eh7pTVQ4LR+cr3XmtLwAMw4oxohlCNw==
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js@2.16.5:
-  version "2.16.5"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.16.5.tgz#c094b06fbcaf769b8571589472d45c16c4079594"
-  integrity sha512-DvTPOHuGK6gi9lHDXaD+9F3c8V08GPZPRf5TdxPrNYcTxawN/i2AQUPHxW3yRidbzwssLh1F43v4KfQj96iFgg==
+mezon-js@2.16.10:
+  version "2.16.10"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.16.10.tgz#e3f7326f5978ed1d55c4c20bfa8767866458cf6a"
+  integrity sha512-0X8W3xi0L33l7Lg6LSHsiCNTmwLqMyGE6t4dEwhkOjDR2+VmzPnJLsZbRhUpYUymAg9+Zrch+2f1wgsBF8hY9A==
   dependencies:
     base64-arraybuffer "^1.0.2"
     js-base64 "^3.7.8"
-    mezon-js-protobuf "^1.10.70"
+    mezon-js-protobuf "^1.10.74"
     whatwg-fetch "^3.6.2"
 
 micromatch@^4.0.2, micromatch@^4.0.4, micromatch@^4.0.5, micromatch@^4.0.8:
@@ -14064,9 +14064,9 @@ protobufjs@^7.2.4:
     long "^5.3.2"
 
 proxy-addr@~2.0.7:
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.7.tgz#f19fe69ceab311eeb94b42e70e8c2070f9ba1025"
-  integrity sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.8.tgz#624e760fd8ab06b1b8320c2f8506d4422cf8e932"
+  integrity sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==
   dependencies:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
