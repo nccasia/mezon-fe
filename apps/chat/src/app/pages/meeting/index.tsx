@@ -384,7 +384,7 @@ export default function PreJoinCalling() {
 						}
 					/>
 					{cameraOn && (
-						<div className="absolute top-4 right-24 z-40">
+						<div className="absolute top-4 right-4 z-40">
 							<InMeetingBackgroundMenu selectedMode={selectedBg} onSelectMode={handleSelectBg} />
 						</div>
 					)}
