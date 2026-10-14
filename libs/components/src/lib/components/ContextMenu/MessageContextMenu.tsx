@@ -182,7 +182,6 @@ function MessageContextMenu({
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmChannelId) || '')
 	);
 	const allMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, (isClanView ? currentChannelId : currentDmId) as string));
-	const topicMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, currentTopicId || ''));
 	const dispatch = useAppDispatch();
 
 	const handleItemClick = useCallback(() => {
@@ -577,13 +576,15 @@ function MessageContextMenu({
 		return message?.code === TypeMessage.Poll;
 	}, [message?.code]);
 
+	const isTopicRootMessage = useMemo(() => message?.code === TypeMessage.Topic, [message?.code]);
+
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableEdit = isMyMessage && !message?.content?.tp && !isPollMessage;
+		const enableEdit = isMyMessage && !isTopicRootMessage && !isPollMessage;
 		const enableReport = !isMyMessage;
 
 		return [enableEdit, enableReport];
-	}, [isMyMessage, checkPos, message?.content?.tp, isPollMessage]);
+	}, [isMyMessage, checkPos, isTopicRootMessage, isPollMessage]);
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
@@ -617,13 +618,9 @@ function MessageContextMenu({
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
-		// content.tp on a channel message means that message owns a topic.
-		// Replies inside a topic also get content.tp when they contain mentions, so only block outside the topic.
-		if (!isTopic && message?.content?.tp) return false;
-
-		const isFirstTopicMessage = isTopic && topicMessageIds?.length > 0 && messageId === topicMessageIds[0];
+		if (isTopicRootMessage) return false;
 		const isInitTopicMessage = !isTopic && messageId === initTopicMessageId;
-		if (isFirstTopicMessage || isInitTopicMessage) return false;
+		if (isInitTopicMessage) return false;
 
 		if (isMyMessage) return true;
 
@@ -632,19 +629,7 @@ function MessageContextMenu({
 		const isChannelOrThreadOrTopic =
 			isTopic || activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL || activeMode === ChannelStreamMode.STREAM_MODE_THREAD;
 		return isChannelOrThreadOrTopic ? canDeleteMessage : false;
-	}, [
-		activeMode,
-		type,
-		canDeleteMessage,
-		isMyMessage,
-		checkPos,
-		isOwnerGroupDM,
-		message?.content?.tp,
-		messageId,
-		initTopicMessageId,
-		isTopic,
-		topicMessageIds
-	]);
+	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM, isTopicRootMessage, messageId, initTopicMessageId, isTopic]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 	const checkElementIsLink = elementTarget instanceof HTMLAnchorElement;
