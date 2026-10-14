@@ -5,6 +5,7 @@ import {
 	selectNoiseSuppressionEnabled,
 	selectShowCamera,
 	selectShowMicrophone,
+	selectShowScreen,
 	toastActions,
 	useAppDispatch,
 	voiceActions
@@ -482,6 +483,7 @@ export function MezonSfuVoiceRoom({
 	const clanMembers = useSelector(selectEntitesUserClans);
 	const microphoneEnabled = useSelector(selectShowMicrophone);
 	const cameraEnabled = useSelector(selectShowCamera);
+	const screenSharing = useSelector(selectShowScreen);
 	const noiseSuppressionEnabled = useSelector(selectNoiseSuppressionEnabled);
 	const noiseSuppressionEnabledRef = useRef(noiseSuppressionEnabled);
 	const { hasMicrophoneAccess, hasCameraAccess, microphonePermissionState, cameraPermissionState } = useMediaPermissions();
@@ -625,7 +627,6 @@ export function MezonSfuVoiceRoom({
 	);
 	useEffect(() => screenKeyframeRecovery.wake(), [remoteMedia, screenKeyframeRecovery]);
 	const [roomParticipantCount, setRoomParticipantCount] = useState(1);
-	const [screenSharing, setScreenSharing] = useState(false);
 	const [screenShareMode, setScreenShareMode] = useState<ScreenShareMode>('text');
 	const [changingScreenShareMode, setChangingScreenShareMode] = useState(false);
 	const [pushToTalkActive, setPushToTalkActive] = useState(false);
@@ -2287,6 +2288,8 @@ export function MezonSfuVoiceRoom({
 				if (track !== customVideoTrack) track.stop();
 			});
 			screenStreamRef.current?.getTracks().forEach((track) => track.stop());
+			screenStreamRef.current = null;
+			dispatch(voiceActions.setShowScreen(false));
 			wsRef.current = null;
 			pcRef.current = null;
 			joinedRef.current = false;
@@ -2325,41 +2328,53 @@ export function MezonSfuVoiceRoom({
 		syncSelectedMicrophone
 	]);
 
+	const stopLocalScreenCapture = () => {
+		clearScreenKeyFrameRefresh();
+		const stream = screenStreamRef.current;
+		if (!stream) return;
+		stream.getTracks().forEach((track) => {
+			track.onended = null;
+			track.stop();
+		});
+		screenStreamRef.current = null;
+	};
+
 	const toggleScreenShare = async () => {
 		const pc = pcRef.current;
 		if (!pc) return;
 		const sender = findUplinkVideoSender('2');
-		if (screenStreamRef.current) {
-			clearScreenKeyFrameRefresh();
-			screenStreamRef.current.getTracks().forEach((track) => {
-				track.onended = null;
-				track.stop();
-			});
-			screenStreamRef.current = null;
-			if (sender) {
-				await sender.replaceTrack(null);
-				const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
-				if (
-					!slotAssignmentsRef.current.enabled &&
-					transceiver &&
-					transceiver.direction !== 'recvonly' &&
-					transceiver.direction !== 'inactive'
-				) {
-					transceiver.direction = 'recvonly';
+		if (screenStreamRef.current || screenSharing) {
+			stopLocalScreenCapture();
+			try {
+				if (sender) {
+					await sender.replaceTrack(null);
+					const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
+					if (
+						!slotAssignmentsRef.current.enabled &&
+						transceiver &&
+						transceiver.direction !== 'recvonly' &&
+						transceiver.direction !== 'inactive'
+					) {
+						transceiver.direction = 'recvonly';
+					}
 				}
+			} catch (cause) {
+				setError(cause instanceof Error ? cause.message : 'Unable to stop screen sharing');
+			} finally {
+				if (wsRef.current?.readyState === WebSocket.OPEN) {
+					wsRef.current.send(JSON.stringify({ type: 'share_screen', active: false }));
+				}
+				dispatch(voiceActions.setShowScreen(false));
+				setLocalPreview(localStreamRef.current || undefined);
 			}
-			if (wsRef.current?.readyState === WebSocket.OPEN) {
-				wsRef.current.send(JSON.stringify({ type: 'share_screen', active: false }));
-			}
-			setScreenSharing(false);
-			setLocalPreview(localStreamRef.current || undefined);
 			return;
 		}
+		let stream: MediaStream | undefined;
 		try {
 			const CaptureControllerConstructor = (window as typeof window & { CaptureController?: new () => ScreenCaptureController })
 				.CaptureController;
 			const captureController = CaptureControllerConstructor ? new CaptureControllerConstructor() : undefined;
-			const stream = await navigator.mediaDevices.getDisplayMedia({
+			stream = await navigator.mediaDevices.getDisplayMedia({
 				video: getScreenShareConstraints(screenShareModeRef.current),
 				audio: false,
 				...(captureController ? { controller: captureController } : {})
@@ -2371,7 +2386,6 @@ export function MezonSfuVoiceRoom({
 			const track = stream.getVideoTracks()[0];
 			if (!track) throw new Error('Unable to get the screen track');
 			track.contentHint = SCREEN_SHARE_PROFILES[screenShareModeRef.current].contentHint;
-			screenStreamRef.current = stream;
 			if (sender) {
 				await sender.replaceTrack(track);
 				const transceiver =
@@ -2382,10 +2396,15 @@ export function MezonSfuVoiceRoom({
 				if (transceiver) forceVideoCodec(transceiver, SCREEN_CODEC);
 				await applyScreenEncodingParams(sender);
 			}
-			setScreenSharing(true);
-			wsRef.current?.send(JSON.stringify({ type: 'share_screen', active: true }));
+			screenStreamRef.current = stream;
+			dispatch(voiceActions.setShowScreen(true));
+			if (wsRef.current?.readyState === WebSocket.OPEN) {
+				wsRef.current.send(JSON.stringify({ type: 'share_screen', active: true }));
+			}
 			track.onended = () => void toggleScreenShare();
 		} catch (cause) {
+			stream?.getTracks().forEach((captureTrack) => captureTrack.stop());
+			dispatch(voiceActions.setShowScreen(false));
 			setError(cause instanceof Error ? cause.message : 'Unable to share the screen');
 		}
 	};
