@@ -17,6 +17,7 @@ import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { SfuAudioAudience, type SfuAudioAudienceState } from './MyVideoConference/Media/SfuAudioAudience';
+import { usePreferredOutputDevice } from './usePreferredOutputDevice';
 
 /**
  * Keeps stream-channel SFU audio alive while the user is joined, including
@@ -34,6 +35,7 @@ export function StreamAudioSession() {
 	const members = useAppSelector((state) => selectStreamMembersByChannelId(state, streamInfo?.streamId || ''));
 	const sfuUrl = useSelector(selectStreamSfuUrl);
 	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
+	const { outputDeviceId, handleSinkIdFailure } = usePreferredOutputDevice();
 
 	const refreshToken = useCallback(async () => {
 		if (!streamInfo?.streamId) throw new Error('Stream channel is unavailable');
@@ -77,6 +79,8 @@ export function StreamAudioSession() {
 			serverUrl={serverUrl}
 			volume={volume}
 			muted={muted}
+			sinkId={outputDeviceId}
+			onSinkIdFailure={handleSinkIdFailure}
 			onRefreshToken={refreshToken}
 			onConnectionStateChange={handleConnectionStateChange}
 		/>
