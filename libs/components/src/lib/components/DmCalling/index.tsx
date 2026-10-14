@@ -24,6 +24,7 @@ import {
 import { Icons, Menu } from '@mezon/ui';
 import { IMessageTypeCallLog, createImgproxyUrl, ensureMediaPermission, useMediaPermissions } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
+import type { RefObject } from 'react';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -33,6 +34,8 @@ type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
 	directId: string;
 };
+
+type VideoTileKey = 'local' | 'remote';
 
 function dmCallingDeviceMenuSubtitle(device: MediaDeviceInfo | null, systemDefaultLabel: string): string {
 	if (!device) return '';
@@ -69,7 +72,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const isRemoteAudio = useSelector(selectRemoteAudio);
 	const isRemoteVideo = useSelector(selectRemoteVideo);
-	const [activeVideo, setActiveVideo] = useState<'local' | 'remote' | null>(null);
+	const [activeVideo, setActiveVideo] = useState<VideoTileKey | null>(null);
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const otherCall = useSelector(selectOtherCall);
 	const isInChannelCalled = useMemo(() => {
@@ -205,6 +208,19 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		}
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
+	useEffect(() => {
+		if (!activeVideo) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setActiveVideo(null);
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [activeVideo]);
+
+	const handleTileClick = (tile: VideoTileKey) => {
+		setActiveVideo((current) => (current === tile ? null : tile));
+	};
+
 	const [expandedDevice, setExpandedDevice] = useState<'input' | 'output' | null>(null);
 	const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
 
@@ -307,19 +323,85 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		changeAudioOutputDevice
 	]);
 
-	const localVideoContainerClass =
-		activeVideo === 'remote'
-			? 'absolute z-10 right-0 bottom-0 w-[200px] h-[150px] max-sbm:w-[140px] max-sbm:h-[100px]'
-			: activeVideo === 'local'
-				? 'relative w-full h-full'
-				: 'relative w-[400px] h-[300px] max-sbm:w-full max-sbm:h-[200px]';
+	const localDisplayName = userProfile?.user?.display_name || userProfile?.user?.username || '';
+	const remoteDisplayName = currentDmGroup?.channel_label || nameImages[0] || '';
 
-	const remoteVideoContainerClass =
-		activeVideo === 'local'
-			? 'absolute z-10 right-0 bottom-0 w-[200px] h-[150px] max-sbm:w-[140px] max-sbm:h-[100px]'
-			: activeVideo === 'remote'
-				? 'relative w-full h-full'
-				: 'relative w-[400px] h-[300px] max-sbm:w-full max-sbm:h-[200px]';
+	const renderVideoTile = ({
+		tile,
+		videoRef,
+		isLocal,
+		hasVideo,
+		isMicMuted,
+		avatar,
+		label,
+		avatarName
+	}: {
+		tile: VideoTileKey;
+		videoRef: RefObject<HTMLVideoElement>;
+		isLocal: boolean;
+		hasVideo: boolean;
+		isMicMuted: boolean;
+		avatar?: string;
+		label: string;
+		avatarName: string;
+	}) => {
+		const mode = !activeVideo ? 'grid' : activeVideo === tile ? 'main' : 'pip';
+		const layoutClass =
+			mode === 'main'
+				? 'absolute inset-0'
+				: mode === 'pip'
+					? 'absolute top-3 right-3 z-20 w-[200px] max-sbm:w-[120px] aspect-video shadow-xl'
+					: 'relative w-full max-w-[640px] max-h-full aspect-video max-sbm:max-w-none max-sbm:aspect-auto max-sbm:flex-1 max-sbm:min-h-0';
+		const avatarClass = mode === 'main' ? '!size-28' : mode === 'pip' ? '!size-10' : '!size-20';
+		const avatarTextClass = mode === 'main' ? '!text-5xl' : mode === 'pip' ? '!text-base' : '!text-3xl';
+		const actionLabel = mode === 'main' ? t('dmCall.restoreLayout') : t('dmCall.enlarge', { name: label });
+
+		return (
+			<div
+				role="button"
+				tabIndex={0}
+				aria-label={actionLabel}
+				title={actionLabel}
+				onClick={() => handleTileClick(tile)}
+				onKeyDown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						event.preventDefault();
+						handleTileClick(tile);
+					}
+				}}
+				className={`group/tile cursor-pointer overflow-hidden rounded-xl bg-neutral-900 ring-1 ring-white/10 transition-shadow duration-200 hover:ring-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${layoutClass}`}
+			>
+				<video
+					ref={videoRef}
+					autoPlay
+					muted={isLocal}
+					playsInline
+					className={`absolute inset-0 h-full w-full bg-black ${mode === 'main' ? 'object-contain' : 'object-cover'}`}
+				/>
+				{!hasVideo && (
+					<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-neutral-800 to-neutral-900">
+						<AvatarImage
+							alt={avatarName}
+							username={avatarName}
+							src={avatar}
+							srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+							className={`${avatarClass} font-semibold`}
+							classNameText={`${avatarTextClass} font-semibold`}
+						/>
+					</div>
+				)}
+				<div className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-1.5 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+					{isMicMuted && <Icons.VoiceMicDisabledIcon scale={1.5} className="shrink-0" />}
+					<span className="truncate">{label}</span>
+				</div>
+				{mode !== 'pip' && (
+					<div className="absolute top-2 left-2 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition-opacity duration-200 group-hover/tile:opacity-100 group-focus-visible/tile:opacity-100">
+						{mode === 'main' ? <Icons.ExitFullScreen className="h-4 w-4" /> : <Icons.FullScreen className="h-4 w-4" />}
+					</div>
+				)}
+			</div>
+		);
+	};
 
 	const deviceSettingsTriggerLabel =
 		dmCallingDeviceMenuSubtitle(currentInputDevice, systemDefaultLabel) || dmCallingDeviceMenuSubtitle(currentOutputDevice, systemDefaultLabel);
@@ -341,72 +423,29 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			</div>
 
 			<div
-				className={`flex ${activeVideo === 'local' || activeVideo === 'remote' ? 'relative w-full h-[calc(100%_-_32px)] justify-center' : 'flex justify-center items-center h-full'} space-x-4 max-sbm:flex-col max-sbm:space-x-0 max-sbm:space-y-4 ${!isShowMeetDM && !isRemoteVideo ? 'hidden -z-10 opacity-0' : `${activeVideo === 'local' || activeVideo === 'remote' ? '' : 'z-10 mb-5 mt-5'}`}`}
+				className={`relative w-full flex-1 min-h-0 ${activeVideo ? '' : 'pb-14 sbm:pb-16 lg:pb-[72px]'} ${!isShowMeetDM && !isRemoteVideo ? 'hidden' : ''}`}
 			>
-				<div className={remoteVideoContainerClass}>
-					<video
-						ref={localVideoRef}
-						autoPlay
-						muted
-						playsInline
-						onClick={() => setActiveVideo(activeVideo === 'local' || activeVideo === 'remote' ? null : 'local')}
-						className="w-full h-full"
-						style={{
-							width: activeVideo === 'local' ? '100%' : activeVideo === 'remote' ? 'min(120px, 30vw)' : 'min(400px, 45vw)',
-							height: activeVideo === 'local' ? '100%' : activeVideo === 'remote' ? 'min(90px, 22vw)' : 'min(300px, 34vw)',
-							backgroundColor: 'black',
-							borderRadius: '8px',
-							display: !isShowMeetDM && !isRemoteVideo ? 'none' : 'block'
-						}}
-					/>
-					<div
-						className={`flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${!isShowMeetDM ? 'w-full h-full bg-black rounded-lg' : ''} `}
-					>
-						{!isShowMeetDM && (
-							<div className=" flex flex-col items-center">
-								<Icons.VoiceCameraDisabledIcon scale={1} />
-							</div>
-						)}
-
-						{isMuteMicrophone && (
-							<div className="flex flex-col items-center">
-								<Icons.VoiceMicDisabledIcon scale={2} />
-							</div>
-						)}
-					</div>
-				</div>
-				<div className={localVideoContainerClass}>
-					<div className="relative w-full h-full">
-						<video
-							ref={remoteVideoRef}
-							autoPlay
-							playsInline
-							onClick={() => setActiveVideo(activeVideo === 'local' || activeVideo === 'remote' ? null : 'remote')}
-							className="w-full h-full"
-							style={{
-								width: activeVideo === 'remote' ? '100%' : activeVideo === 'local' ? 'min(120px, 30vw)' : 'min(400px, 45vw)',
-								height: activeVideo === 'remote' ? '100%' : activeVideo === 'local' ? 'min(90px, 22vw)' : 'min(300px, 34vw)',
-								backgroundColor: 'black',
-								borderRadius: '8px',
-								display: !isShowMeetDM && !isRemoteVideo ? 'none' : 'block'
-							}}
-						/>
-						<div
-							className={`flex gap-6 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${!isRemoteVideo ? 'w-full h-full bg-black rounded-lg' : ''} `}
-						>
-							{!isRemoteVideo && (
-								<div className="flex flex-col items-center">
-									<Icons.VoiceCameraDisabledIcon scale={1} />
-								</div>
-							)}
-
-							{!isRemoteAudio && (
-								<div className="flex flex-col items-center">
-									<Icons.VoiceMicDisabledIcon scale={2} />
-								</div>
-							)}
-						</div>
-					</div>
+				<div className={activeVideo ? 'relative h-full w-full' : 'flex h-full w-full items-center justify-center gap-3 max-sbm:flex-col'}>
+					{renderVideoTile({
+						tile: 'local',
+						videoRef: localVideoRef,
+						isLocal: true,
+						hasVideo: isShowMeetDM,
+						isMicMuted: isMuteMicrophone,
+						avatar: userProfile?.user?.avatar_url,
+						label: t('dmCall.you'),
+						avatarName: localDisplayName
+					})}
+					{renderVideoTile({
+						tile: 'remote',
+						videoRef: remoteVideoRef,
+						isLocal: false,
+						hasVideo: isRemoteVideo,
+						isMicMuted: !isRemoteAudio,
+						avatar: avatarImages[0],
+						label: remoteDisplayName,
+						avatarName: remoteDisplayName
+					})}
 				</div>
 			</div>
 
