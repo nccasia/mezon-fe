@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Увядзіце дадатковае паведамленне..."
 	},
 	"successMessage": "Паведамленне паспяхова пераслана",
-	"errorMessage": "Не атрымалася пераслаць паведамленне"
+	"errorMessage": "Не атрымалася пераслаць паведамленне",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Digite a mensagem que deseja enviar junto..."
 	},
 	"successMessage": "Mensagem encaminhada com sucesso",
-	"errorMessage": "Não foi possível encaminhar a mensagem"
+	"errorMessage": "Não foi possível encaminhar a mensagem",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

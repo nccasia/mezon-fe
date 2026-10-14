@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Wpisz wiadomość, którą chcesz wysłać dołączoną..."
 	},
 	"successMessage": "Przekierowano wiadomość pomyślnie",
-	"errorMessage": "Nie można przekierować wiadomości"
+	"errorMessage": "Nie można przekierować wiadomości",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

@@ -3,13 +3,18 @@ import { getStore, selectCurrentClanId, toastActions, useAppDispatch } from '@me
 import { useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { MAX_FORWARD_MESSAGE_LENGTH } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType, safeJSONParse, type ApiMessageMention } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, safeJSONParse, type ApiMessageAttachment, type ApiMessageMention } from 'mezon-js';
 import React, { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 const CLAN_CHANNEL_LISTING_LIMIT = 500;
 const CLAN_CHANNEL_LISTING_STATE = 1;
+const FORWARD_SOCKET_PAYLOAD_MAX_BYTES = 4 * 1024;
+
+function forwardPayloadBytes(content: IMessageSendPayload, attachments: ApiMessageAttachment[], mentions: ApiMessageMention[]): number {
+	return new TextEncoder().encode(JSON.stringify({ content, attachments, mentions })).length;
+}
 
 export function useSendForwardMessage() {
 	const { t } = useTranslation('forwardMessage');
@@ -110,7 +115,29 @@ export function useSendForwardMessage() {
 					fwd: true
 				};
 
+				const attachmentsMessage: ApiMessageAttachment[] =
+					message.attachments?.map((attach) => ({
+						filename: attach.filename,
+						filetype: attach.filetype,
+						size: attach.size,
+						duration: attach.duration,
+						url: attach.url,
+						thumbnail: attach.thumbnail,
+						height: attach.height,
+						width: attach.width
+					})) ?? [];
+
 				const mentions = sanitizedMentions;
+
+				if (forwardPayloadBytes(validatedContent, attachmentsMessage, mentions) > FORWARD_SOCKET_PAYLOAD_MAX_BYTES) {
+					dispatch(
+						toastActions.addToast({
+							type: 'error',
+							message: t('payloadTooLarge')
+						})
+					);
+					return;
+				}
 
 				if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL && isPublic && clanid && clanid !== '0' && clanid !== currentClanId) {
 					await joinClanBeforePublicChannel(clanid);
@@ -118,7 +145,7 @@ export function useSendForwardMessage() {
 
 				await client.joinChat(session, clanid || '0', channel_id, type, isPublic);
 
-				await client.writeChatMessage(session, clanid || '0', channel_id, mode, isPublic, validatedContent, mentions, message.attachments);
+				await client.writeChatMessage(session, clanid || '0', channel_id, mode, isPublic, validatedContent, mentions, attachmentsMessage);
 
 				if (additionalMessage && additionalMessage.trim()) {
 					const trimmedMessage = additionalMessage.trim();
