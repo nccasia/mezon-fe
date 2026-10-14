@@ -241,6 +241,7 @@ const RECONNECT_RETRY_BASE_MS = 500;
 const RECONNECT_RETRY_JITTER_MS = 400;
 
 const RECONNECT_WAVE_COOLDOWN_MS = 10000;
+const STREAM_SELF_REJOIN_GRACE_MS = 3000;
 
 function randomReconnectSpacingMs(): number {
 	return RECONNECT_RETRY_BASE_MS + Math.floor(Math.random() * RECONNECT_RETRY_JITTER_MS);
@@ -381,6 +382,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch]
 	);
 
+	const pendingStreamSelfLeaveRef = useRef<{ channelId: string; timer: NodeJS.Timeout } | null>(null);
+
+	const cancelPendingStreamSelfLeave = useCallback(() => {
+		if (!pendingStreamSelfLeaveRef.current) return;
+		clearTimeout(pendingStreamSelfLeaveRef.current.timer);
+		pendingStreamSelfLeaveRef.current = null;
+	}, []);
+
+	useEffect(() => cancelPendingStreamSelfLeave, [cancelPendingStreamSelfLeave]);
+
 	const onstreamingchanneljoined = useCallback(
 		(user: StreamingJoinedEvent) => {
 			if (!user?.user_id) return;
@@ -391,8 +402,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					user_name: ''
 				})
 			);
+			if (String(user.user_id) !== String(userId)) return;
+			if (pendingStreamSelfLeaveRef.current?.channelId !== String(user.streaming_channel_id)) return;
+			cancelPendingStreamSelfLeave();
 		},
-		[dispatch]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onstreamingchannelleaved = useCallback(
@@ -404,11 +418,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!isJoin || !streamInfo?.streamId) return;
 			if (String(user.streaming_channel_id) !== String(streamInfo.streamId)) return;
 			if (String(user.streaming_user_id) !== String(userId)) return;
-			dispatch(usersStreamActions.streamEnded(streamInfo.streamId));
-			dispatch(videoStreamActions.resetPlayback());
-			dispatch(appActions.setIsShowChatStream(false));
+			const channelId = String(streamInfo.streamId);
+			cancelPendingStreamSelfLeave();
+			pendingStreamSelfLeaveRef.current = {
+				channelId,
+				timer: setTimeout(() => {
+					pendingStreamSelfLeaveRef.current = null;
+					const state = getStore().getState();
+					if (!selectIsJoin(state) || String(selectCurrentStreamInfo(state)?.streamId) !== channelId) return;
+					dispatch(usersStreamActions.streamEnded(channelId));
+					dispatch(videoStreamActions.resetPlayback());
+					dispatch(appActions.setIsShowChatStream(false));
+				}, STREAM_SELF_REJOIN_GRACE_MS)
+			};
 		},
-		[dispatch, userId]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onactivityupdated = useCallback(

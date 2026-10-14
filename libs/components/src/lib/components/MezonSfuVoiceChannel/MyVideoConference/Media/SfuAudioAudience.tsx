@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { SfuSignalMessage } from '../../types';
 import { meetTokenNeedsRefresh } from '../meetToken';
 import { canReactivateMid, getDepartedMids, getMsidOccupantsByMidFromSdp, isReceivingRemoteTrack, type RetiredSource } from '../remoteMediaLifecycle';
-import { sfuCloseAction, sfuReconnectDelay } from '../sfuReconnect';
+import { SFU_DUPLICATE_SESSION_CLOSE_CODE, sfuCloseAction, sfuReconnectDelay } from '../sfuReconnect';
 import { SfuSlotAssignments } from '../sfuSlotAssignments';
 import { SfuAudioTrack } from './SfuAudioTrack';
 
-export type SfuAudioAudienceState = 'joining' | 'connected' | 'reconnecting' | 'failed' | 'closed';
+export type SfuAudioAudienceState = 'joining' | 'connected' | 'reconnecting' | 'failed' | 'replaced' | 'closed';
 
 export interface SfuAudioAudienceProps {
 	token: string;
@@ -382,7 +382,7 @@ export function SfuAudioAudience({
 					if (action === 'stop') {
 						reconnectAllowed = false;
 						closeTransport();
-						reportState('closed');
+						reportState(event.code === SFU_DUPLICATE_SESSION_CLOSE_CODE ? 'replaced' : 'closed');
 						return;
 					}
 					if (action === 'refresh-token') tokenRejected = true;

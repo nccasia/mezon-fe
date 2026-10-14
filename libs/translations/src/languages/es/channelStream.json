@@ -6,5 +6,6 @@
 	"joinStream": "Unirse a la transmisión",
 	"noStreamToday": "Sin transmisión hoy",
 	"hideMembers": "Ocultar Miembros",
-	"showMembers": "Mostrar Miembros"
+	"showMembers": "Mostrar Miembros",
+	"duplicateSessionDisconnected": "Se desconectó porque tu cuenta se unió a una transmisión o canal de voz en otra sesión."
 }
