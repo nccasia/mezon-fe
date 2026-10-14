@@ -1,8 +1,9 @@
-// The media server converts every video uploaded to these hosts into HLS, writes the stream to
-// `<video url>/master.m3u8` and deletes the original, while the message keeps the original url.
+// The media server converts videos uploaded to these hosts into HLS and writes the stream under its own
+// prefix, `<origin>/hls/<key>/master.m3u8`, while the message keeps the url of the original.
 const TRANSCODING_ORIGINS = ['https://cdn.mezon.ai', 'http://cdn.mezon.ai', 'https://cdn.mezon.vn', 'http://cdn.mezon.vn'];
 // Containers no browser plays, which the media server converts like any other video.
 const TRANSCODED_CONTAINERS = new Set(['avi', 'flv', 'mkv', 'wmv']);
+const HLS_OUTPUT_PREFIX = 'hls/';
 const HLS_MASTER_PLAYLIST = 'master.m3u8';
 const HLS_PLAYLIST_SUFFIX = '.m3u8';
 const HLS_PLAYLIST_TAG = '#EXTM3U';
@@ -10,7 +11,8 @@ const HLS_PROBE_TIMEOUT_MS = 5000;
 
 interface TranscodableUrl {
 	file: string;
-	path: string;
+	origin: string;
+	key: string;
 	query: string;
 }
 
@@ -19,12 +21,18 @@ function readTranscodableUrl(url?: string): TranscodableUrl | undefined {
 
 	const queryIndex = url.indexOf('?');
 	const path = queryIndex === -1 ? url : url.slice(0, queryIndex);
-	if (!TRANSCODING_ORIGINS.some((origin) => path.startsWith(`${origin}/`))) return undefined;
+	const origin = TRANSCODING_ORIGINS.find((candidate) => path.startsWith(`${candidate}/`));
+	if (!origin) return undefined;
 
+	const key = path.slice(origin.length + 1);
 	const file = path.slice(path.lastIndexOf('/') + 1);
-	if (!file || file.toLowerCase().endsWith(HLS_PLAYLIST_SUFFIX)) return undefined;
+	if (!file || key.startsWith(HLS_OUTPUT_PREFIX) || file.toLowerCase().endsWith(HLS_PLAYLIST_SUFFIX)) return undefined;
 
-	return { file, path, query: queryIndex === -1 ? '' : url.slice(queryIndex + 1) };
+	return { file, origin, key, query: queryIndex === -1 ? '' : url.slice(queryIndex + 1) };
+}
+
+function masterPlaylistPath({ origin, key }: TranscodableUrl): string {
+	return `${origin}/${HLS_OUTPUT_PREFIX}${key}/${HLS_MASTER_PLAYLIST}`;
 }
 
 /** True for a video the media server may have replaced with an HLS stream. */
@@ -43,7 +51,7 @@ export function isTranscodedVideoContainer(url?: string): boolean {
 export function getHlsMasterPlaylistUrl(url?: string): string | undefined {
 	const parts = readTranscodableUrl(url);
 	if (!parts) return undefined;
-	return `${parts.path}/${HLS_MASTER_PLAYLIST}${parts.query ? `?${parts.query}` : ''}`;
+	return `${masterPlaylistPath(parts)}${parts.query ? `?${parts.query}` : ''}`;
 }
 
 async function readPrefix(body: ReadableStream<Uint8Array>, length: number): Promise<string> {
@@ -74,7 +82,7 @@ export async function probeHlsMasterPlaylist(url?: string, signal?: AbortSignal)
 	signal?.addEventListener('abort', abort, { once: true });
 	const timeout = setTimeout(abort, HLS_PROBE_TIMEOUT_MS);
 	try {
-		const response = await fetch(`${parts.path}/${HLS_MASTER_PLAYLIST}?probe=${Date.now().toString(16)}`, { signal: controller.signal });
+		const response = await fetch(`${masterPlaylistPath(parts)}?probe=${Date.now().toString(16)}`, { signal: controller.signal });
 		if (!response.ok || !response.body) {
 			void response.body?.cancel().catch(() => undefined);
 			return undefined;

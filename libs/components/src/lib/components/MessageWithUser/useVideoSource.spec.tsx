@@ -47,7 +47,7 @@ jest.mock('hls.js', () => ({ __esModule: true, default: MockHls }));
 
 const VIDEO = 'https://cdn.mezon.ai/1cf93b197d401000/2080000000000000001_clip.mp4';
 const SIGNED = `${VIDEO}?1791900000-c2lnbmF0dXJl`;
-const PLAYLIST = `${VIDEO}/master.m3u8?1791900000-c2lnbmF0dXJl`;
+const PLAYLIST = 'https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000001_clip.mp4/master.m3u8?1791900000-c2lnbmF0dXJl';
 const MASTER = '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=3137344,RESOLUTION=1280x720\nstream_0/playlist.m3u8\n';
 
 class FakeVideo {
@@ -312,5 +312,5 @@ it('stays failed through a renewed signature and starts over for another file', 
 	act(() => renderer.update(<Player url={other} />));
 	expect(isFailed()).toBe(false);
 	await settle();
-	expect(video.src).toBe(`${other}/master.m3u8`);
+	expect(video.src).toBe('https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000002_other.mp4/master.m3u8');
 });

@@ -5,6 +5,7 @@ jest.mock('../constant', () => ({ MAX_FILE_ATTACHMENTS: 10 }));
 jest.mock('../helper/videoPoster', () => ({ captureVideoPosterFromUrl: jest.fn() }));
 
 const VIDEO = 'https://cdn.mezon.ai/1cf93b197d401000/2080000000000000001_clip.mp4';
+const PLAYLIST = 'https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000001_clip.mp4/master.m3u8';
 const SIGNATURE = '1791900000-c2lnbmF0dXJl';
 const MASTER = '#EXTM3U\n#EXT-X-VERSION:6\n#EXT-X-STREAM-INF:BANDWIDTH=3137344,RESOLUTION=1280x720\nstream_0/playlist.m3u8\n';
 
@@ -24,14 +25,19 @@ it('only treats files on the transcoding hosts as possibly converted', () => {
 	expect(mayBeTranscodedVideo('https://cdn.mezon.ai.example.com/clip.mp4')).toBe(false);
 	expect(mayBeTranscodedVideo('blob:https://mezon.ai/0b6f')).toBe(false);
 	expect(mayBeTranscodedVideo(`${VIDEO}/master.m3u8`)).toBe(false);
+	expect(mayBeTranscodedVideo('https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000001_clip.mp4')).toBe(false);
+	expect(mayBeTranscodedVideo('https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000001_clip.mp4/stream_0/data000.ts')).toBe(false);
 	expect(mayBeTranscodedVideo('https://cdn.mezon.ai/1cf93b197d401000/')).toBe(false);
 	expect(mayBeTranscodedVideo(`${VIDEO}#t=3`)).toBe(false);
 	expect(mayBeTranscodedVideo(undefined)).toBe(false);
 });
 
-it('points at the master playlist next to the original and keeps its CDN signature', () => {
-	expect(getHlsMasterPlaylistUrl(VIDEO)).toBe(`${VIDEO}/master.m3u8`);
-	expect(getHlsMasterPlaylistUrl(`${VIDEO}?${SIGNATURE}`)).toBe(`${VIDEO}/master.m3u8?${SIGNATURE}`);
+it('points at the master playlist under the hls/ prefix and keeps the CDN signature', () => {
+	expect(getHlsMasterPlaylistUrl(VIDEO)).toBe(PLAYLIST);
+	expect(getHlsMasterPlaylistUrl(`${VIDEO}?${SIGNATURE}`)).toBe(`${PLAYLIST}?${SIGNATURE}`);
+	expect(getHlsMasterPlaylistUrl('http://cdn.mezon.vn/1cf93b197d401000/clip.mov')).toBe(
+		'http://cdn.mezon.vn/hls/1cf93b197d401000/clip.mov/master.m3u8'
+	);
 	expect(getHlsMasterPlaylistUrl('https://cdn.komu.vn/1cf93b197d401000/clip.mp4')).toBeUndefined();
 });
 
@@ -51,10 +57,10 @@ it('plays the containers the media server converts and keeps the rest as files',
 it('resolves to the signed playlist when the converted stream exists', async () => {
 	const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(respond(200, MASTER));
 
-	await expect(probeHlsMasterPlaylist(`${VIDEO}?${SIGNATURE}`)).resolves.toBe(`${VIDEO}/master.m3u8?${SIGNATURE}`);
+	await expect(probeHlsMasterPlaylist(`${VIDEO}?${SIGNATURE}`)).resolves.toBe(`${PLAYLIST}?${SIGNATURE}`);
 
 	const probed = String(fetchMock.mock.calls[0][0]);
-	expect(probed).toMatch(new RegExp(`^${VIDEO.replace(/\./g, '\\.')}/master\\.m3u8\\?probe=[0-9a-f]+$`));
+	expect(probed).toMatch(new RegExp(`^${PLAYLIST.replace(/\./g, '\\.')}\\?probe=[0-9a-f]+$`));
 });
 
 it('asks the CDN for a fresh answer on every probe so a cached 404 cannot hide a new stream', async () => {
@@ -65,7 +71,7 @@ it('asks the CDN for a fresh answer on every probe so a cached 404 cannot hide a
 	await expect(probeHlsMasterPlaylist(VIDEO)).resolves.toBeUndefined();
 	now.mockReturnValue(2000);
 	fetchMock.mockResolvedValue(respond(200, MASTER));
-	await expect(probeHlsMasterPlaylist(VIDEO)).resolves.toBe(`${VIDEO}/master.m3u8`);
+	await expect(probeHlsMasterPlaylist(VIDEO)).resolves.toBe(PLAYLIST);
 
 	expect(String(fetchMock.mock.calls[0][0])).not.toBe(String(fetchMock.mock.calls[1][0]));
 });
@@ -104,7 +110,7 @@ it('reads only the head of the playlist', async () => {
 	});
 	jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(body, { status: 200 }));
 
-	await expect(probeHlsMasterPlaylist(VIDEO)).resolves.toBe(`${VIDEO}/master.m3u8`);
+	await expect(probeHlsMasterPlaylist(VIDEO)).resolves.toBe(PLAYLIST);
 	expect(cancelled).toBe(true);
 	expect(pulled).toBeLessThanOrEqual(3);
 });
