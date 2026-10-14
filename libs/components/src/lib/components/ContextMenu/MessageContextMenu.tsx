@@ -423,16 +423,6 @@ function MessageContextMenu({
 		[currentChannelId, dispatch]
 	);
 
-	const setIsShowCreateTopic = useCallback(
-		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
-			dispatch(
-				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread: false })
-			);
-		},
-		[currentChannelId, dispatch]
-	);
-
 	const setValueThread = useCallback(
 		(value: IMessageWithUser | null) => {
 			dispatch(threadsActions.setValueThread(value));
@@ -448,7 +438,7 @@ function MessageContextMenu({
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
 
 	const handleCreateTopic = useCallback(() => {
-		startCreateTopicFromMessage(message);
+		startCreateTopicFromMessage(message, message);
 	}, [message, startCreateTopicFromMessage]);
 
 	const handleMarkMessageNoti = useCallback(async () => {

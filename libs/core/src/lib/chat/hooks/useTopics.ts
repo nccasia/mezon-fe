@@ -1,4 +1,7 @@
+import type { AppDispatch } from '@mezon/store';
 import {
+	accountActions,
+	getStore,
 	selectAnonymousMode,
 	selectCurrentChannelId,
 	selectCurrentTopicInitMessage,
@@ -14,19 +17,36 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+export function startCreateTopicFromMessage(
+	message: IMessageWithUser,
+	dispatch: AppDispatch,
+	tMessage: (key: string) => string,
+	initMessage?: IMessageWithUser | null,
+	channelIdFallback?: string
+): void {
+	const state = getStore().getState();
+	const channelId =
+		(message.channel_id as string) || (initMessage?.channel_id as string) || channelIdFallback || (selectCurrentChannelId(state) as string) || '';
+	if (selectAnonymousMode(state, channelId)) {
+		dispatch(toastActions.addToast({ message: tMessage('turnOffAnonymousToCreateTopic'), type: 'error' }));
+		return;
+	}
+	dispatch(accountActions.turnOffAnonymous({ id: channelId, topic: true }));
+	dispatch(topicsActions.setIsShowCreateTopic(true));
+	dispatch(threadsActions.setIsShowCreateThread({ channelId, isShowCreateThread: false }));
+	dispatch(topicsActions.setOpenTopicMessageState(true));
+	dispatch(topicsActions.setCurrentTopicInitMessage(initMessage ?? message));
+	dispatch(topicsActions.setCurrentTopicId(''));
+	dispatch(topicsActions.setInitTopicMessageId(message.id));
+}
+
 export function useTopics() {
 	const dispatch = useAppDispatch();
 	const { t: tMessage } = useTranslation('message');
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const anonymousMode = useSelector((state) => selectAnonymousMode(state, currentChannelId as string));
 	const messageTopicError = useSelector(selectMessageTopicError);
 	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
 	const currentTopicInitMessage = useSelector(selectCurrentTopicInitMessage);
-
-	const setTurnOffTopicMessage = useCallback(() => {
-		setOpenTopicMessageState(false);
-		setCurrentTopicInitMessage(null);
-	}, [dispatch]);
 
 	const setOpenTopicMessageState = useCallback(
 		(value: boolean) => {
@@ -49,27 +69,16 @@ export function useTopics() {
 		[dispatch]
 	);
 
-	const startCreateTopicFromMessage = useCallback(
-		(message: IMessageWithUser, initMessage?: IMessageWithUser | null) => {
-			if (anonymousMode) {
-				dispatch(
-					toastActions.addToast({
-						message: tMessage('turnOffAnonymousToCreateTopic'),
-						type: 'error'
-					})
-				);
-				return;
-			}
+	const setTurnOffTopicMessage = useCallback(() => {
+		setOpenTopicMessageState(false);
+		setCurrentTopicInitMessage(null);
+	}, [setOpenTopicMessageState, setCurrentTopicInitMessage]);
 
-			const channelId = (message.channel_id as string) || (currentChannelId as string);
-			dispatch(topicsActions.setIsShowCreateTopic(true));
-			dispatch(threadsActions.setIsShowCreateThread({ channelId, isShowCreateThread: false }));
-			dispatch(topicsActions.setOpenTopicMessageState(true));
-			dispatch(topicsActions.setCurrentTopicInitMessage(initMessage ?? message));
-			dispatch(topicsActions.setCurrentTopicId(''));
-			dispatch(topicsActions.setInitTopicMessageId(message.id));
+	const startCreateTopicFromMessageBound = useCallback(
+		(message: IMessageWithUser, initMessage?: IMessageWithUser | null) => {
+			startCreateTopicFromMessage(message, dispatch, tMessage, initMessage);
 		},
-		[anonymousMode, currentChannelId, dispatch, tMessage]
+		[dispatch, tMessage]
 	);
 
 	return useMemo(
@@ -81,7 +90,7 @@ export function useTopics() {
 			setCurrentTopicInitMessage,
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage,
-			startCreateTopicFromMessage
+			startCreateTopicFromMessage: startCreateTopicFromMessageBound
 		}),
 		[
 			isShowCreateTopic,
@@ -91,7 +100,7 @@ export function useTopics() {
 			setCurrentTopicInitMessage,
 			setOpenTopicMessageState,
 			setTurnOffTopicMessage,
-			startCreateTopicFromMessage
+			startCreateTopicFromMessageBound
 		]
 	);
 }

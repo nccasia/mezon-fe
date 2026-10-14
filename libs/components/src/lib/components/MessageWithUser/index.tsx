@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { useTopics } from '@mezon/core';
+import { startCreateTopicFromMessage } from '@mezon/core';
 import type { MessagesEntity, RootState } from '@mezon/store';
 import { getPoll, getStore, selectBanMeInChannel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -162,7 +162,6 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const { t } = useTranslation('message');
 	const dispatch = useAppDispatch();
-	const { startCreateTopicFromMessage } = useTopics();
 	const userId = user?.user?.id as string;
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
@@ -235,8 +234,8 @@ function MessageWithUser({
 	);
 
 	const handleLeaveComment = useCallback(() => {
-		startCreateTopicFromMessage(message);
-	}, [message, startCreateTopicFromMessage]);
+		startCreateTopicFromMessage(message, dispatch, t, message, channelId);
+	}, [dispatch, message, channelId, t]);
 
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 

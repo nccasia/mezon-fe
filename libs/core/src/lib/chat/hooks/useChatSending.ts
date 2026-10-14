@@ -12,7 +12,6 @@ import {
 	selectMessageByMessageId,
 	selectSearchChannelById,
 	selectTopicAnonymousMode,
-	toastActions,
 	topicsActions,
 	useAppDispatch,
 	useAppSelector
@@ -20,7 +19,6 @@ import {
 import { useMezon } from '@mezon/transport';
 import type { IMessageSendPayload } from '@mezon/utils';
 import { TypeMessage, getMessageCreateTimeSeconds, withCreateTimeSecondsInUpdateContent } from '@mezon/utils';
-import { t } from 'i18next';
 import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef } from 'react';
@@ -119,15 +117,6 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 
 			if (fromTopic) {
 				if (!currentTopicId) {
-					if (anonymousMode) {
-						dispatch(
-							toastActions.addToast({
-								message: t('message:turnOffAnonymousToCreateTopic'),
-								type: 'error'
-							})
-						);
-						return;
-					}
 					if (isCreatingTopicRef.current) {
 						return;
 					}
