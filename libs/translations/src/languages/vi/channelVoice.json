@@ -176,5 +176,10 @@
 	"agentHint": {
 		"title": "Bật KOMU Agent",
 		"body": "Bấm vào biểu tượng KOMU Agent để thêm AI agent vào cuộc gọi này."
+	},
+	"dmCall": {
+		"you": "Bạn",
+		"enlarge": "Phóng to {{name}}",
+		"restoreLayout": "Quay lại chế độ xem cạnh nhau"
 	}
 }

@@ -382,12 +382,8 @@ export default function PreJoinCalling() {
 									: processorRef.current?.getVideoTrack()
 								: null
 						}
+						headerActions={cameraOn ? <InMeetingBackgroundMenu selectedMode={selectedBg} onSelectMode={handleSelectBg} /> : undefined}
 					/>
-					{cameraOn && (
-						<div className="absolute top-4 right-4 z-40">
-							<InMeetingBackgroundMenu selectedMode={selectedBg} onSelectMode={handleSelectBg} />
-						</div>
-					)}
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center min-h-screen bg-black text-white flex-1 p-4 overflow-y-auto">

@@ -6,5 +6,6 @@
 	"joinStream": "스트림 참여",
 	"noStreamToday": "오늘 스트림이 없습니다",
 	"hideMembers": "멤버 숨기기",
-	"showMembers": "멤버 표시"
+	"showMembers": "멤버 표시",
+	"duplicateSessionDisconnected": "계정이 다른 세션에서 스트림 또는 음성 채널에 참여하여 연결이 끊어졌습니다."
 }

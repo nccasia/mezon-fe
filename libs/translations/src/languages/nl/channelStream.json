@@ -6,5 +6,6 @@
 	"joinStream": "Bij stream betreden",
 	"noStreamToday": "Geen stream vandaag",
 	"hideMembers": "Leden verbergen",
-	"showMembers": "Leden tonen"
+	"showMembers": "Leden tonen",
+	"duplicateSessionDisconnected": "Verbinding verbroken omdat je account in een andere sessie lid is geworden van een stream of spraakkanaal."
 }
