@@ -48,11 +48,15 @@ export function useVideoSource(
 			hls = undefined;
 		};
 
+		// Loading a source cancels a play asked for before it (the click that mounted this video, or the viewer's
+		// play before a fallback), so ask again once the new source is attached.
 		const play = async (source: string, isPlaylist: boolean) => {
+			const resume = !video.paused;
 			detach();
 			playingPlaylist = isPlaylist;
 			if (!isPlaylist || video.canPlayType(HLS_MIME_TYPE)) {
 				video.src = source;
+				if (resume) void video.play().catch(() => undefined);
 				return;
 			}
 
@@ -71,6 +75,7 @@ export function useVideoSource(
 			});
 			player.loadSource(source);
 			player.attachMedia(video);
+			if (resume) void video.play().catch(() => undefined);
 		};
 
 		const fail = () => {
@@ -81,14 +86,10 @@ export function useVideoSource(
 				return;
 			}
 			switched = true;
-			// Loading another source cancels the play the viewer asked for, so ask again.
-			const resume = !video.paused;
 			const signedUrl = latestUrlRef.current ?? url;
 			const other = playingPlaylist ? signedUrl : getHlsMasterPlaylistUrl(signedUrl);
 			if (!other) return;
-			void play(other, !playingPlaylist).then(() => {
-				if (resume && !disposed) void video.play().catch(() => undefined);
-			});
+			void play(other, !playingPlaylist);
 		};
 
 		// hls.js reports its own failures; the video element also fires for those it gives up on.

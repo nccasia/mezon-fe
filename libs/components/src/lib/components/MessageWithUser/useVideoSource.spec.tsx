@@ -51,9 +51,17 @@ const PLAYLIST = 'https://cdn.mezon.ai/hls/1cf93b197d401000/2080000000000000001_
 const MASTER = '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=3137344,RESOLUTION=1280x720\nstream_0/playlist.m3u8\n';
 
 class FakeVideo {
-	src = '';
+	private source = '';
 	nativeHls = '';
 	paused = true;
+	get src() {
+		return this.source;
+	}
+	// Like the media element's load algorithm: a new source cancels a pending play.
+	set src(value: string) {
+		this.source = value;
+		this.paused = true;
+	}
 	play = jest.fn(() => {
 		this.paused = false;
 		return Promise.resolve();
@@ -117,6 +125,17 @@ it('plays a file outside the transcoding hosts as it is, without probing', async
 
 	expect(video.src).toBe('https://cdn.komu.vn/1cf93b197d401000/clip.mp4');
 	expect(fetchMock).not.toHaveBeenCalled();
+	expect(video.play).not.toHaveBeenCalled();
+});
+
+it('starts a file outside the transcoding hosts when the viewer pressed play before it loaded', async () => {
+	video.paused = false;
+	render(<Player url="https://cdn.komu.vn/1cf93b197d401000/clip.mp4" />);
+	await settle();
+
+	expect(video.src).toBe('https://cdn.komu.vn/1cf93b197d401000/clip.mp4');
+	expect(video.play).toHaveBeenCalledTimes(1);
+	expect(video.paused).toBe(false);
 });
 
 it('plays the converted stream natively where the browser can', async () => {
