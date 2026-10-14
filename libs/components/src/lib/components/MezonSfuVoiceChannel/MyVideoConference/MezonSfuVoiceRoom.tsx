@@ -449,6 +449,7 @@ export interface MezonSfuVoiceRoomProps {
 	username?: string;
 	isPrivateVoice?: boolean;
 	customVideoTrack?: MediaStreamTrack | null;
+	headerActions?: ReactNode;
 }
 
 type SfuOffer = { sdp: string; offer_generation: number };
@@ -471,7 +472,8 @@ export function MezonSfuVoiceRoom({
 	onToggleChat,
 	username,
 	isPrivateVoice,
-	customVideoTrack
+	customVideoTrack,
+	headerActions
 }: MezonSfuVoiceRoomProps) {
 	const { t } = useTranslation('channelVoice');
 	const dispatch = useAppDispatch();
@@ -2956,6 +2958,7 @@ export function MezonSfuVoiceRoom({
 						</span>
 					</div>
 					<div className="flex items-center gap-4 text-[var(--bg-icon-theme)]">
+						{headerActions}
 						{!isExternalCalling && <NotificationTooltip />}
 						<button
 							type="button"
