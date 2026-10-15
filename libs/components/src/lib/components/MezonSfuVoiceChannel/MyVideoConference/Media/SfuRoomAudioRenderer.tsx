@@ -13,7 +13,7 @@ export const SfuRoomAudioRenderer = ({
 	mutedParticipantIds: Set<string>;
 	sinkId?: string;
 	onPlaybackFailure?: AudioPlaybackFailure;
-	onSinkIdFailure?: (sinkId: string) => void;
+	onSinkIdFailure?: (sinkId?: string) => void;
 }) => (
 	<div className="hidden">
 		{participants.map((participant) =>
