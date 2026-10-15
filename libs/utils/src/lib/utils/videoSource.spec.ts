@@ -140,7 +140,7 @@ it('gives up when the caller aborts or the CDN hangs', async () => {
 });
 
 it('asks the server to transcode only large videos the media server accepts', () => {
-	const large = 10 * 1024 * 1024;
+	const large = 50 * 1024 * 1024;
 	for (const name of ['clip.mp4', 'IMG_0001.MOV', 'movie.mkv', 'old.avi', 'a.flv', 'b.m4v', 'c.wmv']) {
 		expect(wantsHlsTranscode(name, large)).toBe(true);
 		expect(wantsHlsTranscode(name, large - 1)).toBe(false);
@@ -149,4 +149,13 @@ it('asks the server to transcode only large videos the media server accepts', ()
 		expect(wantsHlsTranscode(name, Number.MAX_SAFE_INTEGER)).toBe(false);
 	}
 	expect(wantsHlsTranscode('clip.mp4', undefined)).toBe(false);
+});
+
+it('uploads videos under 50 MiB without asking for HLS', () => {
+	const mib = 1024 * 1024;
+	expect(wantsHlsTranscode('clip.mp4', 10 * mib)).toBe(false);
+	expect(wantsHlsTranscode('clip.mp4', 20 * mib)).toBe(false);
+	expect(wantsHlsTranscode('clip.mp4', 50 * mib - 1)).toBe(false);
+	expect(wantsHlsTranscode('clip.mp4', 50 * mib)).toBe(true);
+	expect(wantsHlsTranscode('IMG_0001.MOV', 200 * mib)).toBe(true);
 });
