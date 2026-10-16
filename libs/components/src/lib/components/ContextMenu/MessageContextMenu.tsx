@@ -9,7 +9,8 @@ import {
 	useDirect,
 	usePermissionChecker,
 	useReference,
-	useSendInviteMessage
+	useSendInviteMessage,
+	useTopics
 } from '@mezon/core';
 import {
 	channelMetaActions,
@@ -134,6 +135,7 @@ function MessageContextMenu({
 	const { t } = useTranslation('contextMenu');
 	const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 	const { setOpenThreadMessageState } = useReference();
+	const { startCreateTopicFromMessage } = useTopics();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannelPrivate = useSelector(selectCurrentChannelPrivate);
@@ -420,26 +422,9 @@ function MessageContextMenu({
 		[currentChannelId, dispatch]
 	);
 
-	const setIsShowCreateTopic = useCallback(
-		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
-			dispatch(
-				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread: false })
-			);
-		},
-		[currentChannelId, dispatch]
-	);
-
 	const setValueThread = useCallback(
 		(value: IMessageWithUser | null) => {
 			dispatch(threadsActions.setValueThread(value));
-		},
-		[dispatch]
-	);
-
-	const setCurrentTopicInitMessage = useCallback(
-		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -452,12 +437,8 @@ function MessageContextMenu({
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
 
 	const handleCreateTopic = useCallback(() => {
-		setIsShowCreateTopic(true);
-		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setCurrentTopicInitMessage(message);
-		dispatch(topicsActions.setCurrentTopicId(''));
-		dispatch(topicsActions.setInitTopicMessageId(message.id));
-	}, [dispatch, message, setIsShowCreateTopic, setCurrentTopicInitMessage]);
+		startCreateTopicFromMessage(message, message);
+	}, [message, startCreateTopicFromMessage]);
 
 	const handleMarkMessageNoti = useCallback(async () => {
 		try {
