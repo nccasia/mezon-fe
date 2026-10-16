@@ -21,6 +21,7 @@
 	"turnOnCamera": "Turn On Camera",
 	"stopScreenShare": "Stop screen share",
 	"shareYourScreen": "Share Your Screen",
+	"screenShareCaptureFailed": "Your browser couldn't capture the selected screen. Try sharing a window or a tab instead.",
 	"disconnect": "Disconnect",
 	"weakNetwork": "Weak network",
 	"networkWarning": "Your internet connection is unstable. Others may not hear you clearly.",
@@ -157,7 +158,11 @@
 		"aloneTimeoutDisconnected": "You were disconnected from the voice channel because you were alone in it for too long.",
 		"duplicateSessionDisconnected": "You joined the voice channel on another device, so this session was disconnected.",
 		"disconnectedRejoin": "You were disconnected from the voice channel.",
-		"weakNetworkDisconnected": "You were disconnected from the voice channel because your network is weak."
+		"weakNetworkDisconnected": "You were disconnected from the voice channel because your network is weak.",
+		"cameraLimitReached": "This voice channel has reached its camera limit. Try again when someone turns their camera off.",
+		"screenShareLimitReached": "This voice channel has reached its screen share limit. Try again when someone stops sharing.",
+		"cameraUpdateFailed": "Couldn't turn your camera on or off. Please try again.",
+		"screenShareUpdateFailed": "Couldn't start or stop screen sharing. Please try again."
 	},
 	"usernameScreen": "{{username}}'s screen",
 	"recording": {

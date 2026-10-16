@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Você foi desconectado do canal de voz porque ficou sozinho nele por muito tempo.",
 		"duplicateSessionDisconnected": "Você entrou no canal de voz em outro dispositivo, então esta sessão foi desconectada.",
 		"disconnectedRejoin": "Você foi desconectado do canal de voz.",
-		"weakNetworkDisconnected": "Você foi desconectado do canal de voz porque sua rede está fraca."
+		"weakNetworkDisconnected": "Você foi desconectado do canal de voz porque sua rede está fraca.",
+		"cameraLimitReached": "Este canal de voz atingiu o limite de câmeras. Tente novamente quando alguém desativar a câmera.",
+		"screenShareLimitReached": "Este canal de voz atingiu o limite de compartilhamentos de tela. Tente novamente quando alguém parar de compartilhar.",
+		"cameraUpdateFailed": "Não foi possível ativar ou desativar a câmera. Tente novamente.",
+		"screenShareUpdateFailed": "Não foi possível iniciar ou parar o compartilhamento de tela. Tente novamente."
 	},
 	"usernameScreen": "Tela de {{username}}",
 	"recording": {

@@ -70,7 +70,7 @@ import {
 
 import { SfuMediaHealth, SfuNetworkQuality } from './sfuMediaHealth';
 import { SFU_DUPLICATE_SESSION_CLOSE_CODE, SfuMuteSync, sfuCloseAction, sfuReconnectDelay, withSfuTimeout } from './sfuReconnect';
-import { SfuSlotAssignments } from './sfuSlotAssignments';
+import { SFU_MEDIA_POOL_VERSION, SfuSlotAssignments } from './sfuSlotAssignments';
 
 const ICE_RECOVERY_GRACE_MS = 4000;
 const NETWORK_QUALITY_INTERVAL_MS = 5000;
@@ -105,6 +105,13 @@ const SFU_PARTICIPANT_ACTION_ERRORS = new Set([
 	'unsupported_participant_action',
 	'auth_not_configured'
 ]);
+const SFU_MEDIA_REFUSALS = new Map<string, { media: 'camera' | 'screen'; toast: string }>([
+	['camera_capacity_full', { media: 'camera', toast: 'toast.cameraLimitReached' }],
+	['camera_update_failed', { media: 'camera', toast: 'toast.cameraUpdateFailed' }],
+	['screen_share_capacity_full', { media: 'screen', toast: 'toast.screenShareLimitReached' }],
+	['screen_share_update_failed', { media: 'screen', toast: 'toast.screenShareUpdateFailed' }]
+]);
+const SFU_IGNORED_ERRORS = new Set(['stale_mute_revision', 'invalid_camera_active']);
 
 const getRemoteParticipantId = (mid: string) => {
 	const numericMid = Number(mid);
@@ -575,6 +582,7 @@ export function MezonSfuVoiceRoom({
 	const muteSyncRef = useRef(new SfuMuteSync());
 	const connectionEpochRef = useRef(0);
 	const restartSessionRef = useRef<() => void>(() => undefined);
+	const stopScreenShareRef = useRef<() => Promise<void>>(() => Promise.resolve());
 	const pendingForcedMuteRef = useRef<number>();
 	const refreshingTokenRef = useRef(false);
 
@@ -875,7 +883,7 @@ export function MezonSfuVoiceRoom({
 					const id = `sfu-peer-${peerId}`;
 					next.set(id, mergeRemotePeerState({ id }, peer));
 				}
-				for (const [peerId, media] of slotAssignmentsRef.current.getMedia(pc.getTransceivers())) {
+				for (const [peerId, media] of slotAssignmentsRef.current.getMedia(pc.getTransceivers(), peerStateByIdRef.current)) {
 					const previous = next.get(media.id);
 					next.set(media.id, { ...previous, ...media, userId: media.userId ?? previous?.userId, peerId });
 				}
@@ -1996,7 +2004,14 @@ export function MezonSfuVoiceRoom({
 				setError(undefined);
 				setConnectionState('joining');
 
-				const joinMessage = { type: 'join', room: roomId, token: sessionToken, role: joinRole, screen_codec: SCREEN_CODEC.toLowerCase() };
+				const joinMessage = {
+					type: 'join',
+					room: roomId,
+					token: sessionToken,
+					role: joinRole,
+					screen_codec: SCREEN_CODEC.toLowerCase(),
+					media_pool_version: SFU_MEDIA_POOL_VERSION
+				};
 				ws.send(JSON.stringify(joinMessage));
 				const sendVisibility = () => {
 					screenKeyframeRecovery.setDocumentVisible(document.visibilityState === 'visible');
@@ -2087,6 +2102,7 @@ export function MezonSfuVoiceRoom({
 				if (message.type === 'joined') {
 					setError(undefined);
 					setConnectionState('awaiting offer');
+					slotAssignmentsRef.current.observeJoined(message);
 					if ((message as unknown as { room: string })?.room) {
 						setRoomPeerId((message as unknown as { room: string }).room);
 					}
@@ -2212,6 +2228,18 @@ export function MezonSfuVoiceRoom({
 					if (!joinedRef.current && (errorMsg === 'invalid_token' || errorMsg === 'missing_token')) {
 						tokenRejected = true;
 						restartSession();
+						return;
+					}
+					if (SFU_IGNORED_ERRORS.has(errorMsg)) return;
+					if (errorMsg === 'session_not_found') {
+						restartSession();
+						return;
+					}
+					const refusal = SFU_MEDIA_REFUSALS.get(errorMsg);
+					if (refusal) {
+						if (refusal.media === 'camera') dispatch(voiceActions.setShowCamera(false));
+						else void stopScreenShareRef.current();
+						dispatch(toastActions.addToast({ message: tRef.current(refusal.toast), type: 'warning', autoClose: 5000 }));
 						return;
 					}
 					setError(errorMsg);
@@ -2437,36 +2465,44 @@ export function MezonSfuVoiceRoom({
 		screenStreamRef.current = null;
 	};
 
-	const toggleScreenShare = async () => {
+	const stopScreenShare = async () => {
 		const pc = pcRef.current;
 		if (!pc) return;
 		const sender = findUplinkVideoSender('2');
-		if (screenStreamRef.current || screenSharing) {
-			stopLocalScreenCapture();
-			try {
-				if (sender) {
-					await sender.replaceTrack(null);
-					const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
-					if (
-						!slotAssignmentsRef.current.enabled &&
-						transceiver &&
-						transceiver.direction !== 'recvonly' &&
-						transceiver.direction !== 'inactive'
-					) {
-						transceiver.direction = 'recvonly';
-					}
+		stopLocalScreenCapture();
+		try {
+			if (sender) {
+				await sender.replaceTrack(null);
+				const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
+				if (
+					!slotAssignmentsRef.current.enabled &&
+					transceiver &&
+					transceiver.direction !== 'recvonly' &&
+					transceiver.direction !== 'inactive'
+				) {
+					transceiver.direction = 'recvonly';
 				}
-			} catch (cause) {
-				setError(cause instanceof Error ? cause.message : 'Unable to stop screen sharing');
-			} finally {
-				if (wsRef.current?.readyState === WebSocket.OPEN) {
-					wsRef.current.send(JSON.stringify({ type: 'share_screen', active: false }));
-				}
-				dispatch(voiceActions.setShowScreen(false));
-				setLocalPreview(localStreamRef.current || undefined);
 			}
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Unable to stop screen sharing');
+		} finally {
+			if (wsRef.current?.readyState === WebSocket.OPEN) {
+				wsRef.current.send(JSON.stringify({ type: 'share_screen', active: false }));
+			}
+			dispatch(voiceActions.setShowScreen(false));
+			setLocalPreview(localStreamRef.current || undefined);
+		}
+	};
+	stopScreenShareRef.current = stopScreenShare;
+
+	const toggleScreenShare = async () => {
+		const pc = pcRef.current;
+		if (!pc) return;
+		if (screenStreamRef.current || screenSharing) {
+			await stopScreenShare();
 			return;
 		}
+		const sender = findUplinkVideoSender('2');
 		let stream: MediaStream | undefined;
 		try {
 			const CaptureControllerConstructor = (window as typeof window & { CaptureController?: new () => ScreenCaptureController })
@@ -2503,7 +2539,8 @@ export function MezonSfuVoiceRoom({
 		} catch (cause) {
 			stream?.getTracks().forEach((captureTrack) => captureTrack.stop());
 			dispatch(voiceActions.setShowScreen(false));
-			setError(cause instanceof Error ? cause.message : 'Unable to share the screen');
+			if (cause instanceof DOMException && cause.name === 'NotReadableError') setError(t('screenShareCaptureFailed'));
+			else setError(cause instanceof Error ? cause.message : 'Unable to share the screen');
 		}
 	};
 
