@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Je verbinding met het stemkanaal is verbroken omdat je er te lang alleen in was.",
 		"duplicateSessionDisconnected": "Je bent op een ander apparaat lid geworden van het spraakkanaal. Deze sessie is daarom verbroken.",
 		"disconnectedRejoin": "Je verbinding met het spraakkanaal is verbroken.",
-		"weakNetworkDisconnected": "Je bent losgekoppeld van het spraakkanaal omdat je netwerk zwak is."
+		"weakNetworkDisconnected": "Je bent losgekoppeld van het spraakkanaal omdat je netwerk zwak is.",
+		"cameraLimitReached": "Dit spraakkanaal heeft het maximale aantal camera's bereikt. Probeer het opnieuw wanneer iemand de camera uitschakelt.",
+		"screenShareLimitReached": "Dit spraakkanaal heeft het maximale aantal schermdelingen bereikt. Probeer het opnieuw wanneer iemand stopt met delen.",
+		"cameraUpdateFailed": "Je camera kon niet worden in- of uitgeschakeld. Probeer het opnieuw.",
+		"screenShareUpdateFailed": "Scherm delen kon niet worden gestart of gestopt. Probeer het opnieuw."
 	},
 	"usernameScreen": "Scherm van {{username}}",
 	"recording": {

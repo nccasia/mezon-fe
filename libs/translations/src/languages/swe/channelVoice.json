@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Du kopplades från röstkanalen eftersom du var ensam i den för länge.",
 		"duplicateSessionDisconnected": "Du gick med i röstkanalen på en annan enhet, så den här sessionen kopplades från.",
 		"disconnectedRejoin": "Du kopplades från röstkanalen.",
-		"weakNetworkDisconnected": "Du kopplades från röstkanalen eftersom ditt nätverk är svagt."
+		"weakNetworkDisconnected": "Du kopplades från röstkanalen eftersom ditt nätverk är svagt.",
+		"cameraLimitReached": "Den här röstkanalen har nått gränsen för kameror. Försök igen när någon stänger av sin kamera.",
+		"screenShareLimitReached": "Den här röstkanalen har nått gränsen för skärmdelning. Försök igen när någon slutar dela.",
+		"cameraUpdateFailed": "Det gick inte att slå på eller av kameran. Försök igen.",
+		"screenShareUpdateFailed": "Det gick inte att starta eller stoppa skärmdelningen. Försök igen."
 	},
 	"usernameScreen": "{{username}}s skärm",
 	"recording": {
