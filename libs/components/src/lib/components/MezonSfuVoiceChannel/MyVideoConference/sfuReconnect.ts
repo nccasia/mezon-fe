@@ -1,5 +1,7 @@
 export type SfuCloseAction = 'stop' | 'refresh-token' | 'network-lost' | 'retry';
 
+export const SFU_DUPLICATE_SESSION_CLOSE_CODE = 4012;
+
 export const sfuCloseAction = (code: number): SfuCloseAction => {
 	switch (code) {
 		case 1000:

@@ -267,6 +267,7 @@ const ChannelLinkComponent = ({ clanId, channel, isPrivate, isUnReadChannel, num
 										defaultFill1="var(--speaker-fill-1)"
 										defaultFill2="var(--speaker-fill-2)"
 										defaultFill3="var(--speaker-fill-2)"
+										data-e2e={generateE2eId('clan_page.channel_list.item.icon.speaker_lock')}
 									/>
 								) : (
 									<Icons.Speaker
@@ -274,6 +275,7 @@ const ChannelLinkComponent = ({ clanId, channel, isPrivate, isUnReadChannel, num
 										defaultFill1="var(--speaker-fill-1)"
 										defaultFill2="var(--speaker-fill-2)"
 										defaultFill3="var(--speaker-fill-2)"
+										data-e2e={generateE2eId('clan_page.channel_list.item.icon.speaker')}
 									/>
 								))}
 

@@ -6,5 +6,6 @@
 	"joinStream": "Join stream",
 	"noStreamToday": "No stream today",
 	"hideMembers": "Hide Members",
-	"showMembers": "Show Members"
+	"showMembers": "Show Members",
+	"duplicateSessionDisconnected": "Disconnected because your account joined a stream or voice channel in another session."
 }

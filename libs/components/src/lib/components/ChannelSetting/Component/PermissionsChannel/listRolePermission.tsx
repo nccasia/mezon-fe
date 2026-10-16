@@ -1,7 +1,7 @@
 import { channelUsersActions, selectAllRolesClan, selectCurrentClanId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { IChannel } from '@mezon/utils';
-import { generateE2eId, DEFAULT_ROLE_COLOR } from '@mezon/utils';
+import { DEFAULT_ROLE_COLOR, generateE2eId } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -67,7 +67,11 @@ const ListRolePermission = (props: ListRolePermissionProps) => {
 				</div>
 				<div className="flex items-center gap-x-2">
 					<p className="text-xs ">{t('role')}</p>
-					<div onClick={() => deleteRole(role?.id || '')} role="button">
+					<div
+						onClick={() => deleteRole(role?.id || '')}
+						role="button"
+						data-e2e={generateE2eId('channel_setting_page.permissions.section.member_role_management.role_list.button_remove')}
+					>
 						<Icons.EscIcon className="size-[15px] cursor-pointer" />
 					</div>
 				</div>

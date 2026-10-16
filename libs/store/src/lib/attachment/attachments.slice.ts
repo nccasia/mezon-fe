@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import type { IAttachmentEntity, IChannelAttachment, LoadingStatus } from '@mezon/utils';
-import { AttachmentTypeUpload, EMimeTypes, ETypeLinkMedia } from '@mezon/utils';
+import { AttachmentTypeUpload, EMimeTypes, ETypeLinkMedia, isMediaTypeNotSupported } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type { ApiChannelAttachment, ChannelStreamMode } from 'mezon-js';
@@ -521,10 +521,11 @@ export const selectAllListAttachmentByChannel = createSelector([getAttachmentSta
 	}
 	return state.listAttachmentsByChannel[channelId]?.attachments?.filter(
 		(att) =>
-			att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) ||
-			att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) ||
-			att?.filetype?.includes(EMimeTypes.mp4) ||
-			att?.filetype?.includes(EMimeTypes.mov)
+			!isMediaTypeNotSupported(att?.filetype, att?.url) &&
+			(att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) ||
+				att?.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX) ||
+				att?.filetype?.includes(EMimeTypes.mp4) ||
+				att?.filetype?.includes(EMimeTypes.mov))
 	);
 });
 

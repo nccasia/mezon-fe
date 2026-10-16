@@ -18,10 +18,11 @@ export function getPresignKeyFromAttachmentUrl(url?: string): string | undefined
 		const pathname = new URL(url).pathname;
 		const segment = pathname.split('/').filter(Boolean).pop();
 		if (!segment) return undefined;
-		return normalizePresignKey(segment);
+
+		return normalizePresignKey(segment.split('.')[0]);
 	} catch {
 		const segment = url.split('?')[0].split('/').filter(Boolean).pop();
-		return segment ? normalizePresignKey(segment) : undefined;
+		return segment ? normalizePresignKey(segment.split('.')[0]) : undefined;
 	}
 }
 

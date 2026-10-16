@@ -23,7 +23,7 @@ const FileItem = ({ attachmentData, mode, channelId, isDirect = false, fallbackU
 	);
 	const isPresignPending = isAttachmentPresignPendingForMessage(attachmentData.url, sourceMessage);
 	const isHidden = shouldHidePresignAttachment(attachmentData.url, sourceMessage);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([attachmentData.url]);
+	const { signCdnUrl } = useCdnUrlSigner([attachmentData.url], channelId);
 	const userSendAttachment = useAppSelector((state) =>
 		isDirect
 			? selectMemberGroupByUserId(state, channelId ?? '', attachmentData?.uploader ?? '')
@@ -62,7 +62,7 @@ const FileItem = ({ attachmentData, mode, channelId, isDirect = false, fallbackU
 		attachment: { ...attachmentData, url: signCdnUrl(attachmentData.url) },
 		size: 'w-8 h-10',
 		isFileList: true,
-		isPresignPending: isPresignPending || isAwaitingSignature(attachmentData.url)
+		isPresignPending
 	});
 
 	const hideTheInformationFile =

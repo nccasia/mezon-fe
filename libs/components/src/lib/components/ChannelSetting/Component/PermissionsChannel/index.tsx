@@ -1,4 +1,5 @@
 import { useAuth } from '@mezon/core';
+import type { AddedChannelUserProfile } from '@mezon/store';
 import {
 	channelsActions,
 	fetchUserChannels,
@@ -48,6 +49,8 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [valueToggleInit, setValueToggleInit] = useState(!!channel.channel_private);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+	// Names and avatars of picked members the clan roster does not hold, until saving fetches the channel listing.
+	const [stagedProfiles, setStagedProfiles] = useState<Record<string, AddedChannelUserProfile>>({});
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 	const [permissionsListHasChanged, setPermissionsListHasChanged] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -74,6 +77,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const handleReset = useCallback(() => {
 		setSelectedRoleIds([]);
 		setSelectedUserIds([]);
+		setStagedProfiles({});
 		setValueToggle(valueToggleInit);
 		if (resetTriggerRef.current) {
 			resetTriggerRef.current();
@@ -100,6 +104,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		dispatch(fetchUserChannels({ channelId: channel.id, noCache: true }));
 		setValueToggleInit(valueToggle);
 		setSelectedUserIds([]);
+		setStagedProfiles({});
 		setSelectedRoleIds([]);
 	}, [valueToggle, selectedUserIds, selectedRoleIds, userProfile, channel, clanId, dispatch]);
 
@@ -138,8 +143,9 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	const hasUnsavedChanges = valueToggleInit !== valueToggle || permissionsListHasChanged;
 
-	const handleSelectedUsersChange = useCallback((newSelectedUserIds: string[]) => {
+	const handleSelectedUsersChange = useCallback((newSelectedUserIds: string[], profiles: Record<string, AddedChannelUserProfile>) => {
 		setSelectedUserIds(newSelectedUserIds);
+		setStagedProfiles((staged) => ({ ...staged, ...profiles }));
 	}, []);
 
 	const handleSelectedRolesChange = useCallback((newSelectedRoleIds: string[]) => {
@@ -206,7 +212,12 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 									</div>
 								</div>
 								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
-								<ListMemberPermission channel={channel} selectedUserIds={selectedUserIds} setSelectedUserIds={setSelectedUserIds} />
+								<ListMemberPermission
+									channel={channel}
+									selectedUserIds={selectedUserIds}
+									setSelectedUserIds={setSelectedUserIds}
+									stagedProfiles={stagedProfiles}
+								/>
 							</div>
 						)}
 					</div>

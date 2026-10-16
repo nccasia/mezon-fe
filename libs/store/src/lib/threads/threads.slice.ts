@@ -7,6 +7,7 @@ import { t } from 'i18next';
 import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { cdnSignatureActions } from '../cdnSignature/cdnSignature.slice';
 import { applyChannelArchiveState, channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
@@ -287,6 +288,7 @@ export const leaveThread = createAsyncThunk(
 			const response = await mezon.client.leaveThread(mezon.session, clanId, threadId);
 			if (response) {
 				thunkAPI.dispatch(channelsActions.removeByChannelID({ channelId: threadId, clanId }));
+				thunkAPI.dispatch(cdnSignatureActions.removeByChannelId(threadId));
 				if (isPrivate) {
 					thunkAPI.dispatch(threadsActions.remove(threadId));
 					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId, threadId }));

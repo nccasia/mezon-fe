@@ -13,6 +13,7 @@ import {
 	badgeService,
 	canvasAPIActions,
 	categoriesActions,
+	cdnSignatureActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -58,6 +59,7 @@ import {
 	selectChannelsByClanId,
 	selectClanMemberByClanId,
 	selectClanView,
+	selectClansEntities,
 	selectClansLoadingStatus,
 	selectClickedOnTopicStatus,
 	selectCurrentChannel,
@@ -108,7 +110,17 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
+import {
+	CHECK_HEALTHY_EVENT,
+	REALTIME_SERVER_CHANGED_EVENT,
+	RECONNECT_NETWORK_PROBE_TIMEOUT_MS,
+	disableSlowReports,
+	isRealtimeServerPinned,
+	probeNetworkReachability,
+	publishSessionUpdate,
+	shouldReportSlowNode,
+	useMezon
+} from '@mezon/transport';
 import type { IMessageSendPayload, INotification, IUserProfileActivity } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -229,6 +241,7 @@ const RECONNECT_RETRY_BASE_MS = 500;
 const RECONNECT_RETRY_JITTER_MS = 400;
 
 const RECONNECT_WAVE_COOLDOWN_MS = 10000;
+const STREAM_SELF_REJOIN_GRACE_MS = 3000;
 
 function randomReconnectSpacingMs(): number {
 	return RECONNECT_RETRY_BASE_MS + Math.floor(Math.random() * RECONNECT_RETRY_JITTER_MS);
@@ -298,7 +311,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isMobile = false }) => {
 	const { t } = useTranslation('token');
 	const { t: tChannelMenu } = useTranslation('channelMenu');
-	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
+	const { clientRef, sessionRef, mmnRef, askHealthyEndpoint, connectSocket, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
 	const reconnectRecoveryPendingRef = useRef(false);
@@ -369,6 +382,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch]
 	);
 
+	const pendingStreamSelfLeaveRef = useRef<{ channelId: string; timer: NodeJS.Timeout } | null>(null);
+
+	const cancelPendingStreamSelfLeave = useCallback(() => {
+		if (!pendingStreamSelfLeaveRef.current) return;
+		clearTimeout(pendingStreamSelfLeaveRef.current.timer);
+		pendingStreamSelfLeaveRef.current = null;
+	}, []);
+
+	useEffect(() => cancelPendingStreamSelfLeave, [cancelPendingStreamSelfLeave]);
+
 	const onstreamingchanneljoined = useCallback(
 		(user: StreamingJoinedEvent) => {
 			if (!user?.user_id) return;
@@ -379,8 +402,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					user_name: ''
 				})
 			);
+			if (String(user.user_id) !== String(userId)) return;
+			if (pendingStreamSelfLeaveRef.current?.channelId !== String(user.streaming_channel_id)) return;
+			cancelPendingStreamSelfLeave();
 		},
-		[dispatch]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onstreamingchannelleaved = useCallback(
@@ -392,11 +418,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!isJoin || !streamInfo?.streamId) return;
 			if (String(user.streaming_channel_id) !== String(streamInfo.streamId)) return;
 			if (String(user.streaming_user_id) !== String(userId)) return;
-			dispatch(usersStreamActions.streamEnded(streamInfo.streamId));
-			dispatch(videoStreamActions.resetPlayback());
-			dispatch(appActions.setIsShowChatStream(false));
+			const channelId = String(streamInfo.streamId);
+			cancelPendingStreamSelfLeave();
+			pendingStreamSelfLeaveRef.current = {
+				channelId,
+				timer: setTimeout(() => {
+					pendingStreamSelfLeaveRef.current = null;
+					const state = getStore().getState();
+					if (!selectIsJoin(state) || String(selectCurrentStreamInfo(state)?.streamId) !== channelId) return;
+					dispatch(usersStreamActions.streamEnded(channelId));
+					dispatch(videoStreamActions.resetPlayback());
+					dispatch(appActions.setIsShowChatStream(false));
+				}, STREAM_SELF_REJOIN_GRACE_MS)
+			};
 		},
-		[dispatch, userId]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onactivityupdated = useCallback(
@@ -1126,6 +1162,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID({ channelId: user.channel_id, clanId: user.clan_id || (clanId as string) }));
+					// A file forwarded out of this channel must stop loading for this user now, not when the signature expires.
+					dispatch(cdnSignatureActions.removeByChannelId(user.channel_id));
 
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 						if (threadToRemove && threadToRemove.channel_private === ChannelStatusEnum.isPrivate) {
@@ -1206,6 +1244,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						dispatch(videoStreamActions.resetPlayback());
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+					channels.forEach((channel) => dispatch(cdnSignatureActions.removeByChannelId(channel.id)));
 					dispatch(listChannelsByUserActions.remove(id));
 					dispatch(topicsActions.removeClanTopics(user?.clan_id));
 					dispatch(channelsActions.removeByClanId(user.clan_id));
@@ -1333,8 +1372,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 
 			if (currentClanId === clan_id) {
+				// Only members the roster lacks: an entry replaces the roster's whole user, and the event carries just the id
+				// when the server has no cached profile, which blanked the member's name everywhere until the next fetch.
+				const roster = selectEntitesUserClans(store.getState() as unknown as RootState);
 				const members = users
-					.filter((user) => user?.user_id)
+					.filter((user) => user?.user_id && !roster[user.user_id] && (user.username || user.display_name))
 					.map((user) => ({
 						id: user.user_id,
 						user: {
@@ -1369,6 +1411,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	const onuserclanadded = useCallback(
 		async (userJoinClan: AddClanUserEvent) => {
 			const store = await getStoreAsync();
+
+			if (userJoinClan?.user?.user_id === userId && !selectClansEntities(store.getState() as unknown as RootState)[userJoinClan.clan_id]) {
+				dispatch(clansActions.fetchClans({ noCache: true }));
+			}
 
 			const clanMemberStore = selectClanMemberByClanId(store.getState() as unknown as RootState, userJoinClan.clan_id);
 
@@ -2837,14 +2883,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, [dispatch]);
 
 	const onServerDisconnectStreakLogout = useCallback(
-		(_evt: Event, streak: number) => {
+		async (_evt: Event, streak: number) => {
 			captureSentryError(new Error(`serverDisconnectStreak=${String(streak)}`), 'SERVER_DISCONNECT_STREAK_LOGOUT');
+			// A node the user pinned by hand closing the socket is not evidence the session is gone.
+			// `ondisconnect` already started a reconnect wave; logging them out would be the wrong answer.
+			if (isRealtimeServerPinned()) {
+				return;
+			}
+			// A node refusing us three times says nothing about the session. Ask the gateway
+			// (ignoring the usual throttle): if it still answers us, the session is alive and the
+			// node is the problem — keep the user in the app and let the wave, or Settings → Server,
+			// deal with it. Only an outright rejection means the session is really gone.
+			if ((await askHealthyEndpoint({ force: true })) !== 'rejected') {
+				return;
+			}
 			resetRefreshState();
 			dispatch(authActions.setLogout());
 			dispatch(walletActions.setLogout());
 			publishSessionUpdate(null, 'logout');
 		},
-		[dispatch]
+		[dispatch, askHealthyEndpoint]
 	);
 
 	const onscreenshare = useCallback(
@@ -3111,9 +3169,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 								return 'SKIP';
 							}
 
+							// The first attempt already failed on the node we have: ask the gateway
+							// whether it wants to move us before burning the rest of the wave on it.
+							if (getReconnectWaveAttempts() >= 1 && (await askHealthyEndpoint()) === 'changed') {
+								// A node we have never tried deserves a full budget instead of the
+								// cooldown this wave was about to hit.
+								resetReconnectWave();
+							}
+
 							if (!consumeReconnectAttempt()) {
-								const exhaustedWaves = noteReconnectWaveExhausted();
-								if (exhaustedWaves >= MAX_RECONNECT_WAVES_BEFORE_LOGOUT) {
+								// A pinned server that never answers must not cost the user their session.
+								const exhaustedWaves = isRealtimeServerPinned() ? 0 : noteReconnectWaveExhausted();
+								if (
+									exhaustedWaves >= MAX_RECONNECT_WAVES_BEFORE_LOGOUT &&
+									(await askHealthyEndpoint({ force: true })) === 'rejected'
+								) {
 									reconnectRecoveryPendingRef.current = false;
 									socketState.status = 'disconnected';
 									resetRefreshState();
@@ -3152,7 +3222,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [reconnect$, executeReconnect, clientRef, dispatch, runPostReconnectActions]);
+	}, [reconnect$, executeReconnect, clientRef, dispatch, runPostReconnectActions, askHealthyEndpoint]);
 
 	useEffect(() => {
 		const onWaveReset = () => {
@@ -3182,6 +3252,71 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		console.error('HEARTBEATTIMEOUT');
 		socketState.status = 'disconnected';
 	}, [handleReconnect]);
+
+	// Bootstrap can hand us a dead socket (a pinned node that is down, or a gateway that only knows
+	// the node that just refused us). Nothing else starts a wave in that case, so the app would sit
+	// silently offline until the window regained focus.
+	useEffect(() => {
+		if (socketState.status === 'connected' || !sessionRef.current) {
+			return;
+		}
+		handleReconnect('Socket was not connected at startup, attempting to reconnect...');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// mezon-js says our requests have gone slow. That can be the node or it can be the user's link,
+	// so this only reaches the gateway once we have been on the node long enough to blame it — and
+	// if the gateway keeps naming the same node, we stop asking about slowness until we reconnect.
+	useEffect(() => {
+		const onSlowNode = async () => {
+			if (socketState.status !== 'connected' || !shouldReportSlowNode()) {
+				return;
+			}
+			const verdict = await askHealthyEndpoint();
+			if (verdict === 'changed') {
+				window.dispatchEvent(new CustomEvent(REALTIME_SERVER_CHANGED_EVENT));
+			} else if (verdict === 'same') {
+				disableSlowReports();
+			}
+		};
+		window.addEventListener(CHECK_HEALTHY_EVENT, onSlowNode);
+		return () => {
+			window.removeEventListener(CHECK_HEALTHY_EVENT, onSlowNode);
+		};
+	}, [askHealthyEndpoint]);
+
+	// The Server page lives in a modal portal outside this provider, so it asks for the move by event.
+	// A wave may be cooling down after the node the user is leaving went bad, and `exhaustMap` would make
+	// them wait it out, so the move gets one immediate connect and only falls back to the wave if it fails.
+	useEffect(() => {
+		const onRealtimeServerChanged = () => {
+			clientRef.current?.disconnect(false);
+			socketState.status = 'connecting';
+			resetReconnectWave();
+			resetExhaustedWaveCount();
+			reconnectRecoveryPendingRef.current = true;
+			setTimeout(() => {
+				connectSocket({ createStatus: true, force: true })
+					.then((session) => {
+						if (!session) {
+							// No client or no session to connect with — do not claim we are online.
+							socketState.status = 'disconnected';
+							return;
+						}
+						socketState.status = 'connected';
+						runPostReconnectActions();
+					})
+					.catch(() => {
+						socketState.status = 'disconnected';
+						handleReconnect('Realtime server changed, reconnecting...');
+					});
+			}, 0);
+		};
+		window.addEventListener(REALTIME_SERVER_CHANGED_EVENT, onRealtimeServerChanged);
+		return () => {
+			window.removeEventListener(REALTIME_SERVER_CHANGED_EVENT, onRealtimeServerChanged);
+		};
+	}, [clientRef, connectSocket, handleReconnect, runPostReconnectActions]);
 
 	useEffect(() => {
 		const socket = clientRef.current;

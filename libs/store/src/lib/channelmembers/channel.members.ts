@@ -14,6 +14,7 @@ import { ChannelType } from 'mezon-js';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import type { CacheMetadata } from '../cache-metadata';
 import { clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { cdnSignatureActions } from '../cdnSignature/cdnSignature.slice';
 import {
 	USERS_CLANS_FEATURE_KEY,
 	selectAllUserClans,
@@ -256,6 +257,7 @@ export const removeMemberChannel = createAsyncThunk(
 				return;
 			} else {
 				thunkAPI.dispatch(notificationSettingActions.removeNotiSetting(channelId));
+				thunkAPI.dispatch(cdnSignatureActions.removeByChannelId(channelId));
 			}
 
 			return true;

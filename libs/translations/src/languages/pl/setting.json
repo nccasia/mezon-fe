@@ -47,7 +47,18 @@
 		"advanced": "Zaawansowane",
 		"appVersion": "Wersja aplikacji",
 		"startUp": "Uruchamianie",
-		"quitApp": "Wyjdź z aplikacji"
+		"quitApp": "Wyjdź z aplikacji",
+		"server": "Serwer"
+	},
+	"server": {
+		"auto": "Automatycznie",
+		"autoHint": "Wybiera serwer za Ciebie",
+		"inUse": "Używany: {{region}}",
+		"vietnam": "Wietnam",
+		"unitedStates": "Stany Zjednoczone",
+		"connectedTo": "Połączono z {{region}}",
+		"connectingTo": "Łączenie z {{region}}…",
+		"footer": "Automatycznie: Wybiera serwer za Ciebie. Wybierz serwer, jeśli chcesz zawsze z niego korzystać."
 	},
 	"autoStart": {
 		"title": "Automatyczne uruchamianie aplikacji",

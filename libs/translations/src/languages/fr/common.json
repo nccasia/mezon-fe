@@ -531,6 +531,7 @@
 		"accessDenied": "Accès refusé",
 		"accessDeniedDesc": "Vous n'avez pas la permission d'accéder à ce canal ou à ce clan. Veuillez contacter l'administrateur si vous pensez qu'il s'agit d'une erreur.",
 		"goToWelcomeChannel": "Aller au canal d'accueil",
+		"goToFriendPage": "Aller à la page des amis",
 		"okayGotIt": "D'accord"
 	},
 	"reportMessage": {

@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "長時間ひとりだったため、ボイスチャンネルから切断されました。",
 		"duplicateSessionDisconnected": "別のデバイスでボイスチャンネルに参加したため、このセッションは切断されました。",
 		"disconnectedRejoin": "ボイスチャンネルから切断されました。",
-		"weakNetworkDisconnected": "ネットワークが弱いため、音声チャンネルから切断されました。"
+		"weakNetworkDisconnected": "ネットワークが弱いため、音声チャンネルから切断されました。",
+		"cameraLimitReached": "このボイスチャンネルはカメラの上限に達しています。誰かがカメラをオフにしてから、もう一度お試しください。",
+		"screenShareLimitReached": "このボイスチャンネルはスクリーン共有の上限に達しています。誰かが共有を停止してから、もう一度お試しください。",
+		"cameraUpdateFailed": "カメラのオン/オフを切り替えられませんでした。もう一度お試しください。",
+		"screenShareUpdateFailed": "スクリーン共有を開始または停止できませんでした。もう一度お試しください。"
 	},
 	"usernameScreen": "{{username}}のスクリーン",
 	"recording": {

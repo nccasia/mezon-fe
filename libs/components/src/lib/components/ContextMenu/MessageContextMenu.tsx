@@ -9,7 +9,8 @@ import {
 	useDirect,
 	usePermissionChecker,
 	useReference,
-	useSendInviteMessage
+	useSendInviteMessage,
+	useTopics
 } from '@mezon/core';
 import {
 	channelMetaActions,
@@ -134,6 +135,7 @@ function MessageContextMenu({
 	const { t } = useTranslation('contextMenu');
 	const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 	const { setOpenThreadMessageState } = useReference();
+	const { startCreateTopicFromMessage } = useTopics();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannelPrivate = useSelector(selectCurrentChannelPrivate);
@@ -182,7 +184,6 @@ function MessageContextMenu({
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmChannelId) || '')
 	);
 	const allMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, (isClanView ? currentChannelId : currentDmId) as string));
-	const topicMessageIds = useAppSelector((state) => selectMessageIdsByChannelId(state, currentTopicId || ''));
 	const dispatch = useAppDispatch();
 
 	const handleItemClick = useCallback(() => {
@@ -421,26 +422,9 @@ function MessageContextMenu({
 		[currentChannelId, dispatch]
 	);
 
-	const setIsShowCreateTopic = useCallback(
-		(isShowCreateTopic: boolean, channelId?: string) => {
-			dispatch(topicsActions.setIsShowCreateTopic(isShowCreateTopic));
-			dispatch(
-				threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread: false })
-			);
-		},
-		[currentChannelId, dispatch]
-	);
-
 	const setValueThread = useCallback(
 		(value: IMessageWithUser | null) => {
 			dispatch(threadsActions.setValueThread(value));
-		},
-		[dispatch]
-	);
-
-	const setCurrentTopicInitMessage = useCallback(
-		(value: IMessageWithUser | null) => {
-			dispatch(topicsActions.setCurrentTopicInitMessage(value));
 		},
 		[dispatch]
 	);
@@ -453,12 +437,8 @@ function MessageContextMenu({
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
 
 	const handleCreateTopic = useCallback(() => {
-		setIsShowCreateTopic(true);
-		dispatch(topicsActions.setOpenTopicMessageState(true));
-		setCurrentTopicInitMessage(message);
-		dispatch(topicsActions.setCurrentTopicId(''));
-		dispatch(topicsActions.setInitTopicMessageId(message.id));
-	}, [dispatch, message, setIsShowCreateTopic, setCurrentTopicInitMessage]);
+		startCreateTopicFromMessage(message, message);
+	}, [message, startCreateTopicFromMessage]);
 
 	const handleMarkMessageNoti = useCallback(async () => {
 		try {
@@ -577,13 +557,15 @@ function MessageContextMenu({
 		return message?.code === TypeMessage.Poll;
 	}, [message?.code]);
 
+	const isTopicRootMessage = useMemo(() => message?.code === TypeMessage.Topic, [message?.code]);
+
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableEdit = isMyMessage && !message?.content?.tp && !isPollMessage;
+		const enableEdit = isMyMessage && !isTopicRootMessage && !isPollMessage;
 		const enableReport = !isMyMessage;
 
 		return [enableEdit, enableReport];
-	}, [isMyMessage, checkPos, message?.content?.tp, isPollMessage]);
+	}, [isMyMessage, checkPos, isTopicRootMessage, isPollMessage]);
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
@@ -616,11 +598,10 @@ function MessageContextMenu({
 	}, [checkPos, activeMode, canManageThread, currentChannelType, isTopic]);
 
 	const enableDelMessageItem = useMemo(() => {
-		if (!checkPos || message?.content?.tp) return false;
-
-		const isFirstTopicMessage = isTopic && topicMessageIds?.length > 0 && messageId === topicMessageIds[0];
+		if (!checkPos) return false;
+		if (isTopicRootMessage) return false;
 		const isInitTopicMessage = !isTopic && messageId === initTopicMessageId;
-		if (isFirstTopicMessage || isInitTopicMessage) return false;
+		if (isInitTopicMessage) return false;
 
 		if (isMyMessage) return true;
 
@@ -629,19 +610,7 @@ function MessageContextMenu({
 		const isChannelOrThreadOrTopic =
 			isTopic || activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL || activeMode === ChannelStreamMode.STREAM_MODE_THREAD;
 		return isChannelOrThreadOrTopic ? canDeleteMessage : false;
-	}, [
-		activeMode,
-		type,
-		canDeleteMessage,
-		isMyMessage,
-		checkPos,
-		isOwnerGroupDM,
-		message?.content?.tp,
-		messageId,
-		initTopicMessageId,
-		isTopic,
-		topicMessageIds
-	]);
+	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM, isTopicRootMessage, messageId, initTopicMessageId, isTopic]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 	const checkElementIsLink = elementTarget instanceof HTMLAnchorElement;
@@ -659,8 +628,7 @@ function MessageContextMenu({
 		}
 		return '';
 	}, [imageSrc, message?.content?.embed]);
-	// `urlImage` stays unsigned so a copied link does not expire with its signature; open, copy image and save sign it on use.
-	const { signCdnUrl } = useCdnUrlSigner([urlImage]);
+	const { signCdnUrl } = useCdnUrlSigner([urlImage], message?.channel_id);
 
 	useMemo(() => {
 		if (isClickedEmoji) {
@@ -955,7 +923,8 @@ function MessageContextMenu({
 		builder.when(enableCopyLinkItem, (builder) => {
 			builder.addMenuItem('copyLink', t('copyLink'), async () => {
 				try {
-					const contentToCopy = isLinkContent && linkContent ? linkContent : checkElementIsImage ? urlImage : (message?.content?.t ?? '');
+					const contentToCopy =
+						isLinkContent && linkContent ? linkContent : checkElementIsImage ? signCdnUrl(urlImage) : (message?.content?.t ?? '');
 					await handleCopyLink(contentToCopy);
 				} catch (error) {
 					console.error(t('errors.failedToCopyLink'), error);

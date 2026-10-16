@@ -41,16 +41,17 @@ export type NotificationAttachmentItemProps = {
 	readonly attachment: ApiMessageAttachment;
 	readonly index: number;
 	readonly compact?: boolean;
+	readonly channelId?: string;
 };
 
-export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, compact = false }: NotificationAttachmentItemProps) => {
-	const { t } = useTranslation(['channelTopbar', 'common']);
-	const dispatch = useAppDispatch();
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([rawAttachment?.url, rawAttachment?.thumbnail]);
+export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, compact = false, channelId }: NotificationAttachmentItemProps) => {
+	const { signCdnUrl } = useCdnUrlSigner([rawAttachment?.url, rawAttachment?.thumbnail], channelId);
 	const attachment = useMemo<ApiMessageAttachment>(
 		() => ({ ...rawAttachment, url: signCdnUrl(rawAttachment?.url), thumbnail: signCdnUrl(rawAttachment?.thumbnail) }),
 		[rawAttachment, signCdnUrl]
 	);
+	const { t } = useTranslation(['channelTopbar', 'common']);
+	const dispatch = useAppDispatch();
 	const isPDF = Boolean(attachment?.filetype === 'application/pdf' || attachment?.filename?.toLowerCase().endsWith('.pdf'));
 	const isImageOrVideo = Boolean(
 		attachment?.filetype?.startsWith('image/') ||
@@ -93,7 +94,7 @@ export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, c
 			initialHeight: 600,
 			minWidth: 600,
 			minHeight: 400,
-			popupId: `pdf-viewer-${attachment?.filename || 'doc'}-${rawAttachment?.url || index}`
+			popupId: `pdf-viewer-${attachment?.filename || 'doc'}-${attachment?.url || index}`
 		}
 	);
 
@@ -127,7 +128,6 @@ export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, c
 		if (isPDF) {
 			openPDFViewer();
 		} else if (isImageOrVideo && rawAttachment?.url) {
-			// The viewer signs the url itself; a signed url stored here would never be re-signed once it expires.
 			dispatch(
 				attachmentActions.setCurrentAttachment({
 					id: rawAttachment.url,
@@ -166,8 +166,7 @@ export const NotificationAttachmentItem = ({ attachment: rawAttachment, index, c
 			filename: attachment?.filename || displayName
 		},
 		size: compact ? 'w-8 h-8' : 'w-10 h-10',
-		isFileList: true,
-		isPresignPending: isAwaitingSignature(rawAttachment?.url)
+		isFileList: true
 	});
 
 	return (

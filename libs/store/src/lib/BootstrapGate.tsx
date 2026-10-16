@@ -1,5 +1,5 @@
 import { probeNetworkReachability, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
-import { E_CONNECT_ERROR, type ApiSession, type TopicInMessageEvent } from 'mezon-js';
+import type { ApiSession, TopicInMessageEvent } from 'mezon-js';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import type { Persistor } from 'redux-persist';
@@ -44,7 +44,7 @@ type Props = {
 	fallback?: ReactNode;
 };
 export function BootstrapGate({ children, persistor, fallback }: Props) {
-	const { sessionRef, createClient, connectSocket } = useMezon();
+	const { sessionRef, createClient, connectSocket, askHealthyEndpoint } = useMezon();
 	const dispatch = useAppDispatch();
 	const [ready, setReady] = useState(false);
 	const [checkConnect, setCheckConnect] = useState(false);
@@ -107,9 +107,20 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 							try {
 								await connectSocket({ useToken: true });
 							} catch (errorToken) {
-								if (errorToken instanceof Error && errorToken.message !== E_CONNECT_ERROR.TIME_OUT) {
+								// Ask the gateway, the only party that can tell a dead node from a dead
+								// session: a different node is worth retrying right away, a refusal means the
+								// session is gone, and anything else (including a pinned server the user chose,
+								// which is never moved) lets them into the app with a socket the reconnect wave
+								// keeps retrying — staying on this screen would hide Settings → Server, the one
+								// way out.
+								console.error('ERROR_CONNECT (socket)', errorToken);
+								const verdict = await askHealthyEndpoint({ force: true });
+								if (verdict === 'changed') {
+									continue;
+								}
+								if (verdict === 'rejected') {
 									shouldLogout = true;
-								} else {
+								} else if (verdict === 'unreachable') {
 									setCheckConnect(true);
 								}
 							}

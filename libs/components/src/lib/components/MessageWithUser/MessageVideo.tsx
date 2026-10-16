@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { AttachmentSendingIndicator } from './AttachmentSendingIndicator';
+import { useVideoSource } from './useVideoSource';
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 	isMobile?: boolean;
@@ -488,7 +489,15 @@ function DefaultVideo({
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [showControl, setShowControl] = useState(true);
 	const isVideoActive = activated && isIntersecting && !isUploading;
+
+	// Scrolling away already stops the video and drops its source, so bring the poster back with it: coming into view
+	// again must not reload a video nobody pressed play on, which for an HLS stream means two whole segments.
+	useEffect(() => {
+		if (!isIntersecting) setActivated(false);
+	}, [isIntersecting]);
+
 	const { requestPlay, tryPlay } = usePlayOnActivation(videoRef, isVideoActive);
+	const { failed, handleError } = useVideoSource(videoRef, attachmentData.url, isVideoActive);
 
 	useVideoCleanup(videoRef, isVideoActive);
 
@@ -557,21 +566,30 @@ function DefaultVideo({
 						style={mediaStyle}
 						ref={videoRef}
 						onCanPlay={handleOnCanPlay}
+						onError={handleError}
 						className="object-contain"
 						preload="auto"
 						playsInline
 					>
-						<source src={attachmentData.url} />
 						{t('video.error.browserNotSupported')}
 					</video>
 
-					{!showControl && (
-						<div
-							className="cursor-pointer absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-30 group"
-							onClick={handleShowFullVideo}
-						>
-							<Icons.PlayButton className="w-4 h-4 text-white transition-all duration-150 group-hover:scale-110" />
+					{failed ? (
+						<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-20 p-2 rounded-lg text-center text-sm bg-bgLightSecondary dark:bg-bgSecondary text-textSecondary800 dark:text-textSecondary">
+							<span>{t('video.error.cannotPlay')}</span>
+							<button className="underline hover:text-black dark:hover:text-white" onClick={handleDownloadVideo}>
+								{t('video.error.downloadButton')}
+							</button>
 						</div>
+					) : (
+						!showControl && (
+							<div
+								className="cursor-pointer absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-30 group"
+								onClick={handleShowFullVideo}
+							>
+								<Icons.PlayButton className="w-4 h-4 text-white transition-all duration-150 group-hover:scale-110" />
+							</div>
+						)
 					)}
 
 					<div

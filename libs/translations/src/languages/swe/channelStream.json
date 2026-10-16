@@ -6,5 +6,6 @@
 	"joinStream": "Gå med i stream",
 	"noStreamToday": "Ingen stream idag",
 	"hideMembers": "Dölj medlemmar",
-	"showMembers": "Visa medlemmar"
+	"showMembers": "Visa medlemmar",
+	"duplicateSessionDisconnected": "Frånkopplad eftersom ditt konto gick med i en stream eller röstkanal i en annan session."
 }

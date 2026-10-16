@@ -24,12 +24,11 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 	const sourceMessage = useAppSelector((state) =>
 		attachment.message_id && channelId ? selectMessageByMessageId(state, channelId, attachment.message_id) : undefined
 	);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([attachment.url]);
-	// Not loadable yet: the upload is unconfirmed, or the channel's CDN signature is still on its way.
-	const isMediaPending = isAttachmentPresignPendingForMessage(attachment.url, sourceMessage) || isAwaitingSignature(attachment.url);
+	const isPresignPending = isAttachmentPresignPendingForMessage(attachment.url, sourceMessage);
+	const { signCdnUrl } = useCdnUrlSigner([attachment.url], channelId);
 
 	const handleSelectImage = () => {
-		if (isMediaPending) return;
+		if (isPresignPending) return;
 		setUrlImg(attachment.url || '');
 		setCurrentIndexAtt(index);
 		dispatch(attachmentActions.setCurrentAttachment(attachment));
@@ -42,16 +41,16 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 		attachment.filetype?.includes(EMimeTypes.mov);
 
 	const thumbnailClassName = `block w-[120px] h-[90px] max-sbm:w-16 max-sbm:h-12 object-cover rounded ${
-		isMediaPending ? 'cursor-default' : 'cursor-pointer'
+		isPresignPending ? 'cursor-default' : 'cursor-pointer'
 	} ${isSelected ? '' : 'overlay'}`;
 
 	return (
 		<div className={`attachment-item`} ref={isSelected ? selectedImageRef : null}>
 			<div
-				className={`relative flex w-fit mx-auto rounded-md border-2 ${isMediaPending ? 'cursor-default' : 'cursor-pointer'} ${isSelected ? 'border-buttonPrimary' : 'border-transparent'}`}
+				className={`relative flex w-fit mx-auto rounded-md border-2 ${isPresignPending ? 'cursor-default' : 'cursor-pointer'} ${isSelected ? 'border-buttonPrimary' : 'border-transparent'}`}
 				onClick={handleSelectImage}
 			>
-				{isMediaPending ? (
+				{isPresignPending ? (
 					<div className={`${thumbnailClassName} bg-bgLightSecondary dark:bg-bgSecondary`} />
 				) : isVideo ? (
 					<div className="relative">

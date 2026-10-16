@@ -30,19 +30,35 @@ import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
 import TopicDiscussionMain from '../pages/topicDiscussion';
 
+function getClanSidePanelState(isShowCreateThread: boolean, isShowCreateTopic: boolean, currentChannelType: number | undefined) {
+	const isThreadPanelOpen = isShowCreateThread && !isShowCreateTopic;
+	const isTopicPanelOpen =
+		isShowCreateTopic &&
+		!isShowCreateThread &&
+		currentChannelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
+		currentChannelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
+
+	return {
+		isThreadPanelOpen,
+		isTopicPanelOpen,
+		isSidePanelVisible: isThreadPanelOpen || isTopicPanelOpen
+	};
+}
+
 const ClanEffects: React.FC<{
 	chatStreamRef: React.RefObject<HTMLDivElement>;
 	isShowChatStream: boolean;
 	isShowCreateThread: boolean;
 	isShowCreateTopic: boolean;
+	currentChannelType: number | undefined;
 	userId?: string;
 	username?: string;
-}> = ({ chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic }) => {
+}> = ({ chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, currentChannelType }) => {
 	// move code thanh.levan
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList, isShowMemberList } = useApp();
 
-	const isPanelOpen = isShowCreateThread || isShowCreateTopic;
+	const { isSidePanelVisible: isPanelOpen } = getClanSidePanelState(isShowCreateThread, isShowCreateTopic, currentChannelType);
 	const isPanelOpenRef = useRef(isPanelOpen);
 	const previousMemberListState = useRef<boolean>(isShowMemberList);
 
@@ -113,6 +129,8 @@ const ClanLayout = () => {
 		}
 	}, [currentClanIsOnboarding, currentClanId, dispatch]);
 
+	const { isThreadPanelOpen, isTopicPanelOpen } = getClanSidePanelState(isShowCreateThread, isShowCreateTopic, currentChannelType);
+
 	return (
 		<>
 			<div
@@ -139,20 +157,18 @@ const ClanLayout = () => {
 					</div>
 				)}
 			</div>
-			{isShowCreateThread && !isShowCreateTopic && (
+
+			{isThreadPanelOpen && (
 				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] rounded-l-lg">
 					<ThreadsMain />
 				</div>
 			)}
 
-			{isShowCreateTopic &&
-				!isShowCreateThread &&
-				currentChannelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
-				currentChannelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
-					<div onMouseDown={onMouseDownTopicBox} className="w-[510px] rounded-l-lg">
-						<TopicDiscussionMain />
-					</div>
-				)}
+			{isTopicPanelOpen && (
+				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] rounded-l-lg">
+					<TopicDiscussionMain />
+				</div>
+			)}
 
 			{/* update later */}
 			<Setting isDM={false} />
@@ -162,6 +178,7 @@ const ClanLayout = () => {
 				isShowChatStream={isShowChatStream}
 				isShowCreateThread={isShowCreateThread}
 				isShowCreateTopic={isShowCreateTopic}
+				currentChannelType={currentChannelType}
 				userId={userProfile?.user?.id || ''}
 				username={userProfile?.user?.username || ''}
 			/>

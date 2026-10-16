@@ -100,6 +100,13 @@ const extractMessageText = (content: any): string => {
 	return String(content);
 };
 
+const isAnonymousMessageSource = (message: unknown): boolean => {
+	if (!message || typeof message !== 'object') return false;
+	const msg = message as { isAnonymous?: boolean; sender_id?: string };
+	const senderId = String(msg.sender_id || '');
+	return Boolean(msg.isAnonymous || senderId === NX_CHAT_APP_ANNONYMOUS_USER_ID);
+};
+
 type ExtractedAttachment = {
 	url: string;
 	filename: string;
@@ -214,19 +221,15 @@ const renderFileIcon = (filename: string, filetype: string) => {
 };
 
 const AttachmentThumbnail = memo(({ attachment }: { attachment: ExtractedAttachment }) => {
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([attachment.url]);
+	const { signCdnUrl } = useCdnUrlSigner([attachment.url]);
 	if (attachment.isImage && attachment.url) {
 		return (
 			<div className="shrink-0 flex items-center justify-center">
-				{isAwaitingSignature(attachment.url) ? (
-					<div className="w-7 h-7 rounded shrink-0 bg-item-theme border border-theme-primary" />
-				) : (
-					<img
-						src={createImgproxyUrl(signCdnUrl(attachment.url), { width: 64, height: 64, resizeType: 'fit' })}
-						alt={attachment.filename}
-						className="w-7 h-7 rounded object-cover shrink-0 bg-item-theme border border-theme-primary"
-					/>
-				)}
+				<img
+					src={createImgproxyUrl(signCdnUrl(attachment.url), { width: 64, height: 64, resizeType: 'fit' })}
+					alt={attachment.filename}
+					className="w-7 h-7 rounded object-cover shrink-0 bg-item-theme border border-theme-primary"
+				/>
 			</div>
 		);
 	}
@@ -597,7 +600,16 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 
 	const topicSenderMember = useAppSelector((state) => (topicSenderId ? selectMemberClanByUserId(state, topicSenderId) : null));
 
-	const isTopicSenderAnonymous = Boolean(isTopicAnonymous || topicSourceMessage?.isAnonymous || topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID);
+	const isTopicSenderAnonymous = Boolean(
+		isTopicAnonymous ||
+			topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID ||
+			topicSourceMessage?.isAnonymous ||
+			isAnonymousMessageSource(topicLastMessageInStore) ||
+			isAnonymousMessageSource(topicOriginalMessage) ||
+			isAnonymousMessageSource(latestTopic?.last_sent_message) ||
+			isAnonymousMessageSource(latestTopic?.message) ||
+			isAnonymousMessageSource(topicSourceMessage?.message)
+	);
 
 	const topicSenderName = useMemo(() => {
 		if (!topicSenderId) return '';

@@ -531,6 +531,7 @@
 		"accessDenied": "アクセス拒否",
 		"accessDeniedDesc": "このチャンネルまたはクランにアクセスする権限がありません。これがエラーであると考える場合は、管理者にお問い合わせください。",
 		"goToWelcomeChannel": "ウェルカムチャンネルに移動",
+		"goToFriendPage": "友達ページへ移動",
 		"okayGotIt": "わかりました"
 	},
 	"reportMessage": {

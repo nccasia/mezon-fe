@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Introduce un mensaje para enviar junto con..."
 	},
 	"successMessage": "Mensaje reenviado con éxito",
-	"errorMessage": "Error al reenviar mensaje"
+	"errorMessage": "Error al reenviar mensaje",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

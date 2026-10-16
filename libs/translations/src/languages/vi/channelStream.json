@@ -6,5 +6,6 @@
 	"joinStream": "Tham gia phát trực tiếp",
 	"noStreamToday": "Hôm nay không có phát trực tiếp",
 	"hideMembers": "Ẩn thành viên",
-	"showMembers": "Hiện thành viên"
+	"showMembers": "Hiện thành viên",
+	"duplicateSessionDisconnected": "Đã ngắt kết nối vì tài khoản của bạn đã tham gia phát trực tiếp hoặc kênh thoại ở phiên khác."
 }

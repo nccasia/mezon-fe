@@ -2,6 +2,7 @@ import { uploadFileToPath } from '@mezon/transport';
 import type { ApiMessageAttachment, ApiSession, Client } from 'mezon-js';
 import { AttachmentTypeUpload, ETypesCDN } from '../types';
 import { isMezonCdnUrl, isTenorUrl } from './urlSanitization';
+import { wantsHlsTranscode } from './videoSource';
 
 export async function generatePathAttachments(client: Client, session: ApiSession, attachments: Array<ApiMessageAttachment>, channelId?: string) {
 	const result = await Promise.all(
@@ -19,13 +20,15 @@ export async function generatePathAttachments(client: Client, session: ApiSessio
 						: attach.filetype?.includes(AttachmentTypeUpload.audio)
 							? AttachmentTypeUpload.audio
 							: AttachmentTypeUpload.doc;
+				const uploadName = (attach.filename || '').replace(/[^a-zA-Z0-9.]/g, '_');
 				const data = await client.uploadAttachmentFile(session, {
-					filename: (attach.filename || '').replace(/[^a-zA-Z0-9.]/g, '_'),
+					filename: uploadName,
 					filetype: fileType,
 					size: attach.size,
 					width: attach.width,
 					height: attach.height,
-					channel_id: channelId
+					channel_id: channelId,
+					transcode_hls: wantsHlsTranscode(uploadName, attach.size)
 				});
 				// The poster is uploaded HERE, before the message is posted, and its url
 				// is published only once the object is actually on the CDN. It used to

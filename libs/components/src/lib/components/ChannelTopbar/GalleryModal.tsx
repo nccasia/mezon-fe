@@ -39,6 +39,7 @@ import {
 	generateAttachmentId,
 	generateE2eId,
 	isAttachmentPresignPendingForMessage,
+	isMediaTypeNotSupported,
 	shouldHidePresignAttachment
 } from '@mezon/utils';
 import { clamp, endOfDay, format, getUnixTime, isSameDay, startOfDay } from 'date-fns';
@@ -47,6 +48,7 @@ import type { RefObject } from 'react';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useVideoSource } from '../MessageWithUser/useVideoSource';
 import InfiniteScroll from './InfiniteScroll';
 
 const DatePickerWrapper = lazy(() => import('../ChannelList/EventChannelModal/ModalCreate/DatePickerWrapper'));
@@ -139,14 +141,14 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 	}, [attachments, mediaFilter, startDate, endDate]);
 
 	const rangeUrls = useMemo(() => rangeAttachments.map((att) => att.url), [rangeAttachments]);
-	const { isSignatureDenied } = useCdnUrlSigner(rangeUrls);
+	const { isSignatureDenied } = useCdnUrlSigner(rangeUrls, currentChannelId);
 
 	const filteredAttachments = useMemo(
 		() =>
 			rangeAttachments.filter((att) => {
 				if (isSignatureDenied(att.url)) return false;
 				const sourceMessage = att.message_id ? messageEntities?.[att.message_id] : undefined;
-				return !shouldHidePresignAttachment(att.url, sourceMessage);
+				return !isMediaTypeNotSupported(att.filetype, att.url) && !shouldHidePresignAttachment(att.url, sourceMessage);
 			}),
 		[rangeAttachments, messageEntities, isSignatureDenied]
 	);
@@ -697,12 +699,12 @@ const GalleryAttachmentTile = React.memo(({ attachment, channelId, dateKey, atta
 		attachment.message_id && channelId ? selectMessageByMessageId(state, channelId, attachment.message_id) : undefined
 	);
 	const isPresignPending = isAttachmentPresignPendingForMessage(attachment.url, sourceMessage);
-	const { signCdnUrl, isAwaitingSignature } = useCdnUrlSigner([attachment.url]);
+	const { signCdnUrl } = useCdnUrlSigner([attachment.url], channelId);
 
 	const cacheKey = attachment.id || attachment.message_id || `${dateKey}-${attachment.url}-${attachmentIndex}`;
 	const isVideo = attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX);
 
-	if (isPresignPending || isAwaitingSignature(attachment.url)) {
+	if (isPresignPending) {
 		return <div key={cacheKey} className="aspect-square rounded-lg bg-bgLightSecondary dark:bg-bgSecondary" />;
 	}
 
@@ -755,6 +757,8 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 		const [hasError, setHasError] = useState(false);
 		const [isInView, setIsInView] = useState(!isVideo);
 		const containerRef = useRef<HTMLDivElement>(null);
+		const videoRef = useRef<HTMLVideoElement>(null);
+		const { failed: isVideoFailed, handleError: handleVideoError } = useVideoSource(videoRef, src, !!isVideo && isInView, { preview: true });
 
 		useEffect(() => {
 			setIsLoading(true);
@@ -797,7 +801,7 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 
 		return (
 			<div ref={containerRef} className="aspect-square relative cursor-pointer" onClick={onClick}>
-				{isLoading && (
+				{isLoading && !isVideoFailed && (
 					<div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
 						<svg
 							className="w-8 h-8 text-gray-400 dark:text-gray-500"
@@ -814,7 +818,7 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 					</div>
 				)}
 
-				{hasError && (
+				{(hasError || isVideoFailed) && (
 					<div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
 						<div className="text-center">
 							<svg
@@ -840,10 +844,10 @@ const ImageWithLoading = React.memo<ImageWithLoadingProps>(
 					<div className="relative w-full h-full bg-gray-900">
 						{isInView ? (
 							<video
-								src={src}
+								ref={videoRef}
 								className={`w-full h-full object-cover ${isLoading ? 'opacity-0' : 'opacity-100'} ${className}`}
 								onLoadedData={handleLoad}
-								onError={handleError}
+								onError={handleVideoError}
 								preload="metadata"
 								muted
 								playsInline
