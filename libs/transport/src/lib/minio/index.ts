@@ -396,7 +396,7 @@ export async function uploadFile(
 			if (res.status !== 200) {
 				throw new Error('Failed to upload file to MinIO.');
 			}
-			let url = `${data.type_cdn === ETypesCDN.MEZON ? process.env.NX_MEZON_CDN_URL : process.env.NX_CLOUDFLARE_CDN_URL}/${data.filename}`;
+			let url = `${data.type_cdn === ETypesCDN.MEZON ? process.env.NX_MEZON_CDN_URL || 'https://cdn.mezon.ai' : process.env.NX_CLOUDFLARE_CDN_URL}/${data.filename}`;
 			if (isOauth) {
 				url = `${process.env.NX_PROFILE_IMG_URL}/${data.filename}`;
 			}
