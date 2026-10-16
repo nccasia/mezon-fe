@@ -531,6 +531,7 @@
 		"accessDenied": "액세스 거부",
 		"accessDeniedDesc": "이 채널 또는 클랜에 액세스 권한이 없습니다. 오류라고 생각되면 관리자에게 문의하세요.",
 		"goToWelcomeChannel": "환영 채널으로 이동",
+		"goToFriendPage": "친구 페이지로 이동",
 		"okayGotIt": "알겠습니다"
 	},
 	"reportMessage": {

@@ -531,6 +531,7 @@
 		"accessDenied": "Tillgång avvisad",
 		"accessDeniedDesc": "Du har inte tillgång till denna kanal eller clan. Vänligen kontakta administratör om du tror det är fel.",
 		"goToWelcomeChannel": "Gå till välkomstkanal",
+		"goToFriendPage": "Gå till vänsidan",
 		"okayGotIt": "Ok, förstått"
 	},
 	"reportMessage": {
