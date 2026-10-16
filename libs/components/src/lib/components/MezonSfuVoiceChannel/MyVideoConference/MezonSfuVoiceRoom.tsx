@@ -80,7 +80,7 @@ const MAX_RECONNECT_ATTEMPTS = 4;
 const MAX_RECOVERY_MS = 120_000;
 const SFU_SERVER_RESTART_CLOSE_CODE = 1001;
 const SFU_ALONE_TIMEOUT_CLOSE_CODE = 4011;
-const PREFERRED_MICROPHONE_STORAGE_KEY = 'mezon.voice.inputDeviceId';
+export const PREFERRED_MICROPHONE_STORAGE_KEY = 'mezon.voice.inputDeviceId';
 const PREFERRED_SPEAKER_STORAGE_KEY = 'mezon.voice.outputDeviceId';
 const AGENT_HINT_DISMISSED_STORAGE_KEY = 'mezon.voice.agentHintDismissed';
 
@@ -2754,6 +2754,7 @@ export function MezonSfuVoiceRoom({
 			const member = participant.userId ? clanMembers[participant.userId] : undefined;
 			return {
 				displayName:
+					(isExternalCalling && participant.username) ||
 					getNameForPrioritize(member?.clan_nick, member?.user?.display_name, member?.user?.username) ||
 					participant.username ||
 					participant.userId ||
@@ -2761,12 +2762,12 @@ export function MezonSfuVoiceRoom({
 				avatar: getAvatarForPrioritize(member?.clan_avatar, member?.user?.avatar_url) || participant.avatar || ''
 			};
 		},
-		[clanMembers]
+		[clanMembers, isExternalCalling]
 	);
 	const localMember = currentUserId ? clanMembers[currentUserId] || userProfile : undefined;
 	const localDisplayName =
-		getNameForPrioritize(localMember?.clan_nick, localMember?.user?.display_name, localMember?.user?.username) ||
 		username ||
+		getNameForPrioritize(localMember?.clan_nick, localMember?.user?.display_name, localMember?.user?.username) ||
 		currentUserId ||
 		GUEST_NAME;
 

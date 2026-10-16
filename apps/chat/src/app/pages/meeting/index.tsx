@@ -1,10 +1,16 @@
 import {
 	BackgroundSelector,
+	CameraControl,
 	JoinForm,
 	MediaPipeBackgroundProcessor,
 	MezonSfuVoiceRoom,
+	MicrophoneControl,
+	PREFERRED_MICROPHONE_STORAGE_KEY,
 	VideoPreview,
 	VisualEffectsIcon,
+	getPreferredOutputDeviceId,
+	setPreferredOutputDeviceId,
+	sinkIdForHtmlMediaElement,
 	type BackgroundMode,
 	type SfuJoinRole
 } from '@mezon/components';
@@ -19,7 +25,7 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import { GUEST_NAME } from '@mezon/utils';
+import { GUEST_NAME, ensureMediaPermission, useMediaPermissions } from '@mezon/utils';
 import React, { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -147,6 +153,12 @@ const sanitizeUsername = (val: string) =>
 		.replace(/[^a-z0-9]/g, '')
 		.slice(0, 12);
 
+// Plays test audio on the speaker picked in the mic menu
+const applyOutputSink = async (audio: HTMLAudioElement, deviceId: string) => {
+	const el = audio as HTMLAudioElement & { setSinkId?: (id: string) => Promise<void> };
+	if (el.setSinkId) await el.setSinkId(sinkIdForHtmlMediaElement(deviceId)).catch(() => undefined);
+};
+
 export default function PreJoinCalling() {
 	const { t } = useTranslation('common');
 	const account = useSelector(selectAllAccount);
@@ -154,6 +166,12 @@ export default function PreJoinCalling() {
 	const getAvatar = account?.user?.avatar_url;
 
 	const [cameraOn, setCameraOn] = useState(false);
+	const [micOn, setMicOn] = useState(false);
+	const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+	const [selectedCamera, setSelectedCamera] = useState('default');
+	const [selectedMic, setSelectedMic] = useState(() => localStorage.getItem(PREFERRED_MICROPHONE_STORAGE_KEY) || 'default');
+	const [selectedSpeaker, setSelectedSpeaker] = useState(getPreferredOutputDeviceId);
+	const { hasMicrophoneAccess, hasCameraAccess, microphonePermissionState, cameraPermissionState } = useMediaPermissions();
 	const [selectedBg, setSelectedBg] = useState<BackgroundMode | null>(null);
 	const selectedBgRef = useRef<BackgroundMode | null>(null);
 	const [showBgSelector, setShowBgSelector] = useState(false);
@@ -175,6 +193,10 @@ export default function PreJoinCalling() {
 
 	const rawStreamRef = useRef<MediaStream | null>(null);
 	const processorRef = useRef<MediaPipeBackgroundProcessor | null>(null);
+	const [micTesting, setMicTesting] = useState(false);
+	const micTestRef = useRef<{ stream: MediaStream; context: AudioContext; frame: number } | null>(null);
+	const micLevelRef = useRef<HTMLDivElement>(null);
+	const monitorAudioRef = useRef<HTMLAudioElement>(null);
 
 	const dispatch = useAppDispatch();
 	const { code } = useParams<{ code: string }>();
@@ -251,54 +273,150 @@ export default function PreJoinCalling() {
 		};
 	}, []);
 
-	// Auto initialize camera stream for preview on mount
+	// Device lists for the mic/camera menus; labels show up once a permission is granted
 	useEffect(() => {
-		let active = true;
+		const refreshDevices = () =>
+			navigator.mediaDevices
+				.enumerateDevices()
+				.then(setDevices)
+				.catch(() => undefined);
+		refreshDevices();
+		navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
+		return () => navigator.mediaDevices.removeEventListener('devicechange', refreshDevices);
+	}, [cameraOn, micOn]);
 
-		const initCamera = async () => {
-			try {
-				const stream = await navigator.mediaDevices.getUserMedia({
-					video: {
-						width: { ideal: 1280 },
-						height: { ideal: 720 },
-						facingMode: 'user'
-					},
-					audio: false
-				});
+	// Camera starts off; user turns it on before joining
+	const startCamera = useCallback(async (deviceId: string) => {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: {
+					width: { ideal: 1280 },
+					height: { ideal: 720 },
+					...(deviceId === 'default' ? { facingMode: 'user' } : { deviceId: { exact: deviceId } })
+				},
+				audio: false
+			});
 
-				if (!active) {
-					stream.getTracks().forEach((track) => track.stop());
-					return;
-				}
+			rawStreamRef.current?.getTracks().forEach((track) => track.stop());
+			rawStreamRef.current = stream;
 
-				rawStreamRef.current = stream;
-
-				if (!processorRef.current) {
-					processorRef.current = new MediaPipeBackgroundProcessor();
-				}
-
-				const outStream = await processorRef.current.start(stream, selectedBgRef.current);
-				if (!active) {
-					outStream.getTracks().forEach((track) => track.stop());
-					return;
-				}
-
-				setProcessedStream(outStream);
-				setProcessorCanvas(processorRef.current.getCanvas());
-				setCustomVideoTrack(processorRef.current.getVideoTrack());
-				setCameraOn(true);
-				setPermissionsState((prev) => ({ ...prev, camera: true }));
-			} catch (err) {
-				console.warn('Camera preview not available:', err);
+			if (!processorRef.current) {
+				processorRef.current = new MediaPipeBackgroundProcessor();
 			}
-		};
 
-		initCamera();
+			const outStream = await processorRef.current.start(stream, selectedBgRef.current);
 
-		return () => {
-			active = false;
-		};
+			setProcessedStream(outStream);
+			setProcessorCanvas(processorRef.current.getCanvas());
+			setCustomVideoTrack(processorRef.current.getVideoTrack());
+			setSelectedCamera(stream.getVideoTracks()[0]?.getSettings().deviceId || deviceId);
+			setCameraOn(true);
+			setError(null);
+			setPermissionsState((prev) => ({ ...prev, camera: true }));
+		} catch (err) {
+			console.error('Error accessing camera:', err);
+			setError('Failed to access camera. Please check your permissions and try again.');
+		}
 	}, []);
+
+	const toggleCamera = useCallback(() => {
+		if (!cameraOn) {
+			void startCamera(selectedCamera);
+			return;
+		}
+		rawStreamRef.current?.getTracks().forEach((track) => track.stop());
+		rawStreamRef.current = null;
+		processorRef.current?.stop();
+		setCameraOn(false);
+		setProcessedStream(null);
+		setCustomVideoTrack(null);
+	}, [cameraOn, selectedCamera, startCamera]);
+
+	const handleSelectCamera = useCallback(
+		(deviceId: string) => {
+			setSelectedCamera(deviceId);
+			if (cameraOn) void startCamera(deviceId);
+		},
+		[cameraOn, startCamera]
+	);
+
+	const requestCameraPermission = useCallback(async () => {
+		const enableCamera = () => void startCamera(selectedCamera);
+		if (await ensureMediaPermission('camera', enableCamera)) enableCamera();
+	}, [selectedCamera, startCamera]);
+
+	// The room opens the mic after joining, with the device picked here
+	const toggleMic = useCallback(() => setMicOn((on) => !on), []);
+
+	const requestMicPermission = useCallback(async () => {
+		const enableMic = () => setMicOn(true);
+		if (await ensureMediaPermission('microphone', enableMic)) enableMic();
+	}, []);
+
+	const handleSelectMic = useCallback((deviceId: string) => {
+		setSelectedMic(deviceId);
+		localStorage.setItem(PREFERRED_MICROPHONE_STORAGE_KEY, deviceId);
+	}, []);
+
+	const handleSelectSpeaker = useCallback((deviceId: string) => {
+		setSelectedSpeaker(deviceId);
+		setPreferredOutputDeviceId(deviceId);
+	}, []);
+
+	const stopMicTest = useCallback(() => {
+		const test = micTestRef.current;
+		micTestRef.current = null;
+		if (test) {
+			cancelAnimationFrame(test.frame);
+			test.stream.getTracks().forEach((track) => track.stop());
+			void test.context.close().catch(() => undefined);
+		}
+		if (monitorAudioRef.current) monitorAudioRef.current.srcObject = null;
+		if (micLevelRef.current) micLevelRef.current.style.width = '0%';
+		setMicTesting(false);
+	}, []);
+
+	// Plays the mic back on the selected speaker, like Settings > Voice > Mic Test
+	const startMicTest = useCallback(async () => {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				// Echo cancellation treats the playback as echo and chops the voice
+				audio: { echoCancellation: false, ...(selectedMic === 'default' ? {} : { deviceId: { exact: selectedMic } }) }
+			});
+			const context = new AudioContext();
+			const analyser = context.createAnalyser();
+			context.createMediaStreamSource(stream).connect(analyser);
+			const samples = new Uint8Array(analyser.fftSize);
+			const test = { stream, context, frame: 0 };
+			let level = 0;
+			// Meter is drawn on the DOM directly so the page does not re-render every frame
+			const drawLevel = () => {
+				analyser.getByteTimeDomainData(samples);
+				const rms = Math.sqrt(samples.reduce((sum, sample) => sum + ((sample - 128) / 128) ** 2, 0) / samples.length);
+				// Rise fast, fall slowly so the bar does not flicker
+				level = Math.max(Math.min(rms * 2.2, 1), level * 0.9);
+				if (micLevelRef.current) micLevelRef.current.style.width = `${level * 100}%`;
+				test.frame = requestAnimationFrame(drawLevel);
+			};
+			drawLevel();
+			micTestRef.current = test;
+
+			const audio = monitorAudioRef.current;
+			if (audio) {
+				audio.srcObject = stream;
+				await applyOutputSink(audio, selectedSpeaker);
+				await audio.play().catch(() => undefined);
+			}
+			setMicTesting(true);
+			setError(null);
+		} catch (err) {
+			console.error('Error testing microphone:', err);
+			setError('Failed to access microphone. Please check your permissions and try again.');
+		}
+	}, [selectedMic, selectedSpeaker]);
+
+	// Stop the test when the device changes or the page unmounts
+	useEffect(() => stopMicTest, [selectedMic, selectedSpeaker, stopMicTest]);
 
 	// Handle background selection
 	const handleSelectBg = useCallback((mode: BackgroundMode | null) => {
@@ -328,10 +446,10 @@ export default function PreJoinCalling() {
 			setError(null);
 			setAvatar(avatar as string);
 			setJoinRole(role);
+			stopMicTest();
 
-			if (cameraOn) {
-				dispatch(voiceActions.setShowCamera(true));
-			}
+			dispatch(voiceActions.setShowCamera(cameraOn));
+			dispatch(voiceActions.setShowMicrophone(micOn));
 
 			const metadata = trimmed || avatar || getAvatar ? `${trimmed};${avatar || getAvatar || ''}` : '';
 			await dispatch(
@@ -343,7 +461,7 @@ export default function PreJoinCalling() {
 				})
 			);
 		},
-		[dispatch, username, isUser, code, avatar, getAvatar, cameraOn]
+		[dispatch, username, isUser, code, avatar, getAvatar, cameraOn, micOn, stopMicTest]
 	);
 
 	const handleRefreshToken = useCallback(async () => {
@@ -440,6 +558,48 @@ export default function PreJoinCalling() {
 								onEffectClick={() => setShowBgSelector((prev) => !prev)}
 								isEffectActive={showBgSelector || !!selectedBg}
 							/>
+
+							{/* Audio / Video Controls */}
+							<div className="flex gap-3 mb-3 justify-center">
+								<MicrophoneControl
+									enabled={micOn}
+									devices={devices.filter((device) => device.kind === 'audioinput')}
+									outputDevices={devices.filter((device) => device.kind === 'audiooutput')}
+									selectedDeviceId={selectedMic}
+									selectedOutputDeviceId={selectedSpeaker}
+									onToggle={toggleMic}
+									onSelect={handleSelectMic}
+									onSelectOutput={handleSelectSpeaker}
+									permissionState={microphonePermissionState}
+									hasMicrophoneAccess={hasMicrophoneAccess ?? false}
+									onPermissionRequest={requestMicPermission}
+								/>
+								<CameraControl
+									enabled={cameraOn}
+									devices={devices.filter((device) => device.kind === 'videoinput')}
+									selectedDeviceId={selectedCamera}
+									onToggle={toggleCamera}
+									onSelect={handleSelectCamera}
+									permissionState={cameraPermissionState}
+									hasCameraAccess={hasCameraAccess ?? false}
+									onPermissionRequest={requestCameraPermission}
+								/>
+							</div>
+
+							{/* Mic test */}
+							<div className="w-full flex items-center gap-3 mb-3">
+								<button
+									type="button"
+									onClick={micTesting ? stopMicTest : startMicTest}
+									className={`shrink-0 px-3 py-1.5 rounded-md ${micTesting ? 'bg-red-700 hover:bg-red-600' : 'bg-zinc-700 hover:bg-zinc-600'} text-sm font-medium text-white transition-colors`}
+								>
+									{micTesting ? 'Stop test' : 'Test mic'}
+								</button>
+								<div className="flex-1 h-2 rounded-full bg-zinc-700 overflow-hidden" title="Microphone level">
+									<div ref={micLevelRef} className="h-full w-0 bg-emerald-500" />
+								</div>
+								<audio ref={monitorAudioRef} className="hidden" />
+							</div>
 
 							{/* 5 Selectable Backgrounds - Toggled from camera view button */}
 							{showBgSelector && (
