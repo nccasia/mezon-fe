@@ -401,11 +401,7 @@ const SidebarMenu = memo(
 							</div>
 						</div>
 					</div>
-					<div className="absolute bottom-[92px] left-0 right-0 z-[60] flex justify-center pointer-events-none px-0.5">
-						<div className="pointer-events-auto -translate-y-1">
-							<ClanRailUnreadFloatButton scrollContainerRef={clanRailScrollRef} />
-						</div>
-					</div>
+					<ClanRailUnreadFloatButton scrollContainerRef={clanRailScrollRef} />
 				</div>
 			</div>
 		);
@@ -596,7 +592,6 @@ const ClansList = memo(() => {
 					);
 				})}
 
-			{/* Floating dragged item */}
 			{isDragging && draggedItem && dragPosition && (
 				<div
 					className="fixed pointer-events-none z-50 w-[40px] h-[40px] transform rotate-3 shadow-lg"
