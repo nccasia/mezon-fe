@@ -26,6 +26,8 @@ import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import { hasKeySearch, searchFieldName } from './constant';
 
+const SEARCH_MENTION_MARKUP = /[>~&]\[[^\]]*\]\([^)]*\)/g;
+
 export const useSearchLogic = (mode?: ChannelStreamMode) => {
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('searchMessageChannel');
@@ -104,7 +106,7 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 	const handleChange: OnChangeHandlerFunc = useCallback(
 		(event, newValue, newPlainTextValue, mentions) => {
 			const value = event.target.value;
-			const words = value.split(' ');
+			const words = value.replace(SEARCH_MENTION_MARKUP, ' ').split(' ');
 			const cleanedWords = words.filter((word) => {
 				const mentionPrefixes = [...mentionPrefixMap.flatMap((item) => item.prefixes), '>', '~', '&', '#'];
 				const isMentionStart = mentionPrefixes.some((prefix) => word.startsWith(prefix));
