@@ -42,7 +42,7 @@ import { getDateLocale } from './dateI18n';
 import { getLinkType } from './embed-social';
 import { getPreSendSourceFile, getPreSendThumbnailBlob } from './file';
 import { Foreman } from './foreman';
-import { isMezonCdnUrl, isTenorUrl } from './urlSanitization';
+import { isMezonCdnUrl, isMezonMediaUrl, isTenorUrl } from './urlSanitization';
 export * from './animateScroll';
 export * from './audio';
 export * from './buildClassName';
@@ -273,7 +273,8 @@ export const setEmojiSourceResolver = (resolver: (id: string) => string | undefi
 
 export const getSrcEmoji = (id: string, src?: string) => {
 	if (!id) return '';
-	const source = src || resolveEmojiSource(id) || `${process.env.NX_CLOUDFLARE_CDN_URL}/emojis/${id}.webp`;
+	const known = src || resolveEmojiSource(id) || '';
+	const source = isMezonMediaUrl(known) ? known : `${process.env.NX_CLOUDFLARE_CDN_URL}/emojis/${id}.webp`;
 	return createImgproxyUrl(source, { width: 100, height: 100, resizeType: 'fit' });
 };
 
