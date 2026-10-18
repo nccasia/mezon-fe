@@ -2,6 +2,7 @@ import {
 	getPoll,
 	getStore,
 	selectCurrentUserId,
+	selectEmojiSrcById,
 	selectMemberClanByUserId,
 	selectMemberDMByUserId,
 	selectMessageByMessageId,
@@ -18,6 +19,18 @@ import { PollDetailModal } from './PollDetailModal';
 import './PollMessage.scss';
 
 const POLL_EMOJI_REGEX = /\[e:([^\]]+)\]/g;
+
+function PollEmoji({ emojiId }: { emojiId: string }) {
+	const emojiSrc = useAppSelector((state) => selectEmojiSrcById(state, emojiId));
+	return (
+		<img
+			src={getSrcEmoji(emojiId, emojiSrc)}
+			alt=""
+			className="w-5 h-5 object-contain inline-block align-middle flex-shrink-0"
+			draggable={false}
+		/>
+	);
+}
 
 export type RenderPollTextWithEmojiOptions = {
 	className?: string;
@@ -50,15 +63,7 @@ function renderPollTextWithEmoji(text: string, classNameOrOptions?: string | Ren
 				)
 			);
 		}
-		const emoji = (
-			<img
-				key={`e-${match.index}`}
-				src={getSrcEmoji(match[1])}
-				alt=""
-				className="w-5 h-5 object-contain inline-block align-middle flex-shrink-0"
-				draggable={false}
-			/>
-		);
+		const emoji = <PollEmoji key={`e-${match.index}`} emojiId={match[1]} />;
 		parts.push(
 			emojiPartClassName ? (
 				<span key={`w-${match.index}`} className={emojiPartClassName}>
