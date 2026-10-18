@@ -3,7 +3,6 @@ import {
 	getStoreAsync,
 	messagesActions,
 	selectCurrentChannelId,
-	selectDmGroupCurrentId,
 	selectMemberClanByUserId,
 	selectMemberGroupByUserId,
 	useAppDispatch,
@@ -38,9 +37,9 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, mode, onClick, isT
 		if (isChannelMode) {
 			return selectMemberClanByUserId(state, senderIdMessageRef);
 		}
-		const currentDMId = selectDmGroupCurrentId(state);
-		if (!currentDMId) return undefined;
-		return selectMemberGroupByUserId(state, currentDMId, senderIdMessageRef);
+		const dmChannelId = message.channel_id;
+		if (!dmChannelId) return undefined;
+		return selectMemberGroupByUserId(state, dmChannelId, senderIdMessageRef);
 	});
 	const content = safeJSONParse(message?.references?.[0]?.content ?? '{}');
 	const hasAttachmentInMessageRef = message?.references?.[0]?.has_attachment;
