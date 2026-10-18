@@ -132,6 +132,8 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 				let fieldValue: string;
 				if (mappedType === 'mentions') {
 					fieldValue = `"user_id":"${mention.id}"`;
+				} else if (mappedType === 'from') {
+					fieldValue = mention.id;
 				} else {
 					fieldValue = mentionDisplay.replace(matchedPrefix, '') || mention.id;
 				}

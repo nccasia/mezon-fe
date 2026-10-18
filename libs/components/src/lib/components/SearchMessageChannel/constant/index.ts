@@ -1,14 +1,14 @@
 export const GLOBAL_CHANNEL_ID = '0';
 
 export const searchFieldName: Record<string, string> = {
-	from: 'username',
+	from: 'sender_id',
 	mentions: 'mention',
 	has: 'has',
 	before: 'before',
 	after: 'after',
 	pinned: '',
 	content: 'content',
-	'>': 'username',
+	'>': 'sender_id',
 	'~': 'mention',
 	'&': 'has'
 };
