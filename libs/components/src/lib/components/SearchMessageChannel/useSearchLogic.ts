@@ -129,17 +129,18 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 				const matchedPrefix = prefixItem?.prefixes.find((prefix) => mentionDisplay.startsWith(prefix)) || '';
 				const mappedType = prefixItem?.mappedType || mentionDisplay.split(':')[0];
 
+				const isSender = mappedType === 'from' && !!mention.id;
 				let fieldValue: string;
 				if (mappedType === 'mentions') {
 					fieldValue = `"user_id":"${mention.id}"`;
-				} else if (mappedType === 'from') {
+				} else if (isSender) {
 					fieldValue = mention.id;
 				} else {
 					fieldValue = mentionDisplay.replace(matchedPrefix, '') || mention.id;
 				}
 
 				filter.push({
-					field_name: searchFieldName?.[mappedType] || searchFieldName?.[mentionDisplay.split(':')[0]],
+					field_name: isSender ? 'sender_id' : searchFieldName?.[mappedType] || searchFieldName?.[mentionDisplay.split(':')[0]],
 					field_value: fieldValue
 				});
 			}
