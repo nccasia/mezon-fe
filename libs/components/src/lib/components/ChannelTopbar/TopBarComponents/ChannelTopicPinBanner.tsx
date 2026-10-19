@@ -18,6 +18,7 @@ import {
 	selectIsShowMemberList,
 	selectLastMessageByChannelId,
 	selectMediaChannelViewMode,
+	selectMemberClanByUserId,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectTimelineViewMode,
@@ -597,9 +598,12 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 		isAnonymous: isTopicAnonymous
 	} = useGetPriorityNameFromUserClan(topicSenderId);
 
+	const topicSenderMember = useAppSelector((state) => (topicSenderId ? selectMemberClanByUserId(state, topicSenderId) : null));
+
 	const isTopicSenderAnonymous = Boolean(
 		isTopicAnonymous ||
 			topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID ||
+			topicSourceMessage?.isAnonymous ||
 			isAnonymousMessageSource(topicLastMessageInStore) ||
 			isAnonymousMessageSource(topicOriginalMessage) ||
 			isAnonymousMessageSource(latestTopic?.last_sent_message) ||
@@ -610,8 +614,16 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 	const topicSenderName = useMemo(() => {
 		if (!topicSenderId) return '';
 		if (isTopicSenderAnonymous) return 'Anonymous';
-		return topicSenderNamePriority || topicSourceMessage?.username || topicSenderUsername || '';
-	}, [topicSenderId, isTopicSenderAnonymous, topicSenderNamePriority, topicSourceMessage?.username, topicSenderUsername]);
+		return (
+			topicSenderNamePriority ||
+			topicSourceMessage?.username ||
+			topicSenderUsername ||
+			topicSenderMember?.clan_nick ||
+			topicSenderMember?.user?.display_name ||
+			topicSenderMember?.user?.username ||
+			''
+		);
+	}, [topicSenderId, isTopicSenderAnonymous, topicSenderNamePriority, topicSourceMessage?.username, topicSenderUsername, topicSenderMember]);
 
 	const topicTitle = useMemo(() => {
 		if (!latestTopic) return '';
@@ -778,41 +790,8 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 
 	const isPinPoll = useMemo(() => {
 		if (!latestPin) return false;
-		if ((latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll) {
-			return true;
-		}
-		if (pollQuestionFromContent) {
-			return true;
-		}
-		let raw: any = pinMessageInStore?.content || latestPin.content;
-		if (raw instanceof Uint8Array) {
-			try {
-				raw = new TextDecoder().decode(raw);
-			} catch {
-				return false;
-			}
-		}
-		let parsed: any = raw;
-		if (typeof raw === 'string') {
-			try {
-				parsed = safeJSONParse(raw);
-			} catch {
-				parsed = null;
-			}
-		}
-		if (typeof raw === 'string' && raw.startsWith('📊')) {
-			return true;
-		}
-		if (parsed && typeof parsed === 'object') {
-			if ('poll_id' in parsed || 'question' in parsed || 'answer_counts' in parsed || 'answers' in parsed) {
-				return true;
-			}
-			if (typeof parsed.t === 'string' && parsed.t.startsWith('📊')) {
-				return true;
-			}
-		}
-		return false;
-	}, [latestPin, pinMessageInStore, pollQuestionFromContent]);
+		return (latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll;
+	}, [latestPin, pinMessageInStore]);
 
 	useEffect(() => {
 		if (!isPinPoll || pollQuestionFromContent) return;

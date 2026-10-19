@@ -42,7 +42,7 @@ import { getDateLocale } from './dateI18n';
 import { getLinkType } from './embed-social';
 import { getPreSendSourceFile, getPreSendThumbnailBlob } from './file';
 import { Foreman } from './foreman';
-import { isMezonCdnUrl, isTenorUrl } from './urlSanitization';
+import { isMezonCdnUrl, isMezonMediaUrl, isTenorUrl } from './urlSanitization';
 export * from './animateScroll';
 export * from './audio';
 export * from './buildClassName';
@@ -265,10 +265,17 @@ export const convertMarkdown = (markdown: string, type: EBacktickType): string =
 	return `\n${substring}\n`;
 };
 
-export const getSrcEmoji = (id: string) => {
+let resolveEmojiSource: (id: string) => string | undefined = () => undefined;
+
+export const setEmojiSourceResolver = (resolver: (id: string) => string | undefined) => {
+	resolveEmojiSource = resolver;
+};
+
+export const getSrcEmoji = (id: string, src?: string) => {
 	if (!id) return '';
-	const baseUrl = `${process.env.NX_CLOUDFLARE_CDN_URL}/emojis/${id}.webp`;
-	return createImgproxyUrl(baseUrl, { width: 100, height: 100, resizeType: 'fit' });
+	const known = src || resolveEmojiSource(id) || '';
+	const source = isMezonMediaUrl(known) ? known : `${process.env.NX_CLOUDFLARE_CDN_URL}/emojis/${id}.webp`;
+	return createImgproxyUrl(source, { width: 100, height: 100, resizeType: 'fit' });
 };
 
 export const getSrcSound = (id: string) => {
