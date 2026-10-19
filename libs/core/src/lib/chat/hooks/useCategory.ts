@@ -10,7 +10,6 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDefaultChannelIdByClanId,
-	selectWelcomeChannelByClanId,
 	useAppDispatch
 } from '@mezon/store';
 import { checkIsThread, type ICategoryChannel, type IChannel } from '@mezon/utils';
@@ -59,17 +58,18 @@ export function useCategory() {
 			const isUserInCategoryChannel = currentChannel && currentChannel.category_id === category.id;
 
 			if (isUserInCategoryChannel) {
-				const welcomeChannelId = selectWelcomeChannelByClanId(state, currentClanId as string);
 				const defaultChannelId = selectDefaultChannelIdByClanId(state, currentClanId as string);
 				const fallbackChannelId = channels.find((ch) => ch.category_id !== category.id && !checkIsThread(ch))?.id;
 
-				const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+				const redirectChannelId = defaultChannelId || fallbackChannelId;
 
 				if (redirectChannelId) {
 					const channelPath = toChannelPage(redirectChannelId, currentClanId as string);
 					navigate(channelPath);
-					await new Promise((resolve) => setTimeout(resolve, 100));
+				} else {
+					navigate('/chat/direct/friends');
 				}
+				await new Promise((resolve) => setTimeout(resolve, 100));
 			}
 			const channelsInCategory = channels.filter((ch) => ch.category_id === category.id);
 

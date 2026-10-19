@@ -76,7 +76,7 @@ function ChannelList() {
 		}
 	}, [isOpenModal]);
 
-	const shouldShowSkeleton = !listChannelRender || listChannelRender?.length === 0;
+	const shouldShowSkeleton = !listChannelRender;
 
 	return (
 		<div onContextMenu={(event) => event.preventDefault()} id="channelList" className="contain-strict h-full">

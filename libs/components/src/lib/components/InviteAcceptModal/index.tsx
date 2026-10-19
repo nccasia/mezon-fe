@@ -23,7 +23,6 @@ export default function InviteAcceptModal({ inviteId, onClose, showModal }: Invi
 	const [error, setError] = useState<string | null>(null);
 
 	const clanId = selectInvite?.clan_id || '0';
-	const channelId = selectInvite?.channel_id || '0';
 
 	const clan = useSelector(selectClanById(clanId));
 	const userJoined = selectInvite?.user_joined;
@@ -56,7 +55,7 @@ export default function InviteAcceptModal({ inviteId, onClose, showModal }: Invi
 		dispatch(inviteActions.setIsClickInvite(false));
 		if (userJoined || !!clan) {
 			toast.info(t('acceptModal.toast.alreadyMember'));
-			navigate(`/chat/clans/${clanId}/channels/${channelId}`);
+			navigate(`/chat/clans/${clanId}/member-safety`);
 			onClose();
 			return;
 		}

@@ -237,7 +237,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				if (isThread) {
 					navigate(`/chat/clans/${currentClanId}/channels/${channel.parent_id}`);
 				} else {
-					navigate(`/chat/clans/${currentClanId}/channels/${welcomeChannelId}`);
+					navigate(`/chat/direct/friends`);
 				}
 			}
 		} catch (error) {

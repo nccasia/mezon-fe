@@ -90,7 +90,6 @@ import {
 	selectThreadCurrentChannel,
 	selectUserCallId,
 	selectVoiceInfo,
-	selectWelcomeChannelByClanId,
 	socketState,
 	statusActions,
 	stickerSettingActions,
@@ -1877,11 +1876,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						return;
 					}
 
-					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
 					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
 					const fallbackChannelId = allChannels.find((ch) => ch.category_id !== categoryEvent.id && !checkIsThread(ch))?.id;
 
-					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+					const redirectChannelId = defaultChannelId || fallbackChannelId;
 
 					if (redirectChannelId) {
 						navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
@@ -1997,12 +1995,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						return;
 					}
 
-					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
 					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
 					const allChannels = selectAllChannels(store.getState());
 					const fallbackChannelId = allChannels.find((ch) => ch.id !== channelDeleted.channel_id && !checkIsThread(ch))?.id;
 
-					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+					const redirectChannelId = defaultChannelId || fallbackChannelId;
 
 					if (redirectChannelId) {
 						navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
@@ -2263,10 +2260,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			);
 
 			if (isArchiveAction && currentChannelId === channelId) {
-				const redirectChannelId = isThread ? parentId : selectWelcomeChannelByClanId(getStore().getState() as unknown as RootState, clanId);
+				const redirectChannelId = isThread ? parentId : '';
 
 				if (redirectChannelId) {
 					navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+				} else {
+					navigate(`/chat/direct/friends`);
 				}
 
 				if (userId && channelArchive.creator_id !== userId) {
