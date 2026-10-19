@@ -72,10 +72,9 @@ export function useCdnUrlSigner(urls: ReadonlyArray<string | undefined>, shownIn
 }
 
 /**
- * Asks for a new signature when the CDN refuses signed media whose signature is past its own expiry, e.g. after the tab
- * slept through the 5-hour refresh. Mount it once for the app: it hears every media load error in the document. Media
- * failing on a signature still in date is broken for another reason, such as a deleted file, and asks for nothing. A
- * signature stating no expiry is renewed at most once per retry interval.
+ * Asks for a new signature when the CDN refuses signed media, e.g. after the tab slept through the TTL refresh. Mount it
+ * once for the app: it hears every media load error in the document. A channel's signature is renewed at most once per
+ * retry interval, so media broken for another reason, such as a deleted file, cannot keep re-signing it.
  */
 export function useCdnSignatureRefreshOnMediaError() {
 	const dispatch = useAppDispatch();
