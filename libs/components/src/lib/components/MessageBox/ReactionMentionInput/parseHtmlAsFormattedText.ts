@@ -264,7 +264,8 @@ export default function parseHtmlAsFormattedToText(html: string, withMarkdownLin
 	const prepared = skipMarkdown ? html : withMarkdownLinks ? parseMarkdown(parseMarkdownLinks(html)) : parseMarkdown(html);
 	fragment.innerHTML = sanitizeMessageHtml(prepared);
 	fixImageContent(fragment);
-	const text = fragment.innerText.trim().replace(/\u200b+/g, '');
+	removeZeroWidthSpaces(fragment);
+	const text = fragment.innerText.trim();
 	const trimShift = fragment.innerText.indexOf(text[0]);
 	let textIndex = -trimShift;
 	let recursionDeepness = 0;
@@ -314,6 +315,15 @@ export default function parseHtmlAsFormattedToText(html: string, withMarkdownLin
 		entities: entities.length ? entities : undefined,
 		linkPreview
 	};
+}
+
+function removeZeroWidthSpaces(fragment: HTMLDivElement) {
+	const walker = document.createTreeWalker(fragment, NodeFilter.SHOW_TEXT);
+	for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+		if (node.nodeValue?.includes('\u200b')) {
+			node.nodeValue = node.nodeValue.replace(/\u200b+/g, '');
+		}
+	}
 }
 
 export function fixImageContent(fragment: HTMLDivElement) {
