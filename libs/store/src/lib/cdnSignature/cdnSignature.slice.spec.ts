@@ -23,8 +23,6 @@ jest.mock('../helpers', () => ({
 const {
 	appendCdnSignature,
 	getCdnSignatureChannelId,
-	getCdnSignatureTtlMs,
-	isCdnSignatureExpired,
 	needsCdnSignature,
 	parseSignedCdnMediaSrc,
 	CDN_SIGNATURE_TTL_MS: TTL_MS
@@ -146,51 +144,39 @@ it('stops waiting after 5s so the media loads unsigned, and ignores the late rep
 });
 
 describe('after the CDN refuses media', () => {
-	const EXPIRES_AT_MS = 1_791_259_679_000;
+	const SIGNED_AT_MS = 1_791_259_679_000;
 	const signFirst = async (store: ReturnType<typeof createStore>, signature = '1791259679-old') => {
 		mockGenerateCDNSignature.mockResolvedValueOnce({ signature });
 		await store.dispatch(fetchCdnSignature({ channelId: '16' }));
 	};
 
-	it('makes one request for N images refused on an expired signature, and none for the replaced one', async () => {
-		const now = jest.spyOn(Date, 'now').mockReturnValue(EXPIRES_AT_MS - 60_000);
+	it('makes one request for N refused images, and none for the replaced signature', async () => {
+		const now = jest.spyOn(Date, 'now').mockReturnValue(SIGNED_AT_MS);
 		const store = createStore();
 		await signFirst(store);
 
-		now.mockReturnValue(EXPIRES_AT_MS);
-		mockGenerateCDNSignature.mockResolvedValueOnce({ signature: '1791277679-new' });
+		now.mockReturnValue(SIGNED_AT_MS + 30_000);
+		mockGenerateCDNSignature.mockResolvedValueOnce({ signature: '1791259709-new' });
 		await Promise.all([1, 2, 3].map(() => store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: '1791259679-old' }))));
 		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: '1791259679-old' }));
 
 		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(2);
-		expect(selectCdnSignatureByChannelId(store.getState(), '16')).toBe('1791277679-new');
+		expect(selectCdnSignatureByChannelId(store.getState(), '16')).toBe('1791259709-new');
 		now.mockRestore();
 	});
 
-	it('keeps a signature still inside its own expiry: a broken file is no reason to re-sign', async () => {
-		const now = jest.spyOn(Date, 'now').mockReturnValue(EXPIRES_AT_MS - TTL_MS);
+	it('renews a fresh signature only once the retry interval has passed', async () => {
+		const now = jest.spyOn(Date, 'now').mockReturnValue(SIGNED_AT_MS);
 		const store = createStore();
 		await signFirst(store);
 
-		now.mockReturnValue(EXPIRES_AT_MS - 1);
+		now.mockReturnValue(SIGNED_AT_MS + 29_999);
 		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: '1791259679-old' }));
-
-		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(1);
-		now.mockRestore();
-	});
-
-	it('renews a signature that states no expiry once the retry interval has passed', async () => {
-		const now = jest.spyOn(Date, 'now').mockReturnValue(1_000);
-		const store = createStore();
-		await signFirst(store, 'Expires=never&Signature=x');
-
-		now.mockReturnValue(30_999);
-		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: 'Expires=never&Signature=x' }));
 		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(1);
 
-		now.mockReturnValue(31_000);
-		mockGenerateCDNSignature.mockResolvedValueOnce({ signature: 'Expires=never&Signature=y' });
-		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: 'Expires=never&Signature=x' }));
+		now.mockReturnValue(SIGNED_AT_MS + 30_000);
+		mockGenerateCDNSignature.mockResolvedValueOnce({ signature: '1791259709-new' });
+		await store.dispatch(fetchCdnSignature({ channelId: '16', failedSignature: '1791259679-old' }));
 		expect(mockGenerateCDNSignature).toHaveBeenCalledTimes(2);
 		now.mockRestore();
 	});
@@ -341,22 +327,6 @@ describe('getCdnSignatureChannelId', () => {
 	});
 });
 
-describe('isCdnSignatureExpired', () => {
-	const NOW = 1_791_259_679_000;
-
-	it('is true from the expiry the signature starts with', () => {
-		expect(isCdnSignatureExpired(`${NOW / 1000}-x`, NOW)).toBe(true);
-		expect(isCdnSignatureExpired(`${NOW / 1000 - 60}-x`, NOW)).toBe(true);
-		expect(isCdnSignatureExpired(`${NOW / 1000 + 1}-x`, NOW)).toBe(false);
-	});
-
-	it('is undefined for a signature that states no expiry', () => {
-		expect(isCdnSignatureExpired('abc', NOW)).toBeUndefined();
-		expect(isCdnSignatureExpired('Expires=1&Signature=x', NOW)).toBeUndefined();
-		expect(isCdnSignatureExpired('', NOW)).toBeUndefined();
-	});
-});
-
 describe('CDN_SIGNATURE_TTL_MS', () => {
 	const ENV_KEY = 'NX_CDN_SIGNATURE_TTL_MS';
 	const originalValue = process.env[ENV_KEY];
@@ -384,37 +354,6 @@ describe('CDN_SIGNATURE_TTL_MS', () => {
 		expect(loadTtl(undefined)).toBe(3 * 60 * 60 * 1000);
 		expect(loadTtl('abc')).toBe(3 * 60 * 60 * 1000);
 		expect(loadTtl('0')).toBe(3 * 60 * 60 * 1000);
-	});
-});
-
-describe('getCdnSignatureTtlMs', () => {
-	const NOW = 1_791_259_679_000;
-	const MARGIN = 5 * 60 * 1000;
-
-	it('is the TTL while the signature outlives it', () => {
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 24 * 3600}-x`, NOW)).toBe(TTL_MS);
-		expect(getCdnSignatureTtlMs(`${(NOW + TTL_MS + MARGIN) / 1000}-x`, NOW)).toBe(TTL_MS);
-	});
-
-	it('ends a margin before an earlier expiry the signature starts with', () => {
-		expect(getCdnSignatureTtlMs(`${(NOW + TTL_MS) / 1000}-x`, NOW)).toBe(TTL_MS - MARGIN);
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 3600}-x`, NOW)).toBe(3600 * 1000 - MARGIN);
-	});
-
-	it('renews a short-lived signature halfway through its life', () => {
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 10 * 60}-x`, NOW)).toBe(5 * 60 * 1000);
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 6 * 60}-x`, NOW)).toBe(3 * 60 * 1000);
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 5 * 60}-x`, NOW)).toBe(150 * 1000);
-	});
-
-	it('waits at least 30s before renewing a signature about to expire', () => {
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 + 10}-x`, NOW)).toBe(30 * 1000);
-	});
-
-	it('is the TTL without a believable expiry', () => {
-		expect(getCdnSignatureTtlMs('abc', NOW)).toBe(TTL_MS);
-		expect(getCdnSignatureTtlMs(`${NOW / 1000}-x`, NOW)).toBe(TTL_MS);
-		expect(getCdnSignatureTtlMs(`${NOW / 1000 - 60}-x`, NOW)).toBe(TTL_MS);
 	});
 });
 
