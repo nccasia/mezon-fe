@@ -84,6 +84,7 @@ jobs:
           envkey_NX_CLOUDFLARE_CDN_URL: https://cdn.komu.vn
           envkey_NX_MEZON_CDN_URL: https://cdn.mezon.ai
           envkey_NX_PROFILE_IMG_URL: https://profile.mezon.ai
+          envkey_NX_CDN_SIGNATURE_TTL_MS: 10800000
           envkey_NX_CHAT_APP_OAUTH2_LOG_OUT_CALLBACK: https://mezon.ai/logout/callback
           envkey_NX_CHAT_APP_OAUTH2_LOG_OUT: https://oauth2.mezon.ai/oauth2/sessions/logout
           envkey_NX_CLI_SET: true
