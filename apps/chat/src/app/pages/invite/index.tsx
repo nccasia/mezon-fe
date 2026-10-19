@@ -38,7 +38,7 @@ export default function InvitePage() {
 				await inviteUser(inviteIdParam).then(async (res) => {
 					if (res?.channel_id && res?.clan_id) {
 						await new Promise((resolve) => setTimeout(resolve, 1000));
-						navigate(`/chat/clans/${res.clan_id}/channels/${res.channel_id}`);
+						navigate(`/chat/clans/${res.clan_id}/member-safety`);
 					}
 				});
 				if (selectInvite.channel_desc) {

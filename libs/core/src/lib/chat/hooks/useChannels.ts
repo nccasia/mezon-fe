@@ -8,7 +8,6 @@ import {
 	selectCurrentClanId,
 	selectDefaultChannelIdByClanId,
 	selectIsShowCreateThread,
-	selectWelcomeChannelByClanId,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -35,17 +34,18 @@ export function useChannels() {
 			const isUserInChildThread = currentChannel && checkIsThread(currentChannel) && currentChannel.parent_id === channelId;
 
 			if (isUserInChildThread) {
-				const welcomeChannelId = selectWelcomeChannelByClanId(state, clanId);
 				const defaultChannelId = selectDefaultChannelIdByClanId(state, clanId);
 				const fallbackChannelId = channels.find((ch) => ch.id !== channelId && !checkIsThread(ch))?.id;
 
-				const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+				const redirectChannelId = defaultChannelId || fallbackChannelId;
 
 				if (redirectChannelId) {
 					const channelPath = toChannelPage(redirectChannelId, clanId);
 					navigate(channelPath);
-					await new Promise((resolve) => setTimeout(resolve, 100));
+				} else {
+					navigate(`/chat/direct/friends`);
 				}
+				await new Promise((resolve) => setTimeout(resolve, 100));
 			}
 		}
 

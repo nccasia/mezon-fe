@@ -38,8 +38,8 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '', onClanCl
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const store = getStore();
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
-		const channelId = idsSelectedChannel[option?.id] || option?.welcome_channel_id;
-		const link = `/chat/clans/${option?.id}${channelId ? `/channels/${channelId}` : ''}`;
+		const channelId = idsSelectedChannel[option?.id];
+		const link = channelId ? `/chat/clans/${option?.id}/channels/${channelId}` : `/chat/clans/${option?.id}/member-safety`;
 		const isShowDmProfile = selectIsUseProfileDM(store.getState());
 		onClanClick?.();
 
