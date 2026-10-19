@@ -2285,6 +2285,7 @@ export function MezonSfuVoiceRoom({
 					}
 					const refusal = SFU_MEDIA_REFUSALS.get(errorMsg);
 					if (refusal) {
+						if (refusal.media === 'screen' && !screenStreamRef.current) return;
 						if (refusal.media === 'camera') dispatch(voiceActions.setShowCamera(false));
 						else void stopScreenShareRef.current();
 						dispatch(toastActions.addToast({ message: tRef.current(refusal.toast), type: 'warning', autoClose: 5000 }));
