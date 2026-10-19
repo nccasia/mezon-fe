@@ -1,7 +1,7 @@
 import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { authActions, channelsActions, inviteActions, selectInviteById, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { authActions, inviteActions, selectInviteById, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { generateE2eId } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,10 +41,6 @@ export default function InvitePage() {
 						navigate(`/chat/clans/${res.clan_id}/member-safety`);
 					}
 				});
-				if (selectInvite.channel_desc) {
-					const channel = { ...selectInvite, id: selectInvite.channel_id as string };
-					dispatch(channelsActions.add({ clanId: selectInvite.channel_desc?.clan_id as string, channel: { ...channel, active: 1 } }));
-				}
 				return true;
 			} catch (err) {
 				setError(t('invite.failedToJoin'));
@@ -79,7 +75,7 @@ export default function InvitePage() {
 
 	useEffect(() => {
 		if (userJoined) {
-			navigate(`/chat/clans/${clanId}/channels/${channeId}`);
+			navigate(`/chat/clans/${clanId}/member-safety`);
 			toast.info(t('invite.alreadyMember'));
 		} else {
 			const handleKeyDown = (event: KeyboardEvent) => {

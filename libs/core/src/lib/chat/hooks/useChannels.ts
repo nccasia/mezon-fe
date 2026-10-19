@@ -6,7 +6,6 @@ import {
 	selectChannelById,
 	selectCurrentChannelId,
 	selectCurrentClanId,
-	selectDefaultChannelIdByClanId,
 	selectIsShowCreateThread,
 	threadsActions,
 	useAppDispatch
@@ -34,13 +33,10 @@ export function useChannels() {
 			const isUserInChildThread = currentChannel && checkIsThread(currentChannel) && currentChannel.parent_id === channelId;
 
 			if (isUserInChildThread) {
-				const defaultChannelId = selectDefaultChannelIdByClanId(state, clanId);
 				const fallbackChannelId = channels.find((ch) => ch.id !== channelId && !checkIsThread(ch))?.id;
 
-				const redirectChannelId = defaultChannelId || fallbackChannelId;
-
-				if (redirectChannelId) {
-					const channelPath = toChannelPage(redirectChannelId, clanId);
+				if (fallbackChannelId) {
+					const channelPath = toChannelPage(fallbackChannelId, clanId);
 					navigate(channelPath);
 				} else {
 					navigate(`/chat/direct/friends`);
