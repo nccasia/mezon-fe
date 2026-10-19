@@ -1,4 +1,4 @@
-import { selectVoiceRecording } from '@mezon/store';
+import { getStore, selectVoiceRecording, toastActions, useAppDispatch } from '@mezon/store';
 import { generateE2eId } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,11 @@ import { useSelector } from 'react-redux';
 import { BLOB_SINK_MAX_DURATION_MS } from './RecordingSink';
 import { sfuCallRecorder } from './callRecorder';
 import { detectRecorderCapabilities } from './capabilities';
+
+function formatRecordingSize(bytes: number): string {
+	if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 const RecordGlyph = ({ active }: { active: boolean }) => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -55,9 +60,51 @@ interface RecordingControlProps {
 
 export const RecordingControl = memo(({ channelLabel }: RecordingControlProps) => {
 	const { t } = useTranslation('channelVoice');
+	const dispatch = useAppDispatch();
 	const recording = useSelector(selectVoiceRecording);
+	const memoryLimitMinutes = Math.round(BLOB_SINK_MAX_DURATION_MS / 60000);
 
 	const capabilities = useMemo(() => detectRecorderCapabilities(), []);
+	const memoryRecordingWarning = useMemo(() => t('recording.memoryRecordingWarning', { minutes: memoryLimitMinutes }), [t, memoryLimitMinutes]);
+
+	useEffect(() => {
+		return sfuCallRecorder.subscribe((event) => {
+			if (event.type === 'started') {
+				const { streamingToDisk } = selectVoiceRecording(getStore().getState());
+				if (!streamingToDisk) {
+					dispatch(
+						toastActions.addToast({
+							message: memoryRecordingWarning,
+							type: 'warning',
+							autoClose: 14_000
+						})
+					);
+				}
+				return;
+			}
+			if (event.type === 'finished') {
+				const { fileName, bytes, savedToDisk } = event.result;
+				const size = formatRecordingSize(bytes);
+				dispatch(
+					toastActions.addToast({
+						message: savedToDisk ? t('recording.savedToDisk', { fileName, size }) : t('recording.downloaded', { fileName, size }),
+						type: 'success',
+						autoClose: 5000
+					})
+				);
+				return;
+			}
+			if (event.type === 'error' && event.message !== 'recording-cancelled') {
+				dispatch(
+					toastActions.addToast({
+						message: t('recording.failed', { reason: event.message }),
+						type: 'error',
+						autoClose: 6000
+					})
+				);
+			}
+		});
+	}, [dispatch, memoryRecordingWarning, t]);
 	const isBusy = recording.status === 'starting' || recording.status === 'stopping';
 	const isActive = recording.status === 'recording' || recording.status === 'starting';
 	const showBadge = recording.status === 'recording' || recording.status === 'stopping';
@@ -75,7 +122,7 @@ export const RecordingControl = memo(({ channelLabel }: RecordingControlProps) =
 
 	const notes: string[] = [];
 	if (recording.deadlineAt) {
-		notes.push(t('recording.memoryLimitWarning', { minutes: Math.round(BLOB_SINK_MAX_DURATION_MS / 60000) }));
+		notes.push(memoryRecordingWarning);
 	}
 	if (recording.degraded) {
 		notes.push(t('recording.frozenWarning'));
@@ -86,6 +133,7 @@ export const RecordingControl = memo(({ channelLabel }: RecordingControlProps) =
 	}
 
 	const label = isActive ? t('recording.stop') : t('recording.start');
+	const recordHint = !isActive && !capabilities.streamingToDisk ? memoryRecordingWarning : undefined;
 
 	return (
 		<div className="flex gap-1">
@@ -93,6 +141,7 @@ export const RecordingControl = memo(({ channelLabel }: RecordingControlProps) =
 				role="button"
 				tabIndex={0}
 				aria-label={label}
+				title={recordHint}
 				aria-pressed={isActive}
 				onClick={handleToggle}
 				className={`flex items-center cursor-pointer transition-colors ${isBusy ? 'opacity-60 pointer-events-none' : ''} ${

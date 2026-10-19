@@ -12,6 +12,36 @@ export interface RecordingSink {
 	abort(): Promise<void>;
 }
 
+function buildSaveFilePickerOptions(fileName: string, mimeType: string, extension: string) {
+	return {
+		suggestedName: fileName,
+		types: [
+			{
+				description: extension === 'mp4' ? 'MPEG-4 video' : 'WebM video',
+				accept: { [mimeType.split(';')[0]]: [`.${extension}`] }
+			}
+		]
+	};
+}
+
+async function writeBlobToDiskPicker(
+	fileName: string,
+	mimeType: string,
+	extension: string,
+	blob: Blob
+): Promise<{ savedToDisk: boolean; fileName: string }> {
+	const win = getRecordingWindow();
+	if (!win?.showSaveFilePicker || !supportsDiskStreaming()) {
+		return { savedToDisk: false, fileName };
+	}
+
+	const handle = await win.showSaveFilePicker(buildSaveFilePickerOptions(fileName, mimeType, extension));
+	const writable = await handle.createWritable();
+	await writable.write(blob);
+	await writable.close();
+	return { savedToDisk: true, fileName: handle.name || fileName };
+}
+
 class FileSystemSink implements RecordingSink {
 	readonly streaming = true;
 	bytesWritten = 0;
@@ -62,7 +92,8 @@ class BlobSink implements RecordingSink {
 
 	constructor(
 		readonly fileName: string,
-		private readonly mimeType: string
+		private readonly mimeType: string,
+		private readonly extension: string
 	) {}
 
 	write(chunk: Blob): void {
@@ -75,6 +106,20 @@ class BlobSink implements RecordingSink {
 		const blob = new Blob(this.chunks, { type: this.mimeType });
 		this.chunks = [];
 		const bytes = blob.size;
+
+		if (supportsDiskStreaming()) {
+			try {
+				const outcome = await writeBlobToDiskPicker(this.fileName, this.mimeType, this.extension, blob);
+				if (outcome.savedToDisk) {
+					return { savedToDisk: true, bytes };
+				}
+			} catch (error) {
+				if ((error as DOMException)?.name !== 'AbortError') {
+					console.warn('[recording] could not save in-memory recording to disk, falling back to download', error);
+				}
+			}
+		}
+
 		triggerDownload(URL.createObjectURL(blob), this.fileName);
 		return { savedToDisk: false, bytes };
 	}
@@ -109,26 +154,20 @@ export async function createRecordingSink(fileName: string, mimeType: string, ex
 
 	if (win && supportsDiskStreaming() && win.showSaveFilePicker) {
 		try {
-			const handle = await win.showSaveFilePicker({
-				suggestedName: fileName,
-				types: [
-					{
-						description: extension === 'mp4' ? 'MPEG-4 video' : 'WebM video',
-						accept: { [mimeType.split(';')[0]]: [`.${extension}`] }
-					}
-				]
-			});
+			const handle = await win.showSaveFilePicker(buildSaveFilePickerOptions(fileName, mimeType, extension));
 			const writable = await handle.createWritable();
 			return new FileSystemSink(handle.name || fileName, writable);
 		} catch (error) {
 			if ((error as DOMException)?.name === 'AbortError') {
 				throw new RecordingCancelledError();
 			}
-			console.warn('[recording] save picker unavailable, buffering in memory instead', error);
+			console.warn('[recording] could not open disk stream, using in-memory recording', error);
 		}
+	} else {
+		console.warn('[recording] File System Access API unavailable, using in-memory recording');
 	}
 
-	return new BlobSink(fileName, mimeType);
+	return new BlobSink(fileName, mimeType, extension);
 }
 
 export function buildRecordingFileName(channelLabel: string | undefined, extension: string): string {
