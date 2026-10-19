@@ -1,4 +1,4 @@
-import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { getShowName, useGetPriorityNameFromUserClan } from '@mezon/core';
 import type { PinMessageEntity } from '@mezon/store';
 import {
 	appActions,
@@ -138,16 +138,16 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	};
 
 	const checkAnonymous = pinMessage?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
+	const senderId = String(pinMessage.sender_id || '');
 
-	const avatarToShow =
-		(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-			? priorityAvatar
-			: pinMessage.avatar || priorityAvatar || directAvatar || message?.avatar) || '';
+	const avatarToShow = message?.clan_avatar || message?.avatar || pinMessage.avatar || priorityAvatar || directAvatar || '';
 	const nameToShow = checkAnonymous
 		? 'Anonymous'
-		: (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-				? namePriority
-				: pinMessage.username || namePriority || directName || message?.display_name || message?.username) || '';
+		: getShowName(message?.clan_nick ?? '', message?.display_name ?? '', message?.username ?? '', senderId) ||
+			pinMessage.username ||
+			namePriority ||
+			directName ||
+			'';
 	return (
 		<div
 			key={pinMessage.id}
