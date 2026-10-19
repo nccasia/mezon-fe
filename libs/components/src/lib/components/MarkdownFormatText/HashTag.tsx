@@ -50,7 +50,7 @@ const ChannelHashtag = ({
 	const { toChannelPage, navigate } = useAppNavigation();
 
 	const storedChannel = getTagById(channelHastagId);
-	const clanExist = useSelector(selectClanExists(clanId || ''));
+	const clanExist = useAppSelector((state) => selectClanExists(state, clanId || ''));
 	const sentChannel = useMemo<IChannel | undefined>(
 		() =>
 			channelType !== undefined && channelLabel && clanId && clanExist
@@ -63,7 +63,7 @@ const ChannelHashtag = ({
 						type: channelType
 					}
 				: undefined,
-		[channelHastagId, channelLabel, channelType, clanId, parentId]
+		[channelHastagId, channelLabel, channelType, clanId, parentId, clanExist]
 	);
 	const subscribeDetail = useCallback((onChange: () => void) => subscribeChannelDetail(channelHastagId, onChange), [channelHastagId]);
 	const readDetail = useCallback(() => selectChannelDetailById(getStore().getState(), channelHastagId), [channelHastagId]);
