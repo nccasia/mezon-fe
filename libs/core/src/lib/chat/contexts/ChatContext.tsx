@@ -3168,10 +3168,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 							// The first attempt already failed on the node we have: ask the gateway
 							// whether it wants to move us before burning the rest of the wave on it.
-							if (getReconnectWaveAttempts() >= 1 && (await askHealthyEndpoint()) === 'changed') {
-								// A node we have never tried deserves a full budget instead of the
-								// cooldown this wave was about to hit.
-								resetReconnectWave();
+							if (getReconnectWaveAttempts() >= 1) {
+								const verdict = await askHealthyEndpoint();
+								// A node we have never tried, or a session id the gateway has just minted,
+								// deserves a full budget instead of the cooldown this wave was about to hit.
+								if (verdict === 'changed' || verdict === 'renewed') {
+									resetReconnectWave();
+								}
 							}
 
 							if (!consumeReconnectAttempt()) {
@@ -3266,13 +3269,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	// if the gateway keeps naming the same node, we stop asking about slowness until we reconnect.
 	useEffect(() => {
 		const onSlowNode = async () => {
-			if (socketState.status !== 'connected' || !shouldReportSlowNode()) {
+			if (socketState.status !== 'connected' || isRealtimeServerPinned() || !shouldReportSlowNode()) {
 				return;
 			}
 			const verdict = await askHealthyEndpoint();
 			if (verdict === 'changed') {
 				window.dispatchEvent(new CustomEvent(REALTIME_SERVER_CHANGED_EVENT));
-			} else if (verdict === 'same') {
+			} else if (verdict === 'same' || verdict === 'renewed') {
 				disableSlowReports();
 			}
 		};
