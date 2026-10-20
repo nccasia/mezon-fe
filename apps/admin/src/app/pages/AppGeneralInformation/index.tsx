@@ -2,6 +2,7 @@ import { ModalSaveChanges } from '@mezon/components';
 import { editApplication, selectAppDetail, uploadAttachmentAdmin, useAppDispatch } from '@mezon/store';
 import { uploadImageToMinIO } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
+import { ETypesCDN } from '@mezon/utils';
 import type { ApiApp, MezonUpdateAppBody } from 'mezon-js';
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -48,7 +49,7 @@ const GeneralInformation = () => {
 				try {
 					const response = await uploadImageToMinIO(result.url, file, file.size);
 					if (response) {
-						const url = `${process.env.NX_CLOUDFLARE_CDN_URL}/${result.filename}`;
+						const url = `${result.type_cdn === ETypesCDN.MEZON ? process.env.NX_MEZON_CDN_URL : process.env.NX_CLOUDFLARE_CDN_URL}/${result.filename}`;
 						setAppLogoUrl(url);
 					}
 				} catch (error) {
