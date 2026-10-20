@@ -12,6 +12,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { checkIsThread, type ICategoryChannel, type IChannel } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -57,13 +58,16 @@ export function useCategory() {
 			const isUserInCategoryChannel = currentChannel && currentChannel.category_id === category.id;
 
 			if (isUserInCategoryChannel) {
-				const fallbackChannelId = channels.find((ch) => ch.category_id !== category.id && !checkIsThread(ch))?.id;
+				const fallbackChannelId = channels.find(
+					(ch) => ch.category_id !== category.id && !checkIsThread(ch) && ch.type === ChannelType.CHANNEL_TYPE_CHANNEL
+				)?.id;
 
 				if (fallbackChannelId) {
 					const channelPath = toChannelPage(fallbackChannelId, currentClanId as string);
 					navigate(channelPath);
 				} else {
-					navigate(category?.clan_id ? `/chat/clans/${category?.clan_id}/member-safety` : '/chat/direct/friends');
+					const path = category?.clan_id ? toMembersPage(category?.clan_id) : '/chat/direct/friends';
+					navigate(path);
 				}
 				await new Promise((resolve) => setTimeout(resolve, 100));
 			}

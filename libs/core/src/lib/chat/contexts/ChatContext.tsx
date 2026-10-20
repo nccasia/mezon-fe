@@ -1138,7 +1138,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						}
 
 						const clanChannels = selectChannelsByClanId(store.getState() as unknown as RootState, clanId as string);
-						const fallbackChannelId = clanChannels.find((ch) => !checkIsThread(ch) && ch.id !== user.channel_id)?.id;
+						const fallbackChannelId = clanChannels.find(
+							(ch) => !checkIsThread(ch) && ch.id !== user.channel_id && ch.type === ChannelType.CHANNEL_TYPE_CHANNEL
+						)?.id;
 
 						if (fallbackChannelId) {
 							navigate(`/chat/clans/${clanId}/channels/${fallbackChannelId}`, true);
@@ -1872,7 +1874,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						return;
 					}
 
-					const fallbackChannelId = allChannels.find((ch) => ch.category_id !== categoryEvent.id && !checkIsThread(ch))?.id;
+					const fallbackChannelId = allChannels.find(
+						(ch) => ch.category_id !== categoryEvent.id && !checkIsThread(ch) && ch.type === ChannelType.CHANNEL_TYPE_CHANNEL
+					)?.id;
 
 					if (fallbackChannelId) {
 						navigate(`/chat/clans/${clanId}/channels/${fallbackChannelId}`);
@@ -2255,7 +2259,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				if (redirectChannelId) {
 					navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
 				} else {
-					navigate(`/chat/clans/${clanId}/member-safety`);
+					navigate(`/chat/direct/friends`);
 				}
 
 				if (userId && channelArchive.creator_id !== userId) {

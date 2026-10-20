@@ -23,9 +23,7 @@ export default function InvitePage() {
 	const clanId = useMemo(() => {
 		return selectInvite?.clan_id || '0';
 	}, [selectInvite]);
-	const channeId = useMemo(() => {
-		return selectInvite?.channel_id || '0';
-	}, [selectInvite]);
+
 	const userJoined = useMemo(() => {
 		return selectInvite?.user_joined;
 	}, [selectInvite]);
@@ -90,7 +88,7 @@ export default function InvitePage() {
 				document.removeEventListener('keydown', handleKeyDown);
 			};
 		}
-	}, [userJoined, navigate, clanId, channeId, t]);
+	}, [userJoined, navigate, clanId, t]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-cover bg-center bg-theme-primary">
