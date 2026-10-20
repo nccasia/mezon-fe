@@ -49,7 +49,7 @@ import { useSfuGridLayout, useSfuPagination } from './GridLayout/useSfuGridLayou
 import { SfuRoomAudioRenderer } from './Media/SfuRoomAudioRenderer';
 import { SfuVideo } from './Media/SfuVideo';
 import { MezonNsAudioPipeline } from './Media/mezonNs/MezonNsAudioPipeline';
-import { SfuParticipantTile } from './ParticipantTile/SfuParticipantTile';
+import { SfuParticipantTile, getParticipantTileFrameClass } from './ParticipantTile/SfuParticipantTile';
 import { ScreenShareFocusContext, SfuScreenShareTile } from './ParticipantTile/SfuScreenShareTile';
 import { ReactionCallHandler, useSendReaction } from './Reaction';
 import { SfuVoiceContextMenu } from './VoiceContextMenu';
@@ -2880,11 +2880,7 @@ export function MezonSfuVoiceRoom({
 		participantId: 'local',
 		isScreen: false,
 		content: (
-			<div
-				className={`relative aspect-video overflow-hidden rounded-xl border-2 bg-[#181825] transition-[border-color,box-shadow] duration-150 hover:border-zinc-400 ${
-					localSpeaking ? '!border-green-400 shadow-[0_0_18px_rgba(74,222,128,0.55)]' : 'border-transparent'
-				}`}
-			>
+			<div className={getParticipantTileFrameClass(localSpeaking)}>
 				{joinRole === 'speaker' && localPreview && cameraEnabled ? (
 					<SfuVideo stream={localPreview} muted mirrored />
 				) : (
@@ -3133,7 +3129,7 @@ export function MezonSfuVoiceRoom({
 					onPlaybackFailure={handleAudioPlaybackFailure}
 					onSinkIdFailure={handleSinkIdFailure}
 				/>
-				<header className="relative z-20 flex h-[68px] shrink-0 items-center justify-between px-4 text-sm">
+				<header className="relative z-20 flex h-[68px] shrink-0 items-center justify-between px-4 text-sm bg-theme-setting-nav">
 					<div className="flex items-center gap-2 text-[var(--bg-icon-theme)]">
 						{isPrivateVoice ? (
 							<Icons.SpeakerLocked

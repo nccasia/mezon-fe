@@ -133,7 +133,7 @@ export const SfuControlBar = ({
 	const showPushToTalkHint = joinRole === 'audience' && !pushToTalkHintDismissed && !deviceMenuOpen;
 	const showAgentHint = !agentHintDismissed && !showNetworkWarning && !deviceMenuOpen && !(joinRole === 'audience' && !pushToTalkHintDismissed);
 	return (
-		<footer className="relative z-20 grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-t border-white/10 bg-[#11111b] px-4 py-3 max-md:flex max-md:flex-col max-md:justify-center max-md:gap-3 max-md:px-2 max-md:py-2">
+		<footer className="relative z-20 grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-t border-white/10 bg-theme-setting-nav px-4 py-3 max-md:flex max-md:flex-col max-md:justify-center max-md:gap-3 max-md:px-2 max-md:py-2">
 			<div className="flex items-center justify-start gap-4 max-md:justify-center max-md:gap-3">
 				{!isExternalCalling && (
 					<>
