@@ -9,8 +9,10 @@ import {
 	canAskHealthyEndpoint,
 	fetchHealthyEndpoint,
 	fetchSessionRefresh,
+	gatewayAnsweredThisOutage,
 	isJwtExpired,
 	isRefreshRefused,
+	noteGatewayAnswered,
 	noteHealthyEndpointAsked,
 	probeCredential,
 	refreshTokenNeedsRotation,
@@ -567,7 +569,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			await client.connect(credential, resolveConnectWsUrl(sessionRef.current), options.createStatus ?? true);
 
-			resetHealthyEndpointThrottle();
 			socketState.status = 'connected';
 			return sessionRef.current;
 		})();
@@ -708,9 +709,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			let refusedByProbe = false;
 			if (knownRefused) {
 				status = 401;
-			} else if (pinned && sessionId && apiUrl) {
-				// Every gateway answer mints a session id, so a pinned tab, which has no use for the node it
-				// names, only asks once the api has confirmed the session id is dead.
+			} else if ((pinned || gatewayAnsweredThisOutage()) && sessionId && apiUrl) {
+				// Every gateway answer mints a session id, so a tab with no use for the node it names (pinned,
+				// or already told this outage) only asks once the api has confirmed the session id is dead.
 				const probe = await probeCredential(apiUrl, sessionId);
 				if (probe !== 'rejected') {
 					noteHealthyEndpointAsked(probe === 'inconclusive');
@@ -767,6 +768,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					return status === 0 ? 'unreachable' : 'failed';
 				}
 				noteHealthyEndpointAsked(false);
+				noteGatewayAnswered();
 
 				const host = (payload.ws_url ?? '').trim();
 				// The gateway answers with `host` on production but `host:port` elsewhere; the allowlist
