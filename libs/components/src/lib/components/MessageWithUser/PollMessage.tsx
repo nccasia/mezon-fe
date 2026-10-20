@@ -5,6 +5,7 @@ import {
 	selectEmojiSrcById,
 	selectMemberClanByUserId,
 	selectMemberDMByUserId,
+	selectMemberGroupByUserId,
 	selectMessageByMessageId,
 	selectMyVote,
 	useAppDispatch,
@@ -205,7 +206,7 @@ export const PollMessage = ({
 				const state = getStore().getState();
 
 				userIds.forEach((userId) => {
-					const member = selectMemberClanByUserId(state, userId);
+					const member = selectMemberClanByUserId(state, userId) || selectMemberGroupByUserId(state, channelId ?? '', userId);
 
 					const dmProfile = selectMemberDMByUserId(state, userId);
 
@@ -229,7 +230,7 @@ export const PollMessage = ({
 		});
 
 		return result;
-	}, [pollData, answers.length]);
+	}, [pollData, answers.length, channelId]);
 
 	const hasVoted = useMemo(() => {
 		return votedAnswers.length > 0;
@@ -350,7 +351,7 @@ export const PollMessage = ({
 						const userIds = (detailObj.user_ids as string[]) ?? [];
 						if (answerIndex >= 0 && answerIndex < answers.length) {
 							const voters: PollVoter[] = userIds.map((userId) => {
-								const member = selectMemberClanByUserId(state, userId);
+								const member = selectMemberClanByUserId(state, userId) || selectMemberGroupByUserId(state, channelId, userId);
 								const dmProfile = selectMemberDMByUserId(state, userId);
 								if (member) {
 									return {
