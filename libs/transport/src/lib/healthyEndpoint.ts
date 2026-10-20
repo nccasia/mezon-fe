@@ -30,7 +30,7 @@ const FAILURE_BACKOFF_MS = 60000;
 const REQUEST_TIMEOUT_MS = 8000;
 // The paths that ignore the throttle (we are about to log the user out) repeat for as long as the
 // outage lasts, so they get a budget instead: enough to find a live node, not enough to churn
-// through the user's ten gateway session slots. Reset once a socket is up again.
+// through the user's ten gateway session slots. Reset once a socket has stayed up.
 const MAX_FORCED_ASKS_PER_OUTAGE = 3;
 // Even the paths that ignore the throttle keep a floor between asks: bootstrap, the streak handler
 // and the wave can all decide to ask within the same second, and each answer costs a session slot.
@@ -46,15 +46,24 @@ const STALE_ASK_MS = 90000;
 export const CHECK_HEALTHY_EVENT = 'CHECK_HEALTHY';
 const SETTLED_ON_NODE_MS = 120000;
 const SLOW_REPORT_COOLDOWN_MS = 120000;
+// The gateway's last answer is kept beside the session, so a reload or another tab opened while the node is
+// still down checks the session id instead of having the gateway mint one more.
+const GATEWAY_ANSWERED_KEY = 'mezon_gateway_answered_at';
+const GATEWAY_ANSWER_MEMORY_MS = 5 * 60 * 1000;
 
 let nextAllowedAt = 0;
 let lastAskAt = 0;
 let nextInterval = MIN_INTERVAL_MS;
 let forcedAsks = 0;
 let asking = false;
+let gatewayAnswered = false;
 let connectedSince = 0;
 let slowReportsDisabled = false;
 let slowSuppressedUntil = 0;
+
+function connectionSettled(now: number): boolean {
+	return connectedSince !== 0 && now - connectedSince >= SETTLED_ON_NODE_MS;
+}
 
 export function noteSocketConnected(now: number = Date.now()): void {
 	connectedSince = now;
@@ -62,8 +71,52 @@ export function noteSocketConnected(now: number = Date.now()): void {
 	slowSuppressedUntil = 0;
 }
 
-export function noteSocketDisconnected(): void {
+// Only a connection that held ends the outage. One that drops within moments is the same outage going on,
+// or every flap of a bad link would start a fresh budget and ask the gateway — minting a session id —
+// all over again.
+export function noteSocketDisconnected(now: number = Date.now()): void {
+	if (connectionSettled(now)) {
+		resetHealthyEndpointThrottle();
+	}
 	connectedSince = 0;
+}
+
+/**
+ * The gateway names the node from a fixed map (the user's country, and the node the client says it is on),
+ * so once it has answered during an outage, asking it again names the same node and mints one more session
+ * id. Until a connection settles, later asks only check that the session id still holds.
+ */
+export function gatewayAnsweredThisOutage(now: number = Date.now()): boolean {
+	if (connectionSettled(now)) {
+		return false;
+	}
+	return gatewayAnswered || gatewayAnsweredRecently(now);
+}
+
+export function noteGatewayAnswered(now: number = Date.now()): void {
+	gatewayAnswered = true;
+	try {
+		localStorage.setItem(GATEWAY_ANSWERED_KEY, String(now));
+	} catch {
+		// Without storage a reload asks the gateway again, as it always did.
+	}
+}
+
+function gatewayAnsweredRecently(now: number): boolean {
+	try {
+		const at = Number(localStorage.getItem(GATEWAY_ANSWERED_KEY));
+		return at > 0 && at <= now && now - at < GATEWAY_ANSWER_MEMORY_MS;
+	} catch {
+		return false;
+	}
+}
+
+function forgetGatewayAnswer(): void {
+	try {
+		localStorage.removeItem(GATEWAY_ANSWERED_KEY);
+	} catch {
+		// Nothing was stored.
+	}
 }
 
 /** True at most once per cooldown, and only once this node has had time to prove itself. */
@@ -109,13 +162,15 @@ export function noteHealthyEndpointAsked(failed: boolean, now: number = Date.now
 	nextInterval = Math.min(nextInterval * 2, MAX_INTERVAL_MS);
 }
 
-/** A socket that came up ends the outage: ask freely again the next time one goes down. */
+/** A socket that stayed up ends the outage: ask freely again the next time one goes down. */
 export function resetHealthyEndpointThrottle(): void {
 	nextAllowedAt = 0;
 	lastAskAt = 0;
 	nextInterval = MIN_INTERVAL_MS;
 	forcedAsks = 0;
 	asking = false;
+	gatewayAnswered = false;
+	forgetGatewayAnswer();
 }
 
 // Keep the "how long have we been on this node" clock honest without every connect path having to
