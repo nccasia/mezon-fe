@@ -521,12 +521,36 @@ export const updateUser = createAsyncThunk(
 
 interface JoinClanPayload {
 	clanId: string;
+	noCache?: boolean;
 }
 
-export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
-	try {
+const clanJoinsInFlight = new Map<string, Promise<void>>();
+
+export const waitForClanJoin = (clanId: string) => clanJoinsInFlight.get(clanId);
+
+// clan_join subscribes the socket only to the private channels and threads in the server's cached channel list of the clan,
+// and the server ignores a repeat clan join, or one sent after a public channel join of that clan, so the list is loaded first
+// and channel joins wait for the clan join.
+export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId, noCache = false }, thunkAPI) => {
+	const join = (async () => {
+		if (clanId !== '0') {
+			await thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
+		}
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.clientRef.current?.joinClanChat(mezon.session, clanId);
+	})();
+	const settled = join.then(
+		() => undefined,
+		() => undefined
+	);
+	clanJoinsInFlight.set(clanId, settled);
+	settled.then(() => {
+		if (clanJoinsInFlight.get(clanId) === settled) {
+			clanJoinsInFlight.delete(clanId);
+		}
+	});
+	try {
+		await join;
 		const state = thunkAPI.getState() as RootState;
 		if (!state.clans?.checkJoinList?.[clanId] && clanId !== '0') {
 			thunkAPI.dispatch(listChannelBadgeCount({ clanId }));

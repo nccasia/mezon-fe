@@ -31,7 +31,7 @@ import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCa
 import { fetchCategoriesCached, mapCategoryToEntity } from '../categories/categories.slice';
 import { cdnSignatureActions } from '../cdnSignature/cdnSignature.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { selectClansEntities } from '../clans/clans.slice';
+import { selectClansEntities, waitForClanJoin } from '../clans/clans.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { messagesActions, processQueuedLastSeenMessages } from '../messages/messages.slice';
@@ -311,6 +311,9 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	if (!channelId) return null;
 
 	try {
+		if (clanId && clanId !== '0') {
+			await waitForClanJoin(clanId);
+		}
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const channel = await mezon.clientRef.current?.joinChat(mezon.session, clanId, channelId, channelType, isPublic);
 		return channel;
