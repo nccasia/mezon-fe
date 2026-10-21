@@ -160,44 +160,9 @@ export const writeMessageReaction = createAsyncThunk(
 					throw new Error('Client is not initialized');
 				}
 
-				let socketSuccess = false;
-				if (client) {
-					try {
-						await retryWithBackoff(
-							async () => {
-								return await createTimeoutPromise(
-									client.writeMessageReaction(
-										session,
-										id || '0',
-										clanId || '0',
-										channelId,
-										mode,
-										isPublic,
-										messageId,
-										emoji_id || '0',
-										emoji,
-										count,
-										messageSenderId,
-										actionDelete,
-										topic_id || '0',
-										emoji_recent_id || '0',
-										sender_name
-									),
-									2000,
-									'Message reaction operation timed out'
-								);
-							},
-							1,
-							1000
-						);
-						socketSuccess = true;
-					} catch (socketError) {
-						socketSuccess = false;
-					}
-				}
-
-				if (!socketSuccess) {
-					const result = await client.channelMessageReact(
+				const isTopicReaction = Boolean(topic_id && topic_id !== '0');
+				const persistReaction = () =>
+					client.channelMessageReact(
 						session,
 						clanId || '0',
 						channelId || '0',
@@ -213,6 +178,49 @@ export const writeMessageReaction = createAsyncThunk(
 						emoji_recent_id || '0',
 						sender_name
 					);
+
+				if (isTopicReaction) {
+					await persistReaction();
+				} else {
+					let socketSuccess = false;
+					if (client) {
+						try {
+							await retryWithBackoff(
+								async () => {
+									return await createTimeoutPromise(
+										client.writeMessageReaction(
+											session,
+											id || '0',
+											clanId || '0',
+											channelId,
+											mode,
+											isPublic,
+											messageId,
+											emoji_id || '0',
+											emoji,
+											count,
+											messageSenderId,
+											actionDelete,
+											topic_id || '0',
+											emoji_recent_id || '0',
+											sender_name
+										),
+										2000,
+										'Message reaction operation timed out'
+									);
+								},
+								1,
+								1000
+							);
+							socketSuccess = true;
+						} catch (socketError) {
+							socketSuccess = false;
+						}
+					}
+
+					if (!socketSuccess) {
+						await persistReaction();
+					}
 				}
 
 				const emojiLastest: EmojiStorage = {
