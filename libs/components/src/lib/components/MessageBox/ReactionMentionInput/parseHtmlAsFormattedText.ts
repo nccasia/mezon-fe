@@ -1,4 +1,4 @@
-import { sanitizeMessageHtml } from '@mezon/utils';
+import { parenBalance, sanitizeMessageHtml } from '@mezon/utils';
 
 function escapeHtmlText(value: string): string {
 	return value.replace(/[&<>"']/g, (ch) => {
@@ -226,7 +226,6 @@ function getCleanUrlAndTrailing(match: string, fullText: string, matchIndex: num
 	const beforeMatch = fullText.substring(0, matchIndex);
 
 	const wrappingPairs = [
-		{ open: '(', close: ')' },
 		{ open: '[', close: ']' },
 		{ open: '{', close: '}' },
 		{ open: '<', close: '>' }
@@ -251,6 +250,11 @@ function getCleanUrlAndTrailing(match: string, fullText: string, matchIndex: num
 		if (trailingMatch) {
 			cleanMatch = match.slice(0, -trailingMatch[0].length);
 			trailingPunctuation = trailingMatch[0];
+		}
+		const ownCloseParens = Math.min(parenBalance(cleanMatch), /^\)*/.exec(trailingPunctuation)?.[0].length ?? 0);
+		if (ownCloseParens > 0) {
+			cleanMatch += trailingPunctuation.slice(0, ownCloseParens);
+			trailingPunctuation = trailingPunctuation.slice(ownCloseParens);
 		}
 	}
 

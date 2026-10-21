@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "長時間ひとりだったため、ボイスチャンネルから切断されました。",
 		"duplicateSessionDisconnected": "別のデバイスでボイスチャンネルに参加したため、このセッションは切断されました。",
 		"disconnectedRejoin": "ボイスチャンネルから切断されました。",
-		"weakNetworkDisconnected": "ネットワークが弱いため、音声チャンネルから切断されました。"
+		"weakNetworkDisconnected": "ネットワークが弱いため、音声チャンネルから切断されました。",
+		"cameraLimitReached": "このボイスチャンネルはカメラの上限に達しています。誰かがカメラをオフにしてから、もう一度お試しください。",
+		"screenShareLimitReached": "このボイスチャンネルはスクリーン共有の上限に達しています。誰かが共有を停止してから、もう一度お試しください。",
+		"cameraUpdateFailed": "カメラのオン/オフを切り替えられませんでした。もう一度お試しください。",
+		"screenShareUpdateFailed": "スクリーン共有を開始または停止できませんでした。もう一度お試しください。"
 	},
 	"usernameScreen": "{{username}}のスクリーン",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "音声は一時停止しています。クリックするとマイクをミュートのままにします。"
 	},
 	"weakNetwork": "ネットワークが不安定",
-	"networkWarning": "インターネット接続が不安定です。他の人に聞こえにくい可能性があります。",
+	"networkWarning": {
+		"title": "インターネット接続が不安定です",
+		"body": "ネットワーク接続を確認してください。"
+	},
 	"reconnectModal": {
 		"title": "音声に接続できません",
 		"description": "音声接続を復元できませんでした。接続を確認して、もう一度参加してください。",

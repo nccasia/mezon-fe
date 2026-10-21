@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Zostałeś rozłączony z kanału głosowego, ponieważ zbyt długo byłeś w nim sam.",
 		"duplicateSessionDisconnected": "Dołączono do kanału głosowego na innym urządzeniu, więc ta sesja została rozłączona.",
 		"disconnectedRejoin": "Rozłączono Cię z kanałem głosowym.",
-		"weakNetworkDisconnected": "Zostałeś rozłączony z kanału głosowego, ponieważ Twoja sieć jest słaba."
+		"weakNetworkDisconnected": "Zostałeś rozłączony z kanału głosowego, ponieważ Twoja sieć jest słaba.",
+		"cameraLimitReached": "Ten kanał głosowy osiągnął limit kamer. Spróbuj ponownie, gdy ktoś wyłączy kamerę.",
+		"screenShareLimitReached": "Ten kanał głosowy osiągnął limit udostępniania ekranu. Spróbuj ponownie, gdy ktoś zatrzyma udostępnianie.",
+		"cameraUpdateFailed": "Nie udało się włączyć ani wyłączyć kamery. Spróbuj ponownie.",
+		"screenShareUpdateFailed": "Nie udało się rozpocząć ani zatrzymać udostępniania ekranu. Spróbuj ponownie."
 	},
 	"usernameScreen": "Ekran {{username}}",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "Audio jest wstrzymane. Kliknij, aby pozostawić mikrofon wyciszony."
 	},
 	"weakNetwork": "Słaba sieć",
-	"networkWarning": "Twoje połączenie internetowe jest niestabilne. Inni mogą Cię nie słyszeć wyraźnie.",
+	"networkWarning": {
+		"title": "Twoje połączenie jest niestabilne",
+		"body": "Sprawdź swoje połączenie sieciowe."
+	},
 	"reconnectModal": {
 		"title": "Nie można połączyć się z głosem",
 		"description": "Nie udało się przywrócić połączenia głosowego. Sprawdź połączenie i spróbuj dołączyć ponownie.",

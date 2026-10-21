@@ -531,6 +531,7 @@
 		"accessDenied": "Từ chối truy cập",
 		"accessDeniedDesc": "Bạn không có quyền truy cập kênh hoặc clan này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
 		"goToWelcomeChannel": "Đi đến kênh chào mừng",
+		"goToFriendPage": "Đi đến trang bạn bè",
 		"okayGotIt": "Đã hiểu"
 	},
 	"reportMessage": {

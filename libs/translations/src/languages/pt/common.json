@@ -531,6 +531,7 @@
 		"accessDenied": "Acesso negado",
 		"accessDeniedDesc": "Você não tem permissão para acessar este canal ou clã. Entre em contato com o administrador se achar que é um erro.",
 		"goToWelcomeChannel": "Ir para o canal de boas-vindas",
+		"goToFriendPage": "Ir para a página de amigos",
 		"okayGotIt": "Entendi"
 	},
 	"reportMessage": {

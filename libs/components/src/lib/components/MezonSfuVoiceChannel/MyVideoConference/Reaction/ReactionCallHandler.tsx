@@ -1,6 +1,6 @@
 import { getStore, getStoreAsync, selectMemberClanByUserId, selectVoiceInfo } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { getSrcEmoji } from '@mezon/utils';
+import { getSrcEmoji, sinkIdForHtmlMediaElement } from '@mezon/utils';
 import type { VoiceReactionSend } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,7 +11,32 @@ import type { DisplayedEmoji, DisplayedHand } from './types';
 const MAX_EMOJIS_DISPLAYED = 20;
 const EMOJI_RATE_LIMIT_MS = 150;
 
-export const ReactionCallHandler = memo(() => {
+type AudioWithSink = HTMLAudioElement & { setSinkId?: (id: string) => Promise<void> };
+
+interface ReactionCallHandlerProps {
+	sinkId?: string;
+}
+
+const applyOutputSink = async (audio: HTMLAudioElement, sinkId?: string) => {
+	if (sinkId === undefined) return;
+	const el = audio as AudioWithSink;
+	if (typeof el.setSinkId !== 'function') return;
+	const targetSinkId = sinkIdForHtmlMediaElement(sinkId);
+	try {
+		await el.setSinkId(targetSinkId);
+	} catch (err) {
+		console.warn('[ReactionCallHandler] failed to setSinkId', err);
+		if (targetSinkId !== '') {
+			try {
+				await el.setSinkId('');
+			} catch (fallbackErr) {
+				console.warn('[ReactionCallHandler] fallback to default speaker failed', fallbackErr);
+			}
+		}
+	}
+};
+
+export const ReactionCallHandler = memo(({ sinkId }: ReactionCallHandlerProps = {}) => {
 	const [displayedEmojis, setDisplayedEmojis] = useState<DisplayedEmoji[]>([]);
 	const [raisingList, setRaisingList] = useState<DisplayedHand[]>([]);
 	const timeoutsRef = useRef<Map<string, number>>(new Map());
@@ -24,6 +49,17 @@ export const ReactionCallHandler = memo(() => {
 	const channelId = voiceInfo?.channelId;
 	const rafRef = useRef<number>();
 	const audioRef = useRef<HTMLAudioElement>(null);
+
+	useEffect(() => {
+		if (sinkId === undefined) return;
+		const elements: HTMLAudioElement[] = [];
+		if (audioRef.current) elements.push(audioRef.current);
+		audioRefs.current.forEach((audio) => elements.push(audio));
+		elements.forEach((audio) => {
+			void applyOutputSink(audio, sinkId);
+		});
+	}, [sinkId]);
+
 	const generatePosition = useCallback(() => {
 		const horizontalOffset = (Math.random() - 0.5) * 40;
 		const baseLeft = 50;
@@ -41,28 +77,40 @@ export const ReactionCallHandler = memo(() => {
 		};
 	}, []);
 
-	const playSound = useCallback((soundUrl: string, soundId: string, senderId: string) => {
-		try {
-			let audio = audioRefs.current.get(soundId);
-			if (audio) {
-				audio.pause();
-				audio.currentTime = 0;
-			} else {
-				audio = new Audio(soundUrl);
-				audio.volume = 0.3;
-				audioRefs.current.set(soundId, audio);
-				audio.onended = () => {
-					soundReactionsService.removeActiveSoundParticipant(senderId);
-				};
-			}
+	const playSound = useCallback(
+		(soundUrl: string, soundId: string, senderId: string) => {
+			try {
+				let audio = audioRefs.current.get(soundId);
+				const isNewAudio = !audio;
+				if (audio) {
+					audio.pause();
+					audio.currentTime = 0;
+				} else {
+					audio = new Audio(soundUrl);
+					audio.volume = 0.3;
+					audioRefs.current.set(soundId, audio);
+					audio.onended = () => {
+						soundReactionsService.removeActiveSoundParticipant(senderId);
+					};
+				}
 
-			audio.play().catch((error) => {
-				console.error('Failed to play sound reaction:', error);
-			});
-		} catch (error) {
-			console.error('Error playing sound reaction:', error);
-		}
-	}, []);
+				const triggerPlay = () => {
+					audio.play().catch((error) => {
+						console.error('Failed to play sound reaction:', error);
+					});
+				};
+
+				if (isNewAudio) {
+					void applyOutputSink(audio, sinkId).finally(triggerPlay);
+				} else {
+					triggerPlay();
+				}
+			} catch (error) {
+				console.error('Error playing sound reaction:', error);
+			}
+		},
+		[sinkId]
+	);
 
 	useEffect(() => {
 		const handleAnimationFrame = () => {

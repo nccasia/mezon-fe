@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "너무 오랫동안 혼자 있어서 음성 채널에서 연결이 해제되었습니다.",
 		"duplicateSessionDisconnected": "다른 기기에서 음성 채널에 참여하여 이 세션의 연결이 끊어졌습니다.",
 		"disconnectedRejoin": "음성 채널 연결이 끊어졌습니다.",
-		"weakNetworkDisconnected": "네트워크가 약하여 음성 채널에서 연결이 끊어졌습니다."
+		"weakNetworkDisconnected": "네트워크가 약하여 음성 채널에서 연결이 끊어졌습니다.",
+		"cameraLimitReached": "이 음성 채널의 카메라 한도에 도달했습니다. 다른 사람이 카메라를 끈 후 다시 시도하세요.",
+		"screenShareLimitReached": "이 음성 채널의 화면 공유 한도에 도달했습니다. 다른 사람이 공유를 중지한 후 다시 시도하세요.",
+		"cameraUpdateFailed": "카메라를 켜거나 끄지 못했습니다. 다시 시도하세요.",
+		"screenShareUpdateFailed": "화면 공유를 시작하거나 중지하지 못했습니다. 다시 시도하세요."
 	},
 	"usernameScreen": "{{username}} 의 화면",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "오디오가 일시정지되었습니다. 클릭하면 마이크를 계속 음소거 상태로 유지합니다."
 	},
 	"weakNetwork": "약한 네트워크",
-	"networkWarning": "인터넷 연결이 불안정합니다. 다른 사람들이 당신의 목소리를 선명하게 듣지 못할 수 있습니다.",
+	"networkWarning": {
+		"title": "인터넷 연결이 불안정합니다",
+		"body": "네트워크 연결을 확인해 주세요."
+	},
 	"reconnectModal": {
 		"title": "음성 채널에 연결할 수 없습니다",
 		"description": "음성 연결을 복원하지 못했습니다. 연결을 확인하고 다시 참여해 보세요.",

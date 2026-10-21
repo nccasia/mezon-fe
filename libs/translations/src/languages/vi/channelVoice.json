@@ -21,9 +21,13 @@
 	"turnOnCamera": "Bật camera",
 	"stopScreenShare": "Dừng chia sẻ màn hình",
 	"shareYourScreen": "Chia sẻ màn hình",
+	"screenShareCaptureFailed": "Trình duyệt không thể ghi lại màn hình đã chọn. Hãy thử chia sẻ một cửa sổ hoặc tab.",
 	"disconnect": "Ngắt kết nối",
 	"weakNetwork": "Mạng yếu",
-	"networkWarning": "Kết nối mạng của bạn không ổn định. Người khác có thể không nghe rõ bạn.",
+	"networkWarning": {
+		"title": "Kết nối mạng của bạn không ổn định",
+		"body": "Hãy kiểm tra lại đường truyền mạng của bạn."
+	},
 	"muteModal": {
 		"title": "Tắt tiếng thành viên",
 		"content": "Bạn có chắc muốn tắt tiếng \"{{userName}}\"?",
@@ -140,10 +144,14 @@
 		}
 	},
 	"device": {
-		"inputDevice": "Microphone",
-		"outputDevice": "Audio",
+		"inputDevice": "Thiết bị đầu vào",
+		"outputDevice": "Thiết bị đầu ra",
 		"camera": "Camera",
-		"systemDefault": "Mặc định hệ thống"
+		"systemDefault": "Mặc định hệ thống",
+		"audioSettings": "Cài đặt âm thanh",
+		"noDevices": "Không tìm thấy thiết bị",
+		"noInputDevices": "Không tìm thấy thiết bị đầu vào",
+		"noOutputDevices": "Không tìm thấy thiết bị đầu ra"
 	},
 	"toast": {
 		"connectionConnected": "Kết nối thành công",
@@ -153,7 +161,11 @@
 		"aloneTimeoutDisconnected": "Bạn đã bị ngắt khỏi kênh thoại vì ở một mình quá lâu.",
 		"duplicateSessionDisconnected": "Bạn đã tham gia kênh thoại trên thiết bị khác nên phiên này bị ngắt kết nối.",
 		"disconnectedRejoin": "Bạn đã bị ngắt khỏi kênh thoại.",
-		"weakNetworkDisconnected": "Bạn đã bị ngắt khỏi kênh thoại do mạng yếu."
+		"weakNetworkDisconnected": "Bạn đã bị ngắt khỏi kênh thoại do mạng yếu.",
+		"cameraLimitReached": "Kênh thoại đã đạt giới hạn số người bật camera. Hãy thử lại khi có người tắt camera.",
+		"screenShareLimitReached": "Kênh thoại đã đạt giới hạn số người chia sẻ màn hình. Hãy thử lại khi có người dừng chia sẻ.",
+		"cameraUpdateFailed": "Không bật/tắt được camera. Vui lòng thử lại.",
+		"screenShareUpdateFailed": "Không bật/tắt được chia sẻ màn hình. Vui lòng thử lại."
 	},
 	"usernameScreen": "Màn hình của {{username}}",
 	"recording": {
@@ -169,6 +181,7 @@
 		"failed": "Ghi thất bại: {{reason}}"
 	},
 	"pushToTalk": {
+		"title": "Nhấn để nói",
 		"holdSpace": "Giữ phím Space để nói",
 		"holdingSpace": "Đang nói — thả Space để tắt mic",
 		"hintBody": "Bạn đang tham gia để nghe. Giữ phím Space để mở mic khi nói, thả ra để tắt lại."

@@ -119,6 +119,9 @@ function MyApp() {
 					dispatch(accountActions.setTopicAnonymousMode());
 					return;
 				}
+				if (isFocusTopicBox && !currentTopicId) {
+					return;
+				}
 				if (!currentClanId) return;
 				const currentChannelId = selectCurrentChannelId(store.getState());
 				if (!currentChannelId) return;

@@ -1382,8 +1382,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 
 			if (currentClanId === clan_id) {
+				// Only members the roster lacks: an entry replaces the roster's whole user, and the event carries just the id
+				// when the server has no cached profile, which blanked the member's name everywhere until the next fetch.
+				const roster = selectEntitesUserClans(store.getState() as unknown as RootState);
 				const members = users
-					.filter((user) => user?.user_id)
+					.filter((user) => user?.user_id && !roster[user.user_id] && (user.username || user.display_name))
 					.map((user) => ({
 						id: user.user_id,
 						user: {

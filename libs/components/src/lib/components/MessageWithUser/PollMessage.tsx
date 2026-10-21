@@ -2,6 +2,7 @@ import {
 	getPoll,
 	getStore,
 	selectCurrentUserId,
+	selectEmojiSrcById,
 	selectMemberClanByUserId,
 	selectMemberDMByUserId,
 	selectMessageByMessageId,
@@ -18,6 +19,18 @@ import { PollDetailModal } from './PollDetailModal';
 import './PollMessage.scss';
 
 const POLL_EMOJI_REGEX = /\[e:([^\]]+)\]/g;
+
+function PollEmoji({ emojiId }: { emojiId: string }) {
+	const emojiSrc = useAppSelector((state) => selectEmojiSrcById(state, emojiId));
+	return (
+		<img
+			src={getSrcEmoji(emojiId, emojiSrc)}
+			alt=""
+			className="w-5 h-5 object-contain inline-block align-middle flex-shrink-0"
+			draggable={false}
+		/>
+	);
+}
 
 export type RenderPollTextWithEmojiOptions = {
 	className?: string;
@@ -50,15 +63,7 @@ function renderPollTextWithEmoji(text: string, classNameOrOptions?: string | Ren
 				)
 			);
 		}
-		const emoji = (
-			<img
-				key={`e-${match.index}`}
-				src={getSrcEmoji(match[1])}
-				alt=""
-				className="w-5 h-5 object-contain inline-block align-middle flex-shrink-0"
-				draggable={false}
-			/>
-		);
+		const emoji = <PollEmoji key={`e-${match.index}`} emojiId={match[1]} />;
 		parts.push(
 			emojiPartClassName ? (
 				<span key={`w-${match.index}`} className={emojiPartClassName}>
@@ -86,8 +91,6 @@ function renderPollTextWithEmoji(text: string, classNameOrOptions?: string | Ren
 }
 
 export { renderPollTextWithEmoji };
-
-const POLL_ANSWERS_SCROLL_AFTER = 5;
 
 export type PollVoter = {
 	displayName: string;
@@ -406,13 +409,7 @@ export const PollMessage = ({
 				)}
 
 				{/* Answers */}
-				<div
-					className={
-						answers.length > POLL_ANSWERS_SCROLL_AFTER
-							? 'space-y-2 mb-3 max-h-[280px] overflow-y-auto overflow-x-hidden pr-1 thread-scroll'
-							: 'space-y-2 mb-3'
-					}
-				>
+				<div className="space-y-2 mb-3 max-h-[280px] overflow-y-auto overflow-x-hidden pr-1 thread-scroll">
 					{answers.map((answer, index) => {
 						const voteCount = voteCounts[index];
 						const percentage = getPercentage(voteCount);
@@ -443,11 +440,9 @@ export const PollMessage = ({
 									</div>
 								)}
 								<div className="relative z-10 flex items-center gap-2 min-w-0 flex-1 justify-center">
-									<span
-										className={`text-sm font-medium ${hasVoted && isVoted ? 'text-theme-primary-active' : 'text-theme-primary-active'} break-all min-w-0 flex-1 truncate`}
-									>
+									<span className={`text-sm font-medium text-theme-primary-active break-words min-w-0 flex-1 line-clamp-3`}>
 										{renderPollTextWithEmoji(answer, {
-											textPartClassName: 'poll-option-text ml-1 ',
+											textPartClassName: 'poll-option-text ml-1',
 											emojiPartClassName: 'poll-option-emoji '
 										})}
 									</span>

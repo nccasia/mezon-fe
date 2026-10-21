@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Vous avez été déconnecté du canal vocal car vous y étiez seul depuis trop longtemps.",
 		"duplicateSessionDisconnected": "Vous avez rejoint le salon vocal sur un autre appareil. Cette session a donc été déconnectée.",
 		"disconnectedRejoin": "Vous avez été déconnecté du salon vocal.",
-		"weakNetworkDisconnected": "Vous avez été déconnecté du canal vocal car votre réseau est faible."
+		"weakNetworkDisconnected": "Vous avez été déconnecté du canal vocal car votre réseau est faible.",
+		"cameraLimitReached": "Ce salon vocal a atteint sa limite de caméras. Réessayez quand quelqu'un aura coupé sa caméra.",
+		"screenShareLimitReached": "Ce salon vocal a atteint sa limite de partages d'écran. Réessayez quand quelqu'un aura arrêté de partager.",
+		"cameraUpdateFailed": "Impossible d'activer ou de couper votre caméra. Veuillez réessayer.",
+		"screenShareUpdateFailed": "Impossible de démarrer ou d'arrêter le partage d'écran. Veuillez réessayer."
 	},
 	"usernameScreen": "Écran de {{username}}",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "L'audio est en pause. Cliquez pour garder votre micro coupé."
 	},
 	"weakNetwork": "Réseau faible",
-	"networkWarning": "Votre connexion internet est instable. Les autres pourraient ne pas vous entendre clairement.",
+	"networkWarning": {
+		"title": "Votre connexion internet est instable",
+		"body": "Veuillez vérifier votre connexion réseau."
+	},
 	"reconnectModal": {
 		"title": "Impossible de se connecter au vocal",
 		"description": "La connexion vocale n'a pas pu être rétablie. Vérifiez votre connexion et réessayez de rejoindre.",

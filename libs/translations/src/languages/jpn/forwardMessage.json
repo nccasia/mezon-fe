@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "送信する添付メッセージを入力..."
 	},
 	"successMessage": "メッセージの転送に成功しました",
-	"errorMessage": "メッセージを転送できません"
+	"errorMessage": "メッセージを転送できません",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

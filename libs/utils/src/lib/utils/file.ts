@@ -12,6 +12,7 @@ import type {
 	PreSendMediaAttachment,
 	RequestInput
 } from '../types';
+import { isTranscodedVideoContainer } from './videoSource';
 
 export const VIDEO_PROCESS_CONCURRENCY = 2;
 export const FILE_PROCESS_CONCURRENCY = 4;
@@ -326,6 +327,10 @@ const UNSUPPORTED_MEDIA_TYPES = new Set([
 const UNSUPPORTED_MEDIA_EXTENSIONS = new Set(['wmv', 'avi', 'flv', 'mkv', 'rmvb', 'wma', 'ra', 'tiff', 'tif', 'bmp', 'psd']);
 
 export function isMediaTypeNotSupported(mediaType?: string, url?: string) {
+	if (isTranscodedVideoContainer(url)) {
+		return false;
+	}
+
 	if (mediaType && UNSUPPORTED_MEDIA_TYPES.has(mediaType)) {
 		return true;
 	}

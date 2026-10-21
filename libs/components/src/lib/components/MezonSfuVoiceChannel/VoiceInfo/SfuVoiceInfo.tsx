@@ -55,13 +55,8 @@ const SfuVoiceInfo = React.memo(() => {
 	const microphoneWarning = microphonePermissionState === 'denied' || hasMicrophoneAccess === false;
 	const cameraWarning = cameraPermissionState === 'denied' || hasCameraAccess === false;
 	const handleToggleShareScreen = useCallback(() => {
-		const btnControl = document.getElementById('btn-meet-screen');
-		if (btnControl) {
-			btnControl.click();
-		} else {
-			dispatch(voiceActions.setShowScreen(!showScreen));
-		}
-	}, [showScreen, dispatch]);
+		document.getElementById('btn-meet-screen')?.click();
+	}, []);
 
 	const handleToggleShareCamera = useCallback(() => {
 		const btnControl = document.getElementById('btn-meet-camera');

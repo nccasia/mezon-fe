@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Sei stato disconnesso dal canale vocale perché sei rimasto da solo troppo a lungo.",
 		"duplicateSessionDisconnected": "Hai effettuato l’accesso al canale vocale su un altro dispositivo, quindi questa sessione è stata disconnessa.",
 		"disconnectedRejoin": "Sei stato disconnesso dal canale vocale.",
-		"weakNetworkDisconnected": "Sei stato disconnesso dal canale vocale perché la tua rete è debole."
+		"weakNetworkDisconnected": "Sei stato disconnesso dal canale vocale perché la tua rete è debole.",
+		"cameraLimitReached": "Questo canale vocale ha raggiunto il limite di fotocamere. Riprova quando qualcuno disattiva la fotocamera.",
+		"screenShareLimitReached": "Questo canale vocale ha raggiunto il limite di condivisioni schermo. Riprova quando qualcuno interrompe la condivisione.",
+		"cameraUpdateFailed": "Impossibile attivare o disattivare la fotocamera. Riprova.",
+		"screenShareUpdateFailed": "Impossibile avviare o interrompere la condivisione schermo. Riprova."
 	},
 	"usernameScreen": "Schermo di {{username}}",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "L'audio è in pausa. Fai clic per mantenere il microfono disattivato."
 	},
 	"weakNetwork": "Rete debole",
-	"networkWarning": "La tua connessione internet è instabile. Gli altri potrebbero non sentirti chiaramente.",
+	"networkWarning": {
+		"title": "La tua connessione internet è instabile",
+		"body": "Controlla la tua connessione di rete."
+	},
 	"reconnectModal": {
 		"title": "Impossibile connettersi alla voce",
 		"description": "La connessione vocale non è stata ripristinata. Controlla la connessione e prova a entrare di nuovo.",

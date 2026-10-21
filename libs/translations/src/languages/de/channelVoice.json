@@ -135,7 +135,11 @@
 		"aloneTimeoutDisconnected": "Du wurdest vom Sprachkanal getrennt, weil du zu lange allein darin warst.",
 		"duplicateSessionDisconnected": "Du bist dem Sprachkanal auf einem anderen Gerät beigetreten. Diese Sitzung wurde daher getrennt.",
 		"disconnectedRejoin": "Du wurdest vom Sprachkanal getrennt.",
-		"weakNetworkDisconnected": "Du wurdest vom Sprachkanal getrennt, weil dein Netzwerk schwach ist."
+		"weakNetworkDisconnected": "Du wurdest vom Sprachkanal getrennt, weil dein Netzwerk schwach ist.",
+		"cameraLimitReached": "Dieser Sprachkanal hat die maximale Anzahl an Kameras erreicht. Versuche es erneut, wenn jemand die Kamera ausschaltet.",
+		"screenShareLimitReached": "Dieser Sprachkanal hat die maximale Anzahl an Bildschirmfreigaben erreicht. Versuche es erneut, wenn jemand die Freigabe beendet.",
+		"cameraUpdateFailed": "Die Kamera konnte nicht ein- oder ausgeschaltet werden. Bitte versuche es erneut.",
+		"screenShareUpdateFailed": "Die Bildschirmfreigabe konnte nicht gestartet oder beendet werden. Bitte versuche es erneut."
 	},
 	"usernameScreen": "{{username}}s Bildschirm",
 	"recording": {
@@ -162,7 +166,10 @@
 		"keepMuted": "Audio ist pausiert. Klicke, um dein Mikrofon stumm zu lassen."
 	},
 	"weakNetwork": "Schwaches Netzwerk",
-	"networkWarning": "Deine Internetverbindung ist instabil. Andere hören dich möglicherweise nicht klar.",
+	"networkWarning": {
+		"title": "Deine Internetverbindung ist instabil",
+		"body": "Bitte überprüfe deine Netzwerkverbindung."
+	},
 	"reconnectModal": {
 		"title": "Verbindung mit Sprachkanal nicht möglich",
 		"description": "Die Sprachverbindung konnte nicht wiederhergestellt werden. Prüfe deine Verbindung und versuche erneut beizutreten.",

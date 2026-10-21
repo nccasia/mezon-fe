@@ -3,7 +3,7 @@ import type { SfuSignalMessage } from '../../types';
 import { meetTokenNeedsRefresh } from '../meetToken';
 import { canReactivateMid, getDepartedMids, getMsidOccupantsByMidFromSdp, isReceivingRemoteTrack, type RetiredSource } from '../remoteMediaLifecycle';
 import { SFU_DUPLICATE_SESSION_CLOSE_CODE, sfuCloseAction, sfuReconnectDelay } from '../sfuReconnect';
-import { SfuSlotAssignments } from '../sfuSlotAssignments';
+import { SFU_MEDIA_POOL_VERSION, SfuSlotAssignments } from '../sfuSlotAssignments';
 import { SfuAudioTrack } from './SfuAudioTrack';
 
 export type SfuAudioAudienceState = 'joining' | 'connected' | 'reconnecting' | 'failed' | 'replaced' | 'closed';
@@ -14,6 +14,8 @@ export interface SfuAudioAudienceProps {
 	serverUrl: string;
 	volume?: number;
 	muted?: boolean;
+	sinkId?: string;
+	onSinkIdFailure?: (failedSinkId?: string) => void;
 	onRefreshToken: () => Promise<string>;
 	onConnectionStateChange?: (state: SfuAudioAudienceState) => void;
 	onError?: (error: Error) => void;
@@ -43,6 +45,8 @@ export function SfuAudioAudience({
 	serverUrl,
 	volume = 1,
 	muted = false,
+	sinkId,
+	onSinkIdFailure,
 	onRefreshToken,
 	onConnectionStateChange,
 	onError
@@ -300,7 +304,13 @@ export function SfuAudioAudience({
 				ws.onopen = () => {
 					if (disposed || disposedRef.current || wsRef.current !== ws) return;
 					if (ws.readyState === WebSocket.OPEN) {
-						const joinMessage = { type: 'join', room: roomId, token: nextToken, role: 'audience' };
+						const joinMessage = {
+							type: 'join',
+							room: roomId,
+							token: nextToken,
+							role: 'audience',
+							media_pool_version: SFU_MEDIA_POOL_VERSION
+						};
 						ws.send(JSON.stringify(joinMessage));
 					}
 				};
@@ -312,6 +322,7 @@ export function SfuAudioAudience({
 					} catch {
 						return;
 					}
+					if (message.type === 'joined') slots.observeJoined(message);
 					if (message.type === 'slot_assigned' || message.type === 'slot_released') {
 						if (slots.handle(message)) {
 							syncAudio(pc);
@@ -417,7 +428,7 @@ export function SfuAudioAudience({
 	return (
 		<div className="hidden" aria-hidden="true">
 			{audioTracks.map((track) => (
-				<SfuAudioTrack key={track.id} track={track} volume={volume} muted={muted} />
+				<SfuAudioTrack key={track.id} track={track} volume={volume} muted={muted} sinkId={sinkId} onSinkIdFailure={onSinkIdFailure} />
 			))}
 		</div>
 	);

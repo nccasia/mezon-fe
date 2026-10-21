@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { startCreateTopicFromMessage } from '@mezon/core';
 import type { MessagesEntity, RootState } from '@mezon/store';
-import { getPoll, getStore, selectBanMeInChannel, topicsActions, useAppDispatch } from '@mezon/store';
+import { getPoll, getStore, selectBanMeInChannel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { ObserveFn, UsersClanEntity } from '@mezon/utils';
 import {
@@ -233,11 +234,8 @@ function MessageWithUser({
 	);
 
 	const handleLeaveComment = useCallback(() => {
-		dispatch(topicsActions.setIsShowCreateTopic(true));
-		dispatch(topicsActions.setCurrentTopicInitMessage(message));
-		dispatch(topicsActions.setCurrentTopicId(''));
-		dispatch(topicsActions.setInitTopicMessageId(message.id));
-	}, [dispatch, message]);
+		startCreateTopicFromMessage(message, dispatch, t, message, channelId);
+	}, [dispatch, message, channelId, t]);
 
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 

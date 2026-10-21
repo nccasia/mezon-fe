@@ -1,5 +1,5 @@
 import { probeNetworkReachability, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
-import { type ApiSession, type TopicInMessageEvent } from 'mezon-js';
+import type { ApiSession, TopicInMessageEvent } from 'mezon-js';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import type { Persistor } from 'redux-persist';
