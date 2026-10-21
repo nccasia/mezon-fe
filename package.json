@@ -166,7 +166,7 @@
     "ts-node": "10.9.2",
     "typescript": "5.4.3",
     "url-loader": "^4.1.1",
-    "vite": "^7.3.5",
+    "vite": "^7.3.7",
     "vite-plugin-node-polyfills": "^0.25.0",
     "vite-plugin-static-copy": "^3.1.4",
     "webpack-cli": "^5.1.4",
