@@ -1,5 +1,5 @@
 import { useInvite } from '@mezon/core';
-import { channelsActions, clansActions, inviteActions, selectClanById, selectInviteById, useAppDispatch } from '@mezon/store';
+import { clansActions, inviteActions, selectClanById, selectInviteById, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,15 +35,11 @@ export default function InviteAcceptModal({ inviteId, onClose, showModal }: Invi
 				await inviteUser(inviteId).then(async (res) => {
 					if (res?.channel_id && res?.clan_id) {
 						await new Promise((resolve) => setTimeout(resolve, 1000));
-						navigate(`/chat/clans/${res.clan_id}/channels/${res.channel_id}`);
+						navigate(`/chat/clans/${res?.clan_id}/member-safety`);
 						onClose();
 					}
 				});
 				dispatch(clansActions.fetchClans({ noCache: true }));
-				if (selectInvite.channel_desc) {
-					const channel = { ...selectInvite, id: selectInvite.channel_id as string };
-					dispatch(channelsActions.add({ clanId: selectInvite.channel_desc?.clan_id as string, channel: { ...channel, active: 1 } }));
-				}
 			} finally {
 				setLoading(false);
 				onClose();

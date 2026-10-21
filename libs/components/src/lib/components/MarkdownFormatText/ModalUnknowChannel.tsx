@@ -57,20 +57,14 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 		dispatch(toastActions.clearAllToastErrors());
 	};
 
-	const directToWelcomeChannel = async () => {
+	const goToWelcomeChannel = () => {
 		clearAllToastError();
 		if (!currentClanId || currentClanId === '0') {
 			navigate(FRIEND_PAGE_LINK);
 			return;
 		}
 
-		if (!currentClan) {
-			navigate(toMembersPage(currentClanId));
-
-			return;
-		} else {
-			navigate(FRIEND_PAGE_LINK);
-		}
+		navigate(toMembersPage(currentClanId));
 	};
 
 	const onCloseAndReset = () => {
@@ -119,7 +113,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 					{isError ? (
 						<>
 							<button
-								onClick={directToWelcomeChannel}
+								onClick={goToWelcomeChannel}
 								className="flex-1 bg-[#5865f2] hover:bg-[#4752c4] text-white font-medium py-2.5 px-4 rounded transition-colors duration-200"
 								data-e2e={generateE2eId('clan_page.settings.modal.permission.confirm')}
 							>

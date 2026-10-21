@@ -8,6 +8,7 @@ import {
 	applySortChannelInCategory,
 	categoriesActions,
 	extractChannelRowIdsForCategory,
+	selectChannelFetchSuccessByClanId,
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClanBanner,
@@ -50,6 +51,7 @@ function ChannelList() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClanCreatorId = useSelector(selectCurrentClanCreatorId);
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClanId as string));
+	const checkFetchChannel = useAppSelector((state) => selectChannelFetchSuccessByClanId(state, currentClanId || ''));
 
 	const userId = useSelector(selectCurrentUserId);
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
@@ -76,7 +78,7 @@ function ChannelList() {
 		}
 	}, [isOpenModal]);
 
-	const shouldShowSkeleton = !listChannelRender;
+	const shouldShowSkeleton = !listChannelRender || !checkFetchChannel;
 
 	return (
 		<div onContextMenu={(event) => event.preventDefault()} id="channelList" className="contain-strict h-full">
