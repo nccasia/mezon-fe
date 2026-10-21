@@ -12,7 +12,8 @@
 		"friendRequests": "Friend Requests",
 		"QRScan": "Scan QR Code",
 		"MyQRCode": "My QR Code",
-		"devices": "Devices"
+		"devices": "Devices",
+		"chat": "Chat"
 	},
 	"deviceSettings": {
 		"description1": "Here are all the devices that are currently logged in with your account. You can log out of each one individually.",
@@ -150,5 +151,9 @@
 		"recentChannels": "Recent Channels",
 		"searchByChannelLabel": "Search by channel label"
 	},
-	"setting": "Setting"
+	"setting": "Setting",
+	"chat": {
+		"title": "Show spelling corrections",
+		"description": "Automatically detect spelling mistakes and suggest corrections as you type your messages."
+	}
 }

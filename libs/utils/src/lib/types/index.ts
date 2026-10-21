@@ -1094,6 +1094,7 @@ export type AnswerByClanArgs = {
 
 export enum EUserSettings {
 	ACCOUNT = 'Account',
+	CHAT = 'CHAT',
 	PROFILES = 'Profiles',
 	PRIVACY_SAFETY = 'Privacy & Safety',
 	FAMILY_CENTER = 'Family Center',
