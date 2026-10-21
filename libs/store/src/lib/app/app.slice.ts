@@ -211,7 +211,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 		}
 		thunkAPI.dispatch(clansActions.clearJoinList());
 
-		const joinPromises = [thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }))];
+		const joinPromises: Promise<unknown>[] = [thunkAPI.dispatch(directActions.joinDirectMessageSpace({ restart: true }))];
 		if (isClanView && currentClanId) {
 			joinPromises.push(thunkAPI.dispatch(clansActions.joinClan({ clanId: currentClanId })));
 		}
@@ -279,8 +279,6 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 			console.warn('[refreshApp] aborted stale generation');
 			return { skipped: true, reason: 'stale' as const };
 		}
-
-		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 
 		const settledPromises = [fetchClansPromise, fetchChannelsPromise].filter(Boolean);
 		await Promise.allSettled(settledPromises);

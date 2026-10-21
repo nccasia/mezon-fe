@@ -1369,6 +1369,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						addedByUserId: caller?.user_id
 					})
 				);
+				if (user) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: '0',
+							channelId: channel_desc.channel_id as string,
+							channelType: channel_desc.type,
+							isPublic: false
+						})
+					);
+				}
 			}
 
 			if (currentClanId === clan_id) {
@@ -1840,6 +1850,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					active: 1
 				})
 			);
+			if (channelCreated.creator_id !== userId) {
+				dispatch(directActions.followReopenedDirectMessage({ channelId: channelCreated.channel_id }));
+			}
 		}
 	}, []);
 	const oncategoryevent = useCallback(async (categoryEvent: CategoryEvent) => {
