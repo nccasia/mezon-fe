@@ -166,7 +166,10 @@
 		"keepMuted": "Audio ist pausiert. Klicke, um dein Mikrofon stumm zu lassen."
 	},
 	"weakNetwork": "Schwaches Netzwerk",
-	"networkWarning": "Deine Internetverbindung ist instabil. Andere hören dich möglicherweise nicht klar.",
+	"networkWarning": {
+		"title": "Deine Internetverbindung ist instabil",
+		"body": "Bitte überprüfe deine Netzwerkverbindung."
+	},
 	"reconnectModal": {
 		"title": "Verbindung mit Sprachkanal nicht möglich",
 		"description": "Die Sprachverbindung konnte nicht wiederhergestellt werden. Prüfe deine Verbindung und versuche erneut beizutreten.",

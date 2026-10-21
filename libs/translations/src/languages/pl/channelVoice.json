@@ -166,7 +166,10 @@
 		"keepMuted": "Audio jest wstrzymane. Kliknij, aby pozostawić mikrofon wyciszony."
 	},
 	"weakNetwork": "Słaba sieć",
-	"networkWarning": "Twoje połączenie internetowe jest niestabilne. Inni mogą Cię nie słyszeć wyraźnie.",
+	"networkWarning": {
+		"title": "Twoje połączenie jest niestabilne",
+		"body": "Sprawdź swoje połączenie sieciowe."
+	},
 	"reconnectModal": {
 		"title": "Nie można połączyć się z głosem",
 		"description": "Nie udało się przywrócić połączenia głosowego. Sprawdź połączenie i spróbuj dołączyć ponownie.",

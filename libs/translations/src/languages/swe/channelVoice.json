@@ -166,7 +166,10 @@
 		"keepMuted": "Ljudet är pausat. Klicka för att hålla mikrofonen avstängd."
 	},
 	"weakNetwork": "Svagt nätverk",
-	"networkWarning": "Din internetanslutning är instabil. Andra kanske inte hör dig tydligt.",
+	"networkWarning": {
+		"title": "Din internetanslutning är instabil",
+		"body": "Kontrollera din nätverksanslutning."
+	},
 	"reconnectModal": {
 		"title": "Kan inte ansluta till röst",
 		"description": "Röstanslutningen kunde inte återställas. Kontrollera anslutningen och försök gå med igen.",
