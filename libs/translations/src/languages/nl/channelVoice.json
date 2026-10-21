@@ -166,7 +166,10 @@
 		"keepMuted": "Audio is gepauzeerd. Klik om je microfoon gedempt te houden."
 	},
 	"weakNetwork": "Zwak netwerk",
-	"networkWarning": "Je internetverbinding is onstabiel. Anderen horen je mogelijk niet duidelijk.",
+	"networkWarning": {
+		"title": "Je internetverbinding is onstabiel",
+		"body": "Controleer je netwerkverbinding."
+	},
 	"reconnectModal": {
 		"title": "Kan geen verbinding maken met spraak",
 		"description": "De spraakverbinding kon niet worden hersteld. Controleer je verbinding en probeer opnieuw deel te nemen.",
