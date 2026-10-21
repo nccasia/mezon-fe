@@ -241,6 +241,7 @@ const RECONNECT_RETRY_BASE_MS = 500;
 const RECONNECT_RETRY_JITTER_MS = 400;
 
 const RECONNECT_WAVE_COOLDOWN_MS = 10000;
+const STREAM_SELF_REJOIN_GRACE_MS = 3000;
 
 function randomReconnectSpacingMs(): number {
 	return RECONNECT_RETRY_BASE_MS + Math.floor(Math.random() * RECONNECT_RETRY_JITTER_MS);
@@ -381,6 +382,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch]
 	);
 
+	const pendingStreamSelfLeaveRef = useRef<{ channelId: string; timer: NodeJS.Timeout } | null>(null);
+
+	const cancelPendingStreamSelfLeave = useCallback(() => {
+		if (!pendingStreamSelfLeaveRef.current) return;
+		clearTimeout(pendingStreamSelfLeaveRef.current.timer);
+		pendingStreamSelfLeaveRef.current = null;
+	}, []);
+
+	useEffect(() => cancelPendingStreamSelfLeave, [cancelPendingStreamSelfLeave]);
+
 	const onstreamingchanneljoined = useCallback(
 		(user: StreamingJoinedEvent) => {
 			if (!user?.user_id) return;
@@ -391,8 +402,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					user_name: ''
 				})
 			);
+			if (String(user.user_id) !== String(userId)) return;
+			if (pendingStreamSelfLeaveRef.current?.channelId !== String(user.streaming_channel_id)) return;
+			cancelPendingStreamSelfLeave();
 		},
-		[dispatch]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onstreamingchannelleaved = useCallback(
@@ -404,11 +418,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!isJoin || !streamInfo?.streamId) return;
 			if (String(user.streaming_channel_id) !== String(streamInfo.streamId)) return;
 			if (String(user.streaming_user_id) !== String(userId)) return;
-			dispatch(usersStreamActions.streamEnded(streamInfo.streamId));
-			dispatch(videoStreamActions.resetPlayback());
-			dispatch(appActions.setIsShowChatStream(false));
+			const channelId = String(streamInfo.streamId);
+			cancelPendingStreamSelfLeave();
+			pendingStreamSelfLeaveRef.current = {
+				channelId,
+				timer: setTimeout(() => {
+					pendingStreamSelfLeaveRef.current = null;
+					const state = getStore().getState();
+					if (!selectIsJoin(state) || String(selectCurrentStreamInfo(state)?.streamId) !== channelId) return;
+					dispatch(usersStreamActions.streamEnded(channelId));
+					dispatch(videoStreamActions.resetPlayback());
+					dispatch(appActions.setIsShowChatStream(false));
+				}, STREAM_SELF_REJOIN_GRACE_MS)
+			};
 		},
-		[dispatch, userId]
+		[dispatch, userId, cancelPendingStreamSelfLeave]
 	);
 
 	const onactivityupdated = useCallback(
@@ -1348,8 +1372,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 
 			if (currentClanId === clan_id) {
+				// Only members the roster lacks: an entry replaces the roster's whole user, and the event carries just the id
+				// when the server has no cached profile, which blanked the member's name everywhere until the next fetch.
+				const roster = selectEntitesUserClans(store.getState() as unknown as RootState);
 				const members = users
-					.filter((user) => user?.user_id)
+					.filter((user) => user?.user_id && !roster[user.user_id] && (user.username || user.display_name))
 					.map((user) => ({
 						id: user.user_id,
 						user: {
@@ -3144,10 +3171,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 							// The first attempt already failed on the node we have: ask the gateway
 							// whether it wants to move us before burning the rest of the wave on it.
-							if (getReconnectWaveAttempts() >= 1 && (await askHealthyEndpoint()) === 'changed') {
-								// A node we have never tried deserves a full budget instead of the
-								// cooldown this wave was about to hit.
-								resetReconnectWave();
+							if (getReconnectWaveAttempts() >= 1) {
+								const verdict = await askHealthyEndpoint();
+								// A node we have never tried, or a session id the gateway has just minted,
+								// deserves a full budget instead of the cooldown this wave was about to hit.
+								if (verdict === 'changed' || verdict === 'renewed') {
+									resetReconnectWave();
+								}
 							}
 
 							if (!consumeReconnectAttempt()) {
@@ -3242,13 +3272,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	// if the gateway keeps naming the same node, we stop asking about slowness until we reconnect.
 	useEffect(() => {
 		const onSlowNode = async () => {
-			if (socketState.status !== 'connected' || !shouldReportSlowNode()) {
+			if (socketState.status !== 'connected' || isRealtimeServerPinned() || !shouldReportSlowNode()) {
 				return;
 			}
 			const verdict = await askHealthyEndpoint();
 			if (verdict === 'changed') {
 				window.dispatchEvent(new CustomEvent(REALTIME_SERVER_CHANGED_EVENT));
-			} else if (verdict === 'same') {
+			} else if (verdict === 'same' || verdict === 'renewed') {
 				disableSlowReports();
 			}
 		};

@@ -6,5 +6,6 @@
 	"joinStream": "Dołącz do streamu",
 	"noStreamToday": "Dziś nie ma streamu",
 	"hideMembers": "Ukryj członków",
-	"showMembers": "Pokaż członków"
+	"showMembers": "Pokaż członków",
+	"duplicateSessionDisconnected": "Rozłączono, ponieważ Twoje konto dołączyło do streamu lub kanału głosowego w innej sesji."
 }

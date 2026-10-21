@@ -5,6 +5,7 @@ import {
 	selectNoiseSuppressionEnabled,
 	selectShowCamera,
 	selectShowMicrophone,
+	selectShowScreen,
 	toastActions,
 	useAppDispatch,
 	voiceActions
@@ -12,6 +13,7 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	GUEST_NAME,
+	OUTPUT_DEVICE_CHANGE_EVENT,
 	createImgproxyUrl,
 	ensureMediaPermission,
 	generateE2eId,
@@ -19,7 +21,13 @@ import {
 	getMezonNsAudioCaptureOptions,
 	getNameForPrioritize,
 	getNoiseSuppressionAudioCaptureOptions,
+	getPreferredInputDeviceId,
+	getPreferredOutputDeviceId,
+	isPermissionRefusal,
+	parseOutputDeviceChangeEventDetail,
 	reportMediaAccessError,
+	setPreferredInputDeviceId,
+	setPreferredOutputDeviceId,
 	useMediaPermissions
 } from '@mezon/utils';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
@@ -41,7 +49,7 @@ import { useSfuGridLayout, useSfuPagination } from './GridLayout/useSfuGridLayou
 import { SfuRoomAudioRenderer } from './Media/SfuRoomAudioRenderer';
 import { SfuVideo } from './Media/SfuVideo';
 import { MezonNsAudioPipeline } from './Media/mezonNs/MezonNsAudioPipeline';
-import { SfuParticipantTile } from './ParticipantTile/SfuParticipantTile';
+import { SfuParticipantTile, getParticipantTileFrameClass } from './ParticipantTile/SfuParticipantTile';
 import { ScreenShareFocusContext, SfuScreenShareTile } from './ParticipantTile/SfuScreenShareTile';
 import { ReactionCallHandler, useSendReaction } from './Reaction';
 import { SfuVoiceContextMenu } from './VoiceContextMenu';
@@ -68,8 +76,8 @@ import {
 } from './screenShareQuality';
 
 import { SfuMediaHealth, SfuNetworkQuality } from './sfuMediaHealth';
-import { SfuMuteSync, sfuCloseAction, sfuReconnectDelay, withSfuTimeout } from './sfuReconnect';
-import { SfuSlotAssignments } from './sfuSlotAssignments';
+import { SFU_DUPLICATE_SESSION_CLOSE_CODE, SfuMuteSync, sfuCloseAction, sfuReconnectDelay, withSfuTimeout } from './sfuReconnect';
+import { SFU_MEDIA_POOL_VERSION, SfuSlotAssignments } from './sfuSlotAssignments';
 
 const ICE_RECOVERY_GRACE_MS = 4000;
 const NETWORK_QUALITY_INTERVAL_MS = 5000;
@@ -79,8 +87,6 @@ const MAX_RECONNECT_ATTEMPTS = 4;
 const MAX_RECOVERY_MS = 120_000;
 const SFU_SERVER_RESTART_CLOSE_CODE = 1001;
 const SFU_ALONE_TIMEOUT_CLOSE_CODE = 4011;
-const SFU_DUPLICATE_SESSION_CLOSE_CODE = 4012;
-const PREFERRED_MICROPHONE_STORAGE_KEY = 'mezon.voice.inputDeviceId';
 const AGENT_HINT_DISMISSED_STORAGE_KEY = 'mezon.voice.agentHintDismissed';
 
 const readAgentHintDismissed = () => {
@@ -104,6 +110,13 @@ const SFU_PARTICIPANT_ACTION_ERRORS = new Set([
 	'unsupported_participant_action',
 	'auth_not_configured'
 ]);
+const SFU_MEDIA_REFUSALS = new Map<string, { media: 'camera' | 'screen'; toast: string }>([
+	['camera_capacity_full', { media: 'camera', toast: 'toast.cameraLimitReached' }],
+	['camera_update_failed', { media: 'camera', toast: 'toast.cameraUpdateFailed' }],
+	['screen_share_capacity_full', { media: 'screen', toast: 'toast.screenShareLimitReached' }],
+	['screen_share_update_failed', { media: 'screen', toast: 'toast.screenShareUpdateFailed' }]
+]);
+const SFU_IGNORED_ERRORS = new Set(['stale_mute_revision', 'invalid_camera_active']);
 
 const getRemoteParticipantId = (mid: string) => {
 	const numericMid = Number(mid);
@@ -330,6 +343,22 @@ const getCameraConstraints = (index: number): MediaTrackConstraints => {
 	return { width: cameraRange(width, !uncapped), height: cameraRange(height, !uncapped), frameRate: cameraRange(frameRate, !uncapped) };
 };
 
+// Prefers the given camera but still opens another one if it is gone
+const withPreferredCamera = (constraints: MediaTrackConstraints, deviceId?: string): MediaTrackConstraints =>
+	deviceId && deviceId !== 'default' ? { ...constraints, deviceId: { ideal: deviceId } } : constraints;
+
+// Cheap webcams can list a mode they cannot start (e.g. "Timeout starting video source"), so retry once in the camera's own default mode.
+// No retry when the permission was refused or the camera is gone: the same deviceId would fail again
+const openCameraStream = async (video: MediaTrackConstraints): Promise<MediaStream> => {
+	try {
+		return await navigator.mediaDevices.getUserMedia({ audio: false, video });
+	} catch (cause) {
+		const name = (cause as { name?: string } | null)?.name;
+		if (isPermissionRefusal(cause) || name === 'OverconstrainedError' || name === 'NotFoundError') throw cause;
+		return navigator.mediaDevices.getUserMedia({ audio: false, video: video.deviceId ? { deviceId: video.deviceId } : true });
+	}
+};
+
 const SCREEN_MIN_BITRATE_KBPS = 400;
 const SCREEN_START_BITRATE_KBPS = 1000;
 const SCREEN_MAX_BITRATE_KBPS = 3500;
@@ -450,9 +479,15 @@ export interface MezonSfuVoiceRoomProps {
 	username?: string;
 	isPrivateVoice?: boolean;
 	customVideoTrack?: MediaStreamTrack | null;
+	// Camera picked before joining; used whenever the room opens the camera itself
+	preferredCameraId?: string;
+	// The caller owns the camera behind customVideoTrack, so camera picks go to it while that track is in use
+	onSelectCamera?: (deviceId: string) => void;
+	headerActions?: ReactNode;
 }
 
 type SfuOffer = { sdp: string; offer_generation: number };
+const NO_CLAN_MEMBERS: ReturnType<typeof selectEntitesUserClans> = {};
 const AGENT_AVATAR =
 	'https://imgproxy.komu.vn/K0YUZRIosDOcz5lY6qrgC6UIXmQgWzLjZv7VJ1RAA8c/rs:fit:100:100:1/mb:2097152/plain/https://cdn.mezon.vn/0/0/1779484387973271600/1737423959329_undefined173740153013517374015248704886401586613166392.png@webp';
 const AGENT_DISPLAY_NAME = 'KOMU Agent';
@@ -472,15 +507,21 @@ export function MezonSfuVoiceRoom({
 	onToggleChat,
 	username,
 	isPrivateVoice,
-	customVideoTrack
+	customVideoTrack,
+	preferredCameraId,
+	onSelectCamera,
+	headerActions
 }: MezonSfuVoiceRoomProps) {
 	const { t } = useTranslation('channelVoice');
 	const dispatch = useAppDispatch();
 	const { userProfile, userId } = useAuth();
 	const currentUserId = userId || '';
-	const clanMembers = useSelector(selectEntitesUserClans);
+	const currentClanMembers = useSelector(selectEntitesUserClans);
+	// External meeting people are not members of the clan open in the app: names and avatars come from the call itself
+	const clanMembers = isExternalCalling ? NO_CLAN_MEMBERS : currentClanMembers;
 	const microphoneEnabled = useSelector(selectShowMicrophone);
 	const cameraEnabled = useSelector(selectShowCamera);
+	const screenSharing = useSelector(selectShowScreen);
 	const noiseSuppressionEnabled = useSelector(selectNoiseSuppressionEnabled);
 	const noiseSuppressionEnabledRef = useRef(noiseSuppressionEnabled);
 	const { hasMicrophoneAccess, hasCameraAccess, microphonePermissionState, cameraPermissionState } = useMediaPermissions();
@@ -497,7 +538,7 @@ export function MezonSfuVoiceRoom({
 	const mezonNsPipelineRef = useRef<MezonNsAudioPipeline | null>(null);
 	const mezonNsGenerationRef = useRef(0);
 	const microphoneCaptureModeRef = useRef(new WeakMap<MediaStreamTrack, 'native' | 'mezon-ns'>());
-	const preferredMicrophoneIdRef = useRef(localStorage.getItem(PREFERRED_MICROPHONE_STORAGE_KEY) || 'default');
+	const preferredMicrophoneIdRef = useRef(getPreferredInputDeviceId());
 	const [mezonNsUnavailable, setMezonNsUnavailable] = useState(false);
 	const mezonNsUnavailableRef = useRef(mezonNsUnavailable);
 	mezonNsUnavailableRef.current = mezonNsUnavailable;
@@ -571,6 +612,7 @@ export function MezonSfuVoiceRoom({
 	const muteSyncRef = useRef(new SfuMuteSync());
 	const connectionEpochRef = useRef(0);
 	const restartSessionRef = useRef<() => void>(() => undefined);
+	const stopScreenShareRef = useRef<() => Promise<void>>(() => Promise.resolve());
 	const pendingForcedMuteRef = useRef<number>();
 	const refreshingTokenRef = useRef(false);
 
@@ -624,7 +666,6 @@ export function MezonSfuVoiceRoom({
 	);
 	useEffect(() => screenKeyframeRecovery.wake(), [remoteMedia, screenKeyframeRecovery]);
 	const [roomParticipantCount, setRoomParticipantCount] = useState(1);
-	const [screenSharing, setScreenSharing] = useState(false);
 	const [screenShareMode, setScreenShareMode] = useState<ScreenShareMode>('text');
 	const [changingScreenShareMode, setChangingScreenShareMode] = useState(false);
 	const [pushToTalkActive, setPushToTalkActive] = useState(false);
@@ -646,6 +687,8 @@ export function MezonSfuVoiceRoom({
 	microphoneEnabledRef.current = microphoneEnabled;
 	const microphonePermissionStateRef = useRef(microphonePermissionState);
 	microphonePermissionStateRef.current = microphonePermissionState;
+	const cameraPermissionStateRef = useRef(cameraPermissionState);
+	cameraPermissionStateRef.current = cameraPermissionState;
 	const mutedParticipantIds = useMemo(() => new Set<string>(), []);
 	const [isGridView, setIsGridView] = useState(true);
 	const [pinnedTrackId, setPinnedTrackId] = useState<string>();
@@ -658,7 +701,22 @@ export function MezonSfuVoiceRoom({
 	const [popoutTrackId, setPopoutTrackId] = useState<string>();
 	const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
 	const [selectedMicrophone, setSelectedMicrophone] = useState(preferredMicrophoneIdRef.current);
+	const [selectedSpeaker, setSelectedSpeaker] = useState(getPreferredOutputDeviceId);
 	const [selectedCamera, setSelectedCamera] = useState('default');
+	// A ref so changing it never restarts the connection effect that opens the camera on join
+	const preferredCameraIdRef = useRef(preferredCameraId);
+	useEffect(() => {
+		const handleOutputDeviceChange = (e: Event) => {
+			const nextId = parseOutputDeviceChangeEventDetail((e as CustomEvent).detail);
+			setSelectedSpeaker((prev) => (prev !== nextId ? nextId : prev));
+		};
+		window.addEventListener(OUTPUT_DEVICE_CHANGE_EVENT, handleOutputDeviceChange);
+		window.addEventListener('storage', handleOutputDeviceChange);
+		return () => {
+			window.removeEventListener(OUTPUT_DEVICE_CHANGE_EVENT, handleOutputDeviceChange);
+			window.removeEventListener('storage', handleOutputDeviceChange);
+		};
+	}, []);
 	const syncSelectedMicrophone = useCallback((track: MediaStreamTrack) => {
 		setSelectedMicrophone(track.getSettings().deviceId || preferredMicrophoneIdRef.current);
 	}, []);
@@ -853,7 +911,7 @@ export function MezonSfuVoiceRoom({
 					const id = `sfu-peer-${peerId}`;
 					next.set(id, mergeRemotePeerState({ id }, peer));
 				}
-				for (const [peerId, media] of slotAssignmentsRef.current.getMedia(pc.getTransceivers())) {
+				for (const [peerId, media] of slotAssignmentsRef.current.getMedia(pc.getTransceivers(), peerStateByIdRef.current)) {
 					const previous = next.get(media.id);
 					next.set(media.id, { ...previous, ...media, userId: media.userId ?? previous?.userId, peerId });
 				}
@@ -1059,16 +1117,20 @@ export function MezonSfuVoiceRoom({
 					if (customVideoTrack && customVideoTrack.readyState === 'live') {
 						cameraTrack = customVideoTrack;
 					} else {
-						const video = getCameraConstraints(cameraQualityTierRef.current);
-						const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video }).catch((cause) => {
+						const video = withPreferredCamera(getCameraConstraints(cameraQualityTierRef.current), preferredCameraIdRef.current);
+						const stream = await openCameraStream(video).catch((cause) => {
 							if (reportMediaAccessError('camera', cause)) dispatch(voiceActions.setShowCamera(false));
 							throw cause;
 						});
-						if (cancelled) {
+						// Turned off while the camera was opening: drop it, the newer run already reported the camera off
+						if (cancelled || !desiredMediaRef.current.cameraEnabled) {
 							stream.getTracks().forEach((track) => track.stop());
 							return;
 						}
-						cameraTrack = stream.getVideoTracks()[0];
+						// Another run opened a camera meanwhile: keep that one
+						const openedMeanwhile = cameraTrackRef.current?.readyState === 'live' ? cameraTrackRef.current : null;
+						if (openedMeanwhile) stream.getTracks().forEach((track) => track.stop());
+						cameraTrack = openedMeanwhile || stream.getVideoTracks()[0];
 					}
 					if (cancelled || pcRef.current !== pc || wsRef.current !== ws) return;
 					if (cameraTrack) {
@@ -1083,6 +1145,18 @@ export function MezonSfuVoiceRoom({
 				}
 
 				if (cancelled || pcRef.current !== pc || wsRef.current !== ws) return;
+				// Turning the camera off releases a camera the room opened itself so its light goes off; turning it on opens it again.
+				// A custom track belongs to the caller (external meeting pre-join), which releases its own camera
+				if (!cameraEnabled && cameraTrack && cameraTrack !== customVideoTrack) {
+					await findUplinkVideoSender()?.replaceTrack(null);
+					// Turned back on meanwhile: the newer run is using this track
+					if (desiredMediaRef.current.cameraEnabled) return;
+					cameraTrack.stop();
+					localStreamRef.current?.removeTrack(cameraTrack);
+					cameraTrackRef.current = null;
+					if (localStreamRef.current) setLocalPreview(new MediaStream(localStreamRef.current.getTracks()));
+					cameraTrack = null;
+				}
 				if (cameraTrack) {
 					cameraTrack.enabled = cameraEnabled;
 					if ('contentHint' in cameraTrack && cameraTrack.contentHint !== 'detail') {
@@ -1290,7 +1364,22 @@ export function MezonSfuVoiceRoom({
 	]);
 
 	useEffect(() => {
-		const refreshDevices = async () => setDevices(await navigator.mediaDevices.enumerateDevices());
+		const refreshDevices = async () => {
+			const enumerated = await navigator.mediaDevices.enumerateDevices();
+			setDevices(enumerated);
+			const currentOutputs = enumerated.filter((d) => d.kind === 'audiooutput');
+			if (currentOutputs.length > 0) {
+				setSelectedSpeaker((prev) => {
+					if (!prev || prev === 'default') return prev;
+					const exists = currentOutputs.some((d) => d.deviceId === prev);
+					if (!exists) {
+						setPreferredOutputDeviceId('default');
+						return 'default';
+					}
+					return prev;
+				});
+			}
+		};
 		void refreshDevices();
 		navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
 		return () => navigator.mediaDevices.removeEventListener('devicechange', refreshDevices);
@@ -1298,31 +1387,78 @@ export function MezonSfuVoiceRoom({
 
 	const changeInputDevice = useCallback(
 		async (kind: 'audioinput' | 'videoinput', deviceId: string) => {
+			let stream: MediaStream | null = null;
+			let acquiredTrackCommitted = false;
+			const releaseAcquiredStream = () => {
+				if (acquiredTrackCommitted || !stream) return;
+				stream.getTracks().forEach((track) => track.stop());
+				stream = null;
+			};
 			try {
+				if (kind === 'audioinput') {
+					if (microphonePermissionStateRef.current !== 'granted' && !(await ensureMediaPermission('microphone'))) {
+						return;
+					}
+				} else if (kind === 'videoinput') {
+					// Camera off: only remember the choice, turning the camera on opens it
+					if (!cameraEnabled) {
+						preferredCameraIdRef.current = deviceId;
+						setSelectedCamera(deviceId);
+						return;
+					}
+					if (cameraPermissionStateRef.current !== 'granted' && !(await ensureMediaPermission('camera'))) {
+						return;
+					}
+				}
+
 				const usingMezonNsCapture = noiseSuppressionEnabledRef.current && !mezonNsUnavailableRef.current;
-				const stream = await navigator.mediaDevices.getUserMedia({
-					audio:
-						kind === 'audioinput'
-							? {
-									...getMicrophoneCaptureOptions(),
-									...microphoneDeviceConstraint(deviceId)
-								}
-							: false,
-					video: kind === 'videoinput' ? { ...getCameraConstraints(cameraQualityTierRef.current), deviceId: { exact: deviceId } } : false
-				});
+				stream =
+					kind === 'audioinput'
+						? await navigator.mediaDevices.getUserMedia({
+								audio: { ...getMicrophoneCaptureOptions(), ...microphoneDeviceConstraint(deviceId) },
+								video: false
+							})
+						: await openCameraStream({ ...getCameraConstraints(cameraQualityTierRef.current), deviceId: { exact: deviceId } });
 				const nextTrack = kind === 'audioinput' ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0];
-				const localStream = localStreamRef.current;
-				if (!nextTrack || !localStream) return;
+				if (!nextTrack) {
+					releaseAcquiredStream();
+					return;
+				}
+
+				const localStream = localStreamRef.current || new MediaStream();
+				localStreamRef.current = localStream;
 
 				if (kind === 'audioinput') {
+					const isAudioActive =
+						joinRole === 'audience'
+							? Boolean(pushToTalkActive || pushToTalkRequestedRef.current || holdToTalkRef.current)
+							: microphoneEnabled;
+
+					if (joinRole === 'audience' && !isAudioActive) {
+						releaseAcquiredStream();
+						const previousTrack = localStream.getAudioTracks()[0];
+						if (previousTrack) {
+							localStream.removeTrack(previousTrack);
+							previousTrack.stop();
+						}
+						preferredMicrophoneIdRef.current = deviceId;
+						setPreferredInputDeviceId(deviceId);
+						setSelectedMicrophone(deviceId);
+						return;
+					}
+
 					microphoneCaptureModeRef.current.set(nextTrack, usingMezonNsCapture ? 'mezon-ns' : 'native');
 					const previousTrack = localStream.getAudioTracks()[0];
-					const uplinkEnabled = joinRole === 'audience' ? pushToTalkActive : microphoneEnabled;
-					setAudioTrackEnabled(nextTrack, uplinkEnabled);
-					await pcRef.current
+					setAudioTrackEnabled(nextTrack, isAudioActive);
+					const audioTransceiver = pcRef.current
 						?.getTransceivers()
-						.find((item) => item.mid === '0')
-						?.sender.replaceTrack(uplinkEnabled ? getOutgoingAudioTrack(nextTrack) : null);
+						.find((item) => item.mid === '0' || item.receiver.track.kind === 'audio');
+					if (audioTransceiver) {
+						await audioTransceiver.sender.replaceTrack(isAudioActive ? getOutgoingAudioTrack(nextTrack) : null);
+						if (isAudioActive && audioTransceiver.direction !== 'sendonly' && audioTransceiver.direction !== 'sendrecv') {
+							audioTransceiver.direction = 'sendonly';
+						}
+					}
 					if (previousTrack) {
 						localStream.removeTrack(previousTrack);
 						previousTrack.stop();
@@ -1330,8 +1466,9 @@ export function MezonSfuVoiceRoom({
 					localStream.addTrack(nextTrack);
 					setLocalAudioTrack(nextTrack);
 					preferredMicrophoneIdRef.current = deviceId;
-					localStorage.setItem(PREFERRED_MICROPHONE_STORAGE_KEY, deviceId);
+					setPreferredInputDeviceId(deviceId);
 					setSelectedMicrophone(deviceId);
+					acquiredTrackCommitted = true;
 				} else {
 					const previousTrack = cameraTrackRef.current;
 					nextTrack.enabled = cameraEnabled;
@@ -1344,8 +1481,11 @@ export function MezonSfuVoiceRoom({
 					localStream.addTrack(nextTrack);
 					if (!screenStreamRef.current) setLocalPreview(new MediaStream(localStream.getTracks()));
 					setSelectedCamera(deviceId);
+					preferredCameraIdRef.current = deviceId;
+					acquiredTrackCommitted = true;
 				}
 			} catch (cause) {
+				releaseAcquiredStream();
 				setError(cause instanceof Error ? cause.message : 'Unable to switch device');
 			}
 		},
@@ -1360,6 +1500,19 @@ export function MezonSfuVoiceRoom({
 			setAudioTrackEnabled
 		]
 	);
+	const changeOutputDevice = useCallback((deviceId: string) => {
+		setSelectedSpeaker(deviceId);
+		setPreferredOutputDeviceId(deviceId);
+	}, []);
+	const handleSinkIdFailure = useCallback((failedSinkId?: string) => {
+		setSelectedSpeaker((prev) => {
+			if (prev && prev !== 'default' && (failedSinkId === undefined || prev === failedSinkId)) {
+				setPreferredOutputDeviceId('default');
+				return 'default';
+			}
+			return prev;
+		});
+	}, []);
 	const chatRef = useRef<ExternalChatRef>(null);
 	const handleAddMessage = useCallback((message: string) => {
 		chatRef.current?.setMessages((prev) => [...prev, message]);
@@ -1533,11 +1686,14 @@ export function MezonSfuVoiceRoom({
 		const prepareLocalMedia = async () => {
 			let stream: MediaStream;
 			let usingMezonNsCapture = noiseSuppressionEnabledRef.current && !mezonNsUnavailableRef.current;
-			const shouldOpenNativeCamera = !customVideoTrack || customVideoTrack.readyState !== 'live';
+			// Joining with the camera off leaves it closed; the camera effect opens it when it is turned on
+			const shouldOpenNativeCamera = desiredMediaRef.current.cameraEnabled && (!customVideoTrack || customVideoTrack.readyState !== 'live');
 			try {
 				stream = await openPreferredMicrophone(
 					getMicrophoneCaptureOptions(),
-					shouldOpenNativeCamera ? getCameraConstraints(cameraQualityTierRef.current) : false
+					shouldOpenNativeCamera
+						? withPreferredCamera(getCameraConstraints(cameraQualityTierRef.current), preferredCameraIdRef.current)
+						: false
 				);
 			} catch {
 				usingMezonNsCapture = false;
@@ -1896,7 +2052,14 @@ export function MezonSfuVoiceRoom({
 				setError(undefined);
 				setConnectionState('joining');
 
-				const joinMessage = { type: 'join', room: roomId, token: sessionToken, role: joinRole, screen_codec: SCREEN_CODEC.toLowerCase() };
+				const joinMessage = {
+					type: 'join',
+					room: roomId,
+					token: sessionToken,
+					role: joinRole,
+					screen_codec: SCREEN_CODEC.toLowerCase(),
+					media_pool_version: SFU_MEDIA_POOL_VERSION
+				};
 				ws.send(JSON.stringify(joinMessage));
 				const sendVisibility = () => {
 					screenKeyframeRecovery.setDocumentVisible(document.visibilityState === 'visible');
@@ -1987,6 +2150,7 @@ export function MezonSfuVoiceRoom({
 				if (message.type === 'joined') {
 					setError(undefined);
 					setConnectionState('awaiting offer');
+					slotAssignmentsRef.current.observeJoined(message);
 					if ((message as unknown as { room: string })?.room) {
 						setRoomPeerId((message as unknown as { room: string }).room);
 					}
@@ -2112,6 +2276,19 @@ export function MezonSfuVoiceRoom({
 					if (!joinedRef.current && (errorMsg === 'invalid_token' || errorMsg === 'missing_token')) {
 						tokenRejected = true;
 						restartSession();
+						return;
+					}
+					if (SFU_IGNORED_ERRORS.has(errorMsg)) return;
+					if (errorMsg === 'session_not_found') {
+						restartSession();
+						return;
+					}
+					const refusal = SFU_MEDIA_REFUSALS.get(errorMsg);
+					if (refusal) {
+						if (refusal.media === 'screen' && !screenStreamRef.current) return;
+						if (refusal.media === 'camera') dispatch(voiceActions.setShowCamera(false));
+						else void stopScreenShareRef.current();
+						dispatch(toastActions.addToast({ message: tRef.current(refusal.toast), type: 'warning', autoClose: 5000 }));
 						return;
 					}
 					setError(errorMsg);
@@ -2286,6 +2463,8 @@ export function MezonSfuVoiceRoom({
 				if (track !== customVideoTrack) track.stop();
 			});
 			screenStreamRef.current?.getTracks().forEach((track) => track.stop());
+			screenStreamRef.current = null;
+			dispatch(voiceActions.setShowScreen(false));
 			wsRef.current = null;
 			pcRef.current = null;
 			joinedRef.current = false;
@@ -2324,17 +2503,23 @@ export function MezonSfuVoiceRoom({
 		syncSelectedMicrophone
 	]);
 
-	const toggleScreenShare = async () => {
+	const stopLocalScreenCapture = () => {
+		clearScreenKeyFrameRefresh();
+		const stream = screenStreamRef.current;
+		if (!stream) return;
+		stream.getTracks().forEach((track) => {
+			track.onended = null;
+			track.stop();
+		});
+		screenStreamRef.current = null;
+	};
+
+	const stopScreenShare = async () => {
 		const pc = pcRef.current;
 		if (!pc) return;
 		const sender = findUplinkVideoSender('2');
-		if (screenStreamRef.current) {
-			clearScreenKeyFrameRefresh();
-			screenStreamRef.current.getTracks().forEach((track) => {
-				track.onended = null;
-				track.stop();
-			});
-			screenStreamRef.current = null;
+		stopLocalScreenCapture();
+		try {
 			if (sender) {
 				await sender.replaceTrack(null);
 				const transceiver = pc.getTransceivers().find((item) => item.sender === sender);
@@ -2347,18 +2532,32 @@ export function MezonSfuVoiceRoom({
 					transceiver.direction = 'recvonly';
 				}
 			}
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Unable to stop screen sharing');
+		} finally {
 			if (wsRef.current?.readyState === WebSocket.OPEN) {
 				wsRef.current.send(JSON.stringify({ type: 'share_screen', active: false }));
 			}
-			setScreenSharing(false);
+			dispatch(voiceActions.setShowScreen(false));
 			setLocalPreview(localStreamRef.current || undefined);
+		}
+	};
+	stopScreenShareRef.current = stopScreenShare;
+
+	const toggleScreenShare = async () => {
+		const pc = pcRef.current;
+		if (!pc) return;
+		if (screenStreamRef.current || screenSharing) {
+			await stopScreenShare();
 			return;
 		}
+		const sender = findUplinkVideoSender('2');
+		let stream: MediaStream | undefined;
 		try {
 			const CaptureControllerConstructor = (window as typeof window & { CaptureController?: new () => ScreenCaptureController })
 				.CaptureController;
 			const captureController = CaptureControllerConstructor ? new CaptureControllerConstructor() : undefined;
-			const stream = await navigator.mediaDevices.getDisplayMedia({
+			stream = await navigator.mediaDevices.getDisplayMedia({
 				video: getScreenShareConstraints(screenShareModeRef.current),
 				audio: false,
 				...(captureController ? { controller: captureController } : {})
@@ -2370,7 +2569,6 @@ export function MezonSfuVoiceRoom({
 			const track = stream.getVideoTracks()[0];
 			if (!track) throw new Error('Unable to get the screen track');
 			track.contentHint = SCREEN_SHARE_PROFILES[screenShareModeRef.current].contentHint;
-			screenStreamRef.current = stream;
 			if (sender) {
 				await sender.replaceTrack(track);
 				const transceiver =
@@ -2381,11 +2579,17 @@ export function MezonSfuVoiceRoom({
 				if (transceiver) forceVideoCodec(transceiver, SCREEN_CODEC);
 				await applyScreenEncodingParams(sender);
 			}
-			setScreenSharing(true);
-			wsRef.current?.send(JSON.stringify({ type: 'share_screen', active: true }));
+			screenStreamRef.current = stream;
+			dispatch(voiceActions.setShowScreen(true));
+			if (wsRef.current?.readyState === WebSocket.OPEN) {
+				wsRef.current.send(JSON.stringify({ type: 'share_screen', active: true }));
+			}
 			track.onended = () => void toggleScreenShare();
 		} catch (cause) {
-			setError(cause instanceof Error ? cause.message : 'Unable to share the screen');
+			stream?.getTracks().forEach((captureTrack) => captureTrack.stop());
+			dispatch(voiceActions.setShowScreen(false));
+			if (cause instanceof DOMException && cause.name === 'NotReadableError') setError(t('screenShareCaptureFailed'));
+			else setError(cause instanceof Error ? cause.message : 'Unable to share the screen');
 		}
 	};
 
@@ -2622,6 +2826,7 @@ export function MezonSfuVoiceRoom({
 	const participantCount = Math.max(roomParticipantCount, participants.length + 1);
 	const microphones = devices.filter((device) => device.kind === 'audioinput');
 	const cameras = devices.filter((device) => device.kind === 'videoinput');
+	const speakers = devices.filter((device) => device.kind === 'audiooutput');
 	const { sendEmojiReaction: sendMezonEmojiReaction, sendSoundReaction: sendMezonSoundReaction } = useSendReaction();
 	const sendEmojiReaction = (emojiId: string, emoji: string) => {
 		sendMezonEmojiReaction(emoji, emojiId);
@@ -2646,8 +2851,8 @@ export function MezonSfuVoiceRoom({
 	);
 	const localMember = currentUserId ? clanMembers[currentUserId] || userProfile : undefined;
 	const localDisplayName =
-		getNameForPrioritize(localMember?.clan_nick, localMember?.user?.display_name, localMember?.user?.username) ||
 		username ||
+		getNameForPrioritize(localMember?.clan_nick, localMember?.user?.display_name, localMember?.user?.username) ||
 		currentUserId ||
 		GUEST_NAME;
 
@@ -2675,11 +2880,7 @@ export function MezonSfuVoiceRoom({
 		participantId: 'local',
 		isScreen: false,
 		content: (
-			<div
-				className={`relative aspect-video overflow-hidden rounded-xl border-2 bg-[#181825] transition-[border-color,box-shadow] duration-150 hover:border-zinc-400 ${
-					localSpeaking ? '!border-green-400 shadow-[0_0_18px_rgba(74,222,128,0.55)]' : 'border-transparent'
-				}`}
-			>
+			<div className={getParticipantTileFrameClass(localSpeaking)}>
 				{joinRole === 'speaker' && localPreview && cameraEnabled ? (
 					<SfuVideo stream={localPreview} muted mirrored />
 				) : (
@@ -2919,14 +3120,16 @@ export function MezonSfuVoiceRoom({
 	return (
 		<>
 			<div className="relative flex h-full w-full min-w-0 flex-1 flex-col overflow-hidden bg-[#11111b] text-white">
-				<ReactionCallHandler />
-				<SfuVoiceInteractiveLayer channelId={roomId} />
+				<ReactionCallHandler sinkId={selectedSpeaker} />
+				<SfuVoiceInteractiveLayer channelId={roomId} sinkId={selectedSpeaker} />
 				<SfuRoomAudioRenderer
 					participants={participants}
 					mutedParticipantIds={mutedParticipantIds}
+					sinkId={selectedSpeaker}
 					onPlaybackFailure={handleAudioPlaybackFailure}
+					onSinkIdFailure={handleSinkIdFailure}
 				/>
-				<header className="relative z-20 flex h-[68px] shrink-0 items-center justify-between px-4 text-sm">
+				<header className="relative z-20 flex h-[68px] shrink-0 items-center justify-between px-4 text-sm bg-theme-setting-nav">
 					<div className="flex items-center gap-2 text-[var(--bg-icon-theme)]">
 						{isPrivateVoice ? (
 							<Icons.SpeakerLocked
@@ -2957,6 +3160,7 @@ export function MezonSfuVoiceRoom({
 						</span>
 					</div>
 					<div className="flex items-center gap-4 text-[var(--bg-icon-theme)]">
+						{headerActions}
 						{!isExternalCalling && <NotificationTooltip />}
 						<button
 							type="button"
@@ -3125,8 +3329,10 @@ export function MezonSfuVoiceRoom({
 					showVoiceInteractivePanel={showVoiceInteractivePanel}
 					microphones={microphones}
 					cameras={cameras}
+					speakers={speakers}
 					selectedMicrophone={selectedMicrophone}
 					selectedCamera={selectedCamera}
+					selectedSpeaker={selectedSpeaker}
 					isPopoutOpen={isPopoutOpen}
 					isFullScreen={isFullScreen}
 					isExternalCalling={isExternalCalling}
@@ -3148,7 +3354,15 @@ export function MezonSfuVoiceRoom({
 					onCameraToggle={() => dispatch(voiceActions.setShowCamera(!cameraEnabled))}
 					onScreenShareToggle={() => void toggleScreenShare()}
 					onMicrophoneSelect={(deviceId) => void changeInputDevice('audioinput', deviceId)}
-					onCameraSelect={(deviceId) => void changeInputDevice('videoinput', deviceId)}
+					onCameraSelect={(deviceId) => {
+						if (onSelectCamera && customVideoTrack) {
+							setSelectedCamera(deviceId);
+							onSelectCamera(deviceId);
+							return;
+						}
+						void changeInputDevice('videoinput', deviceId);
+					}}
+					onSpeakerSelect={changeOutputDevice}
 					onLeaveRoom={onLeaveRoom}
 					onTogglePopout={() => void togglePopout(activePinnedTrackId)}
 					onFullScreen={onFullScreen}

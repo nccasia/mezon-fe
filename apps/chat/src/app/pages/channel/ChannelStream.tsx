@@ -1,4 +1,4 @@
-import { AvatarImage } from '@mezon/components';
+import { AvatarImage, StreamOutputDeviceMenu } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import type { ChannelsEntity, UsersStreamEntity } from '@mezon/store';
 import {
@@ -313,6 +313,7 @@ export default function ChannelStream({ currentStreamInfo, currentChannel }: Cha
 										className="cursor-pointer w-[100px] h-[5px]"
 									/>
 								</div>
+								<StreamOutputDeviceMenu />
 							</div>
 						</div>
 						{memberJoin.length > 0 && (

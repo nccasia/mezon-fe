@@ -8,13 +8,16 @@ import {
 	selectStreamMuted,
 	selectStreamSfuUrl,
 	selectStreamVolume,
+	toastActions,
 	useAppDispatch,
 	useAppSelector,
 	videoStreamActions
 } from '@mezon/store';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { SfuAudioAudience, type SfuAudioAudienceState } from './MyVideoConference/Media/SfuAudioAudience';
+import { usePreferredOutputDevice } from './usePreferredOutputDevice';
 
 /**
  * Keeps stream-channel SFU audio alive while the user is joined, including
@@ -23,6 +26,7 @@ import { SfuAudioAudience, type SfuAudioAudienceState } from './MyVideoConferenc
  */
 export function StreamAudioSession() {
 	const dispatch = useAppDispatch();
+	const { t } = useTranslation('channelStream');
 	const isJoin = useSelector(selectIsJoin);
 	const streamInfo = useSelector(selectCurrentStreamInfo);
 	const token = useSelector(selectStreamAudioToken);
@@ -31,6 +35,7 @@ export function StreamAudioSession() {
 	const members = useAppSelector((state) => selectStreamMembersByChannelId(state, streamInfo?.streamId || ''));
 	const sfuUrl = useSelector(selectStreamSfuUrl);
 	const serverUrl = sfuUrl || process.env.NX_CHAT_APP_SFU_WS_URL;
+	const { outputDeviceId, handleSinkIdFailure } = usePreferredOutputDevice();
 
 	const refreshToken = useCallback(async () => {
 		if (!streamInfo?.streamId) throw new Error('Stream channel is unavailable');
@@ -48,11 +53,14 @@ export function StreamAudioSession() {
 
 	const handleConnectionStateChange = useCallback(
 		(state: SfuAudioAudienceState) => {
-			if (state !== 'failed') return;
+			if (state !== 'failed' && state !== 'replaced') return;
+			if (state === 'replaced') {
+				dispatch(toastActions.addToast({ message: t('duplicateSessionDisconnected'), type: 'warning', autoClose: 5000 }));
+			}
 			dispatch(videoStreamActions.resetPlayback());
 			dispatch(appActions.setIsShowChatStream(false));
 		},
-		[dispatch]
+		[dispatch, t]
 	);
 
 	useEffect(() => {
@@ -71,6 +79,8 @@ export function StreamAudioSession() {
 			serverUrl={serverUrl}
 			volume={volume}
 			muted={muted}
+			sinkId={outputDeviceId}
+			onSinkIdFailure={handleSinkIdFailure}
 			onRefreshToken={refreshToken}
 			onConnectionStateChange={handleConnectionStateChange}
 		/>

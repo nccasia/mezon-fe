@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "동봉할 메시지 입력..."
 	},
 	"successMessage": "메시지가 성공적으로 전달되었습니다",
-	"errorMessage": "메시지 전달에 실패했습니다"
+	"errorMessage": "메시지 전달에 실패했습니다",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

@@ -20,6 +20,6 @@
 		"additionalMessagePlaceholder": "Введите сообщение, которое хотите отправить вместе с..."
 	},
 	"successMessage": "Сообщение успешно перенаправлено",
-	"errorMessage": "Не удалось перенаправить сообщение"
+	"errorMessage": "Не удалось перенаправить сообщение",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }
-

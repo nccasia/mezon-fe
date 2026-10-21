@@ -531,6 +531,7 @@
 		"accessDenied": "Zugriff verweigert",
 		"accessDeniedDesc": "Du hast keine Berechtigung, diesem Kanal oder Clan beizutreten. Bitte kontaktiere einen Administrator, falls dies ein Fehler sein sollte.",
 		"goToWelcomeChannel": "Zum Willkommenskanal gehen",
+		"goToFriendPage": "Zur Freundesseite",
 		"okayGotIt": "Verstanden"
 	},
 	"reportMessage": {

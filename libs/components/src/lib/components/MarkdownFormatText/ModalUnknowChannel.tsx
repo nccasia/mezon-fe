@@ -1,11 +1,11 @@
 import { FRIEND_PAGE_LINK, toChannelPage, useAppNavigation } from '@mezon/core';
 
 import type { RootState } from '@mezon/store';
-import { getStoreAsync, selectClanById, selectCurrentClanId, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
+import { getStoreAsync, selectClanById, selectCurrentClan, selectWelcomeChannelByClanId, toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 type ModalUnknowChannelProps = {
@@ -45,6 +45,8 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const { onClose, isError = false, errMessage, idErr } = props;
 	const { toClanPage, navigate } = useAppNavigation();
 	const location = useLocation();
+	const currentClan = useSelector(selectCurrentClan);
+	const currentClanId = currentClan?.id;
 
 	const errorConfig = getErrorConfig(errMessage);
 
@@ -61,7 +63,6 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const directToWelcomeChannel = async () => {
 		clearAllToastError();
 		const store = await getStoreAsync();
-		const currentClanId = selectCurrentClanId(store.getState() as RootState);
 		if (!currentClanId || currentClanId === '0') {
 			navigate(FRIEND_PAGE_LINK);
 			return;
@@ -87,6 +88,9 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	};
 
 	const onCloseAndReset = () => {
+		if (!currentClanId) {
+			return;
+		}
 		if (isError) {
 			removeToastError();
 		}
@@ -133,15 +137,17 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 								className="flex-1 bg-[#5865f2] hover:bg-[#4752c4] text-white font-medium py-2.5 px-4 rounded transition-colors duration-200"
 								data-e2e={generateE2eId('clan_page.settings.modal.permission.confirm')}
 							>
-								{t('modalUnknowChannel.goToWelcomeChannel')}
+								{currentClanId ? t('modalUnknowChannel.goToWelcomeChannel') : t('modalUnknowChannel.goToFriendPage')}
 							</button>
-							<button
-								onClick={onCloseAndReset}
-								className="px-4 py-2.5 text-theme-primary hover:underline rounded transition-colors duration-200"
-								data-e2e={generateE2eId('clan_page.settings.modal.permission.cancel')}
-							>
-								{t('cancel')}
-							</button>
+							{currentClanId && (
+								<button
+									onClick={onCloseAndReset}
+									className="px-4 py-2.5 text-theme-primary hover:underline rounded transition-colors duration-200"
+									data-e2e={generateE2eId('clan_page.settings.modal.permission.cancel')}
+								>
+									{t('cancel')}
+								</button>
+							)}
 						</>
 					) : (
 						<button

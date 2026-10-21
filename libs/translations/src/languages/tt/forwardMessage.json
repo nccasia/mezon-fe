@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Бергә җибәрергә теләгән хәбәрегезне керетегез..."
 	},
 	"successMessage": "Хәбәр уңышлы юнәлтелде",
-	"errorMessage": "Хәбәрне юнәлтеп булмады"
+	"errorMessage": "Хәбәрне юнәлтеп булмады",
+	"payloadTooLarge": "This message can't be forwarded because the content or attachment is too large. Copy the text or upload the file as a normal message instead."
 }

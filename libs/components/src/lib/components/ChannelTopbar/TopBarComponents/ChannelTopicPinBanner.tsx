@@ -18,6 +18,7 @@ import {
 	selectIsShowMemberList,
 	selectLastMessageByChannelId,
 	selectMediaChannelViewMode,
+	selectMemberClanByUserId,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectTimelineViewMode,
@@ -97,6 +98,13 @@ const extractMessageText = (content: any): string => {
 		return content.t || content.content || content.text || '';
 	}
 	return String(content);
+};
+
+const isAnonymousMessageSource = (message: unknown): boolean => {
+	if (!message || typeof message !== 'object') return false;
+	const msg = message as { isAnonymous?: boolean; sender_id?: string };
+	const senderId = String(msg.sender_id || '');
+	return Boolean(msg.isAnonymous || senderId === NX_CHAT_APP_ANNONYMOUS_USER_ID);
 };
 
 type ExtractedAttachment = {
@@ -332,10 +340,96 @@ const UnpinBannerIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
 	</svg>
 );
 
+type ChannelBannerDismissState = {
+	at: number;
+	pinId?: string;
+	topicId?: string;
+	topicAt?: number;
+	unpinned?: boolean;
+};
+
+const channelBannerDismissKey = (channelId: string) => `mezon_banner_dismissed_${channelId}`;
+
+const getPinPinnedAtMs = (
+	pin: { create_time_seconds?: number } | null | undefined,
+	pinMessageInStore?: { create_time_seconds?: number } | null
+): number => Math.max((pin?.create_time_seconds || 0) * 1000, (pinMessageInStore?.create_time_seconds || 0) * 1000);
+
+const parseBannerDismissState = (raw: unknown): ChannelBannerDismissState | null => {
+	if (!raw || typeof raw !== 'object') return null;
+	const record = raw as Record<string, unknown>;
+	const at = Number(record.at ?? record.dismissedAt);
+	if (!(at > 0)) return null;
+
+	const pinId = String(record.pinId ?? record.dismissedPinMessageId ?? '').trim();
+	const topicId = String(record.topicId ?? record.dismissedTopicId ?? '').trim();
+	const topicAt = Number(record.topicAt ?? record.topicActivityAt);
+
+	return {
+		at,
+		pinId: pinId || undefined,
+		topicId: topicId || undefined,
+		topicAt: topicAt > 0 ? topicAt : undefined,
+		unpinned: Boolean(record.unpinned ?? record.pinWasRemovedSinceDismiss)
+	};
+};
+
+const markUnpinnedIfNeeded = (state: ChannelBannerDismissState, pinnedMessageIds: string[]): ChannelBannerDismissState => {
+	if (state.unpinned || !state.pinId) return state;
+	const pinLeftList = !pinnedMessageIds.includes(state.pinId);
+	if (pinLeftList) {
+		return { ...state, unpinned: true };
+	}
+	return state;
+};
+
+const shouldRevealBannerAfterDismiss = (
+	state: ChannelBannerDismissState,
+	latestTopic: ApiSdTopic | null,
+	latestPin: { message_id?: string; create_time_seconds?: number } | null,
+	pinMessageInStore?: { create_time_seconds?: number } | null
+): boolean => {
+	const pinMsg = latestPin?.message_id ? String(latestPin.message_id) : '';
+	const topicId = latestTopic?.id ? String(latestTopic.id) : '';
+
+	if (pinMsg) {
+		if (!state.pinId) return true;
+		if (state.unpinned) return true;
+		if (pinMsg !== state.pinId) return true;
+		if (getPinPinnedAtMs(latestPin, pinMessageInStore) > state.at) return true;
+	}
+
+	if (topicId) {
+		if (!state.topicId) return true;
+		if (topicId !== state.topicId) return true;
+		const topicMs = getTopicTimestamp(latestTopic);
+		const topicAt = state.topicAt ?? state.at;
+		if (topicMs > topicAt) return true;
+	}
+
+	return false;
+};
+
+/** Pre-v2 localStorage entries (id lists only). */
+const shouldRevealBannerLegacy = (
+	raw: Record<string, unknown>,
+	latestTopic: ApiSdTopic | null,
+	latestPin: { message_id?: string } | null
+): boolean => {
+	const dismissedPinnedIds: string[] = Array.isArray(raw.pinnedIds) ? raw.pinnedIds.map(String) : raw.pinId ? [String(raw.pinId)] : [];
+	const dismissedTopicIds: string[] = Array.isArray(raw.topicIds) ? raw.topicIds.map(String) : raw.topicId ? [String(raw.topicId)] : [];
+
+	const pinMsg = latestPin?.message_id ? String(latestPin.message_id) : '';
+	const topicId = latestTopic?.id ? String(latestTopic.id) : '';
+	const hasNewPin = Boolean(pinMsg && !dismissedPinnedIds.includes(pinMsg));
+	const hasNewTopic = dismissedTopicIds.length > 0 && Boolean(topicId && !dismissedTopicIds.includes(topicId));
+	return hasNewPin || hasNewTopic;
+};
+
 const checkIsChannelBannerDismissed = (channelId: string | null | undefined): boolean => {
 	if (!channelId) return false;
 	try {
-		const raw = localStorage.getItem(`mezon_banner_dismissed_${channelId}`);
+		const raw = localStorage.getItem(channelBannerDismissKey(channelId));
 		if (!raw) return false;
 		const dismissed = JSON.parse(raw);
 		return Boolean(dismissed && typeof dismissed === 'object');
@@ -590,13 +684,32 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 		isAnonymous: isTopicAnonymous
 	} = useGetPriorityNameFromUserClan(topicSenderId);
 
-	const isTopicSenderAnonymous = Boolean(isTopicAnonymous || topicSourceMessage?.isAnonymous || topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID);
+	const topicSenderMember = useAppSelector((state) => (topicSenderId ? selectMemberClanByUserId(state, topicSenderId) : null));
+
+	const isTopicSenderAnonymous = Boolean(
+		isTopicAnonymous ||
+			topicSenderId === NX_CHAT_APP_ANNONYMOUS_USER_ID ||
+			topicSourceMessage?.isAnonymous ||
+			isAnonymousMessageSource(topicLastMessageInStore) ||
+			isAnonymousMessageSource(topicOriginalMessage) ||
+			isAnonymousMessageSource(latestTopic?.last_sent_message) ||
+			isAnonymousMessageSource(latestTopic?.message) ||
+			isAnonymousMessageSource(topicSourceMessage?.message)
+	);
 
 	const topicSenderName = useMemo(() => {
 		if (!topicSenderId) return '';
 		if (isTopicSenderAnonymous) return 'Anonymous';
-		return topicSenderNamePriority || topicSourceMessage?.username || topicSenderUsername || '';
-	}, [topicSenderId, isTopicSenderAnonymous, topicSenderNamePriority, topicSourceMessage?.username, topicSenderUsername]);
+		return (
+			topicSenderNamePriority ||
+			topicSourceMessage?.username ||
+			topicSenderUsername ||
+			topicSenderMember?.clan_nick ||
+			topicSenderMember?.user?.display_name ||
+			topicSenderMember?.user?.username ||
+			''
+		);
+	}, [topicSenderId, isTopicSenderAnonymous, topicSenderNamePriority, topicSourceMessage?.username, topicSenderUsername, topicSenderMember]);
 
 	const topicTitle = useMemo(() => {
 		if (!latestTopic) return '';
@@ -763,41 +876,8 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 
 	const isPinPoll = useMemo(() => {
 		if (!latestPin) return false;
-		if ((latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll) {
-			return true;
-		}
-		if (pollQuestionFromContent) {
-			return true;
-		}
-		let raw: any = pinMessageInStore?.content || latestPin.content;
-		if (raw instanceof Uint8Array) {
-			try {
-				raw = new TextDecoder().decode(raw);
-			} catch {
-				return false;
-			}
-		}
-		let parsed: any = raw;
-		if (typeof raw === 'string') {
-			try {
-				parsed = safeJSONParse(raw);
-			} catch {
-				parsed = null;
-			}
-		}
-		if (typeof raw === 'string' && raw.startsWith('📊')) {
-			return true;
-		}
-		if (parsed && typeof parsed === 'object') {
-			if ('poll_id' in parsed || 'question' in parsed || 'answer_counts' in parsed || 'answers' in parsed) {
-				return true;
-			}
-			if (typeof parsed.t === 'string' && parsed.t.startsWith('📊')) {
-				return true;
-			}
-		}
-		return false;
-	}, [latestPin, pinMessageInStore, pollQuestionFromContent]);
+		return (latestPin as any)?.code === TypeMessage.Poll || pinMessageInStore?.code === TypeMessage.Poll;
+	}, [latestPin, pinMessageInStore]);
 
 	useEffect(() => {
 		if (!isPinPoll || pollQuestionFromContent) return;
@@ -908,6 +988,11 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 		);
 	}, [dispatch, isShowCanvas, latestPin, currentClanId, currentChannelId, isChannelGatePassed, isExcludedRoute, isVoiceOrStream]);
 
+	const pinnedMessageIds = useMemo(() => (pinMessages || []).map((p) => String(p.message_id || '')).filter(Boolean), [pinMessages]);
+	const pinnedMessageIdsKey = useMemo(() => pinnedMessageIds.join(','), [pinnedMessageIds]);
+
+	const latestTopicActivityMs = useMemo(() => getTopicTimestamp(latestTopic), [latestTopic]);
+
 	const [prevChannelId, setPrevChannelId] = useState(currentChannelId);
 	const [isDismissed, setIsDismissed] = useState<boolean>(() => checkIsChannelBannerDismissed(currentChannelId));
 
@@ -922,67 +1007,81 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 			return;
 		}
 
+		const storageKey = channelBannerDismissKey(currentChannelId);
+		let parsed: Record<string, unknown> | null = null;
 		try {
-			const raw = localStorage.getItem(`mezon_banner_dismissed_${currentChannelId}`);
+			const raw = localStorage.getItem(storageKey);
 			if (!raw) {
 				setIsDismissed(false);
 				return;
 			}
-			const dismissed = JSON.parse(raw);
-			if (!dismissed || typeof dismissed !== 'object') {
+			const value = JSON.parse(raw);
+			if (!value || typeof value !== 'object') {
 				setIsDismissed(false);
 				return;
 			}
-
-			const currentTopicId = latestTopic?.id ? String(latestTopic.id) : '';
-			const hasNewTopic = Boolean(
-				currentTopicId &&
-					(Array.isArray(dismissed.topicIds)
-						? !dismissed.topicIds.includes(currentTopicId)
-						: dismissed.topicId
-							? String(dismissed.topicId) !== currentTopicId
-							: false)
-			);
-
-			const currentPinId = latestPin?.message_id ? String(latestPin.message_id) : '';
-			const hasNewPin = Boolean(
-				currentPinId &&
-					(Array.isArray(dismissed.pinnedIds)
-						? !dismissed.pinnedIds.includes(currentPinId)
-						: dismissed.pinId
-							? String(dismissed.pinId) !== currentPinId
-							: false)
-			);
-
-			if (hasNewTopic || hasNewPin) {
-				localStorage.removeItem(`mezon_banner_dismissed_${currentChannelId}`);
-				setIsDismissed(false);
-			} else {
-				setIsDismissed(true);
-			}
+			parsed = value as Record<string, unknown>;
 		} catch {
 			setIsDismissed(false);
+			return;
 		}
-	}, [currentChannelId, latestTopic?.id, latestPin?.message_id]);
+
+		let dismissState = parseBannerDismissState(parsed);
+		let shouldReveal = false;
+
+		if (dismissState) {
+			const withUnpin = markUnpinnedIfNeeded(dismissState, pinnedMessageIds);
+			if (withUnpin.unpinned && !dismissState.unpinned) {
+				try {
+					localStorage.setItem(storageKey, JSON.stringify(withUnpin));
+				} catch {
+					console.error('Error setting item in localStorage', storageKey);
+				}
+			}
+			dismissState = withUnpin;
+			shouldReveal = shouldRevealBannerAfterDismiss(dismissState, latestTopic, latestPin, pinMessageInStore);
+		} else {
+			shouldReveal = shouldRevealBannerLegacy(parsed, latestTopic, latestPin);
+		}
+
+		if (shouldReveal) {
+			try {
+				localStorage.removeItem(storageKey);
+			} catch {
+				console.error('Error removing item from localStorage', storageKey);
+			}
+			setIsDismissed(false);
+			return;
+		}
+
+		setIsDismissed(true);
+	}, [
+		currentChannelId,
+		latestTopic?.id,
+		latestPin?.message_id,
+		latestPin?.create_time_seconds,
+		latestTopicActivityMs,
+		pinnedMessageIdsKey,
+		pinMessageInStore?.create_time_seconds
+	]);
 
 	const handleConfirmDismiss = useCallback(() => {
 		if (!currentChannelId) return;
-		const channelTopics = allTopics?.filter((tp) => tp.channel_id === currentChannelId) || [];
-		const currentTopicIds = channelTopics.map((tp) => String(tp.id || '')).filter(Boolean);
-		const currentPinnedIds = (pinMessages || []).map((p) => String(p.message_id || '')).filter(Boolean);
 
-		const dismissedData = {
-			topicIds: currentTopicIds,
-			pinnedIds: currentPinnedIds,
-			dismissedAt: Date.now()
+		const at = Date.now();
+		const dismissState: ChannelBannerDismissState = {
+			at,
+			pinId: latestPin?.message_id ? String(latestPin.message_id) : undefined,
+			topicId: latestTopic?.id ? String(latestTopic.id) : undefined,
+			topicAt: latestTopic ? getTopicTimestamp(latestTopic) : undefined
 		};
 		try {
-			localStorage.setItem(`mezon_banner_dismissed_${currentChannelId}`, JSON.stringify(dismissedData));
+			localStorage.setItem(channelBannerDismissKey(currentChannelId), JSON.stringify(dismissState));
 		} catch {
 			// ignore
 		}
 		setIsDismissed(true);
-	}, [currentChannelId, allTopics, pinMessages]);
+	}, [currentChannelId, latestTopic, latestPin]);
 
 	const [openDismissModal, closeDismissModal] = useModal(
 		() => (
@@ -992,12 +1091,9 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 					handleConfirmDismiss();
 					closeDismissModal();
 				}}
-				title={t('unpin', 'Bỏ ghim')}
-				message={t(
-					'confirmUnpinBannerDesc',
-					'Bạn có chắc chắn muốn bỏ ghim không? Thanh ghim sẽ tự động hiện lại khi có tin nhắn ghim hoặc topic mới.'
-				)}
-				buttonName={t('unpin', 'Bỏ ghim')}
+				title={t('topicPinBanner.dismissModal.title')}
+				message={t('topicPinBanner.dismissModal.message')}
+				buttonName={t('topicPinBanner.dismissModal.confirm')}
 				buttonColor="bg-red-600 hover:bg-red-700"
 			/>
 		),
@@ -1029,10 +1125,8 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 
 	return (
 		<>
-			{/* Lớp layout trong suốt ở dưới để giữ chỗ trong flow, ngăn chữ cuộn lên lọt vào sau banner */}
 			<div className="w-full h-14 shrink-0 pointer-events-none" />
 
-			{/* Banner nổi (absolute) nằm ngoài layout với đầy đủ hiệu ứng nổi, bóng đổ và màu sắc */}
 			<div
 				className="absolute top-2 left-0 z-20 px-4 pointer-events-none transition-[right] duration-200"
 				style={{ right: isMemberListOpen ? 245 : 0 }}
@@ -1118,8 +1212,8 @@ export const ChannelTopicPinBanner = memo(({ channelId: propChannelId }: Channel
 						type="button"
 						className="flex items-center justify-center px-2.5 text-theme-primary hover:text-theme-primary-active hover:bg-item-theme-hover transition-colors cursor-pointer shrink-0"
 						onClick={handleOpenDismissModal}
-						title={t('unpin', 'Bỏ ghim')}
-						aria-label={t('unpin', 'Bỏ ghim')}
+						title={t('topicPinBanner.dismissButton')}
+						aria-label={t('topicPinBanner.dismissButton')}
 						data-e2e={generateE2eId('chat.channel_message.topic_pin_banner.container', 'dismiss_button')}
 					>
 						<UnpinBannerIcon className="w-5 h-5 shrink-0" />

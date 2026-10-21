@@ -20,5 +20,6 @@
 		"additionalMessagePlaceholder": "Nhập tin nhắn muốn gửi kèm..."
 	},
 	"successMessage": "Chuyển tiếp tin nhắn thành công",
-	"errorMessage": "Không thể chuyển tiếp tin nhắn"
+	"errorMessage": "Không thể chuyển tiếp tin nhắn",
+	"payloadTooLarge": "Không thể chuyển tiếp tin nhắn này vì nội dung hoặc tệp đính kèm quá lớn. Hãy sao chép nội dung hoặc gửi file bằng cách tải lên như tin nhắn thường."
 }

@@ -6,5 +6,6 @@
 	"joinStream": "Livestream beitreten",
 	"noStreamToday": "Heute findet kein Livestream statt",
 	"hideMembers": "Mitglieder ausblenden",
-	"showMembers": "Mitglieder anzeigen"
+	"showMembers": "Mitglieder anzeigen",
+	"duplicateSessionDisconnected": "Getrennt, weil dein Konto in einer anderen Sitzung einem Livestream oder Sprachkanal beigetreten ist."
 }
