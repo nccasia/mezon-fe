@@ -98,7 +98,7 @@ function ChannelList() {
 				>
 					<RowVirtualizerDynamic permissions={permissions} />
 				</div>
-				{!checkHasChannel && (
+				{!checkHasChannel && checkFetchChannel && (
 					<div className="absolute bottom-5 flex-col flex rounded-lg p-3 gap-2 bg-theme-contexify w-[264px] left-1">
 						<div className="flex gap-1 text-sm items-center font-semibold">
 							<svg
