@@ -351,12 +351,12 @@ export const settingClanChannelSlice = createSlice({
 				}
 				const existingThread = state.threadsByChannel[channel.parent_id].find((t) => t.id === channel.id);
 				if (!existingThread) {
-					state.threadsByChannel[channel.parent_id].push(channel);
+					state.threadsByChannel[channel.parent_id].push({ ...channel, clan_id: channel?.clan_id || '' });
 					state.threadCount += 1;
 				}
 				return;
 			}
-			channelSettingAdapter.addOne(state, channel);
+			channelSettingAdapter.addOne(state, { ...channel, clan_id: channel?.clan_id || '' });
 			state.channelCount += 1;
 		},
 		removeChannelFromSocket: (state, action) => {
@@ -387,7 +387,7 @@ export const settingClanChannelSlice = createSlice({
 			const channel = action.payload;
 			if (!channel?.id) return;
 
-			const safeChannel = { ...channel };
+			const safeChannel = { ...channel, clan_id: channel?.clan_id || '' };
 			if (safeChannel.channel_type === 0 || safeChannel.channel_type === undefined) {
 				delete safeChannel.channel_type;
 			}
@@ -411,9 +411,9 @@ export const settingClanChannelSlice = createSlice({
 
 			if (channel.parent_id && channel.parent_id !== '0') {
 				state.threadsByChannel[channel.parent_id] ??= [];
-				state.threadsByChannel[channel.parent_id].push(channel);
+				state.threadsByChannel[channel.parent_id].push({ ...channel, clan_id: channel?.clan_id || '' });
 			} else {
-				channelSettingAdapter.addOne(state, channel);
+				channelSettingAdapter.addOne(state, { ...channel, clan_id: channel?.clan_id || '' });
 			}
 		}
 	},

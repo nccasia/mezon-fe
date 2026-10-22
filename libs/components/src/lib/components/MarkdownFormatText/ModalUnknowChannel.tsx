@@ -73,7 +73,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 			removeToastError();
 		}
 		onClose?.();
-		if (!currentClanId) {
+		if (!currentClanId || currentClanId === '0') {
 			navigate(FRIEND_PAGE_LINK);
 			return;
 		}

@@ -1,4 +1,4 @@
-import { selectAllChannels, selectAllChannelSuggestion, selectCategoryEntityStateByClanId, selectCurrentClanId, useAppSelector } from '@mezon/store';
+import { selectAllChannelSuggestion, selectCategoryEntityStateByClanId, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js';
@@ -30,17 +30,12 @@ const SystemMessagesManagement = ({
 	setClanRequest
 }: SystemMessagesManagementProps) => {
 	const { t } = useTranslation('clanSettings');
-	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
 	const allChannelAdmin = useAppSelector(selectAllChannelSuggestion);
-	const selectCategoryEntites = useAppSelector((state) => selectCategoryEntityStateByClanId(state, currentClanId || '')).entities;
+	const selectCategoryEntites = useAppSelector((state) => selectCategoryEntityStateByClanId(state, currentClanId || ''))?.entities;
 	const selectedChannel = useMemo(() => {
-		if (channelsList.length === 0) {
-			return allChannelAdmin.find((channel) => channel.id === channelSelectedId);
-		}
-
-		return channelsList.find((channel) => channel.id === channelSelectedId);
-	}, [channelsList, channelSelectedId, allChannelAdmin]);
+		return allChannelAdmin.find((channel) => channel.id === channelSelectedId);
+	}, [channelSelectedId, allChannelAdmin]);
 
 	const renderChannelIcon = (channel?: { age_restricted?: number; channel_private?: number }) => {
 		if (channel?.age_restricted === 1) {
@@ -101,7 +96,7 @@ const SystemMessagesManagement = ({
 				}
 			});
 		return <>{menuItems}</>;
-	}, [channelsList, selectedChannel?.id]);
+	}, [allChannelAdmin, selectedChannel?.id]);
 	return (
 		<div className={'border-t-theme-primary mt-10 pt-10 flex flex-col '}>
 			<h3 className="text-sm font-bold uppercase mb-2">{t('systemMessages.title')}</h3>
@@ -121,7 +116,7 @@ const SystemMessagesManagement = ({
 							className={'ml-5 font-semibold'}
 							data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.selected.category_name')}
 						>
-							{selectCategoryEntites?.[selectedChannel?.id || '']?.category_name}
+							{selectCategoryEntites?.[selectedChannel?.category_id || '']?.category_name}
 						</p>
 					</div>
 					<div>
