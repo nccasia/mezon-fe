@@ -1,6 +1,6 @@
 import { selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
-import { ChannelStatusEnum, generateE2eId } from '@mezon/utils';
+import { generateE2eId } from '@mezon/utils';
 import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
 import type { ReactElement } from 'react';
@@ -70,12 +70,7 @@ const SystemMessagesManagement = ({
 	const menu = useMemo(() => {
 		const menuItems: ReactElement[] = [];
 		channelsList
-			.filter(
-				(channel) =>
-					channel.clan_id === currentClanId &&
-					channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
-					channel.channel_private !== ChannelStatusEnum.isPrivate
-			)
+			.filter((channel) => channel.clan_id === currentClanId && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL)
 			.map((channel) => {
 				if (channel.id !== selectedChannel?.id) {
 					menuItems.push(
