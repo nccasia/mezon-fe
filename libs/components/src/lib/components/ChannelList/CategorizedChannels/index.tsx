@@ -33,6 +33,8 @@ export interface IChannelLinkPermission {
 	hasClanPermission: boolean;
 	hasChannelManagePermission: boolean;
 	isClanOwner: boolean;
+	checkHasChannel: boolean;
+	checkFetchChannel: boolean;
 }
 
 interface DeleteCategoryModalProps {
