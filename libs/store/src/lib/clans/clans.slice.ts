@@ -1141,10 +1141,10 @@ export const selectClanHasUnreadMessage = createSelector(
 	(clan, clan_id) => selectClanUnreadById(clan, clan_id)?.has_unread || false
 );
 
-export const selectClanExists = (clanId: string) =>
-	createSelector(selectClansEntities, (clansEntities) => {
-		return !!clansEntities[clanId];
-	});
+export const selectClanExists = createSelector(
+	[selectClansEntities, (_state: RootState, clanId: string) => clanId],
+	(clansEntities, clanId) => !!clansEntities[clanId]
+);
 
 export const selectOrderedClansWithGroups = createSelector([selectAllClans, selectClanGroups, selectClanGroupOrder], (clans, groups, order) => {
 	if (!order || order.length === 0) {
