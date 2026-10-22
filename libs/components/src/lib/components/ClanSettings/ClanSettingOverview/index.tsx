@@ -187,6 +187,9 @@ const ClanSettingOverview = () => {
 	};
 
 	useEffect(() => {
+		if (!currentClan?.id) {
+			return;
+		}
 		dispatch(
 			channelSettingActions.fetchActiveChannelSettingInClan({
 				clanId: currentClan?.id || '',
@@ -196,7 +199,7 @@ const ClanSettingOverview = () => {
 				typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL
 			})
 		);
-	}, []);
+	}, [currentClan?.id]);
 	return (
 		<div className="h-full pb-10">
 			<ClanLogoName
