@@ -102,29 +102,30 @@ function ChannelList() {
 	);
 }
 
-const ChannelBannerAndEvents = memo(({ banner }: { banner?: string }) => {
-	return (
-		<>
-			{banner && (
-				<div className="h-[136px]" data-e2e={generateE2eId('clan_page.banner')}>
-					<img
-						src={createImgproxyUrl(banner ?? '', { width: 300, height: 300, resizeType: 'fit' })}
-						alt="imageCover"
-						className="h-full w-full object-cover"
-					/>
+const ChannelBannerAndEvents = memo(
+	({ banner, checkFetchChannel, checkHasChannel }: { banner?: string; checkHasChannel: boolean; checkFetchChannel: boolean }) => {
+		return (
+			<>
+				{banner && (
+					<div className="h-[136px]" data-e2e={generateE2eId('clan_page.banner')}>
+						<img
+							src={createImgproxyUrl(banner ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+							alt="imageCover"
+							className="h-full w-full object-cover"
+						/>
+					</div>
+				)}
+				<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
+					<Events checkHasChannel={checkHasChannel} checkFetchChannel={checkFetchChannel} />
+					<hr className="w-full ml-[3px] border-t-theme-primary"></hr>
 				</div>
-			)}
-			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
-				<Events />
-				<hr className="w-full ml-[3px] border-t-theme-primary"></hr>
-			</div>
-		</>
-	);
-});
+			</>
+		);
+	}
+);
 
 const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLinkPermission }) => {
 	const { t } = useTranslation('channelList');
-	const { t: tWelcome } = useTranslation('chatWelcome');
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClanBanner = useSelector(selectCurrentClanBanner);
@@ -471,7 +472,11 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 						if (virtualRow.index === 0) {
 							return (
 								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
-									<ChannelBannerAndEvents banner={currentClanBanner} />
+									<ChannelBannerAndEvents
+										checkFetchChannel={permissions?.checkFetchChannel}
+										checkHasChannel={permissions?.checkHasChannel}
+										banner={currentClanBanner}
+									/>
 								</div>
 							);
 						} else if (item.channels) {
@@ -489,59 +494,40 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									})}
 								>
 									{isFirstCategory && (
-										<>
-											{!permissions?.checkHasChannel && permissions?.checkFetchChannel && (
-												<div className="bottom-5 flex-col flex rounded-lg p-3 mb-2 gap-2 bg-theme-surface w-250 ml-2">
-													<div className="flex gap-1 text-sm items-center font-semibold">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="-5 -10 110 135"
-															className={`h-6 w-6 max-lg:h-5 max-lg:w-5 max-md:h-5 max-md:w-5 text-white `}
-															fill="currentColor"
-														>
-															<path d="m50 94.488c-30.781-.488-28.59-41.488-28.59-41.488V32a4.86 4.86 0 0 1 9.71 0v21h2.12V14.67a4.86 4.86 0 0 1 9.71 0v36h2.16V10.35a4.85 4.85 0 0 1 9.7 0v40.32h2V15.75a5 5 0 0 1 10 0v45.38l2 .46V46a4.86 4.86 0 0 1 9.71 0v15.59s2.22 33.41-28.52 32.898Z" />
-														</svg>
-														{tWelcome('welcome.welcomeToClan')}
-													</div>
-													<div className="text-xs text-theme-primary"> {tWelcome('welcome.emptyChannel')}</div>
-												</div>
-											)}
-
-											<div
-												className={`absolute ${permissions.hasChannelManagePermission && item.id !== FAVORITE_CATEGORY_ID ? 'right-7' : 'right-1'} z-10 transition-opacity ${
-													isDragModeEnabled ? 'opacity-100' : 'opacity-0 group-hover/category:opacity-100'
+										<div
+											className={`absolute ${permissions.hasChannelManagePermission && item.id !== FAVORITE_CATEGORY_ID ? 'right-7' : 'right-1'} z-10 transition-opacity ${
+												isDragModeEnabled ? 'opacity-100' : 'opacity-0 group-hover/category:opacity-100'
+											}`}
+										>
+											<button
+												onClick={() => setIsDragModeEnabled(!isDragModeEnabled)}
+												className={`flex items-center justify-center w-5 h-5 rounded-md transition-all ${
+													isDragModeEnabled
+														? 'text-green-500 bg-green-500/10 hover:bg-green-500/20'
+														: 'text-[var(--text-theme-primary)] hover:bg-black/5 dark:hover:bg-white/5'
 												}`}
+												title={isDragModeEnabled ? t('dragMode.disable') : t('dragMode.enable')}
+												data-e2e={generateE2eId('clan_page.channel_list.button.drag_channel')}
 											>
-												<button
-													onClick={() => setIsDragModeEnabled(!isDragModeEnabled)}
-													className={`flex items-center justify-center w-5 h-5 rounded-md transition-all ${
-														isDragModeEnabled
-															? 'text-green-500 bg-green-500/10 hover:bg-green-500/20'
-															: 'text-[var(--text-theme-primary)] hover:bg-black/5 dark:hover:bg-white/5'
-													}`}
-													title={isDragModeEnabled ? t('dragMode.disable') : t('dragMode.enable')}
-													data-e2e={generateE2eId('clan_page.channel_list.button.drag_channel')}
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													className="w-4 h-4"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
 												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														className="w-4 h-4"
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														strokeWidth="2"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													>
-														<path d="M12 2v20" />
-														<path d="m15 19-3 3-3-3" />
-														<path d="m19 9 3 3-3 3" />
-														<path d="M2 12h20" />
-														<path d="m5 9-3 3 3 3" />
-														<path d="m9 5 3-3 3 3" />
-													</svg>
-												</button>
-											</div>
-										</>
+													<path d="M12 2v20" />
+													<path d="m15 19-3 3-3-3" />
+													<path d="m19 9 3 3-3 3" />
+													<path d="M2 12h20" />
+													<path d="m5 9-3 3 3 3" />
+													<path d="m9 5 3-3 3 3" />
+												</svg>
+											</button>
+										</div>
 									)}
 									<CategorizedItem key={item.id} category={item} />
 								</div>
