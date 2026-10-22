@@ -183,5 +183,22 @@
 		"holdSpace": "Mantén Espacio para hablar",
 		"holdingSpace": "Hablando — suelta Espacio para silenciar",
 		"hintBody": "Te uniste para escuchar. Mantén Espacio para abrir tu micrófono mientras hablas; suéltalo para volver a silenciar."
+	},
+	"screenDraw": {
+		"annotateScreen": "Dibujar en tu pantalla compartida",
+		"stopAnnotating": "Dejar de dibujar en tu pantalla",
+		"drawOnScreen": "Dibujar en la pantalla (solo tú lo ves)",
+		"stopDrawing": "Dejar de dibujar",
+		"closeDrawing": "Cerrar dibujo",
+		"selectAndMove": "Seleccionar y mover",
+		"pen": "Lápiz",
+		"text": "Texto",
+		"eraser": "Borrador",
+		"undo": "Deshacer",
+		"redo": "Rehacer",
+		"clear": "Borrar todos los dibujos",
+		"textPlaceholder": "Escribe una nota, Enter para colocarla",
+		"commit": "Colocar (Enter)",
+		"cancel": "Cancelar (Esc)"
 	}
 }

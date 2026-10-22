@@ -194,5 +194,22 @@
 		"you": "You",
 		"enlarge": "Enlarge {{name}}",
 		"restoreLayout": "Back to side-by-side view"
+	},
+	"screenDraw": {
+		"annotateScreen": "Draw on your shared screen",
+		"stopAnnotating": "Stop drawing on your screen",
+		"drawOnScreen": "Draw on screen (only you see it)",
+		"stopDrawing": "Stop drawing",
+		"closeDrawing": "Close drawing",
+		"selectAndMove": "Select and move",
+		"pen": "Pen",
+		"text": "Text",
+		"eraser": "Eraser",
+		"undo": "Undo",
+		"redo": "Redo",
+		"clear": "Clear all drawings",
+		"textPlaceholder": "Type a note, Enter to place",
+		"commit": "Place (Enter)",
+		"cancel": "Cancel (Esc)"
 	}
 }

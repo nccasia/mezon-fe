@@ -183,5 +183,22 @@
 		"holdSpace": "Houd Spatie ingedrukt om te praten",
 		"holdingSpace": "Je praat — laat Spatie los om te dempen",
 		"hintBody": "Je bent lid geworden om te luisteren. Houd Spatie ingedrukt om je microfoon te openen terwijl je praat, laat los om weer te dempen."
+	},
+	"screenDraw": {
+		"annotateScreen": "Tekenen op je gedeelde scherm",
+		"stopAnnotating": "Stoppen met tekenen op je scherm",
+		"drawOnScreen": "Tekenen op het scherm (alleen jij ziet het)",
+		"stopDrawing": "Stoppen met tekenen",
+		"closeDrawing": "Tekenen sluiten",
+		"selectAndMove": "Selecteren en verplaatsen",
+		"pen": "Pen",
+		"text": "Tekst",
+		"eraser": "Gum",
+		"undo": "Ongedaan maken",
+		"redo": "Opnieuw",
+		"clear": "Alle tekeningen wissen",
+		"textPlaceholder": "Typ een notitie, Enter om te plaatsen",
+		"commit": "Plaatsen (Enter)",
+		"cancel": "Annuleren (Esc)"
 	}
 }
