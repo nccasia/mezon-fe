@@ -902,7 +902,9 @@ export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptio
 	// presign gate does not recognise lets imgproxy cache a not-found for an
 	// upload that has not finished. Still https-only, as before.
 	const isProxyableCdn = sourceImageUrl.startsWith('https://') && isMezonCdnUrl(sourceImageUrl);
-	if (!isProxyableCdn && !sourceImageUrl?.startsWith('https://profile.mezon')) {
+	const profileImgUrl = process.env.NX_PROFILE_IMG_URL;
+	const isProfileImg = sourceImageUrl.startsWith('https://profile.mezon.') || (!!profileImgUrl && sourceImageUrl.startsWith(profileImgUrl));
+	if (!isProxyableCdn && !isProfileImg) {
 		return sourceImageUrl;
 	}
 	const { width, height, resizeType } = options;
