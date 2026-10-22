@@ -188,7 +188,7 @@ export const ClanRailUnreadFloatButton = memo(({ scrollContainerRef }: ClanRailU
 
 		const observer = new ResizeObserver(onLayoutChange);
 		observer.observe(container);
-		for (const child of container.children) {
+		for (const child of Array.from(container.children)) {
 			if (child instanceof HTMLElement) observer.observe(child);
 		}
 
