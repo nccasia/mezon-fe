@@ -1,4 +1,4 @@
-import { selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
+import { selectAllChannels, selectAllChannelSuggestion, selectCategoryEntityStateByClanId, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js';
@@ -32,10 +32,15 @@ const SystemMessagesManagement = ({
 	const { t } = useTranslation('clanSettings');
 	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
-
+	const allChannelAdmin = useAppSelector(selectAllChannelSuggestion);
+	const selectCategoryEntites = useAppSelector((state) => selectCategoryEntityStateByClanId(state, currentClanId || '')).entities;
 	const selectedChannel = useMemo(() => {
+		if (channelsList.length === 0) {
+			return allChannelAdmin.find((channel) => channel.id === channelSelectedId);
+		}
+
 		return channelsList.find((channel) => channel.id === channelSelectedId);
-	}, [channelsList, channelSelectedId]);
+	}, [channelsList, channelSelectedId, allChannelAdmin]);
 
 	const renderChannelIcon = (channel?: { age_restricted?: number; channel_private?: number }) => {
 		if (channel?.age_restricted === 1) {
@@ -69,25 +74,27 @@ const SystemMessagesManagement = ({
 	};
 	const menu = useMemo(() => {
 		const menuItems: ReactElement[] = [];
-		channelsList
-			.filter((channel) => channel.clan_id === currentClanId && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL)
+		allChannelAdmin
+			.filter((channel) => channel.clan_id === currentClanId && channel.channel_type === ChannelType.CHANNEL_TYPE_CHANNEL)
 			.map((channel) => {
 				if (channel.id !== selectedChannel?.id) {
 					menuItems.push(
 						<Menu.Item
 							key={channel.id}
-							className="flex flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer bg-item-hover transition-colors"
+							className="flex justify-between flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer bg-item-hover transition-colors"
 							onClick={() => handleToggleSetting(true, ETypeUpdateSystemMessage.CHANNEL, channel.id)}
 						>
-							{renderChannelIcon(channel)}
-							<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.item.channel_name')}>
-								{channel.channel_label ?? ''}
-							</p>
+							<div className={' flex flex-row items-center gap-2'}>
+								{renderChannelIcon(channel)}
+								<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.item.channel_name')}>
+									{channel.channel_label ?? ''}
+								</p>
+							</div>
 							<p
 								data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.item.category_name')}
 								className="uppercase ml-5 font-semibold"
 							>
-								{channel.category_name}
+								{selectCategoryEntites?.[channel.category_id || '']?.category_name}
 							</p>
 						</Menu.Item>
 					);
@@ -100,19 +107,21 @@ const SystemMessagesManagement = ({
 			<h3 className="text-sm font-bold uppercase mb-2">{t('systemMessages.title')}</h3>
 			<Menu menu={menu} className={'h-fit max-h-[200px] text-xs overflow-y-auto customSmallScrollLightMode '}>
 				<div
-					className="w-full cursor-pointer  h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm border border-theme-primary "
+					className="w-full cursor-pointer  h-10 rounded-md flex flex-row p-3 justify-between items-center text-sm border border-theme-primary "
 					data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel')}
 				>
-					<div className={' flex flex-row items-center'}>
-						{renderChannelIcon(selectedChannel)}
-						<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.selected.channel_name')}>
-							{selectedChannel?.channel_label}
-						</p>
+					<div className={' flex flex-row items-center justify-between'}>
+						<div className={' flex flex-row items-center gap-2'}>
+							{renderChannelIcon(selectedChannel)}
+							<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.selected.channel_name')}>
+								{selectedChannel?.channel_label}
+							</p>
+						</div>
 						<p
-							className={'uppercase ml-5 font-semibold'}
+							className={'ml-5 font-semibold'}
 							data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.selected.category_name')}
 						>
-							{selectedChannel?.category_name}
+							{selectCategoryEntites?.[selectedChannel?.id || '']?.category_name}
 						</p>
 					</div>
 					<div>

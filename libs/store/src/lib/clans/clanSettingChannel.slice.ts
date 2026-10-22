@@ -13,6 +13,10 @@ import type { RootState } from '../store';
 
 export const SETTING_CLAN_CHANNEL = 'settingClanChannel';
 
+export interface ApiChannelSettingItemEntity extends ApiChannelSettingItem {
+	clan_id: string;
+}
+
 interface CachedChannelSettingData {
 	channel_setting_list: ApiChannelSettingItem[];
 	channel_count: number;
@@ -20,7 +24,7 @@ interface CachedChannelSettingData {
 	metadata?: CacheMetadata;
 }
 
-export interface SettingClanChannelState extends EntityState<ApiChannelSettingItem, string> {
+export interface SettingClanChannelState extends EntityState<ApiChannelSettingItemEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	channelCount: number;
@@ -32,10 +36,13 @@ export interface SettingClanChannelState extends EntityState<ApiChannelSettingIt
 }
 
 export const channelSettingAdapter = createEntityAdapter({
-	selectId: (channel: ApiChannelSettingItem) => channel.id || ''
+	selectId: (channel: ApiChannelSettingItemEntity) => channel.id || ''
 });
-const cleanUndefinedFields = (item: ApiChannelSettingItem): ApiChannelSettingItem => {
-	return Object.fromEntries(Object.entries(item).filter(([_, value]) => value !== undefined)) as ApiChannelSettingItem;
+const cleanUndefinedFields = (item: ApiChannelSettingItem, clan_id: string): ApiChannelSettingItemEntity => {
+	return {
+		...Object.fromEntries(Object.entries(item).filter(([_, value]) => value !== undefined)),
+		clan_id
+	} as ApiChannelSettingItemEntity;
 };
 
 export const initialSettingClanChannelState: SettingClanChannelState = channelSettingAdapter.getInitialState({
@@ -296,7 +303,7 @@ const applyChannelSettingFulfilled = (
 	if (!response) return;
 
 	state.loadingStatus = 'loaded';
-	const cleanedList = (response.channel_setting_list || []).map(cleanUndefinedFields);
+	const cleanedList = (response.channel_setting_list || []).map((item) => cleanUndefinedFields(item, response.clan_id || ''));
 
 	switch (typeFetch) {
 		case ETypeFetchChannelSetting.FETCH_CHANNEL:
@@ -312,7 +319,7 @@ const applyChannelSettingFulfilled = (
 			state.listSearchChannel = response.channel_setting_list || [];
 			break;
 		default:
-			channelSettingAdapter.setAll(state, response.channel_setting_list || []);
+			channelSettingAdapter.setAll(state, cleanedList || []);
 	}
 	state.channelCount = response.channel_count || 0;
 	state.threadCount = response.thread_count || 0;
