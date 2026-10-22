@@ -12,7 +12,8 @@
 		"friendRequests": "Yêu cầu kết bạn",
 		"QRScan": "Quét mã QR",
 		"MyQRCode": "Mã QR của tôi",
-		"devices": "Thiết bị"
+		"devices": "Thiết bị",
+		"chat": "Tin nhắn"
 	},
 	"deviceSettings": {
 		"description1": "Đây là tất cả các thiết bị đang đăng nhập vào tài khoản của bạn. Bạn có thể đăng xuất từng thiết bị.",
@@ -150,5 +151,9 @@
 		"recentChannels": "Kênh gần đây",
 		"searchByChannelLabel": "Tìm kiếm theo nhãn kênh"
 	},
-	"setting": "Cài đặt"
+	"setting": "Cài đặt",
+	"chat": {
+		"title": "Hiển thị bắt lỗi văn bản",
+		"description": "Tự động phát hiện và gợi ý sửa các lỗi chính tả trong tin nhắn, giúp bạn viết chính xác và dễ hiểu hơn."
+	}
 }

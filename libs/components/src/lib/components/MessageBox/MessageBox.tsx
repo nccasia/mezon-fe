@@ -1,5 +1,5 @@
 import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectDataReferences, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectCloseMenu, selectDataReferences, selectIsSpelling, selectStatusMenu, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { ILongPressType, IMessageSendPayload, MentionDataProps, ThreadValue } from '@mezon/utils';
 import {
@@ -15,6 +15,7 @@ import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mez
 import type { ReactElement } from 'react';
 import { Fragment, memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
+import Spelling from '../Spelling';
 import AttachmentPreviewThumbnail from './AttachmentPreviewThumbnail';
 import AudioRecorderControl from './AudioRecorder/AudioRecorderControl';
 import FileSelectionButton from './FileSelectionButton';
@@ -45,6 +46,7 @@ export type MessageBoxProps = {
 const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const dispatch = useAppDispatch();
 	const { currentChannelId, currentClanId } = props;
+	const isCheckSpelling = useSelector(selectIsSpelling);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 	const hasReplyMessage = useSelector((state) => {
@@ -140,6 +142,8 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 
 			<PreviewOgp />
 			<AudioRecorderControl outerRecording={isRecording} onSendRecord={handleEndRecording} />
+			{isCheckSpelling && <Spelling channelId={currentChannelId || ''} />}
+
 			<div
 				className={`flex flex-inline items-start gap-2 box-content max-sm:mb-0
 			bg-theme-surface rounded-lg relative shadow-md border-theme-primary ${checkAttachment || hasReplyMessage ? 'rounded-t-none' : 'rounded-t-lg'}

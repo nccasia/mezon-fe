@@ -113,6 +113,7 @@ export interface AppState {
 	hardwareAcceleration: boolean;
 	isMediaChannelViewMode: boolean;
 	autoHidden: boolean;
+	isSpelling: boolean;
 }
 
 const getInitialLanguage = (): 'en' | 'vi' => {
@@ -162,7 +163,8 @@ export const initialAppState: AppState = {
 	isMediaChannelViewMode: false,
 	autoStart: false,
 	hardwareAcceleration: true,
-	autoHidden: false
+	autoHidden: false,
+	isSpelling: false
 };
 
 export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI) => {
@@ -347,6 +349,7 @@ export const appSlice = createSlice({
 		setStatusMenu: (state, action) => {
 			state.statusMenu = action.payload;
 		},
+
 		setHiddenBottomTabMobile: (state, action) => {
 			state.hiddenBottomTabMobile = action.payload;
 		},
@@ -419,6 +422,9 @@ export const appSlice = createSlice({
 		},
 		toggleAutoHidden: (state) => {
 			state.autoHidden = state.autoHidden === undefined ? true : !state.autoHidden;
+		},
+		toggleIsSpelling: (state) => {
+			state.isSpelling = !state.isSpelling;
 		}
 	}
 });
@@ -481,3 +487,4 @@ export const selectHardwareAcceleration = createSelector(getAppState, (state: Ap
 export const selectMediaChannelViewMode = createSelector(getAppState, (state: AppState) => state.isMediaChannelViewMode);
 
 export const selectAutoHidden = createSelector(getAppState, (state: AppState) => state.autoHidden);
+export const selectIsSpelling = createSelector(getAppState, (state: AppState) => state.isSpelling);
