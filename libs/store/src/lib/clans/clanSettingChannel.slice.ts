@@ -289,7 +289,7 @@ const applyChannelSettingFulfilled = (
 			apiKey: string;
 			time: number;
 			channel_count?: number;
-			channel_setting_list?: Array<ApiChannelSettingItem>;
+			channel_setting_list?: Array<ApiChannelSettingItem & { clan_id?: string }>;
 			clan_id?: string;
 			thread_count?: number;
 		};
@@ -303,7 +303,7 @@ const applyChannelSettingFulfilled = (
 	if (!response) return;
 
 	state.loadingStatus = 'loaded';
-	const cleanedList = (response.channel_setting_list || []).map((item) => cleanUndefinedFields(item, response.clan_id || ''));
+	const cleanedList = (response.channel_setting_list || []).map((item) => cleanUndefinedFields(item, response.clan_id || item.clan_id || ''));
 
 	switch (typeFetch) {
 		case ETypeFetchChannelSetting.FETCH_CHANNEL:
