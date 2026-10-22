@@ -1,13 +1,13 @@
 import { uploadFileToPath } from '@mezon/transport';
 import type { ApiMessageAttachment, ApiSession, Client } from 'mezon-js';
 import { AttachmentTypeUpload, ETypesCDN } from '../types';
-import { isMezonCdnUrl, isTenorUrl } from './urlSanitization';
+import { isMezonMediaUrl, isTenorUrl } from './urlSanitization';
 import { wantsHlsTranscode } from './videoSource';
 
 export async function generatePathAttachments(client: Client, session: ApiSession, attachments: Array<ApiMessageAttachment>, channelId?: string) {
 	const result = await Promise.all(
 		attachments.map(async (attach) => {
-			const nonDirectAttachments = !isTenorUrl(attach.url) && !isMezonCdnUrl(attach.url);
+			const nonDirectAttachments = !isTenorUrl(attach.url) && !isMezonMediaUrl(attach.url);
 
 			if (!nonDirectAttachments) {
 				return attach;

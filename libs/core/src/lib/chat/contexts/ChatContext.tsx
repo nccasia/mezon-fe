@@ -70,7 +70,6 @@ import {
 	selectCurrentUserId,
 	selectDMVoiceEntities,
 	selectDataReferences,
-	selectDefaultChannelIdByClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectDmMetaEntities,
@@ -90,7 +89,6 @@ import {
 	selectThreadCurrentChannel,
 	selectUserCallId,
 	selectVoiceInfo,
-	selectWelcomeChannelByClanId,
 	socketState,
 	statusActions,
 	stickerSettingActions,
@@ -1139,14 +1137,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 							}
 						}
 
-						const defaultChannelId = selectDefaultChannelIdByClanId(store.getState() as unknown as RootState, clanId as string);
 						const clanChannels = selectChannelsByClanId(store.getState() as unknown as RootState, clanId as string);
-						const fallbackChannelId = clanChannels.find((ch) => !checkIsThread(ch))?.id;
+						const fallbackChannelId = clanChannels.find(
+							(ch) => !checkIsThread(ch) && ch.id !== user.channel_id && ch.type === ChannelType.CHANNEL_TYPE_CHANNEL
+						)?.id;
 
-						const redirectChannelId = defaultChannelId || fallbackChannelId;
-
-						if (redirectChannelId) {
-							navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`, true);
+						if (fallbackChannelId) {
+							navigate(`/chat/clans/${clanId}/channels/${fallbackChannelId}`, true);
 						} else {
 							navigate(`/chat/clans/${clanId}/member-safety`, true);
 						}
@@ -1890,14 +1887,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						return;
 					}
 
-					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
-					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
-					const fallbackChannelId = allChannels.find((ch) => ch.category_id !== categoryEvent.id && !checkIsThread(ch))?.id;
+					const fallbackChannelId = allChannels.find(
+						(ch) => ch.category_id !== categoryEvent.id && !checkIsThread(ch) && ch.type === ChannelType.CHANNEL_TYPE_CHANNEL
+					)?.id;
 
-					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
-
-					if (redirectChannelId) {
-						navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+					if (fallbackChannelId) {
+						navigate(`/chat/clans/${clanId}/channels/${fallbackChannelId}`);
 					} else {
 						navigate(`/chat/clans/${clanId}/member-safety`);
 					}
@@ -2010,15 +2005,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						return;
 					}
 
-					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
-					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
 					const allChannels = selectAllChannels(store.getState());
 					const fallbackChannelId = allChannels.find((ch) => ch.id !== channelDeleted.channel_id && !checkIsThread(ch))?.id;
 
-					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
-
-					if (redirectChannelId) {
-						navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+					if (fallbackChannelId) {
+						navigate(`/chat/clans/${clanId}/channels/${fallbackChannelId}`);
 					} else {
 						navigate(`/chat/clans/${clanId}/member-safety`);
 					}
@@ -2276,10 +2267,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			);
 
 			if (isArchiveAction && currentChannelId === channelId) {
-				const redirectChannelId = isThread ? parentId : selectWelcomeChannelByClanId(getStore().getState() as unknown as RootState, clanId);
+				const redirectChannelId = isThread ? parentId : '';
 
 				if (redirectChannelId) {
 					navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+				} else {
+					navigate(`/chat/direct/friends`);
 				}
 
 				if (userId && channelArchive.creator_id !== userId) {
