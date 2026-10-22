@@ -9,6 +9,7 @@ import {
 	selectIsUnreadChannelById,
 	selectIsUnreadThreadInChannel,
 	selectStreamMembersByChannelId,
+	selectStreamUnlistedViewerCount,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector
 } from '@mezon/store';
@@ -18,6 +19,7 @@ import AvatarGroup, { AvatarCount } from '../../Avatar/AvatarGroup';
 import type { ChannelLinkRef } from '../../ChannelLink';
 import { ChannelLink } from '../../ChannelLink';
 import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
+import { StreamViewerCount } from '../../StreamPlayer/StreamPublisher';
 import UserListItem from '../../UserListVoiceChannel/UserListItemVoiceChannel';
 import type { IChannelLinkPermission } from '../CategorizedChannels';
 
@@ -127,19 +129,20 @@ interface ICollapsedMemberListProps {
 const CollapsedMemberList = ({ channelId, clanId, channelType }: ICollapsedMemberListProps) => {
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channelId, clanId));
 	const streamChannelMembers = useAppSelector((state) => selectStreamMembersByChannelId(state, channelId));
+	const unlistedViewers = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
 	const channelMemberList = useMemo(() => {
 		if (channelType === ChannelType.CHANNEL_TYPE_MEZON_VOICE || channelType === ChannelType.CHANNEL_TYPE_APP) return voiceChannelMembers;
 		if (channelType === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
 		return [];
 	}, [channelType, voiceChannelMembers, streamChannelMembers]);
+	const hiddenMembers = Math.max(0, channelMemberList.length - 5) + unlistedViewers;
 	return (
 		<AvatarGroup className={'px-6'}>
 			{[...channelMemberList].slice(0, 5).map((user, index) => (
 				<AvatarUserShort id={user.user_id || ''} key={(user.user_id || '') + index} />
 			))}
-			{channelMemberList && channelMemberList.length > 5 && (
-				<AvatarCount number={channelMemberList?.length - 5 > 99 ? 99 : channelMemberList?.length - 5} />
-			)}
+			{hiddenMembers > 0 && <AvatarCount number={Math.min(hiddenMembers, 99)} />}
+			{channelType === ChannelType.CHANNEL_TYPE_STREAMING && <StreamViewerCount channelId={channelId} className="ml-auto text-theme-primary" />}
 		</AvatarGroup>
 	);
 };
@@ -153,6 +156,8 @@ type UserListVoiceChannelProps = {
 function UserListVoiceChannel({ channelId, channelType, clanId }: UserListVoiceChannelProps) {
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channelId, clanId));
 	const streamChannelMembers = useAppSelector((state) => selectStreamMembersByChannelId(state, channelId));
+	const unlistedViewers = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
+	const isStream = channelType === ChannelType.CHANNEL_TYPE_STREAMING;
 	const channelMemberList = useMemo(() => {
 		if (channelType === ChannelType.CHANNEL_TYPE_MEZON_VOICE || channelType === ChannelType.CHANNEL_TYPE_APP) return voiceChannelMembers;
 		if (channelType === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
@@ -163,16 +168,24 @@ function UserListVoiceChannel({ channelId, channelType, clanId }: UserListVoiceC
 		return null;
 	}
 
-	return channelMemberList?.map((user) => {
-		if (user.user_id === process.env.NX_VOICE_AGENT_ID) {
-			return null;
-		}
-		return (
-			<div key={user.user_id} className={'mt-[1px]'}>
-				<UserListItem id={user.user_id} user_name={user.user_name} user_avatar={user.user_avatar} />
-			</div>
-		);
-	});
+	return (
+		<>
+			{channelMemberList.map((user, index) => {
+				if (user.user_id === process.env.NX_VOICE_AGENT_ID) {
+					return null;
+				}
+				const isPublisher = isStream && index === 0;
+				return (
+					<div key={isPublisher ? `publisher:${user.user_id}` : user.user_id} className={'mt-[1px]'}>
+						<UserListItem id={user.user_id} user_name={user.user_name} user_avatar={user.user_avatar}>
+							{isPublisher && <StreamViewerCount channelId={channelId} className="text-theme-primary" />}
+						</UserListItem>
+					</div>
+				);
+			})}
+			{unlistedViewers > 0 && <div className="ml-[18px] mt-[1px] w-[90%] p-1 pl-8 text-sm text-theme-primary">+{unlistedViewers}</div>}
+		</>
+	);
 }
 
 export default memo(ChannelLinkContent);
