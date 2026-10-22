@@ -1,6 +1,6 @@
 import { FRIEND_PAGE_LINK, toMembersPage, useAppNavigation } from '@mezon/core';
 
-import { selectCurrentClan, toastActions } from '@mezon/store';
+import { selectAllChannels, selectCurrentClan, toastActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +43,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	const { onClose, isError = false, errMessage, idErr } = props;
 	const { navigate } = useAppNavigation();
 	const currentClan = useSelector(selectCurrentClan);
+	const allChannel = useSelector(selectAllChannels);
 	const currentClanId = currentClan?.id;
 
 	const errorConfig = getErrorConfig(errMessage);
@@ -68,13 +69,17 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	};
 
 	const onCloseAndReset = () => {
-		if (!currentClanId) {
-			return;
-		}
 		if (isError) {
 			removeToastError();
 		}
 		onClose?.();
+		if (!currentClanId || currentClanId === '0') {
+			navigate(FRIEND_PAGE_LINK);
+			return;
+		}
+		if (!allChannel.length) {
+			navigate(toMembersPage(currentClanId));
+		}
 	};
 
 	if (errorConfig.type === 'connection') return null;
