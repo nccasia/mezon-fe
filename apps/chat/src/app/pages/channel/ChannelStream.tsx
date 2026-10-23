@@ -8,7 +8,6 @@ import {
 	selectIsJoin,
 	selectStatusStream,
 	selectStreamMembersByChannelId,
-	selectStreamUnlistedViewerCount,
 	toastActions,
 	useAppDispatch,
 	useAppSelector,
@@ -33,7 +32,6 @@ export default function ChannelStream({ currentStreamInfo, currentChannel }: Cha
 	const channelId = currentChannel?.channel_id || '0';
 	const publisher = useStreamPublisher(channelId);
 	const listedViewers = useAppSelector((state) => Math.max(0, selectStreamMembersByChannelId(state, channelId).length - 1));
-	const unlistedViewers = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
 	const [showMembers, setShowMembers] = useState(true);
 	const streamPlay = useSelector(selectStatusStream);
 	const isJoin = useSelector(selectIsJoin);
@@ -109,7 +107,7 @@ export default function ChannelStream({ currentStreamInfo, currentChannel }: Cha
 				<div className="min-h-0 flex-1">
 					<StreamStage channelId={channelId} poster={streamPoster} onLeave={handleLeaveChannel} />
 				</div>
-				{(listedViewers > 0 || unlistedViewers > 0) && (
+				{listedViewers > 0 && (
 					<div className="flex shrink-0 flex-col items-center gap-2 pt-2">
 						<button
 							type="button"
