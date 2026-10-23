@@ -9,7 +9,6 @@ import {
 	selectIsUnreadChannelById,
 	selectIsUnreadThreadInChannel,
 	selectStreamMembersByChannelId,
-	selectStreamUnlistedViewerCount,
 	selectVoiceChannelMembersByChannelId,
 	useAppSelector
 } from '@mezon/store';
@@ -129,13 +128,12 @@ interface ICollapsedMemberListProps {
 const CollapsedMemberList = ({ channelId, clanId, channelType }: ICollapsedMemberListProps) => {
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channelId, clanId));
 	const streamChannelMembers = useAppSelector((state) => selectStreamMembersByChannelId(state, channelId));
-	const unlistedViewers = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
 	const channelMemberList = useMemo(() => {
 		if (channelType === ChannelType.CHANNEL_TYPE_MEZON_VOICE || channelType === ChannelType.CHANNEL_TYPE_APP) return voiceChannelMembers;
 		if (channelType === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
 		return [];
 	}, [channelType, voiceChannelMembers, streamChannelMembers]);
-	const hiddenMembers = Math.max(0, channelMemberList.length - 5) + unlistedViewers;
+	const hiddenMembers = Math.max(0, channelMemberList.length - 5);
 	return (
 		<AvatarGroup className={'px-6'}>
 			{[...channelMemberList].slice(0, 5).map((user, index) => (
@@ -156,7 +154,6 @@ type UserListVoiceChannelProps = {
 function UserListVoiceChannel({ channelId, channelType, clanId }: UserListVoiceChannelProps) {
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channelId, clanId));
 	const streamChannelMembers = useAppSelector((state) => selectStreamMembersByChannelId(state, channelId));
-	const unlistedViewers = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
 	const isStream = channelType === ChannelType.CHANNEL_TYPE_STREAMING;
 	const channelMemberList = useMemo(() => {
 		if (channelType === ChannelType.CHANNEL_TYPE_MEZON_VOICE || channelType === ChannelType.CHANNEL_TYPE_APP) return voiceChannelMembers;
@@ -183,7 +180,6 @@ function UserListVoiceChannel({ channelId, channelType, clanId }: UserListVoiceC
 					</div>
 				);
 			})}
-			{unlistedViewers > 0 && <div className="ml-[18px] mt-[1px] w-[90%] p-1 pl-8 text-sm text-theme-primary">+{unlistedViewers}</div>}
 		</>
 	);
 }

@@ -4,7 +4,6 @@ import {
 	USERS_STREAM_FEATURE_KEY,
 	fetchStreamChannelMembers,
 	selectStreamMembersByChannelId,
-	selectStreamUnlistedViewerCount,
 	selectStreamViewerCount,
 	usersStreamActions,
 	usersStreamReducer
@@ -45,25 +44,27 @@ beforeEach(() => {
 });
 
 describe('fetchStreamChannelMembers', () => {
-	it("replaces the clan's publishers and resets the viewer count of streams that ended", async () => {
+	it("replaces the clan's members and counts the listed viewers", async () => {
 		const store = createStore();
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-1', 'u1')));
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-2', 'u2')));
 		store.dispatch(usersStreamActions.add(publisher('clan-b', 'ch-3', 'u3')));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-1', count: 4 }));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-2', count: 7 }));
+		store.dispatch(usersStreamActions.add(viewer('clan-a', 'ch-2', 'v2')));
 		mockFetchDataWithSocketFallback.mockResolvedValueOnce({
 			streaming_channel_users: [
-				{ id: 'row-u1', user_id: 'u1', channel_id: 'ch-1' },
-				{ id: 'row-u4', user_id: 'u4', channel_id: 'ch-4' }
+				{ id: 'row-u1', user_id: 'u1', channel_id: 'ch-1', is_publisher: true },
+				{ id: '0', user_id: 'v1', channel_id: 'ch-1' },
+				{ id: '0', user_id: 'v3', channel_id: 'ch-1' },
+				{ id: 'row-u4', user_id: 'u4', channel_id: 'ch-4', is_publisher: true }
 			]
 		});
 
 		await store.dispatch(refetch('clan-a'));
 
-		expect(store.getState()[USERS_STREAM_FEATURE_KEY].ids).toEqual(['u1:ch-1', 'u3:ch-3', 'u4:ch-4']);
-		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(4);
+		expect(store.getState()[USERS_STREAM_FEATURE_KEY].ids).toEqual(['u1:ch-1', 'u3:ch-3', 'v1:ch-1', 'v3:ch-1', 'u4:ch-4']);
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(2);
 		expect(selectStreamViewerCount(store.getState(), 'ch-2')).toBe(0);
+		expect(selectStreamViewerCount(store.getState(), 'ch-4')).toBe(0);
 	});
 
 	it('removes every publisher of the clan when the list comes back empty', async () => {
@@ -131,7 +132,6 @@ describe('fetchStreamChannelMembers', () => {
 	it('takes is_publisher and the participant name from the list and keeps a known avatar', async () => {
 		const store = createStore();
 		store.dispatch(usersStreamActions.add({ ...viewer('clan-a', 'ch-1', 'v1'), user_avatar: 'https://avatar/v1' }));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-1', count: 3 }));
 		mockFetchDataWithSocketFallback.mockResolvedValueOnce({
 			streaming_channel_users: [
 				{ id: 'row-u1', user_id: 'u1', channel_id: 'ch-1', is_publisher: true },
@@ -152,23 +152,22 @@ describe('fetchStreamChannelMembers', () => {
 			{ user_id: 'u1', is_publisher: true, user_name: '', user_avatar: '' },
 			{ user_id: 'v1', is_publisher: undefined, user_name: 'Viewer One', user_avatar: 'https://avatar/v1' }
 		]);
-		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(3);
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(1);
 	});
 });
 
 describe('stream members', () => {
-	it('keeps the stream and its count when a viewer leaves', () => {
+	it('counts viewers as they join and leave and keeps the stream when a viewer leaves', () => {
 		const store = createStore();
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-1', 'u1')));
 		store.dispatch(usersStreamActions.add(viewer('clan-a', 'ch-1', 'v1')));
 		store.dispatch(usersStreamActions.add(viewer('clan-a', 'ch-1', 'v2')));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-1', count: 5 }));
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(2);
 
 		store.dispatch(usersStreamActions.leave({ userId: 'v1', channelId: 'ch-1', clanId: 'clan-a' }));
 
 		expect(selectStreamMembersByChannelId(store.getState(), 'ch-1').map((member) => member.user_id)).toEqual(['u1', 'v2']);
-		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(5);
-		expect(selectStreamUnlistedViewerCount(store.getState(), 'ch-1')).toBe(4);
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(1);
 	});
 
 	it('ends the stream when the publisher leaves', () => {
@@ -176,7 +175,7 @@ describe('stream members', () => {
 		store.dispatch(usersStreamActions.add(viewer('clan-a', 'ch-1', 'v1')));
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-1', 'u1')));
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-2', 'u2')));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-1', count: 5 }));
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(1);
 
 		store.dispatch(usersStreamActions.leave({ userId: 'u1', channelId: 'ch-1', clanId: 'clan-a' }));
 
@@ -199,13 +198,12 @@ describe('stream members', () => {
 		store.dispatch(usersStreamActions.add(viewer('clan-a', 'ch-1', 'v1')));
 		store.dispatch(usersStreamActions.add(publisher('clan-a', 'ch-1', 'u1')));
 		store.dispatch(usersStreamActions.add({ ...viewer('clan-a', 'ch-1', 'u1'), user_name: 'stale' }));
-		store.dispatch(usersStreamActions.setViewerCount({ channelId: 'ch-1', count: 1 }));
 
 		const members = selectStreamMembersByChannelId(store.getState(), 'ch-1');
 		expect(members.map((member) => [member.user_id, member.is_publisher, member.user_name])).toEqual([
 			['u1', true, ''],
 			['v1', false, '']
 		]);
-		expect(selectStreamUnlistedViewerCount(store.getState(), 'ch-1')).toBe(0);
+		expect(selectStreamViewerCount(store.getState(), 'ch-1')).toBe(1);
 	});
 });

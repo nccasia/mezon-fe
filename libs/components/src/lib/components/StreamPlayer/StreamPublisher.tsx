@@ -1,10 +1,4 @@
-import {
-	selectMemberClanByUserId,
-	selectStreamMembersByChannelId,
-	selectStreamUnlistedViewerCount,
-	selectStreamViewerCount,
-	useAppSelector
-} from '@mezon/store';
+import { selectMemberClanByUserId, selectStreamMembersByChannelId, selectStreamViewerCount, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
@@ -53,10 +47,9 @@ export function StreamLiveBadge() {
 
 export function StreamViewers({ channelId }: { channelId: string }) {
 	const members = useAppSelector((state) => selectStreamMembersByChannelId(state, channelId));
-	const unlisted = useAppSelector((state) => selectStreamUnlistedViewerCount(state, channelId));
 	const viewers = useMemo(() => members.slice(1), [members]);
-	if (!viewers.length && !unlisted) return null;
-	return <VoiceChannelUsers voiceChannelMembers={viewers} total={viewers.length + unlisted} />;
+	if (!viewers.length) return null;
+	return <VoiceChannelUsers voiceChannelMembers={viewers} total={viewers.length} />;
 }
 
 export function StreamViewerCount({ channelId, className = '' }: { channelId: string; className?: string }) {

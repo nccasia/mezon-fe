@@ -31,7 +31,6 @@ export interface UsersStreamState extends EntityState<UsersStreamEntity, string>
 	error?: string | null;
 	streamChannelMember: IChannelMember[];
 	cacheByClans: Record<string, CacheMetadata>;
-	viewerCountByChannel: Record<string, number>;
 	presenceRevisionByClan: Record<string, number>;
 }
 
@@ -151,7 +150,6 @@ export const initialUsersStreamState: UsersStreamState = userStreamAdapter.getIn
 	error: null,
 	streamChannelMember: [],
 	cacheByClans: {},
-	viewerCountByChannel: {},
 	presenceRevisionByClan: {}
 });
 
@@ -174,14 +172,10 @@ export const usersStreamSlice = createSlice({
 					state,
 					members.map((member) => streamMemberEntityId(member.user_id, member.streaming_channel_id))
 				);
-				state.viewerCountByChannel[channelId] = 0;
 			} else {
 				userStreamAdapter.removeOne(state, streamMemberEntityId(userId, channelId));
 			}
 			state.presenceRevisionByClan[clanId] = (state.presenceRevisionByClan[clanId] ?? 0) + 1;
-		},
-		setViewerCount: (state, action: PayloadAction<{ channelId: string; count: number }>) => {
-			state.viewerCountByChannel[action.payload.channelId] = action.payload.count;
 		}
 		// ...
 	},
@@ -215,12 +209,7 @@ export const usersStreamSlice = createSlice({
 				});
 				if (presenceRevision === (state.presenceRevisionByClan[clanId] ?? 0)) {
 					const liveIds = new Set(members.map((member) => streamMemberEntityId(member.user_id, member.streaming_channel_id)));
-					const liveChannels = new Set(members.map((member) => member.streaming_channel_id));
 					const staleIds = state.ids.filter((id) => state.entities[id].clan_id === clanId && !liveIds.has(id));
-					for (const id of staleIds) {
-						const channelId = state.entities[id].streaming_channel_id;
-						if (!liveChannels.has(channelId)) state.viewerCountByChannel[channelId] = 0;
-					}
 					userStreamAdapter.removeMany(state, staleIds);
 				}
 				userStreamAdapter.setMany(state, members);
@@ -292,11 +281,4 @@ export const selectStreamMembersByChannelId = createSelector([selectAllUsersStre
 	return publisher ? [publisher, ...listStreamChannelUser.filter((member) => member !== publisher)] : listStreamChannelUser;
 });
 
-export const selectStreamViewerCount = createSelector(
-	[getUsersStreamState, (_, channelId: string) => channelId],
-	(state, channelId) => state.viewerCountByChannel[channelId] ?? 0
-);
-
-export const selectStreamUnlistedViewerCount = createSelector([selectStreamMembersByChannelId, selectStreamViewerCount], (members, count) =>
-	Math.max(0, count - Math.max(0, members.length - 1))
-);
+export const selectStreamViewerCount = createSelector([selectStreamMembersByChannelId], (members) => Math.max(0, members.length - 1));
