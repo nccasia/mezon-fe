@@ -42,7 +42,7 @@ import { getDateLocale } from './dateI18n';
 import { getLinkType } from './embed-social';
 import { getPreSendSourceFile, getPreSendThumbnailBlob } from './file';
 import { Foreman } from './foreman';
-import { isMezonCdnUrl, isMezonMediaUrl, isTenorUrl } from './urlSanitization';
+import { isFromAllowedDomain, isMezonCdnUrl, isMezonMediaUrl, isTenorUrl } from './urlSanitization';
 export * from './animateScroll';
 export * from './audio';
 export * from './buildClassName';
@@ -903,7 +903,7 @@ export const createImgproxyUrl = (sourceImageUrl: string, options: ImgproxyOptio
 	// upload that has not finished. Still https-only, as before.
 	const isProxyableCdn = sourceImageUrl.startsWith('https://') && isMezonCdnUrl(sourceImageUrl);
 	const profileImgUrl = process.env.NX_PROFILE_IMG_URL;
-	const isProfileImg = sourceImageUrl.startsWith('https://profile.mezon.') || (!!profileImgUrl && sourceImageUrl.startsWith(profileImgUrl));
+	const isProfileImg = isFromAllowedDomain(sourceImageUrl, ['https://profile.mezon.ai', ...(profileImgUrl ? [profileImgUrl] : [])]);
 	if (!isProxyableCdn && !isProfileImg) {
 		return sourceImageUrl;
 	}
