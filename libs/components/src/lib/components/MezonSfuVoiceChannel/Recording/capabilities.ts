@@ -61,6 +61,11 @@ export function supportsDiskStreaming(): boolean {
 	return !!win && typeof win.showSaveFilePicker === 'function' && !!win.isSecureContext;
 }
 
+export function supportsOriginPrivateFileSystem(): boolean {
+	const win = getRecordingWindow();
+	return !!win?.isSecureContext && typeof navigator !== 'undefined' && typeof navigator.storage?.getDirectory === 'function';
+}
+
 export function detectRecorderCapabilities(): RecorderCapabilities {
 	if (typeof window === 'undefined' || typeof MediaRecorder === 'undefined') {
 		return { supported: false, pipeline: 'none', codec: null, streamingToDisk: false, reason: 'no-media-recorder' };
@@ -82,6 +87,6 @@ export function detectRecorderCapabilities(): RecorderCapabilities {
 		supported: true,
 		pipeline: workerPipeline ? 'worker' : 'canvas',
 		codec,
-		streamingToDisk: supportsDiskStreaming()
+		streamingToDisk: supportsDiskStreaming() || supportsOriginPrivateFileSystem()
 	};
 }
