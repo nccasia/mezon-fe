@@ -2,6 +2,7 @@
 import { captureSentryError } from '@mezon/logger';
 import type { ActivitiesEntity, AttachmentEntity, RootState, ThreadsEntity } from '@mezon/store';
 import {
+	BREAKOUT_UNOBSERVED_RECHECK_SECS,
 	DMCallActions,
 	EStateFriend,
 	accountActions,
@@ -41,14 +42,17 @@ import {
 	messagesActions,
 	notificationActions,
 	notificationSettingActions,
+	observeHostedRooms,
 	overriddenPoliciesActions,
 	permissionRoleChannelActions,
 	pinMessageActions,
+	planHostedBreakout,
 	policiesActions,
 	referencesActions,
 	resetRefreshState,
 	rolesClanActions,
 	selectAllChannels,
+	selectBreakoutPending,
 	selectCategoryById,
 	selectChannelById,
 	selectChannelByIdAndClanId,
@@ -61,6 +65,7 @@ import {
 	selectClansEntities,
 	selectClansLoadingStatus,
 	selectClickedOnTopicStatus,
+	selectClosingBreakoutIds,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -76,17 +81,20 @@ import {
 	selectEntitiesChannelsByUser,
 	selectEstablishedCall,
 	selectFriendById,
+	selectHostedBreakouts,
 	selectIsInCall,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
+	selectListVoiceMemberByClan,
 	selectLoadingStatus,
 	selectMessageByMessageId,
 	selectThreadCurrentChannel,
 	selectUserCallId,
 	selectVoiceInfo,
+	selectVoiceMembersLoadedByClan,
 	socketState,
 	statusActions,
 	stickerSettingActions,
@@ -105,6 +113,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
+import type { PatchedMezonClient, SfuBreakoutRoomEventPayload } from '@mezon/transport';
 import {
 	CHECK_HEALTHY_EVENT,
 	REALTIME_SERVER_CHANGED_EVENT,
@@ -209,6 +218,7 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import type { ScreenShareEvent } from 'node_modules/mezon-js-protobuf/dist/rtapi/realtime';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { Observable, Subject } from 'rxjs';
 import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -2882,6 +2892,134 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch]
 	);
 
+	const onsfubreakoutroomevent = useCallback(
+		(event: SfuBreakoutRoomEventPayload) => {
+			dispatch(voiceActions.receiveBreakoutRoomEvent(event));
+		},
+		[dispatch]
+	);
+
+	const hostedBreakouts = useSelector(selectHostedBreakouts);
+	const breakoutPending = useSelector(selectBreakoutPending);
+	const closingBreakoutIds = useSelector(selectClosingBreakoutIds);
+	const voiceMembersLoadedByClan = useSelector(selectVoiceMembersLoadedByClan);
+	const listVoiceMemberByClan = useSelector(selectListVoiceMemberByClan);
+	const hostedClanChannelsReady = useSelector((s: RootState) => {
+		const list = Object.values(s.voice?.hostedBreakouts ?? {});
+		if (list.length === 0) {
+			return '';
+		}
+		return list.map((h) => `${h.clanId}:${Boolean(s.channels?.byClans?.[h.clanId]?.fetchChannelSuccess)}`).join(',');
+	});
+	const [breakoutRecheckTick, setBreakoutRecheckTick] = React.useState(0);
+	const fetchedHostedClansRef = useRef<Map<string, number>>(new Map());
+
+	useEffect(() => {
+		fetchedHostedClansRef.current.clear();
+		dispatch(voiceActions.syncHostedBreakoutsOwner(userId || null));
+	}, [dispatch, userId]);
+
+	useEffect(() => {
+		const hostedList = Object.values(hostedBreakouts);
+		if (hostedList.length === 0 || breakoutPending) {
+			return;
+		}
+		const state = getStore().getState() as RootState;
+		const nowUnixSecs = Math.floor(Date.now() / 1000);
+		let earliestRecheckAt: number | null = null;
+
+		for (const hosted of hostedList) {
+			const clanId = hosted.clanId;
+			if (!clanId || clanId === '0' || hosted.roomIds.length === 0) {
+				continue;
+			}
+			const clanChannelsState = state.channels?.byClans?.[clanId];
+			const channelsLoaded = Boolean(clanChannelsState?.fetchChannelSuccess) && (clanChannelsState?.entities?.ids?.length ?? 0) > 0;
+			const voiceMembersLoaded = Boolean(voiceMembersLoadedByClan[clanId]);
+			const isClanReady = channelsLoaded && voiceMembersLoaded;
+
+			if (!isClanReady) {
+				const lastFetchAt = fetchedHostedClansRef.current.get(clanId) ?? 0;
+				if (nowUnixSecs - lastFetchAt >= BREAKOUT_UNOBSERVED_RECHECK_SECS) {
+					fetchedHostedClansRef.current.set(clanId, nowUnixSecs);
+					if (!channelsLoaded) {
+						void dispatch(channelsActions.fetchChannels({ clanId }));
+					}
+					if (!voiceMembersLoaded) {
+						void dispatch(
+							voiceActions.fetchVoiceChannelMembers({
+								clanId,
+								channelId: hosted.parentChannelId,
+								channelType: ChannelType.CHANNEL_TYPE_MEZON_VOICE
+							})
+						);
+					}
+				}
+				const unobservedRecheckAt = nowUnixSecs + BREAKOUT_UNOBSERVED_RECHECK_SECS;
+				earliestRecheckAt = earliestRecheckAt === null ? unobservedRecheckAt : Math.min(earliestRecheckAt, unobservedRecheckAt);
+			}
+
+			const membersByChannelId: Record<string, readonly string[]> = {};
+			const clanVoiceRooms = listVoiceMemberByClan[clanId];
+			if (clanVoiceRooms) {
+				for (const [channelId, roomState] of Object.entries(clanVoiceRooms)) {
+					membersByChannelId[channelId] = (roomState?.ids ?? []).map(String);
+				}
+			}
+
+			const observation = observeHostedRooms(hosted, isClanReady, membersByChannelId);
+			const { next, dirty, plan } = planHostedBreakout(hosted, observation, nowUnixSecs);
+
+			if (
+				dirty ||
+				next.emptySinceUnixSecs !== hosted.emptySinceUnixSecs ||
+				next.hadOccupants !== hosted.hadOccupants ||
+				next.pendingInvitees.length !== hosted.pendingInvitees.length
+			) {
+				dispatch(
+					voiceActions.updateHostedBreakoutState({
+						parentChannelId: hosted.parentChannelId,
+						hosted: next,
+						persist: dirty
+					})
+				);
+			}
+
+			if (plan.kind === 'Close') {
+				if (!closingBreakoutIds.includes(hosted.breakoutId)) {
+					void dispatch(
+						voiceActions.autoCloseHostedBreakout({
+							parentChannelId: hosted.parentChannelId,
+							breakoutId: hosted.breakoutId
+						})
+					);
+				}
+			} else if (plan.kind === 'RecheckAt') {
+				earliestRecheckAt = earliestRecheckAt === null ? plan.atUnixSecs : Math.min(earliestRecheckAt, plan.atUnixSecs);
+			}
+		}
+
+		if (earliestRecheckAt === null) {
+			return;
+		}
+		const delayMs = Math.max(1, earliestRecheckAt - nowUnixSecs) * 1000;
+		const timer = window.setTimeout(() => {
+			setBreakoutRecheckTick((tick) => tick + 1);
+		}, delayMs);
+		return () => {
+			window.clearTimeout(timer);
+		};
+	}, [
+		breakoutPending,
+		breakoutRecheckTick,
+		closingBreakoutIds,
+		dispatch,
+		hostedBreakouts,
+		hostedClanChannelsReady,
+		listVoiceMemberByClan,
+		voiceMembersLoadedByClan
+	]);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Client) => {
 			socket.onconnect = (_evt: Event) => {
@@ -3008,6 +3146,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onbanneduser = onbanneduser;
 
 			socket.onscreenshare = onscreenshare;
+
+			(socket as PatchedMezonClient).onsfubreakoutroomevent = onsfubreakoutroomevent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -3066,7 +3206,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			onbanneduser,
 			runPostReconnectActions,
 			onServerDisconnectStreakLogout,
-			onscreenshare
+			onscreenshare,
+			onsfubreakoutroomevent
 		]
 	);
 
@@ -3376,6 +3517,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onchannelarchive = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onscreenshare = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			(socket as PatchedMezonClient).onsfubreakoutroomevent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -3431,7 +3574,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		onUnpinMessageEvent,
 		onblockfriend,
 		onunblockfriend,
-		onscreenshare
+		onscreenshare,
+		onsfubreakoutroomevent
 	]);
 
 	const value = React.useMemo<ChatContextValue>(
