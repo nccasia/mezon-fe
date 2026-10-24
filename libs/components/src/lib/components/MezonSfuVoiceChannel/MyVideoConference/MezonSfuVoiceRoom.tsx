@@ -79,6 +79,7 @@ import {
 import { SfuMediaHealth, SfuNetworkQuality } from './sfuMediaHealth';
 import { SFU_DUPLICATE_SESSION_CLOSE_CODE, SfuMuteSync, sfuCloseAction, sfuReconnectDelay, withSfuTimeout } from './sfuReconnect';
 import { SFU_MEDIA_POOL_VERSION, SfuSlotAssignments } from './sfuSlotAssignments';
+import { isStillSpeaking, pickTileToSwapOut, speakerRecency } from './speakerSpotlight';
 
 const ICE_RECOVERY_GRACE_MS = 4000;
 const NETWORK_QUALITY_INTERVAL_MS = 5000;
@@ -216,6 +217,7 @@ const useParticipantsSpeakingMap = (localAudioTrack: MediaStreamTrack | undefine
 
 		const nodeMap = new Map<string, { source: MediaStreamAudioSourceNode; analyser: AnalyserNode }>();
 		const lastSpeakingMap = new Map<string, boolean>();
+		const lastLoudAtMap = new Map<string, number>();
 
 		const ctx = audioContext;
 		targetMap.forEach((item, id) => {
@@ -247,7 +249,10 @@ const useParticipantsSpeakingMap = (localAudioTrack: MediaStreamTrack | undefine
 						sumSquares += normalized * normalized;
 					}
 					const rms = Math.sqrt(sumSquares / timeDomainData.length);
-					isSpeaking = rms > 0.04;
+					if (rms > 0.04) {
+						lastLoudAtMap.set(id, now);
+					}
+					isSpeaking = isStillSpeaking(lastLoudAtMap.get(id), now);
 				}
 
 				const prevSpeaking = lastSpeakingMap.get(id);
@@ -2889,6 +2894,8 @@ export function MezonSfuVoiceRoom({
 	const isLocalAudioEnabled = joinRole === 'audience' ? pushToTalkActive : microphoneEnabled;
 	const outgoingLocalAudioTrack = getOutgoingAudioTrack(localAudioTrack) || undefined;
 	const speakingMap = useParticipantsSpeakingMap(outgoingLocalAudioTrack, isLocalAudioEnabled, participants);
+	const speakingMapRef = useRef(speakingMap);
+	speakingMapRef.current = speakingMap;
 	const localSpeaking = isLocalAudioEnabled ? (speakingMap.get('local')?.speaking ?? false) : false;
 	const conferenceTiles: Array<{ id: string; participantId: string; contextMenuUserId?: string; isScreen: boolean; content: ReactNode }> = [];
 	conferenceTiles.push({
@@ -3163,7 +3170,11 @@ export function MezonSfuVoiceRoom({
 		});
 		if (visibleThumbnails.some((thumbnail) => thumbnail.dataset.participantId === activeSpeakerId)) return;
 
-		const replacementTileId = visibleThumbnails[visibleThumbnails.length - 1]?.dataset.tileId;
+		const replacementTileId = pickTileToSwapOut(
+			visibleThumbnails.map((t) => t.dataset.tileId).filter((tileId): tileId is string => Boolean(tileId)),
+			(tileId) =>
+				speakerRecency(speakingMapRef.current.get(visibleThumbnails.find((t) => t.dataset.tileId === tileId)?.dataset.participantId || ''))
+		);
 		const activeIndex = focusTileOrderRef.current.indexOf(activeSpeakerTileId || '');
 		const replacementIndex = focusTileOrderRef.current.indexOf(replacementTileId || '');
 		if (activeIndex < 0 || replacementIndex < 0) return;
